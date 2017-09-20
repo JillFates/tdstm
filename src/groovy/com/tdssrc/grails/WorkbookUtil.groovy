@@ -72,14 +72,14 @@ class WorkbookUtil {
 	 * @param type
 	 * @return
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
 		CellStyle style = null
 
 		if (type != null) {
 			style = createCellStyle(sheet, type)
 		}
 
-		addCell(sheet, columnIdx, rowIdx, value, type, style)
+		return addCell(sheet, columnIdx, rowIdx, value, type, style)
 	}
 
 	/**
@@ -91,7 +91,7 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
 		Cell cell = getOrCreateCell(row, colIdx)
 
 		if(cellType) {
@@ -100,7 +100,8 @@ class WorkbookUtil {
 		if (cellStyle != null) {
 			cell.setCellStyle(cellStyle)
 		}
-		setCellValue(cell, value)
+
+		return setCellValue(cell, value)
 	}
 
 	/**
@@ -112,12 +113,12 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		CellStyle cellStyle = null
 		if(cellType){
 			cellStyle = getCellStyle(row.sheet, cellType, workbookCellStyles)
 		}
-		addCell(row, colIdx, value, cellType, cellStyle)
+		return addCell(row, colIdx, value, cellType, cellStyle)
 	}
 
 		/**
@@ -129,9 +130,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, columnIdx, value, cellType, cellStyle)
+		return addCell(row, columnIdx, value, cellType, cellStyle)
 	}
 
 	/**
@@ -143,9 +144,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, colIdx, value, cellType, workbookCellStyles)
+		return addCell(row, colIdx, value, cellType, workbookCellStyles)
 	}
 
 
@@ -171,12 +172,40 @@ class WorkbookUtil {
 	 * @param cell
 	 * @param value
 	 */
-	static void setCellValue(Cell cell, Object value) {
-		if (value instanceof Long || value instanceof Integer || value instanceof Double) {
-			cell.setCellValue((Double) value)
-		} else {
-			cell.setCellValue(value.toString())
+	static Cell setCellValue(Cell cell, Object value) {
+		switch (value) {
+			case Number :
+				cell.setCellValue((double) value)
+				break
+
+			default :
+				cell.setCellValue(value.toString())
 		}
+
+		return cell
+	}
+
+	/**
+	 * Add a cell to a row and the style
+	 * @param row
+	 * @param col
+	 * @param value
+	 * @param cellStyles
+	 * @return
+	 */
+	static Cell addCellAndStyle(Row row, int col, Object value , List<CellStyle> cellStyles) {
+		Cell cell = null
+
+		if ( value != null || ( (value instanceof String) && ((String)value).length() > 0 )) {
+			cell = addCell(row, col, value)
+
+			CellStyle cellStyle = cellStyles[col]
+			if (cellStyle) {
+				cell.cellStyle = cellStyle
+			}
+		}
+
+		return cell
 	}
 
 	static int getColumnsCount(Sheet sheet) {
@@ -678,5 +707,37 @@ class WorkbookUtil {
 			}
 		}
 		return true
+	}
+
+	/**
+	 * Get a list of the Cellstyles from the header of the Spreadsheet
+	 * @param workbookCellStyles
+	 * @param sheet
+	 * @return
+	 */
+	static List<CellStyle> getHeaderStyles(Map<Integer, CellStyle> workbookCellStyles, Sheet sheet) {
+		List<CellStyle> rowStyles = []
+		Row rowHeader =  sheet.getRow(0)
+		int lastCellNum = rowHeader.getLastCellNum()
+
+		for( int i = 0; i <= lastCellNum; i++ ) {
+
+			CellStyle cellStyle = null
+			Cell cell = rowHeader.getCell(i)
+			if(cell) {
+				short dataFormat = cell.cellStyle.dataFormat
+
+				cellStyle = workbookCellStyles.get(dataFormat)
+
+				if( cellStyle == null ) {
+					cellStyle = sheet.workbook.createCellStyle()
+					cellStyle.dataFormat = dataFormat
+				}
+			}
+
+			rowStyles << cellStyle
+		}
+
+		return rowStyles
 	}
 }
