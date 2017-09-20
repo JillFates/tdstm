@@ -78,11 +78,9 @@ export class AssetExplorerViewConfigComponent {
 		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain.toUpperCase()] = true);
 		this.applyFilters();
 		let columns = this.model.schema.columns.map(x => `${x.domain}.${x.property}`);
-		console.log(columns);
 		this.fields
 			.filter(f => columns.indexOf(`${f['domain']}.${f.field}`) !== -1)
 			.forEach(x => x['selected'] = true);
-		console.log(this.fields);
 	}
 
 	protected updateModelbyFilter() {
@@ -283,7 +281,7 @@ export class AssetExplorerViewConfigComponent {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains:  this.domains,
+			domains: this.domains,
 			previewMode: true
 		};
 
@@ -323,18 +321,30 @@ export class AssetExplorerViewConfigComponent {
 		} else {
 			let index = this.model.schema.columns
 				.findIndex(x => x.domain === field['domain'].toLowerCase() && x.property === field.field);
+
 			if (index !== -1) {
 				this.model.schema.columns.splice(index, 1);
+			}
+			if (this.grid.state.sort.length > 0
+				&& this.grid.state.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
+				&& this.model.schema.columns.length > 0) {
+				this.grid.state.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
+				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
+				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
 		}
 	}
 
 	protected onPreview(): void {
-		let params = this.getQueryParams();
-		this.assetExpService.previewQuery(params)
-			.subscribe(result => {
-				this.grid.apply(result);
-			}, err => console.log(err));
+		if (this.isValid()) {
+			let params = this.getQueryParams();
+			this.assetExpService.previewQuery(params)
+				.subscribe(result => {
+					this.grid.apply(result);
+				}, err => console.log(err));
+		} else {
+			this.grid.gridData = null;
+		}
 	}
 
 	/**
