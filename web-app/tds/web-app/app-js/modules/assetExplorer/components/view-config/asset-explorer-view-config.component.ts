@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
@@ -8,9 +8,12 @@ import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
+import { AssetQueryParams } from '../../model/asset-query-params';
+import { AssetExportModel } from '../../model/asset-export-model';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -27,7 +30,7 @@ import { Permission } from '../../../../shared/model/permission.model';
 	`]
 })
 export class AssetExplorerViewConfigComponent {
-
+	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	private dataSignature: string;
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
@@ -53,6 +56,7 @@ export class AssetExplorerViewConfigComponent {
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
+
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
 		private assetExpService: AssetExplorerService,
@@ -71,7 +75,7 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected updateFilterbyModel() {
-		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain] = true);
+		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain.toUpperCase()] = true);
 		this.applyFilters();
 		let columns = this.model.schema.columns.map(x => `${x.domain}.${x.property}`);
 		this.fields
@@ -80,9 +84,9 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected updateModelbyFilter() {
-		this.model.schema.domains = this.selectedAssetClasses();
+		this.model.schema.domains = this.selectedAssetClasses().map(x => x.toLowerCase());
 		this.fields.filter(x => x['selected'] &&
-			this.model.schema.domains.indexOf(x['domain']) === -1)
+			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
 		this.model.schema.columns = this.model.schema.columns
@@ -142,7 +146,7 @@ export class AssetExplorerViewConfigComponent {
 			.reduce((p: FieldSettingsModel[], c: DomainModel) => {
 				if (c.fields.length > 0) {
 					let domainTitle = new FieldSettingsModel();
-					domainTitle['domain'] = c.domain;
+					domainTitle['domain'] = c.domain.toLowerCase();
 					domainTitle['isTitle'] = true;
 					p.push(domainTitle);
 				}
@@ -193,10 +197,7 @@ export class AssetExplorerViewConfigComponent {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		let isSelected = this.model.schema.domains.length > 0;
-		if (this.model.schema.domains.length === 1) {
-			return this.model.schema.domains[0] !== 'COMMON';
-		}
+		let isSelected = this.model.schema.domains.filter(x => x !== 'common').length > 0;
 		return isSelected;
 	}
 
@@ -275,9 +276,19 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onExport(): void {
+		let assetExportModel: AssetExportModel = {
+			assetQueryParams: this.getQueryParams(),
+			domains: this.domains,
+			previewMode: true
+		};
+
 		this.dialogService.open(AssetExplorerViewExportComponent, [
-			{ provide: ViewModel, useValue: this.model }
-		]);
+			{ provide: AssetExportModel, useValue: assetExportModel }
+		]).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('error');
+		});
 	}
 
 	protected onFavorite() {
@@ -286,40 +297,74 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {
-		console.log(field);
 		if (field['selected']) {
 			this.model.schema.columns.push({
-				domain: field['domain'],
+				domain: field['domain'].toLowerCase(),
 				property: field.field,
 				width: 200,
 				locked: false,
 				edit: false,
-				label: field.label
+				label: field.label,
+				filter: ''
 			});
+			if (this.model.schema.columns.length === 1) {
+				this.model.schema.sort = {
+					domain: field['domain'].toLowerCase(),
+					property: field.field,
+					order: 'a'
+				};
+				this.grid.state.sort = [{ field: `${field['domain'].toLowerCase()}_${field.field}`, dir: 'asc' }];
+			}
 		} else {
 			let index = this.model.schema.columns
-				.findIndex(x => x.domain === field['domain'] && x.property === field.field);
+				.findIndex(x => x.domain === field['domain'].toLowerCase() && x.property === field.field);
+
 			if (index !== -1) {
 				this.model.schema.columns.splice(index, 1);
+			}
+			if (this.grid.state.sort.length > 0
+				&& this.grid.state.sort[0].field === `${field['domain'].toLowerCase()}_${field.field}`
+				&& this.model.schema.columns.length > 0) {
+				this.grid.state.sort = [{ field: `${this.model.schema.columns[0]['domain'].toLowerCase()}_${this.model.schema.columns[0]}`, dir: 'asc' }];
+				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
+				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
 		}
 	}
 
 	protected onPreview(): void {
-		this.model.schema.columns = this.filteredData
-			.map((d) => d.fields
-				.filter((f) => f['selected'])
-				.map((f) => {
-					return {
-						domain: d.domain,
-						property: f.field,
-						width: 50,
-						locked: false,
-						edit: false,
-						label: f.label
-					};
-				}))
-			.reduce((p, c) => p.concat(c), []);
+		if (this.isValid()) {
+			let params = this.getQueryParams();
+			this.assetExpService.previewQuery(params)
+				.subscribe(result => {
+					this.grid.apply(result);
+				}, err => console.log(err));
+		} else {
+			this.grid.gridData = null;
+		}
+	}
+
+	/**
+	 * Prepare the Params for the Query with the current UI configuration
+	 * @returns {AssetQueryParams}
+	 */
+	private getQueryParams(): AssetQueryParams {
+		let assetQueryParams = {
+			offset: this.grid.state.skip,
+			limit: this.grid.state.take,
+			sortDomain: this.model.schema.sort.domain,
+			sortProperty: this.model.schema.sort.property,
+			sortOrder: this.model.schema.sort.order,
+
+			filters: {
+				domains: this.model.schema.domains,
+				columns: this.model.schema.columns
+			}
+		};
+		if (this.grid.justPlanning) {
+			assetQueryParams['justPlanning'] = this.grid.justPlanning;
+		}
+		return assetQueryParams;
 	}
 
 	protected onClearTextFilter() {

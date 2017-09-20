@@ -11,13 +11,13 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
-	private assetExplorerUrl = '../ws/assetExplorer/view';
+	private assetExplorerUrl = '../ws/assetExplorer';
 
 	constructor(private http: HttpInterceptor) {
 	}
 
 	getReports(): Observable<ViewGroupModel[]> {
-		return this.http.get(`${this.assetExplorerUrl}s`)
+		return this.http.get(`${this.assetExplorerUrl}/views`)
 			.map((res: Response) => {
 				let response = res.json().data;
 				let reportGroupModel: ViewGroupModel[] = Object.keys(response).map(key => {
@@ -61,7 +61,7 @@ export class AssetExplorerService {
 	}
 
 	getReport(id: number): Observable<ViewModel> {
-		return this.http.get(`${this.assetExplorerUrl}/${id}`)
+		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				if (result && result.status === 'success' && result.data) {
@@ -75,14 +75,14 @@ export class AssetExplorerService {
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
 		if (!model.id) {
-			return this.http.post(this.assetExplorerUrl, JSON.stringify(model))
+			return this.http.post(`${this.assetExplorerUrl}/view`, JSON.stringify(model))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
 				})
 				.catch((error: any) => error.json());
 		} else {
-			return this.http.put(`${this.assetExplorerUrl}/${model.id}`, JSON.stringify(model))
+			return this.http.put(`${this.assetExplorerUrl}/view/${model.id}`, JSON.stringify(model))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -91,15 +91,29 @@ export class AssetExplorerService {
 		}
 	}
 
-	queryData(query: QuerySpec): any[] {
-		return [];
-	}
-
 	deleteReport(id: number): Observable<string> {
-		return this.http.delete(`${this.assetExplorerUrl}/${id}`)
+		return this.http.delete(`${this.assetExplorerUrl}/view/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	query(id: number, schema: any): Observable<any[]> {
+		return this.http.post(`${this.assetExplorerUrl}/query/${id}`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	previewQuery(schema: any): Observable<any[]> {
+		return this.http.post(`${this.assetExplorerUrl}/previewQuery`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
