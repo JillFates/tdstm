@@ -319,11 +319,16 @@ class DataviewService implements ServiceMethods {
                 ],
                 assets      : assets.collect { columns ->
                     Map row = [:]
-                    columns.eachWithIndex { cell, index ->
-                        if(dataviewSpec.columns[index]){
-                            row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
-                        }
-                    }
+					if(columns.getClass() == String) {
+						row["${dataviewSpec.columns[0].domain}_${dataviewSpec.columns[0].property}"] = columns
+					} else {
+						columns.eachWithIndex { cell, index ->
+							if(dataviewSpec.columns[index]){
+								row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+							}
+						}
+					}
+
                     row
                 }
         ]
