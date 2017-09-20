@@ -69,7 +69,7 @@ export class HttpInterceptor extends Http {
 
 	getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {
 		let headers = new Headers({ 'Content-Type': 'application/json' });
-		if (options === null) {
+		if (!options) {
 			options = new RequestOptions({ headers: headers });
 		}
 		return options;

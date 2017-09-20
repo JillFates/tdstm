@@ -66,6 +66,10 @@ export class AssetExplorerIndexComponent {
 		}
 	}
 
+	protected onShowReport(report: ViewModel): void {
+		this.stateService.go(AssetExplorerStates.REPORT_SHOW.name, { id: report.id });
+	}
+
 	protected onDeleteReport(report: ViewModel): void {
 		if (this.isDeleteAvailable(report)) {
 			this.prompt.open('Confirmation Required', 'Are you sure you want to delete this view?', 'Yes', 'No')

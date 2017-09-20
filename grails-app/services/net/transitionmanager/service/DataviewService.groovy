@@ -4,6 +4,7 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.MoveBundle
@@ -278,7 +279,7 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project $hqlWhere
+             where AE.project = :project $hqlWhere  
           order by $hqlOrder  
         """
 
@@ -316,11 +317,15 @@ class DataviewService implements ServiceMethods {
                 pagination: [
                         offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
                 ],
-                assets      : assets.collect { columns ->
+                assets    : assets.collect { columns ->
                     Map row = [:]
+                    columns = [columns].flatten()
                     columns.eachWithIndex { cell, index ->
-                        row["${dataviewSpec.columns[index].domain}.${dataviewSpec.columns[index].property}"] = cell
+                        if (dataviewSpec.columns[index]) {
+                            row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+                        }
                     }
+
                     row
                 }
         ]
@@ -334,7 +339,7 @@ class DataviewService implements ServiceMethods {
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
         dataviewSpec.columns.collect { Map column ->
-            "${fieldsTransformation(column).join}"
+            "${joinFor(column)}"
         }.join(" ")
     }
     /**
@@ -355,8 +360,13 @@ class DataviewService implements ServiceMethods {
             ]
         }
         dataviewSpec.filterColumns.each { Map column ->
-            params << [("${fieldsTransformation(column).namedParamter}".toString()): calculateParamsFor(column)]
+            params << [("${namedParameterFor(column)}".toString()): calculateParamsFor(column)]
         }
+
+        if(!dataviewSpec.domains.isEmpty()) {
+            params << ["assetClasses" : dataviewSpec.domains.findResults { AssetClass.safeValueOf(it.toUpperCase())}]
+        }
+
         params
     }
     /**
@@ -368,7 +378,7 @@ class DataviewService implements ServiceMethods {
      */
 	private String hqlColumns(DataviewSpec dataviewSpec){
         dataviewSpec.columns.collect { Map column ->
-            "${fieldsTransformation(column).property}"
+            "${propertyFor(column)}"
         }.join(", ")
     }
     /**
@@ -381,15 +391,20 @@ class DataviewService implements ServiceMethods {
 	private String hqlWhere(DataviewSpec dataviewSpec){
 
         String where = ""
+
+        if(!dataviewSpec.domains.isEmpty()){
+            where += " and AE.assetClass in (:assetClasses) "
+        }
+
         if (dataviewSpec.justPlanning != null) {
             where += " and AE.moveBundle in (:moveBundles) "
         }
 
         where += dataviewSpec.filterColumns.collect { Map column ->
             if (hasMultipleFilter(column)){
-                " and ${fieldsTransformation(column).property} in (:${fieldsTransformation(column).namedParamter}) \n"
+                " and ${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
             } else {
-                " and ${fieldsTransformation(column).property} like :${fieldsTransformation(column).namedParamter} \n"
+                " and ${propertyFor(column)} like :${namedParameterFor(column)} \n"
             }
         }.join(" ")
 
@@ -410,13 +425,22 @@ class DataviewService implements ServiceMethods {
     /**
      *
      * Calculate Map with params splitting column.filter content
+     * if column.flter has only one value It's prepared with %${column.filter}%
+     * in order to use like filter in HQL query.
+     *
+     * Also, if a parameter should be Strings, it is parsed and converted to the correct type
      *
      * @param column
      * @return
      */
 	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
-        values.size()==1?values[0]:values
+
+        if(values.size()==1){
+            paramConversionFor(column, "%${values[0]}%")
+        } else {
+            values.collect { paramConversionFor(column, it) }
+        }
     }
     /**
      *
@@ -432,21 +456,34 @@ class DataviewService implements ServiceMethods {
     }
 
 	private String hqlOrder(DataviewSpec dataviewSpec){
-        "${fieldsTransformation(dataviewSpec.order).property} ${dataviewSpec.order.sort}"
+        "${propertyFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
-	private static Map fieldsTransformation(Map column) {
-        transformations[column.property]
+    private static String namedParameterFor(Map column) {
+        transformations[column.property].namedParamter
+    }
+
+    private static String propertyFor(Map column) {
+        transformations[column.property].property
+    }
+
+    private static String joinFor(Map column) {
+        transformations[column.property].join
+    }
+
+    private static def paramConversionFor(Map column, String value) {
+        transformations[column.property].transform(value)
     }
 
 
-	private static final Map<String, Map> transformations = [
-            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle"],
-            "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project"],
-            "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer"],
-            "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme"],
-            "sme2"        : [property: "AE.sme2.firstName", namedParamter: "sme2FirstName", join: "left outer join AE.sme2"],
-            "model"       : [property: "AE.model.modelName", namedParamter: "modelModelName", join: "left outer join AE.model"],
-            "appOwner"    : [property: "AE.appOwner.firstName", namedParamter: "appOwnerFirstName", join: "left outer join AE.appOwner"]
-    ].withDefault { String key -> [property: "AE." + key, namedParamter: key, join: ""] }
+    private static final Map<String, Map> transformations = [
+            "id"          : [property: "AE.id", namedParamter: "moveBundleName", join: "", transform: { String value -> Long.parseLong(value) }],
+            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle", transform: { String value -> value?.trim() }],
+            "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project", transform: { String value -> value?.trim() }],
+            "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer", transform: { String value -> value?.trim() }],
+            "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme", transform: { String value -> value?.trim() }],
+            "sme2"        : [property: "AE.sme2.firstName", namedParamter: "sme2FirstName", join: "left outer join AE.sme2", transform: { String value -> value?.trim() }],
+            "model"       : [property: "AE.model.modelName", namedParamter: "modelModelName", join: "left outer join AE.model", transform: { String value -> value?.trim() }],
+            "appOwner"    : [property: "AE.appOwner.firstName", namedParamter: "appOwnerFirstName", join: "left outer join AE.appOwner", transform: { String value -> value?.trim() }]
+    ].withDefault { String key -> [property: "AE." + key, namedParamter: key, join: "", transform: { String value -> value?.trim() }] }
 }

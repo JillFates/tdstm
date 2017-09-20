@@ -394,4 +394,25 @@ class StringUtil {
 
 		return left + right
 	}
+
+	/**
+	 * Performs a check to determine if the string compareTo is similar to the given string str.
+	 * For instance for compareTo='hello', will return true if str is 'h', 'he', 'hel', 'elo' etc.
+	 * Also checks for nullity and blank of str (returns false).
+	 *
+	 * @param str - the string to compare
+	 * @param compareTo - the string to be compared to
+	 * @param caseInsensitive - flag if true will perform the comparison case insensitive (default true)
+	 * @return True if str is like compareTo.
+	 */
+	static boolean isLike( String str, String compareTo, boolean caseInsensitive=true) {
+		if (isBlank(str) || isBlank(compareTo)) {
+			return false
+		}
+		if (caseInsensitive) {
+			str = str.toUpperCase()
+			compareTo = compareTo.toUpperCase()
+		}
+		return compareTo.contains(str)
+	}
 }
