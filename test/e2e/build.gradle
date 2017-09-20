@@ -1,6 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import groovy.xml.MarkupBuilder
 import groovy.json.JsonOutput
+import groovy.io.FileType
 
 import static groovyx.net.http.HttpBuilder.configure
 //import static groovyx.net.http.ContentTypes.JSON
@@ -200,24 +201,20 @@ task reportSnaps {
     description 'Generate a report per test of both the screen snapshots and the raw page html.'
     doLast{
         def list = []
-
         def dir = new File("build/reports")
 //        println "  List of all files found at ${dir.path}"
-//        dir.eachFileRecurse (FileType.FILES) { file ->
+        dir.eachFileRecurse (FileType.FILES) { file ->
 //            println "    ${file.path}"
-//            if (file.path.contains( "geb" )) {
-//                list << file
-//            }
-//        }
-//
+           if (file.path.contains( "geb" )) {
+                list << file
+            }
+        }
 //        println "  File path list of screenshots found:"
 //        list.each {
 //            println "    " + it.path
 //        }
-
         generateScreenshotsReportsPage(list)
     }
-
 }
 
 reportSnaps.mustRunAfter firefoxTest
