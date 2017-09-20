@@ -12,6 +12,7 @@ import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
+import {VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
 import { AssetQueryParams } from '../../model/asset-query-params';
 import { AssetExportModel } from '../../model/asset-export-model';
 
@@ -301,7 +302,7 @@ export class AssetExplorerViewConfigComponent {
 			this.model.schema.columns.push({
 				domain: field['domain'].toLowerCase(),
 				property: field.field,
-				width: 200,
+				width: VIEW_COLUMN_MIN_WIDTH,
 				locked: false,
 				edit: false,
 				label: field.label,

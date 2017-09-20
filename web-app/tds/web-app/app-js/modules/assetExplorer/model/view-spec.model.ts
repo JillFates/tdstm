@@ -3,8 +3,10 @@ export class QueryColumn {
 	property: string;
 }
 
+export const VIEW_COLUMN_MIN_WIDTH = 200;
+
 export class ViewColumn extends QueryColumn {
-	width?= 200;
+	width?= VIEW_COLUMN_MIN_WIDTH;
 	locked?= false;
 	edit?= false;
 	filter = '';

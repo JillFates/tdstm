@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { ViewSpec, ViewColumn } from '../../model/view-spec.model';
+import {ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 
@@ -19,6 +19,7 @@ export class AssetExplorerViewGridComponent {
 	lastEvent: MouseEvent;
 	selectColumn: ViewColumn;
 	justPlanning = false;
+	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 
 	state: State = {
 		skip: 0,
@@ -42,7 +43,7 @@ export class AssetExplorerViewGridComponent {
 		if (this.mouseDown) {
 			let xValueChange = event.clientX - this.lastEvent.clientX;
 			let width = this.selectColumn.width + (xValueChange);
-			this.selectColumn.width = width < 100 ? 100 : width;
+			this.selectColumn.width = width < (VIEW_COLUMN_MIN_WIDTH - 50) ? (VIEW_COLUMN_MIN_WIDTH - 50) : width;
 			this.lastEvent = event;
 		}
 	}
