@@ -317,17 +317,14 @@ class DataviewService implements ServiceMethods {
                 pagination: [
                         offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
                 ],
-                assets      : assets.collect { columns ->
+                assets    : assets.collect { columns ->
                     Map row = [:]
-					if(columns.getClass() == String) {
-						row["${dataviewSpec.columns[0].domain}_${dataviewSpec.columns[0].property}"] = columns
-					} else {
-						columns.eachWithIndex { cell, index ->
-							if(dataviewSpec.columns[index]){
-								row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
-							}
-						}
-					}
+                    columns = [columns].flatten()
+                    columns.eachWithIndex { cell, index ->
+                        if (dataviewSpec.columns[index]) {
+                            row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+                        }
+                    }
 
                     row
                 }
