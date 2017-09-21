@@ -346,6 +346,7 @@ export class AssetExplorerViewConfigComponent {
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
 		}
+		this.grid.clear();
 	}
 
 	protected onPreview(): void {
