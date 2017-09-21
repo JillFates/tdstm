@@ -28,7 +28,7 @@
 				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
 			</ng-template>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
-			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()"(click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
+			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
 			<asset-explorer-view-selector></asset-explorer-view-selector>
 			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
 		</div>
@@ -36,34 +36,34 @@
 		<div class="nav-tabs-custom" *ngIf="!collapsed">
 			<!-- Tabs within a box -->
 			<ul class="nav nav-tabs">
-				<li role="presentation" [ngClass]="{'active':!model.id}">
-					<a href="#tab_1" data-toggle="tab">Asset Classes</a>
+				<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
+					<a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab">Asset Classes</a>
 				</li>
-				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':model.id}">
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':isCurrentTab(1)}">
 					<a *ngIf="!isAssetSelected();else fieldsTabLink">Fields</a>
 					<ng-template #fieldsTabLink>
-						<a href="#tab_2" data-toggle="tab" #link>Fields</a>
+						<a href="#tab_2" data-toggle="tab" (click)="setCurrentTab(1)" #link>Fields</a>
 					</ng-template>
 				</li>
-				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected()}">
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':isCurrentTab(2)}">
 					<a *ngIf="!isAssetSelected();else columnsTabLink">Columns</a>
 					<ng-template #columnsTabLink>
-						<a href="#tab_3" data-toggle="tab" #link>Columns</a>
+						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab" #link>Columns</a>
 					</ng-template>
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
 				</li>
 				<li class="pull-right" role="presentation">
-					<button class="btn" [disabled]="!isColumnSelected()" [ngClass]="{'btn-default':!isColumnSelected(),'btn-success':isColumnSelected()}"
-					 name="btnPreview" (click)="onPreview()">Preview</button>
+					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}" name="btnPreview"
+					 (click)="onPreview()">Preview</button>
 				</li>
 				<!-- <li class="pull-right" role="presentation">
 					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
 				</li> -->
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
-				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':!model.id}" id="tab_1">
+				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
 					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
@@ -72,7 +72,7 @@
 					</div>
 					<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
-				<div class="tab-pane" id="tab_2" [ngClass]="{'active':model.id}">
+				<div class="tab-pane" id="tab_2" [ngClass]="{'active':isCurrentTab(1)}">
 					<div class="row">
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
@@ -120,7 +120,7 @@
 					</div>
 
 				</div>
-				<div class="tab-pane" style="padding-left:15px" id="tab_3">
+				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(2)}" id="tab_3">
 					<div class="row">
 						<div class="col-md-12">
 							<div class="form-group">

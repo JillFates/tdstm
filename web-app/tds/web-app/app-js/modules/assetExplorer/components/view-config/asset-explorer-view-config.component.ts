@@ -12,7 +12,7 @@ import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
-import {VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
+import { VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { AssetQueryParams } from '../../model/asset-query-params';
 import { AssetExportModel } from '../../model/asset-export-model';
 
@@ -57,6 +57,7 @@ export class AssetExplorerViewConfigComponent {
 	filteredData: DomainModel[] = [];
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
+	currentTab = 0;
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -69,8 +70,9 @@ export class AssetExplorerViewConfigComponent {
 			this.domains = result[0];
 			this.model = { ...result[1] };
 			this.dataSignature = JSON.stringify(this.model);
-			if (this.model.id !== 0) {
+			if (this.model.id) {
 				this.updateFilterbyModel();
+				this.currentTab = 1;
 			}
 		}, (err) => console.log(err));
 	}
@@ -86,12 +88,18 @@ export class AssetExplorerViewConfigComponent {
 
 	protected updateModelbyFilter() {
 		this.model.schema.domains = this.selectedAssetClasses().map(x => x.toLowerCase());
+		if (!this.isAssetSelected()) {
+			this.model.schema.domains = [];
+			this.model.schema.columns = [];
+		} else {
+			this.model.schema.columns = this.model.schema.columns
+				.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
+		}
 		this.fields.filter(x => x['selected'] &&
 			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
-		this.model.schema.columns = this.model.schema.columns
-			.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
+		this.grid.clear();
 	}
 
 	/** Filter Methods */
@@ -198,8 +206,7 @@ export class AssetExplorerViewConfigComponent {
 	/** Validation and Permission Methods */
 
 	protected isAssetSelected(): boolean {
-		let isSelected = this.model.schema.domains.filter(x => x !== 'common').length > 0;
-		return isSelected;
+		return this.model.schema.domains.filter(x => x !== 'common').length > 0;
 	}
 
 	protected isColumnSelected(): boolean {
@@ -240,6 +247,14 @@ export class AssetExplorerViewConfigComponent {
 		return edit ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
+	}
+
+	protected isCurrentTab(num: number): boolean {
+		return this.currentTab === num;
+	}
+
+	protected setCurrentTab(num: number): void {
+		this.currentTab = num;
 	}
 
 	/**

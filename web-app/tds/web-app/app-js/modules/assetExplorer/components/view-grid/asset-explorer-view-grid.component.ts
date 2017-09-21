@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import {ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH} from '../../model/view-spec.model';
+import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 
@@ -61,6 +61,15 @@ export class AssetExplorerViewGridComponent {
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
+		};
+	}
+
+	clear(): void {
+		this.gridData = null;
+		this.state = {
+			skip: 0,
+			take: 25,
+			sort: []
 		};
 	}
 
