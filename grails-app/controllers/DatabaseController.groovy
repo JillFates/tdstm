@@ -189,15 +189,13 @@ class DatabaseController implements ControllerMethods {
 			}
 		}
 
-		query.append(" WHERE 1=1 ")
-
 		if (params.moveBundleId) {
 			if (params.moveBundleId != 'unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				whereConditions.add ' dbs.moveBundle = :bundleName '
 				queryParams.put 'bundleName', bundleName
 			} else {
-				query.append(" AND dbs.moveBundle IS NULL ")
+				whereConditions.add ' dbs.moveBundle IS NULL '
 			}
 		}
 		if (params.toValidate){
@@ -209,8 +207,8 @@ class DatabaseController implements ControllerMethods {
 			queryParams.put 'planStatus', params.plannedStatus
 		}
 
-		if (whereConditions.size()){
-			query.append(" AND dbs.${whereConditions.join(" AND dbs.")} ")
+		if (whereConditions) {
+			query.append(" WHERE ${whereConditions.join(" AND ")} ")
 		}
 
 		def dbsList = []
