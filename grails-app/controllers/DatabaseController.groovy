@@ -181,7 +181,6 @@ class DatabaseController implements ControllerMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		def firstWhere = true
 		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
@@ -189,23 +188,27 @@ class DatabaseController implements ControllerMethods {
 				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Database)
 			}
 		}
-		if (whereConditions.size()){
-			query.append(" WHERE dbs.${whereConditions.join(" AND dbs.")}")
-		}
 
-		if (params.moveBundleId){
-			if (params.moveBundleId!='unAssigned'){
+		if (params.moveBundleId) {
+			if (params.moveBundleId != 'unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" WHERE dbs.moveBundle  = '$bundleName' ")
-			}else{
-				query.append(" WHERE dbs.moveBundle IS NULL ")
+				whereConditions.add ' dbs.moveBundle = :bundleName '
+				queryParams.put 'bundleName', bundleName
+			} else {
+				whereConditions.add ' dbs.moveBundle IS NULL '
 			}
 		}
 		if (params.toValidate){
-			query.append(" WHERE dbs.validation='Discovery'")
+			whereConditions.add ' dbs.validation = :validation '
+			queryParams.put 'validation', 'Discovery'
 		}
 		if (params.plannedStatus){
-			query.append(" WHERE dbs.planStatus='$params.plannedStatus'")
+			whereConditions.add ' dbs.planStatus = :planStatus '
+			queryParams.put 'planStatus', params.plannedStatus
+		}
+
+		if (whereConditions) {
+			query.append(" WHERE ${whereConditions.join(" AND ")} ")
 		}
 
 		def dbsList = []
