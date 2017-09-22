@@ -5,6 +5,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.MoveBundle
@@ -494,14 +495,14 @@ class DataviewService implements ServiceMethods {
      * @param value
      * @return
      */
-    private static def transformType(Class clazz, def value) {
+    private static def transformType(def clazz, def value) {
         def result
         switch (clazz) {
             case Long:
-                result = [like: value?.isLong() ? value.toLong() : -1l, equality: value?.isLong() ? value.toLong() : -1l]
+                result = [like: NumberUtil.toLong(value, -1l) , equality: NumberUtil.toLong(value, -1l) ]
                 break
             case Integer:
-                result = [like: value?.isInteger() ? value.toInteger() : -1, equality: value?.isInteger() ? value.toInteger() : -1]
+                result = [like: NumberUtil.toInteger(value, -1) , equality: NumberUtil.toLong(value, -1) ]
                 break
             case String:
                 result = [like: "%${value.trim()}%".toString(), equality: "${value.trim()}".toString()]
