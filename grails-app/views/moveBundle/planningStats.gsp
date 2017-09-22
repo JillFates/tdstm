@@ -138,8 +138,8 @@ $(document).ready(function() {
 					</h4>
 					<table class="dashboard_stat_table">
 						<tr>
-							<td class="dashboard_stat_td"><g:link
-									controller="assetEntity" action="listTasks"
+							<td class="dashboard_stat_td">
+                                <g:link controller="assetEntity" action="listTasks"
 									params="[filter:'openIssue', moveEvent:'0', justRemaining:1]"
 									class="links">
 									${openIssue}
@@ -150,8 +150,11 @@ $(document).ready(function() {
 						</tr>
 						<g:if test="${dueOpenIssue>0}">
 							<tr>
-								<td class="dashboard_stat_td" style="color: red;"><b> ${dueOpenIssue}
-								</b></td>
+								<td class="dashboard_stat_td">
+                                    <g:link controller="assetEntity" action="listTasks"
+                                            params="[filter:'dueOpenIssue', moveEvent:'0', justRemaining:1]"
+                                            class="links"><b style="color: red;">${dueOpenIssue}</b></g:link>
+                                </td>
 								<td><g:link controller="assetEntity" action="listTasks"
 										params="[filter:'dueOpenIssue', moveEvent:'0', justRemaining:1]"
 										class="links">Overdue</g:link></td>
@@ -287,8 +290,11 @@ $(document).ready(function() {
 						</tr>
 						<g:if test="${generalOverDue>0}">
 							<tr>
-								<td class="dashboard_stat_td" style="color: red;"><b> ${generalOverDue}
-								</b></td>
+								<td class="dashboard_stat_td">
+                                    <g:link controller="assetEntity" action="listTasks"
+                                            params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]"
+                                            class="links"><b style="color: red;"> ${generalOverDue}</b></g:link>
+                                </td>
 								<td><g:link controller="assetEntity" action="listTasks"
 										params="[filter:'generalOverDue', justRemaining:1, moveEvent:0]"
 										class="links">Overdue</g:link></td>
@@ -409,9 +415,7 @@ $(document).ready(function() {
 								<div>
 									<table id="eventHeaderTableId" class="dashboard_right_table" style="border: none;">
 										<thead>
-										<tr><th style="background-color: transparent; line-height: 45px;" class="">&nbsp;</th></tr>
-										<tr><th style="background-color: transparent; line-height: 25px;" class="">&nbsp;</th></tr>
-										<tr><th style="background-color: transparent; line-height: 25px;" class="">&nbsp;</th></tr>
+										<tr><th style="background-color: transparent; line-height: 100px;" class="">&nbsp;</th></tr>
 										</thead>
 										<tbody>
 										<tr>
@@ -478,7 +482,7 @@ $(document).ready(function() {
 									</table>
 								</div>
 							</div>
-							<div class="col-md-9 col-xs-9" >
+							<div class="col-md-10 col-xs-10" style="padding-left: 0px; padding-right: 0px;">
 								<div id="eventDataTableId" style="overflow-y: hidden;">
 									<table class="dashboard_right_table dashboard_stat_table"
                                            style="width: 100% !important; border-spacing: 5px 0px; border-collapse: separate;">
@@ -489,14 +493,15 @@ $(document).ready(function() {
                                                 </th>
 
                                                 <g:each in="${moveEventList}" var="event">
-                                                    <th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title"
-                                                        style="text-align: right !important; padding-right: 0px !important;">
-                                                        <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
-                                                            ${event}
-                                                        </g:link>
+                                                    <th class="dashboard_stat_exec_tdmc" style="text-align: right !important; padding-right: 0px !important;">
+                                                        <div class="dashboard_stat_exec_tdmc_title">
+                                                            <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
+                                                                ${event}
+                                                            </g:link>
+                                                        </div>
                                                     </th>
                                                 </g:each>
-                                                <th class="dashboard_stat_exec_tdmc"></th>
+                                                <th class="dashboard_stat_exec_tdmc_title"></th>
                                             </tr>
                                             <tr>
                                                 <g:each in="${moveEventList}" var="event">

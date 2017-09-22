@@ -370,11 +370,19 @@ tr#applicationDependentId td.class-wrap-depend {
 }
 
 .dashboard_stat_exec_tdmc_title {
-	max-width: 60px;
-	white-space: normal;
-	overflow: hidden;
-	text-overflow: ellipsis;
-    padding: 0px 10px 10px 0px !important;
+    background-color: transparent;
+}
+div.dashboard_stat_exec_tdmc_title {
+    /*
+        ellipsis(text-truncate) configuration
+    */
+    min-height: 45px;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 /* ACTION BUTTONS */
