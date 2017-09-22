@@ -1,6 +1,9 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
+			<div class="btn-group asset-view-title" *ngIf="model.name && model.name !== ''">
+				<h3>{{model.name}}</h3>
+			</div>
 			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
 				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
