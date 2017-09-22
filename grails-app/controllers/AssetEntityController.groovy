@@ -1227,13 +1227,18 @@ class AssetEntityController implements ControllerMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 
 		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
+		/*
+		 oluna 170921 (for the developer of the future) : the use of "DATE like param" in the queries is interpolated due to the fact that we are comparing against the
+		 	String "Date" representation of the field ("2017-05-13 17:35:24") and if we try to use "named-params" it will fail the type-check (comparing Strings to Dates)
+		 	so leave this implementation alone unless you find a better way :)
+		*/
 		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%$params.dueDate%' ",[project:project])?.dueDate : []
 		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%$params.estStart%' ",[project:project])?.estStart : []
 		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%$params.actStart%' ",[project:project])?.actStart : []
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
 		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
 		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
-		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like :statusUpdated",[project:project, statusUpdated:"%${params.statusUpdated}%"])?.statusUpdated : []
+		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
 
 		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
@@ -1355,7 +1360,7 @@ class AssetEntityController implements ControllerMethods {
 				'in'('createdBy', createdBy)
 			}
 			if (resolvedBy) {
-				'in'('createdBy', resolvedBy)
+				'in'('resolvedBy', resolvedBy)
 			}
 			if (assigned) {
 				'in'('assignedTo', assigned)
