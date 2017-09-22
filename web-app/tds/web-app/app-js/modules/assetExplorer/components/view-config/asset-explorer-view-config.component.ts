@@ -58,6 +58,7 @@ export class AssetExplorerViewConfigComponent {
 	fields: FieldSettingsModel[] = [];
 	position: any[] = [];
 	currentTab = 0;
+	previewButtonClicked = false;
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -100,6 +101,7 @@ export class AssetExplorerViewConfigComponent {
 			.forEach(x => delete x['selected']);
 		this.applyFilters();
 		this.grid.clear();
+		this.previewButtonClicked = false;
 	}
 
 	/** Filter Methods */
@@ -347,10 +349,11 @@ export class AssetExplorerViewConfigComponent {
 			}
 		}
 		this.grid.clear();
+		this.previewButtonClicked = false;
 	}
 
 	protected onPreview(): void {
-		if (this.isValid()) {
+		if (this.isValid() && this.previewButtonClicked) {
 			let params = this.getQueryParams();
 			this.assetExpService.previewQuery(params)
 				.subscribe(result => {
