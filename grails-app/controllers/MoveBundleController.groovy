@@ -312,7 +312,7 @@ class MoveBundleController implements ControllerMethods {
 		def projectManager = params.projectManager
 		def moveManager = params.moveManager
 
-		moveBundle.useForPlanning = params.useForPlanning as Boolean
+		moveBundle.useForPlanning = params.useForPlanning == 'true'
 
 		if (!moveBundle.hasErrors() && moveBundle.save()) {
 			if (projectManager){
