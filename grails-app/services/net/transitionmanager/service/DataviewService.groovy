@@ -5,6 +5,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.MoveBundle
@@ -403,6 +404,8 @@ class DataviewService implements ServiceMethods {
         where += dataviewSpec.filterColumns.collect { Map column ->
             if (hasMultipleFilter(column)){
                 " and ${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
+            } else if(!hasStringType(column)) {
+                " and ${propertyFor(column)} = :${namedParameterFor(column)} \n"
             } else {
                 " and ${propertyFor(column)} like :${namedParameterFor(column)} \n"
             }
@@ -421,7 +424,16 @@ class DataviewService implements ServiceMethods {
 	private Boolean hasMultipleFilter(Map column) {
         splitColumnFilter(column).size() > 1
     }
-
+    /**
+     *
+     * Checks if Column belongs to a Field String type
+     *
+     * @param column
+     * @return
+     */
+	private Boolean hasStringType(Map column) {
+        transformations[column.property].type == String
+	}
     /**
      *
      * Calculate Map with params splitting column.filter content
@@ -437,9 +449,9 @@ class DataviewService implements ServiceMethods {
         String[] values = splitColumnFilter(column)
 
         if(values.size()==1){
-            paramConversionFor(column, "%${values[0]}%")
+            paramConversionFor(column, values[0]).like
         } else {
-            values.collect { paramConversionFor(column, it) }
+            values.collect { paramConversionFor(column, it).equality }
         }
     }
     /**
@@ -460,7 +472,7 @@ class DataviewService implements ServiceMethods {
     }
 
     private static String namedParameterFor(Map column) {
-        transformations[column.property].namedParamter
+        transformations[column.property].namedParameter
     }
 
     private static String propertyFor(Map column) {
@@ -475,15 +487,43 @@ class DataviewService implements ServiceMethods {
         transformations[column.property].transform(value)
     }
 
+    /**
+     *
+     * Tranform Type base on Field Type. It configures like and equals in custom HQL for
+     *
+     * @param clazz
+     * @param value
+     * @return
+     */
+    private static def transformType(def clazz, def value) {
+        def result
+        switch (clazz) {
+            case Long:
+                result = [like: NumberUtil.toLong(value, -1l) , equality: NumberUtil.toLong(value, -1l) ]
+                break
+            case Integer:
+                result = [like: NumberUtil.toInteger(value, -1) , equality: NumberUtil.toLong(value, -1) ]
+                break
+            case String:
+                result = [like: "%${value.trim()}%".toString(), equality: "${value.trim()}".toString()]
+                break
+            default:
+                result = [like: "%${value?.toString()?.trim()}%".toString(), equality: "${value?.toString()?.trim()}".toString()]
+                break
+        }
+        result
+    }
 
     private static final Map<String, Map> transformations = [
-            "id"          : [property: "AE.id", namedParamter: "moveBundleName", join: "", transform: { String value -> Long.parseLong(value) }],
-            "moveBundle"  : [property: "AE.moveBundle.name", namedParamter: "moveBundleName", join: "left outer join AE.moveBundle", transform: { String value -> value?.trim() }],
-            "project"     : [property: "AE.project.description", namedParamter: "projectDescription", join: "left outer join AE.project", transform: { String value -> value?.trim() }],
-            "manufacturer": [property: "AE.manufacturer.name", namedParamter: "manufacturerName", join: "left outer join AE.manufacturer", transform: { String value -> value?.trim() }],
-            "sme"         : [property: "AE.sme.firstName", namedParamter: "smeFirstName", join: "left outer join AE.sme", transform: { String value -> value?.trim() }],
-            "sme2"        : [property: "AE.sme2.firstName", namedParamter: "sme2FirstName", join: "left outer join AE.sme2", transform: { String value -> value?.trim() }],
-            "model"       : [property: "AE.model.modelName", namedParamter: "modelModelName", join: "left outer join AE.model", transform: { String value -> value?.trim() }],
-            "appOwner"    : [property: "AE.appOwner.firstName", namedParamter: "appOwnerFirstName", join: "left outer join AE.appOwner", transform: { String value -> value?.trim() }]
-    ].withDefault { String key -> [property: "AE." + key, namedParamter: key, join: "", transform: { String value -> value?.trim() }] }
+            "id"          : [property: "AE.id", type: Long, namedParameter: "id", join: "", transform: { String value -> transformType(Long, value) }],
+            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle", transform: { String value -> transformType(String, value)}],
+            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project", transform: { String value -> transformType(String, value)}],
+            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer", transform: { String value -> transformType(String, value)}],
+            "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme", transform: { String value -> transformType(String, value)}],
+            "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2", transform: { String value -> transformType(String, value)}],
+            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model", transform: { String value -> transformType(String, value)}],
+            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner", transform: { String value -> transformType(String, value)}]
+    ].withDefault {
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", transform: { String value -> transformType(String, value) }]
+    }
 }
