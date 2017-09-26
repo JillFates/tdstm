@@ -49,9 +49,11 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clearText(column: ViewColumn): void {
-		column.filter = '';
-		this.state.skip = 0;
-		this.onReload();
+		if (column.filter) {
+			column.filter = '';
+			this.state.skip = 0;
+			this.onReload();
+		}
 	}
 
 	onReload(): void {
