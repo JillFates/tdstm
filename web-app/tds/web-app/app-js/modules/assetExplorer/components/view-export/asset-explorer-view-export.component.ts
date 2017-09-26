@@ -19,6 +19,8 @@ export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
 	protected dataToExport: any[] = [];
+	private defaulLimitRows = 1000;
+	private defaultOffset = 0;
 
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
@@ -58,10 +60,11 @@ export class AssetExplorerViewExportComponent {
 	}
 
 	/**
-	 * Transform the Data information and remove
-	 * the dot in the field that cause empty values in Excel
+	 * Transform the Data information
 	 */
 	private getExportData(): void {
+		this.assetExportModel.assetQueryParams.limit = this.defaulLimitRows;
+		this.assetExportModel.assetQueryParams.offset = this.defaultOffset;
 		if (this.assetExportModel.previewMode) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
