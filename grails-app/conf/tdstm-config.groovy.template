@@ -33,7 +33,7 @@ tdstm {
 
 	admin {
 		// The command to be executed to restart the application
-		serviceRestartCommand='service tomcat_tranman01 restart'
+		serviceRestartCommand='touch /tmp/tm-restartme.now'
 	}
 
   qztray{

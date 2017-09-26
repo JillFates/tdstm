@@ -1,0 +1,11 @@
+#!/bin/sh
+# oluna 20170926 Program to run a Tomcat restart if the "tm-restartme.now" file is found in the TMP directory
+# Install the cronjob to watch for the restart file in the system
+# * * * * * /opt/tranman/bin/tm-watchdog
+#
+
+if [ -f /tmp/tm-restartme.now ]
+then
+	sudo rm -f /tmp/tm-restartme.now
+	sudo service tomcat_tranman01 restart
+fi
