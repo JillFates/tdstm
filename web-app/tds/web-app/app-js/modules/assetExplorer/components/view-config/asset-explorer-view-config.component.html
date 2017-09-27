@@ -48,7 +48,7 @@
 						<a href="#tab_2" data-toggle="tab" (click)="setCurrentTab(1)" #link>Fields</a>
 					</ng-template>
 				</li>
-				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':isCurrentTab(2)}">
+				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected() || !isColumnSelected(),'active':isCurrentTab(2)}">
 					<a *ngIf="!isAssetSelected();else columnsTabLink">Columns</a>
 					<ng-template #columnsTabLink>
 						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab" #link>Columns</a>
@@ -66,16 +66,17 @@
 				</li> -->
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
-				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
+				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
 					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
 							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> <tds-ui-svg-icon [name]="getAssetIcon(asset)" [height]="'16'" [width]="'16'"></tds-ui-svg-icon> {{ 'ASSETS.'+asset  | translate }}
 						</label>
 					</div>
-					<button class="btn" [disabled]="!isAssetSelected()" onclick="$('a[href=#tab_2]').trigger('click')" [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
+					<button class="btn" [disabled]="!isAssetSelected()" (click)="setCurrentTab(1)" onclick="$('a[href=#tab_2]').trigger('click')"
+					 [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
-				<div class="tab-pane" id="tab_2" [ngClass]="{'active':isCurrentTab(1)}">
+				<div class="tab-pane" id="tab_2" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}">
 					<div class="row">
 						<div class="col-md-4 col-sm-12">
 							<div class="col-sm-9">
@@ -123,7 +124,7 @@
 					</div>
 
 				</div>
-				<div class="tab-pane" style="padding-left:15px" [ngClass]="{'active':isCurrentTab(2)}" id="tab_3">
+				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(2)" [ngClass]="{'active':isCurrentTab(2)}" id="tab_3">
 					<div class="row">
 						<div class="col-md-12">
 							<div class="form-group">
