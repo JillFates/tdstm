@@ -323,6 +323,21 @@ class TaskController implements ControllerMethods {
 				              redirect: 'taskManager', disabled: !(comment.status in [READY, STARTED])]
 			}
 
+			if (securityService.hasPermission(Permission.ActionInvoke)) {
+				if (comment.isActionInvocable() && !comment.isAutomatic()) {
+					actionBar << [label   : 'Invoke', icon: 'ui-icon-gear', actionType: 'invokeAction', newStatus: STARTED,
+								  redirect: 'taskManager', disabled: comment.status != READY]
+				}
+			}
+
+			if (securityService.hasPermission(Permission.ActionEdit)) {
+				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
+					actionBar << [label   : 'Reset', icon: 'ui-icon-power', actionType: 'resetAction', newStatus: READY,
+								  redirect: 'taskManager', disabled: false]
+				}
+			}
+
+
 			if (includeDetails) {
 				actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
 			}
