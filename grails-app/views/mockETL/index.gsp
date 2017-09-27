@@ -14,6 +14,13 @@
             padding-top: 10px;
             border-color:#ccc;
         }
+        samp {
+            background: #000;
+            border: 3px groove #ccc;
+            color: #058907;
+            display: block;
+            padding: 5px;
+        }
     </style>
 </head>
 
@@ -82,6 +89,14 @@ ${script}
             </table>
         </div>
     </fieldset>
+
+    <g:if test="${logContent}">
+        <div class="row">
+            <div class="col-md-12">
+                <textarea id="console" rows="15" style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+            </div>
+        </div>
+    </g:if>
 
 </form>
 </body>

@@ -769,4 +769,66 @@ class ETLProcessorSpec extends Specification {
         then:
         notThrown MultipleCompilationErrorsException
     }
+
+    void 'test can enable console and log domain selected'() {
+
+        given:
+        String scriptText = """            
+            console on
+            domain Device
+        """
+
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        StringBuffer buffer = new StringBuffer()
+        DebugConsole console = new DebugConsole(buffer: buffer)
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data, debugConsole: console)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                console     : etlProcessor.&console,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+        customizer.addStaticStars Math.class.name
+        customizer.addStaticStars ConsoleStatus.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+        secureASTCustomizer.starImportsWhitelist = []
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        buffer.toString() == "INFO - Selected Domain: Device" + System.lineSeparator()
+    }
 }
