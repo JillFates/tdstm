@@ -213,6 +213,8 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Batch Id', transform:xfrmString, template:changeTmpl('batchId')],
 	]
 
+	// Map of properties that can be modified by the user
+	static final Map modifiableProperties = taskSpreadsheetColumnMap.findAll{ p, k -> k.modifiable}
 	// The map of the location for the properties on the Title sheet.
 	static final Map TitlePropMap = [
 		 clientName: [1,2, 'String'],
@@ -825,6 +827,10 @@ class TaskImportExportService implements ServiceMethods {
 					task.errors << "Move Event doesn't exist."
 				}
 			}
+
+			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
+			assetComment.discard()
 		}
 
 		setIconsOnTasks(tasks)
@@ -979,7 +985,6 @@ class TaskImportExportService implements ServiceMethods {
 				tasks[i].errors << ["Row ${i+2} $error"]
 				results.taskError++
 			}
-
 			// Add the task to the new updatedTasks to be displayed on the results page
 			if (tasks[i].errors || taskChanged) {
 
@@ -1054,7 +1059,7 @@ class TaskImportExportService implements ServiceMethods {
 	}
 
 
-	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, Map modifiableProperties, boolean setDefaults=false) {
+	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
 
 		boolean unplannedChange = false
 		String unChgdLabel='Unplanned change'
@@ -1141,7 +1146,6 @@ class TaskImportExportService implements ServiceMethods {
 	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed = false
-		Map modifiableProperties = taskSpreadsheetColumnMap.findAll{ p, k -> k.modifiable}
 
 		// Ignore comments
 		if(NumberUtil.isPositiveLong(task.taskNumber)){
@@ -1151,7 +1155,7 @@ class TaskImportExportService implements ServiceMethods {
 				log.debug "applyTaskChanges() About to apply changes to $assetComment"
 
 				// Update the person with the values passed in
-				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, modifiableProperties, true )
+				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
 
 				changed = assetComment.dirtyPropertyNames
 
