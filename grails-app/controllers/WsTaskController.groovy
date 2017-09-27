@@ -184,10 +184,29 @@ class WsTaskController implements ControllerMethods {
 		if (assetComment) {
 			Person whom = securityService.loadCurrentPerson()
 			String status = taskService.invokeAction(assetComment, whom)
-			renderSuccessJson([status: status])
+			render([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)] as JSON)
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "invokeAction: $errorMsg"
+			renderErrorJson([errorMsg])
+		}
+	}
+
+	/**
+	 * Reset an action tied to a task and returns new task status if applies.
+	 * @param id - task id
+	 * @return
+	 */
+	@HasPermission(Permission.ActionEdit)
+	def resetAction() {
+		AssetComment assetComment = AssetComment.get(params.id)
+		if (assetComment) {
+			Person whom = securityService.loadCurrentPerson()
+			String status = taskService.resetAction(assetComment, whom)
+			render([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)] as JSON)
+		} else {
+			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
+			log.error "resetAction: $errorMsg"
 			renderErrorJson([errorMsg])
 		}
 	}

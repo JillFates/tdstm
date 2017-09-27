@@ -167,7 +167,11 @@ class TaskService implements ServiceMethods {
 			t.duration AS duration,
 			t.duration_scale AS durationScale,
 			t.category,
-			t.instructions_link AS instructionsLink""")
+			t.instructions_link AS instructionsLink,
+			t.api_action_id AS apiActionId,
+			t.api_action_invoked_at AS apiActionInvokedAt,
+			t.api_action_completed_at AS apiActionCompletedAt
+			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if (!countOnly) {
@@ -304,6 +308,7 @@ class TaskService implements ServiceMethods {
 		def minAgoFormat = minAgo.format(format)
 		def todoTasks = allTasks.findAll { task ->
 			task.status == ACS.READY ||
+			(task.status == ACS.HOLD && task.apiActionId != null) ||
 			(task.status == ACS.STARTED && task.assignedTo == personId) ||
 			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
 		}
@@ -455,6 +460,49 @@ class TaskService implements ServiceMethods {
 					status = ACS.HOLD
 					task.status = status
 				}
+			}
+		}
+		return status
+	}
+
+	/**
+	 * Reset an action so it can be invoked again
+	 * @param task
+	 * @param whom
+	 * @return
+	 */
+	String resetAction(AssetComment task, Person whom) {
+		String status = task.status
+		if (task.hasAction() && !task.isAutomatic() && status == AssetCommentStatus.HOLD) {
+			String errMsg
+			try {
+				// Update the task so it can be invoked again
+				task.apiActionInvokedAt = null
+				task.apiActionCompletedAt = null
+				task.actStart = null
+				task.dateResolved = null
+
+				// Log a note that the API Action was reset
+				addNote(task, whom, "Reset action ${task.apiAction.name}")
+
+				// Make sure that the status is READY instead
+				status = AssetCommentStatus.READY
+				task.status = status
+
+			} catch (InvalidRequestException e) {
+				errMsg = e.getMessage()
+			} catch (InvalidConfigurationException e) {
+				errMsg = e.getMessage()
+			} catch (e) {
+				errMsg = 'A runtime error occurred while attempting to process the action'
+				log.error ExceptionUtil.stackTraceToString('resetAction() failed ', e)
+			}
+
+			if (errMsg) {
+				log.info "resetAction() error $errMsg"
+				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
+				status = ACS.HOLD
+				task.status = status
 			}
 		}
 		return status

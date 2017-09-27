@@ -1281,7 +1281,6 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	var getComment = function (commentId) {
-		//console.log("getComment()", commentId);
 		var deferred = q.defer();
 		http.get(utils.url.applyRootPath('/assetEntity/showComment?id=' + commentId)).
 			success(function (data, status, headers, config) {
@@ -1294,9 +1293,20 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	var invokeAction = function (commentId) {
-		//console.log("invokeAction()", commentId);
 		var deferred = q.defer();
 		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeAction')).
+			success(function (data, status, headers, config) {
+				deferred.resolve(data);
+			}).
+			error(function (data, status, headers, config) {
+				deferred.reject(data);
+			});
+		return deferred.promise;
+	};
+
+	var resetAction = function (commentId) {
+		var deferred = q.defer();
+		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/resetAction')).
 			success(function (data, status, headers, config) {
 				deferred.resolve(data);
 			}).
@@ -1539,6 +1549,7 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		searchComments: searchComments,
 		getComment: getComment,
 		invokeAction: invokeAction,
+		resetAction: resetAction,
 		getActionBarButtons: getActionBarButtons,
 		predecessorTableHtml: predecessorTableHtml,
 		successorTableHtml: successorTableHtml,
@@ -2273,6 +2284,12 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 					case "showNeighborhood":
 						action = scope.showNeighborhood;
 						break;
+					case "invokeAction":
+						action = scope.invokeAction;
+						break;
+					case "resetAction":
+						action = scope.resetAction;
+						break;
 				}
 				if (action != null) {
 					action(button);
@@ -2336,6 +2353,32 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 				window.open(utils.url.applyRootPath('/task/taskGraph?neighborhoodTaskId=' + scope.comment.commentId), '_blank');
 			};
 
+			scope.invokeAction = function(button) {
+                updateStatus(true);
+                commentService.invokeAction(scope.comment.commentId).then(
+                    function (data) {
+                    	postAction(button, data);
+                    },
+                    function (data) {
+                        updateStatus(false);
+                        alerts.showGenericMsg();
+                    }
+                );
+            };
+
+			scope.resetAction = function(button) {
+                updateStatus(true);
+                commentService.resetAction(scope.comment.commentId).then(
+                    function (data) {
+                    	postAction(button, data);
+                    },
+                    function (data) {
+                        updateStatus(false);
+                        alerts.showGenericMsg();
+                    }
+                );
+            };
+
 			var postAction = function (button, data) {
 				button.disabled = true;
 				updateStatus(false);
@@ -2347,6 +2390,8 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 						alerts.addAlertMsg(data.error);
 					} else {
 						switch (button.actionType) {
+							case "invokeAction":
+							case "resetAction":
 							case "changeStatus":
 								var cell = angular.element('#status_' + id);
 								if (cell.length == 0) {
@@ -2358,6 +2403,7 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 									cell.removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 								}
 								updateColumn('assignedTo', id, data.assignedToName);
+								updateColumn('actStart', id, data.assetComment.actStart);
 								break;
 							case "assignTask":
 								updateColumn('assignedTo', id, data.assignedToName);
@@ -2366,7 +2412,8 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 								updateColumn('estStart', id, data.estStart);
 								updateColumn('estFinish', id, data.estFinish);
 								break;
-
+							default:
+								console.log('Unhandled action type.', button, data)
 						}
 					}
 				}

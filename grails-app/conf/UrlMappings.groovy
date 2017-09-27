@@ -237,6 +237,11 @@ class UrlMappings {
 			action = [POST:"invokeAction"]
 		}
 
+		"/ws/task/$id/resetAction" {
+			controller = "wsTask"
+			action = [POST:"resetAction"]
+		}
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [GET:"retrieveStatus"]
