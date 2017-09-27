@@ -60,7 +60,7 @@ ${script}
                 </g:if>
                 <g:if test="${missingPropertyError}">
                     <div class="alert alert-danger">
-                        <strong>Missing property Exception!</strong> ${missingPropertyError}
+                        <strong>Missing property Exception!</strong> ${missingPropertyError} Line number: ${lineNumber}
                     </div>
                 </g:if>
                 <br>
