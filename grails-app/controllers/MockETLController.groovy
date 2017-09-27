@@ -1,7 +1,4 @@
-import com.tdsops.etl.DataPart
-import com.tdsops.etl.DomainAssets
-import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.StringTransformation
+import com.tdsops.etl.*
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -31,7 +28,8 @@ class MockETLController implements ControllerMethods {
             data.addAll([line.split(',')])
         }
 
-        def script = params.script ?: """domain Application
+        def script = params.script ?: """console on
+domain Application
 read labels
 iterate {
     extract 'MODEL NAME' transform lowercase
@@ -42,6 +40,7 @@ iterate {
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DomainAssets.class.name
         customizer.addStaticStars DataPart.class.name
+        customizer.addStaticStars ConsoleStatus.class.name
 
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 //        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
@@ -52,16 +51,18 @@ iterate {
         CompilerConfiguration configuration = new CompilerConfiguration()
         configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
-        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+        DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data, debugConsole: console)
 
         Binding binding = new Binding([
                 etlProcessor: etlProcessor,
-                domain   : etlProcessor.&domain,
-                read     : etlProcessor.&read,
-                iterate  : etlProcessor.&iterate,
-                transform: etlProcessor.&transform,
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                console     : etlProcessor.&console,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         ErrorCollector errorCollector
@@ -73,11 +74,11 @@ iterate {
 
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
-        } catch (MissingPropertyException mpe){
+        } catch (MissingPropertyException mpe) {
             missingPropertyError = mpe.getMessage() + ". Property: ${mpe.getProperty()}"
         }
 
-        [mockData: mockData, script: script, etlProcessor: etlProcessor, errorCollector: errorCollector, missingPropertyError: missingPropertyError]
+        [mockData: mockData, script: script, etlProcessor: etlProcessor, errorCollector: errorCollector, missingPropertyError: missingPropertyError, logContent: console.content()]
     }
 
 
