@@ -184,7 +184,7 @@ class WsTaskController implements ControllerMethods {
 		if (assetComment) {
 			Person whom = securityService.loadCurrentPerson()
 			String status = taskService.invokeAction(assetComment, whom)
-			render([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)] as JSON)
+			renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "invokeAction: $errorMsg"
@@ -203,7 +203,7 @@ class WsTaskController implements ControllerMethods {
 		if (assetComment) {
 			Person whom = securityService.loadCurrentPerson()
 			String status = taskService.resetAction(assetComment, whom)
-			render([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)] as JSON)
+			renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "resetAction: $errorMsg"
