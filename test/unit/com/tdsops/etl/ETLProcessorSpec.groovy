@@ -3,6 +3,7 @@ package com.tdsops.etl
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
@@ -97,12 +98,12 @@ class ETLProcessorSpec extends Specification {
 
         then:
         !!etlProcessor.labelMap
-        0 == etlProcessor.labelMap["DEVICE ID"]
-        1 == etlProcessor.labelMap["MODEL NAME"]
-        2 == etlProcessor.labelMap["MANUFACTURER NAME"]
+        etlProcessor.labelMap["DEVICE ID"] == 0
+        etlProcessor.labelMap["MODEL NAME"] == 1
+        etlProcessor.labelMap["MANUFACTURER NAME"] == 2
 
         and:
-        1 == etlProcessor.currentRowPosition
+        etlProcessor.currentRowPosition == 1
     }
 
     /**
@@ -150,7 +151,7 @@ class ETLProcessorSpec extends Specification {
         shell.evaluate(scriptText)
 
         then:
-        data.size() == etlProcessor.currentRowPosition
+        etlProcessor.currentRowPosition == data.size()
     }
 
     /**
@@ -205,7 +206,7 @@ class ETLProcessorSpec extends Specification {
         data.size() == etlProcessor.currentRowPosition
 
         and:
-        "Slideaway" == etlProcessor.currentFieldValue
+        etlProcessor.currentFieldValue == "Slideaway"
     }
 
     /**
@@ -260,7 +261,7 @@ class ETLProcessorSpec extends Specification {
         data.size() == etlProcessor.currentRowPosition
 
         and:
-        "Slideaway" == etlProcessor.currentFieldValue
+        etlProcessor.currentFieldValue == "Slideaway"
     }
 
     void 'test can transform a field value to uppercase'() {
@@ -314,9 +315,9 @@ class ETLProcessorSpec extends Specification {
         data.size() == etlProcessor.currentRowPosition
 
         and:
-        "SRW24G4" == etlProcessor.crudData[1][1]
-        "ZPHA MODULE" == etlProcessor.crudData[2][1]
-        "SLIDEAWAY" == etlProcessor.crudData[3][1]
+        etlProcessor.crudData[1][1] == "SRW24G4"
+        etlProcessor.crudData[2][1] == "ZPHA MODULE"
+        etlProcessor.crudData[3][1] == "SLIDEAWAY"
     }
 
     void 'test can transform a field value to lowercase'() {
@@ -368,9 +369,9 @@ class ETLProcessorSpec extends Specification {
         data.size() == etlProcessor.currentRowPosition
 
         and:
-        "srw24g4" == etlProcessor.crudData[1][1]
-        "zpha module" == etlProcessor.crudData[2][1]
-        "slideaway" == etlProcessor.crudData[3][1]
+        etlProcessor.crudData[1][1] == "srw24g4"
+        etlProcessor.crudData[2][1] == "zpha module"
+        etlProcessor.crudData[3][1] == "slideaway"
     }
 
     void 'test can check syntax errors at parsing time'() {
@@ -422,7 +423,7 @@ class ETLProcessorSpec extends Specification {
         thrown MultipleCompilationErrorsException
     }
 
-    void 'test can check syntax errors at evaluate time'() {
+    void 'test can check syntax errors at evaluation time'() {
 
         given:
         String scriptText = """
@@ -469,5 +470,303 @@ class ETLProcessorSpec extends Specification {
 
         then:
         thrown MissingPropertyException
+    }
+
+    void 'test can disallow closure creation using a secure syntax with AST customizer'() {
+
+        given:
+        String scriptText = """
+            domain Device
+            read labels
+            def greeting = { String name -> "Hello, \$name!" }
+            assert greeting('Diego') == 'Hello, Diego!'
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+//        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+//        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+//        secureASTCustomizer.starImportsWhitelist = []
+//        secureASTCustomizer.staticStarImportsWhitelist = ['java.lang.Math'] // Only allow the java.lang.Math.* static import
+
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
+        e.errorCollector.errors*.cause*.message == ["Closures are not allowed"]
+    }
+
+    void 'test can disallow method creation using a secure syntax with AST customizer'() {
+
+        given:
+        String scriptText = """
+            domain Device
+            read labels
+            def greeting(String name){ 
+                "Hello, \$name!" 
+            }
+            assert greeting('Diego') == 'Hello, Diego!'
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+//        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+//        secureASTCustomizer.starImportsWhitelist = []
+//        secureASTCustomizer.staticStarImportsWhitelist = ['java.lang.Math'] // Only allow the java.lang.Math.* static import
+
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
+        e.errorCollector.errors*.cause*.message == ["Method definitions are not allowed"]
+    }
+
+    void 'test can disallow unnecessary imports using a secure syntax with AST customizer'() {
+
+        given:
+        String scriptText = """
+            
+            import java.lang.Math
+            
+            domain Device
+            read labels
+            Math.max 10, 100
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+//        secureASTCustomizer.starImportsWhitelist = []
+//        secureASTCustomizer.staticStarImportsWhitelist = ['java.lang.Math'] // Only allow the java.lang.Math.* static import
+
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
+        e.errorCollector.errors*.cause*.message == ["Importing [java.lang.Math] is not allowed"]
+    }
+
+    void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer'() {
+
+        given:
+        String scriptText = """
+            
+            import java.lang.Math.*
+            
+            domain Device
+            read labels
+            max 10, 100
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+        secureASTCustomizer.starImportsWhitelist = []
+//        secureASTCustomizer.staticStarImportsWhitelist = ['java.lang.Math'] // Only allow the java.lang.Math.* static import
+
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
+        e.errorCollector.errors*.cause*.message == ["Importing [java.lang.Math.*] is not allowed"]
+    }
+
+    void 'test can allow stars imports using a secure syntax with AST customizer'() {
+
+        given:
+        String scriptText = """            
+            domain Device
+            read labels
+            max 10, 100
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        Binding binding = new Binding([
+                etlProcessor: etlProcessor,
+                domain      : etlProcessor.&domain,
+                read        : etlProcessor.&read,
+                iterate     : etlProcessor.&iterate,
+                transform   : etlProcessor.&transform,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        and:
+        ImportCustomizer customizer = new ImportCustomizer()
+        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars DataPart.class.name
+        customizer.addStaticStars Math.class.name
+
+        and:
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+        secureASTCustomizer.starImportsWhitelist = []
+
+        and:
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
+
+        when:
+        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+        shell.evaluate(scriptText)
+
+        then:
+        notThrown MultipleCompilationErrorsException
     }
 }

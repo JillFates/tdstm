@@ -8,6 +8,7 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 
 @Secured('isAuthenticated()')
 class MockETLController implements ControllerMethods {
@@ -42,23 +43,30 @@ iterate {
         customizer.addStaticStars DomainAssets.class.name
         customizer.addStaticStars DataPart.class.name
 
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+//        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
+        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+        secureASTCustomizer.starImportsWhitelist = []
+
         CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
+        configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         Binding binding = new Binding([
                 etlProcessor: etlProcessor,
-                 domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
-                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+                domain   : etlProcessor.&domain,
+                read     : etlProcessor.&read,
+                iterate  : etlProcessor.&iterate,
+                transform: etlProcessor.&transform,
+                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         ErrorCollector errorCollector
         String missingPropertyError
+
         try {
             GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
             shell.evaluate(script)

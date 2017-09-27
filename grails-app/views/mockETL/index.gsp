@@ -5,6 +5,16 @@
     <meta name="layout" content="topNav" />
 
     <title>Datasource transformation</title>
+    <style type="text/css">
+        #script {
+            background: url(http://i.imgur.com/2cOaJ.png);
+            background-attachment: local;
+            background-repeat: no-repeat;
+            padding-left: 35px;
+            padding-top: 10px;
+            border-color:#ccc;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,21 +36,24 @@ ${mockData}
                 <legend>ETL Scripting Sandbox</legend>
                 <br>
                 <div>
-                    <textarea class="form-control" name="script" rows="10" style="width: 100%;">
+                    <textarea id="script" class="form-control" name="script" rows="10" style="width: 100%;">
 ${script}
                     </textarea>
                 </div>
                 <br>
                 <g:if test="${errorCollector}">
-                    <div class="alert alert-warning">
+                    <div class="alert alert-danger">
                         <strong>${errorCollector.getErrorCount()} Errors!</strong>
+                        <g:each in="${errorCollector.errors}" var="error">
+                            <th>${error.cause*.message}</th>
+                        </g:each>
 
 
                     </div>
                 </g:if>
                 <g:if test="${missingPropertyError}">
                     <div class="alert alert-danger">
-                        <strong>Missing property!</strong> Indicates a dangerous or potentially negative action.
+                        <strong>Missing property Exception!</strong> ${missingPropertyError}
                     </div>
                 </g:if>
                 <br>
