@@ -7,11 +7,14 @@ class ETLProcessor {
     Integer currentRowPosition = 0
     Integer currentColumnPosition = 0
     String currentFieldValue
+    DebugConsole debugConsole = new DebugConsole(buffer: new StringBuffer())
+
 
     Map<String, Integer> labelMap
 
     ETLProcessor domain(DomainAssets aDomain) {
         selectedDomain = aDomain
+        debugConsole.info("Selected Domain: $aDomain")
         this
     }
 
@@ -19,6 +22,7 @@ class ETLProcessor {
 
         if (dataPart == DataPart.labels) {
             labelMap = [:]
+            debugConsole.info("Reading labels")
 
             crudData.get(0).eachWithIndex { String columnName, Integer index ->
                 labelMap[columnName] = index
@@ -33,7 +37,7 @@ class ETLProcessor {
         crudData[1..(crudData.size() - 1)]
     }
 
-    def iterate(Closure closure) {
+    ETLProcessor iterate(Closure closure) {
         closure.delegate = this
         crudData[currentRowPosition..(crudData.size() - 1)].each {
             closure(it)
@@ -43,31 +47,33 @@ class ETLProcessor {
         this
     }
 
-    def extract(Integer index) {
+    ETLProcessor console(ConsoleStatus status){
+        debugConsole.status = status
+        this
+    }
+
+    ETLProcessor extract(Integer index) {
         currentColumnPosition = index
         currentFieldValue = crudData[currentRowPosition][currentColumnPosition]
+        debugConsole.info "Current field value: $currentFieldValue"
         this
     }
 
-    def extract(String columnName) {
+    ETLProcessor extract(String columnName) {
         currentColumnPosition = labelMap[columnName]
         currentFieldValue = crudData[currentRowPosition][currentColumnPosition]
+        debugConsole.info "Current field value: $currentFieldValue"
         this
     }
 
-    def transform(StringTransformation transformation ){
+    ETLProcessor transform(StringTransformation transformation ){
+        String oldValue =  currentFieldValue
         currentFieldValue = transformation.apply(currentFieldValue)
         crudData[currentRowPosition][currentColumnPosition] = currentFieldValue
+        debugConsole.info "Transformation $oldValue -> $currentFieldValue"
         this
     }
 
-    def uppercase = {
-
-    }
-
-    def lowercase = {
-
-    }
 
     def methodMissing(String methodName, args) {
 

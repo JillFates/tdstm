@@ -4,7 +4,7 @@ class StringTransformation {
 
     Closure<String> closure
 
-    def apply(String value){
+    String apply(String value){
         closure(value)
     }
 }
