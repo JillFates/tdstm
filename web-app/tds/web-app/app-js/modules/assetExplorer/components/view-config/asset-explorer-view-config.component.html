@@ -49,7 +49,7 @@
 					</ng-template>
 				</li>
 				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected() || !isColumnSelected(),'active':isCurrentTab(2)}">
-					<a *ngIf="!isAssetSelected();else columnsTabLink">Columns</a>
+					<a *ngIf="!isAssetSelected() || !isColumnSelected();else columnsTabLink">Columns</a>
 					<ng-template #columnsTabLink>
 						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab" #link>Columns</a>
 					</ng-template>
