@@ -67,18 +67,19 @@ iterate {
 
         ErrorCollector errorCollector
         String missingPropertyError
-
+        Integer lineNumber
         try {
             GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-            shell.evaluate(script)
+            shell.evaluate(script, "ETLProcessor")
 
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
         } catch (MissingPropertyException mpe) {
-            missingPropertyError = mpe.getMessage() + ". Property: ${mpe.getProperty()}"
+            lineNumber = mpe.stackTrace.find {StackTraceElement ste -> ste.fileName == "ETLProcessor"}?.lineNumber
+            missingPropertyError = mpe.getMessage()
         }
 
-        [mockData: mockData, script: script, etlProcessor: etlProcessor, errorCollector: errorCollector, missingPropertyError: missingPropertyError, logContent: console.content()]
+        [mockData: mockData, script: script.trim(), etlProcessor: etlProcessor, errorCollector: errorCollector, lineNumber: lineNumber, missingPropertyError: missingPropertyError, logContent: console.content()]
     }
 
 

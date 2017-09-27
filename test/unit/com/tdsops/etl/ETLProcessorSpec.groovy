@@ -27,7 +27,7 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         etlProcessor.selectedDomain == DomainAssets.Application
@@ -59,7 +59,7 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         etlProcessor.selectedDomain == DomainAssets.Application
@@ -94,7 +94,7 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         !!etlProcessor.labelMap
@@ -148,7 +148,7 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         etlProcessor.currentRowPosition == data.size()
@@ -200,7 +200,7 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         data.size() == etlProcessor.currentRowPosition
@@ -426,8 +426,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at evaluation time'() {
 
         given:
-        String scriptText = """
-            domain Device
+        String scriptText = """domain Device
             read labels
             iterate {
                 extract 'MODEL NAME' transform unknown
@@ -466,10 +465,11 @@ class ETLProcessorSpec extends Specification {
 
         when:
         GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        shell.evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        thrown MissingPropertyException
+        MissingPropertyException missingPropertyException = thrown MissingPropertyException
+        missingPropertyException.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber == 4
     }
 
     void 'test can disallow closure creation using a secure syntax with AST customizer'() {
@@ -528,7 +528,7 @@ class ETLProcessorSpec extends Specification {
 
         then:
         MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
-        e.errorCollector.errors*.cause*.message == ["Closures are not allowed"]
+        e.errorCollector.errors[0].cause*.message == ["Closures are not allowed"]
     }
 
     void 'test can disallow method creation using a secure syntax with AST customizer'() {
@@ -741,7 +741,7 @@ class ETLProcessorSpec extends Specification {
                 iterate     : etlProcessor.&iterate,
                 transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() }),
         ])
 
         and:
@@ -831,4 +831,61 @@ class ETLProcessorSpec extends Specification {
         then:
         buffer.toString() == "INFO - Selected Domain: Device" + System.lineSeparator()
     }
+
+//    void 'test can extract a field value and load into a domain object property name'() {
+//
+//        // The 'load into' command will take whatever value is in the internal register and map it to the domain object
+//        // property name.  The command takes a String argument that will map to the property name of the domain. This
+//        // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
+//        // with an explaination that the property does not exist and reference the line of the error if possible.
+//
+//        given:
+//        String scriptText = """
+//            domain Application
+//            read labels
+//            iterate {
+//                extract 'VENDOR NAME'
+//                load into 'appName'
+//
+//            }
+//        """
+//        and:
+//        List<List<String>> data = [
+//                ["APPLICATION ID", "VENDOR NAME", "TEChNOLOGY"],
+//                ["152254", "Microsoft", "(xlsx updated)"],
+//                ["152255", "Mozilla", "NGM"],
+//                ["152256", "VMWare", ""]
+//        ]
+//
+//        and:
+//        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+//
+//        and:
+//        Binding binding = new Binding([
+//                etlProcessor: etlProcessor,
+//                domain      : etlProcessor.&domain,
+//                read        : etlProcessor.&read,
+//                iterate     : etlProcessor.&iterate,
+//
+//        ])
+//
+//        and:
+//        ImportCustomizer customizer = new ImportCustomizer()
+//        customizer.addStaticStars DomainAssets.class.name
+//        customizer.addStaticStars DataPart.class.name
+//
+//        and:
+//        CompilerConfiguration configuration = new CompilerConfiguration()
+//        configuration.addCompilationCustomizers customizer
+//
+//        when:
+//        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
+//        shell.evaluate(scriptText)
+//
+//        then:
+//        data.size() == etlProcessor.currentRowPosition
+//
+//        and:
+//        etlProcessor.currentFieldValue == "Slideaway"
+//    }
 }
