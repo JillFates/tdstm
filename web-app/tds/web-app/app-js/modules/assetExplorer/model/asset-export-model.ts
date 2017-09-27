@@ -7,4 +7,5 @@ export class AssetExportModel {
 	totalData?: number;
 	domains: DomainModel[];
 	previewMode: boolean;
+	searchExecuted: boolean;
 }

@@ -99,7 +99,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 			domains:  this.domains,
 			previewMode: false,
 			queryId: this.model.id,
-			totalData: this.grid.gridData.total
+			totalData: this.grid.gridData.total,
+			searchExecuted: true,
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
