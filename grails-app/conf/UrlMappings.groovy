@@ -504,6 +504,21 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/favoriteDataviews" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "favoriteDataviews"
+			]
+		}
+
+		"/ws/assetExplorer/favoriteDataview/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "addFavoriteDataview",
+					DELETE: "deleteFavoriteDataview"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
