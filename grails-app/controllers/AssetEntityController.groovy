@@ -2379,7 +2379,7 @@ class AssetEntityController implements ControllerMethods {
 		if (!project) return
 
 		def task
-		def moveEventId=params.moveEvent
+		def moveEventId=NumberUtil.toLong(params.moveEvent)
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
 		def filterDesc=params['filter[filters][0][value]']

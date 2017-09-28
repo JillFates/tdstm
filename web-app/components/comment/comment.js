@@ -2012,7 +2012,7 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
 					autoWidth: true,
 					dataSource: {
 						transport: {
-							read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId),
+							read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId  + '&moveEvent=' + scope.moveEvent),
 							type: "get",
 							dataType: "json",
 							cache: true
