@@ -63,24 +63,10 @@ export class SelectListConfigurationPopupComponent {
 
 				let indexOfBlank = value.indexOf('');
 				if (this.field.constraints.required && indexOfBlank !== -1) {
-					// value.splice(indexOfBlank, 1);
 					this.items.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === -1) {
-					// value.splice(0, 0, '');
 					this.items.splice(0, 0, '');
 				}
-				/*
-				let udfValues: any[] = [];
-				if (this.field.constraints.values) {
-				udfValues = this.field.constraints.values
-						.filter(i => value.indexOf(i) === -1)
-						.map(i => {
-							return {
-								deletable: true,
-								value: i
-							};
-						});
-				}*/
 				if (this.field.constraints.values) {
 					for (let item of this.field.constraints.values) {
 						if (value.indexOf(item) === -1) {
@@ -90,15 +76,6 @@ export class SelectListConfigurationPopupComponent {
 						}
 					}
 				}
-				/*
-				let distinct = value.map(i => {
-					return {
-						deletable: false,
-						value: i
-					};
-				});
-				this.items = distinct.concat(udfValues);
-				*/
 			});
 		this.defaultValue = this.field.default;
 	}

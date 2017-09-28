@@ -640,35 +640,6 @@ class MoveBundleController implements ControllerMethods {
 		}
 		def groupValues = Application.executeQuery(groupingSumQuery, [project:project])
 
-        println(groupingSumQuery)
-        println(groupValues)
-
-        def customFieldSetting = customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
-            it.field == customField
-        }
-
-        /*
-        * SELECT count(*)
-FROM asset_entity ae
--- JOIN application app on app.app_id = ae.application
-WHERE ae.project_id = 2445
-AND ae.asset_type = 'Application'
-AND ae.custom2 is null
--- AND ae. = 'one'
-;
-
-SELECT ae.custom2, count(ae.custom2)
-FROM asset_entity ae
--- JOIN application app on app.app_id = ae.application
-WHERE ae.project_id = 2445
-AND ae.asset_type = 'Application'
-AND ae.custom2 is not null
-group by ae.custom2
--- AND ae. = 'one'
-;
-        * */
-        println(customFieldSetting)
-
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
 			if(!key) key = Application.UNKNOWN
@@ -678,6 +649,20 @@ group by ae.custom2
 			groups[key] += it.count
 
 			groups
+		}
+
+		// sort values based on custom field setting configuration
+		def customFieldSetting = customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+			it.field == customField
+		}
+
+		if (customFieldSetting?.constraints?.values) {
+			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
+				if (!it) result[Application.UNKNOWN] = 0
+				else if (groupPlanMethodologyCount[it]) result[it] = 0
+				result
+			}
+			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
 		}
 
 /*
