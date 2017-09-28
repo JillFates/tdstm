@@ -33,6 +33,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -64,6 +65,7 @@ class MoveBundleController implements ControllerMethods {
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+    CustomDomainService customDomainService
 
 	@HasPermission(Permission.BundleView)
 	def list() {}
@@ -638,6 +640,35 @@ class MoveBundleController implements ControllerMethods {
 		}
 		def groupValues = Application.executeQuery(groupingSumQuery, [project:project])
 
+        println(groupingSumQuery)
+        println(groupValues)
+
+        def customFieldSetting = customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+            it.field == customField
+        }
+
+        /*
+        * SELECT count(*)
+FROM asset_entity ae
+-- JOIN application app on app.app_id = ae.application
+WHERE ae.project_id = 2445
+AND ae.asset_type = 'Application'
+AND ae.custom2 is null
+-- AND ae. = 'one'
+;
+
+SELECT ae.custom2, count(ae.custom2)
+FROM asset_entity ae
+-- JOIN application app on app.app_id = ae.application
+WHERE ae.project_id = 2445
+AND ae.asset_type = 'Application'
+AND ae.custom2 is not null
+group by ae.custom2
+-- AND ae. = 'one'
+;
+        * */
+        println(customFieldSetting)
+
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
 			if(!key) key = Application.UNKNOWN
@@ -648,6 +679,7 @@ class MoveBundleController implements ControllerMethods {
 
 			groups
 		}
+
 /*
 		// TODO - this is unnecessary and could just load the map
 
