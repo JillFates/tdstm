@@ -403,6 +403,37 @@ log4j = {
 // trace 'org.hibernate.type'
 // debug 'org.hibernate.SQL'
 
+    appenders {
+        def appName = appName ?: 'tdstm'    // If not defined (for local config)
+        def commonPattern = '%d{ISO8601} [%t] %-5p %c %x - %m%n'
+        def auditPattern = '%d{ISO8601} - %m%n'
+        def logDirectory = 'target'
+
+        if (System.properties.getProperty('catalina.base')) {
+            logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
+        }
+
+        // Use this if we want to modify the default appender called 'stdout'.
+        console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
+
+        // Application log file
+        file (
+            name:'applicationLog',
+            file:"${logDirectory}/${appName}.log",
+            layout:pattern(conversionPattern: commonPattern)
+         )
+
+        // Audit log file
+        file (
+            name:'auditLog',
+            file:"$logDirectory/${appName}-audit.log",
+            layout:pattern(conversionPattern: auditPattern)
+        )
+
+        // Disable the Stacktrace
+        'null' name:'stacktrace'
+    }
+
     root {
         debug 'stdout', 'applicationLog'
         additivity: true
