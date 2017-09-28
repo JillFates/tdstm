@@ -1,6 +1,8 @@
 import com.tdsops.etl.*
+import com.tdsops.tm.enums.domain.AssetClass
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -11,7 +13,21 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 class MockETLController implements ControllerMethods {
 
 
+    def customDomainService
+
     def index() {
+
+        Project project = securityService.userCurrentProject
+
+        List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
+                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
+        List<Map<String, ?>> deviceFieldSpecs = customDomainService.allFieldSpecs(project,
+                AssetClass.DEVICE.name())[AssetClass.DEVICE.name()]["fields"]
+        List<Map<String, ?>> databaseFieldSpecs = customDomainService.allFieldSpecs(project,
+                AssetClass.DATABASE.name())[AssetClass.DATABASE.name()]["fields"]
+        List<Map<String, ?>> storageFieldSpecs = customDomainService.allFieldSpecs(project,
+                AssetClass.STORAGE.name())[AssetClass.STORAGE.name()]["fields"]
+
 
         def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME
 152254,SRW24G4,LINKSYS
