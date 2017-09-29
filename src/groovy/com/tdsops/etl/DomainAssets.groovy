@@ -2,5 +2,5 @@ package com.tdsops.etl
 
 enum DomainAssets {
 
-    Application, Device, Database, Storage
+    Application, Device, Database, Storage, External
 }
