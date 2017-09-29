@@ -70,57 +70,60 @@ ${script}
     </div>
 
     <fieldset>
-        <legend>Results</legend>
+        <legend>Raw data modified</legend>
         <br>
         <div>
-            %{--<table style="width:100%" class="table">--}%
-                %{--<tr>--}%
-                    %{--<g:each in="${etlProcessor?.columnNames}" var="columnName">--}%
-                        %{--<th>${columnName}</th>--}%
-                    %{--</g:each>--}%
-                %{--</tr>--}%
-                %{--<g:each in="${etlProcessor?.rows()}" var="row">--}%
-                    %{--<tr>--}%
-                    %{--<g:each in="${row}" var="value">--}%
-                        %{--<td>${value}</td>--}%
-                    %{--</g:each>--}%
-                    %{--</tr>--}%
-                %{--</g:each>--}%
-            %{--</table>--}%
-
-            <table style="width:100%" class="table">
+            <table style="width:100%" class="table table-condensed table-hover">
                 <tr>
-                    <g:each in="${etlProcessor?.tableHeaders}" var="columnName">
+                    <g:each in="${etlProcessor?.columnNames}" var="columnName">
                         <th>${columnName}</th>
                     </g:each>
                 </tr>
-                <g:each in="${etlProcessor?.tableRows}" var="row">
+                <g:each in="${etlProcessor?.rows()}" var="row">
                     <tr>
-                        <g:each in="${row}" var="value">
-                            <td>${value}</td>
-                        </g:each>
+                    <g:each in="${row}" var="value">
+                        <td>${value}</td>
+                    </g:each>
                     </tr>
                 </g:each>
             </table>
-
+            %{--<table style="width:100%" class="table">--}%
+                %{--<tr>--}%
+                    %{--<g:each in="${etlProcessor?.tableHeaders}" var="columnName">--}%
+                        %{--<th>${columnName}</th>--}%
+                    %{--</g:each>--}%
+                %{--</tr>--}%
+                %{--<g:each in="${etlProcessor?.tableRows}" var="row">--}%
+                    %{--<tr>--}%
+                        %{--<g:each in="${row}" var="value">--}%
+                            %{--<td>${value}</td>--}%
+                        %{--</g:each>--}%
+                    %{--</tr>--}%
+                %{--</g:each>--}%
+            %{--</table>--}%
         </div>
     </fieldset>
 
         <div class="row">
             <div class="col-md-6">
                 <g:if test="${logContent}">
-                    <textarea id="console" rows="15" style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+                    <fieldset>
+                        <legend>Console output</legend>
+                        <br>
+                        <textarea id="console" rows="15" style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+                    </fieldset>
                 </g:if>
             </div>
             <div class="col-md-6">
                 <g:if test="${jsonResult}">
-                    <textarea id="jsonResult" rows="50" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${jsonResult}</textarea>
+                    <fieldset>
+                        <legend>JSON result</legend>
+                        <br>
+                        <textarea id="jsonResult" rows="50" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${jsonResult}</textarea>
+                    </fieldset>
                 </g:if>
             </div>
         </div>
-
-
-
-</form>
+    </form>
 </body>
 </html>

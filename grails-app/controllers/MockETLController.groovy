@@ -22,29 +22,29 @@ class MockETLController implements ControllerMethods {
 
         DomainAssetFieldsMapper domainAssetFieldsMapper = new DomainAssetFieldsMapper()
 
-        List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
-                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
-        List<Map<String, ?>> deviceFieldSpecs = customDomainService.allFieldSpecs(project,
-                AssetClass.DEVICE.name())[AssetClass.DEVICE.name()]["fields"]
-        List<Map<String, ?>> databaseFieldSpecs = customDomainService.allFieldSpecs(project,
-                AssetClass.DATABASE.name())[AssetClass.DATABASE.name()]["fields"]
-        List<Map<String, ?>> storageFieldSpecs = customDomainService.allFieldSpecs(project,
-                AssetClass.STORAGE.name())[AssetClass.STORAGE.name()]["fields"]
+//        List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
+//                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
+//        List<Map<String, ?>> deviceFieldSpecs = customDomainService.allFieldSpecs(project,
+//                AssetClass.DEVICE.name())[AssetClass.DEVICE.name()]["fields"]
+//        List<Map<String, ?>> databaseFieldSpecs = customDomainService.allFieldSpecs(project,
+//                AssetClass.DATABASE.name())[AssetClass.DATABASE.name()]["fields"]
+//        List<Map<String, ?>> storageFieldSpecs = customDomainService.allFieldSpecs(project,
+//                AssetClass.STORAGE.name())[AssetClass.STORAGE.name()]["fields"]
+//
+//        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, applicationFieldSpecs)
+//        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DEVICE, deviceFieldSpecs)
+//        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DATABASE, databaseFieldSpecs)
+//        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.STORAGE, storageFieldSpecs)
 
-        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, applicationFieldSpecs)
-        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DEVICE, deviceFieldSpecs)
-        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DATABASE, databaseFieldSpecs)
-        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.STORAGE, storageFieldSpecs)
 
-
-        def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME
-152254,SRW24G4,LINKSYS
-152255,ZPHA MODULE,TippingPoint
-152256,Slideaway,ATEN
-152258,CCM4850",Avocent
-152259,DSR2035",Avocent
-152266,2U Cable Management,Generic
-152275,ProLiant BL465c G7,HP"""
+        def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME,ENVIRONMENT
+152254,SRW24G4,LINKSYS,Prod
+152255,ZPHA MODULE,TippingPoint,Dev
+152256,Slideaway,ATEN,Prod
+152258,CCM4850",Avocent,Prod
+152259,DSR2035",Avocent,Dev
+152266,2U Cable Management,Generic,Prod
+152275,ProLiant BL465c G7,HP,Dev"""
 
         def data = []
 
@@ -86,7 +86,13 @@ iterate {
                 iterate     : etlProcessor.&iterate,
                 transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() }),
+                first       : new StringTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
+                blanks      : new StringTransformation(closure: { String value -> value.replaceAll(" ", "") }),
+                camelcase   : new StringTransformation(closure: { String value ->
+                    value.toLowerCase()
+                }),
+                translate: etlProcessor.&translate
         ])
 
         ErrorCollector errorCollector
@@ -99,7 +105,7 @@ iterate {
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
         } catch (MissingPropertyException mpe) {
-            lineNumber = mpe.stackTrace.find {StackTraceElement ste -> ste.fileName == "ETLProcessor"}?.lineNumber
+            lineNumber = mpe.stackTrace.find { StackTraceElement ste -> ste.fileName == "ETLProcessor" }?.lineNumber
             missingPropertyError = mpe.getMessage()
         }
 
