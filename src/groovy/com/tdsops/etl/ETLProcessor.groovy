@@ -92,22 +92,25 @@ class ETLProcessor {
         this
     }
 
-    ETLProcessor translate(Map map) {
 
-        if(map.containsKey(currentFieldValue)){
-            String oldValue = currentFieldValue
+    ETLProcessor translate(Map actions) {
 
-            currentFieldValue = map[currentFieldValue]
-            crudData[currentRowPosition][currentColumnPosition] = currentFieldValue
+        if (actions.containsKey('with')) {
+            Map map = actions.get 'with'
+            if (map.containsKey(currentFieldValue)) {
+                String oldValue = currentFieldValue
 
-            debugConsole.info "Translate $oldValue -> $currentFieldValue"
-        } else {
-            debugConsole.warn "Could not translate $currentFieldValue"
+                currentFieldValue = map[currentFieldValue]
+                crudData[currentRowPosition][currentColumnPosition] = currentFieldValue
+
+                debugConsole.info "Translate $oldValue -> $currentFieldValue"
+            } else {
+                debugConsole.warn "Could not translate $currentFieldValue"
+            }
         }
+
         this
     }
-
-
 
 
     ETLProcessor load(String assetProperty) {
@@ -148,11 +151,11 @@ class ETLProcessor {
     }
 
     List<?> getTableHeaders() {
-        metadata.rows.find {!!it}?.keySet() as List
+        metadata.rows.find { !!it }?.keySet() as List
     }
 
     List<List<?>> getTableRows() {
-        metadata.rows.findAll{!!it}.collect{it.values()}
+        metadata.rows.findAll { !!it }.collect { it.values() }
     }
 
 }
