@@ -33,7 +33,7 @@
             <fieldset>
                 <legend>Mock Data</legend>
                 <br>
-                <textarea class="form-control" name="mockData" rows="10" style="width: 100%;">
+                <textarea class="form-control" name="mockData" rows="8" style="width: 100%;">
 ${mockData}
                 </textarea>
             </fieldset>
@@ -43,7 +43,7 @@ ${mockData}
                 <legend>ETL Scripting Sandbox</legend>
                 <br>
                 <div>
-                    <textarea id="script" class="form-control" name="script" rows="10" style="width: 100%;">
+                    <textarea id="script" class="form-control" name="script" rows=10 style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">
 ${script}
                     </textarea>
                 </div>
@@ -73,30 +73,53 @@ ${script}
         <legend>Results</legend>
         <br>
         <div>
+            %{--<table style="width:100%" class="table">--}%
+                %{--<tr>--}%
+                    %{--<g:each in="${etlProcessor?.columnNames}" var="columnName">--}%
+                        %{--<th>${columnName}</th>--}%
+                    %{--</g:each>--}%
+                %{--</tr>--}%
+                %{--<g:each in="${etlProcessor?.rows()}" var="row">--}%
+                    %{--<tr>--}%
+                    %{--<g:each in="${row}" var="value">--}%
+                        %{--<td>${value}</td>--}%
+                    %{--</g:each>--}%
+                    %{--</tr>--}%
+                %{--</g:each>--}%
+            %{--</table>--}%
+
             <table style="width:100%" class="table">
                 <tr>
-                    <g:each in="${etlProcessor?.labelMap?.keySet()}" var="label">
-                        <th>${label}</th>
+                    <g:each in="${etlProcessor?.tableHeaders}" var="columnName">
+                        <th>${columnName}</th>
                     </g:each>
                 </tr>
-                <g:each in="${etlProcessor?.rows()}" var="row">
+                <g:each in="${etlProcessor?.tableRows}" var="row">
                     <tr>
-                    <g:each in="${row}" var="value">
-                        <td>${value}</td>
-                    </g:each>
+                        <g:each in="${row}" var="value">
+                            <td>${value}</td>
+                        </g:each>
                     </tr>
                 </g:each>
             </table>
+
         </div>
     </fieldset>
 
-    <g:if test="${logContent}">
         <div class="row">
-            <div class="col-md-12">
-                <textarea id="console" rows="15" style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+            <div class="col-md-6">
+                <g:if test="${logContent}">
+                    <textarea id="console" rows="15" style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+                </g:if>
+            </div>
+            <div class="col-md-6">
+                <g:if test="${jsonResult}">
+                    <textarea id="jsonResult" rows="50" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${jsonResult}</textarea>
+                </g:if>
             </div>
         </div>
-    </g:if>
+
+
 
 </form>
 </body>
