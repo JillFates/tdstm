@@ -92,6 +92,24 @@ class ETLProcessor {
         this
     }
 
+    ETLProcessor translate(Map map) {
+
+        if(map.containsKey(currentFieldValue)){
+            String oldValue = currentFieldValue
+
+            currentFieldValue = map[currentFieldValue]
+            crudData[currentRowPosition][currentColumnPosition] = currentFieldValue
+
+            debugConsole.info "Translate $oldValue -> $currentFieldValue"
+        } else {
+            debugConsole.warn "Could not translate $currentFieldValue"
+        }
+        this
+    }
+
+
+
+
     ETLProcessor load(String assetProperty) {
         //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(metadata.domain, assetProperty)
 
