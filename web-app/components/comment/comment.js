@@ -512,6 +512,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 			}
 
 			commentService.deleteDependency(assetDependency).then(function(){
+				warningChangeGraph();
 				if(toClose) {
 					$scope.close();
 				}
@@ -545,17 +546,10 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 		}
 
 		$q.all(qPromises).then(function(){
-			reloadGraph();
+			warningChangeGraph();
 			$scope.close();
 		});
 	};
-
-	function reloadGraph() {
-		setTimeout(function(){
-			// Update the Grap after a change has been reflected
-			$(document).trigger('entityAssetUpdated', {});
-		}, 700);
-	}
 
 	/**
 	 * On delete invoke the Confirmation Modal
@@ -610,6 +604,13 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 			$scope.isDirty = false;
 		}
 	};
+
+	/**
+	 * Let the user know that something has change
+	 */
+	function warningChangeGraph() {
+		$(document).trigger('entityAssetUpdated', {});
+	}
 
 };
 
