@@ -1,5 +1,6 @@
 import com.tdsops.etl.*
 import com.tdsops.tm.enums.domain.AssetClass
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
@@ -19,6 +20,8 @@ class MockETLController implements ControllerMethods {
 
         Project project = securityService.userCurrentProject
 
+        DomainAssetFieldsMapper domainAssetFieldsMapper = new DomainAssetFieldsMapper()
+
         List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
                 AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
         List<Map<String, ?>> deviceFieldSpecs = customDomainService.allFieldSpecs(project,
@@ -27,6 +30,11 @@ class MockETLController implements ControllerMethods {
                 AssetClass.DATABASE.name())[AssetClass.DATABASE.name()]["fields"]
         List<Map<String, ?>> storageFieldSpecs = customDomainService.allFieldSpecs(project,
                 AssetClass.STORAGE.name())[AssetClass.STORAGE.name()]["fields"]
+
+        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, applicationFieldSpecs)
+        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DEVICE, deviceFieldSpecs)
+        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.DATABASE, databaseFieldSpecs)
+        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.STORAGE, storageFieldSpecs)
 
 
         def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME
@@ -48,8 +56,8 @@ class MockETLController implements ControllerMethods {
 domain Application
 read labels
 iterate {
-    extract 'MODEL NAME' transform lowercase
-    extract 2 transform uppercase
+    extract 'MODEL NAME' transform lowercase load 'modelName'
+    extract 2 transform uppercase  load 'appName'
 }
 """
 
@@ -95,7 +103,7 @@ iterate {
             missingPropertyError = mpe.getMessage()
         }
 
-        [mockData: mockData, script: script.trim(), etlProcessor: etlProcessor, errorCollector: errorCollector, lineNumber: lineNumber, missingPropertyError: missingPropertyError, logContent: console.content()]
+        [mockData: mockData, script: script.trim(), etlProcessor: etlProcessor, errorCollector: errorCollector, lineNumber: lineNumber, missingPropertyError: missingPropertyError, logContent: console.content(), jsonResult: (etlProcessor?.transformationResult as JSON)?.toString(true)]
     }
 
 
