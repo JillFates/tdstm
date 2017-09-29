@@ -496,13 +496,26 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	 * Execute the Delete of the Dependencies
 	 * @param asset
 	 */
-	$scope.deleteDependency = function(asset) {
+	$scope.deleteDependency = function(asset, toClose) {
 		if($scope.assetDependency[asset].dependency) {
 			var assetDependency = {
 				assetId: $scope.assetDependency[asset].dependency.asset.id,
-				dependencyId:  $scope.assetDependency[asset].dependency.id
+				dependencyId: $scope.assetDependency[asset].dependency.id
 			};
-			commentService.deleteDependency(assetDependency);
+
+			// To not recall the server, we just delete the dependency
+			delete $scope.assetDependency[asset].dependency;
+
+			if(asset === 'assetA') {
+				$scope.assetDependency['assetA'].dependency = $scope.assetDependency['assetB'].dependency;
+				delete $scope.assetDependency['assetB'].dependency;
+			}
+
+			commentService.deleteDependency(assetDependency).then(function(){
+				if(toClose) {
+					$scope.close();
+				}
+			});
 		}
 	};
 
@@ -510,13 +523,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	 * Listener to catch the Update from the Dialog
 	 */
 	$scope.onClickUpdate = function() {
-		if(($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete)
-		|| ($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete)) {
-			var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
-			$scope.warningConfirmationDialog(confirmMessage, $scope.updateDependencies);
-		} else {
-			$scope.updateDependencies();
-		}
+		$scope.updateDependencies();
 	};
 
 	/**
@@ -525,23 +532,13 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	$scope.updateDependencies = function() {
 		var qPromises = [];
 
-		if($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete) {
-			qPromises.push(commentService.deleteDependency({
-				assetId: $scope.assetDependency.assetA.dependency.asset.id,
-				dependencyId:  $scope.assetDependency.assetA.dependency.id
-			}));
-		} else if($scope.assetDependency.assetA.dependency) {
+	    if($scope.assetDependency.assetA.dependency) {
 			qPromises.push(commentService.updateDependencies({
 				dependency: $scope.assetDependency.assetA.dependency
 			}));
 		}
 
-		if($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete) {
-			qPromises.push(commentService.deleteDependency({
-				assetId: $scope.assetDependency.assetB.dependency.asset.id,
-				dependencyId:  $scope.assetDependency.assetB.dependency.id
-			}));
-		} else if($scope.assetDependency.assetB.dependency) {
+		if($scope.assetDependency.assetB.dependency) {
 			qPromises.push(commentService.updateDependencies({
 				dependency: $scope.assetDependency.assetB.dependency
 			}));
@@ -561,31 +558,16 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	}
 
 	/**
-	 * Mark a Dependency as deletable
-	 * @param asset
-	 * @param toDelete
-	 */
-	$scope.toDeleteDependency = function(asset, toDelete) {
-		if(toDelete){
-			asset.delete = toDelete;
-		} else {
-			delete asset.delete;
-		}
-		$scope.changeData();
-	};
-
-	/**
 	 * On delete invoke the Confirmation Modal
+	 * @param asset
 	 */
-	$scope.onDeleteDependency = function() {
-		var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
+	$scope.toDeleteDependency = function(asset, toClose) {
+		var confirmMessage = 'Are you sure you would like to delete the dependency?';
 		$scope.warningConfirmationDialog(confirmMessage, function(){
-			$scope.deleteDependency('assetA');
-			$scope.deleteDependency('assetB');
-			reloadGraph();
-			$scope.close();
+			$scope.deleteDependency(asset, toClose);
 		});
 	};
+
 
 	/**
 	 * Inline controller of a Confirmation Model
@@ -2012,7 +1994,7 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
 					autoWidth: true,
 					dataSource: {
 						transport: {
-							read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId),
+							read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId  + '&moveEvent=' + scope.moveEvent),
 							type: "get",
 							dataType: "json",
 							cache: true
