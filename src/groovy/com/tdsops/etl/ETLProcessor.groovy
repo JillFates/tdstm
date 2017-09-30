@@ -1,6 +1,9 @@
 package com.tdsops.etl
 
-
+/**
+ *
+ *
+ */
 class ETLProcessor {
 
     List<List<String>> crudData = []
@@ -8,27 +11,33 @@ class ETLProcessor {
     Integer currentColumnPosition = 0
     String currentFieldValue
     DebugConsole debugConsole
-    DomainAssetFieldsMapper domainAssetFieldsMapper
-    Map metadata = [:]
+    ETLFieldsMapper domainAssetFieldsMapper
+    Map metadata = [domain: null, columns: [names: [:], ordinals: [:]], rows: []]
 
     ETLProcessor() {
-        this([], new DebugConsole(buffer: new StringBuffer()), new DomainAssetFieldsMapper())
+        this([], new DebugConsole(buffer: new StringBuffer()), new ETLFieldsMapper())
     }
 
-    ETLProcessor(List<List<String>> data, DomainAssetFieldsMapper domainAssetFieldsMapper) {
+    ETLProcessor(List<List<String>> data, ETLFieldsMapper domainAssetFieldsMapper) {
         this(data, new DebugConsole(buffer: new StringBuffer()), domainAssetFieldsMapper)
     }
 
-    ETLProcessor(List<List<String>> data, DebugConsole console, DomainAssetFieldsMapper domainAssetFieldsMapper) {
+    ETLProcessor(List<List<String>> data, DebugConsole console, ETLFieldsMapper domainAssetFieldsMapper) {
         this.crudData = data
         this.debugConsole = console
         this.domainAssetFieldsMapper = domainAssetFieldsMapper
         this.metadata = [domain: null, columns: [names: [:], ordinals: [:]], rows: []]
     }
 
-    ETLProcessor domain(DomainAssets aDomain) {
-        metadata.domain = aDomain
-        debugConsole.info("Selected Domain: $aDomain")
+    ETLProcessor domain(DomainAssets domain) {
+        metadata.domain = domain
+        debugConsole.info("Selected Domain: $domain")
+        this
+    }
+
+    ETLProcessor domain(String domain) {
+        metadata.domain = DomainAssets.values().find { it.name() == domain } ?: DomainAssets.External
+        debugConsole.info("Selected Domain: $domain")
         this
     }
 
@@ -125,10 +134,10 @@ class ETLProcessor {
         this
     }
 
-//    def methodMissing(String methodName, args) {
-//        debugConsole.info "Method missing: ${methodName}, args: ${args}"
-//
-//    }
+    def methodMissing(String methodName, args) {
+        debugConsole.info "Method missing: ${methodName}, args: ${args}"
+
+    }
 
     DomainAssets getSelectedDomain() {
         metadata.domain
