@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
 
-    void 'test can specify which is the primary Domain for the ETL'() {
+    void 'test can specify once the primary Domain for the ETL'() {
 
         given:
         String scriptText = """
@@ -20,50 +20,37 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor()
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                *           : DomainAssets.values().collectEntries { [(it.name()): it] },
-                domain      : etlProcessor.&domain
-        ])
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         etlProcessor.selectedDomain == DomainAssets.Application
     }
 
-    void 'test can specify which is the primary Domain for the ETL using Import Customizer'() {
+    void 'test can specify several times the primary Domain for the ETL using Import Customizer'() {
 
         given:
         String scriptText = """
             domain Application
+            domain Device
+            domain Storage
         """
 
         and:
         ETLProcessor etlProcessor = new ETLProcessor()
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain
-        ])
-
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars com.tdsops.etl.DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.selectedDomain == DomainAssets.Application
+        etlProcessor.selectedDomain == DomainAssets.Storage
     }
 
     void 'test can read labels from Datasource and create a map of columns'() {
@@ -836,7 +823,6 @@ class ETLProcessorSpec extends Specification {
                 .toString()
     }
 
-
     void 'test can extract a field value and load into a domain object property name'() {
 
         // The 'load into' command will take whatever value is in the internal register and map it to the domain object
@@ -862,7 +848,7 @@ class ETLProcessorSpec extends Specification {
         ]
 
         and:
-        DomainAssetFieldsMapper domainAssetFieldsMapper = new DomainAssetFieldsMapper()
+        ETLFieldsMapper domainAssetFieldsMapper = new ETLFieldsMapper()
         domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
                 [constraints: [required: 0],
                  "control"  : "Number",
