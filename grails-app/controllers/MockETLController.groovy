@@ -1,5 +1,4 @@
 import com.tdsops.etl.*
-import com.tdsops.tm.enums.domain.AssetClass
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
@@ -20,7 +19,7 @@ class MockETLController implements ControllerMethods {
 
         Project project = securityService.userCurrentProject
 
-        DomainAssetFieldsMapper domainAssetFieldsMapper = new DomainAssetFieldsMapper()
+        ETLFieldsMapper domainAssetFieldsMapper = new ETLFieldsMapper()
 
 //        List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
 //                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
@@ -85,14 +84,11 @@ iterate {
                 console     : etlProcessor.&console,
                 iterate     : etlProcessor.&iterate,
                 transform   : etlProcessor.&transform,
+                translate   : etlProcessor.&translate,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() }),
                 first       : new StringTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
-                blanks      : new StringTransformation(closure: { String value -> value.replaceAll(" ", "") }),
-                camelcase   : new StringTransformation(closure: { String value ->
-                    value.toLowerCase()
-                }),
-                translate: etlProcessor.&translate
+                blanks      : new StringTransformation(closure: { String value -> value.replaceAll(" ", "") })
         ])
 
         ErrorCollector errorCollector
