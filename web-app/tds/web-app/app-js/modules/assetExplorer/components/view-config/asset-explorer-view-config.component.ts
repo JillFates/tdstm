@@ -7,6 +7,7 @@ import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
+import { ViewColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
@@ -362,6 +363,13 @@ export class AssetExplorerViewConfigComponent {
 		} else {
 			this.grid.gridData = null;
 		}
+	}
+
+	protected onLockedColumn(item: ViewColumn): void {
+		let itemIndex = this.model.schema.columns.findIndex(x => x.domain === item.domain && x.property === item.property);
+		this.model.schema.columns.splice(itemIndex, 1);
+		let lockeds = this.model.schema.columns.filter((x: ViewColumn) => x.locked).length;
+		this.model.schema.columns.splice(lockeds, 0, item);
 	}
 
 	/**
