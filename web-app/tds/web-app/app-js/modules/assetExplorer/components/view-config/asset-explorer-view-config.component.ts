@@ -175,7 +175,7 @@ export class AssetExplorerViewConfigComponent {
 			this.rowIndex = 0;
 		} else if (this.rowIndex >= 15) {
 			this.columnIndex += 1;
-			this.rowIndex = 0;
+			this.rowIndex = 1;
 		}
 		let result = {
 			'height': '25px',
