@@ -4,7 +4,6 @@ import com.tdsops.tm.enums.domain.AssetClass
 
 class ETLFieldsMapper {
 
-
     Map<AssetClass, Map> assetClassFieldsSpecMap
 
     ETLFieldsMapper() {
