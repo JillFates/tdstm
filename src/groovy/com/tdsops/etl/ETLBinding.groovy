@@ -3,20 +3,32 @@ package com.tdsops.etl
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 
+/**
+ *
+ * ETLBinding represents all the custom bindings associated a DSL ETL Script.
+ *
+ * It'll use from outside the script to pass variables into it.
+ *
+ */
 class ETLBinding extends Binding {
 
     ETLFieldsMapper fieldsMapper = new ETLFieldsMapper()
 
-    private Map variables
-
     ETLBinding(Map vars) {
-
-        this.variables = [
+        this.variables.putAll([
                 *: vars,
-                *: DomainAssets.values().collectEntries { [(it.name()): it] }
-        ]
+                *: DomainAssets.values().collectEntries { [(it.name()): it] },
+                *: DataPart.values().collectEntries { [(it.name()): it] }
+        ])
     }
 
+    /**
+     *
+     * Custom lookup variable
+     *
+     * @param name
+     * @return
+     */
     @Override
     Object getVariable(String name) {
 
@@ -34,8 +46,12 @@ class ETLBinding extends Binding {
     }
 
     CompilerConfiguration getConfiguration() {
+
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ConsoleStatus.class.name
+        customizer.addStaticStars DataPart.class.name
+
         CompilerConfiguration configuration = new CompilerConfiguration()
         configuration.addCompilationCustomizers customizer
         configuration.scriptBaseClass = ETLProcessorBaseScript.class.name
