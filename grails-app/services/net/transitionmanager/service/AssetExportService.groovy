@@ -626,8 +626,7 @@ class AssetExportService {
                                 break
 
                             default:
-                                def value = currentAsset[field]
-                                colVal = value ?: ""
+								colVal = currentAsset[field]
                         }
 
 						WorkbookUtil.addCellAndStyle(row, colNum, colVal, serverStyles)
