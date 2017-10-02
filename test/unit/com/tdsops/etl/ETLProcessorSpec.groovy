@@ -53,6 +53,54 @@ class ETLProcessorSpec extends Specification {
         etlProcessor.selectedDomain == DomainAssets.Storage
     }
 
+    void 'test can skip a fixed number of rows'() {
+
+        given:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152251", "SRW24G1", "LINKSYS"],
+                ["152252", "SRW24G2", "LINKSYS"],
+                ["152253", "SRW24G3", "LINKSYS"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "SRW24G5", "LINKSYS"],
+                ["152256", "ZPHA MODULE", "TippingPoint"]
+        ])
+
+        and:
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
+
+        when:
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate("skip 2", ETLProcessor.class.name)
+
+        then:
+        etlProcessor.currentRowPosition == 2
+    }
+
+    void 'test cannot skip a fixed number of rows if it bigger that rows count'() {
+
+        given:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152251", "SRW24G1", "LINKSYS"],
+                ["152252", "SRW24G2", "LINKSYS"],
+                ["152253", "SRW24G3", "LINKSYS"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "SRW24G5", "LINKSYS"],
+                ["152256", "ZPHA MODULE", "TippingPoint"]
+        ])
+
+        and:
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
+
+        when:
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate("skip 20", ETLProcessor.class.name)
+
+        then:
+        etlProcessor.currentRowPosition == 0
+    }
+
     void 'test can read labels from Datasource and create a map of columns'() {
 
         // Reads the labels and creates a map of column names and ordinal positions. Upon reading the header
@@ -72,22 +120,23 @@ class ETLProcessorSpec extends Specification {
         ])
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                *           : DomainAssets.values().collectEntries { [(it.name()): it] },
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                *           : DataPart.values().collectEntries { [(it.name()): it] },
-        ])
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.column("DEVICE ID").ordinal == 0
-        etlProcessor.column("MODEL NAME").ordinal == 1
-        etlProcessor.column("MANUFACTURER NAME").ordinal == 2
+        etlProcessor.column("DEVICE ID").index == 0
+        etlProcessor.column(0).label == "DEVICE ID"
+
+        and:
+        etlProcessor.column("MODEL NAME").index == 1
+        etlProcessor.column(1).label == "MODEL NAME"
+
+        and:
+        etlProcessor.column("MANUFACTURER NAME").index == 2
+        etlProcessor.column(2).label == "MANUFACTURER NAME"
 
         and:
         etlProcessor.currentRowPosition == 1
@@ -124,18 +173,11 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                *           : DomainAssets.values().collectEntries { [(it.name()): it] },
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                *           : DataPart.values().collectEntries { [(it.name()): it] },
-                iterate     : etlProcessor.&iterate
-        ])
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(binding)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         etlProcessor.currentRowPosition == data.size()
@@ -168,32 +210,21 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-
-        ])
-
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        data.size() == etlProcessor.currentRowPosition
+        etlProcessor.currentRowPosition == data.size()
 
         and:
-        etlProcessor.currentFieldValue == "Slideaway"
+        etlProcessor.currentColumnPosition == 1
+
+        and:
+        etlProcessor.currentRow.getCell(1).value == "Slideaway"
+        etlProcessor.currentRow.getCell(1).initialValue == "Slideaway"
     }
 
     /**
@@ -223,32 +254,21 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-
-        ])
-
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
+        ETLBinding binding = new ETLBinding([etlProcessor: etlProcessor])
 
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        data.size() == etlProcessor.currentRowPosition
+        etlProcessor.currentRowPosition == data.size()
 
         and:
-        etlProcessor.currentFieldValue == "Slideaway"
+        etlProcessor.currentColumnPosition == 1
+
+        and:
+        etlProcessor.currentRow.getCell(1).value == "Slideaway"
+        etlProcessor.currentRow.getCell(1).initialValue == "Slideaway"
     }
 
     void 'test can transform a field value to uppercase'() {
@@ -273,38 +293,20 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
-                uppercase   : new StringTransformation(closure: {
-                    it.toUpperCase()
-                })
-
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
-
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        data.size() == etlProcessor.currentRowPosition
-
-        and:
-        etlProcessor.crudData[1][1] == "SRW24G4"
-        etlProcessor.crudData[2][1] == "ZPHA MODULE"
-        etlProcessor.crudData[3][1] == "SLIDEAWAY"
+        etlProcessor.getRow(0).getCell(1).value == "SRW24G4"
+        etlProcessor.getRow(1).getCell(1).value == "ZPHA MODULE"
+        etlProcessor.getRow(2).getCell(1).value == "SLIDEAWAY"
     }
 
     void 'test can transform a field value to lowercase'() {
@@ -329,36 +331,20 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
-
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        data.size() == etlProcessor.currentRowPosition
-
-        and:
-        etlProcessor.crudData[1][1] == "srw24g4"
-        etlProcessor.crudData[2][1] == "zpha module"
-        etlProcessor.crudData[3][1] == "slideaway"
+        etlProcessor.getRow(0).getCell(1).value == "srw24g4"
+        etlProcessor.getRow(1).getCell(1).value == "zpha module"
+        etlProcessor.getRow(2).getCell(1).value == "slideaway"
     }
 
     void 'test can check syntax errors at parsing time'() {
@@ -383,28 +369,16 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
-
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.parse(scriptText)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
+
 
         then:
         thrown MultipleCompilationErrorsException
@@ -431,32 +405,19 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
-
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        MissingPropertyException missingPropertyException = thrown MissingPropertyException
-        missingPropertyException.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber == 4
+        MissingMethodException missingMethodException = thrown MissingMethodException
+        missingMethodException.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber == 4
     }
 
     void 'test can disallow closure creation using a secure syntax with AST customizer'() {
@@ -480,12 +441,8 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
@@ -541,12 +498,8 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
@@ -602,12 +555,8 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
@@ -663,12 +612,8 @@ class ETLProcessorSpec extends Specification {
         ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
@@ -684,8 +629,6 @@ class ETLProcessorSpec extends Specification {
         secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
         secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
         secureASTCustomizer.starImportsWhitelist = []
-//        secureASTCustomizer.staticStarImportsWhitelist = ['java.lang.Math'] // Only allow the java.lang.Math.* static import
-
 
         and:
         CompilerConfiguration configuration = new CompilerConfiguration()
@@ -704,7 +647,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can allow stars imports using a secure syntax with AST customizer'() {
 
         given:
-        String scriptText = """            
+        String scriptText = """
             domain Device
             read labels
             max 10, 100
@@ -725,69 +668,6 @@ class ETLProcessorSpec extends Specification {
                 etlProcessor: etlProcessor,
                 domain      : etlProcessor.&domain,
                 read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
-                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() }),
-        ])
-
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars Math.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-        secureASTCustomizer.closuresAllowed = false             // disallow closure creation
-        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-        secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
-        secureASTCustomizer.starImportsWhitelist = []
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
-
-        when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
-
-        then:
-        notThrown MultipleCompilationErrorsException
-    }
-
-    void 'test can enable console and log domain selected'() {
-
-        given:
-        String scriptText = """            
-            console on
-            domain Device
-        """
-
-        and:
-        List<List<String>> data = [
-                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                ["152254", "SRW24G4", "LINKSYS"],
-                ["152255", "ZPHA Module", "TippingPoint"],
-                ["152256", "Slideaway", "ATEN"]
-        ]
-
-        and:
-        StringBuffer buffer = new StringBuffer()
-        DebugConsole console = new DebugConsole(buffer: buffer)
-
-        and:
-        ETLProcessor etlProcessor = new ETLProcessor(crudData: data, debugConsole: console)
-
-        and:
-        Binding binding = new Binding([
-                etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
-                console     : etlProcessor.&console,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
@@ -810,10 +690,47 @@ class ETLProcessorSpec extends Specification {
         CompilerConfiguration configuration = new CompilerConfiguration()
         configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
+        when:
+        new GroovyShell(this.class.classLoader, binding, configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
+
+        then:
+        notThrown MultipleCompilationErrorsException
+    }
+
+    void 'test can enable console and log domain selected'() {
+
+        given:
+        String scriptText = """
+            console on
+            domain Device
+        """
+
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                ["152254", "SRW24G4", "LINKSYS"],
+                ["152255", "ZPHA Module", "TippingPoint"],
+                ["152256", "Slideaway", "ATEN"]
+        ]
+
+        and:
+        StringBuffer buffer = new StringBuffer()
+        DebugConsole console = new DebugConsole(buffer: buffer)
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data, debugConsole: console)
+
+        and:
+        ETLBinding binding = new ETLBinding([
+                etlProcessor: etlProcessor,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
 
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
         buffer.toString() == new StringBuffer("INFO - Console status changed: on")
@@ -821,6 +738,46 @@ class ETLProcessorSpec extends Specification {
                 .append("INFO - Selected Domain: Device")
                 .append(System.lineSeparator())
                 .toString()
+    }
+
+    void 'test can transform a field value using a dictionary'() {
+
+        given:
+        String scriptText = """domain Device
+            dictionary = [prod: 'Production', dev: 'Development']
+            read labels
+            iterate {
+                extract 'ENVIRONMENT' 
+                transform lowercase  
+                translate with: dictionary
+            }
+        """
+        and:
+        List<List<String>> data = [
+                ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME", "ENVIRONMENT"],
+                ["152254", "SRW24G4", "LINKSYS", "Prod"],
+                ["152255", "ZPHA Module", "TippingPoint", "Prod"],
+                ["152256", "Slideaway", "ATEN", "Dev"]
+        ]
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data)
+
+        and:
+        ETLBinding binding = new ETLBinding([
+                etlProcessor: etlProcessor,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        when:
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
+
+        then:
+        etlProcessor.getRow(0).getCell(3).value == "Production"
+        etlProcessor.getRow(1).getCell(3).value == "Production"
+        etlProcessor.getRow(2).getCell(3).value == "Development"
     }
 
     void 'test can extract a field value and load into a domain object property name'() {
@@ -835,7 +792,7 @@ class ETLProcessorSpec extends Specification {
             domain Application
             read labels
             iterate {
-                extract 'VENDOR NAME' load 'appVendor'
+                extract 'VENDOR NAME' load appVendor
             }
         """
 
@@ -886,43 +843,22 @@ class ETLProcessorSpec extends Specification {
                 domainAssetFieldsMapper: domainAssetFieldsMapper)
 
         and:
-        Binding binding = new Binding([
+        ETLBinding binding = new ETLBinding([
                 etlProcessor: etlProcessor,
-                domain      : etlProcessor.&domain,
-                read        : etlProcessor.&read,
-                iterate     : etlProcessor.&iterate,
-                transform   : etlProcessor.&transform,
-                console     : etlProcessor.&console,
-                load        : etlProcessor.&load,
                 uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                 lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
-        and:
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars Math.class.name
-        customizer.addStaticStars ConsoleStatus.class.name
-        customizer.addStaticStars DomainAssets.class.name
-
-        and:
-        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-        secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-        secureASTCustomizer.importsWhitelist = []               // Empty withe list means forbid imports
-        secureASTCustomizer.starImportsWhitelist = []
-
-        and:
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
-
         when:
-        GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-        shell.evaluate(scriptText, ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.currentFieldValue == "VMWare"
-
-
+        etlProcessor.getRow(0).getCell(1).value == "Microsoft"
+        etlProcessor.getRow(0).getCell(1).field.name == "appVendor"
+        etlProcessor.getRow(1).getCell(1).value == "Mozilla"
+        etlProcessor.getRow(1).getCell(1).field.name == "appVendor"
+        etlProcessor.getRow(2).getCell(1).value == "VMWare"
+        etlProcessor.getRow(2).getCell(1).field.name == "appVendor"
     }
 }
