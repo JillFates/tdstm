@@ -3,6 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { PreferenceService } from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'asset-explorer-view-grid',
@@ -28,6 +29,10 @@ export class AssetExplorerViewGridComponent {
 		sort: []
 	};
 	gridData: GridDataResult;
+
+	constructor(private userPref: PreferenceService) {
+		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+	}
 
 	onMouseUp(): void {
 		this.mouseDown = false;
@@ -79,7 +84,7 @@ export class AssetExplorerViewGridComponent {
 		this.gridData = null;
 		this.state = {
 			skip: 0,
-			take: 25,
+			take: this.state.take,
 			sort: []
 		};
 	}
