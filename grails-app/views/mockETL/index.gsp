@@ -74,18 +74,18 @@ ${script}
         <br>
         <div>
             <table style="width:100%" class="table table-condensed table-hover">
-                <tr>
-                    <g:each in="${etlProcessor?.columnNames}" var="columnName">
-                        <th>${columnName}</th>
-                    </g:each>
-                </tr>
-                <g:each in="${etlProcessor?.rows()}" var="row">
-                    <tr>
-                    <g:each in="${row}" var="value">
-                        <td>${value}</td>
-                    </g:each>
-                    </tr>
-                </g:each>
+                %{--<tr>--}%
+                    %{--<g:each in="${etlProcessor?.columnNames}" var="columnName">--}%
+                        %{--<th>${columnName}</th>--}%
+                    %{--</g:each>--}%
+                %{--</tr>--}%
+                %{--<g:each in="${etlProcessor?.rows()}" var="row">--}%
+                    %{--<tr>--}%
+                    %{--<g:each in="${row}" var="value">--}%
+                        %{--<td>${value}</td>--}%
+                    %{--</g:each>--}%
+                    %{--</tr>--}%
+                %{--</g:each>--}%
             </table>
             %{--<table style="width:100%" class="table">--}%
                 %{--<tr>--}%

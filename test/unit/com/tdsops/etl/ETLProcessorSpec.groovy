@@ -863,7 +863,7 @@ class ETLProcessorSpec extends Specification {
         etlProcessor.getRow(2).getCell(1).field.name == "appVendor"
     }
 
-    void 'test can save explicitly a list of rows already processed associated to a domain'() {
+    void 'test can save a row already processed in results associated to a selected Application'() {
 
         // The 'load into' command will take whatever value is in the internal register and map it to the domain object
         // property name.  The command takes a String argument that will map to the property name of the domain. This
@@ -875,10 +875,8 @@ class ETLProcessorSpec extends Specification {
             read labels
             iterate {
                 extract 'VENDOR NAME' load appVendor
-                save()
             }
             
-            save()
         """
 
         and:
@@ -941,11 +939,38 @@ class ETLProcessorSpec extends Specification {
         then:
         etlProcessor.getRow(0).getCell(1).value == "Microsoft"
         etlProcessor.getRow(0).getCell(1).field.name == "appVendor"
+        etlProcessor.results.get(DomainAssets.Application).get(0) == [
+                [
+                        originalValue: "Microsoft",
+                        value        : "Microsoft",
+                        field        : [
+                                name: "appVendor"
+                        ]
+                ]
+        ]
+
 
         etlProcessor.getRow(1).getCell(1).value == "Mozilla"
         etlProcessor.getRow(1).getCell(1).field.name == "appVendor"
+        etlProcessor.results.get(DomainAssets.Application).get(1) == [
+                [
+                        originalValue: "Mozilla",
+                        value        : "Mozilla",
+                        field        : [
+                                name: "appVendor"
+                        ]
+                ]
+        ]
 
         etlProcessor.getRow(2).getCell(1).value == "VMWare"
         etlProcessor.getRow(2).getCell(1).field.name == "appVendor"
-    }
+        etlProcessor.results.get(DomainAssets.Application).get(2) == [
+                [
+                        originalValue: "VMWare",
+                        value        : "VMWare",
+                        field        : [
+                                name: "appVendor"
+                        ]
+                ]
+        ]    }
 }

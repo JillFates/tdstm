@@ -7,7 +7,6 @@ package com.tdsops.etl
 class ETLProcessor {
 
     List<List<String>> crudData = []
-    Integer startIteration = 0
     Integer currentRowPosition = 0
     Integer currentColumnPosition = 0
 
@@ -18,9 +17,9 @@ class ETLProcessor {
     List<ETLProcessor.Column> columns = []
     Map<String, ETLProcessor.Column> columnsMap = [:]
     List<ETLProcessor.Row> rows = []
+
     ETLProcessor.Row currentRow
-    //ETLProcessor.Cell currentCell
-    List<Map<String, ?>> results = []
+    Map<DomainAssets, List<Map<String, ?>>> results = [:]
 
 
     ETLProcessor() {
@@ -63,16 +62,12 @@ class ETLProcessor {
         this
     }
 
-    List<List<String>> rows() {
-        crudData[1..(crudData.size() - 1)]
-    }
-
     ETLProcessor iterate(Closure closure) {
-        startIteration = currentRowPosition
 
         crudData[currentRowPosition..(crudData.size() - 1)].each { List<String> crudRowData ->
             currentColumnPosition = 0
             closure(addCrudRowData(crudRowData))
+            save()
             currentRowPosition++
         }
         currentRowPosition--
@@ -93,19 +88,20 @@ class ETLProcessor {
 
     ETLProcessor.Cell extract(Integer index) {
         currentColumnPosition = index
-        doExtract()
+        currentCell
     }
 
     ETLProcessor.Cell extract(String columnName) {
         currentColumnPosition = columnsMap[columnName].index
-        doExtract()
+        currentCell
     }
 
-    private ETLProcessor.Cell doExtract() {
+    private ETLProcessor.Cell getCurrentCell() {
         ETLProcessor.Cell cell = currentRow.getCell(currentColumnPosition)
         debugConsole.info "currentColumnPosition${cell.value}"
         cell
     }
+
 
     ETLProcessor skip(Integer amount) {
         if (amount + currentRowPosition <= crudData.size()) {
@@ -155,32 +151,17 @@ class ETLProcessor {
     void save() {
         debugConsole.info "Saving results for domain ${selectedDomain}"
 
-        results.add([
-                domain: selectedDomain.name(),
-                rows  : alreadyProcessedRows()
-        ])
-    }
-    /**
-     *
-     * Collects and formats already processed rows to be used as a ETL process result.
-     *
-     * @return
-     */
-    private List<Map<String, ?>> alreadyProcessedRows() {
-        List<ETLProcessor.Row> alreadyProcessed = rows.subList(startIteration, currentRowPosition)
-
-        startIteration = currentRowPosition
-        alreadyProcessed.collect { ETLProcessor.Row row ->
-            row.cells.collect { ETLProcessor.Cell cell ->
-                [
-                        originalValue: cell.originalValue,
-                        value        : cell.value,
-                        field        : [
-                                name: ""
-                        ]
-                ]
-            }
+        if (!results.containsKey(selectedDomain)) {
+            results.put(selectedDomain, [])
         }
+        results.get(selectedDomain).add(
+                currentRow.loadedCells.collect { ETLProcessor.Cell cell ->
+                    [
+                            originalValue: cell.originalValue,
+                            value        : cell.value,
+                            field        : cell.field
+                    ]
+                })
     }
 
 //    def methodMissing(String methodName, args) {
@@ -202,14 +183,6 @@ class ETLProcessor {
 
     Set getColumnNames() {
         columnsMap.keySet()
-    }
-
-    Map<String, ?> getTransformationResult() {
-
-        [data: [
-                domain   : selectedDomain?.name(),
-                instances: rows?.findAll { !!it }
-        ]]
     }
 
     ETLProcessor.Row getCurrentRow() {
@@ -248,6 +221,10 @@ class ETLProcessor {
         Cell getCell(Integer index) {
             cells[index]
         }
+
+        List<Cell> getLoadedCells() {
+            cells.findAll { it.isSelected() }
+        }
     }
 
     static class Cell {
@@ -284,6 +261,10 @@ class ETLProcessor {
             //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(selectedDomain, assetProperty)
             field.name = fieldProperty
             this
+        }
+
+        Boolean isSelected() {
+            !!field.name
         }
     }
 }
