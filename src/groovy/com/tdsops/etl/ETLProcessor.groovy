@@ -7,6 +7,7 @@ package com.tdsops.etl
 class ETLProcessor {
 
     List<List<String>> crudData = []
+    Integer startIteration = 0
     Integer currentRowPosition = 0
     Integer currentColumnPosition = 0
 
@@ -18,7 +19,8 @@ class ETLProcessor {
     Map<String, ETLProcessor.Column> columnsMap = [:]
     List<ETLProcessor.Row> rows = []
     ETLProcessor.Row currentRow
-    ETLProcessor.Cell currentCell
+    //ETLProcessor.Cell currentCell
+    List<Map<String, ?>> results = []
 
 
     ETLProcessor() {
@@ -66,12 +68,14 @@ class ETLProcessor {
     }
 
     ETLProcessor iterate(Closure closure) {
+        startIteration = currentRowPosition
+
         crudData[currentRowPosition..(crudData.size() - 1)].each { List<String> crudRowData ->
             currentColumnPosition = 0
             closure(addCrudRowData(crudRowData))
             currentRowPosition++
         }
-
+        currentRowPosition--
         this
     }
 
@@ -131,16 +135,52 @@ class ETLProcessor {
         currentRow.getCell(currentColumnPosition).translate(actions)
         this
     }
-
-    ETLProcessor load(String assetProperty) {
-        //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(selectedDomain, assetProperty)
+    /**
+     *
+     * Delegate load methods to maintenance method's chain
+     *
+     * @param fieldProperty
+     * @return
+     */
+    ETLProcessor load(String fieldProperty) {
+        currentRow.getCell(currentColumnPosition).load(fieldProperty)
 
         this
     }
+    /**
+     *
+     * Saves current domain class and rows already processed as a partial result
+     *
+     */
+    void save() {
+        debugConsole.info "Saving results for domain ${selectedDomain}"
 
-    ETLProcessor into(String assetProperty) {
+        results.add([
+                domain: selectedDomain.name(),
+                rows  : alreadyProcessedRows()
+        ])
+    }
+    /**
+     *
+     * Collects and formats already processed rows to be used as a ETL process result.
+     *
+     * @return
+     */
+    private List<Map<String, ?>> alreadyProcessedRows() {
+        List<ETLProcessor.Row> alreadyProcessed = rows.subList(startIteration, currentRowPosition)
 
-        this
+        startIteration = currentRowPosition
+        alreadyProcessed.collect { ETLProcessor.Row row ->
+            row.cells.collect { ETLProcessor.Cell cell ->
+                [
+                        originalValue: cell.originalValue,
+                        value        : cell.value,
+                        field        : [
+                                name: ""
+                        ]
+                ]
+            }
+        }
     }
 
 //    def methodMissing(String methodName, args) {
@@ -197,7 +237,7 @@ class ETLProcessor {
         Row(List<String> values, DebugConsole console) {
             cells = []
             values.eachWithIndex { String value, int i ->
-                addCell new Cell(value: value, initialValue: value, index: i, debugConsole: console)
+                addCell new Cell(originalValue: value, value: value, index: i, debugConsole: console)
             }
         }
 
@@ -212,12 +252,12 @@ class ETLProcessor {
 
     static class Cell {
 
-        String initialValue
+        String originalValue
         String value
         Integer index
         List<StringTransformation> transformations = []
         DebugConsole debugConsole
-        Map field = [name:""]
+        Map field = [name: ""]
 
         ETLProcessor.Cell transform(StringTransformation transformation) {
             value = transformation.apply(value)
