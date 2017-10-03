@@ -783,6 +783,28 @@ class MoveBundleController implements ControllerMethods {
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 
+		// Query to obtain the count of Servers in 'Moved' Plan Status
+		def serversCountsQuery = """SELECT
+				assetClass,
+				COUNT(ae) AS all,
+				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END) AS allMoved
+			FROM AssetEntity ae
+			WHERE ae.project=:project 
+			AND ae.assetClass = :deviceAssetClass
+			AND ae.assetType IN (:allServers)
+			AND ae.moveBundle IN (:moveBundles)
+			GROUP BY ae.assetClass"""
+
+		def serversCountsQueryParams = [
+				project: project,
+				moveBundles: moveBundleList,
+				movedStatus: AssetEntityPlanStatus.MOVED,
+				deviceAssetClass: AssetClass.DEVICE,
+				allServers: AssetType.allServerTypes]
+
+		def serversCountsQueryResults = AssetEntity.executeQuery(serversCountsQuery, serversCountsQueryParams)[0]
+		def serversCompletedPercentage = countAppPercentage(serversCountsQueryResults[1].intValue(), serversCountsQueryResults[2].intValue())
+
 		return [
 			appList:appList,
 			applicationCount:applicationCount,
@@ -790,6 +812,7 @@ class MoveBundleController implements ControllerMethods {
 			assignedAppPerc: assignedAppPerc,
 			confirmedAppPerc: confirmedAppPerc,
 			movedAppPerc: movedAppPerc,
+			movedServersPerc: serversCompletedPercentage,
 			appToValidate:appToValidate,
 			unassignedServerCount: unassignedServerCount,
 			unassignedPhysicalServerCount:unassignedPhysicalServerCount,
