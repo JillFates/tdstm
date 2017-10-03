@@ -6,14 +6,14 @@ abstract class ETLMockScript extends Script {
     Integer currentColumnPosition = 0
     String currentFieldValue
 
-    ETLMockScript domain(DomainAssets domain) {
+    ETLMockScript domain(ETLDomain domain) {
         getMetadata().domain = domain
         getDebugConsole().info("Selected Domain: $domain")
         this
     }
 
     ETLMockScript domain(String domain) {
-        getMetadata().domain = DomainAssets.values().find { it.name() == domain } ?: DomainAssets.External
+        getMetadata().domain = ETLDomain.values().find { it.name() == domain } ?: ETLDomain.External
         getDebugConsole().info("Selected Domain: $domain")
         this
     }
