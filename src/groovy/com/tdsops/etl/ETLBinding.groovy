@@ -12,12 +12,11 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
  */
 class ETLBinding extends Binding {
 
-    ETLFieldsMapper fieldsMapper = new ETLFieldsMapper()
+    ETLDomainFieldsValidator fieldsMapper = new ETLDomainFieldsValidator()
 
-    ETLBinding(Map vars) {
+    ETLBinding (Map vars) {
         this.variables.putAll([
                 *: vars,
-                *: DomainAssets.values().collectEntries { [(it.name()): it] },
                 *: DataPart.values().collectEntries { [(it.name()): it] }
         ])
     }
@@ -30,7 +29,7 @@ class ETLBinding extends Binding {
      * @return
      */
     @Override
-    Object getVariable(String name) {
+    Object getVariable (String name) {
 
         if (variables == null)
             throw new MissingPropertyException(name, this.getClass())
@@ -45,10 +44,9 @@ class ETLBinding extends Binding {
         result
     }
 
-    CompilerConfiguration getConfiguration() {
+    CompilerConfiguration getConfiguration () {
 
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DomainAssets.class.name
         customizer.addStaticStars ConsoleStatus.class.name
         customizer.addStaticStars DataPart.class.name
 

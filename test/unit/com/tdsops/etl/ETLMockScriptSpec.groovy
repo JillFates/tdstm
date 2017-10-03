@@ -18,13 +18,13 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         Binding binding = new ETLBinding([
-                *: DomainAssets.values().collectEntries { [(it.name()): it] }
+                *: ETLDomain.values().collectEntries { [(it.name()): it] }
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -45,7 +45,7 @@ class ETLMockScriptSpec extends Specification {
         shell.evaluate(scriptText)
 
         then:
-        binding.getVariable('metadata').domain == DomainAssets.Application
+        binding.getVariable('metadata').domain == ETLDomain.Application
     }
 
     void 'test can specify several times the primary Domain for the ETL'() {
@@ -59,13 +59,13 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         Binding binding = new ETLBinding([
-                *: DomainAssets.values().collectEntries { [(it.name()): it] }
+                *: ETLDomain.values().collectEntries { [(it.name()): it] }
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -86,7 +86,7 @@ class ETLMockScriptSpec extends Specification {
         shell.evaluate(scriptText)
 
         then:
-        binding.getVariable('metadata').domain == DomainAssets.External
+        binding.getVariable('metadata').domain == ETLDomain.External
     }
 
     void 'test can read labels from Datasource and create a map of columns'() {
@@ -115,7 +115,7 @@ class ETLMockScriptSpec extends Specification {
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -136,7 +136,7 @@ class ETLMockScriptSpec extends Specification {
         shell.evaluate(scriptText)
 
         then:
-        binding.getVariable('datasource').columns == DomainAssets.Application
+        binding.getVariable('datasource').columns == ETLDomain.Application
 
         binding.getVariable('datasource').columns["DEVICE ID"].ordinal == 0
         binding.getVariable('datasource').columns["MODEL NAME"] == 1
@@ -163,7 +163,7 @@ class ETLMockScriptSpec extends Specification {
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -208,7 +208,7 @@ class ETLMockScriptSpec extends Specification {
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -253,7 +253,7 @@ class ETLMockScriptSpec extends Specification {
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
@@ -298,7 +298,7 @@ class ETLMockScriptSpec extends Specification {
         and:
         ImportCustomizer customizer = new ImportCustomizer()
         customizer.addStaticStars DataPart.class.name
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
 
         and:
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
