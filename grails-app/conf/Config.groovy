@@ -213,12 +213,13 @@ environments {
 	}
 }
 
-// log4J Logging Configuration  (Basic configuration al INFO LEVEL)
-//
-// Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy
-// configuration file in order to override this closure. When running locally, the logs will reside in the target directory
-// and for Tomcat they will reside in the CATALINA_HOME/logs directory.
-//
+/********************************************************
+** log4J Logging Configuration  (Basic configuration al INFO LEVEL)
+**
+** Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy
+** configuration file in order to override this closure. When running locally, the logs will reside in the target directory
+** and for Tomcat they will reside in the CATALINA_HOME/logs directory.
+*********************************************************/
 log4j = {
 	// Set level for all application artifacts
 	info	'grails.app'
