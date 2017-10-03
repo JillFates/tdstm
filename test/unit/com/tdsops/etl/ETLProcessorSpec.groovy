@@ -676,8 +676,10 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
 
         and:
-            ETLBinding binding = new ETLBinding([
+            Binding binding = new Binding([
                     etlProcessor: etlProcessor,
+                    domain      : etlProcessor.&domain,
+                    read        : etlProcessor.&read,
                     uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
                     lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
             ])
