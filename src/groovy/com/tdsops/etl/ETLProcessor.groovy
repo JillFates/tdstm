@@ -1,59 +1,89 @@
 package com.tdsops.etl
-
 /**
  *
  *
  */
 class ETLProcessor {
 
-    List<List<String>> crudData = []
-    Integer currentRowPosition = 0
-    Integer currentColumnPosition = 0
+    List<List<String>> dataSource = []
+    Integer currentRowIndex = 0
+    Integer currentColumnIndex = 0
 
     DebugConsole debugConsole
-    ETLFieldsMapper domainAssetFieldsMapper
+    ETLDomainFieldsValidator domainAssetFieldsMapper
 
-    DomainAssets selectedDomain
+    ETLDomain selectedDomain
     List<ETLProcessor.Column> columns = []
     Map<String, ETLProcessor.Column> columnsMap = [:]
     List<ETLProcessor.Row> rows = []
 
     ETLProcessor.Row currentRow
-    Map<DomainAssets, List<Map<String, ?>>> results = [:]
+    Map<ETLDomain, List<Map<String, ?>>> results = [:]
 
-
-    ETLProcessor() {
-        this([], new DebugConsole(buffer: new StringBuffer()), new ETLFieldsMapper())
+    /**
+     *
+     * Creates an instance of ETL Processor with all default values
+     *
+     */
+    ETLProcessor () {
+        this([], new DebugConsole(buffer: new StringBuffer()), new ETLDomainFieldsValidator())
     }
-
-    ETLProcessor(List<List<String>> data, ETLFieldsMapper domainAssetFieldsMapper) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), domainAssetFieldsMapper)
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data and a domain mapper validator
+     *
+     * @param data
+     * @param domainValidatorMapper
+     */
+    ETLProcessor (List<List<String>> data, ETLDomainFieldsValidator domainValidatorMapper) {
+        this(data, new DebugConsole(buffer: new StringBuffer()), domainValidatorMapper)
     }
-
-    ETLProcessor(List<List<String>> data, DebugConsole console, ETLFieldsMapper domainAssetFieldsMapper) {
-        this.crudData = data
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data,
+     * a domain mapper validator and an instance of etlDomainFieldsValidator
+     *
+     * @param data
+     * @param console
+     * @param etlDomainFieldsValidator
+     */
+    ETLProcessor (List<List<String>> data, DebugConsole console,
+                  ETLDomainFieldsValidator etlDomainFieldsValidator) {
+        this.dataSource = data
         this.debugConsole = console
         this.domainAssetFieldsMapper = domainAssetFieldsMapper
     }
-
-    ETLProcessor domain(DomainAssets domain) {
-        selectedDomain = domain
+    /**
+     *
+     * Selects a domain or throws an ETLProcessorException in case of an invalid domain
+     *
+     * @param domain
+     * @return
+     */
+    ETLProcessor domain (String domain) {
+        if (currentRow != null) {
+            save()
+        }
+        selectedDomain = ETLDomain.values().find { it.name() == domain }
+        if (selectedDomain == null) {
+            throw ETLProcessorException.invalidDomain(domain)
+        }
         debugConsole.info("Selected Domain: $domain")
         this
     }
-
-    ETLProcessor domain(String domain) {
-        selectedDomain = DomainAssets.values().find { it.name() == domain } ?: DomainAssets.External
-        debugConsole.info("Selected Domain: $domain")
-        this
-    }
-
-    ETLProcessor read(DataPart dataPart) {
+    /**
+     *
+     * Read Labels from source of data
+     *
+     * @param dataPart
+     * @return
+     */
+    ETLProcessor read (DataPart dataPart) {
 
         if (dataPart == DataPart.labels) {
             debugConsole.info "Reading labels"
 
-            crudData.get(currentRowPosition++).eachWithIndex { String columnName, Integer index ->
+            dataSource.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
                 ETLProcessor.Column column = new ETLProcessor.Column(label: columnName, index: index)
                 columns.add(column)
                 columnsMap[column.label] = column
@@ -62,50 +92,56 @@ class ETLProcessor {
         this
     }
 
-    ETLProcessor iterate(Closure closure) {
+    ETLProcessor iterate (Closure closure) {
 
-        crudData[currentRowPosition..(crudData.size() - 1)].each { List<String> crudRowData ->
-            currentColumnPosition = 0
+        dataSource[currentRowIndex..(dataSource.size() - 1)].each { List<String> crudRowData ->
+            currentColumnIndex = 0
             closure(addCrudRowData(crudRowData))
             save()
-            currentRowPosition++
+            currentRowIndex++
         }
-        currentRowPosition--
+        currentRowIndex--
         this
     }
 
-    private void addCrudRowData(List<String> crudRowData) {
+    private void addCrudRowData (List<String> crudRowData) {
         currentRow = new Row(crudRowData, debugConsole)
         rows.add(currentRow)
         currentRow
     }
 
-    ETLProcessor console(ConsoleStatus status) {
+    ETLProcessor console (ConsoleStatus status) {
         debugConsole.status = status
         debugConsole.info "Console status changed: $status"
         this
     }
 
-    ETLProcessor.Cell extract(Integer index) {
-        currentColumnPosition = index
-        currentCell
+    ETLProcessor extract (Integer index) {
+        currentColumnIndex = index
+
+        Element element = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${element.value} by index: $index"
+        this
     }
 
-    ETLProcessor.Cell extract(String columnName) {
-        currentColumnPosition = columnsMap[columnName].index
-        currentCell
+    ETLProcessor extract (String columnName) {
+        currentColumnIndex = columnsMap[columnName].index
+
+        Element element = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${element.value} by column name: $columnName"
+        this
     }
 
-    private ETLProcessor.Cell getCurrentCell() {
-        ETLProcessor.Cell cell = currentRow.getCell(currentColumnPosition)
-        debugConsole.info "currentColumnPosition${cell.value}"
-        cell
+    private Element getCurrentElement () {
+        currentRow.getElement(currentColumnIndex)
     }
 
 
-    ETLProcessor skip(Integer amount) {
-        if (amount + currentRowPosition <= crudData.size()) {
-            currentRowPosition += amount
+    ETLProcessor skip (Integer amount) {
+        if (amount + currentRowIndex <= dataSource.size()) {
+            currentRowIndex += amount
+        } else {
+            throw ETLProcessorException.invalidSkipStep(amount)
         }
         this
     }
@@ -116,8 +152,12 @@ class ETLProcessor {
      * @param transformation
      * @return
      */
-    ETLProcessor transform(StringTransformation transformation) {
-        currentRow.getCell(currentColumnPosition).transform(transformation)
+    ETLProcessor transform (StringTransformation transformation) {
+        ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
+        element.value = transformation.apply(element.value)
+        element.transformations.add(transformation)
+
+        debugConsole.info "Applying transformation on element: $element "
         this
     }
     /**
@@ -127,10 +167,33 @@ class ETLProcessor {
      * @param actions
      * @return
      */
-    ETLProcessor translate(Map actions) {
-        currentRow.getCell(currentColumnPosition).translate(actions)
+    ETLProcessor translate (Map actions) {
+
+        if (actions.containsKey('with')) {
+            Map map = actions.get 'with'
+            ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
+            if (map.containsKey(element.value)) {
+                String oldValue = element.value
+                element.value = map[element.value]
+
+                debugConsole.info "Translate $oldValue -> ${element.value}"
+            } else {
+
+                debugConsole.warn "Could not translate ${element.value}"
+            }
+        }
         this
     }
+
+    ETLProcessor load (String fieldProperty, String with, String value) {
+
+        if (with != "with") {
+            //throw new ETLException("invalid load command, expect: load properti with value")
+        }
+        //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(selectedDomain, assetProperty)
+        this
+    }
+
     /**
      *
      * Delegate load methods to maintenance method's chain
@@ -138,9 +201,11 @@ class ETLProcessor {
      * @param fieldProperty
      * @return
      */
-    ETLProcessor load(String fieldProperty) {
-        currentRow.getCell(currentColumnPosition).load(fieldProperty)
+    ETLProcessor load (String fieldProperty) {
 
+        ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
+        element.domain = selectedDomain
+        element.field.name = fieldProperty
         this
     }
     /**
@@ -148,20 +213,24 @@ class ETLProcessor {
      * Saves current domain class and rows already processed as a partial result
      *
      */
-    void save() {
-        debugConsole.info "Saving results for domain ${selectedDomain}"
+    void save () {
 
         if (!results.containsKey(selectedDomain)) {
             results.put(selectedDomain, [])
         }
-        results.get(selectedDomain).add(
-                currentRow.loadedCells.collect { ETLProcessor.Cell cell ->
-                    [
-                            originalValue: cell.originalValue,
-                            value        : cell.value,
-                            field        : cell.field
-                    ]
-                })
+
+        List<Map<String, ?>> partialResults = currentRow.getLoadedElements(selectedDomain).collect { Element element ->
+            [
+                    originalValue: element.originalValue,
+                    value        : element.value,
+                    field        : element.field
+            ]
+        }
+        debugConsole.info "Saving partial results $partialResults for domain ${selectedDomain}"
+
+        if (partialResults) {
+            results.get(selectedDomain).add(partialResults)
+        }
     }
 
 //    def methodMissing(String methodName, args) {
@@ -169,27 +238,27 @@ class ETLProcessor {
 //
 //    }
 
-    DomainAssets getSelectedDomain() {
+    ETLDomain getSelectedDomain () {
         selectedDomain
     }
 
-    ETLProcessor.Column column(String columnName) {
+    ETLProcessor.Column column (String columnName) {
         columnsMap[columnName]
     }
 
-    ETLProcessor.Column column(Integer columnName) {
+    ETLProcessor.Column column (Integer columnName) {
         columns[columnName]
     }
 
-    Set getColumnNames() {
+    Set getColumnNames () {
         columnsMap.keySet()
     }
 
-    ETLProcessor.Row getCurrentRow() {
+    ETLProcessor.Row getCurrentRow () {
         currentRow
     }
 
-    ETLProcessor.Row getRow(Integer index) {
+    ETLProcessor.Row getRow (Integer index) {
         rows[index]
     }
 
@@ -201,69 +270,43 @@ class ETLProcessor {
 
     static class Row {
 
-        List<Cell> cells
+        List<Element> elements
 
-        Row() {
-            cells = []
+        Row () {
+            elements = []
         }
 
-        Row(List<String> values, DebugConsole console) {
-            cells = []
+        Row (List<String> values, DebugConsole console) {
+            elements = []
             values.eachWithIndex { String value, int i ->
-                addCell new Cell(originalValue: value, value: value, index: i, debugConsole: console)
+                addElement new Element(originalValue: value, value: value, index: i, debugConsole: console)
             }
         }
 
-        void addCell(Cell cell) {
-            cells.add(cell)
+        void addElement (Element element) {
+            elements.add(element)
         }
 
-        Cell getCell(Integer index) {
-            cells[index]
+        Element getElement (Integer index) {
+            elements[index]
         }
 
-        List<Cell> getLoadedCells() {
-            cells.findAll { it.isSelected() }
+        List<Element> getLoadedElements (ETLDomain domain) {
+            elements.findAll { it.domain == domain && it.isSelected() }
         }
     }
 
-    static class Cell {
+    static class Element {
 
         String originalValue
         String value
         Integer index
+        ETLDomain domain
         List<StringTransformation> transformations = []
         DebugConsole debugConsole
         Map field = [name: ""]
 
-        ETLProcessor.Cell transform(StringTransformation transformation) {
-            value = transformation.apply(value)
-            transformations.add(transformation)
-            this
-        }
-
-        ETLProcessor.Cell translate(Map actions) {
-
-            if (actions.containsKey('with')) {
-                Map map = actions.get 'with'
-                if (map.containsKey(value)) {
-                    String oldValue = value
-                    value = map[value]
-                    debugConsole.info "Translate $oldValue -> $value"
-                } else {
-                    debugConsole.warn "Could not translate $value"
-                }
-            }
-            this
-        }
-
-        ETLProcessor.Cell load(String fieldProperty) {
-            //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(selectedDomain, assetProperty)
-            field.name = fieldProperty
-            this
-        }
-
-        Boolean isSelected() {
+        Boolean isSelected () {
             !!field.name
         }
     }

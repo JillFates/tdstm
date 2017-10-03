@@ -19,7 +19,7 @@ class MockETLController implements ControllerMethods {
 
         Project project = securityService.userCurrentProject
 
-        ETLFieldsMapper domainAssetFieldsMapper = new ETLFieldsMapper()
+        ETLDomainFieldsValidator domainAssetFieldsMapper = new ETLDomainFieldsValidator()
 
 //        List<Map<String, ?>> applicationFieldSpecs = customDomainService.allFieldSpecs(project,
 //                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
@@ -61,7 +61,7 @@ iterate {
 """
 
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DomainAssets.class.name
+        customizer.addStaticStars ETLDomain.class.name
         customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ConsoleStatus.class.name
 
@@ -75,7 +75,7 @@ iterate {
         configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-        ETLProcessor etlProcessor = new ETLProcessor(crudData: data, debugConsole: console)
+        ETLProcessor etlProcessor = new ETLProcessor(dataSource: data, debugConsole: console)
 
         Binding binding = new Binding([
                 etlProcessor: etlProcessor,
