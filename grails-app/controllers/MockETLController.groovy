@@ -105,7 +105,7 @@ iterate {
             missingPropertyError = mpe.getMessage()
         }
 
-        [mockData: mockData, script: script.trim(), etlProcessor: etlProcessor, errorCollector: errorCollector, lineNumber: lineNumber, missingPropertyError: missingPropertyError, logContent: console.content(), jsonResult: (etlProcessor?.transformationResult as JSON)?.toString(true)]
+        [mockData: mockData, script: script.trim(), etlProcessor: etlProcessor, errorCollector: errorCollector, lineNumber: lineNumber, missingPropertyError: missingPropertyError, logContent: console.content(), jsonResult: (etlProcessor?.results as JSON)?.toString(true)]
     }
 
 
