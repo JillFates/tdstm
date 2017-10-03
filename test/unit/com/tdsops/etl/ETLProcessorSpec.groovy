@@ -180,7 +180,7 @@ class ETLProcessorSpec extends Specification {
                 .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.currentRowPosition == data.size()
+        etlProcessor.currentRowPosition == data.size() - 1
     }
 
     /**
@@ -217,14 +217,14 @@ class ETLProcessorSpec extends Specification {
                 .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.currentRowPosition == data.size()
+        etlProcessor.currentRowPosition == data.size() - 1
 
         and:
         etlProcessor.currentColumnPosition == 1
 
         and:
         etlProcessor.currentRow.getCell(1).value == "Slideaway"
-        etlProcessor.currentRow.getCell(1).initialValue == "Slideaway"
+        etlProcessor.currentRow.getCell(1).originalValue == "Slideaway"
     }
 
     /**
@@ -261,14 +261,14 @@ class ETLProcessorSpec extends Specification {
                 .evaluate(scriptText, ETLProcessor.class.name)
 
         then:
-        etlProcessor.currentRowPosition == data.size()
+        etlProcessor.currentRowPosition == data.size() - 1
 
         and:
         etlProcessor.currentColumnPosition == 1
 
         and:
         etlProcessor.currentRow.getCell(1).value == "Slideaway"
-        etlProcessor.currentRow.getCell(1).initialValue == "Slideaway"
+        etlProcessor.currentRow.getCell(1).originalValue == "Slideaway"
     }
 
     void 'test can transform a field value to uppercase'() {
@@ -792,7 +792,8 @@ class ETLProcessorSpec extends Specification {
             domain Application
             read labels
             iterate {
-                extract 'VENDOR NAME' load appVendor
+                extract 'VENDOR NAME' 
+                    load appVendor
             }
         """
 
@@ -858,6 +859,92 @@ class ETLProcessorSpec extends Specification {
         etlProcessor.getRow(0).getCell(1).field.name == "appVendor"
         etlProcessor.getRow(1).getCell(1).value == "Mozilla"
         etlProcessor.getRow(1).getCell(1).field.name == "appVendor"
+        etlProcessor.getRow(2).getCell(1).value == "VMWare"
+        etlProcessor.getRow(2).getCell(1).field.name == "appVendor"
+    }
+
+    void 'test can save explicitly a list of rows already processed associated to a domain'() {
+
+        // The 'load into' command will take whatever value is in the internal register and map it to the domain object
+        // property name.  The command takes a String argument that will map to the property name of the domain. This
+        // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
+        // with an explaination that the property does not exist and reference the line of the error if possible.
+        given:
+        String scriptText = """
+            domain Application
+            read labels
+            iterate {
+                extract 'VENDOR NAME' load appVendor
+                save()
+            }
+            
+            save()
+        """
+
+        and:
+        List<List<String>> data = [
+                ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
+                ["152254", "Microsoft", "(xlsx updated)"],
+                ["152255", "Mozilla", "NGM"],
+                ["152256", "VMWare", ""]
+        ]
+
+        and:
+        ETLFieldsMapper domainAssetFieldsMapper = new ETLFieldsMapper()
+        domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
+                [constraints: [required: 0],
+                 "control"  : "Number",
+                 "default"  : "",
+                 "field"    : "id",
+                 "imp"      : "U",
+                 "label"    : "Id",
+                 "order"    : 0,
+                 "shared"   : 0,
+                 "show"     : 0,
+                 "tip"      : "",
+                 "udf"      : 0
+                ],
+                [constraints: [required: 0],
+                 "control"  : "String",
+                 "default"  : "",
+                 "field"    : "appVendor",
+                 "imp"      : "N",
+                 "label"    : "Vendor",
+                 "order"    : 0,
+                 "shared"   : 0,
+                 "show"     : 0,
+                 "tip"      : "",
+                 "udf"      : 0
+                ]
+        ])
+
+        and:
+        StringBuffer buffer = new StringBuffer()
+        DebugConsole console = new DebugConsole(buffer: buffer)
+
+        and:
+        ETLProcessor etlProcessor = new ETLProcessor(crudData: data,
+                debugConsole: console,
+                domainAssetFieldsMapper: domainAssetFieldsMapper)
+
+        and:
+        ETLBinding binding = new ETLBinding([
+                etlProcessor: etlProcessor,
+                uppercase   : new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase   : new StringTransformation(closure: { String value -> value.toLowerCase() })
+        ])
+
+        when:
+        new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                .evaluate(scriptText, ETLProcessor.class.name)
+
+        then:
+        etlProcessor.getRow(0).getCell(1).value == "Microsoft"
+        etlProcessor.getRow(0).getCell(1).field.name == "appVendor"
+
+        etlProcessor.getRow(1).getCell(1).value == "Mozilla"
+        etlProcessor.getRow(1).getCell(1).field.name == "appVendor"
+
         etlProcessor.getRow(2).getCell(1).value == "VMWare"
         etlProcessor.getRow(2).getCell(1).field.name == "appVendor"
     }
