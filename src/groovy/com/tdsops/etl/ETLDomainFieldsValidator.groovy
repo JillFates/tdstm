@@ -2,11 +2,11 @@ package com.tdsops.etl
 
 import com.tdsops.tm.enums.domain.AssetClass
 
-class ETLFieldsMapper {
+class ETLDomainFieldsValidator {
 
     Map<AssetClass, Map> assetClassFieldsSpecMap
 
-    ETLFieldsMapper() {
+    ETLDomainFieldsValidator () {
         assetClassFieldsSpecMap = [:]
         assetClassFieldsSpecMap[AssetClass.APPLICATION] = [:]
         assetClassFieldsSpecMap[AssetClass.STORAGE] = [:]
