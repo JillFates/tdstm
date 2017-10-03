@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -298,6 +299,103 @@ class DataviewService implements ServiceMethods {
 
         previewQueryResults(assets, totalAssets[0], dataviewSpec)
     }
+
+	/**
+	 * Retrieve the list of favorite data views for the current person,
+	 * @return List of dataviews (DataView instances) the user has favorited.
+	 */
+	List<Dataview> getFavorites(Long personId) {
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve all the favorited views for the person.
+		def query = FavoriteDataview.where{
+			person == person
+		}.projections{property 'dataview'}
+
+		return query.list()
+	}
+
+	/**
+	 * Delete the given dataview from the current person's favorites.
+	 * @param dataviewId
+	 * @return
+	 */
+	void deleteFavoriteDataview(Long dataviewId) throws EmptyResultException, DomainUpdateException{
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve the current project
+		Project currentProject = securityService.getUserCurrentProject()
+
+		// Error message
+		String cannotDeleteErrorMsg = "Cannot delete favorite dataview for ${person.toString()}"
+
+		// If no dataviewId given, throw an exception
+		if (!dataviewId) {
+			throw new DomainUpdateException("${cannotDeleteErrorMsg}. No dataview id given.")
+		}
+
+		// Retrieve the given dataview.
+		Dataview dataview = Dataview.where{
+			id == dataviewId && project == currentProject
+		}.find()
+
+		// If no dataview was found, throw an exception
+		if (!dataview) {
+			throw new EmptyResultException("${cannotDeleteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
+		}
+
+		// Delete the corresponding favorite
+		int deletedFavs = FavoriteDataview.where{
+			person == person && dataview == dataview
+		}.deleteAll()
+
+		// If no favs were deleted, throw an exception.
+		if (deletedFavs == 0) {
+			throw new DomainUpdateException("${cannotDeleteErrorMsg}. '${dataview.name}' isn't a favorited dataview.")
+		}
+
+	}
+
+	/**
+	 * Add the given dataview to the current person's favorites.
+	 * @param dataviewId
+	 */
+	void addFavoriteDataview(Long dataviewId) {
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve the current project
+		Project currentProject = securityService.getUserCurrentProject()
+
+		// Error message
+		String cannotFavoriteErrorMsg = "Cannot favorite dataview for ${person.toString()}"
+
+		// If no dataviewId given, throw an exception
+		if (!dataviewId) {
+			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. No dataview id given.")
+		}
+
+		// Retrieve the given dataview.
+		Dataview dataview = Dataview.where{
+			id == dataviewId && project == currentProject
+		}.find()
+
+		// If no dataview was found, throw an exception
+		if (!dataview) {
+			throw new EmptyResultException("${cannotFavoriteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
+		}
+
+		// Check if the favorite already exists.
+		FavoriteDataview favoriteDataview = FavoriteDataview.where{
+			person == person && dataview == dataview
+		}.find()
+
+		// If a favorite was found, throw an exception
+		if (favoriteDataview) {
+			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. ${dataview.name} is already a favorite for this person.")
+		}
+
+		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview).save()
+	}
 
     /**
      *

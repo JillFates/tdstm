@@ -1,14 +1,13 @@
 /**
  * Created by David Ontiveros
  */
-
-
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
@@ -231,4 +230,46 @@ class WsAssetExplorerController implements ControllerMethods {
             renderErrorJson("Incorrect json data request")
         }
     }
+
+	/**
+	 * Retrieve the list of favorite views for the current user.
+	 */
+	@Secured("isAuthenticated()")
+	def favoriteDataviews() {
+		try{
+			def favorites = dataviewService.getFavorites()
+			renderSuccessJson(favorites)
+		} catch (Exception e) {
+			renderErrorJson(e.getMessage())
+		}
+
+	}
+
+	/**
+	 * Favorite the given view.
+	 */
+	@Secured("isAuthenticated()")
+	def addFavoriteDataview(Long id) {
+		try{
+			dataviewService.addFavoriteDataview(id)
+			renderSuccessJson("Dataview ${id} favorited")
+		} catch (Exception e) {
+			renderErrorJson(e.getMessage())
+		}
+
+	}
+
+	/**
+	 * Delete the view from the person's favorite.
+	 */
+	@Secured("isAuthenticated()")
+	def deleteFavoriteDataview(Long id) {
+		try{
+			dataviewService.deleteFavoriteDataview(id)
+			renderSuccessJson("Dataview ${id} removed from the person's favorites.")
+		} catch (Exception e) {
+			renderErrorJson(e.getMessage())
+		}
+
+	}
 }
