@@ -12,6 +12,8 @@ databaseChangeLog = {
 			  CREATE TABLE IF NOT EXISTS `provider` (
 				  `provider_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 				  `name` varchar(255) NOT NULL,
+				  `description` varchar(255),
+				  `comment` TEXT,
 				  `project_id` BIGINT(20) NOT NULL,
 				  `date_created` datetime NOT NULL,
 				  `last_updated` datetime,
