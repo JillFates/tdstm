@@ -213,95 +213,93 @@ environments {
 	}
 }
 
-// log4J Logging Configuration
+// log4J Logging Configuration  (Basic configuration al INFO LEVEL)
 //
 // Any custom logging configuration should be done by copying this whole definition into a local tdstm-config.groovy
 // configuration file in order to override this closure. When running locally, the logs will reside in the target directory
 // and for Tomcat they will reside in the CATALINA_HOME/logs directory.
 //
+log4j = {
+	// Set level for all application artifacts
+	info	'grails.app'
 
-String commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
-String auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
-String catalinaBase = System.getProperty('catalina.base')
-String logDirectory = catalinaBase ? catalinaBase + '/logs' : 'target'
+	// enable *debug* to track security issues
+	info	'grails.plugin.springsecurity',
+			'org.springframework.security'
 
-log4j.main = {
+	//   'controllers.AuthController'
+	//   'org.hibernate.SQL'
+	warn	'org.codehaus.groovy.grails.web.servlet',			// controllers
+			'org.codehaus.groovy.grails.web.pages',				// GSP
+			'org.codehaus.groovy.grails.web.sitemesh',			// layouts
+			'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
+			'org.codehaus.groovy.grails.web.mapping',			// URL mapping
+			'org.codehaus.groovy.grails.commons',				// core / classloading
+			'org.codehaus.groovy.grails.plugins',       		// plugins
+			'org.codehaus.groovy.grails.orm.hibernate',			// hibernate integration
+			'org.codehaus.groovy.grails',      					// Most of all grails code base
+			'org.apache.jasper',
+			'org.grails',
+			'grails.app.services.org.grails.plugin.resource',
+			'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
+			'grails.app.taglib.org.grails.plugin.resource',
+			'grails.app.resourceMappers.org.grails.plugin.resource',
+			'grails.spring.BeanBuilder',
+			'org.hibernate',
+			'org.quartz',
+			'grails.plugins.quartz.QuartzGrailsPlugin',
+			'org.apache.catalina',
+			'org.apache.coyote',
+			'org.apache.naming',
+			'net.sf.ehcache',
+			'net.sf.ehcache.hibernate',
+			'org.springframework',
+			'grails.plugin.databasemigration.GrailsChangeLogParser'
+
+	error	'org.hibernate.hql.internal.ast.HqlSqlWalker',
+			'grails.plugin.hibernate4',
+			'org.apache.tomcat',
+			'liquibase',
+			'net.bull.javamelody'
+
+	// ** Enable Hibernate SQL logging with param values *********
+	// trace 'org.hibernate.type'
+	// debug 'org.hibernate.SQL'
+
 	appenders {
+		String logAppName = appName ?: 'tdstm'    // If not defined (for local config)
+		String commonPattern = '%d{ISO8601} [%t] %-5p %c %x - %m%n'
+		String auditPattern = '%d{ISO8601} - %m%n'
+		String catalinaBase = System.getProperty('catalina.base')
+		String logDirectory = 'target'
+
+		if (catalinaBase) {
+			logDirectory = "${catalinaBase}/logs"
+		}
+
 		// Use this if we want to modify the default appender called 'stdout'.
-		console name: 'stdout', layout: pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
+		console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
 
 		// Application log file
-		rollingFile name: 'applicationLog',
-			file: "$logDirectory/${appName}.log",
-			maxFileSize: '500MB',
-			maxBackupIndex: 7,
-			layout: pattern(conversionPattern: commonPattern)
+		file (
+			name:'applicationLog',
+			file:"${logDirectory}/${logAppName}.log",
+			layout:pattern(conversionPattern: commonPattern)
+		)
 
 		// Audit log file
-		rollingFile name: 'auditLog',
-			file: "$logDirectory/${appName}-audit.log",
-			maxFileSize: '500MB',
-			maxBackupIndex: 7,
-			layout: pattern(conversionPattern: auditPattern)
+		file (
+			name:'auditLog',
+			file:"$logDirectory/${logAppName}-audit.log",
+			layout:pattern(conversionPattern: auditPattern)
+		)
 
-		// Stacktrace log file
-		// Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
-		// 'null' name: 'stacktrace'
-		rollingFile name: 'stacktraceLog',
-			file: "$logDirectory/${appName}-stacktrace.log",
-			maxFileSize: '500MB',
-			maxBackupIndex: 7,
-			layout: pattern(conversionPattern: commonPattern)
+		// Disable the Stacktrace
+		'null' name:'stacktrace'
 	}
 
-    // Set level for all application artifacts
-    info 'grails.app'
-    debug'grails.plugin.springsecurity',
-         'org.springframework.security'
-      // 'controllers.AuthController'
-      // 'org.hibernate.SQL'
-    warn 'org.codehaus.groovy.grails.web.servlet',			// controllers
-         'org.codehaus.groovy.grails.web.pages',			// GSP
-         'org.codehaus.groovy.grails.web.sitemesh',			// layouts
-         'org.codehaus.groovy.grails.web.mapping.filter',	// URL mapping
-         'org.codehaus.groovy.grails.web.mapping',			// URL mapping
-         'org.codehaus.groovy.grails.commons',				// core / classloading
-         'org.codehaus.groovy.grails.plugins',       		// plugins
-         'org.codehaus.groovy.grails.orm.hibernate',		// hibernate integration
-         'org.codehaus.groovy.grails',      				// Most of all grails code base
-         'org.apache.jasper',
-         'org.grails',
-         'grails.app.services.org.grails.plugin.resource',
-         'org.codehaus.groovy.grails.domain.GrailsDomainClassCleaner',
-         'grails.app.taglib.org.grails.plugin.resource',
-         'grails.app.resourceMappers.org.grails.plugin.resource',
-         'grails.spring.BeanBuilder',
-         'org.hibernate',
-         'org.quartz',
-         'grails.plugins.quartz.QuartzGrailsPlugin',
-         'org.apache.catalina',
-         'org.apache.coyote',
-         'org.apache.naming',
-         'net.sf.ehcache',
-         'net.sf.ehcache.hibernate',
-         'org.springframework',
-         'grails.plugin.databasemigration.GrailsChangeLogParser'
-    error'org.hibernate.hql.internal.ast.HqlSqlWalker',
-         'grails.plugin.hibernate4',
-         'org.apache.tomcat',
-         'liquibase',
-         'net.bull.javamelody'
-// debug 'org.apache.shiro'
-// trace 'org.hibernate.type'
-// debug 'org.hibernate.SQL'
-
-// Enable Hibernate SQL logging with param values
-//  trace 'org.hibernate.type'
-//  debug 'org.hibernate.SQL'
-
 	root {
-		debug 'stdout', 'applicationLog'
-		additivity: true
+		info 'stdout', 'applicationLog'
 	}
 
 	// Send debug logging to application log (and console since additivity is true)
@@ -309,9 +307,6 @@ log4j.main = {
 
 	// Setup Audit Logging messages to go to their own log file in addition to the application log
 	info  auditLog: 'net.transitionmanager.service.AuditService', additivity: true
-
-	//additivity.grails=false
-	//additivity.StackTrace=false
 }
 
 //Maintenance file path
