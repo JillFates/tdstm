@@ -603,6 +603,10 @@ class TaskService implements ServiceMethods {
 
 	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
+		// If no task id was given, return 0.
+		if (!taskId) {
+			return 0
+		}
 		def taskIndex = 0
 
 		StringBuffer query = new StringBuffer("""

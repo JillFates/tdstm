@@ -2418,15 +2418,16 @@ class AssetEntityController implements ControllerMethods {
 		def moveEventId = params.moveEvent
 		def taskId = params.taskId
 		def task
-
+		def taskIdx = 0
 		if (params.commentId) {
 			task = AssetComment.findByIdAndProject(params.commentId, project)
-			if (!task) {
+			// If the task was found, retrieve its index.
+			if (task) {
+				taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
+			} else {
 				log.warn "predecessorSelectHtml - Unable to find task id $params.commentId in project $project.id"
 			}
 		}
-
-		def taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
 
 		renderSuccessJson([taskIdx.intValue()])
 	}
