@@ -19,5 +19,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Incorrect skip step: $skip".toString())
     }
 
+    static ETLProcessorException invalidCommand (String message) {
+        new ETLProcessorException(message)
+    }
+
+
 
 }
