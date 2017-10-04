@@ -54,7 +54,6 @@ $(document).ready(function() {
 	}
 
 	table.dashboard_right_table td {
-		padding: 0px;
 		height: 27px;
 	}
 
@@ -372,7 +371,7 @@ $(document).ready(function() {
 
 	<%-- Execution Phase Section --%>
 
-				<div class="dashboard_div col-sm-12 col-md-12 col-lg-6">
+				<div class="dashboard_div col-sm-12 col-md-12">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px; border-spacing: 0px;">
 
@@ -441,18 +440,11 @@ $(document).ready(function() {
 										</tr>
 
 										<tr>
-											<td class="dashboard_stat_icon_td">&nbsp;</td>
-											<td>
-												<g:link controller="assetEntity" params="[filter:'server']" action="list" class="links">Servers</g:link>
-											</td>
-										</tr>
-
-										<tr>
 											<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverPhysical_menu" width="17" height="17" /></td>
 											<td>
 												<g:link controller="assetEntity"
 														params="[filter:'physicalServer']"
-														action="list" class="links">&nbsp;&nbsp;&nbsp;Physical</g:link>
+														action="list" class="links">Physical Server</g:link>
 											</td>
 										</tr>
 
@@ -461,7 +453,7 @@ $(document).ready(function() {
 											<td>
 												<g:link controller="assetEntity"
 														params="[filter:'virtualServer']"
-														action="list" class="links">&nbsp;&nbsp;&nbsp;Virtual</g:link>
+														action="list" class="links">Virtual Server</g:link>
 											</td>
 										</tr>
 										<tr>
@@ -501,8 +493,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-md-10 col-xs-10" style="padding-left: 0px; padding-right: 0px;">
 								<div id="eventDataTableId" style="overflow-y: hidden;">
-									<table class="dashboard_right_table dashboard_stat_table"
-                                           style="width: 100% !important; border-spacing: 5px 0px; border-collapse: separate;">
+									<table class="dashboard_right_table dashboard_stat_table" style="border-spacing: 5px 0px; border-collapse: separate;">
 										<thead>
                                             <tr>
                                                 <th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
@@ -544,11 +535,6 @@ $(document).ready(function() {
                                             <%-- Applications --%>
                                             <g:render template="planningStatsExecRow"
                                                       model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]"
-                                                    />
-
-                                            <%-- Servers (Summary) --%>
-                                            <g:render template="planningStatsExecRow"
-                                                      model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]"
                                                     />
 
                                             <%-- Physical Servers --%>
