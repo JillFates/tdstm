@@ -100,7 +100,6 @@
      * @param str
      */
 	function camelCaseToRegularForm(str) {
-	  debugger;
 	  return str
       		// insert a space before all caps
     		.replace(/([A-Z])/g, ' $1').trim()
