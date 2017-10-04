@@ -15,10 +15,12 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.slf4j.LoggerFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.servlet.http.HttpServletRequest
+import java.text.SimpleDateFormat
 
 class TaskImportExportService implements ServiceMethods {
 
@@ -55,14 +57,7 @@ class TaskImportExportService implements ServiceMethods {
 	static final xfrmListToPipedString = { List list, options -> list?.join('|') ?: '' }
 
 	static final xfrmDateToString = { val, options ->
-		if (val == null) return ''
-
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateFormatter)
-		}
-
-		log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
-		val?.toString()
+		return TimeUtil.dateToStringFormat( val, options.dateFormatter )
 	}
 
 	/**
@@ -84,14 +79,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	// Transformer that is used to populate the spreadsheet using the user's TZ
 	static final xfrmDateTimeToString = { val, options ->
-		if (val == null) return ''
-
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateTimeFormatter)
-		}
-
-		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
-		val?.toString()
+		return TimeUtil.dateToStringFormat( val, options.dateTimeFormatter )
 	}
 
 	// ------------------------------------------------------------------------
@@ -828,7 +816,7 @@ class TaskImportExportService implements ServiceMethods {
 				}
 			}
 
-			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+			AssetComment assetComment = AssetComment.findByTaskNumberAndProject(task.taskNumber, project)
 			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
 			assetComment.discard()
 		}
@@ -1146,11 +1134,12 @@ class TaskImportExportService implements ServiceMethods {
 	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed = false
+		Project project = sheetInfoOpts.project
 
 		// Ignore comments
 		if(NumberUtil.isPositiveLong(task.taskNumber)){
 
-			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+			AssetComment assetComment = AssetComment.findByTaskNumberAndProject(task.taskNumber, project)
 			if (assetComment) {
 				log.debug "applyTaskChanges() About to apply changes to $assetComment"
 
