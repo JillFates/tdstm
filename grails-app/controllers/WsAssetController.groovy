@@ -221,14 +221,16 @@ class WsAssetController implements ControllerMethods {
 					"bundle": assetA.moveBundleName,
 					"planStatus": assetA.planStatus,
 					"dependency": dependencyA,
+					"dependencyClass": dependencyA?.dependent?.assetClass
 			],
 			"assetB" : [
 					"name": assetB.assetName,
-					"assetClass":  assetBClassLabel.value,
+					"assetClass": assetBClassLabel.value,
 					"environment": assetB.environment,
 					"bundle": assetB.moveBundleName,
 					"planStatus": assetB.planStatus,
 					"dependency": dependencyB,
+					"dependencyClass": dependencyB?.dependent?.assetClass
 			],
 			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
 			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,

@@ -521,6 +521,14 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	};
 
 	/**
+	 * Open the Dependency Show view
+	 */
+	$scope.openDependencyView = function(asset){
+		EntityCrud.showAssetDetailView(asset.dependencyClass.name, asset.dependency.dependent.id);
+		$scope.close();
+	};
+
+	/**
 	 * Listener to catch the Update from the Dialog
 	 */
 	$scope.onClickUpdate = function() {
