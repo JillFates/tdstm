@@ -1043,6 +1043,8 @@ class ETLProcessorSpec extends Specification {
             domain Application
             iterate {
                 load environment with Production
+                extract 0 load id
+                extract 'VENDOR NAME' load appVendor
             }
             
         """
@@ -1051,8 +1053,7 @@ class ETLProcessorSpec extends Specification {
             List<List<String>> data = [
                     ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
                     ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"],
-                    ["152256", "VMWare", "VMWare", "VMWare offices"]
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
             ]
 
         and:
@@ -1099,16 +1100,12 @@ class ETLProcessorSpec extends Specification {
                     .evaluate(scriptText, ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application).get(0)[0].originalValue == ""
-            etlProcessor.results.get(ETLDomain.Application).get(0)[0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application).get(0)[0].field.name == "environment"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[2].originalValue == ""
+            etlProcessor.results.get(ETLDomain.Application).get(0)[2].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[2].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].originalValue == ""
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "environment"
-
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].originalValue == ""
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "environment"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[2].originalValue == ""
+            etlProcessor.results.get(ETLDomain.Application).get(1)[2].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[2].field.name == "environment"
     }
 }
