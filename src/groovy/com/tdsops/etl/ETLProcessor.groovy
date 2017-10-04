@@ -18,6 +18,8 @@ class ETLProcessor {
     List<ETLProcessor.Row> rows = []
 
     ETLProcessor.Row currentRow
+    ETLProcessor.Element currentElement
+
     Map<ETLDomain, List<Map<String, ?>>> results = [:]
 
     /**
@@ -62,7 +64,7 @@ class ETLProcessor {
      */
     ETLProcessor domain (String domain) {
         if (currentRow != null) {
-            save()
+            commitChanges()
         }
         selectedDomain = ETLDomain.values().find { it.name() == domain }
         if (selectedDomain == null) {
@@ -97,7 +99,7 @@ class ETLProcessor {
         dataSource[currentRowIndex..(dataSource.size() - 1)].each { List<String> crudRowData ->
             currentColumnIndex = 0
             closure(addCrudRowData(crudRowData))
-            save()
+            commitChanges()
             currentRowIndex++
         }
         currentRowIndex--
@@ -105,7 +107,7 @@ class ETLProcessor {
     }
 
     private void addCrudRowData (List<String> crudRowData) {
-        currentRow = new Row(crudRowData, debugConsole)
+        currentRow = new Row(crudRowData)
         rows.add(currentRow)
         currentRow
     }
@@ -119,21 +121,21 @@ class ETLProcessor {
     ETLProcessor extract (Integer index) {
         currentColumnIndex = index
 
-        Element element = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${element.value} by index: $index"
+        currentElement = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${currentElement.value} by index: $index"
         this
     }
 
     ETLProcessor extract (String columnName) {
         currentColumnIndex = columnsMap[columnName].index
 
-        Element element = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${element.value} by column name: $columnName"
+        currentElement = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
         this
     }
 
     private Element getCurrentElement () {
-        currentRow.getElement(currentColumnIndex)
+        currentElement
     }
 
 
@@ -153,12 +155,32 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor transform (StringTransformation transformation) {
-        ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
-        element.value = transformation.apply(element.value)
-        element.transformations.add(transformation)
+        if (currentElement) {
+            currentElement.value = transformation.apply(currentElement.value)
+            currentElement.transformations.add(transformation)
 
-        debugConsole.info "Applying transformation on element: $element "
-        this
+            debugConsole.info "Applying transformation on element: $currentElement "
+            this
+        } else {
+            throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply transitions without extract previously.")
+        }
+    }
+
+    ETLProcessor translateWith (Map ditionary) {
+
+        if (currentElement) {
+            if (ditionary.containsKey(currentElement.value)) {
+                String oldValue = currentElement.value
+                currentElement.value = ditionary[currentElement.value]
+
+                debugConsole.info "Translate $oldValue -> ${currentElement.value}"
+            } else {
+
+                debugConsole.warn "Could not translate ${currentElement.value}"
+            }
+        } else {
+            throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply translations without extract previously.")
+        }
     }
     /**
      *
@@ -168,52 +190,46 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor translate (Map actions) {
-
         if (actions.containsKey('with')) {
-            Map map = actions.get 'with'
-            ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
-            if (map.containsKey(element.value)) {
-                String oldValue = element.value
-                element.value = map[element.value]
-
-                debugConsole.info "Translate $oldValue -> ${element.value}"
-            } else {
-
-                debugConsole.warn "Could not translate ${element.value}"
-            }
+            translateWith(actions.get('with'))
         }
-        this
-    }
-
-    ETLProcessor load (String fieldProperty, String with, String value) {
-
-        if (with != "with") {
-            //throw new ETLException("invalid load command, expect: load properti with value")
-        }
-        //Map<String, ?> fieldSpec = domainAssetFieldsMapper.field(selectedDomain, assetProperty)
         this
     }
 
     /**
      *
-     * Delegate load methods to maintenance method's chain
+     * Load field values in results. From an extracted value or just as a fixed new Element
      *
      * @param fieldProperty
      * @return
      */
     ETLProcessor load (String fieldProperty) {
 
-        ETLProcessor.Element element = currentRow.getElement(currentColumnIndex)
-        element.domain = selectedDomain
-        element.field.name = fieldProperty
+        if (!currentElement) {
+            currentElement = currentRow.addNewElement()
+        }
+        currentElement.domain = selectedDomain
+        currentElement.field.name = fieldProperty
+        this
+    }
+
+    /**
+     *
+     *  Loads a fixed value in a current element
+     *
+     * @param value
+     * @return
+     */
+    ETLProcessor with (String value) {
+        currentElement.value = value
         this
     }
     /**
      *
-     * Saves current domain class and rows already processed as a partial result
+     * Commits current changes with the current domain class and rows already processed as a partial result
      *
      */
-    void save () {
+    void commitChanges () {
 
         if (!results.containsKey(selectedDomain)) {
             results.put(selectedDomain, [])
@@ -276,15 +292,21 @@ class ETLProcessor {
             elements = []
         }
 
-        Row (List<String> values, DebugConsole console) {
+        Row (List<String> values) {
             elements = []
             values.eachWithIndex { String value, int i ->
-                addElement new Element(originalValue: value, value: value, index: i, debugConsole: console)
+                addElement new Element(originalValue: value, value: value, index: i)
             }
         }
 
         void addElement (Element element) {
             elements.add(element)
+        }
+
+        Element addNewElement () {
+            Element element = new Element(originalValue: "", value: "", index: elements.size())
+            addElement element
+            element
         }
 
         Element getElement (Integer index) {
@@ -303,11 +325,32 @@ class ETLProcessor {
         Integer index
         ETLDomain domain
         List<StringTransformation> transformations = []
-        DebugConsole debugConsole
-        Map field = [name: ""]
+        Field field = new Field()
 
         Boolean isSelected () {
-            !!field.name
+            field.hasName()
+        }
+
+    }
+
+    static class Field {
+
+        Map properties = [name: ""]
+
+        String getName () {
+            properties.name
+        }
+
+        void setName (String name) {
+            properties.name = name
+        }
+
+        Boolean hasName () {
+            !!name
+        }
+
+        Boolean hasFieldSpec () {
+            properties.containsKey("fieldSpec")
         }
     }
 }
