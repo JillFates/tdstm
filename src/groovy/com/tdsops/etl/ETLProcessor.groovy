@@ -118,26 +118,9 @@ class ETLProcessor {
         this
     }
 
-    ETLProcessor extract (Integer index) {
-        currentColumnIndex = index
-
-        currentElement = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${currentElement.value} by index: $index"
-        this
-    }
-
-    ETLProcessor extract (String columnName) {
-        currentColumnIndex = columnsMap[columnName].index
-
-        currentElement = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
-        this
-    }
-
     private Element getCurrentElement () {
         currentElement
     }
-
 
     ETLProcessor skip (Integer amount) {
         if (amount + currentRowIndex <= dataSource.size()) {
@@ -195,10 +178,37 @@ class ETLProcessor {
         }
         this
     }
-
     /**
      *
-     * Load field values in results. From an extracted value or just as a fixed new Element
+     * Extracts an element from dataSource by its index in the row
+     *
+     * @param index
+     * @return
+     */
+    ETLProcessor extract (Integer index) {
+        currentColumnIndex = index
+
+        currentElement = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${currentElement.value} by index: $index"
+        this
+    }
+    /**
+     *
+     * Extracts an element from dataSource by its column name
+     *
+     * @param columnName
+     * @return
+     */
+    ETLProcessor extract (String columnName) {
+        currentColumnIndex = columnsMap[columnName].index
+
+        currentElement = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
+        this
+    }
+    /**
+     *
+     * Loads field values in results. From an extracted value or just as a fixed new Element
      *
      * @param fieldProperty
      * @return
@@ -207,9 +217,13 @@ class ETLProcessor {
 
         if (!currentElement) {
             currentElement = currentRow.addNewElement()
+            currentElement.domain = selectedDomain
+            currentElement.field.name = fieldProperty
+        } else {
+            currentElement.domain = selectedDomain
+            currentElement.field.name = fieldProperty
+            currentElement = null
         }
-        currentElement.domain = selectedDomain
-        currentElement.field.name = fieldProperty
         this
     }
 
@@ -222,6 +236,7 @@ class ETLProcessor {
      */
     ETLProcessor with (String value) {
         currentElement.value = value
+        currentElement = null
         this
     }
     /**
