@@ -1,6 +1,15 @@
 import grails.util.Environment
 import net.transitionmanager.security.Permission
 
+/**
+ * WARNING! CERTAIN SECTIONS OF THIS FILE SHOULD NOT BE MODIFIED:
+ * 	- log4j
+ * 	- mail settings
+ * 	-
+ *
+ * Instead do those changes in the configuration file "tdstm-config.groovy.template" of the application
+ */
+
 // This will add a CRLF so that follow logging in dev mode is legible and not overwriting other log statements
 println()
 
@@ -220,6 +229,7 @@ environments {
 ** configuration file in order to override this closure. When running locally, the logs will reside in the target directory
 ** and for Tomcat they will reside in the CATALINA_HOME/logs directory.
 *********************************************************/
+/* // THIS IS FOUND IN THE "tdstm-config.groovy.template" of the application
 log4j = {
 	// Set level for all application artifacts
 	info	'grails.app'
@@ -309,6 +319,7 @@ log4j = {
 	// Setup Audit Logging messages to go to their own log file in addition to the application log
 	info  auditLog: 'net.transitionmanager.service.AuditService', additivity: true
 }
+*/
 
 //Maintenance file path
 tdsops.maintModeFile = "/tmp/tdstm-maint.txt"
