@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  *
@@ -14,10 +15,13 @@ class ETLBinding extends Binding {
 
     ETLDomainFieldsValidator fieldsMapper = new ETLDomainFieldsValidator()
 
-    ETLBinding (Map vars) {
+    ETLBinding (ETLProcessor etlProcessor, Map vars = [:]) {
         this.variables.putAll([
-                *: vars,
-                *: DataPart.values().collectEntries { [(it.name()): it] }
+                *: etlProcessor.metaClass.methods.collectEntries {
+                    [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
+                },
+                *: DataPart.values().collectEntries { [(it.name()): it] },
+                *: vars
         ])
     }
 
@@ -52,7 +56,7 @@ class ETLBinding extends Binding {
 
         CompilerConfiguration configuration = new CompilerConfiguration()
         configuration.addCompilationCustomizers customizer
-        configuration.scriptBaseClass = ETLProcessorBaseScript.class.name
+        //configuration.scriptBaseClass = ETLProcessorBaseScript.class.name
 
         configuration
     }
