@@ -100,7 +100,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can skip a fixed number of rows' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: [
+            ETLProcessor etlProcessor = new ETLProcessor([
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152251", "SRW24G1", "LINKSYS"],
                     ["152252", "SRW24G2", "LINKSYS"],
@@ -129,7 +129,7 @@ class ETLProcessorSpec extends Specification {
     void 'test cannot skip a fixed number of rows if it bigger that rows count' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: [
+            ETLProcessor etlProcessor = new ETLProcessor([
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152251", "SRW24G1", "LINKSYS"],
                     ["152252", "SRW24G2", "LINKSYS"],
@@ -163,7 +163,7 @@ class ETLProcessorSpec extends Specification {
         """
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: [
+            ETLProcessor etlProcessor = new ETLProcessor([
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
                     ["152255", "ZPHA MODULE", "TippingPoint"]
@@ -212,7 +212,7 @@ class ETLProcessorSpec extends Specification {
                     ["152275", "ProLiant BL465c G7", "HP"]
             ]
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: dataSource)
+            ETLProcessor etlProcessor = new ETLProcessor(dataSource)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -248,7 +248,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: dataSource)
+            ETLProcessor etlProcessor = new ETLProcessor(dataSource)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -290,7 +290,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -327,7 +327,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -363,7 +363,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -399,7 +399,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -433,7 +433,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -467,7 +467,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -520,7 +520,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -574,7 +574,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -629,7 +629,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -682,7 +682,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             Binding binding = new Binding([
@@ -736,7 +736,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data, debugConsole: console)
+            ETLProcessor etlProcessor = new ETLProcessor(data, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -771,7 +771,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -1317,6 +1317,5 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.results.get(ETLDomain.Application).get(1)[2].value == "Production"
             etlProcessor.results.get(ETLDomain.Application).get(1)[2].field.name == "environment"
     }
-
 
 }
