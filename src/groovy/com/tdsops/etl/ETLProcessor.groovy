@@ -33,6 +33,16 @@ class ETLProcessor {
     }
     /**
      *
+     * Creates an instance of ETL processor with a source of data
+     *
+     * @param data
+     * @param domainFieldsSpec
+     */
+    ETLProcessor (List<List<String>> data) {
+        this(data, new DebugConsole(buffer: new StringBuffer()), [:])
+    }
+    /**
+     *
      * Creates an instance of ETL processor with a source of data and a domain mapper validator
      *
      * @param data
@@ -40,6 +50,16 @@ class ETLProcessor {
      */
     ETLProcessor (List<List<String>> data, Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec) {
         this(data, new DebugConsole(buffer: new StringBuffer()), domainFieldsSpec)
+    }
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data and a debugguer console
+     *
+     * @param data
+     * @param console
+     */
+    ETLProcessor (List<List<String>> data, DebugConsole console) {
+        this(data, console, [:])
     }
     /**
      *
