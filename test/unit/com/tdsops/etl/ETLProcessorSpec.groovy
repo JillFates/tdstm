@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tdsops.tm.enums.domain.AssetClass
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -12,11 +11,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can define a the primary domain' () {
 
         given:
-            String scriptText = """
-            domain Application
-        """
-
-        and:
             ETLProcessor etlProcessor = new ETLProcessor()
 
         and:
@@ -24,7 +18,35 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Application
+                        
+                     """,
+                    ETLProcessor.class.name)
+
+        then: 'A domain is selected'
+            etlProcessor.selectedDomain == ETLDomain.Application
+    }
+
+    void 'test can add groovy comments' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor()
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                    .evaluate("""
+                        // Script supports one line comments
+                        domain Application
+                        /*
+                            And multiple Lines comments
+                        */
+                        
+                     """,
+                    ETLProcessor.class.name)
 
         then: 'A domain is selected'
             etlProcessor.selectedDomain == ETLDomain.Application
@@ -33,11 +55,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an exception if an invalid domain is defined' () {
 
         given:
-            String scriptText = """
-            domain Unknown
-        """
-
-        and:
             ETLProcessor etlProcessor = new ETLProcessor()
 
         and:
@@ -45,7 +62,12 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+
+                        domain Unknown
+                        
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
             ETLProcessorException e = thrown ETLProcessorException
@@ -55,13 +77,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can define several times a domain' () {
 
         given:
-            String scriptText = """
-            domain Application
-            domain Device
-            domain Storage
-        """
-
-        and:
             ETLProcessor etlProcessor = new ETLProcessor()
 
         and:
@@ -69,7 +84,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+
+                        domain Application
+                        domain Device
+                        domain Storage
+                        
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'The last domain selected could be recovered'
             etlProcessor.selectedDomain == ETLDomain.Storage
@@ -93,7 +115,12 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate("skip 2", ETLProcessor.class.name)
+                    .evaluate("""
+                    
+                        skip 2
+                        
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'The current row index is increased by 2'
             etlProcessor.currentRowIndex == 2
@@ -174,14 +201,6 @@ class ETLProcessorSpec extends Specification {
         // it increments to row pointer automatically.
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate {
-                println it
-            }
-        """
-        and:
             List<List<String>> dataSource = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -200,7 +219,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            println it
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == dataSource.size() - 1
@@ -214,14 +240,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column ordinal position' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate {
-                extract 1
-            }
-        """
-        and:
             List<List<String>> dataSource = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -237,7 +255,16 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 1
+                        }
+                        
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'The last column index is selected correctly'
             etlProcessor.currentColumnIndex == 1
@@ -255,14 +282,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column name' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate {
-                extract 'MODEL NAME'
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -278,7 +297,16 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                    
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME'
+                        }
+                        
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'The last column index is selected correctly'
             etlProcessor.currentColumnIndex == 1
@@ -291,14 +319,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value to uppercase' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate {
-                extract 'MODEL NAME' transform uppercase
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -317,7 +337,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
             etlProcessor.getRow(0).getElement(1).value == "SRW24G4"
@@ -328,14 +355,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value to lowercase' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate {
-                extract 'MODEL NAME' transform lowercase
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -354,7 +373,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform lowercase
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
             etlProcessor.getRow(0).getElement(1).value == "srw24g4"
@@ -365,14 +391,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at parsing time' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            iterate 
-                extract 'MODEL NAME' transform unknown
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -391,7 +409,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate 
+                            extract 'MODEL NAME' transform unknown
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
             thrown MultipleCompilationErrorsException
@@ -400,13 +425,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at evaluation time' () {
 
         given:
-            String scriptText = """domain Device
-            read labels
-            iterate {
-                extract 'MODEL NAME' transform unknown
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -425,7 +443,13 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform unknown
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
             MissingMethodException missingMethodException = thrown MissingMethodException
@@ -435,13 +459,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow closure creation using a secure syntax with AST customizer' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            def greeting = { String name -> "Hello, \$name!" }
-            assert greeting('Diego') == 'Hello, Diego!'
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -478,8 +495,14 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            GroovyShell shell = new GroovyShell(this.class.classLoader, binding, configuration)
-            shell.evaluate(scriptText)
+            new GroovyShell(this.class.classLoader, binding, configuration)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        def greeting = { String name -> "Hello, \$name!" }
+                        assert greeting('Diego') == 'Hello, Diego!'
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
             MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -489,15 +512,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow method creation using a secure syntax with AST customizer' () {
 
         given:
-            String scriptText = """
-            domain Device
-            read labels
-            def greeting(String name){ 
-                "Hello, \$name!" 
-            }
-            assert greeting('Diego') == 'Hello, Diego!'
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -534,7 +548,15 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).evaluate(scriptText)
+            new GroovyShell(this.class.classLoader, binding, configuration).
+                    evaluate("""
+            domain Device
+            read labels
+            def greeting(String name){ 
+                "Hello, \$name!" 
+            }
+            assert greeting('Diego') == 'Hello, Diego!'
+        """, ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
             MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -544,15 +566,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary imports using a secure syntax with AST customizer' () {
 
         given:
-            String scriptText = """
-            
-            import java.lang.Math
-            
-            domain Device
-            read labels
-            Math.max 10, 100
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -589,7 +602,16 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).evaluate(scriptText, ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, binding, configuration).
+                    evaluate("""
+            
+            import java.lang.Math
+            
+            domain Device
+            read labels
+            Math.max 10, 100
+        """,
+                            ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
             MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -599,15 +621,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer' () {
 
         given:
-            String scriptText = """
-            
-            import java.lang.Math.*
-            
-            domain Device
-            read labels
-            max 10, 100
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -642,7 +655,16 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).evaluate(scriptText, ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, binding, configuration).
+                    evaluate("""
+            
+            import java.lang.Math.*
+            
+            domain Device
+            read labels
+            max 10, 100
+        """,
+                            ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
             MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -652,11 +674,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can allow stars imports using a secure syntax with AST customizer' () {
 
         given:
-            String scriptText = """
-            read labels
-            max 10, 100
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -695,7 +712,11 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+            read labels
+            max 10, 100
+        """,
+                    ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is not thrown'
             notThrown MultipleCompilationErrorsException
@@ -704,12 +725,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can enable console and log domain selected' () {
 
         given:
-            String scriptText = """
-            console on
-            domain Device
-        """
-
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
                     ["152254", "SRW24G4", "LINKSYS"],
@@ -718,8 +733,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            StringBuffer buffer = new StringBuffer()
-            DebugConsole console = new DebugConsole(buffer: buffer)
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
             ETLProcessor etlProcessor = new ETLProcessor(dataSource: data, debugConsole: console)
@@ -732,10 +746,14 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                            console on
+                            domain Device
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'A console content could be recovered after processing an ETL Scrtipt'
-            buffer.toString() == new StringBuffer("INFO - Console status changed: on")
+            console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
                     .append(System.lineSeparator())
                     .append("INFO - Selected Domain: Device")
                     .append(System.lineSeparator())
@@ -745,16 +763,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can translate an extracted value using a dictionary' () {
 
         given:
-            String scriptText = """domain Device
-            dictionary = [prod: 'Production', dev: 'Development']
-            read labels
-            iterate {
-                extract 'ENVIRONMENT' 
-                transform lowercase  
-                translate with: dictionary
-            }
-        """
-        and:
             List<List<String>> data = [
                     ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME", "ENVIRONMENT"],
                     ["152254", "SRW24G4", "LINKSYS", "Prod"],
@@ -773,7 +781,15 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""domain Device
+                            dictionary = [prod: 'Production', dev: 'Development']
+                            read labels
+                            iterate {
+                                extract 'ENVIRONMENT' 
+                                transform lowercase  
+                                translate with: dictionary
+                            }""",
+                    ETLProcessor.class.name)
 
         then: 'The column is trsanlated for every row'
             etlProcessor.getRow(0).getElement(3).value == "Production"
@@ -781,34 +797,22 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(3).value == "Development"
     }
 
-    void 'test can extract a field value and load into a domain object property name' () {
+    void 'test can validate load command using domain field specs' () {
 
         // The 'load into' command will take whatever value is in the internal register and map it to the domain object
         // property name.  The command takes a String argument that will map to the property name of the domain. This
         // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
         // with an explaination that the property does not exist and reference the line of the error if possible.
-
         given:
-            String scriptText = """
-            domain Application
-            read labels
-            iterate {
-                extract 'VENDOR NAME' 
-                    load appVendor
-            }
-        """
-
-        and:
             List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
-                    ["152254", "Microsoft", "(xlsx updated)"],
-                    ["152255", "Mozilla", "NGM"],
-                    ["152256", "VMWare", ""]
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
             ]
 
         and:
-            ETLDomainFieldsValidator domainAssetFieldsMapper = new ETLDomainFieldsValidator()
-            domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
                     [constraints: [required: 0],
                      "control"  : "Number",
                      "default"  : "",
@@ -833,16 +837,10 @@ class ETLProcessorSpec extends Specification {
                      "tip"      : "",
                      "udf"      : 0
                     ]
-            ])
+            ]
 
         and:
-            StringBuffer buffer = new StringBuffer()
-            DebugConsole console = new DebugConsole(buffer: buffer)
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data,
-                    debugConsole: console,
-                    domainAssetFieldsMapper: domainAssetFieldsMapper)
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -852,7 +850,196 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'VENDOR NAME' load appVendor
+                                }""",
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].originalValue == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].value == "Microsoft"
+
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application).get(0)[0].field.constraints.required == 0
+
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].originalValue == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Mozilla"
+
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.constraints.required == 0
+
+    }
+
+    void 'test can throw an ETLProcessorException when try to load without domain definition' () {
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
+            ]
+
+        and:
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor, [
+                    uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                    lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+            ])
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                    .evaluate("""
+                                domain Application
+                                read labels
+                                iterate {
+                                    extract 'VENDOR NAME' load appVendor
+                                }""",
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == "There is not validator for domain Application"
+
+    }
+
+    void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification ' () {
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
+            ]
+
+        and:
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "appVendor",
+                     "imp"      : "N",
+                     "label"    : "Vendor",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor, [
+                    uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                    lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+            ])
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'VENDOR NAME' load vendor
+                                }""",
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == "The domain Application does not have specifications for field: vendor"
+    }
+
+    void 'test can extract a field value and load into a domain object property name' () {
+
+        // The 'load into' command will take whatever value is in the internal register and map it to the domain object
+        // property name.  The command takes a String argument that will map to the property name of the domain. This
+        // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
+        // with an explaination that the property does not exist and reference the line of the error if possible.
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
+                    ["152254", "Microsoft", "(xlsx updated)"],
+                    ["152255", "Mozilla", "NGM"],
+                    ["152256", "VMWare", ""]
+            ]
+
+        and:
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "appVendor",
+                     "imp"      : "N",
+                     "label"    : "Vendor",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor, [
+                    uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
+                    lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+            ])
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding, binding.configuration)
+                    .evaluate("""
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'VENDOR NAME' 
+                                load appVendor
+                        }
+                    """,
+                    ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
             etlProcessor.getRow(0).getElement(1).value == "Microsoft"
@@ -866,17 +1053,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can save a selected domain rows' () {
 
         given:
-            String scriptText = """
-            domain Application
-            read labels
-            iterate {
-                extract 'VENDOR NAME' 
-                    load appVendor
-            }
-            
-        """
-
-        and:
             List<List<String>> data = [
                     ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
                     ["152254", "Microsoft", "(xlsx updated)"],
@@ -885,8 +1061,8 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLDomainFieldsValidator domainAssetFieldsMapper = new ETLDomainFieldsValidator()
-            domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
                     [constraints: [required: 0],
                      "control"  : "Number",
                      "default"  : "",
@@ -911,16 +1087,10 @@ class ETLProcessorSpec extends Specification {
                      "tip"      : "",
                      "udf"      : 0
                     ]
-            ])
+            ]
 
         and:
-            StringBuffer buffer = new StringBuffer()
-            DebugConsole console = new DebugConsole(buffer: buffer)
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data,
-                    debugConsole: console,
-                    domainAssetFieldsMapper: domainAssetFieldsMapper)
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -930,7 +1100,15 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'VENDOR NAME' 
+                                load appVendor
+                        }
+                        """,
+                    ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
             etlProcessor.getRow(0).getElement(1).value == "Microsoft"
@@ -956,21 +1134,6 @@ class ETLProcessorSpec extends Specification {
         // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
         // with an explaination that the property does not exist and reference the line of the error if possible.
         given:
-            String scriptText = """
-            read labels
-            iterate {
-
-                domain Application
-                extract 0 load id
-                extract 'VENDOR NAME' load appVendor
-                
-                domain Device
-                extract 'LOCATION' load location
-            }
-            
-        """
-
-        and:
             List<List<String>> data = [
                     ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
                     ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
@@ -979,8 +1142,8 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLDomainFieldsValidator domainAssetFieldsMapper = new ETLDomainFieldsValidator()
-            domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
                     [constraints: [required: 0],
                      "control"  : "Number",
                      "default"  : "",
@@ -1005,11 +1168,37 @@ class ETLProcessorSpec extends Specification {
                      "tip"      : "",
                      "udf"      : 0
                     ]
-            ])
+            ]
+            domainFieldsSpec[ETLDomain.Device] = [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "location",
+                     "imp"      : "N",
+                     "label"    : "Location",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ]
+
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data,
-                    domainAssetFieldsMapper: domainAssetFieldsMapper)
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -1019,7 +1208,18 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        read labels
+                        iterate {
+                            domain Application
+                            extract 0 load id
+                            extract 'VENDOR NAME' load appVendor
+                            
+                            domain Device
+                            extract 'LOCATION' load location
+                        }
+                        """,
+                    ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
             etlProcessor.results.get(ETLDomain.Application).get(0)[0].value == "152254"
@@ -1038,18 +1238,6 @@ class ETLProcessorSpec extends Specification {
         // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
         // with an explaination that the property does not exist and reference the line of the error if possible.
         given:
-            String scriptText = """
-            read labels
-            domain Application
-            iterate {
-                load environment with Production
-                extract 0 load id
-                extract 'VENDOR NAME' load appVendor
-            }
-            
-        """
-
-        and:
             List<List<String>> data = [
                     ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
                     ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
@@ -1057,8 +1245,8 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLDomainFieldsValidator domainAssetFieldsMapper = new ETLDomainFieldsValidator()
-            domainAssetFieldsMapper.setFieldsSpecFor(AssetClass.APPLICATION, [
+            Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
+            domainFieldsSpec[ETLDomain.Application] = [
                     [constraints: [required: 0],
                      "control"  : "Number",
                      "default"  : "",
@@ -1082,12 +1270,23 @@ class ETLProcessorSpec extends Specification {
                      "show"     : 0,
                      "tip"      : "",
                      "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "environment",
+                     "imp"      : "N",
+                     "label"    : "Environment",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
                     ]
-            ])
+            ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource: data,
-                    domainAssetFieldsMapper: domainAssetFieldsMapper)
+            ETLProcessor etlProcessor = new ETLProcessor(data, domainFieldsSpec)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor, [
@@ -1097,7 +1296,17 @@ class ETLProcessorSpec extends Specification {
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, binding.configuration)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        read labels
+                        domain Application
+                        iterate {
+                            load environment 
+                                with Production
+                            extract 0 load id
+                            extract 'VENDOR NAME' load appVendor
+                        }
+                        """,
+                    ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
             etlProcessor.results.get(ETLDomain.Application).get(0)[2].originalValue == ""
@@ -1108,4 +1317,6 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.results.get(ETLDomain.Application).get(1)[2].value == "Production"
             etlProcessor.results.get(ETLDomain.Application).get(1)[2].field.name == "environment"
     }
+
+
 }
