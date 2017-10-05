@@ -303,7 +303,7 @@ class ETLProcessor {
                     field        : element.field
             ]
         }
-        debugConsole.info "Saving partial results $partialResults for domain ${selectedDomain}"
+        debugConsole.info "Saving partial results ${partialResults*.field.name} for domain ${selectedDomain}"
 
         if (partialResults) {
             results.get(selectedDomain).add(partialResults)
