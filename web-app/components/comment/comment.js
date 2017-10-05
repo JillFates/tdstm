@@ -656,9 +656,13 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
         commentService.getLastCreatedTaskSessionParams().then(
             function (result) {
             	if(result.status) {
-					$scope.ac.moveEvent = result.data.preferences.TASK_CREATE_EVENT;
-					$scope.ac.category = result.data.preferences.TASK_CREATE_CATEGORY;
-					$scope.ac.status = result.data.preferences.TASK_CREATE_STATUS;
+            		var preferencesEvent = result.data.preferences.TASK_CREATE_EVENT;
+            		// Assign the event from the preferences only if there's any.
+            		if (preferencesEvent && preferencesEvent != 'null') {
+                        $scope.ac.moveEvent = preferencesEvent;
+            		}
+            		$scope.ac.category = result.data.preferences.TASK_CREATE_CATEGORY;
+            		$scope.ac.status = result.data.preferences.TASK_CREATE_STATUS;
                 }
             }
         );
