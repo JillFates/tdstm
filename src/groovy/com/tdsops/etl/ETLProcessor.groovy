@@ -6,11 +6,12 @@ package com.tdsops.etl
 class ETLProcessor {
 
     List<List<String>> dataSource = []
+    Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec
+
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
 
     DebugConsole debugConsole
-    ETLDomainFieldsValidator domainAssetFieldsMapper
 
     ETLDomain selectedDomain
     List<ETLProcessor.Column> columns = []
@@ -28,17 +29,17 @@ class ETLProcessor {
      *
      */
     ETLProcessor () {
-        this([], new DebugConsole(buffer: new StringBuffer()), new ETLDomainFieldsValidator())
+        this([], new DebugConsole(buffer: new StringBuffer()), [:])
     }
     /**
      *
      * Creates an instance of ETL processor with a source of data and a domain mapper validator
      *
      * @param data
-     * @param domainValidatorMapper
+     * @param domainFieldsSpec
      */
-    ETLProcessor (List<List<String>> data, ETLDomainFieldsValidator domainValidatorMapper) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), domainValidatorMapper)
+    ETLProcessor (List<List<String>> data, Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec) {
+        this(data, new DebugConsole(buffer: new StringBuffer()), domainFieldsSpec)
     }
     /**
      *
@@ -47,13 +48,13 @@ class ETLProcessor {
      *
      * @param data
      * @param console
-     * @param etlDomainFieldsValidator
+     * @param domainFieldsSpec
      */
     ETLProcessor (List<List<String>> data, DebugConsole console,
-                  ETLDomainFieldsValidator etlDomainFieldsValidator) {
+                  Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec) {
         this.dataSource = data
         this.debugConsole = console
-        this.domainAssetFieldsMapper = domainAssetFieldsMapper
+        this.domainFieldsSpec = domainFieldsSpec
     }
     /**
      *
@@ -210,23 +211,48 @@ class ETLProcessor {
      *
      * Loads field values in results. From an extracted value or just as a fixed new Element
      *
-     * @param fieldProperty
+     * @param field
      * @return
      */
-    ETLProcessor load (String fieldProperty) {
+    ETLProcessor load (String field) {
 
         if (!currentElement) {
             currentElement = currentRow.addNewElement()
-            currentElement.domain = selectedDomain
-            currentElement.field.name = fieldProperty
+            loadPropertyAndValidateFieldSpecs(field)
         } else {
-            currentElement.domain = selectedDomain
-            currentElement.field.name = fieldProperty
+            loadPropertyAndValidateFieldSpecs(field)
             currentElement = null
         }
         this
     }
+    /**
+     *
+     * First, it loads field name in the current selected element.
+     * Then, if selected domain is not ETLDomain.External, then it validates with fields specs
+     *
+     * @param field
+     */
+    void loadPropertyAndValidateFieldSpecs (String field) {
 
+        currentElement.field.name = field
+        currentElement.domain = selectedDomain
+
+        if (ETLDomain.External != selectedDomain) {
+
+            if (!domainFieldsSpec.containsKey(selectedDomain)) {
+                throw ETLProcessorException.unknownDomainFieldsSpec(selectedDomain)
+            }
+
+            Map<String, ?> fieldSpec = domainFieldsSpec[selectedDomain].find { it.field == field || it.label == field }
+            if (!fieldSpec) {
+                throw ETLProcessorException.domainWithoutFieldsSpec(selectedDomain, field)
+            }
+
+            currentElement.field.label = fieldSpec.label
+            currentElement.field.control = fieldSpec.control
+            currentElement.field.constraints = fieldSpec.constraints
+        }
+    }
     /**
      *
      *  Loads a fixed value in a current element
@@ -343,29 +369,15 @@ class ETLProcessor {
         Field field = new Field()
 
         Boolean isSelected () {
-            field.hasName()
+            !!field.name
         }
-
     }
 
     static class Field {
 
-        Map properties = [name: ""]
-
-        String getName () {
-            properties.name
-        }
-
-        void setName (String name) {
-            properties.name = name
-        }
-
-        Boolean hasName () {
-            !!name
-        }
-
-        Boolean hasFieldSpec () {
-            properties.containsKey("fieldSpec")
-        }
+        String name = ""
+        String control
+        String label
+        Map constraints
     }
 }

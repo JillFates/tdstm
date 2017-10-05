@@ -13,8 +13,6 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 class ETLBinding extends Binding {
 
-    ETLDomainFieldsValidator fieldsMapper = new ETLDomainFieldsValidator()
-
     ETLBinding (ETLProcessor etlProcessor, Map vars = [:]) {
         this.variables.putAll([
                 *: etlProcessor.metaClass.methods.collectEntries {
