@@ -4,17 +4,20 @@ import com.tdsops.tm.enums.domain.AssetClass
 
 class ETLDomainFieldsValidator {
 
-    Map<AssetClass, Map> assetClassFieldsSpecMap
+    Map<ETLDomain, Map> assetClassFieldsSpecMap
 
     ETLDomainFieldsValidator () {
         assetClassFieldsSpecMap = [:]
-        assetClassFieldsSpecMap[AssetClass.APPLICATION] = [:]
-        assetClassFieldsSpecMap[AssetClass.STORAGE] = [:]
-        assetClassFieldsSpecMap[AssetClass.DATABASE] = [:]
-        assetClassFieldsSpecMap[AssetClass.DEVICE] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Application] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Device] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Database] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Storage] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Person] = [:]
+        assetClassFieldsSpecMap[ETLDomain.External] = [:]
+        assetClassFieldsSpecMap[ETLDomain.Comment] = [:]
     }
 
-    void setFieldsSpecFor(AssetClass assetClass, List<Map<String, ?>> fieldsSpec) {
+    void setFieldsSpecFor (ETLDomain domain, List<Map<String, ?>> fieldsSpec) {
 
         fieldsSpec.each { spec ->
             Map<String, ?> fieldSpec = [
@@ -24,16 +27,16 @@ class ETLDomainFieldsValidator {
                     label      : spec.label,
             ]
 
-            assetClassFieldsSpecMap[assetClass][spec.field] = fieldSpec
-            assetClassFieldsSpecMap[assetClass][spec.label] = fieldSpec
+            assetClassFieldsSpecMap[domain][spec.field] = fieldSpec
+            assetClassFieldsSpecMap[domain][spec.label] = fieldSpec
         }
     }
 
-    Boolean hasField(AssetClass assetClass, String field) {
+    Boolean hasField (AssetClass assetClass, String field) {
         assetClassFieldsSpecMap[assetClass].containsKey(field)
     }
 
-    Map<String, ?> field(AssetClass assetClass, String field) {
+    Map<String, ?> field (AssetClass assetClass, String field) {
         assetClassFieldsSpecMap[assetClass][field]
     }
 

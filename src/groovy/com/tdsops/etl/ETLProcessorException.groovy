@@ -23,6 +23,11 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException(message)
     }
 
+    static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain) {
+        new ETLProcessorException("There is not validator for domain $domain".toString())
+    }
 
-
+    static ETLProcessorException domainWithoutFieldsSpec (ETLDomain domain, String field) {
+        new ETLProcessorException("The domain $domain does not have specifications for field: $field".toString())
+    }
 }
