@@ -1050,7 +1050,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(1).field.name == "appVendor"
     }
 
-    void 'test can save a selected domain rows' () {
+    void 'test can process a selected domain rows' () {
 
         given:
             List<List<String>> data = [
@@ -1127,7 +1127,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.results.get(ETLDomain.Application).get(2)[0].field.name == "appVendor"
     }
 
-    void 'test can save multiple domains rows' () {
+    void 'test can process multiple domains in same row' () {
 
         // The 'load into' command will take whatever value is in the internal register and map it to the domain object
         // property name.  The command takes a String argument that will map to the property name of the domain. This
