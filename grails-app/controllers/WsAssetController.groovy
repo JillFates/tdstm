@@ -13,6 +13,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
+import grails.gsp.PageRenderer
 
 /**
  * Created by @oluna on 4/5/17.
@@ -23,6 +24,7 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
+	PageRenderer groovyPageRenderer
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -219,13 +221,61 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to delete one or more assets for the current project 
-	 * @params ids - a list of asset id numbers
-	 * @return JSON Success response with data.message with results
+	 * Used to retrieve the Angular HTML template used for the show view of an asset
+	 * @param id - the id of the asset to generate the show view for
+	 * @return html template
 	 */
-	@HasPermission(Permission.AssetDelete)
-	def deleteAssets() {
-		String message = assetEntityService.deleteBulkAssets(projectForWs, 'Assets', request.getJSON().ids)
-		renderSuccessJson(message:message)
+	@HasPermission(Permission.AssetView)
+	def showTemplate(Long id) {
+		String template=''
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (asset) {
+			Map model = [
+				asset: asset
+			]
+
+			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
+			template = groovyPageRenderer.render(view: "/angular/$domainName/show", model: model)
+		}
+		render template
+	}
+
+	/**
+	 * Used to retrieve the model data for the show view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetView)
+	def showModel(Long id) {
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (asset) {
+			Map model = [
+				asset: asset
+			]
+
+			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
+			renderAsJson(model)
+		}
+	}
+
+	/**
+	 * Used to retrieve the model data for the edit view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def editModel(Long id) {
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (asset) {
+			Map map = [
+				id: asset.id,
+				assetName: asset.assetName
+			]
+			renderAsJson(map)
+		}
 	}
 }

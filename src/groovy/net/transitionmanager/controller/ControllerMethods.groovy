@@ -291,4 +291,33 @@ trait ControllerMethods {
 		}
 		return project
 	}
+
+	/**
+	 * Used to retrieve an domain record using the 
+	 * 
+	 */
+	def <T> T fetchDomain(Class<T> clazz, Map params) {
+		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
+		if (t) {
+			if (GormUtil.isDomainProperty(t, 'project')) {
+				SecurityService securityService = ApplicationContextHolder.getBean('securityService')
+				Project project = securityService.userCurrentProject
+				if (! project) {
+					sendNotFound()
+					return null
+				} else {
+					if (project.id != t.project.id) {
+						securityService.reportViolation("attempted to access asset from unrelated project (asset ${t.id})")
+						sendNotFound()
+						return null
+					}
+				}
+			}
+			return t
+		} else {
+			sendNotFound()
+			return null
+		}
+	}
+	
 }
