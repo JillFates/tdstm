@@ -221,25 +221,30 @@ class WsAssetController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to retrieve the Angular HTML template used for the show view of an asset
+	 * Used to retrieve the Angular HTML template used for the show or edit views of an asset
 	 * @param id - the id of the asset to generate the show view for
+	 * @param mode - the mode of the template to render [edit|show]
 	 * @return html template
 	 */
 	@HasPermission(Permission.AssetView)
-	def showTemplate(Long id) {
-		String template=''
-		AssetEntity asset = fetchDomain(AssetEntity, params)
-		if (asset) {
-			Map model = [
-				asset: asset
-			]
-
-			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
-			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
-			// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
-			template = groovyPageRenderer.render(view: "/angular/$domainName/show", model: model)
+	def getTemplate(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode)) {
+			sendBadRequest
+			return
 		}
-		render template
+
+		// Load the asset and validate that it is part of the project
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (! asset) {
+			return
+		}
+		
+		Map model = [ asset: asset ]
+		String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+		model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+		// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
+		render groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
 	}
 
 	/**

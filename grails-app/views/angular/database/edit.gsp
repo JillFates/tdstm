@@ -10,19 +10,19 @@
 
 	$(document).ready(function() {
 		// Ajax to populate dependency selects in edit pages
-		var assetId = '${databaseInstance.id}'
+		var assetId = '${asset.id}'
 		populateDependency(assetId, 'database','edit')
 		changeDocTitle('${escapedName}');
 	})
 </script>
-<g:form method="post" action="update" name="createEditAssetForm">
-	<input type="hidden" name="id" value="${databaseInstance?.id}" />
+<g:form method="post" action="update" name="createEditAssetForm" controller="/ws/asset">
+	<input type="hidden" name="id" value="${asset?.id}" />
 	<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
 	<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
 	<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
 
-	<input type="hidden" id="dbId" value ="${databaseInstance.id}"/>
+	<input type="hidden" id="dbId" value ="${asset.id}"/>
 	<input type="hidden" id="tabType" name="tabType" value =""/>
 	<input type="hidden" name="updateView" id="updateView" value=""/>
 
@@ -34,7 +34,7 @@
 	<input type="hidden" id="version" 	name="version" value="${version}"/>
 
 	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+	<g:render template="/angular/common/dependentHidden" />
 
 
 <table style="border: 0">
@@ -44,26 +44,26 @@
 				<table>
 					<tbody>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${databaseInstance?.assetName}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
 							<td colspan="3" style="font-weight:bold;">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${databaseInstance.assetName}"/>
+								<tds-angular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${asset.assetName}"/>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.description}" value="${databaseInstance?.description}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
 							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${databaseInstance.description}" tooltipDataPlacement="bottom"/>
+								<tds-angular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${asset.description}" tooltipDataPlacement="bottom"/>
 							</td>
 						</tr>
 						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}" tabindex="13"/>
+							<tds-angular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" tabindex="13"/>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${databaseInstance?.supportType}"/>
+							<tds-angular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}"/>
 
-							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance?.environment}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.environment}" value="${asset?.environment}"/>
 							<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Seb lect']}" tabindex="32" />
-								</tds:tooltipSpan>
+								<tds-angular:tooltipSpan field="${standardFieldSpecs.environment}">
+									<g:select id="environment" name="environment" from="${environmentOptions}" value="${asset.environment}" noSelection="${['':' Please Seb lect']}" tabindex="32" />
+								</tds-angular:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
@@ -73,66 +73,66 @@
 								</label>
 							</td>
 							<td nowrap="nowrap" class="sizeScale">
-								<tds:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${databaseInstance.size}"/>
-								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select from="${databaseInstance.constraints.scale.inList}" id="scale" name="scale"
-											  value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
-								</tds:tooltipSpan>
+								<tds-angular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}"/>
+								<tds-angular:tooltipSpan field="${standardFieldSpecs.scale}">
+									<g:select from="${asset.constraints.scale.inList}" id="scale" name="scale"
+											  value="${asset.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
+								</tds-angular:tooltipSpan>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
-							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'retireDate','errors')}">
+							<tds-angular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
+							<td valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')}">
 							    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
 					            </script>
 					            <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate"
 									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:standardFieldSpecs.retireDate.label}"
-					                	value="<tds:convertDate date="${databaseInstance?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="22" >
+					                	value="<tds-angular:convertDate date="${asset?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="22" >
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${databaseInstance?.moveBundle}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
 							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
-								</tds:tooltipSpan>
+								<tds-angular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${asset?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
+								</tds-angular:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance?.rateOfChange}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset?.rateOfChange}"/>
 							<td>
-								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="17" value="${databaseInstance.rateOfChange}"/>
+								<tds-angular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="17" value="${asset.rateOfChange}"/>
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
-							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
+							<tds-angular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
+							<td valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')}">
 					           	<input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
 									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
-					                	value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
+					                	value="<tds-angular:convertDate date="${asset?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
 							</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
 							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
-									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34"/>
-								</tds:tooltipSpan>
+								<tds-angular:tooltipSpan field="${standardFieldSpecs.planStatus}">
+									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${asset.planStatus}" tabindex="34"/>
+								</tds-angular:tooltipSpan>
 							</td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}" tabindex="22"/>
+							<tds-angular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" tabindex="22"/>
 
-							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
+							<tds-angular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
 							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
-									<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation"
-										   value="${databaseInstance.validation}" tabindex="35"/>
-								</tds:tooltipSpan>
+								<tds-angular:tooltipSpan field="${standardFieldSpecs.validation}">
+									<g:select from="${asset.constraints.validation.inList}" id="validation" name="validation"
+										   value="${asset.validation}" tabindex="35"/>
+								</tds-angular:tooltipSpan>
 							</td>
 						</tr>
 						<tbody class="customTemplate">
-							<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>
+							<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 						</tbody>
 					</tbody>
 				</table>
@@ -145,7 +145,7 @@
 	<tr>
 		<td colspan="2">
 			<div class="buttons">
-				<g:render template="../assetEntity/editButtons" model="[assetEntity:databaseInstance]"></g:render>
+				<g:render template="/angular/common/assetEditButtons" model="[assetEntity:asset]"></g:render>
 			</div>
 		</td>
 	</tr>

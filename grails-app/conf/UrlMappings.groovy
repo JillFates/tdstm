@@ -63,12 +63,22 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/asset/showTemplate/$id" {
-			controller = 'wsAsset'
-			action = [
-				GET:'showTemplate'
-			]
+		"/ws/asset/showTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
 		}
+
+		"/ws/asset/editTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'edit'
+		}
+		
+		// "/ws/asset/editTemplate/$id" (
+		// 	controller = 'wsAsset'
+		// 	action = [
+		// 		GET:'getTemplate'
+		// 	]
+		// ) {
+		// 	 mode = 'edit'
+		// }
 
 		"/ws/asset/showModel/$id" {
 			controller = 'wsAsset'
