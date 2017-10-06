@@ -153,7 +153,7 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Outstanding', template:changeTmpl('outstanding'), transform:xfrmString],
 
 		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:false,
-										label: 'Date Required', template:changeTmpl('dateRequired'), transform:xfrmDateToString],
+										label: 'Date Required', template:changeTmpl('dateRequired'), transform: xfrmDateToString],
 
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
