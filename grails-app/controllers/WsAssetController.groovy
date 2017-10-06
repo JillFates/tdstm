@@ -239,7 +239,7 @@ class WsAssetController implements ControllerMethods {
 		if (! asset) {
 			return
 		}
-		
+
 		Map model = [ asset: asset ]
 		String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
 		model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
@@ -253,34 +253,27 @@ class WsAssetController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.AssetView)
-	def showModel(Long id) {
+	def getModel(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode)) {
+			sendBadRequest
+			return
+		}
+
 		AssetEntity asset = fetchDomain(AssetEntity, params)
 		if (asset) {
 			Map model = [
 				asset: asset
 			]
-
 			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
-			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			if (mode == 'show') {
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			} else {
+				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
+			}
 			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
 			renderAsJson(model)
 		}
 	}
 
-	/**
-	 * Used to retrieve the model data for the edit view of an asset
-	 * @param id - the id of the asset to retrieve the model for
-	 * @return JSON map
-	 */
-	@HasPermission(Permission.AssetEdit)
-	def editModel(Long id) {
-		AssetEntity asset = fetchDomain(AssetEntity, params)
-		if (asset) {
-			Map map = [
-				id: asset.id,
-				assetName: asset.assetName
-			]
-			renderAsJson(map)
-		}
-	}
 }

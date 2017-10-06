@@ -70,21 +70,13 @@ class UrlMappings {
 		"/ws/asset/editTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'edit'
 		}
-		
-		// "/ws/asset/editTemplate/$id" (
-		// 	controller = 'wsAsset'
-		// 	action = [
-		// 		GET:'getTemplate'
-		// 	]
-		// ) {
-		// 	 mode = 'edit'
-		// }
 
-		"/ws/asset/showModel/$id" {
-			controller = 'wsAsset'
-			action = [
-				GET:'showModel'
-			]
+		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'edit'
 		}
 		
 		/******************************************************/
