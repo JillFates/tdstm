@@ -658,8 +658,11 @@ class MoveBundleController implements ControllerMethods {
 
 		if (customFieldSetting?.constraints?.values) {
 			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
-				if (!it) result[Application.UNKNOWN] = 0
-				else if (groupPlanMethodologyCount[it]) result[it] = 0
+				if ( ! it ) {
+					result[Application.UNKNOWN] = 0
+				} else if (groupPlanMethodologyCount[it]) {
+					result[it] = 0
+				}
 				result
 			}
 			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
