@@ -57,25 +57,33 @@ export class SelectListConfigurationPopupComponent {
 		this.newItem = '';
 		this.sortType = null;
 		this.defaultValue = null;
-		console.log(this.field.constraints.values);
 		this.customService.getDistinctValues(this.domain, this.field)
-			.subscribe((value: string[]) => {
+			.subscribe((distinctValues: string[]) => {
 
-				let indexOfBlank = value.indexOf('');
+				let indexOfBlank = distinctValues.indexOf('');
+				// Add blank(empty) option if its a required field or remove it if opposite.
 				if (this.field.constraints.required && indexOfBlank !== -1) {
 					this.items.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === -1) {
 					this.items.splice(0, 0, '');
 				}
+
+				// build the option items list based on distinctValues and current stored values (maintain the order).
 				if (this.field.constraints.values) {
-					for (let item of this.field.constraints.values) {
-						if (value.indexOf(item) === -1) {
-							this.items.push( {deletable: true, value: item} );
+					for (let option of this.field.constraints.values) {
+						let indexOfDistinctValue = distinctValues.indexOf(option);
+						if (indexOfDistinctValue === -1) {
+							this.items.push( {deletable: true, value: option} );
 						} else {
-							this.items.push( {deletable: false, value: item} );
+							distinctValues.splice(indexOfDistinctValue, 1);
+							this.items.push( {deletable: false, value: option} );
 						}
 					}
 				}
+
+				// add any distinctValue that was not found on original field.constraint.values at the end.
+				this.items = this.items.concat( distinctValues.map( o => { return {deletable: false, value: o}; }) );
+
 			});
 		this.defaultValue = this.field.default;
 	}
