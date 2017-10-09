@@ -6,7 +6,8 @@ package com.tdsops.etl
 class ETLProcessor {
 
     List<List<String>> dataSource = []
-    Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec
+    ETLFieldsValidator fieldsValidator
+    Map<String, ETLTransformation> transformations = [:]
 
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
@@ -29,7 +30,7 @@ class ETLProcessor {
      *
      */
     ETLProcessor () {
-        this([], new DebugConsole(buffer: new StringBuffer()), [:])
+        this([], new DebugConsole(buffer: new StringBuffer()), null, [:])
     }
     /**
      *
@@ -39,17 +40,38 @@ class ETLProcessor {
      * @param domainFieldsSpec
      */
     ETLProcessor (List<List<String>> data) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), [:])
+        this(data, new DebugConsole(buffer: new StringBuffer()), null, [:])
+    }
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data
+     * and a map with available transformations
+     *
+     * @param data
+     * @param transformations
+     */
+    ETLProcessor (List<List<String>> data, Map<String, ETLTransformation> transformations) {
+        this(data, new DebugConsole(buffer: new StringBuffer()), null, transformations)
+    }
+    /**
+     *
+     *
+     * @param data
+     * @param console
+     * @param transformations
+     */
+    ETLProcessor (List<List<String>> data, DebugConsole console, Map<String, ETLTransformation> transformations) {
+        this(data, console, null, transformations)
     }
     /**
      *
      * Creates an instance of ETL processor with a source of data and a domain mapper validator
      *
      * @param data
-     * @param domainFieldsSpec
+     * @param fieldsValidator
      */
-    ETLProcessor (List<List<String>> data, Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), domainFieldsSpec)
+    ETLProcessor (List<List<String>> data, ETLFieldsValidator fieldsValidator) {
+        this(data, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
     }
     /**
      *
@@ -64,17 +86,36 @@ class ETLProcessor {
     /**
      *
      * Creates an instance of ETL processor with a source of data,
-     * a domain mapper validator and an instance of etlDomainFieldsValidator
+     * a domain mapper validator and an instance of fieldsValidator
      *
      * @param data
      * @param console
-     * @param domainFieldsSpec
+     * @param fieldsValidator
      */
-    ETLProcessor (List<List<String>> data, DebugConsole console,
-                  Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec) {
+    ETLProcessor (List<List<String>> data, DebugConsole console, ETLFieldsValidator fieldsValidator) {
         this.dataSource = data
         this.debugConsole = console
-        this.domainFieldsSpec = domainFieldsSpec
+        this.fieldsValidator = fieldsValidator
+    }
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data,
+     * a domain mapper validator and an instance of fieldsValidator
+     * with a map of available transformations
+     *
+     * @param data
+     * @param console
+     * @param fieldsValidator
+     * @param transformations
+     */
+    ETLProcessor (List<List<String>> data,
+                  DebugConsole console,
+                  ETLFieldsValidator fieldsValidator,
+                  Map<String, ETLTransformation> transformations) {
+        this.dataSource = data
+        this.debugConsole = console
+        this.fieldsValidator = fieldsValidator
+        this.transformations = transformations
     }
     /**
      *
@@ -91,6 +132,7 @@ class ETLProcessor {
         if (selectedDomain == null) {
             throw ETLProcessorException.invalidDomain(domain)
         }
+
         debugConsole.info("Selected Domain: $domain")
         this
     }
@@ -101,9 +143,9 @@ class ETLProcessor {
      * @param dataPart
      * @return
      */
-    ETLProcessor read (DataPart dataPart) {
+    ETLProcessor read (String dataPart) {
 
-        if (dataPart == DataPart.labels) {
+        if ("labels".equalsIgnoreCase(dataPart)) {
             debugConsole.info "Reading labels"
 
             dataSource.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
@@ -133,9 +175,15 @@ class ETLProcessor {
         currentRow
     }
 
-    ETLProcessor console (ConsoleStatus status) {
-        debugConsole.status = status
-        debugConsole.info "Console status changed: $status"
+    ETLProcessor console (String status) {
+
+        ConsoleStatus consoleStatus = ConsoleStatus.values().find { it.name() == status }
+
+        if (consoleStatus == null) {
+            throw ETLProcessorException.invalidConsoleStatus(status)
+        }
+        debugConsole.status = consoleStatus
+        debugConsole.info "Console status changed: $consoleStatus"
         this
     }
 
@@ -158,15 +206,26 @@ class ETLProcessor {
      * @param transformation
      * @return
      */
-    ETLProcessor transform (StringTransformation transformation) {
+    ETLProcessor transform (String transformationName) {
+
+        ETLTransformation transformation = lookupTransformation(transformationName)
+
         if (currentElement) {
-            currentElement.value = transformation.apply(currentElement.value)
+            transformation.apply(currentElement)
             currentElement.transformations.add(transformation)
 
             debugConsole.info "Applying transformation on element: $currentElement "
             this
         } else {
             throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply transitions without extract previously.")
+        }
+    }
+
+    ETLTransformation lookupTransformation (String name) {
+        if (transformations && transformations.containsKey(name)) {
+            transformations[name]
+        } else {
+            throw ETLProcessorException.unknownTransformation(name)
         }
     }
 
@@ -207,11 +266,16 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor extract (Integer index) {
-        currentColumnIndex = index
 
-        currentElement = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${currentElement.value} by index: $index"
-        this
+        if (index in (0..currentRow.size())) {
+            currentColumnIndex = index
+
+            currentElement = currentRow.getElement(currentColumnIndex)
+            debugConsole.info "Extract element: ${currentElement.value} by index: $index"
+            this
+        } else {
+            throw ETLProcessorException.extractInvalidColumn(index)
+        }
     }
     /**
      *
@@ -221,11 +285,16 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor extract (String columnName) {
-        currentColumnIndex = columnsMap[columnName].index
 
-        currentElement = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
-        this
+        if (columnsMap.containsKey(columnName)) {
+            currentColumnIndex = columnsMap[columnName].index
+
+            currentElement = currentRow.getElement(currentColumnIndex)
+            debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
+            this
+        } else {
+            throw ETLProcessorException.extractMissingColumn(columnName)
+        }
     }
     /**
      *
@@ -234,44 +303,65 @@ class ETLProcessor {
      * @param field
      * @return
      */
-    ETLProcessor load (String field) {
+    ETLProcessor load (final String field) {
 
-        if (!currentElement) {
-            currentElement = currentRow.addNewElement()
-            loadPropertyAndValidateFieldSpecs(field)
-        } else {
-            loadPropertyAndValidateFieldSpecs(field)
-            currentElement = null
+        Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+
+        Boolean hasWith = false
+
+        [
+                with: { value ->
+                    hasWith = true
+                    currentElement = currentRow.addNewElement(value)
+                    currentElement.field.name = field
+                    currentElement.domain = selectedDomain
+
+                    if (fieldSpec) {
+                        currentElement.field.label = fieldSpec.label
+                        currentElement.field.control = fieldSpec.control
+                        currentElement.field.constraints = fieldSpec.constraints
+                    }
+                }
+        ]
+
+        if (hasWith) {
+
+            if (fieldSpec) {
+                currentElement.field.name = field
+                currentElement.domain = selectedDomain
+
+                currentElement.field.label = fieldSpec.label
+                currentElement.field.control = fieldSpec.control
+                currentElement.field.constraints = fieldSpec.constraints
+            }
         }
+
         this
     }
     /**
      *
-     * First, it loads field name in the current selected element.
-     * Then, if selected domain is not ETLDomain.External, then it validates with fields specs
+     * It looks up the field Spec for Domain by fieldName
      *
-     * @param field
+     * @param domain
+     * @param fieldName
+     * @return
      */
-    void loadPropertyAndValidateFieldSpecs (String field) {
+    private Map<String, ?> lookUpFieldSpecs (ETLDomain domain, String field) {
 
-        currentElement.field.name = field
-        currentElement.domain = selectedDomain
+        Map<String, ?> fieldSpec
 
-        if (ETLDomain.External != selectedDomain) {
+        if (ETLDomain.External != domain) {
 
-            if (!domainFieldsSpec.containsKey(selectedDomain)) {
-                throw ETLProcessorException.unknownDomainFieldsSpec(selectedDomain)
+            if (!fieldsValidator.hasSpecs(domain, field)) {
+                throw ETLProcessorException.unknownDomainFieldsSpec(domain)
             }
 
-            Map<String, ?> fieldSpec = domainFieldsSpec[selectedDomain].find { it.field == field || it.label == field }
+            fieldSpec = fieldsValidator.lookup(selectedDomain, field)
             if (!fieldSpec) {
-                throw ETLProcessorException.domainWithoutFieldsSpec(selectedDomain, field)
+                throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
             }
-
-            currentElement.field.label = fieldSpec.label
-            currentElement.field.control = fieldSpec.control
-            currentElement.field.constraints = fieldSpec.constraints
         }
+        fieldSpec
     }
     /**
      *
@@ -280,11 +370,11 @@ class ETLProcessor {
      * @param value
      * @return
      */
-    ETLProcessor with (String value) {
-        currentElement.value = value
-        currentElement = null
-        this
-    }
+//    ETLProcessor with (String value) {
+//        currentElement.value = value
+//        currentElement = null
+//        this
+//    }
     /**
      *
      * Commits current changes with the current domain class and rows already processed as a partial result
@@ -310,10 +400,10 @@ class ETLProcessor {
         }
     }
 
-//    def methodMissing(String methodName, args) {
-//        debugConsole.info "Method missing: ${methodName}, args: ${args}"
-//
-//    }
+    def methodMissing (String methodName, args) {
+        debugConsole.info "Method missing: ${methodName}, args: ${args}"
+        throw ETLProcessorException.methodMissing(methodName, args)
+    }
 
     ETLDomain getSelectedDomain () {
         selectedDomain
@@ -364,8 +454,8 @@ class ETLProcessor {
             elements.add(element)
         }
 
-        Element addNewElement () {
-            Element element = new Element(originalValue: "", value: "", index: elements.size())
+        Element addNewElement (String value) {
+            Element element = new Element(originalValue: value, value: value, index: elements.size())
             addElement element
             element
         }
@@ -377,6 +467,10 @@ class ETLProcessor {
         List<Element> getLoadedElements (ETLDomain domain) {
             elements.findAll { it.domain == domain && it.isSelected() }
         }
+
+        int size () {
+            elements.size()
+        }
     }
 
     static class Element {
@@ -385,7 +479,7 @@ class ETLProcessor {
         String value
         Integer index
         ETLDomain domain
-        List<StringTransformation> transformations = []
+        List<ETLTransformation> transformations = []
         Field field = new Field()
 
         Boolean isSelected () {

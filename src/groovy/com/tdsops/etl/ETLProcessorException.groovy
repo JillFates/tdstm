@@ -30,4 +30,25 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException domainWithoutFieldsSpec (ETLDomain domain, String field) {
         new ETLProcessorException("The domain $domain does not have specifications for field: $field".toString())
     }
+
+    static ETLProcessorException methodMissing (String method, args) {
+        new ETLProcessorException("Unrecognized command $method with args $args".toString())
+    }
+
+    static ETLProcessorException extractMissingColumn (String columnName) {
+        new ETLProcessorException("Missing column name '$columnName'".toString())
+    }
+
+    static ETLProcessorException extractInvalidColumn (Integer index) {
+        new ETLProcessorException("Invalid column index: $index".toString())
+    }
+
+    static ETLProcessorException unknownTransformation (String name) {
+        new ETLProcessorException("Unknown transformation: $name".toString())
+    }
+
+    static ETLProcessorException invalidConsoleStatus (String status) {
+        new ETLProcessorException("Unknown console command option: $status".toString())
+    }
+
 }
