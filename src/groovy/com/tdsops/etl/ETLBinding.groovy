@@ -18,7 +18,6 @@ class ETLBinding extends Binding {
                 *: etlProcessor.metaClass.methods.collectEntries {
                     [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
                 },
-                *: DataPart.values().collectEntries { [(it.name()): it] },
                 *: vars
         ])
     }
@@ -45,19 +44,4 @@ class ETLBinding extends Binding {
 
         result
     }
-
-    CompilerConfiguration getConfiguration () {
-
-        ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars ConsoleStatus.class.name
-        customizer.addStaticStars DataPart.class.name
-
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers customizer
-        //configuration.scriptBaseClass = ETLProcessorBaseScript.class.name
-
-        configuration
-    }
-
-
 }
