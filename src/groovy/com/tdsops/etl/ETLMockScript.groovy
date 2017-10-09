@@ -18,19 +18,6 @@ abstract class ETLMockScript extends Script {
         this
     }
 
-    ETLProcessor read(DataPart dataPart) {
-
-        if (dataPart == DataPart.labels) {
-            getDebugConsole().info("Reading labels")
-
-            getDatasource().get(currentRowPosition++).eachWithIndex { String columnName, Integer index ->
-                getMetadata().columns.names[columnName] = [ordinal: index]
-                getMetadata().columns.ordinals[index] = [name: columnName]
-            }
-        }
-        this
-    }
-
     private DebugConsole getDebugConsole() {
         if (!getBinding().hasVariable(DebugConsole.class.name)) {
             getBinding().setVariable(DebugConsole.class.name, new DebugConsole(buffer: new StringBuffer()))
