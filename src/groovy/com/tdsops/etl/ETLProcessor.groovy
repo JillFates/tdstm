@@ -324,7 +324,7 @@ class ETLProcessor {
                 }
         ]
 
-        if (hasWith) {
+        if (!hasWith) {
 
             if (fieldSpec) {
                 currentElement.field.name = field
