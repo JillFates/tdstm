@@ -59,10 +59,10 @@ iterate {
         ETLProcessor etlProcessor = new ETLProcessor(data, console, domainFieldsSpec)
 
         ETLBinding binding = new ETLBinding(etlProcessor, [
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() }),
-                first    : new StringTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
-                blanks   : new StringTransformation(closure: { String value -> value.replaceAll(" ", "") })
+                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() }),
+                first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
+                blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
         ])
 
         ErrorCollector errorCollector
