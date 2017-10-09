@@ -23,7 +23,6 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -64,7 +63,6 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -114,7 +112,6 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -156,13 +153,12 @@ class ETLMockScriptSpec extends Specification {
 
         and:
         Binding binding = new ETLBinding([
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -201,13 +197,12 @@ class ETLMockScriptSpec extends Specification {
         """
         and:
         Binding binding = new ETLBinding([
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -246,13 +241,12 @@ class ETLMockScriptSpec extends Specification {
         """
         and:
         Binding binding = new ETLBinding([
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
@@ -291,13 +285,12 @@ class ETLMockScriptSpec extends Specification {
         """
         and:
         Binding binding = new ETLBinding([
-                uppercase: new StringTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new StringTransformation(closure: { String value -> value.toLowerCase() })
+                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() })
         ])
 
         and:
         ImportCustomizer customizer = new ImportCustomizer()
-        customizer.addStaticStars DataPart.class.name
         customizer.addStaticStars ETLDomain.class.name
 
         and:
