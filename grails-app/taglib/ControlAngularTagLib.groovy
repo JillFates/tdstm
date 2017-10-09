@@ -11,7 +11,7 @@ import com.tdsops.tm.enums.ControlType
  */ 
 class ControlAngularTagLib {
 
-	static String namespace = 'tds-angular'
+	static String namespace = 'tdsAngular'
 
 	// TODO : determine what the CSS class should be for the controls
 	// This is the CSS class name to be assigned to all of the control types (presently not being used)
