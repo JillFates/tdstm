@@ -590,8 +590,7 @@ td[data-for].I .select2-choice,
 	background-image: none !important;
 }
 /* NORMAL */
-td[data-for].N .select2-choice,
-.N{
+td[data-for].N.label, td.N.label {
 	background-color: #ddd !important;
 	background-image: none !important;
 }
@@ -600,10 +599,6 @@ td[data-for].U label, td.U label{
     background-color: #F4F4F4 !important;
     background-image: none !important;
 }
-/*td[data-for].U .select2-choice, .U{
-    background-color: #F4F4F4 !important;
-    background-image: none !important;
-}*/
 /* HIDDEN */
 td[data-for].H .select2-choice,
 .H{
