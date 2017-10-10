@@ -1434,9 +1434,6 @@ class ETLProcessorSpec extends Specification {
                                 load id 
                                 load 'IDENT'
                             load environment with 'Production'        
-                                   
-                            
-                            
                             
                         }
                         """,
