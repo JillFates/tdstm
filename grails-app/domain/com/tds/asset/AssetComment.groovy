@@ -14,9 +14,8 @@ import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.TimeScale.M
@@ -292,7 +291,7 @@ class AssetComment {
 		apiAction &&
 		! apiActionInvokedAt &&
 		! apiActionCompletedAt &&
-		status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED]
+		status in [READY, STARTED]
 	}
 
 	/*
@@ -328,7 +327,7 @@ class AssetComment {
     * isActionable - return indicator that the status of the task is Actionable
     */
 	boolean isActionable() {
-		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
+		!(status in [ COMPLETED, TERMINATED ])
 	}
 
 	// task Manager column header names and its labels
