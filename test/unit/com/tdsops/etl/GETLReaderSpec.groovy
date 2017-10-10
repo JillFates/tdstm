@@ -55,7 +55,7 @@ class GETLReaderSpec extends Specification {
             csvFile.readRowCount() == 3
 
         and: 'First row results contains fields values'
-            csvFile.rows()[0].id == 114054
+            csvFile.rows()[0].id == "114054"
             csvFile.rows()[0].name == "BlackBerry Enterprise Server"
             csvFile.rows()[0].description == "Email sync to Blackberry handhelds"
             csvFile.rows()[0].environment == "Production"
