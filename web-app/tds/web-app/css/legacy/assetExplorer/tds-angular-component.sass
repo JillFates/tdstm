@@ -32,12 +32,16 @@
     border-spacing: 2px
     border-collapse: separate
     padding: 5px 0
+    border: 1px solid #63a242
+    width: 100%
     td .label
       background: none repeat scroll 0% 0% #f3f4f6
       width: 10%
-    td .valueNW
-      background-color: white !important
     div
+      .highField
+        label
+          color: red !important
+          font-weight: 700 !important
       .label
         display: table-cell
         text-align: initial
@@ -49,4 +53,30 @@
           color: #333
           font-size: 12px
           font-style: normal
-          font-weight: normal !important
+          font-weight: normal
+    td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N
+      background-color: #FFF !important
+    /* CRITICAL */
+    td[data-for].C .select2-choice,
+    .C
+      background-color: #F9FF90 !important
+      background-image: none !important
+    /* IMPORTANT */
+    td[data-for].I .select2-choice,
+    .I
+      background-color: #D4F8D4 !important
+      background-image: none !important
+    /* NORMAL */
+    td[data-for].N .select2-choice,
+    .N
+      background-color: #ddd !important
+      background-image: none !important
+    /* UNIMPORTANT */
+    td[data-for].U label, td.U label
+      background-color: #F4F4F4 !important
+      background-image: none !important
+    /* HIDDEN */
+    td[data-for].H .select2-choice,
+    .H
+      background-color: #fff !important
+      background-image: none !important

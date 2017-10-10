@@ -95,3 +95,6 @@
         </tr>
     </table>
 </div>
+<script>
+	$('[data-toggle="popover"]').popover();
+</script>
