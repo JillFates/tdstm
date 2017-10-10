@@ -802,8 +802,17 @@ class MoveBundleController implements ControllerMethods {
 				deviceAssetClass: AssetClass.DEVICE,
 				allServers: AssetType.allServerTypes]
 
-		def serversCountsQueryResults = AssetEntity.executeQuery(serversCountsQuery, serversCountsQueryParams)[0]
-		def serversCompletedPercentage = countAppPercentage(serversCountsQueryResults[1].intValue(), serversCountsQueryResults[2].intValue())
+		def serversCompletedPercentage = 0
+		def serversCountsQueryResults = AssetEntity.executeQuery(serversCountsQuery, serversCountsQueryParams)
+		// Make sure this does not return null while getting [0] element.
+		if (serversCountsQueryResults.size() > 0) {
+			serversCountsQueryResults = serversCountsQueryResults[0]
+			def totalServersCount = serversCountsQueryResults[1].intValue()
+			// Make sure to prevent Division by zero error while calling countAppPercentage method.
+			if (totalServersCount > 0) {
+				serversCompletedPercentage = countAppPercentage(totalServersCount, serversCountsQueryResults[2].intValue())
+			}
+		}
 
 		return [
 			appList:appList,
