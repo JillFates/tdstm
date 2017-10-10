@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Applications>
+    <Application id="114054">
+        <Name>BlackBerry Enterprise Server</Name>
+        <Description>Email sync to Blackberry handhelds</Description>
+        <Environment>Production</Environment>
+    </Application>
+    <application id="114055">
+        <Name>BlackBerry Enterprise Server Test</Name>
+        <Description></Description>
+        <Environment>DR</Environment>
+    </application>
+    <application id="114056">
+        <Name>BlackBerry Express</Name>
+        <Description>Email sync to Blackberry handhelds</Description>
+        <Environment>Production</Environment>
+    </application>
+
+</Applications>
