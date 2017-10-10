@@ -10,23 +10,22 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 @Secured('isAuthenticated()')
 class MockETLController implements ControllerMethods {
 
-
     def customDomainService
 
     def index () {
 
         Project project = securityService.userCurrentProject
 
-        Map<ETLDomain, List<Map<String, ?>>> domainFieldsSpec = [:]
-        domainFieldsSpec[ETLDomain.Application] = customDomainService.allFieldSpecs(project,
-                AssetClass.APPLICATION.name())[AssetClass.APPLICATION.name()]["fields"]
-        domainFieldsSpec[ETLDomain.Device] = customDomainService.allFieldSpecs(project,
-                AssetClass.DEVICE.name())[AssetClass.DEVICE.name()]["fields"]
-        domainFieldsSpec[ETLDomain.Database] = customDomainService.allFieldSpecs(project,
-                AssetClass.DATABASE.name())[AssetClass.DATABASE.name()]["fields"]
-        domainFieldsSpec[ETLDomain.Storage] = customDomainService.allFieldSpecs(project,
-                AssetClass.STORAGE.name())[AssetClass.STORAGE.name()]["fields"]
+        def configureUsingDomain = { AssetClass assetClass ->
+            customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
+        }
 
+        ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+
+        validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
+        validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
+        validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
+        validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
 
         def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME,ENVIRONMENT
 152254,SRW24G4,LINKSYS,Prod
@@ -44,32 +43,38 @@ class MockETLController implements ControllerMethods {
         }
 
         def script = params.script ?: """console on
-domain Application
+
 read labels
 iterate {
+    domain Application
     extract 0 load id
     extract 'MODEL NAME' transform lowercase load Name
     extract 2 transform uppercase  load description
-    load environment with 'Production'
+    //load environment with 'Production'
+
+    domain Device
+    extract 0 load id
+    extract 'MODEL NAME' transform uppercase load Name
+
 }
 """
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(data, console, domainFieldsSpec)
-
-        ETLBinding binding = new ETLBinding(etlProcessor, [
-                uppercase: new ElementTransformation(closure: { String value -> value.toUpperCase() }),
-                lowercase: new ElementTransformation(closure: { String value -> value.toLowerCase() }),
+        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+                uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
                 first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
                 blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
         ])
+
+        ETLBinding binding = new ETLBinding(etlProcessor)
 
         ErrorCollector errorCollector
         String missingPropertyError
         Integer lineNumber
         try {
-            new GroovyShell(this.class.classLoader, binding, binding.configuration).evaluate(script, ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, binding).evaluate(script?.trim(), ETLProcessor.class.name)
 
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
