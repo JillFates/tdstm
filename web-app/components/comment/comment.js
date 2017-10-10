@@ -1668,7 +1668,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 	var commentTemplateFromCreateResponse = function (response, assetId, assetType) {
 		var temp = commentTemplate(assetTO(assetId, assetType));
 		var ac = response.assetComment;
-		temp.assignedTo = ac.assignedTo ? ac.assignedTo.id.toString() : '';
+		temp.assignedTo = (ac.assignedTo === '' || ac.assignedTo === null) ? '0' : ac.assignedTo.id.toString();
 		temp.assetClass = response.assetClass;
 		temp.category = ac.category;
 		temp.comment = ac.comment;
