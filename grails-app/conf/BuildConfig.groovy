@@ -38,6 +38,8 @@ grails.project.dependency.resolution = {
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
+		runtime 'net.sourceforge.getl:getl:1.2.05'
+
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
 	}

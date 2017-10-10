@@ -22,7 +22,7 @@ class ETLProcessorSpec extends Specification {
                     .evaluate("""
                         domain Application
                         
-                     """,
+                     """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'A domain is selected'
@@ -46,7 +46,7 @@ class ETLProcessorSpec extends Specification {
                             And multiple Lines comments
                         */
                         
-                     """,
+                     """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'A domain is selected'
@@ -67,7 +67,7 @@ class ETLProcessorSpec extends Specification {
 
                         domain Unknown
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -91,7 +91,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         domain Storage
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The last domain selected could be recovered'
@@ -120,7 +120,7 @@ class ETLProcessorSpec extends Specification {
                     
                         skip 2
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The current row index is increased by 2'
@@ -249,7 +249,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             println it
                         }
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The current row index is the last row in data source'
@@ -287,7 +287,7 @@ class ETLProcessorSpec extends Specification {
                             extract 1
                         }
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The last column index is selected correctly'
@@ -328,7 +328,7 @@ class ETLProcessorSpec extends Specification {
                             extract 'MODEL NAME'
                         }
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The last column index is selected correctly'
@@ -365,7 +365,7 @@ class ETLProcessorSpec extends Specification {
                             extract 'MODEL NAM'
                         }
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -400,7 +400,7 @@ class ETLProcessorSpec extends Specification {
                             extract 10000
                         }
                         
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -434,7 +434,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             extract 'MODEL NAME' transform uppercase
                         }
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
@@ -469,7 +469,43 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             extract 'MODEL NAME' transform lowercase
                         }
-                    """,
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to uppercase'
+            etlProcessor.getRow(0).getElement(1).value == "srw24g4"
+            etlProcessor.getRow(1).getElement(1).value == "zpha module"
+            etlProcessor.getRow(2).getElement(1).value == "slideaway"
+    }
+
+    void 'test can apply transformations on a field value many times' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, [
+                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
+            ])
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase transform lowercase
+                        }
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
@@ -505,7 +541,7 @@ class ETLProcessorSpec extends Specification {
                         iterate 
                             extract 'MODEL NAME' transform unknown
                         }
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
@@ -538,7 +574,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             extract 'MODEL NAME' transform unknown
                         }
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException exception is thrown'
@@ -590,7 +626,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         def greeting = { String name -> "Hello, \$name!" }
                         assert greeting('Diego') == 'Hello, Diego!'
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
@@ -640,7 +676,7 @@ class ETLProcessorSpec extends Specification {
                 "Hello, \$name!" 
             }
             assert greeting('Diego') == 'Hello, Diego!'
-        """, ETLProcessor.class.name)
+        """.stripIndent(), ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
             MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -690,7 +726,7 @@ class ETLProcessorSpec extends Specification {
             domain Device
             read labels
             Math.max 10, 100
-        """,
+        """.stripIndent(),
                             ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
@@ -742,7 +778,7 @@ class ETLProcessorSpec extends Specification {
             domain Device
             read labels
             max 10, 100
-        """,
+        """.stripIndent(),
                             ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is thrown'
@@ -790,7 +826,7 @@ class ETLProcessorSpec extends Specification {
                     .evaluate("""
             read labels
             max 10, 100
-        """,
+        """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is not thrown'
@@ -824,7 +860,7 @@ class ETLProcessorSpec extends Specification {
                     .evaluate("""
                             console on
                             domain Device
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'A console content could be recovered after processing an ETL Scrtipt'
@@ -862,7 +898,7 @@ class ETLProcessorSpec extends Specification {
                     .evaluate("""
                             console open
                             domain Device
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -898,7 +934,7 @@ class ETLProcessorSpec extends Specification {
                                 extract 'ENVIRONMENT' 
                                 transform lowercase  
                                 translate with: dictionary
-                            }""",
+                            }""".stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'The column is trsanlated for every row'
@@ -964,7 +1000,7 @@ class ETLProcessorSpec extends Specification {
                                 domain Application
                                 iterate {
                                     extract 'VENDOR NAME' load appVendor
-                                }""",
+                                }""".stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
@@ -1016,7 +1052,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 iterate {
                                     extract 'VENDOR NAME' load appVendor
-                                }""",
+                                }""".stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -1082,7 +1118,7 @@ class ETLProcessorSpec extends Specification {
                                 domain Application
                                 iterate {
                                     extract 'VENDOR NAME' load vendor
-                                }""",
+                                }""".stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -1155,7 +1191,7 @@ class ETLProcessorSpec extends Specification {
                             extract 'VENDOR NAME' 
                                 load appVendor
                         }
-                    """,
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
@@ -1227,7 +1263,7 @@ class ETLProcessorSpec extends Specification {
                             extract 'VENDOR NAME' 
                                 load appVendor
                         }
-                        """,
+                        """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
@@ -1340,7 +1376,7 @@ class ETLProcessorSpec extends Specification {
                             domain Device
                             extract 'LOCATION' load location
                         }
-                        """,
+                        """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
@@ -1425,18 +1461,15 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         domain Application
                         iterate {
-                            load environment 
-                                with Production
+                            load environment with Production
                             extract 0 load id
                             extract 'VENDOR NAME' load appVendor
                             
-                            extract 0 
-                                load id 
-                                load 'IDENT'
-                            load environment with 'Production'        
+                            extract 0 load id 
+                            load environment with 'Development'        
                             
                         }
-                        """,
+                        """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
