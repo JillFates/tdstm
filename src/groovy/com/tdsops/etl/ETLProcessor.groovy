@@ -370,11 +370,11 @@ class ETLProcessor {
      * @param value
      * @return
      */
-//    ETLProcessor with (String value) {
-//        currentElement.value = value
-//        currentElement = null
-//        this
-//    }
+    ETLProcessor with (String value) {
+        currentElement.value = value
+        currentElement = null
+        this
+    }
     /**
      *
      * Commits current changes with the current domain class and rows already processed as a partial result
@@ -428,6 +428,17 @@ class ETLProcessor {
     ETLProcessor.Row getRow (Integer index) {
         rows[index]
     }
+
+
+    def resultAsTableFormat () {
+
+        List<String> headers = columns.collect { ETLProcessor.Column column -> column.label }
+        List<List<String>> rows = rows.collect { ETLProcessor.Row row ->
+            row.elements.collect { ETLProcessor.Element element -> element.value }
+        }
+
+    }
+
 
     static class Column {
 
