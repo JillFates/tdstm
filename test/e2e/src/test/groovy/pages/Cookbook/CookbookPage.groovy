@@ -6,18 +6,35 @@ class CookbookPage extends Page {
 
     static at = {
         title == "Cookbook"
-        waitFor(5) { gebRecipes.size() >= 0 }
+        pageTitle.text() == "Cookbook"
+        contextSelectorLabel == "Context:"
+        contextSelectorDefault.text() == "All"
+        createRecipeButton.text() == "Create Recipe..."
+//      viewArchivedCBoxLabel == "View Archived Recipes"
+        taskGenerationTab.text() == "Task Generation"
+        historyTab.text() == "History"
+        editorTab.text()  == "Editor"
+        versionsTab.text() == "Versions"
+
     }
+
     static content = {
-        createRecipeButton {
-            waitFor { browser.currentUrl.split('/')[-1] == "start" }
-            if ($("form div a" ).size() > 1) {
-                $("form div a" )[0]
-            } else {
-                $("form div a" )
-            }
-        }
-        deleteRecipeButtons { $("a.actions.remove" ) }
+        pageTitle(wait:true)        { $("section", 	class:"content-header").find("h1") }
+        pageBreadcrumb              { $("o1", class:"breadcrumb")}
+        contextSelectorLabel        { $("label", for:"contextSelector").text() }
+        contextSelector             { $("select#contextSelector") }
+        contextSelectorDefault      { $("select#contextSelector").find("option", selected:"selected") }
+        createRecipeButton          { $("a#generateRecipe") }
+
+ //TODO following item have the checkbox inside the label
+ //     viewArchivedCBoxLabel       { $("label", for:"viewArchived").text() }
+        viewArchivedCBox            { $("input#viewArchived") }
+
+        deleteRecipeButtons         { $("a.actions.remove" ) }
         gebRecipes(required: false) { $("span.ng-binding", text: "Geb Recipe Test") }
+        taskGenerationTab           { $("li", heading: "Task Generation").find("a") }
+        historyTab                  { $("li", heading: "History").find("a") }
+        editorTab                   { $("li", heading: "Editor").find("a") }
+        versionsTab                 { $("li", heading: "Versions").find("a") }
     }
 }
