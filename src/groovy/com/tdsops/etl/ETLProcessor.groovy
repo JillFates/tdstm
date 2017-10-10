@@ -206,7 +206,7 @@ class ETLProcessor {
      * @param transformation
      * @return
      */
-    ETLProcessor transform (String transformationName) {
+    def transform (String transformationName) {
 
         ETLTransformation transformation = lookupTransformation(transformationName)
 
@@ -215,7 +215,13 @@ class ETLProcessor {
             currentElement.transformations.add(transformation)
 
             debugConsole.info "Applying transformation on element: $currentElement "
-            this
+
+            [transform: { String anotherTransformationName ->
+                transform anotherTransformationName
+            },
+             load     : { String field ->
+                 load field
+             }]
         } else {
             throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply transitions without extract previously.")
         }
@@ -265,14 +271,21 @@ class ETLProcessor {
      * @param index
      * @return
      */
-    ETLProcessor extract (Integer index) {
+    def extract (Integer index) {
 
         if (index in (0..currentRow.size())) {
             currentColumnIndex = index
 
             currentElement = currentRow.getElement(currentColumnIndex)
             debugConsole.info "Extract element: ${currentElement.value} by index: $index"
-            this
+
+            [transform: { String anotherTransformationName ->
+                transform anotherTransformationName
+            },
+             load     : { String field ->
+                 load field
+             }]
+
         } else {
             throw ETLProcessorException.extractInvalidColumn(index)
         }
@@ -284,14 +297,20 @@ class ETLProcessor {
      * @param columnName
      * @return
      */
-    ETLProcessor extract (String columnName) {
+    def extract (String columnName) {
 
         if (columnsMap.containsKey(columnName)) {
             currentColumnIndex = columnsMap[columnName].index
 
             currentElement = currentRow.getElement(currentColumnIndex)
             debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
-            this
+
+            [transform: { String transformationName ->
+                transform transformationName
+            },
+             load     : { String field ->
+                 load field
+             }]
         } else {
             throw ETLProcessorException.extractMissingColumn(columnName)
         }
@@ -303,40 +322,31 @@ class ETLProcessor {
      * @param field
      * @return
      */
-    ETLProcessor load (final String field) {
+    def load (final String field) {
 
         Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
-        Boolean hasWith = false
+        if (fieldSpec && currentElement) {
+            currentElement.field.name = field
+            currentElement.domain = selectedDomain
 
-        [
-                with: { value ->
-                    hasWith = true
-                    currentElement = currentRow.addNewElement(value)
-                    currentElement.field.name = field
-                    currentElement.domain = selectedDomain
+            currentElement.field.label = fieldSpec.label
+            currentElement.field.control = fieldSpec.control
+            currentElement.field.constraints = fieldSpec.constraints
+        }
 
-                    if (fieldSpec) {
-                        currentElement.field.label = fieldSpec.label
-                        currentElement.field.control = fieldSpec.control
-                        currentElement.field.constraints = fieldSpec.constraints
-                    }
-                }
-        ]
-
-        if (!hasWith) {
+        [with: { value ->
+            currentElement = currentRow.addNewElement(value)
+            currentElement.field.name = field
+            currentElement.domain = selectedDomain
 
             if (fieldSpec) {
-                currentElement.field.name = field
-                currentElement.domain = selectedDomain
-
                 currentElement.field.label = fieldSpec.label
                 currentElement.field.control = fieldSpec.control
                 currentElement.field.constraints = fieldSpec.constraints
             }
         }
-
-        this
+        ]
     }
     /**
      *
@@ -370,11 +380,11 @@ class ETLProcessor {
      * @param value
      * @return
      */
-    ETLProcessor with (String value) {
-        currentElement.value = value
-        currentElement = null
-        this
-    }
+//    ETLProcessor with (String value) {
+//        currentElement.value = value
+//        currentElement = null
+//        this
+//    }
     /**
      *
      * Commits current changes with the current domain class and rows already processed as a partial result
