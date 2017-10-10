@@ -1,14 +1,16 @@
 package pages.common
 
 import geb.Page
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 
 //import modules.ManualsMenuModule
 
 class LoginPage extends Page {
     static url = "/tdstm/auth/login"
 
-    static at = { title == "Login" }
+    static at = {
+        title == "Login"
+    }
 
     static content = {
         username { $("#usernameid") }
