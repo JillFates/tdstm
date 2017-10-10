@@ -179,4 +179,5 @@ databaseChangeLog = {
 	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
 	include file: '20170814-create-dataview-table.groovy'
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
+	include file: '20171002-create-provider-and-datasource-tables.groovy'
 }
