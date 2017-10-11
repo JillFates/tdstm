@@ -38,6 +38,7 @@ grails.project.dependency.resolution = {
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
+		// GETL Groovy ETL - https://github.com/ascrus/getl/
 		runtime 'net.sourceforge.getl:getl:1.2.05'
 
 		// test 'com.canoo.webtest:webtest:3.0'
