@@ -16,14 +16,14 @@
 					<tbody>
 					<tr  class="prop">
 						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
-						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">
+						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
 							<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
 								${assetEntity.assetName}
 							</tds:tooltipSpan>
 						</td>
 						
 						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
-						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}">
+						<td colspan="3" class="${standardFieldSpecs.description.imp?:''}">
 							<tds:tooltipSpan field="${standardFieldSpecs.description}">
 								${assetEntity.description}
 							</tds:tooltipSpan>
