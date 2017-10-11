@@ -133,10 +133,10 @@
 										/>
 							</tds:tooltipSpan>
 							</td>
-							<td class="label {standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
+							<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
 								<label for="sourceLocationId">Location/Room</label>
 							</td>
-							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
+                            <td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
 									<tds:tooltipSpan class="useRoomS" field="${standardFieldSpecs.sourceLocation}">
 										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
@@ -163,7 +163,7 @@
 												/>
 									</span>
 							</td>
-							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.sourceLocation.imp?:''}" data-for="sourceLocationId">
+							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.targetLocation.imp?:''}" data-for="sourceLocationId">
 									<tds:tooltipSpan class="useRoomT" field="${standardFieldSpecs.targetLocation}">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
@@ -237,7 +237,7 @@
 									<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
 								</tds:tooltipSpan>
 							</td>
-							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
+							<td class="label rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-for="sourceRackId">
 								<tds:tooltipSpan class="useRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRack}">
 									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 																				   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
