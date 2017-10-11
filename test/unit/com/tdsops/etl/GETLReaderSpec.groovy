@@ -7,7 +7,37 @@ import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
 import spock.lang.Specification
 
+
 class GETLReaderSpec extends Specification {
+
+
+    void 'test can create a CSV connection' () {
+
+        given:
+            String pathName = "test/unit/com/tdsops/etl/resources"
+
+        when: 'It creates a new CSV Connection'
+            CSVConnection files = new CSVConnection(config: "csv", path: pathName)
+
+        then: 'It can read all files'
+            files.retrieveObjects().size() == 3
+            files.retrieveObjects()[0].name == "applications.csv"
+            files.retrieveObjects()[1].name == "applications.xlsx"
+            files.retrieveObjects()[2].name == "applications.xml"
+
+        and: 'It can read all CSV files'
+            files.retrieveObjects(mask: "(?i).*[.]CSV").size() == 1
+
+        and: 'It can read all Excel files'
+            files.retrieveObjects(mask: "(?i).*[.]xlsx").size() == 1
+
+        and: 'It can read subdirectories'
+            files.retrieveObjects(type: "DIR").size() == 0
+
+        and: 'It can read files from parent directory'
+            files.retrieveObjects(directory: "..").size() == 3
+
+    }
 
     /**
      *
@@ -23,9 +53,9 @@ class GETLReaderSpec extends Specification {
             CSVConnection csvCon = new CSVConnection(config: "csv", path: pathName)
             CSVDataset csvFile = new CSVDataset(connection: csvCon, fileName: fileName)
 
-        when: 'CSVDataset has defined field'
-            csvFile.field << new Field(name: 'Id', type: Field.Type.BIGINT)
-            csvFile.field << new Field(name: 'Name', type: Field.Type.STRING)
+        when: 'CSV Dataset has defined field'
+            csvFile.field << new Field(name: 'Id', type: Field.Type.INTEGER, isNull: false, isKey: true, extended: [increment: true])
+            csvFile.field << new Field(name: 'Name', type: Field.Type.STRING, isNull: false, trim: true)
             csvFile.field << new Field(name: 'Description', type: Field.Type.STRING)
             csvFile.field << new Field(name: 'Environment', type: Field.Type.STRING)
 
@@ -33,10 +63,10 @@ class GETLReaderSpec extends Specification {
             csvFile.readRowCount() == 3
 
         and: 'First row results contains fields values'
-            csvFile.rows()[0].Id == 114054
-            csvFile.rows()[0].Name == "BlackBerry Enterprise Server"
-            csvFile.rows()[0].Description == "Email sync to Blackberry handhelds"
-            csvFile.rows()[0].Environment == "Production"
+            csvFile.rows()[0].id == 114054
+            csvFile.rows()[0].name == "BlackBerry Enterprise Server"
+            csvFile.rows()[0].description == "Email sync to Blackberry handhelds"
+            csvFile.rows()[0].environment == "Production"
     }
 
     void 'test can read a csv file without defining fields' () {
@@ -74,7 +104,10 @@ class GETLReaderSpec extends Specification {
             CSVDataset csvFile = new CSVDataset(connection: csvCon, fileName: fileName, header: true)
 
         then: 'It can read rows count'
-            csvFile.rows().collectEntries() == []
+            csvFile.rows()[0].id == "114054"
+            csvFile.rows()[0].name == "BlackBerry Enterprise Server"
+            csvFile.rows()[0].description == "Email sync to Blackberry handhelds"
+            csvFile.rows()[0].environment == "Production"
     }
 
     /**
