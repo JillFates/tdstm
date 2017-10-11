@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -94,6 +95,23 @@ class TaskImportExportService implements ServiceMethods {
 		val?.toString()
 	}
 
+	// Transformer that is used for getting a string representation TimeScale enums
+	static final xfrmTimeScaleToString = { val, options ->
+		if (val == null) {
+			return ""
+		}
+
+		if (val instanceof String) {
+			return val
+		}
+
+		if (val instanceof TimeScale) {
+			return val.toString()
+		}
+		log.error "xfrmTimeScaleToString() got unexpected data type ${val?.getClass()?.getName()}"
+		return val?.toString()
+	}
+
 	// ------------------------------------------------------------------------
 	// Kendo Template builder closures
 	// ------------------------------------------------------------------------
@@ -176,8 +194,8 @@ class TaskImportExportService implements ServiceMethods {
 		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:false,
 										label: 'Duration Locked', transform:xfrmString],
 
-		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
-										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
+		durationScale			: [type: 'timescale', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmTimeScaleToString],
 
 		estStart			: [type: 'datetime', ssPos:17, formPos:18, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Estimated Start', template:changeTmpl('estStart'), transform:xfrmDateTimeToString],
@@ -522,6 +540,18 @@ class TaskImportExportService implements ServiceMethods {
 							}
 							break
 
+						case 'timescale':
+							value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
+							if (value) {
+								TimeScale ts = TimeScale.asEnum(value)
+								if (ts == null) {
+									task[prop] = value
+									setErrorValue(task, prop, "Invalid Time Scale value")
+								} else {
+									value = ts
+								}
+							}
+							break
 						case 'boolean':
 							value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
 							if (value?.size()>0) {
