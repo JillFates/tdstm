@@ -12,6 +12,8 @@ import {
 import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.provider';
 import { DynamicComponent } from '../../../../shared/components/dynamic.component';
 
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+
 @Component({
 	selector: `asset-database-show`,
 	template: `<div #view></div>`
@@ -35,13 +37,14 @@ export class DatabaseShowComponent extends DynamicComponent implements AfterView
 				selector: `dynamic-show`,
 				template: template
 			}) class DatabaseShowComponentImplementation {
+				constructor(private activeDialog: UIActiveDialogService) {
 
-				model: any = {
-					name: 'Database'
-				};
-				onClick() {
-					console.log(this.model);
 				}
+
+				cancelCloseDialog(): void {
+					this.activeDialog.close();
+				}
+
 			}
 
 			this.registerAndCreate(DatabaseShowComponentImplementation, this.view);
