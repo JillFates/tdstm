@@ -5,6 +5,8 @@ import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { DatabaseShowComponent } from '../database-show/database-show.component';
 
 declare var jQuery: any;
 @Component({
@@ -58,7 +60,7 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 
-	constructor(private userPref: PreferenceService) {
+	constructor(private userPref: PreferenceService, private dialog: UIDialogService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
 	}
 
@@ -150,11 +152,8 @@ export class AssetExplorerViewGridComponent {
 		this.modelChange.emit();
 	}
 
-	onWidthChange(data: any) {
-		this.model.columns.filter((c: ViewColumn) =>
-			data[0].column.field === `${c.domain}_${c.property}`
-		).forEach((c: ViewColumn) => {
-			c.width = data[0].newWidth;
-		});
+	protected onShow(data: any) {
+		console.log(data);
+		this.dialog.open(DatabaseShowComponent, [{ provide: 'ID', useValue: data['common_id'] }]);
 	}
 }

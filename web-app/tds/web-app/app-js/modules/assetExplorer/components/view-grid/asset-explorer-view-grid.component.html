@@ -16,8 +16,10 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
-	<kendo-grid-column [locked]="true" [width]="0"></kendo-grid-column>
-	<!-- temporary solution -->
+	<kendo-grid-column title="Action" [locked]="true" [width]="80">
+			<button class="btn btn-default" (click)="onShow(dataItem)"><span class="fa fa-search"></span></button>
+		</ng-template>
+	</kendo-grid-column>
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="cellCallbackClass(column.domain)">
 		<ng-template kendoGridHeaderTemplate>
