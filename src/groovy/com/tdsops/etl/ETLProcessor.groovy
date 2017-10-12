@@ -163,7 +163,7 @@ class ETLProcessor {
 
         dataSource[currentRowIndex..(dataSource.size() - 1)].each { List<String> crudRowData ->
             currentColumnIndex = 0
-            closure(addCrudRowData  (currentRowIndex, crudRowData))
+            closure(addCrudRowData(currentRowIndex, crudRowData))
 
             currentRowResult.each { ETLDomain key, List<List<Map<String, ?>>> value ->
                 if (!results.containsKey(key)) {
@@ -177,12 +177,6 @@ class ETLProcessor {
         }
         currentRowIndex--
         this
-    }
-
-    private void addCrudRowData (Integer rowIndex, List<String> crudRowData) {
-        currentRow = new Row(rowIndex, crudRowData, this)
-        rows.add(currentRow)
-        currentRow
     }
 
     ETLProcessor console (String status) {
@@ -258,17 +252,18 @@ class ETLProcessor {
 
                     Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
-                    Element newELement = currentRow.addNewElement(value, this)
-                    newELement.field.name = field
-                    newELement.domain = selectedDomain
+                    Element newElement = currentRow.addNewElement(value, this)
+                    newElement.field.name = field
+                    newElement.domain = selectedDomain
 
                     if (fieldSpec) {
-                        newELement.field.label = fieldSpec.label
-                        newELement.field.control = fieldSpec.control
-                        newELement.field.constraints = fieldSpec.constraints
+                        newElement.field.label = fieldSpec.label
+                        newElement.field.control = fieldSpec.control
+                        newElement.field.constraints = fieldSpec.constraints
                     }
 
-                    addLoadedElement(selectedDomain, newELement)
+                    addLoadedElement(selectedDomain, newElement)
+                    newElement
                 }
         ]
     }
@@ -296,6 +291,12 @@ class ETLProcessor {
             }
         }
         fieldSpec
+    }
+
+    private void addCrudRowData (Integer rowIndex, List<String> crudRowData) {
+        currentRow = new Row(rowIndex, crudRowData, this)
+        rows.add(currentRow)
+        currentRow
     }
     /**
      *
@@ -345,18 +346,6 @@ class ETLProcessor {
     ETLProcessor.Row getRow (Integer index) {
         rows[index]
     }
-
-
-    def resultAsTable () {
-
-
-        List<String> headers = columns.collect { ETLProcessor.Column column -> column.label }
-        List<List<String>> rows = rows.collect { ETLProcessor.Row row ->
-            row.elements.collect { ETLProcessor.Element element -> element.value }
-        }
-
-    }
-
 
     static class Column {
 
