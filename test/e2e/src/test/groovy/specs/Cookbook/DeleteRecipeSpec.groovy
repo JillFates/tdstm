@@ -3,7 +3,7 @@ package specs.Cookbook
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.common.LoginPage
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 import spock.lang.Stepwise
 
 @Stepwise
