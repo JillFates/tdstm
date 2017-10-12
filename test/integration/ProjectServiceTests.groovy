@@ -5,6 +5,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Setting
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
@@ -159,10 +160,10 @@ class ProjectServiceTests extends Specification {
 			personHelper.createUserLogin(person)
 		then: 'the person should have access to the project'
 			personService.hasAccessToProject(person, project)
-		and: 'filting for ANY status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
-		and: 'filting for ACTIVE status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'filting for ANY status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
 		and: 'filting for COMPLETED status should return zero projects'
 			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
 	}
@@ -183,10 +184,10 @@ class ProjectServiceTests extends Specification {
 			personHelper.createUserLogin(person)
 		then: 'the person should have access to the project'
 			personService.hasAccessToProject(person, project)
-		and: 'filting for ANY status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
-		and: 'filting for ACTIVE status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'filting for ANY status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
 		and: 'filting for COMPLETED status should return zero projects'
 			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
 	}
@@ -199,15 +200,16 @@ class ProjectServiceTests extends Specification {
 			person
 		and: 'the person does not have access to the project because the person has no login'
 			! personService.hasAccessToProject(person, project)
-
 		when: 'creating a user login for the person'
 			personHelper.createUserLogin(person)
 		then: 'the person should have access to the project'
 			personService.hasAccessToProject(person, project)
-		and: 'filting for ANY status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
-		and: 'filting for ACTIVE status should return one project'
-			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
+		and: 'the person has access to the default project because he is an admin'
+			securityService.hasPermission(adminPerson, Permission.ProjectManageDefaults)
+		and: 'filting for ANY status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: person.id]).size()
+		and: 'filting for ACTIVE status should return one project, plus the default project.'
+			2 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: person.id]).size()
 		and: 'filting for COMPLETED status should return zero projects'
 			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: person.id]).size()
 	}
@@ -289,5 +291,25 @@ class ProjectServiceTests extends Specification {
 			projectService.cloneDefaultSettings(p2)
 		then: 'the ConfigurationException should be thrown'
 			thrown ConfigurationException
+	}
+
+	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
+		when: 'creating a new person'
+			Person userPerson = personHelper.createStaff(project.owner)
+			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
+			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+			securityService.assumeUserIdentity(userLogin.username, false)
+		then: 'a person should have been created'
+			userPerson
+		and: 'a user login should have been created'
+			userLogin
+		then: 'the person does not access to the default project because he is not an admin'
+			! securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
+		and: 'filting for ANY status should return one project.'
+			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
+		and: 'filting for ACTIVE status should return one project.'
+			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
+		and: 'filting for COMPLETED status should return zero projects'
+			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
 	}
 }

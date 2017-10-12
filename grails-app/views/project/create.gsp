@@ -297,33 +297,35 @@
 								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
-								<%-- See TM-6673 Removing this select unless the value is going to be populated by default project
-								<g:select id="planMethodology" name="planMethodology" indextab="130"
-										  value="${projectInstance.planMethodology}"
-										  from="${planMethodologies}"
-										  optionKey="field" optionValue="label" />
-								--%>
-								To be set after field specifications are defined
+								<g:if test="${planMethodologies}">
+									<g:select id="planMethodology" name="planMethodology" indextab="130"
+											  value="${projectInstance.planMethodology}"
+											  from="${planMethodologies}"
+											  optionKey="field" optionValue="label" />
+								</g:if>
+								<g:else>
+									To be set after field specifications are defined
+								</g:else>
 								<g:hasErrors bean="${projectInstance}" field="planMethodology">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
 								</g:hasErrors>
 							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="buttons">
-				<span class="button">
-					<input class="save" type="submit" value="Save" tabindex="300" onclick="return validateForm();" />
-				</span>
-				<span class="button">
-					<input type="button" class="cancel" value="Cancel" tabindex="310" onclick="window.history.back()" />
-				</span>
-			</div>
-		</g:form>
-	</div>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+             <div class="buttons">
+                 <span class="button">
+                     <input class="save" type="submit" value="Save" tabindex="300" onclick="return validateForm();" />
+                 </span>
+                 <span class="button">
+                     <input type="button" class="cancel" value="Cancel" tabindex="310" onclick="window.history.back()" />
+                 </span>
+             </div>
+         </g:form>
+     </div>
 
-	<%-- DIV for select time zone --%>
+     <%-- DIV for select time zone --%>
 	<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>
 
 	<g:javascript>

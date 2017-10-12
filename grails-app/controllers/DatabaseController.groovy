@@ -326,7 +326,6 @@ class DatabaseController implements ControllerMethods {
 		if (database) {
 			def assetName = database.assetName
 			assetEntityService.deleteAsset(database)
-			database.delete()
 
 			flash.message = "Database $assetName deleted"
 			if (params.dstPath == 'dependencyConsole') {
@@ -335,28 +334,9 @@ class DatabaseController implements ControllerMethods {
 			} else {
 				redirect(action:"list")
 			}
-		}
-		else {
+		} else {
 			flash.message = "Database not found with id $params.id"
 			redirect(action:"list")
 		}
-
-	}
-	/**
-	 * Delete multiple database.
-	 */
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		def assetNames = []
-		for (assetId in  params.id.split(',')) {
-			def database = Database.get(assetId)
-			if (database) {
-				assetNames.add(database.assetName)
-				assetEntityService.deleteAsset(database)
-				database.delete()
-			}
-		}
-
-		render "Database ${WebUtil.listAsMultiValueString(assetNames)} deleted"
 	}
 }

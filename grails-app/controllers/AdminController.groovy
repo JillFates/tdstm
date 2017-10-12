@@ -8,6 +8,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent

@@ -298,7 +298,8 @@ export class AssetExplorerViewConfigComponent {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
 			domains: this.domains,
-			previewMode: true
+			previewMode: true,
+			searchExecuted: this.previewButtonClicked
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [

@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -280,7 +281,7 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project $hqlWhere  
+             where AE.project = :project and $hqlWhere  
           order by $hqlOrder  
         """
 
@@ -288,7 +289,7 @@ class DataviewService implements ServiceMethods {
             select count(*)
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project $hqlWhere
+             where AE.project = :project and $hqlWhere
         """
 
         log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
@@ -298,6 +299,103 @@ class DataviewService implements ServiceMethods {
 
         previewQueryResults(assets, totalAssets[0], dataviewSpec)
     }
+
+	/**
+	 * Retrieve the list of favorite data views for the current person,
+	 * @return List of dataviews (DataView instances) the user has favorited.
+	 */
+	List<Dataview> getFavorites(Long personId) {
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve all the favorited views for the person.
+		def query = FavoriteDataview.where{
+			person == person
+		}.projections{property 'dataview'}
+
+		return query.list()
+	}
+
+	/**
+	 * Delete the given dataview from the current person's favorites.
+	 * @param dataviewId
+	 * @return
+	 */
+	void deleteFavoriteDataview(Long dataviewId) throws EmptyResultException, DomainUpdateException{
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve the current project
+		Project currentProject = securityService.getUserCurrentProject()
+
+		// Error message
+		String cannotDeleteErrorMsg = "Cannot delete favorite dataview for ${person.toString()}"
+
+		// If no dataviewId given, throw an exception
+		if (!dataviewId) {
+			throw new DomainUpdateException("${cannotDeleteErrorMsg}. No dataview id given.")
+		}
+
+		// Retrieve the given dataview.
+		Dataview dataview = Dataview.where{
+			id == dataviewId && project == currentProject
+		}.find()
+
+		// If no dataview was found, throw an exception
+		if (!dataview) {
+			throw new EmptyResultException("${cannotDeleteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
+		}
+
+		// Delete the corresponding favorite
+		int deletedFavs = FavoriteDataview.where{
+			person == person && dataview == dataview
+		}.deleteAll()
+
+		// If no favs were deleted, throw an exception.
+		if (deletedFavs == 0) {
+			throw new DomainUpdateException("${cannotDeleteErrorMsg}. '${dataview.name}' isn't a favorited dataview.")
+		}
+
+	}
+
+	/**
+	 * Add the given dataview to the current person's favorites.
+	 * @param dataviewId
+	 */
+	void addFavoriteDataview(Long dataviewId) {
+		// Retrieve the current person.
+		Person person = securityService.getUserLoginPerson()
+		// Retrieve the current project
+		Project currentProject = securityService.getUserCurrentProject()
+
+		// Error message
+		String cannotFavoriteErrorMsg = "Cannot favorite dataview for ${person.toString()}"
+
+		// If no dataviewId given, throw an exception
+		if (!dataviewId) {
+			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. No dataview id given.")
+		}
+
+		// Retrieve the given dataview.
+		Dataview dataview = Dataview.where{
+			id == dataviewId && project == currentProject
+		}.find()
+
+		// If no dataview was found, throw an exception
+		if (!dataview) {
+			throw new EmptyResultException("${cannotFavoriteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
+		}
+
+		// Check if the favorite already exists.
+		FavoriteDataview favoriteDataview = FavoriteDataview.where{
+			person == person && dataview == dataview
+		}.find()
+
+		// If a favorite was found, throw an exception
+		if (favoriteDataview) {
+			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. ${dataview.name} is already a favorite for this person.")
+		}
+
+		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview).save()
+	}
 
     /**
      *
@@ -391,27 +489,25 @@ class DataviewService implements ServiceMethods {
      */
 	private String hqlWhere(DataviewSpec dataviewSpec){
 
-        String where = ""
+        List where = []
 
         if(!dataviewSpec.domains.isEmpty()){
-            where += " and AE.assetClass in (:assetClasses) "
+            where << "AE.assetClass in (:assetClasses)"
         }
 
         if (dataviewSpec.justPlanning != null) {
-            where += " and AE.moveBundle in (:moveBundles) "
+            where << "AE.moveBundle in (:moveBundles)"
         }
 
-        where += dataviewSpec.filterColumns.collect { Map column ->
+        dataviewSpec.filterColumns.each { Map column ->
             if (hasMultipleFilter(column)){
-                " and ${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
-            } else if(!hasStringType(column)) {
-                " and ${propertyFor(column)} = :${namedParameterFor(column)} \n"
+				where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
             } else {
-                " and ${propertyFor(column)} like :${namedParameterFor(column)} \n"
+				where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
             }
-        }.join(" ")
+        }
 
-        where
+        where.join(" and ")
     }
     /**
      *
@@ -426,21 +522,9 @@ class DataviewService implements ServiceMethods {
     }
     /**
      *
-     * Checks if Column belongs to a Field String type
-     *
-     * @param column
-     * @return
-     */
-	private Boolean hasStringType(Map column) {
-        transformations[column.property].type == String
-	}
-    /**
-     *
      * Calculate Map with params splitting column.filter content
      * if column.flter has only one value It's prepared with %${column.filter}%
      * in order to use like filter in HQL query.
-     *
-     * Also, if a parameter should be Strings, it is parsed and converted to the correct type
      *
      * @param column
      * @return
@@ -448,10 +532,10 @@ class DataviewService implements ServiceMethods {
 	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
 
-        if(values.size()==1){
-            paramConversionFor(column, values[0]).like
+        if(values.size() == 1){
+			"%${values[0].trim()}%".toString()
         } else {
-            values.collect { paramConversionFor(column, it).equality }
+			values.collect { "${it.trim()}".toString()}
         }
     }
     /**
@@ -483,47 +567,16 @@ class DataviewService implements ServiceMethods {
         transformations[column.property].join
     }
 
-    private static def paramConversionFor(Map column, String value) {
-        transformations[column.property].transform(value)
-    }
-
-    /**
-     *
-     * Tranform Type base on Field Type. It configures like and equals in custom HQL for
-     *
-     * @param clazz
-     * @param value
-     * @return
-     */
-    private static def transformType(def clazz, def value) {
-        def result
-        switch (clazz) {
-            case Long:
-                result = [like: NumberUtil.toLong(value, -1l) , equality: NumberUtil.toLong(value, -1l) ]
-                break
-            case Integer:
-                result = [like: NumberUtil.toInteger(value, -1) , equality: NumberUtil.toLong(value, -1) ]
-                break
-            case String:
-                result = [like: "%${value.trim()}%".toString(), equality: "${value.trim()}".toString()]
-                break
-            default:
-                result = [like: "%${value?.toString()?.trim()}%".toString(), equality: "${value?.toString()?.trim()}".toString()]
-                break
-        }
-        result
-    }
-
     private static final Map<String, Map> transformations = [
-            "id"          : [property: "AE.id", type: Long, namedParameter: "id", join: "", transform: { String value -> transformType(Long, value) }],
-            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle", transform: { String value -> transformType(String, value)}],
-            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project", transform: { String value -> transformType(String, value)}],
-            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer", transform: { String value -> transformType(String, value)}],
-            "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme", transform: { String value -> transformType(String, value)}],
-            "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2", transform: { String value -> transformType(String, value)}],
-            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model", transform: { String value -> transformType(String, value)}],
-            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner", transform: { String value -> transformType(String, value)}]
+            "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: ""],
+            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle"],
+            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project"],
+            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer"],
+            "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme"],
+            "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2"],
+            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model"],
+            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner"]
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", transform: { String value -> transformType(String, value) }]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
     }
 }

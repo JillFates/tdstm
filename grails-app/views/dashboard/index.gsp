@@ -140,7 +140,7 @@
 									</div>
 									<div class="row eventRunbook">
 										<div class="col-md-12">
-											<b>Runbook Status:</b><span id="eventRunbook"></span>
+											Runbook Status: <span id="eventRunbook"></span>
 										</div>
 									</div>
 								</div>

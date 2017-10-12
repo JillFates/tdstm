@@ -614,6 +614,10 @@ class LicenseAdminService extends LicenseCommonService {
 			emailHolder.subject = "License Request - ${license.websitename}"
 			emailHolder.toEmail = toEmail
 			emailHolder.ccEmail = license.email
+			/* The email address provided in the license request form is used as the
+			*  "from" for the email notification. Note that if the grails.mail.overrideAddress
+			*  is present in the configuration file, this address is going to be overridden. */
+			emailHolder.from = license.email
 			emailHolder.body = getLicenseRequestBody(license)
 		}
 
@@ -644,6 +648,7 @@ class LicenseAdminService extends LicenseCommonService {
 		String buff
 		if(lic) {
 			String body = """
+				|from: ${lic.email}
 				|Website Name: ${lic.websitename}
 				|
 				|${lic.toEncodedMessage()}
@@ -669,6 +674,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 		if(emailData) {
 			mailService.sendMail {
+				// oluna: Next is commented since it's not needed and causes SPAM issues (TM-6738)
+				// from emailData.from
 				to emailData.toEmail
 				subject emailData.subject
 				body emailData.body
@@ -718,6 +725,7 @@ class LicenseAdminService extends LicenseCommonService {
 	 * Objecto to hold the Email data in static Type style
 	 */
 	class EmailHolder {
+		String from
 		String toEmail
 		String ccEmail
 		String subject

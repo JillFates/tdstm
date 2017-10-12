@@ -688,8 +688,6 @@ class PersonController implements ControllerMethods {
 		def currRole = params.role ?: userPreferenceService.getPreference(PREF.STAFFING_ROLE) ?: "0"
 		List projects = personService.getAvailableProjects(securityService.userLoginPerson)
 
-		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
-
 		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
 		 editPermission: securityService.hasPermission(Permission.ProjectStaffEdit), assigned: assigned,
 		 onlyClientStaff: onlyClientStaff, currRole: currRole]
@@ -882,7 +880,7 @@ class PersonController implements ControllerMethods {
 							COALESCE(p.last_name, '')) AS fullName,
 						company.name AS company,
 						pr.role_type_code_to_id AS role,
-						SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team,
+						rt.description AS team,
 						pr2.party_id_to_id IS NOT NULL AS project,
 						IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents,
 						IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates
