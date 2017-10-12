@@ -508,7 +508,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform left 4 and uppercase  
+                            extract 'MODEL NAME' transform left 4 and uppercase }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
