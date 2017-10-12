@@ -1,22 +1,9 @@
+import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import com.tdsops.tm.enums.domain.SettingType
-import com.tdsops.tm.enums.domain.SecurityRole
-
-import com.tdsops.common.exceptions.ConfigurationException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
-
+import net.transitionmanager.domain.*
+import net.transitionmanager.service.*
 import spock.lang.Specification
 
 class ProjectServiceIntegrationSpec extends Specification {

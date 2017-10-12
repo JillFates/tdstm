@@ -10,6 +10,11 @@ class Provider {
 
     static belongsTo = [ project: Project ]
 
+    static hasMany = [
+            datasources: Datasource,
+            credentials: Credential
+    ]
+
     static constraints = {
         name size:1..255, unique: 'project'
         description size:0..255
@@ -18,10 +23,13 @@ class Provider {
     }
 
     static mapping = {
+        id column: 'provider_id'
         name sqlType: 'VARCHAR(255)'
         description sqlType: 'VARCHAR(255)'
         comment sqlType: 'TEXT'
 
         sort 'name'
+
+        version false
     }
 }
