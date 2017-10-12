@@ -8,16 +8,16 @@ import {
 	OnDestroy, AfterViewInit
 } from '@angular/core';
 
-import {NotifierService} from '../services/notifier.service';
-import {UIActiveDialogService} from '../services/ui-dialog.service';
-import {ComponentCreatorService} from '../services/component-creator.service';
+import { NotifierService } from '../services/notifier.service';
+import { UIActiveDialogService } from '../services/ui-dialog.service';
+import { ComponentCreatorService } from '../services/component-creator.service';
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-ui-dialog',
 	template: `
     <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document" #modalDialog>
+        <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
             <div class="modal-content">
                 <div #view></div>
             </div>
@@ -26,9 +26,9 @@ declare var jQuery: any;
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
-	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
 	@ViewChild('modalDialog') el: ElementRef;
-
+	size = 'md';
 	tdsUiDialog: any;
 
 	cmpRef: ComponentRef<{}>; // Instace of the component
@@ -75,7 +75,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.tdsUiDialog.modal('hide');
 				this.reject('OTHER_DIALOG_OPENED');
 			}
-
+			this.size = event.size;
 			this.reject = event.reject;
 			this.resolve = event.resolve;
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);

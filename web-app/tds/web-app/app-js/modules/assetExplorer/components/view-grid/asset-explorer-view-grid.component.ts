@@ -153,7 +153,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	protected onShow(data: any) {
-		this.dialog.open(DatabaseShowComponent, [{ provide: 'ID', useValue: data['common_id'] }]).then(x => {
+		this.dialog.open(DatabaseShowComponent, [{ provide: 'ID', useValue: data['common_id'] }], 'lg').then(x => {
 			console.log(x);
 		}).catch(x => {
 			console.log(x);
