@@ -13,7 +13,8 @@ import { AssetExplorerViewExportComponent } from './components/view-export/asset
 import { AssetExplorerViewGridComponent } from './components/view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewShowComponent } from './components/view-show/asset-explorer-view-show.component';
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
-import { AssetShowComponent } from './components/asset-show/asset-show.component';
+import { AssetShowComponent } from './components/asset/asset-show.component';
+import { AssetEditComponent } from './components/asset/asset-edit.component';
 import { SharedModule } from '../../shared/shared.module';
 import { Permission } from '../../shared/model/permission.model';
 // Import Kendo Modules
@@ -43,14 +44,16 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		AssetExplorerViewExportComponent,
 		AssetExplorerViewGridComponent,
 		AssetExplorerViewShowComponent,
-		AssetShowComponent
+		AssetShowComponent,
+		AssetEditComponent
 	],
 	providers: [AssetExplorerService],
 	exports: [AssetExplorerIndexComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
-		AssetShowComponent
+		AssetShowComponent,
+		AssetEditComponent
 	]
 })
 

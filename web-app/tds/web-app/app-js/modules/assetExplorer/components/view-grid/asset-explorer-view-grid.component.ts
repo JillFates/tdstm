@@ -6,7 +6,8 @@ import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/ke
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { AssetShowComponent } from '../asset-show/asset-show.component';
+import { AssetShowComponent } from '../asset/asset-show.component';
+import { AssetEditComponent } from '../asset/asset-edit.component';
 
 declare var jQuery: any;
 @Component({
@@ -154,6 +155,17 @@ export class AssetExplorerViewGridComponent {
 
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
+			{ provide: 'ID', useValue: data['common_id'] },
+			{ provide: 'ASSET', useValue: 'DATABASE' }],
+			'lg').then(x => {
+				console.log(x);
+			}).catch(x => {
+				console.log(x);
+			});
+	}
+
+	protected onEdit(data: any) {
+		this.dialog.open(AssetEditComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: 'DATABASE' }],
 			'lg').then(x => {

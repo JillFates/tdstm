@@ -13,6 +13,7 @@ import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.p
 import { DynamicComponent } from '../../../../shared/components/dynamic.component';
 
 import { DatabaseShowComponent } from '../database/database-show.component';
+import { ApplicationShowComponent } from '../application/application-show.component';
 
 @Component({
 	selector: `asset-database-show`,
@@ -33,7 +34,17 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 	ngAfterViewInit() {
 		this.http.get(`../ws/asset/showTemplate/${this.modelId}`).subscribe(res => {
 			let template = res.text();
-			this.registerAndCreate(DatabaseShowComponent(template), this.view);
+			switch (this.asset) {
+				case 'APPLICATION':
+					this.registerAndCreate(ApplicationShowComponent(template), this.view);
+					break;
+				case 'DATABASE':
+				case 'DEVICE':
+				case 'STORAGE':
+				default:
+					this.registerAndCreate(DatabaseShowComponent(template), this.view);
+					break;
+			}
 		});
 	}
 
