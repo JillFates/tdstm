@@ -13,7 +13,9 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.StorageService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import grails.gsp.PageRenderer
 
@@ -31,6 +33,8 @@ class WsAssetController implements ControllerMethods {
 	PageRenderer groovyPageRenderer
 	ControllerService controllerService
 	ApplicationService applicationService
+	DeviceService deviceService
+	StorageService storageService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -247,13 +251,22 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		Map model = [ asset: asset ]
-		String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
-		if(asset.assetClass.toString().equalsIgnoreCase(AssetClass.APPLICATION.toString())) {
-			Object app = controllerService.getAssetForPage(this, asset.project, APPLICATION, params.id)
-			model << applicationService.getModelForShow(asset.project, app, params)
-		} else {
-			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+		String domainName = asset.assetClass.toString()
+		switch (domainName) {
+			case "APPLICATION":
+				model << applicationService.getModelForShow(asset.project, asset, params)
+				break
+			case "DEVICE":
+				model << deviceService.getModelForShow(asset.project, asset, params)
+				break
+			case "STORAGE":
+				model << storageService.getModelForShow(asset.project, asset, params)
+				break
+			default:
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+				break
 		}
+
 		// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
 		render groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
 	}
