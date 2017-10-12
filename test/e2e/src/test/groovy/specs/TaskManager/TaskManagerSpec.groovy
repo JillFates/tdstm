@@ -5,7 +5,7 @@ import pages.Cookbook.CreateRecipePage
 import pages.TaskManager.TaskManagerPage
 import pages.TaskManager.CreateTaskPage
 import pages.common.LoginPage
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 import spock.lang.Stepwise
 
 @Stepwise
