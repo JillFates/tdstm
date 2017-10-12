@@ -14,15 +14,14 @@ class ETLProcessor {
 
     DebugConsole debugConsole
 
-    ETLDomain selectedDomain
     List<ETLProcessor.Column> columns = []
     Map<String, ETLProcessor.Column> columnsMap = [:]
     List<ETLProcessor.Row> rows = []
-
     ETLProcessor.Row currentRow
-    ETLProcessor.Element currentElement
 
-    Map<ETLDomain, List<Map<String, ?>>> results = [:]
+    ETLDomain selectedDomain
+    Map<ETLDomain, List<List<Map<String, ?>>>> results = [:]
+    Map<ETLDomain, List<List<Map<String, ?>>>> currentRowResult = [:]
 
     /**
      *
@@ -125,9 +124,6 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor domain (String domain) {
-        if (currentRow != null) {
-            commitChanges()
-        }
         selectedDomain = ETLDomain.values().find { it.name() == domain }
         if (selectedDomain == null) {
             throw ETLProcessorException.invalidDomain(domain)
@@ -156,21 +152,35 @@ class ETLProcessor {
         }
         this
     }
-
+    /**
+     *
+     * Iterates and applies closure to every row in the dataSource
+     *
+     * @param closure
+     * @return
+     */
     ETLProcessor iterate (Closure closure) {
 
         dataSource[currentRowIndex..(dataSource.size() - 1)].each { List<String> crudRowData ->
             currentColumnIndex = 0
-            closure(addCrudRowData(crudRowData))
-            commitChanges()
+            closure(addCrudRowData  (currentRowIndex, crudRowData))
+
+            currentRowResult.each { ETLDomain key, List<List<Map<String, ?>>> value ->
+                if (!results.containsKey(key)) {
+                    results[key] = []
+                }
+                results[key].add(value)
+            }
+
+            currentRowResult = [:]
             currentRowIndex++
         }
         currentRowIndex--
         this
     }
 
-    private void addCrudRowData (List<String> crudRowData) {
-        currentRow = new Row(crudRowData)
+    private void addCrudRowData (Integer rowIndex, List<String> crudRowData) {
+        currentRow = new Row(rowIndex, crudRowData, this)
         rows.add(currentRow)
         currentRow
     }
@@ -187,80 +197,11 @@ class ETLProcessor {
         this
     }
 
-    private Element getCurrentElement () {
-        currentElement
-    }
-
     ETLProcessor skip (Integer amount) {
         if (amount + currentRowIndex <= dataSource.size()) {
             currentRowIndex += amount
         } else {
             throw ETLProcessorException.invalidSkipStep(amount)
-        }
-        this
-    }
-    /**
-     *
-     * Delegate method to maintenance method's chain
-     *
-     * @param transformation
-     * @return
-     */
-    def transform (String transformationName) {
-
-        ETLTransformation transformation = lookupTransformation(transformationName)
-
-        if (currentElement) {
-            transformation.apply(currentElement)
-            currentElement.transformations.add(transformation)
-
-            debugConsole.info "Applying transformation on element: $currentElement "
-
-            [transform: { String anotherTransformationName ->
-                transform anotherTransformationName
-            },
-             load     : { String field ->
-                 load field
-             }]
-        } else {
-            throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply transitions without extract previously.")
-        }
-    }
-
-    ETLTransformation lookupTransformation (String name) {
-        if (transformations && transformations.containsKey(name)) {
-            transformations[name]
-        } else {
-            throw ETLProcessorException.unknownTransformation(name)
-        }
-    }
-
-    ETLProcessor translateWith (Map ditionary) {
-
-        if (currentElement) {
-            if (ditionary.containsKey(currentElement.value)) {
-                String oldValue = currentElement.value
-                currentElement.value = ditionary[currentElement.value]
-
-                debugConsole.info "Translate $oldValue -> ${currentElement.value}"
-            } else {
-
-                debugConsole.warn "Could not translate ${currentElement.value}"
-            }
-        } else {
-            throw ETLProcessorException.invalidCommand("Invalid command. Cannot apply translations without extract previously.")
-        }
-    }
-    /**
-     *
-     * Delegate translate methods using actions to maintenance method's chain
-     *
-     * @param actions
-     * @return
-     */
-    ETLProcessor translate (Map actions) {
-        if (actions.containsKey('with')) {
-            translateWith(actions.get('with'))
         }
         this
     }
@@ -276,16 +217,9 @@ class ETLProcessor {
         if (index in (0..currentRow.size())) {
             currentColumnIndex = index
 
-            currentElement = currentRow.getElement(currentColumnIndex)
-            debugConsole.info "Extract element: ${currentElement.value} by index: $index"
-
-            [transform: { String anotherTransformationName ->
-                transform anotherTransformationName
-            },
-             load     : { String field ->
-                 load field
-             }]
-
+            Element selectedElement = currentRow.getElement(currentColumnIndex)
+            debugConsole.info "Extract element: ${selectedElement.value} by index: $index"
+            selectedElement
         } else {
             throw ETLProcessorException.extractInvalidColumn(index)
         }
@@ -302,15 +236,10 @@ class ETLProcessor {
         if (columnsMap.containsKey(columnName)) {
             currentColumnIndex = columnsMap[columnName].index
 
-            currentElement = currentRow.getElement(currentColumnIndex)
-            debugConsole.info "Extract element: ${currentElement.value} by column name: $columnName"
+            Element selectedElement = currentRow.getElement(currentColumnIndex)
+            debugConsole.info "Extract element: ${selectedElement.value} by column name: $columnName"
 
-            [transform: { String transformationName ->
-                transform transformationName
-            },
-             load     : { String field ->
-                 load field
-             }]
+            selectedElement
         } else {
             throw ETLProcessorException.extractMissingColumn(columnName)
         }
@@ -324,28 +253,23 @@ class ETLProcessor {
      */
     def load (final String field) {
 
-        Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+        [
+                with: { value ->
 
-        if (fieldSpec && currentElement) {
-            currentElement.field.name = field
-            currentElement.domain = selectedDomain
+                    Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
-            currentElement.field.label = fieldSpec.label
-            currentElement.field.control = fieldSpec.control
-            currentElement.field.constraints = fieldSpec.constraints
-        }
+                    Element newELement = currentRow.addNewElement(value, this)
+                    newELement.field.name = field
+                    newELement.domain = selectedDomain
 
-        [with: { value ->
-            currentElement = currentRow.addNewElement(value)
-            currentElement.field.name = field
-            currentElement.domain = selectedDomain
+                    if (fieldSpec) {
+                        newELement.field.label = fieldSpec.label
+                        newELement.field.control = fieldSpec.control
+                        newELement.field.constraints = fieldSpec.constraints
+                    }
 
-            if (fieldSpec) {
-                currentElement.field.label = fieldSpec.label
-                currentElement.field.control = fieldSpec.control
-                currentElement.field.constraints = fieldSpec.constraints
-            }
-        }
+                    addLoadedElement(selectedDomain, newELement)
+                }
         ]
     }
     /**
@@ -375,39 +299,22 @@ class ETLProcessor {
     }
     /**
      *
-     *  Loads a fixed value in a current element
-     *
-     * @param value
-     * @return
-     */
-//    ETLProcessor with (String value) {
-//        currentElement.value = value
-//        currentElement = null
-//        this
-//    }
-    /**
-     *
-     * Commits current changes with the current domain class and rows already processed as a partial result
+     * Add a loaded element with the current domain in results
      *
      */
-    void commitChanges () {
+    void addLoadedElement (ETLDomain domain, ETLProcessor.Element element) {
 
-        if (!results.containsKey(selectedDomain)) {
-            results.put(selectedDomain, [])
+        if (!currentRowResult.containsKey(selectedDomain)) {
+            currentRowResult[selectedDomain] = []
         }
 
-        List<Map<String, ?>> partialResults = currentRow.getLoadedElements(selectedDomain).collect { Element element ->
-            [
-                    originalValue: element.originalValue,
-                    value        : element.value,
-                    field        : element.field
-            ]
-        }
-        debugConsole.info "Saving partial results ${partialResults*.field.name} for domain ${selectedDomain}"
+        currentRowResult[selectedDomain].add([
+                originalValue: element.originalValue,
+                value        : element.value,
+                field        : element.field
+        ])
 
-        if (partialResults) {
-            results.get(selectedDomain).add(partialResults)
-        }
+        debugConsole.info "Adding element ${element} in results for domain ${domain}"
     }
 
     def methodMissing (String methodName, args) {
@@ -440,7 +347,8 @@ class ETLProcessor {
     }
 
 
-    def resultAsTableFormat () {
+    def resultAsTable () {
+
 
         List<String> headers = columns.collect { ETLProcessor.Column column -> column.label }
         List<List<String>> rows = rows.collect { ETLProcessor.Row row ->
@@ -459,34 +367,36 @@ class ETLProcessor {
     static class Row {
 
         List<Element> elements
+        Integer index
 
         Row () {
             elements = []
         }
 
-        Row (List<String> values) {
-            elements = []
-            values.eachWithIndex { String value, int i ->
-                addElement new Element(originalValue: value, value: value, index: i)
+        Row (Integer index, List<String> values, ETLProcessor processor) {
+            this.index = index
+            this.elements = values.withIndex().collect { String value, int i ->
+                new Element(
+                        originalValue: value,
+                        value: value,
+                        rowIndex: index,
+                        columnIndex: i,
+                        processor: processor)
             }
         }
 
-        void addElement (Element element) {
-            elements.add(element)
-        }
-
-        Element addNewElement (String value) {
-            Element element = new Element(originalValue: value, value: value, index: elements.size())
-            addElement element
-            element
+        Element addNewElement (String value, ETLProcessor processor) {
+            Element newElement = new Element(originalValue: value,
+                    value: value,
+                    rowIndex: index,
+                    columnIndex: elements.size(),
+                    processor: processor)
+            elements.add(newElement)
+            newElement
         }
 
         Element getElement (Integer index) {
             elements[index]
-        }
-
-        List<Element> getLoadedElements (ETLDomain domain) {
-            elements.findAll { it.domain == domain && it.isSelected() }
         }
 
         int size () {
@@ -498,13 +408,103 @@ class ETLProcessor {
 
         String originalValue
         String value
-        Integer index
+        Integer rowIndex
+        Integer columnIndex
         ETLDomain domain
-        List<ETLTransformation> transformations = []
-        Field field = new Field()
+        ETLProcessor processor
 
-        Boolean isSelected () {
-            !!field.name
+        Field field = new Field()
+        /**
+         *
+         *
+         * @param transformationName
+         * @return
+         */
+        Element and (String transformationName) {
+            transform(transformationName)
+        }
+        /**
+         *
+         *
+         * @param transformationName
+         * @return
+         */
+        Element transform (String transformationName) {
+            ETLTransformation transformation = lookupTransformation(transformationName)
+            transformation.apply(this)
+            processor.debugConsole.info "Applying transformation on element: $this"
+            this
+        }
+        /**
+         *
+         *
+         * @param actions
+         * @return
+         */
+        Element translate (Map actions) {
+            if (actions.containsKey('with')) {
+                translateWith(actions.get('with'))
+            }
+            this
+        }
+        /**
+         *
+         *
+         * @param field
+         * @return
+         */
+        Element load (String fieldName) {
+
+            //TODO: Diego. Review this interaction
+            Map<String, ?> fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+
+            if (fieldSpec) {
+                field.name = fieldName
+                domain = processor.selectedDomain
+
+                field.label = fieldSpec.label
+                field.control = fieldSpec.control
+                field.constraints = fieldSpec.constraints
+            }
+            processor.addLoadedElement(processor.selectedDomain, this)
+            this
+        }
+        /**
+         *
+         *
+         *
+         * @param methodName
+         * @param args
+         */
+        //TODO: Review it. "methodMissing" implementations are not supported on static inner classes as a synthetic version of "methodMissing" is added during compilation for the purpose of outer class delegation.
+//        def methodMissing (String methodName, args) {
+//            processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
+//            throw ETLProcessorException.methodMissing(methodName, args)
+//        }
+
+        /** Private Methods. Non public API for ETL processor */
+
+        private ETLTransformation lookupTransformation (String name) {
+            if (processor.transformations
+                    && processor.transformations.containsKey(name)) {
+                processor.transformations[name]
+            } else {
+                processor.debugConsole.error "Unknown transformation: $name"
+                throw ETLProcessorException.unknownTransformation(name)
+            }
+        }
+
+        private Element translateWith (Map dictionary) {
+
+            if (dictionary.containsKey(value)) {
+                String oldValue = value
+                value = dictionary[value]
+
+                processor.debugConsole.info "Translate $oldValue -> ${value}"
+            } else {
+                processor.debugConsole.warn "Could not translate ${value}"
+            }
+            this
         }
     }
 

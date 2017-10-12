@@ -10,11 +10,15 @@ class DebugConsole {
     }
 
     void debug(def content) {
-        append("INFO", content)
+        append("DEBUG", content)
     }
 
     void warn(def content) {
-        append("INFO", content)
+        append("WARN", content)
+    }
+
+    void error(def content) {
+        append("ERROR", content)
     }
 
     private void append(String level, def content) {
