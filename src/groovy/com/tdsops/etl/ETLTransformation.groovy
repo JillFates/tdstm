@@ -18,7 +18,7 @@ trait ETLTransformation {
      */
     void apply (ETLProcessor.Element element) {
         closure(element)
-        element.transformations.add(this)
+        //TODO: Diego. Add every transformation to a list of applied transformation over an element
     }
 
 
