@@ -50,14 +50,14 @@ iterate {
     extract 0 load id
     extract 'MODEL NAME' transform lowercase load Name
     extract 2 transform uppercase  load description
-    //load environment with 'Production'
+    load environment with 'Production'
 
     domain Device
     extract 0 load id
     extract 'MODEL NAME' transform uppercase load Name
 
 }
-"""
+""".stripIndent()
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
