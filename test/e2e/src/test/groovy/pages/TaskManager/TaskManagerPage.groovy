@@ -5,30 +5,68 @@ import geb.Page
 class TaskManagerPage extends Page{
 
     static at = {
-    
+        headerTitle.text() == "Task Manager"
+        justRemainingCB.value() == "on"
+        justMyTasksCB.value() != "on"
+        viewUnpublishedCB.value() != "on"
+        //breadcrumb.text() == "Task"::before"TaskManager"
     }
 
     static content = {
 
-
         //menu text to determine Event
+        projEventUser               { $("a#nav-project-name")}
+        // eventUserTxt = projEventUser.getText().substr(projEventUser.getText().indexOf(":") + 1)}
+
+        // START Layout elements
+        headerTitle                 { $("section",     class:"content-header").find("h1") }
+        //breadcrumb(wait:true)       { $("section",     class:"content-header").find("o1", class:"breadcrumb") }
+        justRemainingCB             { $("input#justRemainingCB") }
+        justMyTasksCB               { $("input#justMyTasksCB")}
+        viewUnpublishedCB           { $("input#viewUnpublishedCB")}
+        createTaskBtLb              { $("#createtask_text_createTask")}
+        taskTColLb                  { $("#jqgh_taskNumber")}
+        firstElementTaskTbl         { $("#taskListIdGrid").$("tr")[1].$("td")[0].find("a")}
+        //firstElementTaskTbl          { $("#table")}
+
+
+
+
+        //viewTaskGraphBt             { $("#viewtaskgraph_button_graph")}
+        //moveEventDD                 { $("#moveEventId")}
+        //moveEventDDOptions          { $("#moveEventId option")}
+        //moveEventDDSelected         { $("#moveEventId option:checked")}
+        //eventLb                     { $("label" , "for":"lbl-task-event-title").text()}
+        //bulkEditBtLb                { $("#bulkedit_text_bulkEdit")}
+        //actionTColLb                { $("#jqgh_act")}
+        //taskTCol                    { $("#taskListIdGrid_taskNumber")}
+        //descriptionTColLb           { $("#jqgh_comment")}
+        //updatedTColLb               { $("#jqgh_updated")}
+        //dueDateTColLb               { $("#jqgh_dueDate")}
+        //paginationDD                { $("select" , "class":"ui-pg-selbox")}
+        //paginationInfo              { $("div" , "class":"ui-paging-info")}
+
+
+
+/*
+        ///menu text to determine Event
         projEventUser { $("div#nav-project-name")}
         // eventUserTxt = projEventUser.getText().substr(projEventUser.getText().indexOf(":") + 1)}
 
         // START Layout elements
-        headerTitle(wait:true) { $("section", 	class:"content-header").find("h1") }
-        controlRowElements { $("#controlRowId")}
-        controlRow	{ $("#controlRowId")}
-        eventLb { $("for","lbl-task-event-title")}
-        moveEventDD { $("#moveEventId")}
-        moveEventDDOptions { $("#moveEventId option")}
-        moveEventDDSelected { $("#moveEventId option:checked")}
-        breadCrumb { $("div", class:"breadcrumb")}
-        justRemainingCB { $("#justRemainingCB")}
+        //headerTitle(wait:true) { $("section", 	class:"content-header").find("h1") }
+        //controlRowElements { $("#controlRowId")}
+        //controlRow	{ $("#controlRowId")}
+        //eventLb { $("for","lbl-task-event-title")}
+        //moveEventDD { $("#moveEventId")}
+        //moveEventDDOptions { $("#moveEventId option")}
+        //moveEventDDSelected { $("#moveEventId option:checked")}
+       // breadCrumb { $("div", class:"breadcrumb")}
+        //justRemainingCB { $("#justRemainingCB")}
         justRemainingLb { $("for","justRemainingCB")}
-        justMyTasksCB { $("#justMyTasksCB")}
+        //justMyTasksCB { $("#justMyTasksCB")}
         justMyTasksLb { $("for","justMyTasksCB")}
-        viewUnpublishedCB { $("#viewUnpublishedCB")}
+        //viewUnpublishedCB { $("#viewUnpublishedCB")}
         viewUnpublishedLb { $("for","viewUnpublishedCB")}
         viewTaskGraphBt { $("#viewtaskgraph_button_graph")}
         viewTaskGraphBtLb { $("#viewtaskgraph_text_graph")}
@@ -43,25 +81,25 @@ class TaskManagerPage extends Page{
         // Action Buttons
         tasksLb { $("for","lbl-task-list-title")}
         createTaskBt { $("#createtask_button_createTask")}
-        createTaskBtLb { $("#createtask_text_createTask")}
+        //createTaskBtLb { $("#createtask_text_createTask")}
         bulkEditBt { $("#bulkedit_button_bulkEdit")}
-        bulkEditBtLb { $("#bulkedit_text_bulkEdit")}
+        //bulkEditBtLb { $("#bulkedit_text_bulkEdit")}
         clearFiltersBt { $("#clearfilters_button_clearFilters")}
         clearFiltersBtLb { $("#clearfilters_text_clearFilters")}
         tableToggleBt { $("div", class:"ui-jqgrid-titlebar-close HeaderButton")}
         // Table Header
         actionTCol { $("#taskListIdGrid_act")}
-        actionTColLb { $("#jqgh_act")}
-        taskTCol { $("#taskListIdGrid_taskNumber")}
+        //actionTColLb { $("#jqgh_act")}
+        //taskTCol { $("#taskListIdGrid_taskNumber")}
         taskTColLb { $("#jqgh_taskNumber")}
         taskTColFlt { $("#gs_taskNumber")}
         descriptionTCol { $("#taskListIdGrid_comment")}
-        descriptionTColLb { $("#jqgh_comment")}
+        //descriptionTColLb { $("#jqgh_comment")}
         descriptionTColFlt { $("#gs_comment")}
         updatedTCol { $("#taskListIdGrid_updated")}
-        updatedTColLb { $("#jqgh_updated")}
+        //updatedTColLb { $("#jqgh_updated")}
         dueDateTCol { $("#taskListIdGrid_dueDate")}
-        dueDateTColLb { $("#jqgh_dueDate")}
+        //dueDateTColLb { $("#jqgh_dueDate")}
         dueDateTColFlt { $("#gs_dueDate")}
         statusTCol { $("#taskListIdGrid_status")}
         statusTColLb { $("#jqgh_status")}
@@ -76,15 +114,15 @@ class TaskManagerPage extends Page{
         //Table Footer
         tableRefreshBt { $("#taskListId")}
         //-END of Layout Elements
-        
+
         //-START Functionality
-        
+
         // Error Modal window
         errorModal { $("#errorModal")}
         errorModalText {$("#errorModalText")}
         errorModalCloseBtn {$("div", class:"btn btn-default")}
         // End of error modal window
-        
+
         // Create Task Modal Window
         ctModal { $("div",class:"modal fade modal-task in")}
         ctModalTitle {$("#ui-id-5")}
@@ -150,10 +188,10 @@ class TaskManagerPage extends Page{
         //ctModalDepSuccTsk {$(")}
         //ctModalDepSuccTsk {$("ng-click="deleteRow($index)")}
         ctModalButtons { $(".buttons button")}
-        ctModalSaveBt { $("#saveAndCloseBId")}
-        ctModalCancelBt { $("div",class:"btn btn-default tablesave cancel")}
+        //ctModalSaveBt { $("#saveAndCloseBId")}
+        //ctModalCancelBt { $("div",class:"btn btn-default tablesave cancel")}
 
-
+*/
     }
 }
 
