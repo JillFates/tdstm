@@ -10,10 +10,14 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.SecurityService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import grails.gsp.PageRenderer
+
+import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 
 /**
  * Created by @oluna on 4/5/17.
@@ -25,6 +29,8 @@ class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
 	PageRenderer groovyPageRenderer
+	ControllerService controllerService
+	ApplicationService applicationService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -242,7 +248,12 @@ class WsAssetController implements ControllerMethods {
 
 		Map model = [ asset: asset ]
 		String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
-		model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+		if(asset.assetClass.toString().equalsIgnoreCase(AssetClass.APPLICATION.toString())) {
+			Object app = controllerService.getAssetForPage(this, asset.project, APPLICATION, params.id)
+			model << applicationService.getModelForShow(asset.project, app, params)
+		} else {
+			model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+		}
 		// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
 		render groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
 	}

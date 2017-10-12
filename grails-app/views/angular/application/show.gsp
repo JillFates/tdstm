@@ -1,45 +1,34 @@
 <%@page import="com.tds.asset.Application"%>
 <%@page import="net.transitionmanager.security.Permission"%>
-<%@page defaultCodec="html" %> 
+<%@page defaultCodec="html" %>
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 
-<table style="border: 0">
-	<tr>
-	
-		<td colspan="2"><div class="dialog" 
-			<tds:hasPermission permission="${Permission.AssetEdit}">
-				ondblclick="EntityCrud.showAssetEditView('${assetClass}', ${applicationInstance?.id});"
-			</tds:hasPermission>>
-				<g:if test="${errors}">
-					<div id="messageDivId" class="message">${errors}</div>
-				</g:if>
-				<g:render template="show" model="[applicationInstance:applicationInstance]" ></g:render>
-			</div>
-		</td>
-	</tr>
-	<tr id="deps">
-		<g:render template="../assetEntity/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
-	</tr>
-	<tr id="commentListId">
-		<g:render template="../assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="buttons">
-				<g:form>
-					<input type="hidden" name="id" id="applicationId" value="${applicationInstance?.id}" />
-					<g:render template="../assetEntity/showButtons" model="[assetEntity:applicationInstance]"/>
-				</g:form>
-			</div>
-		</td>
-	</tr>
-</table>
+<div class="modal-content tds-angular-component-content">
+	<div class="modal-header">
+		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
+		<h4 class="modal-title">Application Detail</h4>
+	</div>
+	<div class="modal-body">
+		<div>
+			<table style="border: 0">
+				<tr>
+
+					<td colspan="2"><div class="dialog">
+							<g:if test="${errors}">
+								<div id="messageDivId" class="message">${errors}</div>
+							</g:if>
+							<g:render template="angular/application/show" model="[applicationInstance:applicationInstance]" ></g:render>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="modal-footer form-group-center">
+		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+	</div>
+</div>
 <script>
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
-	
-	$(document).ready(function() { 
-		changeDocTitle('${escapedName}');
-	})
+	$('[data-toggle="popover"]').popover();
 </script>
