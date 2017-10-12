@@ -69,7 +69,7 @@ class GETLReaderSpec extends Specification {
             csvFile.rows()[0].environment == "Production"
     }
 
-    void 'test can read a csv file without defining fields' () {
+    void 'test can read a csv file with header labels without defining fields' () {
 
         given:
             String fileName = "applications.csv"
@@ -83,6 +83,9 @@ class GETLReaderSpec extends Specification {
 
         then: 'It can read total amount of rows'
             csvFile.readRowCount() == 3
+
+        and:
+            csvFile.columnsNames == ['id', 'name']
 
         and: 'First row results contains fields values'
             csvFile.rows()[0].id == "114054"
@@ -115,7 +118,6 @@ class GETLReaderSpec extends Specification {
      * Excel tests
      *
      */
-
     void 'test can read an excel file defining fields' () {
 
         given:
