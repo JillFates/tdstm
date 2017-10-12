@@ -68,14 +68,20 @@ class Datasource {
         name size: 1..255, unique: 'provider'
         description size: 0..255
         target size: 0..255
+        lastModifiedBy nullable: true
         lastUpdated nullable: true
     }
 
     static mapping = {
+        id column: 'datasource_id'
         name 			sqlType: 'VARCHAR(255)'
         description 		sqlType: 'VARCHAR(255)'
         target			sqlType: 'VARCHAR(255)'
         etlSourceCode 	sqlType: 'MEDIUMTEXT'
+        createdBy column: 'created_by'
+        lastModifiedBy column: 'last_modified_by'
+
+        version false
     }
 
 }

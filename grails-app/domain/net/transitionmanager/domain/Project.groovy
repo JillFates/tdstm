@@ -144,7 +144,12 @@ class Project extends PartyGroup {
 	String custom95
 	String custom96
 
-	static hasMany = [dataTransferBatch: DataTransferBatch]
+	static hasMany = [
+			dataTransferBatch: DataTransferBatch,
+			providers: Provider,
+			datasources: Datasource,
+			credentials: Credential
+	]
 
 	static constraints = {
 		defaultBundle nullable: true
