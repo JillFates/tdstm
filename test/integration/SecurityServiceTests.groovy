@@ -1,4 +1,5 @@
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeCategory
