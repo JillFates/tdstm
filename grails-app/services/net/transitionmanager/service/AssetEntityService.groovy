@@ -1672,30 +1672,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Get config by entityType and validation
-	 * @deprecated This function is no longer needed.
-	 */
-	@Deprecated
-	Map getConfig(String type, String validation, projectAttributes = null) {
-		throw new RuntimeException('getConfig no longer used')
-		Project project = securityService.userCurrentProject
-		def allconfig = projectService.getConfigByEntity(type)
-		List<Map<String, String>> fields = projectService.getFields(type, projectAttributes) + projectService.getCustoms(projectAttributes)
-		def config = [:]
-		String validationType = ValidationType.valuesAsMap[validation]
-		fields.each { Map f ->
-			if (allconfig[f.label]) {
-				config[f.label] = allconfig[f.label]['phase'][validationType]
-			}
-		}
-
-		// Fetch the custom fields settings for visible fields.
-		List customs = getCustomFieldsSettings(project, type, true)
-
-		return [project: project, config: config, customs: customs]
-	}
-
-	/**
 	 * This method returns the settings for the custom fields for the given
 	 * asset type. Results are sorted by order and field.
 	 *

@@ -1,4 +1,3 @@
-import com.tds.asset.FieldImportance
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
@@ -632,102 +631,6 @@ class ProjectController implements ControllerMethods {
 		}
 		fieldMap.customs = projectService.getCustoms()
 		render fieldMap as JSON
-	}
-
-	/**
-	 * Initialising importance for a given entity type.
-	 *@param : entityType type of entity.
-	 *@return : json data, example map
-	 *  {
-	 *    	AssetEntity:{
-	 *    		assetName:{phase:{D:C,V:C,R:H,S:I,B:C}},
-	 *    		assetTag:{phase:{D:N,V:N,R:N,S:N,B:N}},..............
-	 *    		environment:{phase:{D:N,V:N,R:N,S:N,B:N}}},
-	 *    	Application:{
-	 *    		assetName:{phase:{D:N,V:N:N,S:N,B:N}},
-	 *    		appVendor:{phase:{D:C,V:H,R:I,S:C,B:H}},....
-	 *    		custom8:{phase:{D:N,V:N,R:N,N,B:N}}},
-	 *    	Files:{
-	 *    		assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
-	 *    		fileFormat:{phase:{D:N,V:N,N,S:N,B:N}},........
-	 *    		url:{phase:{D:N,V:N,R:N,S:N,B:N}}},
-	 *    	Database:{
-	 *    		assetName:{phase:{D:N,V:N,R:N,S:N,B:N}},
-	 *    		dbFormat:{phase:{D:N,V:N,R:N,S:N,B:N}},.............
-	 *    		custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
-	 * 	}
-	 */
-	@Deprecated
-	@HasPermission(Permission.AssetView)
-	def retrieveImportance() {
-		throw new RuntimeException('retrieveImportance is no longer used')
-		def assetTypes=EntityType.list
-		def impMap =[:]
-		assetTypes.each {type->
-			impMap[type] = projectService.getConfigByEntity(type)
-		}
-		render impMap as JSON
-	}
-
-	/**
-	 * Renders importance for a given entity type.
-	 * @param entity type
-	 * @return json data
-	 * TM-6617
-	 */
-	@HasPermission(Permission.AssetView)
-	@Deprecated
-	def cancelImportance() {
-		throw new RuntimeException('cancelImportance is no longer used')
-		render projectService.getConfigByEntity(request.JSON.entityType) as JSON
-	}
-
-	/**
-	 * Update field importance and display it to user
-	 * @param : entityType type of entity for which user is requested for importance .
-	 * @return success string
-	 * TM-6617
-	 */
-	@HasPermission(Permission.ProjectFieldSettingsEdit)
-	@Deprecated
-	def updateFieldImportance() {
-		throw new RuntimeException('updateFieldImportance no longer used')
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
-
-		def entityType = request.JSON.entityType
-		def allConfig = request.JSON.jsonString as JSON
-		try {
-			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType", [project:project, entityType:entityType])
-			if (!assetImp)
-				assetImp = new FieldImportance(entityType:entityType, config: allConfig.toString(), project:project)
-			else
-				assetImp.config = allConfig.toString()
-			if (!assetImp.validate() || !assetImp.save(flush: true)) {
-				def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
-				log.error( etext )
-			}
-		} catch(Exception ex) {
-			log.error ExceptionUtil.messageWithStacktrace("Updating FieldImportance", e)
-		}
-
-		render "success"
-	}
-
-	/**
-	 * Retrieve default project field importance and display it to user.
-	 * @param : entityType type of entity for which user is requested for importance .
-	 * @return
-	 * TM-6617
-	 */
-	@HasPermission(Permission.ProjectFieldSettingsEdit)
-	@Deprecated
-	def retriveDefaultImportance() {
-		throw new RuntimeException('retriveDefaultImportance no longer used')
-		def entityType = request.JSON.entityType
-		renderSuccessJson(
-				fields: projectService.generateDefaultConfig(entityType),
-				tooltips: assetEntityService.retrieveTooltips(entityType, Project.defaultProject))
 	}
 
 	/**

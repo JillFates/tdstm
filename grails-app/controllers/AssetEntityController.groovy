@@ -2528,34 +2528,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
-	 * Gets validation for particular fields
-	 * @param type,validation
-	 */
-	@HasPermission(Permission.AssetView)
-	def retrieveAssetImportance() {
-		renderAsJson assetEntityService.getConfig(params.type, params.validation).config
-	}
-
-	/**
-	 * Gets highlighting css for particular fields
-	 */
-	@HasPermission(Permission.AssetView)
-	def retrieveHighlightCssMap() {
-		def assetType = params.type
-		Class clazz
-		switch(assetType) {
-			case 'Application': clazz = Application; break
-			case 'Database':    clazz = Database; break
-			case 'Files':       clazz = Files; break
-			default:            clazz = AssetEntity; break
-		}
-
-		def assetEntity = params.id ? clazz.get(params.id) : clazz.newInstance(appOwner: '')
-		def configMap = assetEntityService.getConfig(assetType, params.validation)
-		renderAsJson assetEntityService.getHighlightedInfo(assetType, assetEntity, configMap)
-	}
-
-	/**
 	 * Updates columnList with custom labels.
 	 * @param entityDTAMap :  dataTransferEntityMap for entity type
 	 * @param columnslist :  column Names

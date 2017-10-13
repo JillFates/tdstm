@@ -7,7 +7,6 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetType
-import com.tds.asset.FieldImportance
 import net.transitionmanager.domain.Setting
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -273,47 +272,6 @@ class ProjectService implements ServiceMethods {
 
 		projectAttributes.findAll { it.attributeCode.contains('custom') }.collect { p ->
 			[id: project[p.attributeCode] ?: p.frontendLabel, label: p.attributeCode]
-		}
-	}
-
-	/**
-	 * Get the config from field importance Table.
-	 * @deprecated
-	 * TM-6617
-	 */
-	@Deprecated
-	def getConfigByEntity(entityType) {
-		throw new RuntimeException('getConfigByEntity no longer used')
-		Project project = securityService.userCurrentProject
-		def parseData
-		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
-		if (data) {
-			parseData = JSON.parse(data)
-		}
-		if (!parseData) {
-			parseData = generateDefaultConfig(entityType)
-		}
-		updateConfigForMissingFields(parseData, entityType)
-	}
-
-	/**
-	 * Create default importance map by assigning normal to all
-	 * @deprecated
-	 * TM-6617
-	 */
-	def generateDefaultConfig(type) {
-		throw new RuntimeException('generateDefaultConfig no longer used')
-		def defaultProject = Project.getDefaultProject()
-		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
-		if (data) {
-			return JSON.parse(data)
-		}
-
-		Set<String> phases = ValidationType.listAsMap.keySet()
-		getAttributes(type)*.attributeCode.inject([:]) { Map rmap, String field ->
-			def pmap = phases.inject([:]) { Map map, String item -> map[item] = field.contains('custom') ? "H" : "N"; map }
-			rmap[field] = [phase: pmap]
-			rmap
 		}
 	}
 
@@ -715,7 +673,6 @@ class ProjectService implements ServiceMethods {
 		Room.executeUpdate("delete from Room r where r.project  = $projectInstance.id")
 		Rack.executeUpdate("delete from Rack ra where ra.project  = $projectInstance.id")
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = $projectInstance.id")
-		FieldImportance.executeUpdate("delete from FieldImportance fi where fi.project  = $projectInstance.id")
 		KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = $projectInstance.id")
 
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance.id")
