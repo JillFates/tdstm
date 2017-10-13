@@ -28,6 +28,7 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils
@@ -53,6 +54,7 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
  * @author John Martin
  */
 @Transactional
+@Slf4j
 class TaskService implements ServiceMethods {
 
 	def controllerService
@@ -358,7 +360,7 @@ class TaskService implements ServiceMethods {
 
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
-			return
+			return task
 		}
 
 		def now = TimeUtil.nowGMT()
