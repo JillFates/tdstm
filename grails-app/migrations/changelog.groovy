@@ -109,7 +109,6 @@ databaseChangeLog = {
 	include file: '20150616-timezones.groovy'
 	include file: '20150626-add-column-timezone-to-project.groovy'
 	include file: '20150827-set-timezone-and-datetime-user-preferences.groovy'
-	include file: '20151020-set-custom-fields-to-hidden.groovy'
 	include file: '20151214-fix-invalid-status-and-type-values-in-assetdep.groovy'
 	include file: '20151214-remove-new-or-old-column-from-asset-entity.groovy'
 	include file: '20151209-nullout-invalid-person-ref.groovy'
@@ -180,4 +179,5 @@ databaseChangeLog = {
 	include file: '20170814-create-dataview-table.groovy'
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
 	include file: '20171002-create-provider-and-datasource-tables.groovy'
+	include file: '20171010-remove-legacy-field-settings.groovy'
 }

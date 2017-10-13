@@ -1,10 +1,12 @@
 import grails.converters.JSON
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tds.asset.FieldImportance
 import net.transitionmanager.domain.Project
 
 /**
  * Set custom fields to hidden by default in default project
+ *
+ * dontiveros: this script has been removed from the changelog.groovy file,
+ * as part of TM-6622 work of removing old legacy Field Settings.
  */
 databaseChangeLog = {
 	changeSet(author: "dscarpa", id: "20151020 TM-3934-1") {
@@ -18,6 +20,8 @@ databaseChangeLog = {
 				def phases = ValidationType.getListAsMap().keySet()
 				def attrValues
 
+				//  FieldImportance table no longer exists
+				/*
 				entityTypes.each { entityType ->
 					def fieldImportance = FieldImportance.findByProjectAndEntityType(defaultProject, entityType)
 					def configMap = JSON.parse(fieldImportance.config)
@@ -32,6 +36,7 @@ databaseChangeLog = {
 					fieldImportance.config = (configMap as JSON).toString()
 					fieldImportance.save(flush: true)
 				}
+				*/
 			}
 		}
 
