@@ -168,7 +168,7 @@ export class AssetExplorerViewGridComponent {
 		this.dialog.open(AssetEditComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: 'DATABASE' }],
-			'lg').then(x => {
+			'xlg').then(x => {
 				console.log(x);
 			}).catch(x => {
 				console.log(x);

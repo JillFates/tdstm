@@ -237,6 +237,3 @@
 		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 	</div>
 </div>
-<script>
-	$('[data-toggle="popover"]').popover();
-</script>

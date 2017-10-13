@@ -17,7 +17,7 @@ export class UIDialogService {
 	 * @param component ComponentType
 	 * @param params properties to be inject in the component creation
 	 */
-	open(component: any, params: Array<any>, size: 'sm' | 'md' | 'lg' = 'md'): Promise<any> {
+	open(component: any, params: Array<any>, size: 'sm' | 'md' | 'xlg' | 'lg' = 'md'): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.open',

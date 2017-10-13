@@ -20,6 +20,9 @@ import { DatabaseEditComponent } from '../database/database-edit.component';
 	template: `<div #view></div>`
 })
 export class AssetEditComponent extends DynamicComponent implements AfterViewInit {
+
+	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+
 	constructor(
 		inj: Injector,
 		comp: Compiler,
@@ -29,7 +32,6 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
 		super(inj, comp, mod);
 	}
-	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
 
 	ngAfterViewInit() {
 		Observable.zip(
@@ -38,7 +40,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 			.subscribe(res => {
 				let template = res[0].text();
 				let model = res[1].json();
-				
+
 				switch (this.asset) {
 					case 'APPLICATION':
 					case 'DATABASE':
@@ -48,7 +50,6 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 						this.registerAndCreate(DatabaseEditComponent(template, model), this.view);
 						break;
 				}
-
 			});
 	}
 

@@ -52,7 +52,7 @@ class ControlAngularTagLib {
 	def inputLabel = { Map attrs ->
 		Map fieldSpec = attrs.field ?: [:]
 		if (!fieldSpec) {
-			throw new InvalidParamException('<tds:inputLabel> tag requires field=fieldSpec Map')
+			throw new InvalidParamException('<tdsAngular:inputLabel> tag requires field=fieldSpec Map')
 		}
 		StringBuilder sb = new StringBuilder("\n")
 
@@ -143,17 +143,18 @@ class ControlAngularTagLib {
 	 * Used to render any of the supported custom fields input control
 	 * @param field - the field spec Map
 	 * @param value - the current or default value to populate the control with (optional)
+	 * @param ngModel - The String representation of the Model on Angular
 	 * @param size - used to define the HTML size attribute on controls (optional)
 	 * @param tabIndex - the tab offset (optional)
 	 * @param tabOffset - used to offset the tabIndex values (used by the custom fields)
-	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" tabOffset="400"/>
+	 * @example <tds:inputControl field="${fieldSpec} value="${domain.value}" ngmodel="model.asset.assetName" tabOffset="400"/>
 	 */
 	def inputControl = { Map attrs ->
 
 		// The field Specifications
 		Map fieldSpec = attrs.field ?: [:]
 		if (!fieldSpec) {
-			throw new InvalidParamException('<tds:inputControl> tag requires field=fieldSpec Map')
+			throw new InvalidParamException('<tdsAngular:inputControl> tag requires field=fieldSpec Map')
 		}
 
 		// The value that the control should be set to (optional)
@@ -167,16 +168,12 @@ class ControlAngularTagLib {
 		String tabIndex = ( attrs.tabIndex ?: (attrs.tabindex ?: null))
 		String tabOffset = (attrs.tabOffset ?: (attrs.taboffset ?: null ))
 
-		// println "attrs=${attrs.keySet()}"
-		// println "tabIndex = $tabIndex; tabOffset=$tabOffset; fieldSpec.order=${fieldSpec.order}"
-
 		// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
 		// This parameter is optional to modify default tooltip positioning
 		// Also checks that the value is one of the valid data-placement element values
 		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
 		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
-			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
-					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+			throw new InvalidParamException('<tdsAngular:inputControl> tag optional argument tooltipDataPlacement requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
 		}
 
 		switch (fieldSpec.control) {
@@ -190,7 +187,7 @@ class ControlAngularTagLib {
 
 			case ControlType.STRING.toString():
 			default:
-				out << renderStringInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
 		}
 	}
 
@@ -272,11 +269,8 @@ class ControlAngularTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		'<input' +
-		attribute('type', 'text') +
-		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) +
-		'/>'
+	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
 	/**

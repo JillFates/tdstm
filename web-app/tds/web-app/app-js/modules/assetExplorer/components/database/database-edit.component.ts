@@ -1,18 +1,26 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit} from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 
-export function DatabaseEditComponent(template, model) {
+declare var jQuery: any;
+
+export function DatabaseEditComponent(template, editModel) {
 	@Component({
 		selector: `database-edit`,
 		template: template,
 		providers: [
-			{ provide: 'model', useValue: model }
+			{ provide: 'model', useValue: editModel }
 		]
-	}) class DatabaseShowComponent {
+	}) class DatabaseShowComponent implements OnInit {
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService) {
+		}
 
+		/**
+		 * Initiates The Injected Component
+		 */
+		ngOnInit(): void {
+			jQuery('[data-toggle="popover"]').popover();
 		}
 
 		cancelCloseDialog(): void {

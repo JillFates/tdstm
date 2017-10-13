@@ -102,10 +102,7 @@
             </table>
         </div>
     </div>
-    <div class="modal-footer form-group-center">
-        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
-    </div>
+<div class="modal-footer form-group-center">
+    <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
 </div>
-<script>
-	$('[data-toggle="popover"]').popover();
-</script>
+</div>
