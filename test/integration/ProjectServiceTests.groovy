@@ -2,11 +2,12 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.SettingType
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.*
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
-import spock.lang.Specification
 
-class ProjectServiceTests extends Specification {
+class ProjectServiceTests extends IntegrationSpec {
 
 	// IOC
 	ProjectService projectService
@@ -281,22 +282,55 @@ class ProjectServiceTests extends Specification {
 	}
 
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
-		when: 'creating a new person'
-			Person userPerson = personHelper.createStaff(project.owner)
-			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
-			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
-			securityService.assumeUserIdentity(userLogin.username, false)
-		then: 'a person should have been created'
-			userPerson
-		and: 'a user login should have been created'
-			userLogin
-		then: 'the person does not access to the default project because he is not an admin'
-			! securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
-		and: 'filting for ANY status should return one project.'
-			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
-		and: 'filting for ACTIVE status should return one project.'
-			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
-		and: 'filting for COMPLETED status should return zero projects'
-			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
+        when: 'creating a new person'
+        Person userPerson = personHelper.createStaff(project.owner)
+        projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
+        UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+        securityService.assumeUserIdentity(userLogin.username, false)
+        then: 'a person should have been created'
+        userPerson
+        and: 'a user login should have been created'
+        userLogin
+        then: 'the person does not access to the default project because he is not an admin'
+        !securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
+        and: 'filting for ANY status should return one project.'
+        1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
+        and: 'filting for ACTIVE status should return one project.'
+        1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
+        and: 'filting for COMPLETED status should return zero projects'
+        0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
+    }
+
+	void "13. Validate that deleting Project deletes the new Provider"() {
+		setup:
+		ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+		providerTestHelper.createProvider(project)
+
+		when: 'project is deleted'
+		projectService.deleteProject(project.id, true)
+
+		and: 'finding all providers by project'
+		def providers = Provider.findAllByProject(project)
+
+		then: 'list of providers by deleted project should be empty'
+		[] == providers
 	}
+
+	void "14. Validate that deleting Project deletes the new Datasource"() {
+		setup:
+		ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+		DatasourceTestHelper datasourceTestHelper = new DatasourceTestHelper()
+		Provider provider = providerTestHelper.createProvider(project)
+		datasourceTestHelper.createDatasource(project, provider, adminPerson)
+
+		when: 'project is deleted'
+		projectService.deleteProject(project.id, true)
+
+		and: 'find all datasources by project'
+		def datasources = Datasource.findAllByProject(project)
+
+		then: 'list of datasources by deleted project should be empty'
+		[] == datasources
+	}
+
 }

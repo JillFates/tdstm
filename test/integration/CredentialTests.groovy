@@ -1,86 +1,55 @@
-import com.tdsops.tm.enums.domain.AuthenticationMethod
-import com.tdsops.tm.enums.domain.CredentialStatus
-import com.tdsops.tm.enums.domain.CredentialType
+import com.tdsops.tm.enums.domain.SecurityRole
 import grails.test.spock.IntegrationSpec
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.*
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
 
 class CredentialTests extends IntegrationSpec {
+
+    ProjectService projectService
+    SecurityService securityService
+
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
+    private ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+    private CredentialTestHelper credentialTestHelper = new CredentialTestHelper()
+    private PersonTestHelper personHelper = new PersonTestHelper()
 
     void "1. Validate that deleting Project deletes the new Credential"() {
-        given:
+        setup:
         Project project = projectHelper.createProjectWithDefaultBundle()
+        Person adminPerson = personHelper.createStaff(project.owner)
+        projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
 
-        when:
-        project.addToProviders(new Provider(name: 'Test provider', comment: 'Test comment', description: 'Test description'))
-        project.save(flush: true, failOnError: true)
+        UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+        securityService.assumeUserIdentity(adminUser.username, false)
 
-        and:
-        Provider provider = project.providers.first()
+        Provider provider = providerTestHelper.createProvider(project)
+        credentialTestHelper.createCredential(project, provider)
 
-        and:
-        project.addToCredentials(new Credential(
-                type: CredentialType.PRODUCTION,
-                status: CredentialStatus.ACTIVE,
-                method: AuthenticationMethod.HTTP_BASIC,
-                name: 'Test credential',
-                salt: '{shablah}', accessKey: 'key', password: 'pwd',
-                authenticationUrl: 'http://localhost', renewTokenUrl: 'http://localhost',
-                expirationDate: new Date(),
-                provider: provider))
-        project.save(flush: true, failOnError: true)
+        when: 'project is deleted'
+        projectService.deleteProject(project.id, true)
 
-        and:
-        Credential credential = project.credentials.first()
+        and: 'finding all credentials by project'
+        def credentials = Credential.findAllByProject(project)
 
-        then:
-        1 == project.credentials.size()
-        null != credential.id
-
-        and:
-        project.delete()
-
-        then:
-        null == Credential.get(credential.id)
+        then: 'list of credentials by deleted project should be empty'
+        [] == credentials
     }
 
     void "2. Validate that deleting Provider deletes the new Credential"() {
         given:
         Project project = projectHelper.createProjectWithDefaultBundle()
-        Provider provider = new Provider(name: 'Test provider', comment: 'Test comment',
-                description: 'Test description',
-                project: project
-        )
+        Provider provider = providerTestHelper.createProvider(project)
+        credentialTestHelper.createCredential(project, provider)
 
-        when:
-        provider.save(flush: true, failOnError: true)
+        when: 'provider is deleted'
+        provider.delete(flush: true)
 
-        and:
-        provider.addToCredentials(new Credential(
-                type: CredentialType.PRODUCTION,
-                status: CredentialStatus.ACTIVE,
-                method: AuthenticationMethod.HTTP_BASIC,
-                name: 'Test credential',
-                salt: '{shablah}', accessKey: 'key', password: 'pwd',
-                authenticationUrl: 'http://localhost', renewTokenUrl: 'http://localhost',
-                expirationDate: new Date(),
-                project: project))
-        provider.save(flush: true, failOnError: true)
+        and: 'finding all credentials by deleted provider'
+        def credentials = Credential.findAllByProvider(provider)
 
-        and:
-        Credential credential = provider.getCredentials().first()
-
-        then:
-        1 == provider.credentials.size()
-        null != credential.id
-
-        and:
-        provider.delete()
-
-        then:
-        null == Credential.get(credential.id)
+        then: 'list of credentials by deleted provider should be empty'
+        [] == credentials
     }
 
 }

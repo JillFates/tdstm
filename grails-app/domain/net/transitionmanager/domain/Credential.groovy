@@ -58,7 +58,5 @@ class Credential {
         renewTokenUrl sqlType: 'VARCHAR(255)'
 
         sort 'name'
-
-        version false
     }
 }

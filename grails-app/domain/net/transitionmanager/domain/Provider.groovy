@@ -30,6 +30,5 @@ class Provider {
 
         sort 'name'
 
-        version false
     }
 }
