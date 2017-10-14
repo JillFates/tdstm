@@ -25,6 +25,7 @@ databaseChangeLog = {
 				  `date_created` datetime NOT NULL,
 				  `last_updated` datetime,
 				  `expiration_date` datetime,
+				  `version` int,
 				  PRIMARY KEY (credential_id),
 				  FOREIGN KEY FK_CREDENTIAL_PROJECT (project_id) REFERENCES project(project_id) ON DELETE CASCADE,
 				  FOREIGN KEY FK_CREDENTIAL_PROVIDER (provider_id) REFERENCES provider(provider_id) ON DELETE CASCADE,

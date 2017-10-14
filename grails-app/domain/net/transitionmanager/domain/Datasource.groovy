@@ -80,8 +80,6 @@ class Datasource {
         etlSourceCode 	sqlType: 'MEDIUMTEXT'
         createdBy column: 'created_by'
         lastModifiedBy column: 'last_modified_by'
-
-        version false
     }
 
 }

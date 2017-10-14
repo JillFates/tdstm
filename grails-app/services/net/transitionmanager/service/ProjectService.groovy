@@ -694,8 +694,14 @@ class ProjectService implements ServiceMethods {
 		PartyGroup.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 		Party.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 
+		Datasource.executeUpdate("delete from Datasource ds where ds.project.id = :projectId", [projectId: projectInstance.id])
+
+		Credential.executeUpdate("delete from Credential c where c.project.id = :projectId", [projectId: projectInstance.id])
+
+		Provider.executeUpdate("delete from Provider p where p.project.id = :projectId", [projectId: projectInstance.id])
+
 		if (includeProject) {
-			Project.executeUpdate("delete from Project p where p.id = $projectInstance.id")
+			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
 		return message

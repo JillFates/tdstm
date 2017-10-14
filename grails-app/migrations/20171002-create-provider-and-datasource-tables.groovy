@@ -4,7 +4,7 @@
 
 databaseChangeLog = {
 
-    changeSet(author: "arecordon", id: "20171002 TM-7221-1") {
+    changeSet(author: "arecordon", id: "20171002 TM-7221-2") {
         comment("Create the table for Provider")
 
 
@@ -17,13 +17,14 @@ databaseChangeLog = {
 				  `project_id` BIGINT(20) NOT NULL,
 				  `date_created` datetime NOT NULL,
 				  `last_updated` datetime,
+				  `version` int,
 				  PRIMARY KEY (provider_id),
 				  FOREIGN KEY FK_PROVIDER_PROJECT (project_id) REFERENCES project(project_id) ON DELETE CASCADE
 			  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 		""")
     }
 
-    changeSet(author: "arecordon", id: "20171002 TM-7221-2") {
+    changeSet(author: "arecordon", id: "20171002 TM-7221-3") {
         comment("Create the table for Datasource")
 
 
@@ -41,6 +42,7 @@ databaseChangeLog = {
 				  `mode` varchar(255) NOT NULL,
 				  `date_created` datetime NOT NULL,
 				  `last_updated` datetime,
+				  `version` int,
 				  PRIMARY KEY (datasource_id),
 				  FOREIGN KEY FK_DATASOURCE_PROJECT (project_id) REFERENCES project(project_id) ON DELETE CASCADE,
 				  FOREIGN KEY FK_DATASOURCE_PROVIDER (provider_id) REFERENCES provider(provider_id) ON DELETE CASCADE,
