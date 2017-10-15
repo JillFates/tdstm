@@ -36,7 +36,7 @@
 										<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset?.environment}"/>
 										<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.environment}">
-												<kendo-dropdownlist [defaultItem]="'Please Select'" [(ngModel)]="model.asset.environment" [data]="model.environmentOptions"></kendo-dropdownlist>
+												<kendo-dropdownlist class="select" [defaultItem]="'Please Select'" [(ngModel)]="model.asset.environment" [data]="model.environmentOptions"></kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 										</td>
 									</tr>
@@ -49,13 +49,13 @@
 										<td nowrap="nowrap" class="sizeScale">
 											<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.scale}">
-												<kendo-dropdownlist [defaultItem]="''" [textField]="'text'" [valueField]="'value'" [(ngModel)]="model.asset.scale.name" [data]="${SizeScale.getAsJsonList() as JSON}"></kendo-dropdownlist>
+												<kendo-dropdownlist class="select" [defaultItem]="''" [textField]="'text'" [valueField]="'value'" [(ngModel)]="model.asset.scale.name" [data]="${SizeScale.getAsJsonList() as JSON}"></kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 										</td>
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
 										<td valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')}">
-											<kendo-datepicker [(ngModel)]="model.asset.retireDate"></kendo-datepicker>
+											<kendo-datepicker></kendo-datepicker> <!-- [(ngModel)]="model.asset.retireDate" -->
 										</td>
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
@@ -73,9 +73,7 @@
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
 										<td valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')}">
-											<input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
-												   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
-												   value="${asset?.maintExpDate}" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
+                                            <kendo-datepicker></kendo-datepicker> <!-- [(ngModel)]="model.asset.maintExpDate" -->
 										</td>
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
