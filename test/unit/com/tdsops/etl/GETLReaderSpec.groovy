@@ -76,22 +76,37 @@ class GETLReaderSpec extends Specification {
             String pathName = "test/unit/com/tdsops/etl/resources"
 
         and:
-            CSVConnection csvCon = new CSVConnection(config: "csv", path: pathName)
+            CSVConnection connection = new CSVConnection(config: "csv", path: pathName)
 
         when: 'CSVDataset can read column names without fields definition'
-            CSVDataset csvFile = new CSVDataset(connection: csvCon, fileName: fileName, header: true)
+            CSVDataset dataset = new CSVDataset(connection: connection, fileName: fileName, header: true)
 
         then: 'It can read total amount of rows'
-            csvFile.readRowCount() == 3
+            dataset.readLinesCount() == 3
 
-        and:
-            csvFile.columnsNames == ['id', 'name']
+        and: 'It can detect automatically the amount of CSV fields'
+            List<Field> fields = dataset.connection.driver.fields(dataset)
+            fields.size() == 5
+
+        and: 'It can detect and define automatically CSV Field Names'
+            fields[0].name = 'id'
+            fields[1].name = 'name'
+            fields[2].name = 'description'
+            fields[3].name = 'environment'
+            fields[4].name = 'modified date'
+
+        and: 'All CSV field are Type of Field.Type.STRING'
+            fields[0].type == Field.Type.STRING
+            fields[1].type == Field.Type.STRING
+            fields[2].type == Field.Type.STRING
+            fields[3].type == Field.Type.STRING
+            fields[4].type == Field.Type.STRING
 
         and: 'First row results contains fields values'
-            csvFile.rows()[0].id == "114054"
-            csvFile.rows()[0].name == "BlackBerry Enterprise Server"
-            csvFile.rows()[0].description == "Email sync to Blackberry handhelds"
-            csvFile.rows()[0].environment == "Production"
+            dataset.rows()[0].id == "114054"
+            dataset.rows()[0].name == "BlackBerry Enterprise Server"
+            dataset.rows()[0].description == "Email sync to Blackberry handhelds"
+            dataset.rows()[0].environment == "Production"
     }
 
     void 'test can read a csv and iterate fields' () {
