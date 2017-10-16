@@ -5,6 +5,7 @@ import getl.csv.CSVDataset
 import getl.data.Field
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
+import getl.exception.ExceptionGETL
 import spock.lang.Specification
 
 
@@ -20,13 +21,14 @@ class GETLReaderSpec extends Specification {
             CSVConnection files = new CSVConnection(config: "csv", path: pathName)
 
         then: 'It can read all files'
-            files.retrieveObjects().size() == 3
+            files.retrieveObjects().size() == 4
             files.retrieveObjects()[0].name == "applications.csv"
             files.retrieveObjects()[1].name == "applications.xlsx"
             files.retrieveObjects()[2].name == "applications.xml"
+            files.retrieveObjects()[3].name == "service_now_applications.csv"
 
         and: 'It can read all CSV files'
-            files.retrieveObjects(mask: "(?i).*[.]CSV").size() == 1
+            files.retrieveObjects(mask: "(?i).*[.]CSV").size() == 2
 
         and: 'It can read all Excel files'
             files.retrieveObjects(mask: "(?i).*[.]xlsx").size() == 1
@@ -63,7 +65,7 @@ class GETLReaderSpec extends Specification {
             csvFile.readRowCount() == 3
 
         and: 'First row results contains fields values'
-            csvFile.rows()[0].id == 114054
+            csvFile.rows()[0].id == "114054"
             csvFile.rows()[0].name == "BlackBerry Enterprise Server"
             csvFile.rows()[0].description == "Email sync to Blackberry handhelds"
             csvFile.rows()[0].environment == "Production"
@@ -89,11 +91,11 @@ class GETLReaderSpec extends Specification {
             fields.size() == 5
 
         and: 'It can detect and define automatically CSV Field Names'
-            fields[0].name = 'id'
-            fields[1].name = 'name'
-            fields[2].name = 'description'
-            fields[3].name = 'environment'
-            fields[4].name = 'modified date'
+            fields[0].name == 'id'
+            fields[1].name == 'name'
+            fields[2].name == 'description'
+            fields[3].name == 'environment'
+            fields[4].name == 'modified date'
 
         and: 'All CSV field are Type of Field.Type.STRING'
             fields[0].type == Field.Type.STRING
@@ -103,10 +105,59 @@ class GETLReaderSpec extends Specification {
             fields[4].type == Field.Type.STRING
 
         and: 'First row results contains fields values'
-            dataset.rows()[0].id == "114054"
-            dataset.rows()[0].name == "BlackBerry Enterprise Server"
-            dataset.rows()[0].description == "Email sync to Blackberry handhelds"
-            dataset.rows()[0].environment == "Production"
+            Map row = dataset.rows()[0]
+            row.id == "114054"
+            row.name == "BlackBerry Enterprise Server"
+            row.description == "Email sync to Blackberry handhelds"
+            row.environment == "Production"
+            row.'modified date' == "08/31/2015 05:15 PM"
+    }
+
+    void 'test can read a csv file extracted from Service Now and read fields automatically' () {
+
+        given:
+            String fileName = "service_now_applications.csv"
+            String pathName = "test/unit/com/tdsops/etl/resources"
+
+        and:
+            CSVConnection connection = new CSVConnection(config: "csv", path: pathName)
+
+        when: 'CSVDataset can read column names without fields definition'
+            CSVDataset dataset = new CSVDataset(connection: connection, fileName: fileName, header: true)
+
+        then: 'It can read total amount of rows'
+            dataset.readLinesCount() == 15
+
+        and: 'It can detect automatically the amount of CSV fields'
+            List<Field> fields = dataset.connection.driver.fields(dataset)
+            fields.size() == 12
+
+        and: 'It can detect and define automatically CSV Field Names'
+            fields[0].name == 'name'
+            fields[1].name == 'short_description'
+            fields[2].name == 'used_for'
+            fields[3].name == 'sys_id'
+            fields[4].name == 'sys_updated_on'
+            fields[5].name == 'vendor'
+            fields[6].name == 'sys_class_name'
+            fields[7].name == 'department'
+            fields[8].name == 'supported_by'
+            fields[9].name == 'owned_by'
+            fields[10].name == 'warranty_expiration'
+            fields[11].name == 'fqdn'
+
+        and: 'All CSV field are Type of Field.Type.STRING'
+            fields*.type.toSet() == [Field.Type.STRING].toSet()
+
+        and: 'First row results contains fields values'
+            Map row = dataset.rows()[0]
+            row.name == "apache linux den 200"
+            row.short_description == null
+            row.used_for == null
+            row.sys_id == "5f8af237c0a8010e01a932999468b83a"
+            row.sys_updated_on == "2006-07-11 14:42:56"
+            row.vendor == null
+            row.sys_class_name == "Web Server"
     }
 
     void 'test can read a csv and iterate fields' () {
@@ -159,7 +210,7 @@ class GETLReaderSpec extends Specification {
             excelDataset.rows().size() == 3
     }
 
-    void 'test can read an excel file without defining fields' () {
+    void 'test cannot read an excel file without defining fields' () {
 
         given:
             String fileName = "applications.xlsx"
@@ -169,13 +220,16 @@ class GETLReaderSpec extends Specification {
             ExcelConnection excelConnection = new ExcelConnection(path: pathName, fileName: fileName)
 
         when:
-            ExcelDataset excelDataset = new ExcelDataset(
+            new ExcelDataset(
                     connection: excelConnection,
                     listName: "applications",
-                    showWarnings: true)
+                    showWarnings: true,
+                    header: true)
+                    .rows()
 
-        then: 'It can read rows count'
-            excelDataset.rows().size() == 3
+        then: 'It throws a ExceptionGETL'
+            ExceptionGETL e = thrown ExceptionGETL
+            e.message == "Required fields description with dataset"
     }
 
 }
