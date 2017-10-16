@@ -252,12 +252,14 @@ class ProjectServiceTests extends IntegrationSpec {
 		when: 'a new project is created directly'
 			Project p = projectHelper.createProject()
 		then: 'there should be no Asset Field Settings for the project'
-			0 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
-
-		when: 'the cloneDefaultSettings method is called for the new project'
-			projectService.cloneDefaultSettings(p)
-		then: 'the project should have 4 Asset Field Settings'
 			4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+
+		// The new project service for creating a project now prepopulates the project from the default so this test
+		// no longer makes sense.
+		//when: 'the cloneDefaultSettings method is called for the new project'
+		//	projectService.cloneDefaultSettings(p)
+		//then: 'the project should have 4 Asset Field Settings'
+		//	4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
 
 		when: 'the cloneDefaultSettings method is called a second time'
 			projectService.cloneDefaultSettings(p)
@@ -283,54 +285,48 @@ class ProjectServiceTests extends IntegrationSpec {
 
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
         when: 'creating a new person'
-        Person userPerson = personHelper.createStaff(project.owner)
-        projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
-        UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
-        securityService.assumeUserIdentity(userLogin.username, false)
+			Person userPerson = personHelper.createStaff(project.owner)
+			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
+			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+			securityService.assumeUserIdentity(userLogin.username, false)
         then: 'a person should have been created'
-        userPerson
+	        userPerson
         and: 'a user login should have been created'
-        userLogin
+    	    userLogin
         then: 'the person does not access to the default project because he is not an admin'
-        !securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
+        	!securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
         and: 'filting for ANY status should return one project.'
-        1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
+        	1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
         and: 'filting for ACTIVE status should return one project.'
-        1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
+        	1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
         and: 'filting for COMPLETED status should return zero projects'
-        0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
+        	0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
     }
 
 	void "13. Validate that deleting Project deletes the new Provider"() {
-		setup:
-		ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-		providerTestHelper.createProvider(project)
+		setup: 'create a Project with a Provider'
+			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+			providerTestHelper.createProvider(project)
 
-		when: 'project is deleted'
-		projectService.deleteProject(project.id, true)
+		when: 'the project is deleted'
+			projectService.deleteProject(project.id, true)
 
-		and: 'finding all providers by project'
-		def providers = Provider.findAllByProject(project)
-
-		then: 'list of providers by deleted project should be empty'
-		[] == providers
+		then: 'querying providers for the project should find none'
+			[] == Provider.findAllByProject(project)
 	}
 
-	void "14. Validate that deleting Project deletes the new Datasource"() {
-		setup:
-		ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-		DatasourceTestHelper datasourceTestHelper = new DatasourceTestHelper()
-		Provider provider = providerTestHelper.createProvider(project)
-		datasourceTestHelper.createDatasource(project, provider, adminPerson)
+	void "14. Validate that deleting Project deletes the new DataScript"() {
+		setup: 'create a project with Provider and DataScript objects'
+			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+			DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+			Provider provider = providerTestHelper.createProvider(project)
+			dataScriptTestHelper.createDataScript(project, provider, adminPerson)
 
-		when: 'project is deleted'
-		projectService.deleteProject(project.id, true)
+		when: 'the project is deleted'
+			projectService.deleteProject(project.id, true)
 
-		and: 'find all datasources by project'
-		def datasources = Datasource.findAllByProject(project)
-
-		then: 'list of datasources by deleted project should be empty'
-		[] == datasources
+		then: 'querying DataScripts for the project should find none'
+			[] == DataScript.findAllByProject(project)
 	}
 
 }

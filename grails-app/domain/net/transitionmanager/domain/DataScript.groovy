@@ -21,13 +21,13 @@ enum IngestionOperation {
     }
 }
 
-enum DatasourceMode {
+enum DataScriptMode {
     IMPORT('Import'),
     EXPORT('Export')
 
     final String label
 
-    DatasourceMode(String label) {
+    DataScriptMode(String label) {
         this.label = label
     }
 
@@ -40,7 +40,7 @@ enum DatasourceMode {
     }
 }
 
-class Datasource {
+class DataScript {
 
     String name
 
@@ -50,7 +50,7 @@ class Datasource {
     // principle domain or list of domains involved in the ETL.
     String target
 
-    DatasourceMode mode
+    DataScriptMode mode
 
     // The etl will contain the source code which will be compiled and executed. Eventually the
     // source code will be broken out and revisioned like how it is done in Recipes.
@@ -73,7 +73,7 @@ class Datasource {
     }
 
     static mapping = {
-        id column: 'datasource_id'
+        id column: 'data_script_id'
         name 			sqlType: 'VARCHAR(255)'
         description 		sqlType: 'VARCHAR(255)'
         target			sqlType: 'VARCHAR(255)'
