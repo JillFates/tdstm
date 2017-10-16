@@ -9,7 +9,7 @@
 	</div>
 	<div class="modal-body">
 		<div>
-			<table style="border:0;width:1000px;" class="assetEntity" data-id="${assetEntity?.id}">
+			<table style="border:0;" class="assetEntity" data-id="${assetEntity?.id}">
 				<tr>
 					<td colspan="2">
 						<div class="dialog">

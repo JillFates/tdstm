@@ -68,7 +68,7 @@
 			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.retireDate.imp}">
 			<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
-				${applicationInstance?.retireDate}
+				{{'${applicationInstance?.retireDate}' | date:'dd/MM/yy' }}
 			</tds:tooltipSpan>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
@@ -80,7 +80,7 @@
 			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
 			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp}">
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-				${applicationInstance?.maintExpDate}
+				{{'${applicationInstance?.maintExpDate}' | date:'dd/MM/yy' }}
 			</tdsAngular:tooltipSpan>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
