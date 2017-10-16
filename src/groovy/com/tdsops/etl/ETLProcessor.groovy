@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tds.asset.AssetEntity
+
 /**
  *
  *
@@ -269,6 +272,15 @@ class ETLProcessor {
     }
     /**
      *
+     *
+     * @param method
+     * @return
+     */
+    def reference (String... fields) {
+        new ETLReferenceElement(this, fields as List)
+    }
+    /**
+     *
      * It looks up the field Spec for Domain by fieldName
      *
      * @param domain
@@ -312,7 +324,12 @@ class ETLProcessor {
         currentRowResult[selectedDomain].add([
                 originalValue: element.originalValue,
                 value        : element.value,
-                field        : element.field
+                field        : [
+                        name       : element.field.name,
+                        control    : element.field.control,
+                        label      : element.field.label,
+                        constraints: element.field.constraints
+                ]
         ])
 
         debugConsole.info "Adding element ${element} in results for domain ${domain}"
@@ -357,6 +374,7 @@ class ETLProcessor {
 
         List<Element> elements
         Integer index
+        AssetEntity instance
 
         Row () {
             elements = []
@@ -418,7 +436,7 @@ class ETLProcessor {
          * @param transformationName
          * @return
          */
-        Element transform (String transformationName) {
+        def transform (String transformationName) {
             ETLTransformation transformation = lookupTransformation(transformationName)
             transformation.apply(this)
             processor.debugConsole.info "Applying transformation on element: $this"
