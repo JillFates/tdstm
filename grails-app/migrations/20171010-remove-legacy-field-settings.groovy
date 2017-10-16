@@ -18,7 +18,7 @@ databaseChangeLog = {
 		sql(" DELETE FROM key_value WHERE category LIKE 'tt_%' ")
 	}
 
-	changeSet(author: "dontiveros", id: "20171010 TM-6622 drop project custom columns.") {
+	changeSet(author: "dontiveros", id: "20171010 TM-6622-v2 drop project custom columns") {
 		comment('Drop custom# columns from table Project')
 
 		grailsChange {
@@ -36,15 +36,20 @@ databaseChangeLog = {
  * @param sql
  */
 void dropCustomColumns(sql) {
-	def existingCustomColumns = sql.rows("""
-						SELECT column_name
-						FROM information_schema.columns
+	def result = sql.rows("""
+						SELECT count(column_name) > 0 as customColumnExists
+						FROM information_schema.columns 
 						WHERE table_name = 'project' 
-						AND column_name LIKE 'custom%'
-						AND column_name NOT IN ('custom_fields_shown')
+						AND column_name LIKE 'custom1' 					 
 					""")
 
-	existingCustomColumns.each {
-		sql.execute(' ALTER TABLE project DROP COLUMN '+it.column_name)
+	def totalCustomColumns = 96
+	if (result.customColumnExists[0] == 1) {
+		def dropStatements = ''
+		1.upto(totalCustomColumns, {
+			def number = it
+			dropStatements <<= " DROP COLUMN custom${number}${number == totalCustomColumns ? '' : ', '} "
+		})
+		sql.execute(' ALTER TABLE project '+dropStatements)
 	}
 }
