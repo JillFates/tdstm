@@ -51,4 +51,7 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unknown console command option: $status".toString())
     }
 
+    static ETLProcessorException nonUniqueResults (List<String> fields) {
+        new ETLProcessorException("The match was non-unique for fields ${fields}".toString())
+    }
 }
