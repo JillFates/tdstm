@@ -22,7 +22,7 @@ class ETLReferenceElement {
         if (assets.size() == 1) {
             processor.currentRow.instance = assets.first()
         } else if (assets.size() > 1) {
-            ETLProcessorException.methodMissing(fields)
+            throw ETLProcessorException.nonUniqueResults(fields)
         }
         this
     }
