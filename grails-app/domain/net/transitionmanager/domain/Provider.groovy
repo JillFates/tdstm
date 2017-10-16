@@ -11,8 +11,8 @@ class Provider {
     static belongsTo = [ project: Project ]
 
     static hasMany = [
-            datasources: Datasource,
-            credentials: Credential
+        datascripts: DataScript,
+        credentials: Credential
     ]
 
     static constraints = {

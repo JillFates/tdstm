@@ -113,6 +113,7 @@ class Person extends Party {
 		[domain: AssetDependency, 	onDelete: 'null',   properties: ['createdBy','updatedBy'] ],
 		[domain: AssetEntity, 		onDelete: 'null',   properties: ['appOwner', 'modifiedBy'] ],
 		[domain: CommentNote, 		onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: DataScript,        onDelete: 'null',   properties: ['createdBy', 'lastModifiedBy'] ],
 		[domain: Dataview, 			onDelete: 'null',   properties: ['person'] ],
 		[domain: EmailDispatch, 	onDelete: 'delete', properties: ['toPerson'] ],
 		[domain: EmailDispatch, 	onDelete: 'null',   properties: ['createdBy'] ],
