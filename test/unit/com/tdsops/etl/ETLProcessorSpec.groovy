@@ -1833,4 +1833,137 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.results.get(ETLDomain.Device)[1][0].field.name == "id"
     }
 
+    void 'test can reference a domain Property Name with loaded Data Value' () {
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
+            ]
+
+        and:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "appVendor",
+                     "imp"      : "N",
+                     "label"    : "Vendor",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "environment",
+                     "imp"      : "N",
+                     "label"    : "Environment",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ])
+            validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "location",
+                     "imp"      : "N",
+                     "label"    : "Location",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ])
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
+            ])
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        read labels
+                        iterate {
+                            domain Application
+                            reference id, appVendor with id, appVendor
+                        }
+                        """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain Application domain results associated'
+            etlProcessor.results.get(ETLDomain.Application)[0][0].originalValue == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "environment"
+
+            etlProcessor.results.get(ETLDomain.Application)[1][0].originalValue == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[1][0].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[1][0].field.name == "environment"
+
+            etlProcessor.results.get(ETLDomain.Application)[0][1].originalValue == "152254"
+            etlProcessor.results.get(ETLDomain.Application)[0][1].value == "152254"
+            etlProcessor.results.get(ETLDomain.Application)[0][1].field.name == "id"
+
+            etlProcessor.results.get(ETLDomain.Application)[1][1].originalValue == "152255"
+            etlProcessor.results.get(ETLDomain.Application)[1][1].value == "152255"
+            etlProcessor.results.get(ETLDomain.Application)[1][1].field.name == "id"
+
+        and: 'Results should contain Device domain results associated'
+            etlProcessor.results.get(ETLDomain.Device)[0][1].originalValue == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[0][1].value == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[0][1].field.name == "location"
+
+            etlProcessor.results.get(ETLDomain.Device)[1][1].originalValue == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[1][1].value == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[1][1].field.name == "location"
+
+            etlProcessor.results.get(ETLDomain.Device)[0][0].originalValue == "152254"
+            etlProcessor.results.get(ETLDomain.Device)[0][0].value == "152254"
+            etlProcessor.results.get(ETLDomain.Device)[0][0].field.name == "id"
+
+            etlProcessor.results.get(ETLDomain.Device)[1][0].originalValue == "152255"
+            etlProcessor.results.get(ETLDomain.Device)[1][0].value == "152255"
+            etlProcessor.results.get(ETLDomain.Device)[1][0].field.name == "id"
+    }
+
 }
