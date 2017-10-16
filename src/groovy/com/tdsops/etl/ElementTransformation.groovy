@@ -1,5 +1,5 @@
 package com.tdsops.etl
 
-class ElementTransformation implements ETLTransformation {
+class ElementTransformation extends ETLTransformation {
 
 }
