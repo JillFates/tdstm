@@ -7,16 +7,16 @@ package com.tdsops.etl
  * It can modifies element value, for example, with an uppercase/lowercase string function
  *
  */
-trait ETLTransformation {
+abstract class ETLTransformation {
 
-    Closure<ETLProcessor.Element> closure
+    Closure<Element> closure
     /**
      *
      * Applies a transformation on an Element modifying its current value
      *
      * @param element and ETL Processor element to be modified
      */
-    void apply (ETLProcessor.Element element) {
+    void apply (Element element) {
         closure(element)
         //TODO: Diego. Add every transformation to a list of applied transformation over an element
     }

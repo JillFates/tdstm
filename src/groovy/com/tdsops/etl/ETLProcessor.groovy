@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import com.tds.asset.AssetEntity
-
 /**
  *
  *
@@ -17,10 +14,10 @@ class ETLProcessor {
 
     DebugConsole debugConsole
 
-    List<ETLProcessor.Column> columns = []
-    Map<String, ETLProcessor.Column> columnsMap = [:]
-    List<ETLProcessor.Row> rows = []
-    ETLProcessor.Row currentRow
+    List<Column> columns = []
+    Map<String, Column> columnsMap = [:]
+    List<Row> rows = []
+    Row currentRow
 
     ETLDomain selectedDomain
     Map<ETLDomain, List<List<Map<String, ?>>>> results = [:]
@@ -148,7 +145,7 @@ class ETLProcessor {
             debugConsole.info "Reading labels"
 
             dataSource.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
-                ETLProcessor.Column column = new ETLProcessor.Column(label: columnName, index: index)
+                Column column = new Column(label: columnName, index: index)
                 columns.add(column)
                 columnsMap[column.label] = column
             }
@@ -181,10 +178,16 @@ class ETLProcessor {
         currentRowIndex--
         this
     }
-
+    /**
+     *
+     * Sets Status console to on/off for allow/disallow log messages.
+     *
+     * @param status
+     * @return
+     */
     ETLProcessor console (String status) {
 
-        ConsoleStatus consoleStatus = ConsoleStatus.values().find { it.name() == status }
+        DebugConsole.ConsoleStatus consoleStatus = DebugConsole.ConsoleStatus.values().find { it.name() == status }
 
         if (consoleStatus == null) {
             throw ETLProcessorException.invalidConsoleStatus(status)
@@ -315,7 +318,7 @@ class ETLProcessor {
      * Add a loaded element with the current domain in results
      *
      */
-    void addLoadedElement (ETLDomain domain, ETLProcessor.Element element) {
+    void addLoadedElement (ETLDomain domain, Element element) {
 
         if (!currentRowResult.containsKey(selectedDomain)) {
             currentRowResult[selectedDomain] = []
@@ -344,11 +347,11 @@ class ETLProcessor {
         selectedDomain
     }
 
-    ETLProcessor.Column column (String columnName) {
+    Column column (String columnName) {
         columnsMap[columnName]
     }
 
-    ETLProcessor.Column column (Integer columnName) {
+    Column column (Integer columnName) {
         columns[columnName]
     }
 
@@ -356,170 +359,11 @@ class ETLProcessor {
         columnsMap.keySet()
     }
 
-    ETLProcessor.Row getCurrentRow () {
+    Row getCurrentRow () {
         currentRow
     }
 
-    ETLProcessor.Row getRow (Integer index) {
+    Row getRow (Integer index) {
         rows[index]
-    }
-
-    static class Column {
-
-        String label
-        Integer index
-    }
-
-    static class Row {
-
-        List<Element> elements
-        Integer index
-        AssetEntity instance
-
-        Row () {
-            elements = []
-        }
-
-        Row (Integer index, List<String> values, ETLProcessor processor) {
-            this.index = index
-            this.elements = values.withIndex().collect { String value, int i ->
-                new Element(
-                        originalValue: value,
-                        value: value,
-                        rowIndex: index,
-                        columnIndex: i,
-                        processor: processor)
-            }
-        }
-
-        Element addNewElement (String value, ETLProcessor processor) {
-            Element newElement = new Element(originalValue: value,
-                    value: value,
-                    rowIndex: index,
-                    columnIndex: elements.size(),
-                    processor: processor)
-            elements.add(newElement)
-            newElement
-        }
-
-        Element getElement (Integer index) {
-            elements[index]
-        }
-
-        int size () {
-            elements.size()
-        }
-    }
-
-    static class Element {
-
-        String originalValue
-        String value
-        Integer rowIndex
-        Integer columnIndex
-        ETLDomain domain
-        ETLProcessor processor
-
-        Field field = new Field()
-        /**
-         *
-         *
-         * @param transformationName
-         * @return
-         */
-        Element and (String transformationName) {
-            transform(transformationName)
-        }
-        /**
-         *
-         *
-         * @param transformationName
-         * @return
-         */
-        def transform (String transformationName) {
-            ETLTransformation transformation = lookupTransformation(transformationName)
-            transformation.apply(this)
-            processor.debugConsole.info "Applying transformation on element: $this"
-            this
-        }
-        /**
-         *
-         *
-         * @param actions
-         * @return
-         */
-        Element translate (Map actions) {
-            if (actions.containsKey('with')) {
-                translateWith(actions.get('with'))
-            }
-            this
-        }
-        /**
-         *
-         *
-         * @param field
-         * @return
-         */
-        Element load (String fieldName) {
-
-            //TODO: Diego. Review this interaction
-            Map<String, ?> fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-
-            if (fieldSpec) {
-                field.name = fieldName
-                domain = processor.selectedDomain
-
-                field.label = fieldSpec.label
-                field.control = fieldSpec.control
-                field.constraints = fieldSpec.constraints
-            }
-            processor.addLoadedElement(processor.selectedDomain, this)
-            this
-        }
-        /**
-         *
-         *
-         *
-         * @param methodName
-         * @param args
-         */
-        //TODO: Review it. "methodMissing" implementations are not supported on static inner classes as a synthetic version of "methodMissing" is added during compilation for the purpose of outer class delegation.
-//        def methodMissing (String methodName, args) {
-//            processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
-//            throw ETLProcessorException.methodMissing(methodName, args)
-//        }
-
-        /** Private Methods. Non public API for ETL processor */
-
-        private ETLTransformation lookupTransformation (String name) {
-            if (processor.transformations
-                    && processor.transformations.containsKey(name)) {
-                processor.transformations[name]
-            } else {
-                processor.debugConsole.error "Unknown transformation: $name"
-                throw ETLProcessorException.unknownTransformation(name)
-            }
-        }
-
-        private Element translateWith (Map dictionary) {
-
-            if (dictionary.containsKey(value)) {
-                String oldValue = value
-                value = dictionary[value]
-
-                processor.debugConsole.info "Translate $oldValue -> ${value}"
-            } else {
-                processor.debugConsole.warn "Could not translate ${value}"
-            }
-            this
-        }
-    }
-
-    static class Field {
-
-        String name = ""
-        String control
-        String label
-        Map constraints
     }
 }
