@@ -276,25 +276,6 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Update default importance map for missing fields by assigning normal to all
-	 * TM-6617
-	 */
-	@Deprecated
-	def updateConfigForMissingFields(parseData, String type) {
-		throw new RuntimeException('updateConfigForMissingFields is no longer used')
-		List<EavAttribute> projectAttributes = getAttributes(type)
-		def fields = getFields(type, projectAttributes) + getCustoms(projectAttributes)
-		Set<String> phases = ValidationType.listAsMap.keySet()
-		fields.each { f ->
-			if (!parseData[f.label]) {
-				Map pmap = phases.inject([:]) { Map map, String item -> map[item] = "N"; map }
-				parseData[f.label] = [phase: pmap]
-			}
-		}
-		return parseData
-	}
-
-	/**
 	 * Get attributes from eavAttribute based on EntityType.
 	 * TM-6617
 	 */
