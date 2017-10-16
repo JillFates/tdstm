@@ -1,3 +1,4 @@
+import groovy.json.JsonOutput
 import org.apache.commons.lang.StringEscapeUtils
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -178,11 +179,11 @@ class ControlAngularTagLib {
 
 		switch (fieldSpec.control) {
 			case ControlType.LIST.toString():
-				out << renderSelectListInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderSelectListInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case ControlType.YES_NO.toString():
-				out << renderYesNoInput(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
 			case ControlType.STRING.toString():
@@ -219,21 +220,24 @@ class ControlAngularTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the SELECT Component HTML
 	 */
-	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = fieldSpec.constraints?.values
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
+		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
+		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append('>')
+
+		List<Object> stringList = new ArrayList<Object>();
 
 		// Add a Select... option at top if the field is required
 		// <option value="" selected>Select...</option>
 		boolean isRequiredField = fieldSpec.constraints?.required
 		if (isRequiredField) {
-			sb.append(selectOption('', value, SELECT_REQUIRED_PROMPT))
+			stringList.add(selectOption('', value, SELECT_REQUIRED_PROMPT))
 		} else {
 			// Add a blank option so users can unset a value
-			sb.append(selectOption('', value))
+			stringList.add(selectOption('', value))
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -245,17 +249,21 @@ class ControlAngularTagLib {
 		boolean isBlankValue = StringUtil.isBlank(value);
 		if (( ! isBlankValue && ! options.contains(value)) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
-			sb.append(selectOption(value, value, warning))
+			stringList.add(selectOption(value, value, warning))
 		}
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {
 		    if( ! StringUtil.isBlank(option) ) {
-		        sb.append(selectOption(option, value))
+				stringList.add(selectOption(option, value))
 		    }
 		}
 
-		sb.append('</select>')
+		sb.append(" [data]=' " + JsonOutput.toJson(stringList) + "' ")
+
+		sb.append('>')
+
+		sb.append('</kendo-dropdownlist>')
 
 		sb.toString()
 	}
@@ -281,22 +289,25 @@ class ControlAngularTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderYesNoInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
+	private String renderYesNoInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = []
 		List valid = ['Yes', 'No']
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
 		sb.append(' style="width: 80px;"')
-		sb.append('>')
+		sb.append(' [(ngModel)]="'+ ngmodel +'" ')
+		sb.append(' [textField]="\'text\'" [valueField]="\'value\'" ')
+
+		List<Object> stringList = new ArrayList<Object>();
+
 
 		if (fieldSpec.constraints?.required) {
 			// Add a Select... option at top if the field is required
-			options << ['', SELECT_REQUIRED_PROMPT]
+			stringList.add([ 'value' : '', 'text': SELECT_REQUIRED_PROMPT])
 		} else {
 			// Put a blank entry in to allow the user to unset a field
-			options << ['', '']
-			valid << ''
+			stringList.add([ 'value' : '', 'text': ''])
 		}
 
 		// Check to see if there is some legacy value that doesn't match the select option values.
@@ -308,18 +319,22 @@ class ControlAngularTagLib {
 		boolean isBlankValue = StringUtil.isBlank(value);
 		if ( ! isBlankValue && ! valid.contains(value) ) {
 			String warning = "$value ($MISSING_OPTION_WARNING)"
-			options << [value, warning]
+			stringList.add([ 'value' : value, 'text': warning ])
 		}
 
-		options << ['Yes', 'Yes']
-		options << ['No', 'No']
+		stringList.add([ 'value' : 'Yes', 'text': 'Yes' ])
+		stringList.add([ 'value' : 'No', 'text': 'No' ])
 
 		// Iterate over the fieldSpec option values to create each of the options
 		for (option in options) {
-			sb.append(selectOption(option[0], value, option[1]))
+			stringList.add(selectOption(option[0], value, option[1]))
 		}
 
-		sb.append('</select>')
+		sb.append(" [data]=' " + JsonOutput.toJson(stringList) + "' ")
+
+		sb.append('>')
+
+		sb.append('</kendo-dropdownlist>')
 
 		sb.toString()
 	}
@@ -570,24 +585,8 @@ class ControlAngularTagLib {
 		if (label==null) label = ''
 
 		boolean labelBlank = StringUtil.isBlank(label)
-		boolean selected = (value == option)
 
-		StringBuilder opt = new StringBuilder('<option')
-		opt.append(' value="')
-		opt.append(StringEscapeUtils.escapeHtml(option))
-		opt.append('"')
-
-		if (selected) {
-			opt.append(' selected')
-		}
-
-		opt.append('>')
-
-		opt.append(labelBlank ? option : label)
-
-		opt.append('</option>')
-
-		return opt.toString()
+		return [ 'value' : StringEscapeUtils.escapeHtml(option), 'text': labelBlank ? option : label]
 	}
 
 }
