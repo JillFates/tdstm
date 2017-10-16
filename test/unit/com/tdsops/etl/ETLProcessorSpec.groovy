@@ -494,7 +494,7 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(data, [
                     lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                    left     : new ElementTransformation(closure: { ETLProcessor.Element element ->
+                    left     : new ElementTransformation(closure: { Element element ->
                         [4: {
                             element.value = element.value[0..4]
                         }]
@@ -892,7 +892,7 @@ class ETLProcessorSpec extends Specification {
         and:
             ImportCustomizer customizer = new ImportCustomizer()
             customizer.addStaticStars Math.class.name
-            customizer.addStaticStars ConsoleStatus.class.name
+            customizer.addStaticStars DebugConsole.ConsoleStatus.class.name
 
         and:
             SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
