@@ -3,6 +3,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { PreferenceService } from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'asset-explorer-view-grid',
@@ -20,6 +21,7 @@ export class AssetExplorerViewGridComponent {
 	selectColumn: ViewColumn;
 	justPlanning = false;
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
+	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 
 	state: State = {
 		skip: 0,
@@ -27,6 +29,10 @@ export class AssetExplorerViewGridComponent {
 		sort: []
 	};
 	gridData: GridDataResult;
+
+	constructor(private userPref: PreferenceService) {
+		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+	}
 
 	onMouseUp(): void {
 		this.mouseDown = false;
@@ -49,15 +55,24 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clearText(column: ViewColumn): void {
-		column.filter = '';
-		this.onReload();
+		if (column.filter) {
+			column.filter = '';
+			this.state.skip = 0;
+			this.onReload();
+		}
 	}
 
 	onReload(): void {
 		this.modelChange.emit();
 	}
 
+	onFilter(): void {
+		this.state.skip = 0;
+		this.onReload();
+	}
+
 	apply(data: any): void {
+		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
@@ -65,10 +80,11 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	clear(): void {
+		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
 		this.state = {
 			skip: 0,
-			take: 25,
+			take: this.state.take,
 			sort: []
 		};
 	}

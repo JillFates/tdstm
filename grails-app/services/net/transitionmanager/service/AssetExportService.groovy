@@ -297,12 +297,15 @@ class AssetExportService {
 
             profiler.lap(mainProfTag, 'Loaded DTAMaps')
 
-            String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
-            List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
-            Map assetDepBundleMap = new HashMap(assetDepBundleList.size())
-            assetDepBundleList.each {
-                assetDepBundleMap.put(it[0].toString(), it[1])
+            List assetDepBundleList = AssetDependencyBundle.executeQuery(
+                'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project',
+                [project:project]
+            )
+
+            Map<Long, Integer> assetDepBundleMap = assetDepBundleList.collectEntries {
+                [(it[0]): it[1]]
             }
+
             profiler.lap(mainProfTag, 'Created asset dep bundles')
 
             // Prevent! Zip bomb
@@ -591,10 +594,7 @@ class AssetExportService {
                                 break
 
                             case 'DepGroup':
-                                def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
-                                if (depGroupId != null) {
-									colVal = depGroupId
-                                }
+								colVal = assetDepBundleMap[currentAsset.id]
                                 break
 
                             case ~/usize|SourcePos|TargetPos/:
@@ -626,8 +626,7 @@ class AssetExportService {
                                 break
 
                             default:
-                                def value = currentAsset[field]
-                                colVal = value ?: ""
+								colVal = currentAsset[field]
                         }
 
 						WorkbookUtil.addCellAndStyle(row, colNum, colVal, serverStyles)
@@ -758,7 +757,7 @@ class AssetExportService {
                                 break
                             case 'DepGroup':
                                 // Find the Dependency Group that this app is bound to
-                                colVal = assetDepBundleMap[app.id.toString()]
+                                colVal = assetDepBundleMap[app.id]
                                 break
                             case ~/ShutdownBy|StartupBy|TestingBy/:
                                 colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
@@ -830,33 +829,27 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-						def colVal = ''
+						def colVal
 
-                        if (colName == "Id") {
-                            colVal = currentDatabase.id
-                        } else if (colName == "DepGroup") {
-                            String depGroupId = assetDepBundleMap[currentDatabase.id.toString()]
-                            if (depGroupId != null) {
-                                colVal = depGroupId
-                            }
-                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            colVal = currentDatabase[field]
-                            if (colVal) {
-                                if (field == 'lastUpdated') {
-                                    colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
-                                } else {
-                                    colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
-                                }
-                            } else {
-                                colVal = ""
-                            }
+						switch (colName) {
+							case 'Id':
+								colVal = currentDatabase.id
+								break
 
-                        } else {
-                            def prop = currentDatabase[field]
-                            if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                colVal = String.valueOf(currentDatabase[field])
-                            }
-                        }
+							case 'DepGroup':
+								colVal = assetDepBundleMap[currentDatabase.id]
+								break
+
+							default:
+								colVal = currentDatabase[field]
+								if (colVal && (field in ['retireDate', 'maintExpDate', 'lastUpdated'])) {
+									if (field == 'lastUpdated') {
+										colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
+									} else {
+										colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
+									}
+								}
+						}
 
 						WorkbookUtil.addCellAndStyle(row, colNum, colVal, dbStyles)
                     } // end columns loop
@@ -909,33 +902,27 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-						def colVal = ''
+						def colVal
 
-                        if (colName == "Id") {
-                            colVal = currentFile.id
-                        } else if (colName == "DepGroup") {
-                            String depGroupId = assetDepBundleMap[currentFile.id.toString()]
-                            if (depGroupId != null) {
-                                colVal = depGroupId
-                            }
-                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            colVal = currentFile[field]
-                            if (colVal) {
-                                if (field == 'lastUpdated') {
-                                    colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
-                                } else {
-                                    colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
-                                }
-                            } else {
-                                colVal = ""
-                            }
+						switch (colName) {
+							case 'Id':
+								colVal = currentFile.id
+								break
 
-                        } else {
-                            def prop = currentFile[field]
-                            if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                colVal = String.valueOf(prop)
-                            }
-                        }
+							case 'DepGroup':
+								colVal = assetDepBundleMap[currentFile.id]
+								break
+
+							default:
+								colVal = currentFile[field]
+								if (colVal && (field in ['retireDate', 'maintExpDate', 'lastUpdated'])) {
+									if (field == 'lastUpdated') {
+										colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
+									} else {
+										colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
+									}
+								}
+						}
 
 						WorkbookUtil.addCellAndStyle(row, colNum, colVal, storageStyles)
 

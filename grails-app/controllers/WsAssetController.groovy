@@ -100,7 +100,6 @@ class WsAssetController implements ControllerMethods {
 		if(!name){
 			errors << "The new asset name is missing"
 		}
-
 		if(dependencies &&
 				!securityService.hasPermission(Permission.AssetCloneDependencies)
 		){
@@ -109,56 +108,12 @@ class WsAssetController implements ControllerMethods {
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
-
-		AssetEntity clonedAsset
-		if(!errors) {
-			AssetEntity assetToClone = AssetEntity.get(assetId)
-			if(!assetToClone) {
-				errors << "The asset specified to clone was not found"
-
-			}else{
-				//check that the asset is part of the project
-				if(!securityService.isCurrentProjectId(assetToClone.projectId)){
-					log.error(
-							"Security Violation, user {} attempted to access an asset not associated to the project",
-							securityService.getCurrentUsername()
-					)
-					errors << "Asset not found in current project"
-				}
-
-				if(!errors) {
-					clonedAsset = assetToClone.clone([
-							assetName : name,
-							validation: ValidationType.DIS
-					])
-
-					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && dependencies) {
-						for (dependency in assetToClone.supportedDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									dependent: clonedAsset,
-									status   : AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-						for (dependency in assetToClone.requiredDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									asset : clonedAsset,
-									status: AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-					}
-				}
-			}
-		}
-
+		// cloning asset
+		Long clonedAssetId = assetEntityService.clone(assetId, name, dependencies, errors)
 		if(errors){
 			renderFailureJson(errors)
 		}else{
-			renderSuccessJson([assetId : clonedAsset.id])
+			renderSuccessJson([assetId : clonedAssetId])
 		}
 	}
 
@@ -221,14 +176,16 @@ class WsAssetController implements ControllerMethods {
 					"bundle": assetA.moveBundleName,
 					"planStatus": assetA.planStatus,
 					"dependency": dependencyA,
+					"dependencyClass": dependencyA?.dependent?.assetClass
 			],
 			"assetB" : [
 					"name": assetB.assetName,
-					"assetClass":  assetBClassLabel.value,
+					"assetClass": assetBClassLabel.value,
 					"environment": assetB.environment,
 					"bundle": assetB.moveBundleName,
 					"planStatus": assetB.planStatus,
 					"dependency": dependencyB,
+					"dependencyClass": dependencyB?.dependent?.assetClass
 			],
 			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
 			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,

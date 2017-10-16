@@ -14,7 +14,12 @@ export const en_DICTIONARY: Object = {
 	'ASSET_EXPLORER': {
 		'ASSET_EXPLORER': 'Asset Explorer',
 		'CREATE': 'Create View',
-		'EDIT': 'Edit View'
+		'EDIT': 'Edit View',
+		'GRID': {
+			'NO_RECORDS': 'No records available.',
+			'SCHEMA_CHANGE': 'New results, click Preview button to see them.',
+			'INITIAL_VALUE': 'Hit Preview to populate grid.'
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',

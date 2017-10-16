@@ -7,6 +7,7 @@ import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
+import { ViewColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
@@ -175,7 +176,7 @@ export class AssetExplorerViewConfigComponent {
 			this.rowIndex = 0;
 		} else if (this.rowIndex >= 15) {
 			this.columnIndex += 1;
-			this.rowIndex = 0;
+			this.rowIndex = 1;
 		}
 		let result = {
 			'height': '25px',
@@ -297,7 +298,8 @@ export class AssetExplorerViewConfigComponent {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
 			domains: this.domains,
-			previewMode: true
+			previewMode: true,
+			searchExecuted: this.previewButtonClicked
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
@@ -362,6 +364,13 @@ export class AssetExplorerViewConfigComponent {
 		} else {
 			this.grid.gridData = null;
 		}
+	}
+
+	protected onLockedColumn(item: ViewColumn): void {
+		let itemIndex = this.model.schema.columns.findIndex(x => x.domain === item.domain && x.property === item.property);
+		this.model.schema.columns.splice(itemIndex, 1);
+		let lockeds = this.model.schema.columns.filter((x: ViewColumn) => x.locked).length;
+		this.model.schema.columns.splice(lockeds, 0, item);
 	}
 
 	/**

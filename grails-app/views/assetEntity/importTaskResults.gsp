@@ -49,7 +49,7 @@
 
 </head>
 <body>
-<div class="body task-import-review" style="float:initial;">
+<div class="body account-import-review" style="float:initial;">
 	<h1>Import Tasks - Posting Results</h1>
 	<g:if test="${flash.message}">
 		<div class="message">OK 3</div>

@@ -12,8 +12,8 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetType
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.eav.EavAttributeSet
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
@@ -56,7 +56,6 @@ class AssetTestHelper {
 			testingBy: pRef,
 			moveBundle: project.projectDefaultBundle
 		)
-		app.attributeSet = EavAttributeSet.get(2)
 		app.moveBundle = project.getDefaultBundle()
 
 		if (! app.save(flush:true) ) {
@@ -70,10 +69,19 @@ class AssetTestHelper {
 	/**
 	 * This method creates a random device using the deviceService.saveAssetFromForm
 	 * @param project: prroject to be assigned.
+	 * @param assetType: what kind of asset it should be as an Enum
+	 */
+	public AssetEntity createDevice(Project project, AssetType assetType, Map params = [:]) {
+	 	return createDevice(project, assetType.toString(), params)
+	}
+
+	/**
+	 * This method creates a random device using the deviceService.saveAssetFromForm
+	 * @param project: prroject to be assigned.
 	 * @param assetType: what kind of asset it should be. It has to be a String because
 	 *    not all the possible values have a corresponding keyword.
 	 */
-	 public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
+	public AssetEntity createDevice(Project project, String assetType, Map params = [:]) {
 		 /* Most the values in this map replicate what the front-end sends to the
 		 back-end when creating a device. */
 		 Map defaultValues = [

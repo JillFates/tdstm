@@ -16,14 +16,14 @@
 					<tbody>
 					<tr  class="prop">
 						<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}"/>
-						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">
+						<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
 							<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
 								${assetEntity.assetName}
 							</tds:tooltipSpan>
 						</td>
 						
 						<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}"/>
-						<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}">
+						<td colspan="3" class="${standardFieldSpecs.description.imp?:''}">
 							<tds:tooltipSpan field="${standardFieldSpecs.description}">
 								${assetEntity.description}
 							</tds:tooltipSpan>
@@ -164,16 +164,7 @@
 							<tds:convertDate date="${assetEntity?.retireDate}" />
 						</tds:tooltipSpan>
 						</td>
-						<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-							<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?: standardFieldSpecs.moveBundle.label}">
-								Bundle : Dep. Group
-							</label>
-						</td>
-						<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-							<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-								${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}
-							</tds:tooltipSpan>
-						</td>
+                        <tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${assetEntity.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber?:''}"/>
 
 						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
 							<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">

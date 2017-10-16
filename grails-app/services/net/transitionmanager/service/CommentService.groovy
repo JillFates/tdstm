@@ -407,11 +407,11 @@ class CommentService implements ServiceMethods {
 				boolean status = assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0
 
 				map = [
-						assetComment: assetComment,
+					assetComment: assetComment,
 					status: status,
-						cssClass: css,
-						statusCss: taskService.getCssClassForStatus(assetComment.status),
-						assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
+					cssClass: css,
+					statusCss: taskService.getCssClassForStatus(assetComment.status),
+					assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
 					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13)
 				]
 
@@ -448,11 +448,11 @@ class CommentService implements ServiceMethods {
 	 */
 	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
 		boolean shouldNotify = (
-				task.commentType == AssetCommentType.TASK &&
-						task.sendNotification &&
-						task.isPublished &&
-						(task.status == AssetCommentStatus.READY || task.status == AssetCommentStatus.STARTED) &&
-			task.assignedTo && task.assignedTo.id != triggeredByWhom.id
+			task.commentType == AssetCommentType.TASK
+			&& task.sendNotification
+			&& task.isPublished
+			&& task.status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+			&& task.assignedTo && task.assignedTo.id != triggeredByWhom.id
 		)
 
 		// Now refine if the task should be sent based on it being new or updated

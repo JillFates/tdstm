@@ -595,18 +595,21 @@ public class GormUtil {
 
 	/**
 	 * Used to clone a domain object to a new object subsituting key properties,
-	 * NOTE: the new object is NOT persisted in the Database
+	 * note that the new object is NOT persisted in the Database. The method will copy all properties excluding
+	 * any Collection properties and those in the replaceKeys parameter. The replaceKeys allows swapping out certain
+	 * properties with specified values instead of cloning from the origin domain.
 	 * @param originalDomain - the domain to clone properties from
 	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
 	 * @return the cloned object
 	 */
-	static Object domainClone(Object originalDomain,  Map replaceKeys = [:]) {
-		logger.debug("** Clonning: {} *****", originalDomain.getClass())
-		if (!isDomainClass(originalDomain.getClass())) {
-			throw new RuntimeException('a Grails domain object parameter is required')
+	static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
+		logger.debug("** Clonning: {} *****", originDomain.getClass())
+		if (!isDomainClass(originDomain.getClass())) {
+			throw new RuntimeException('A non-Grails Domain object was received')
 		}
 
-		Object newDomain = originalDomain.getClass().getConstructor().newInstance()
+		// Create a new domain object
+		Object newDomain = originDomain.getClass().getConstructor().newInstance()
 
 		// Assign the key values to the domain
 		replaceKeys.each { key, value ->
@@ -617,12 +620,19 @@ public class GormUtil {
 
 		// Get the list of persistent properties from the domain that are not the keys being overridden
 		List keys = replaceKeys.keySet() as List
-		List props = persistentProperties(originalDomain)
+		List props = persistentProperties(originDomain)
 
 		// Strip off the replacement keys from the list and then copy over the values to the new domain
 		props = props - keys
-		props.each { p ->
-			newDomain[p] = originalDomain[p]
+
+		// Iterate over all of the properties and assign to the new domain object
+		for (p in props) {
+			// Skip over properties that are of Collection type (TM-6879)
+			if (originDomain[p] instanceof Collection) {
+				continue
+			}
+
+			newDomain[p] = originDomain[p]
 		}
 
 		return newDomain

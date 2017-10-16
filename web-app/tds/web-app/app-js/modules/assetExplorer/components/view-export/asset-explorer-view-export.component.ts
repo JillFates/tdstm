@@ -19,13 +19,13 @@ export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
 	protected dataToExport: any[] = [];
+	private defaulLimitRows = 1000;
+	private defaultOffset = 0;
+	private allProperties = false;
 
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
 
-	constructor(
-		public assetExportModel: AssetExportModel,
-		public activeDialog: UIActiveDialogService,
-		private assetExpService: AssetExplorerService) {
+	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 
 		let configuredColumns = {...this.assetExportModel.assetQueryParams.filters.columns};
 
@@ -42,8 +42,6 @@ export class AssetExplorerViewExportComponent {
 
 			return definition;
 		});
-
-		this.getExportData();
 	}
 
 	/**
@@ -58,20 +56,28 @@ export class AssetExplorerViewExportComponent {
 	}
 
 	/**
-	 * Transform the Data information and remove
-	 * the dot in the field that cause empty values in Excel
+	 * Transform the Data information
 	 */
 	private getExportData(): void {
+
+		if (this.allProperties) {
+			this.assetExportModel.assetQueryParams.limit = this.defaulLimitRows;
+			this.assetExportModel.assetQueryParams.offset = this.defaultOffset;
+		}
+
 		if (this.assetExportModel.previewMode) {
-			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
-				.subscribe(result => {
-					this.dataToExport = result['assets'];
-				}, err => console.log(err));
+			if (this.assetExportModel.searchExecuted) {
+				this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
+					.subscribe(result => {
+						this.onExportDataResponse(result['assets']);
+					}, err => console.log(err));
+			} else {
+				this.onExportDataResponse([]);
+			}
 		} else {
-			this.assetExportModel.assetQueryParams.limit = this.assetExportModel.totalData;
 			this.assetExpService.query(this.assetExportModel.queryId, this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
-					this.dataToExport = result['assets'];
+					this.onExportDataResponse(result['assets']);
 				}, err => console.log(err));
 		}
 	}
@@ -81,9 +87,12 @@ export class AssetExplorerViewExportComponent {
 		return domainDefinition + separator + property;
 	}
 
-	protected createFile(): void {
-		this.excelexport.save();
-		this.activeDialog.close();
+	protected onExportDataResponse(results: any): void {
+		this.dataToExport = results;
+		setTimeout(() => {
+			this.excelexport.save();
+			this.activeDialog.close();
+		}, 500);
 	}
 
 	cancelCloseDialog(): void {
