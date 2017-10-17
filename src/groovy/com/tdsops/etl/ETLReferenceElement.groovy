@@ -20,7 +20,7 @@ class ETLReferenceElement {
         List assets = AssetClassQueryHelper.where(processor.selectedDomain, fields, values as List)
 
         if (assets.size() == 1) {
-            processor.currentRow.instance = assets.first()
+            processor.addAssetEntityReferenced(assets.first())
         } else if (assets.size() > 1) {
             throw ETLProcessorException.nonUniqueResults(fields)
         }

@@ -81,20 +81,26 @@
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
 
-
                     <g:each in="${com.tdsops.etl.ETLDomain.values()}" var="domain">
                         <g:set var="domainResults" value="${etlProcessor.results[domain]}"></g:set>
 
                         <g:if test="${domainResults}">
                             <h3>Results for Domain ${domain}</h3>
                             <table style="width:100%" class="table table-condensed table-hover">
+
                                 <tr>
+                                    <th>#Reference</th>
                                     <g:each in="${domainResults[0]}" var="header">
                                         <th>${header.field.label}</th>
                                     </g:each>
                                 </tr>
                                 <g:each in="${domainResults}" var="row" status="i">
                                     <tr>
+                                        <td>
+                                            %{--${etlProcessor.entitiesResults[domain]?.containsKey(i)}--}%
+                                            %{--<g:if test="${etlProcessor.entitiesResults.containsKey(domain) && etlProcessor.entitiesResults[domain].containsKey(i)}">--}%
+                                            %{--</g:if>--}%
+                                        </td>
                                         <g:each in="${row}" var="value">
                                             <td>${value.value}</td>
                                         </g:each>

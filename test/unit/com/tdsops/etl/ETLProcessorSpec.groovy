@@ -1086,21 +1086,21 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0][0].originalValue == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
 
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.constraints.required == 0
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
 
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].originalValue == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
 
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.constraints.required == 0
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
     }
 
     void 'test can load field many times with the same extracted value' () {
@@ -1176,21 +1176,21 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0][0].originalValue == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
 
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.constraints.required == 0
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
 
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].originalValue == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
 
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.constraints.required == 0
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == "Vendor"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == "String"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
     }
 
     void 'test can throw an ETLProcessorException when try to load without domain definition' () {
@@ -1439,18 +1439,18 @@ class ETLProcessorSpec extends Specification {
         then: 'Results should contain domain results associated'
             etlProcessor.getRow(0).getElement(1).value == "Microsoft"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
 
             etlProcessor.getRow(1).getElement(1).value == "Mozilla"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].value == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application).get(1)[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
 
             etlProcessor.getRow(2).getElement(1).value == "VMWare"
             etlProcessor.getRow(2).getElement(1).field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application).get(2)[0].value == "VMWare"
-            etlProcessor.results.get(ETLDomain.Application).get(2)[0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[2].elements[0].value == "VMWare"
+            etlProcessor.results.get(ETLDomain.Application)[2].elements[0][0].field.name == "appVendor"
     }
 
     void 'test can process multiple domains in same row' () {
@@ -1550,13 +1550,13 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "id"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].value == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "152254"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "id"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].value == "Microsoft"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].field.name == "appVendor"
 
-            etlProcessor.results.get(ETLDomain.Device)[0][0].value == "ACME Data Center"
-            etlProcessor.results.get(ETLDomain.Device)[0][0].field.name == "location"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].value == "ACME Data Center"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].field.name == "location"
     }
 
     void 'test can load values without extract previously' () {
@@ -1666,38 +1666,38 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain Application domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0][0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "environment"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Application)[1][0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1][0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1][0].field.name == "environment"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Production"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Application)[0][1].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].value == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].field.name == "id"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].originalValue == "152254"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].value == "152254"
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].field.name == "id"
 
-            etlProcessor.results.get(ETLDomain.Application)[1][1].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1][1].value == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1][1].field.name == "id"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].originalValue == "152255"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].value == "152255"
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].field.name == "id"
 
         and: 'Results should contain Device domain results associated'
-            etlProcessor.results.get(ETLDomain.Device)[0][1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0][1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0][1].field.name == "location"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].originalValue == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].value == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].field.name == "location"
 
-            etlProcessor.results.get(ETLDomain.Device)[1][1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1][1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1][1].field.name == "location"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].originalValue == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].value == "Development"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].field.name == "location"
 
-            etlProcessor.results.get(ETLDomain.Device)[0][0].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0][0].value == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0][0].field.name == "id"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].originalValue == "152254"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].value == "152254"
+            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].field.name == "id"
 
-            etlProcessor.results.get(ETLDomain.Device)[1][0].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1][0].value == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1][0].field.name == "id"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].originalValue == "152255"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].value == "152255"
+            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].field.name == "id"
     }
 
     void 'test can reference a domain Property Name with loaded Data Value' () {
