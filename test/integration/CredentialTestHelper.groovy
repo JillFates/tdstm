@@ -17,7 +17,7 @@ class CredentialTestHelper {
      * @return
      */
     Credential createCredential(Project project, Provider provider) {
-        Credential credential = new Credential(
+        return new Credential(
                 type: CredentialType.PRODUCTION,
                 status: CredentialStatus.ACTIVE,
                 method: AuthenticationMethod.HTTP_BASIC,
@@ -27,7 +27,10 @@ class CredentialTestHelper {
                 expirationDate: new Date(),
                 project: project,
                 provider: provider
-        ).save(flush: true, failOnError: true)
-        return credential
+        )
     }
+
+     Credential createAndSaveCredential(Project project, Provider provider) {
+         createCredential(project, provider).save(flush: true, failOnError: true)
+     }
 }
