@@ -35,6 +35,21 @@
                 <legend>Mock Data</legend>
                 <br>
                 <textarea class="form-control" name="mockData" rows="8" style="width: 100%;">${mockData}</textarea>
+                <br>
+
+                <div class="col-md-12">
+                    <h1>Service Now Document</h1>
+                    <g:if test="${flash.message}"><div class="message" role="status">${flash.message}</div></g:if>
+
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="file" />
+                        </div>
+                        <div class="col-md-4">
+                            <g:submitButton name="fetch" class="form-control"  value="Fetch" />
+                        </div>
+
+                </div>
+
             </fieldset>
         </div>
 
@@ -63,7 +78,7 @@
                     </div>
                 </g:if>
                 <br>
-                <input class="form-control" type="submit" class="btn-primary" value="Apply">
+                <input class="form-control" type="submit" value="Apply">
             </fieldset>
         </div>
     </div>
