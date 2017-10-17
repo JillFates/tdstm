@@ -1,6 +1,8 @@
 /**
  * Created by David Ontiveros
  */
+
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -11,6 +13,7 @@ import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.dataview.DataviewSpec
 
 /**
@@ -28,6 +31,7 @@ class WsAssetExplorerController implements ControllerMethods {
 
 	DataviewService dataviewService
 	SecurityService securityService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Returns the list of available dataviews as a map(json) result.
@@ -185,6 +189,10 @@ class WsAssetExplorerController implements ControllerMethods {
 		}
 
 		Map queryResult = dataviewService.query(project, dataview, userParams)
+		log.info("UserPreferenceEnum.ASSET_LIST_SIZE: " + userPreferenceService.getPreference(UserPreferenceEnum.ASSET_LIST_SIZE))
+
+		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, userParams.limit)
+
         renderSuccessJson(queryResult)
     }
 
