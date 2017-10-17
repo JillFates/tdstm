@@ -1,8 +1,6 @@
 package net.transitionmanager.domain
 
 import groovy.json.JsonSlurper
-import grails.converters.JSON
-import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
@@ -16,8 +14,6 @@ import groovy.transform.ToString
 @ToString(excludes='methodParams', includeNames=true, includeFields=true)
 class ApiAction {
 	String name
-	String description
-
 	String description
 
 	// Indicates the class to use when invoking the action
@@ -101,42 +97,6 @@ class ApiAction {
 	 */
 	boolean isSync() {
 		callbackMode == CallbackMode.NA
-	}
-
-	static transients = ['methodParamsList']
-
-	/*
-	 * Used to determine if the action is performed asyncronously
-	 * @return true if action is async otherwise false
-	 */
-	boolean isAsync() {
-		callbackMode != CallbackMode.NA
-	}
-
-	/*
-	 * Used to determine if the action is performed syncronously
-	 * @return true if action is syncronous otherwise false
-	 */
-	boolean isSync() {
-		callbackMode == CallbackMode.NA
-	}
-
-	/*
-	 * Used to access the methodParams as a List of Map objects instead of JSON text
-	 * @return The methodParams JSON as Groovy List<Map>
-	 */
-	List<Map> getMethodParamsList(){
-		JsonSlurper slurper = new groovy.json.JsonSlurper()
-		List<Map> list = []
-		if (methodParams) {
-			try {
-				list = slurper.parseText(methodParams)
-			} catch (e) {
-				// println "JsonSlurper failed : ${e.getMessage()}"
-				log.error "getMethodParamsList() methodParams was not propertly formed JSON (value=$methodParams) : ${e.getMessage()}"
-			}
-		}
-		return list
 	}
 
 	/*

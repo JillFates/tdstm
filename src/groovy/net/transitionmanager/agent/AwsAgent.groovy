@@ -12,9 +12,6 @@ import net.transitionmanager.service.AwsService
 class AwsAgent extends AbstractAgent {
 
 	public AwsService awsService
-	private static Map topicParam() { [type:String, description: 'The name of the topic/queue to send message to'] }
-	private static Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
-	private static Map queueParams() { [topicName: topicParam(), message: messageParam()] }
 
 	/*
 	 * Constructor
@@ -24,20 +21,20 @@ class AwsAgent extends AbstractAgent {
 		setInfo(AgentClass.AWS, 'Amazon AWS API')
 
 		setDictionary( [
-			sendSnsNotification: new DictionaryItem([
-				name: 'sendSnsNotification',
-				description: 'Used to generate Simple Notification Service (SNS) messages',
-				method: 'sendSns',
-				params: queueParams(),
-				results: invokeResults()
-			]),
-			sendSqsMessage: new DictionaryItem([
-				name: 'sendSqsMessage',
-				description: 'Used to generate Simple Queue Service (SQS) messages',
-				method: 'sendSqs',
-				params: queueParams(),
-				results: invokeResults()
-			])
+				sendSnsNotification: new DictionaryItem([
+						name: 'sendSnsNotification',
+						description: 'Used to generate Simple Notification Service (SNS) messages',
+						method: 'sendSns',
+						params: queueParams(),
+						results: invokeResults()
+				]),
+				sendSqsMessage: new DictionaryItem([
+						name: 'sendSqsMessage',
+						description: 'Used to generate Simple Queue Service (SQS) messages',
+						method: 'sendSqs',
+						params: queueParams(),
+						results: invokeResults()
+				])
 		].asImmutable() )
 
 		awsService = ApplicationContextHolder.getBean('awsService')

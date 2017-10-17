@@ -16,19 +16,15 @@ class ApiActionService {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS): AwsAgent,
-		(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()
+			(AgentClass.AWS): AwsAgent,
+			(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()
 
-    // This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
-	private static Map agentClassMap = [
-		(AgentClass.AWS): AwsAgent,
-		(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()ApiAction find(Long id){
-        return ApiAction.get(id)
-    }
+	ApiAction find(Long id){
+		return ApiAction.get(id)
+	}
 
-    ApiAction findOrCreateApiAction(Long id, Project project) {
-        ApiAction apiAction = ApiAction.findByIdAndProject(id, project)
-
+	ApiAction findOrCreateApiAction(Long id, Project project) {
+		ApiAction apiAction = ApiAction.findByIdAndProject(id, project)
 
 		return apiAction
 	}
@@ -96,7 +92,7 @@ class ApiActionService {
 			}
 		} else {
 			throw new InvalidRequestException(
-				'invoke() not implemented for class ' + context.getClass().getName() )
+					'invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
@@ -135,7 +131,7 @@ class ApiActionService {
 		DictionaryItem methodDef = dict[action.agentMethod]
 		if (! methodDef) {
 			throw new InvalidRequestException(
-				"Action class ${action.agentClass} method ${action.agentMethod} not implemented" )
+					"Action class ${action.agentClass} method ${action.agentMethod} not implemented" )
 		}
 		methodDef
 	}
