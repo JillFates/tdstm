@@ -62,7 +62,7 @@ class Element {
             field.control = fieldSpec.control
             field.constraints = fieldSpec.constraints
         }
-        processor.addLoadedElement(processor.selectedDomain, this)
+        processor.addElementLoaded(processor.selectedDomain, this)
         this
     }
     /**
