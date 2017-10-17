@@ -1450,7 +1450,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(1).value == "VMWare"
             etlProcessor.getRow(2).getElement(1).field.name == "appVendor"
             etlProcessor.results.get(ETLDomain.Application)[2].elements[0].value == "VMWare"
-            etlProcessor.results.get(ETLDomain.Application)[2].elements[0][0].field.name == "appVendor"
+            etlProcessor.results.get(ETLDomain.Application)[2].elements[0].field.name == "appVendor"
     }
 
     void 'test can process multiple domains in same row' () {

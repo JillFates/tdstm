@@ -59,7 +59,7 @@
                 </g:if>
                 <g:if test="${missingPropertyError}">
                     <div class="alert alert-danger">
-                        <strong>Missing property Exception!</strong> ${missingPropertyError} Line number: ${lineNumber}
+                        <strong>Exception!</strong> ${missingPropertyError} Line number: ${lineNumber}
                     </div>
                 </g:if>
                 <br>
@@ -83,31 +83,26 @@
 
                     <g:each in="${com.tdsops.etl.ETLDomain.values()}" var="domain">
                         <g:set var="domainResults" value="${etlProcessor.results[domain]}"></g:set>
-
                         <g:if test="${domainResults}">
-                            <h3>Results for Domain ${domain}</h3>
-                            <table style="width:100%" class="table table-condensed table-hover">
 
+                            <h3>Results for Domain ${domain}</h3>
+
+                            <table style="width:100%" class="table table-condensed table-hover">
                                 <tr>
-                                    <th>#Reference</th>
-                                    <g:each in="${domainResults[0]}" var="header">
+                                    <th># Reference</th>
+                                    <g:each in="${domainResults[0].elements}" var="header">
                                         <th>${header.field.label}</th>
                                     </g:each>
                                 </tr>
                                 <g:each in="${domainResults}" var="row" status="i">
                                     <tr>
-                                        <td>
-                                            %{--${etlProcessor.entitiesResults[domain]?.containsKey(i)}--}%
-                                            %{--<g:if test="${etlProcessor.entitiesResults.containsKey(domain) && etlProcessor.entitiesResults[domain].containsKey(i)}">--}%
-                                            %{--</g:if>--}%
-                                        </td>
-                                        <g:each in="${row}" var="value">
+                                        <td>${row.reference?.id}</td>
+                                        <g:each in="${row.elements}" var="value">
                                             <td>${value.value}</td>
                                         </g:each>
                                     </tr>
                                 </g:each>
                             </table>
-
                         </g:if>
                     </g:each>
                 </div>
@@ -157,5 +152,27 @@
         </div>
     </div>
 </form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
+<script>
+    var elements = ['span', 'div', 'h1', 'h2', 'h3'];
+    $('#script').textcomplete([
+        { // tech companies
+            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with'],
+            match: /\b(\w{2,})$/,
+            search: function (term, callback) {
+                callback($.map(this.words, function (word) {
+                    return word.indexOf(term) === 0 ? word : null;
+                }));
+            },
+            index: 1,
+            replace: function (word) {
+                return word + ' ';
+            }
+        }
+    ]);
+</script>
+
+
 </body>
 </html>
