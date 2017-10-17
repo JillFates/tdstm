@@ -77,11 +77,23 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
+		Long currentPersonId = securityService.currentPersonId
+
+		// Check if the view is favorite and must be unfavorited.
+		if (dataview.isFavorite(currentPersonId) && !dataviewJson.isFavorite) {
+			deleteFavoriteDataview(dataview.id)
+		} else {
+			// Check if the view must be favorited
+			if (!dataview.isFavorite(currentPersonId) && dataviewJson.isFavorite) {
+				addFavoriteDataview(dataview.id)
+			}
+		}
+
 		return dataview
 	}
 
 	/**
-	 * Creates a Dataview object
+	 * Create a Dataview object and add it to the person's favorite if needed.
 	 * Dataview person and project are taken from current session.
 	 * @param json JSONObject to take changes from.
 	 * @return the Dataview object that was created
@@ -102,6 +114,10 @@ class DataviewService implements ServiceMethods {
 
 		if (!dataview.save()) {
 			throw new DomainUpdateException('Error on create', dataview)
+		}
+
+		if (dataviewJson.isFavorite) {
+			addFavoriteDataview(dataview.id)
 		}
 
 		return dataview
