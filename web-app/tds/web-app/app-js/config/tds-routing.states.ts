@@ -87,7 +87,8 @@ export function PermissionConfig(router: UIRouter) {
 }
 
 export function MiscConfig(router: UIRouter) {
-	router.stateService.defaultErrorHandler(() => {
+	router.stateService.defaultErrorHandler((error) => {
+		console.log(error);
 		router.stateService.go(SharedStates.ERROR.name);
 	});
 

@@ -32,13 +32,10 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private assetService: AssetExplorerService,
 		private stateService: StateService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
-		report.subscribe(
-			(result) => {
-				this.model = result;
-			},
-			(err) => console.log(err));
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
+			this.model = result[1];
+			console.log(this.model);
 		}, (err) => console.log(err));
 	}
 
