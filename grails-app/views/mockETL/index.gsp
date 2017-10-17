@@ -97,7 +97,7 @@
                 <div id="home" class="tab-pane fade in active">
 
                     <g:each in="${com.tdsops.etl.ETLDomain.values()}" var="domain">
-                        <g:set var="domainResults" value="${etlProcessor.results[domain]}"></g:set>
+                        <g:set var="domainResults" value="${etlProcessor?.results?.getAt(domain)}"></g:set>
                         <g:if test="${domainResults}">
 
                             <h3>Results for Domain ${domain}</h3>
