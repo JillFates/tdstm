@@ -11,7 +11,7 @@ class Provider {
     static belongsTo = [ project: Project ]
 
     static hasMany = [
-        datascripts: DataScript,
+        dataScripts: DataScript,
         credentials: Credential
     ]
 
