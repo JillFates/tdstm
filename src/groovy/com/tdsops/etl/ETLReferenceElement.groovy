@@ -16,8 +16,17 @@ class ETLReferenceElement {
      * @param values
      * @return
      */
-    ETLReferenceElement with (Object... values) {
-        List assets = AssetClassQueryHelper.where(processor.selectedDomain, fields, values as List)
+    ETLReferenceElement with (Object... dataSourceFieldNames) {
+
+        List dataSourceFields = processor.currentRowResult[processor.selectedDomain].elements.findAll {
+            it.field?.name in dataSourceFieldNames || it.field?.label in dataSourceFieldNames
+        }
+
+        if (dataSourceFields.size() != fields.size()) {
+            throw ETLProcessorException.invalidReferenceCommand(fields, new ArrayList(dataSourceFields))
+        }
+
+        List assets = AssetClassQueryHelper.where(processor.selectedDomain, fields, dataSourceFields.collect {it.value})
 
         if (assets.size() == 1) {
             processor.addAssetEntityReferenced(assets.first())
