@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tds.asset.AssetEntity
+
 /**
  *
  *
@@ -20,8 +23,8 @@ class ETLProcessor {
     Row currentRow
 
     ETLDomain selectedDomain
-    Map<ETLDomain, List<List<Map<String, ?>>>> results = [:]
-    Map<ETLDomain, List<List<Map<String, ?>>>> currentRowResult = [:]
+    Map<ETLDomain, List<ReferenceResult>> results = [:]
+    Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
     /**
      *
@@ -165,7 +168,7 @@ class ETLProcessor {
             currentColumnIndex = 0
             closure(addCrudRowData(currentRowIndex, crudRowData))
 
-            currentRowResult.each { ETLDomain key, List<List<Map<String, ?>>> value ->
+            currentRowResult.each { ETLDomain key, ReferenceResult value ->
                 if (!results.containsKey(key)) {
                     results[key] = []
                 }
@@ -268,7 +271,7 @@ class ETLProcessor {
                         newElement.field.constraints = fieldSpec.constraints
                     }
 
-                    addLoadedElement(selectedDomain, newElement)
+                    addElementLoaded(selectedDomain, newElement)
                     newElement
                 }
         ]
@@ -315,16 +318,16 @@ class ETLProcessor {
     }
     /**
      *
-     * Add a loaded element with the current domain in results
+     * Adds a loaded element with the current domain in results
      *
      */
-    void addLoadedElement (ETLDomain domain, Element element) {
+    void addElementLoaded (ETLDomain domain, Element element) {
 
         if (!currentRowResult.containsKey(selectedDomain)) {
-            currentRowResult[selectedDomain] = []
+            currentRowResult[selectedDomain] = new ReferenceResult()
         }
 
-        currentRowResult[selectedDomain].add([
+        currentRowResult[selectedDomain].elements.add([
                 originalValue: element.originalValue,
                 value        : element.value,
                 field        : [
@@ -336,6 +339,21 @@ class ETLProcessor {
         ])
 
         debugConsole.info "Adding element ${element} in results for domain ${domain}"
+    }
+    /**
+     *
+     * Adds an asset entity instance referenced from a datasource field
+     *
+     * @param assetEntity
+     * @param row
+     */
+    void addAssetEntityReferenced (AssetEntity assetEntity) {
+
+        if (!currentRowResult.containsKey(selectedDomain)) {
+            currentRowResult[selectedDomain] = new ReferenceResult()
+        }
+
+        currentRowResult[selectedDomain].reference = assetEntity
     }
 
     def methodMissing (String methodName, args) {
