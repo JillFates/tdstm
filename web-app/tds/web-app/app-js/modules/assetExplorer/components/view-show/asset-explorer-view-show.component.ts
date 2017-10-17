@@ -12,9 +12,9 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
-import {AssetQueryParams} from '../../model/asset-query-params';
-import {DomainModel} from '../../../fieldSettings/model/domain.model';
-import {AssetExportModel} from '../../model/asset-export-model';
+import { AssetQueryParams } from '../../model/asset-query-params';
+import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { AssetExportModel } from '../../model/asset-export-model';
 
 @Component({
 	selector: 'asset-explorer-view-show',
@@ -96,7 +96,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains:  this.domains,
+			domains: this.domains,
 			previewMode: false,
 			queryId: this.model.id,
 			totalData: this.grid.gridData.total,
@@ -110,6 +110,20 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		}).catch(result => {
 			console.log('error');
 		});
+	}
+
+	protected onFavorite(): void {
+		if (this.model.isFavorite) {
+			this.assetService.deleteFavorite(this.model.id)
+				.subscribe(d => {
+					this.model.isFavorite = false;
+				});
+		} else {
+			this.assetService.saveFavorite(this.model.id)
+				.subscribe(d => {
+					this.model.isFavorite = true;
+				});
+		}
 	}
 
 	/**

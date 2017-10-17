@@ -76,23 +76,26 @@ export class AssetExplorerIndexComponent {
 				.then((res) => {
 					if (res) {
 						this.assetExpService.deleteReport(report.id)
-							.concat(this.assetExpService.getReports())
 							.subscribe(
 							result => {
-								if (typeof result === 'string') {
-									this.notifier.broadcast({
-										name: AlertType.SUCCESS,
-										message: result
-									});
-								} else {
-									this.reportGroupModels = result as ViewGroupModel[];
-									this.selectedFolder = this.reportGroupModels.find((r) => r.open);
-								}
+								this.notifier.broadcast({
+									name: AlertType.SUCCESS,
+									message: result
+								});
+								this.loadData();
 							},
 							error => console.log(error));
 					}
 				});
 		}
+	}
+
+	protected loadData() {
+		this.assetExpService.getReports()
+			.subscribe(result => {
+				this.reportGroupModels = result as ViewGroupModel[];
+				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
+			});
 	}
 
 	/**
@@ -128,6 +131,22 @@ export class AssetExplorerIndexComponent {
 		return report.isSystem ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemDelete) :
 			report.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerDelete);
+	}
+
+	protected toggleFavorite(report: ViewModel): void {
+		if (report.isFavorite) {
+			this.assetExpService.deleteFavorite(report.id)
+				.subscribe(d => {
+					report.isFavorite = false;
+					this.loadData();
+				});
+		} else {
+			this.assetExpService.saveFavorite(report.id)
+				.subscribe(d => {
+					report.isFavorite = true;
+					this.loadData();
+				});
+		}
 	}
 
 }

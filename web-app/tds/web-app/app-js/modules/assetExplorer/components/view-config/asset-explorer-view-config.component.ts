@@ -311,11 +311,6 @@ export class AssetExplorerViewConfigComponent {
 		});
 	}
 
-	protected onFavorite() {
-		// this.model.favorite = !this.model.favorite;
-		console.log('no empty');
-	}
-
 	protected onFieldSelection(field: FieldSettingsModel) {
 		if (field['selected']) {
 			this.model.schema.columns.push({
@@ -352,6 +347,10 @@ export class AssetExplorerViewConfigComponent {
 		}
 		this.grid.clear();
 		this.previewButtonClicked = false;
+	}
+
+	protected onFavorite() {
+		this.model.isFavorite = !this.model.isFavorite;
 	}
 
 	protected onPreview(): void {
