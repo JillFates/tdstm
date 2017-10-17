@@ -1,25 +1,13 @@
-import com.tdsops.tm.enums.domain.ProjectStatus
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Setting
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
-import com.tdsops.tm.enums.domain.SettingType
-import com.tdsops.tm.enums.domain.SecurityRole
-
 import com.tdsops.common.exceptions.ConfigurationException
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.SettingType
+import grails.test.spock.IntegrationSpec
+import net.transitionmanager.domain.*
+import net.transitionmanager.security.Permission
+import net.transitionmanager.service.*
 
-import spock.lang.Specification
-
-class ProjectServiceTests extends Specification {
+class ProjectServiceTests extends IntegrationSpec {
 
 	// IOC
 	ProjectService projectService
@@ -264,12 +252,14 @@ class ProjectServiceTests extends Specification {
 		when: 'a new project is created directly'
 			Project p = projectHelper.createProject()
 		then: 'there should be no Asset Field Settings for the project'
-			0 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
-
-		when: 'the cloneDefaultSettings method is called for the new project'
-			projectService.cloneDefaultSettings(p)
-		then: 'the project should have 4 Asset Field Settings'
 			4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+
+		// The new project service for creating a project now prepopulates the project from the default so this test
+		// no longer makes sense.
+		//when: 'the cloneDefaultSettings method is called for the new project'
+		//	projectService.cloneDefaultSettings(p)
+		//then: 'the project should have 4 Asset Field Settings'
+		//	4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
 
 		when: 'the cloneDefaultSettings method is called a second time'
 			projectService.cloneDefaultSettings(p)
@@ -294,22 +284,49 @@ class ProjectServiceTests extends Specification {
 	}
 
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
-		when: 'creating a new person'
+        when: 'creating a new person'
 			Person userPerson = personHelper.createStaff(project.owner)
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
-		then: 'a person should have been created'
-			userPerson
-		and: 'a user login should have been created'
-			userLogin
-		then: 'the person does not access to the default project because he is not an admin'
-			! securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
-		and: 'filting for ANY status should return one project.'
-			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
-		and: 'filting for ACTIVE status should return one project.'
-			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
-		and: 'filting for COMPLETED status should return zero projects'
-			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
+        then: 'a person should have been created'
+	        userPerson
+        and: 'a user login should have been created'
+    	    userLogin
+        then: 'the person does not access to the default project because he is not an admin'
+        	!securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
+        and: 'filting for ANY status should return one project.'
+        	1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
+        and: 'filting for ACTIVE status should return one project.'
+        	1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
+        and: 'filting for COMPLETED status should return zero projects'
+        	0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
+    }
+
+	void "13. Validate that deleting Project deletes the new Provider"() {
+		setup: 'create a Project with a Provider'
+			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+			providerTestHelper.createProvider(project)
+
+		when: 'the project is deleted'
+			projectService.deleteProject(project.id, true)
+
+		then: 'querying providers for the project should find none'
+			[] == Provider.findAllByProject(project)
 	}
+
+	void "14. Validate that deleting Project deletes the new DataScript"() {
+		setup: 'create a project with Provider and DataScript objects'
+			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
+			DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+			Provider provider = providerTestHelper.createProvider(project)
+			dataScriptTestHelper.createDataScript(project, provider, adminPerson)
+
+		when: 'the project is deleted'
+			projectService.deleteProject(project.id, true)
+
+		then: 'querying DataScripts for the project should find none'
+			[] == DataScript.findAllByProject(project)
+	}
+
 }
