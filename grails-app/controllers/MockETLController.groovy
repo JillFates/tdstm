@@ -1,31 +1,21 @@
-import com.tdsops.etl.*
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorException
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
 @Secured('isAuthenticated()')
 class MockETLController implements ControllerMethods {
 
-    def customDomainService
+    ScriptProcessorService scriptProcessorService
 
     def index () {
 
         Project project = securityService.userCurrentProject
-
-        def configureUsingDomain = { AssetClass assetClass ->
-            customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
-        }
-
-        ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-
-        validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
 
         def mockData = params.mockData ? """${params.mockData}""" : """DEVICE ID,MODEL NAME,MANUFACTURER NAME,ENVIRONMENT
 152254,SRW24G4,LINKSYS,Prod
@@ -59,22 +49,13 @@ iterate {
 }
 """.stripIndent()
 
-        DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
-        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
-                blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
-        ])
-
-        ETLBinding binding = new ETLBinding(etlProcessor)
-
         ErrorCollector errorCollector
         String missingPropertyError
         Integer lineNumber
+        ETLProcessor etlProcessor
         try {
-            new GroovyShell(this.class.classLoader, binding).evaluate(script?.trim(), ETLProcessor.class.name)
+
+            etlProcessor = scriptProcessorService.execute(project, script, data)
 
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
@@ -92,7 +73,7 @@ iterate {
                 errorCollector      : errorCollector,
                 lineNumber          : lineNumber,
                 missingPropertyError: missingPropertyError,
-                logContent          : console.content(),
+                logContent          : etlProcessor?.debugConsole.content(),
                 jsonResult          : (etlProcessor?.results as JSON)?.toString(true)
         ]
     }
