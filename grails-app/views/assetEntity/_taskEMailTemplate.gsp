@@ -3,6 +3,10 @@
 <body> 
 <div style="font:courier ">
 	<table style="border: 1px solid green;font-family:courier;">
+		<tr class="prop" style="margin-top: 10px">
+			<td valign="top" class="name" ><label for="projectName"><b>Project:</b></label></td>
+			<td valign="top" class="value" id="projectNameId" >${projectName ? projectName : ''}</td>
+		</tr>
 		<tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="TaskNumber" style=""><b>Task #:</b></label></td>
 			<td valign="top" class="value" id="dateCreatedId"  >

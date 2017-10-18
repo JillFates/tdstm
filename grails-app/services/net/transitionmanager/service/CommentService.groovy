@@ -578,7 +578,7 @@ class CommentService implements ServiceMethods {
 
 		[assetComment: assetComment, assetName: assetName, moveEvent: assetComment.moveEvent, createdBy: createdBy,
 		 dtCreated: dtCreated, dtResolved: dtResolved, dueDate: dueDate, resolvedBy: resolvedBy,
-		 assignedTo: assetComment.assignedTo, dateFormat: userDTFormat, notes: notes]
+		 assignedTo: assetComment.assignedTo, dateFormat: userDTFormat, notes: notes, projectName: assetComment?.project?.projectCode]
 	}
 
 	// TODO : move the leftString and getLine methods into a reusable class - perhaps extending string with @Delegate
