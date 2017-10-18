@@ -35,7 +35,6 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = result[1];
-			console.log(this.model);
 		}, (err) => console.log(err));
 	}
 
