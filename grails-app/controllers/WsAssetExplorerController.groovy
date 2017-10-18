@@ -189,8 +189,6 @@ class WsAssetExplorerController implements ControllerMethods {
 		}
 
 		Map queryResult = dataviewService.query(project, dataview, userParams)
-		log.info("UserPreferenceEnum.ASSET_LIST_SIZE: " + userPreferenceService.getPreference(UserPreferenceEnum.ASSET_LIST_SIZE))
-
 		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, userParams.limit)
 
         renderSuccessJson(queryResult)
