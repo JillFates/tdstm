@@ -52,6 +52,9 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		}
 	},
+	'DEPENDENCY_INJECTION': {
+		'MANUAL_ASSET_IMPORT': 'Manual Asset Import'
+	},
 	'GLOBAL': {
 		'OK': 'Ok',
 		'ADD': 'Add',
