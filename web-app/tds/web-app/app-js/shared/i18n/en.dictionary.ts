@@ -46,8 +46,11 @@ export const en_DICTIONARY: Object = {
 		'LEGEND': 'Legend',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
+		'SAVE_AS': 'Save As',
 		'DEFAULT': 'Default',
-		'SORT': 'Sort'
+		'SORT': 'Sort',
+		'ADD_FAVORITES': 'Add to Favorites',
+		'SHARE_WITH_USERS': 'Share with other users'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

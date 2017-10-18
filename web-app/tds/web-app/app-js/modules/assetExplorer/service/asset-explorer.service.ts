@@ -118,4 +118,22 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
+	saveFavorite(id: number): Observable<any[]> {
+		return this.http.post(`${this.assetExplorerUrl}/favoriteDataview/${id}`, '')
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteFavorite(id: number): Observable<any[]> {
+		return this.http.delete(`${this.assetExplorerUrl}/favoriteDataview/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
 }

@@ -45,10 +45,25 @@ class Dataview {
 				isSystem		: isSystem,
 				isShared		: isShared,
 				isOwner			: isOwner,
+				isFavorite		: isFavorite(currentPersonId),
 				schema			: JsonUtil.parseJson(reportSchema)
 		]
 		return data
 	}
+
+	/**
+	 * Determine if the instance is a favorite view for the person.
+	 * @param currentPersonId
+	 * @return
+	 */
+	boolean isFavorite(Long currentPersonId) {
+		int favCount = FavoriteDataview.where {
+			dataview == this
+			person.id == currentPersonId
+		}.count()
+		return favCount > 0
+	}
+
 
 	def beforeInsert = {
 		dateCreated = dateCreated = TimeUtil.nowGMT()
