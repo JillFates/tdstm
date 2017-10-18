@@ -2418,7 +2418,7 @@ class AssetEntityController implements ControllerMethods {
 		def moveEventId = params.moveEvent
 		def taskId = params.taskId
 		def task
-		def taskIdx = 0
+		int taskIdx = 0
 		if (params.commentId) {
 			task = AssetComment.findByIdAndProject(params.commentId, project)
 			// If the task was found, retrieve its index.
@@ -2429,7 +2429,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		renderSuccessJson([taskIdx.intValue()])
+		renderSuccessJson([taskIdx])
 	}
 
 	/**

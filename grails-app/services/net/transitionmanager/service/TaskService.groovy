@@ -601,7 +601,17 @@ class TaskService implements ServiceMethods {
 		return [list: list, total: resultTotal[0]]
 	}
 
-	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+	/**
+	 * Calculate the index for the task in the task selection drop-down.
+	 *
+	 * @param project
+	 * @param category
+	 * @param task
+	 * @param moveEventId
+	 * @param taskId
+	 * @return 0 if the task doesn't exist, the index if it does.
+	 */
+	int searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
 		// If no task id was given, return 0.
 		if (!taskId) {
