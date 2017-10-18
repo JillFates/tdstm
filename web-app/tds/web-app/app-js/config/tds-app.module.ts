@@ -16,6 +16,7 @@ import { TaskManagerModule } from '../modules/taskManager/task-manager.module';
 import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.module';
 import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
+import { ImportAssetsModule } from '../modules/importAssets/import-assets.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
@@ -33,6 +34,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 		FieldSettingsModule,
 		AssetExplorerModule,
 		DataIngestionModule,
+		ImportAssetsModule,
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,
