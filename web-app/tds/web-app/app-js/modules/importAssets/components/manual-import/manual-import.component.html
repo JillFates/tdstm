@@ -1,0 +1,63 @@
+<style>
+    .form-group {
+        margin-bottom: 40px;
+    }
+</style>
+
+<div class="content body">
+    <section>
+        <div>
+            <form class="formly form-horizontal" role="form" novalidate >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body" style="margin-top: 30px;">
+                        <div class="form-group row">
+                            <label class="col-sm-3 control-label" for="fetch">Fetch with data action: </label>
+                            <div class="col-sm-2">
+                                <select [(ngModel)]="selectedManualOption" name="fetch" id="fetch" class="form-control pd-top-5">
+                                    <option value></option>
+                                    <option *ngFor="let option of manualOptions" value="{{option.id}}">{{option.name}}</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedManualOption">Fetch</button>
+                            <a href="javascript:void(0);" *ngIf="fetchResult" (click)="onViewData('FETCH')" class="control-label col-md-1">View data</a>
+
+                        </div>
+                        <!---->
+                        <div class="form-group row">
+                           <label class="col-sm-3 control-label" for="transform">Transform with Data Script: </label>
+                           <div class="col-sm-2">
+
+                               <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
+                                   <option value></option>
+                                   <option *ngFor="let option of dataScriptOptions" value="{{option.id}}">{{option.name}}</option>
+                               </select>
+
+                            </div>
+                            <button [disabled]="!selectedScriptOption && !fetchResult" class="btn btn-default col-sm-1">Transform</button>
+                            <a href="javascript:void(0);" *ngIf="transformResult" class="control-label col-sm-1">View data</a>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 control-label">Load transformed data into Import Batches: </label>
+                            <button [disabled]="!fetchResult && !transformResult" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">Import</button>
+                            <a href="javascript:void(0);" *ngIf="!importResult" class="col-sm-2">Go to Manage Import Batches</a>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <label class="col-sm-3 control-label">Fetched Data / Transformed Data</label>
+                            <a href="javascript: void(0);" (click)="onClearTextArea()" class="col-sm-offset-3 control-label col-sm-1">Clear</a>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-offset-1 col-sm-6" style="padding-left: 4%">
+                               <textarea [(ngModel)]="fileContent" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
