@@ -142,6 +142,17 @@ trait ControllerMethods {
 		render(status:400, text: 'Invalid Input')
 	}
 
+	/**
+	 * Used to indicate that the request input was missing or improperly formatted
+	 * @param message - an optional error message as to why the input was invalid, when included will appear in an X header
+	 */
+	void sendInvalidInput(String message = '') {
+		if (message) {
+			response.addHeader(ERROR_MESG_HEADER, message)
+		}
+		render(status:400, text: 'Invalid Input')
+	}
+
 	void setContentTypeJson() {
 		response.contentType = 'text/json'
 	}
