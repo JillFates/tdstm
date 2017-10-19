@@ -115,7 +115,7 @@ iterate {
                 lineNumber          : lineNumber,
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.results as JSON)?.toString(true)
+                jsonResult          : (etlProcessor?.results as JSON)
         ]
     }
 
