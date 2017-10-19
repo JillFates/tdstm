@@ -55,8 +55,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("The match was non-unique for fields ${fields}".toString())
     }
 
-    static ETLProcessorException invalidReferenceCommand (List<String> fields, List values) {
-        new ETLProcessorException("Invalid reference command fields:${fields} values:${values}".toString())
+    static ETLProcessorException incorrectAmountOfParameters (List<String> fields, List values) {
+        new ETLProcessorException("Incorrect amount of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]".toString())
     }
 
 }
