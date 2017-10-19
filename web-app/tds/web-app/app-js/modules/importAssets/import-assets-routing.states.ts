@@ -5,7 +5,7 @@ import {ManualImportComponent} from './components/manual-import/manual-import.co
 export class ImportAssetsStates {
 	public static readonly IMPORT_ASSETS = {
 		name: 'tds.importassets',
-		url: '/import/assets/'
+		url: '/import/assets'
 	};
 }
 
@@ -28,11 +28,11 @@ export const importAssetsState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	}
 };
 
-export const DEPENDENCY_INJECTION_STATES = [
+export const IMPORT_ASSETS_STATES = [
 	importAssetsState,
 	{
 		name: 'tds.import',
-		url: '/import/assets',
+		url: '/x/x/',
 		redirectTo: 'tds.importassets'
 	}
 ];
