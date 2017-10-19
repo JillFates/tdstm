@@ -272,6 +272,8 @@ class DataviewService implements ServiceMethods {
     // TODO : Annotate READONLY
     Map previewQuery(Project project, DataviewSpec dataviewSpec) {
 
+		dataviewSpec = addRequieredColumns(dataviewSpec)
+
         String hqlColumns = hqlColumns(dataviewSpec)
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
@@ -285,7 +287,7 @@ class DataviewService implements ServiceMethods {
           order by $hqlOrder  
         """
 
-        String countHql = """
+		String countHql = """
             select count(*)
               from AssetEntity AE
                 $hqlJoins
@@ -476,9 +478,9 @@ class DataviewService implements ServiceMethods {
      * @return
      */
 	private String hqlColumns(DataviewSpec dataviewSpec){
-        dataviewSpec.columns.collect { Map column ->
-            "${propertyFor(column)}"
-        }.join(", ")
+		dataviewSpec.columns.collect { Map column ->
+			"${propertyFor(column)}"
+		}.join(", ")
     }
     /**
      *
@@ -560,7 +562,7 @@ class DataviewService implements ServiceMethods {
     }
 
     private static String propertyFor(Map column) {
-        transformations[column.property].property
+		transformations[column.property].property
     }
 
     private static String joinFor(Map column) {
@@ -569,6 +571,7 @@ class DataviewService implements ServiceMethods {
 
     private static final Map<String, Map> transformations = [
             "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: ""],
+			"assetClass"  : [property: "str(AE.assetClass)", type: String, namedParameter: "assetClass", join: ''],
             "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle"],
             "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project"],
             "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer"],
@@ -579,4 +582,22 @@ class DataviewService implements ServiceMethods {
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
     }
+
+	/**
+	 * Mutate DataViewSpec to add the requiered Columns when querying the DB
+	 * This mutates the original Object
+	 * @param dataviewSpec Original DataViewSpec
+	 * @return the mutated dataViewSpec
+	 */
+	private DataviewSpec addRequieredColumns(DataviewSpec dataviewSpec){
+		HashSet<String> requiredColumns = ['id', 'assetClass']
+
+		requiredColumns = requiredColumns - dataviewSpec.columns*.property
+
+		for(String property: requiredColumns) {
+			dataviewSpec.addColumn(DataviewSpec.COMMON, property)
+		}
+
+		return dataviewSpec
+	}
 }
