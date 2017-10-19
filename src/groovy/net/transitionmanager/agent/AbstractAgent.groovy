@@ -93,4 +93,11 @@ class AbstractAgent {
 			message: messageParam()
 		]
 	}
+
+	// Build of some of the standard interfaces for RESTful agent methods
+	protected LinkedHashMap restfulParams() {
+		[
+			callbackMethod: callbackMethodParam()
+		]
+	}
 }

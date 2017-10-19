@@ -17,7 +17,9 @@ class ApiActionService {
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
 			(AgentClass.AWS): AwsAgent,
-			(AgentClass.RIVER_MEADOW): RiverMeadowAgent ].asImmutable()
+			(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
+			(AgentClass.SERVICE_NOW): ServiceNowAgent
+	].asImmutable()
 
 	ApiAction find(Long id){
 		return ApiAction.get(id)
@@ -88,7 +90,12 @@ class ApiActionService {
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 
 			} else {
-				throw new InvalidRequestException('Synchronous invocation not supported')
+				//throw new InvalidRequestException('Synchronous invocation not supported')
+				def agent = agentInstanceForAction(action)
+
+				// Lets try to invoke the method
+				logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}($remoteMethodParams)"
+				agent."${action.agentMethod}"(remoteMethodParams)
 			}
 		} else {
 			throw new InvalidRequestException(
