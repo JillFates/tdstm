@@ -41,6 +41,8 @@ trait ControllerMethods {
 	SecurityService securityService
 	LicenseAdminService licenseAdminService
 
+	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
+
 	void renderAsJson(data) {
 		render(data as JSON)
 	}
@@ -119,8 +121,31 @@ trait ControllerMethods {
 		sendError NOT_FOUND // 404
 	}
 
+	/**
+	 * Used to indicate that the request input was missing or improperly formatted
+	 * @param message - an optional error message as to why the input was invalid, when included will appear in an X header
+	 */
+	void sendInvalidInput(String message = '') {
+		if (message) {
+			response.addHeader(ERROR_MESG_HEADER, message)
+		}
+		render(status:400, text: 'Invalid Input')
+	}
+
 	void setContentTypeJson() {
 		response.contentType = 'text/json'
+	}
+
+	void setContentTypeCsv() {
+		response.contentType = 'text/csv'
+	}
+
+	void setContentTypeXml() {
+		response.contentType = 'text/xml'
+	}
+
+	void setContentTypeExcel() {
+		response.contentType = 'application/vnd.ms-excel'
 	}
 
 	void sendError(HttpStatus status, String message = null) {
