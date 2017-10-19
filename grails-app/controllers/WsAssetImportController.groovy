@@ -49,25 +49,27 @@ class WsAssetImportController implements ControllerMethods {
 	 * 		odd ids  - returns error
 	 * 		invalid ids - returns not found
 	 *
-	 * @param	id - the id of the action to be invoked
+	 * @param	actionId - the id of the action to be invoked
 	 * @return	JSON Map containing the following
 	 * 		status: <String> indicating success|error
 	 * 		errors: <List> a list of error messages that occurred
 	 * 		filename: <String> the name of the import file if successful
 	 */
 	@HasPermission(Permission.AssetImport)
-	def invokeFetchAction(Long id) {
+	def invokeFetchAction(Long actionId) {
+
+
 		Map result = [status:'success', errors:[], filename:'']
 
 		// See if we can find an action to be invoked
-		Map action = actions.find {println "looking for $id and have {$it.id}"; it.id == id}
+		Map action = actions.find {it.id == actionId}
 		if (!action) {
-			sendNotFound
+			sendNotFound("Action $actionId Not Found")
 			return
 		}
 
 		// For testing we'll return success for even ids otherwise error
-		if (id % 2) {
+		if (actionId % 2) {
 			result.status = 'error'
 			result.errors << 'Action failed to connect to service'
 		} else {
@@ -130,6 +132,67 @@ class WsAssetImportController implements ControllerMethods {
 		renderAsJson map
 	}
 
+	/**
+	 * Used to invoke an ETL process on the filename (from invokeFetch) passed in using the Data Script that was
+	 * specified. It will return the status including counts, errors, and output filename.
+	 *
+	 * For testing
+	 * 		even ids - returns success
+	 * 		odd ids  - returns error
+	 * 		invalid ids - returns not found
+	 *
+	 * @param id - the id of the Data Script that should be used to Transform the data
+	 * @param filename - the name of the temporary file that was provided by the fetch action
+	 * @return	JSON Map containing the following
+	 * 		status <String> indicating success|error
+	 * 		errors <List> a list of error messages that occurred
+	 * 		filename <String> the name of the file that contains the transformed data as JSON if successful
+	 * 		results <List><Map> list of the domains that were transformed along with other details
+	 * 			[ 	domain: <String> Name of the domain
+	 * 				rows: <Integer> number of rows in domain transformed
+	 * 				errors: <Integer> number of rows with errors
+	 * 			]
+	 */
+	@HasPermission(Permission.AssetImport)
+	def transformData(Long dataScriptId, String filename) {
+		Map result = [status:'success', errors:[], results: []]
+
+		if (!dataScriptId) {
+			sendInvalidInput 'Missing dataScriptId parameter'
+			return
+		}
+		// See if we can find an action to be invoked
+		Map script = dataScripts.find {it.id == dataScriptId}
+		if (!script) {
+			sendNotFound("DataScript $dataScriptId Not Found")
+			return
+		}
+
+		if (!filename) {
+			sendInvalidInput 'Missing filename parameter'
+			return
+		}
+
+		if (! (filename.endsWith('.csv') || filename.endsWith('.xml'))) {
+			sendInvalidInput 'File type was not CSV or XML'
+			return
+		}
+
+		// For testing we'll return success for even ids otherwise error
+		if (dataScriptId % 2) {
+			result.status = 'error'
+			result.errors << 'Action failed to connect to service'
+		} else {
+			result.filename = RandomStringUtils.randomAlphabetic(12) + '.json'
+			result.results << [
+					domain: 'Application',
+					rows: 4,
+					errors: 0
+			]
+		}
+
+		renderAsJson result
+	}
 
 	/**
 	 * Used to retrieve the raw data from the Fetch or Transform. This requires the name of the file that was generated.
@@ -146,7 +209,9 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		List<String> parts = filename.split('.')
+		List<String> parts = filename.split(/\./)
+		//render parts.toString()
+		//return
 		if (parts.size != 2) {
 			sendNotFound()
 			return
@@ -154,7 +219,7 @@ class WsAssetImportController implements ControllerMethods {
 		println "parts[1] = ${parts[1]}"
 		switch (parts[1]) {
 			case 'json':
-				Map json = [
+				List json = [
 						[externalRefId:'12', assetName:'Autonomy', environment:'Production', department:'HR'],
 						[externalRefId:'13', assetName:'Citrix', environment:'Production', department:'HR'],
 						[externalRefId:'342', assetName:'Corp Tax', environment:'Production', department:'HR'],
@@ -175,66 +240,6 @@ class WsAssetImportController implements ControllerMethods {
 			default:
 				sendNotFound()
 		}
-	}
-
-	/**
-	 * Used to invoke an ETL process on the filename (from invokeFetch) passed in using the Data Script that was
-	 * specified. It will return the status including counts, errors, and output filename.
-
-	 * For testing
-	 * 		even ids - returns success
-	 * 		odd ids  - returns error
-	 * 		invalid ids - returns not found
-	 * @param id - the id of the Data Script that should be used to Transform the data
-	 * @param filename - the name of the temporary file that was provided by the fetch action
-	 * @return	JSON Map containing the following
-	 * 		status <String> indicating success|error
-	 * 		errors <List> a list of error messages that occurred
-	 * 		filename <String> the name of the file that contains the transformed data as JSON if successful
-	 * 		results <List><Map> list of the domains that were transformed along with other details
-	 * 			[ 	domain: <String> Name of the domain
-	 * 				rows: <Integer> number of rows in domain transformed
-	 * 				errors: <Integer> number of rows with errors
-	 * 			]
-	 */
-	@HasPermission(Permission.AssetImport)
-	def transformData(Long id, String filename) {
-		Map result = [status:'success', errors:[], results: []]
-
-		if (!id) {
-			sendInvalidInput 'Missing Data Script id'
-			return
-		}
-		if (!filename) {
-			sendInvalidInput 'Missing filename'
-			return
-		}
-
-		if (! (filename.endsWith('.csv') || filename.endsWith('.xml'))) {
-			sendInvalidInput 'File type was not CSV or XML'
-		}
-
-		// See if we can find an action to be invoked
-		Map script = dataScripts.find {it.id == id}
-		if (!script) {
-			sendNotFound
-			return
-		}
-
-		// For testing we'll return success for even ids otherwise error
-		if (id % 2) {
-			result.filename = RandomStringUtils.randomAlphabetic(12) + '.json'
-			result.results << [
-				domain: 'Application',
-				rows: 4,
-				errors: 0
-			]
-		} else {
-			result.status = 'error'
-			result.errors << 'Action failed to connect to service'
-		}
-
-		renderAsJson result
 	}
 
 }

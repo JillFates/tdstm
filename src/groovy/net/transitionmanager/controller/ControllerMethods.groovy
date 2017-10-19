@@ -118,8 +118,9 @@ trait ControllerMethods {
 		sendError FORBIDDEN // 403
 	}
 
-	void sendNotFound() {
-		sendError NOT_FOUND // 404
+	void sendNotFound(String message='') {
+		render(status:NOT_FOUND, message)
+		//sendError NOT_FOUND // 404
 	}
 
 	/**
