@@ -74,10 +74,18 @@ class DataviewSpec {
                 dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
                 Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
                 if(!specColumn){
-                    spec.columns += ([domain: dataviewColumn.domain , property: dataviewColumn.property , filter :dataviewColumn.filter?:"" ])
+                    addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
                 }
             }
         }
+    }
+
+    void addColumn(domain, property, filter = null){
+        spec.columns += [
+            domain: domain,
+            property: property,
+            filter: (filter ?: '')
+        ]
     }
 
     /**
