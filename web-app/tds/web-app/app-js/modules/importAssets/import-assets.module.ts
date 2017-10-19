@@ -2,15 +2,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {BrowserModule} from '@angular/platform-browser';
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
-import { DEPENDENCY_INJECTION_STATES } from './import-assets-routing.states';
+import { IMPORT_ASSETS_STATES } from './import-assets-routing.states';
 // Component
 import { SharedModule } from '../../shared/shared.module';
 import { InputsModule } from '@progress/kendo-angular-inputs';
+import { ManualImportComponent } from './components/manual-import/manual-import.component';
 // Services
 import { ImportAssetsService } from './service/import-assets.service';
-import {ManualImportComponent} from './components/manual-import/manual-import.component';
 
 @NgModule({
 	imports: [
@@ -18,7 +19,8 @@ import {ManualImportComponent} from './components/manual-import/manual-import.co
 		SharedModule,
 		FormsModule,
 		InputsModule,
-		UIRouterModule.forChild({ states: DEPENDENCY_INJECTION_STATES }),
+		BrowserModule,
+		UIRouterModule.forChild({ states: IMPORT_ASSETS_STATES }),
 	],
 	declarations: [
 		ManualImportComponent

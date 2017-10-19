@@ -2,6 +2,9 @@
     .form-group {
         margin-bottom: 40px;
     }
+    a.control-label {
+        text-align: left !important;
+    }
 </style>
 
 <div class="content body">
@@ -21,38 +24,55 @@
                                     <option *ngFor="let option of manualOptions" value="{{option.id}}">{{option.name}}</option>
                                 </select>
                             </div>
-                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedManualOption">Fetch</button>
+                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedManualOption">
+                                Fetch
+                                <i *ngIf="fetchInProcess" class="fa fa-fw fa-spinner"></i>
+                                <i *ngIf="fetchResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                            </button>
                             <a href="javascript:void(0);" *ngIf="fetchResult" (click)="onViewData('FETCH')" class="control-label col-md-1">View data</a>
 
                         </div>
-                        <!---->
+
                         <div class="form-group row">
                            <label class="col-sm-3 control-label" for="transform">Transform with Data Script: </label>
                            <div class="col-sm-2">
-
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
                                    <option value></option>
                                    <option *ngFor="let option of dataScriptOptions" value="{{option.id}}">{{option.name}}</option>
                                </select>
-
                             </div>
-                            <button [disabled]="!selectedScriptOption && !fetchResult" class="btn btn-default col-sm-1">Transform</button>
-                            <a href="javascript:void(0);" *ngIf="transformResult" class="control-label col-sm-1">View data</a>
+                            <button [disabled]="!selectedScriptOption && !fetchResult" (click)="onTransform()" class="btn btn-default col-sm-1">
+                                Transform
+                                <i *ngIf="transformInProcess" class="fa fa-fw fa-spinner"></i>
+                                <i *ngIf="transformResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                            </button>
+                            <a href="javascript:void(0);" (click)="onViewData('TRANSFORM')" *ngIf="transformResult" class="control-label col-sm-1">View data</a>
                         </div>
+
                         <div class="form-group row">
                             <label class="col-sm-3 control-label">Load transformed data into Import Batches: </label>
-                            <button [disabled]="!fetchResult && !transformResult" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">Import</button>
-                            <a href="javascript:void(0);" *ngIf="!importResult" class="col-sm-2">Go to Manage Import Batches</a>
+                            <button [disabled]="!fetchResult || !transformResult" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">
+                                Import
+                                <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
+                                <i *ngIf="importResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                            </button>
+                            <a href="../dataTransferBatch/list" class="control-label col-sm-2">Go to Manage Import Batches</a>
                         </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <label class="col-sm-3 control-label">Fetched Data / Transformed Data</label>
-                            <a href="javascript: void(0);" (click)="onClearTextArea()" class="col-sm-offset-3 control-label col-sm-1">Clear</a>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-offset-1 col-sm-6" style="padding-left: 4%">
-                               <textarea [(ngModel)]="fileContent" class="form-control"></textarea>
-                            </div>
-                        </div>
+
+                       <div class="form-group row" style="margin-bottom: 0px;">
+                           <label style="text-align: left;" class="col-sm-offset-1 col-sm-3 control-label">
+                               <span *ngIf="viewDataType === 'FETCH'">Fetched Data</span>
+                               <span *ngIf="viewDataType === 'TRANSFORM'">Transformed Data</span>
+                           </label>
+                           <a href="javascript: void(0);" (click)="onClearTextArea()" style="text-align: right !important;" class="col-sm-offset-2 control-label col-sm-1">Clear</a>
+                       </div>
+
+                       <div class="form-group row">
+                           <div class="col-sm-offset-1 col-sm-6" style="">
+                              <textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>
+                           </div>
+                       </div>
+
                     </div>
                     <div class="box-footer">
                     </div>
