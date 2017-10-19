@@ -10,6 +10,31 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 
+const fieldsResolve = {
+	token: 'fields',
+	policy: { async: 'RXWAIT' },
+	deps: [CustomDomainService],
+	resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
+		let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
+		if (commonIndex !== -1) {
+			let common = domains.splice(commonIndex, 1);
+			domains = common.concat(domains);
+		}
+		domains.forEach(d => {
+			d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
+			d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
+		});
+		return domains;
+	})
+};
+
+const reportsResolve = {
+	token: 'reports',
+	policy: { async: 'RXWAIT' },
+	deps: [AssetExplorerService],
+	resolveFn: (service: AssetExplorerService) => service.getReports()
+};
+
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
 		name: 'tds.assetexplorer',
@@ -78,23 +103,9 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
+		reportsResolve,
+		fieldsResolve,
 		{
-			token: 'fields',
-			policy: { async: 'RXWAIT' },
-			deps: [CustomDomainService],
-			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
-				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
-				if (commonIndex !== -1) {
-					let common = domains.splice(commonIndex, 1);
-					domains = common.concat(domains);
-				}
-				domains.forEach(d => {
-					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
-				});
-				return domains;
-			})
-		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
 			deps: [Transition],
@@ -127,23 +138,9 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
+		reportsResolve,
+		fieldsResolve,
 		{
-			token: 'fields',
-			policy: { async: 'RXWAIT' },
-			deps: [CustomDomainService],
-			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
-				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
-				if (commonIndex !== -1) {
-					let common = domains.splice(commonIndex, 1);
-					domains = common.concat(domains);
-				}
-				domains.forEach(d => {
-					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
-				});
-				return domains;
-			})
-		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService, Transition],
@@ -169,23 +166,9 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewShowComponent }
 	},
 	resolve: [
+		reportsResolve,
+		fieldsResolve,
 		{
-			token: 'fields',
-			policy: { async: 'RXWAIT' },
-			deps: [CustomDomainService],
-			resolveFn: (service: CustomDomainService) => service.getCommonFieldSpecs().map(domains => {
-				let commonIndex = domains.findIndex(x => x.domain.toUpperCase() === 'COMMON');
-				if (commonIndex !== -1) {
-					let common = domains.splice(commonIndex, 1);
-					domains = common.concat(domains);
-				}
-				domains.forEach(d => {
-					d.fields = d.fields.sort((a, b) => a.label > b.label ? 1 : b.label > a.label ? -1 : 0);
-					d.fields.forEach(f => f['domain'] = d.domain.toLowerCase());
-				});
-				return domains;
-			})
-		}, {
 			token: 'report',
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService, Transition],
