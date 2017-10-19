@@ -5,9 +5,11 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel } from '../../model/view.model';
+import { ViewModel, ViewGroupModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { AlertType } from '../../../../shared/model/alert.model';
 
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
@@ -23,6 +25,8 @@ import { AssetExportModel } from '../../model/asset-export-model';
 export class AssetExplorerViewShowComponent implements OnInit {
 	model: ViewModel;
 	domains: DomainModel[] = [];
+	private reportGroupModels = Array<ViewGroupModel>();
+
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 
 	constructor(
@@ -31,10 +35,13 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
 		private stateService: StateService,
-		@Inject('fields') fields: Observable<DomainModel[]>) {
-		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
+		private notifier: NotifierService,
+		@Inject('fields') fields: Observable<DomainModel[]>,
+		@Inject('reports') reports: Observable<ViewGroupModel[]>) {
+		Observable.zip(fields, report, reports).subscribe((result: [DomainModel[], ViewModel, ViewGroupModel[]]) => {
 			this.domains = result[0];
 			this.model = result[1];
+			this.reportGroupModels = result[2];
 		}, (err) => console.log(err));
 	}
 
@@ -77,7 +84,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	protected onSaveAs(): void {
 		if (this.isSaveAsAvailable()) {
 			this.dialogService.open(AssetExplorerViewSaveComponent, [
-				{ provide: ViewModel, useValue: this.model }
+				{ provide: ViewModel, useValue: this.model },
+				{ provide: 'favorites', useValue: this.reportGroupModels.filter(x => x.name === 'Favorites')[0] }
 			]).then(result => {
 				this.model = result;
 				setTimeout(() => {
@@ -113,12 +121,23 @@ export class AssetExplorerViewShowComponent implements OnInit {
 			this.assetService.deleteFavorite(this.model.id)
 				.subscribe(d => {
 					this.model.isFavorite = false;
+					const reportIndex = this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.findIndex(x => x.id === this.model.id);
+					if (reportIndex !== -1) {
+						this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.splice(reportIndex, 1);
+					}
 				});
 		} else {
-			this.assetService.saveFavorite(this.model.id)
-				.subscribe(d => {
-					this.model.isFavorite = true;
+			if (this.assetService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: 'Maximum number of favorite data views reached.'
 				});
+			} else {
+				this.assetService.saveFavorite(this.model.id)
+					.subscribe(d => {
+						this.model.isFavorite = true;
+					});
+			}
 		}
 	}
 

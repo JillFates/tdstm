@@ -11,6 +11,13 @@ import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 import { PreferenceService } from '../../shared/services/preference.service';
 
+const assetsListSizeResolve = {
+	token: 'preferences',
+	policy: { async: 'RXWAIT', when: 'EAGER' },
+	deps: [PreferenceService],
+	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
+};
+
 const fieldsResolve = {
 	token: 'fields',
 	policy: { async: 'RXWAIT' },
@@ -29,11 +36,11 @@ const fieldsResolve = {
 	})
 };
 
-const assetsListSizeResolve = {
-	token: 'preferences',
-	policy: { async: 'RXWAIT', when: 'EAGER' },
-	deps: [PreferenceService],
-	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
+const reportsResolve = {
+	token: 'reports',
+	policy: { async: 'RXWAIT' },
+	deps: [AssetExplorerService],
+	resolveFn: (service: AssetExplorerService) => service.getReports()
 };
 
 export class AssetExplorerStates {
@@ -104,6 +111,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
+		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{
@@ -139,6 +147,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
+		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{
@@ -167,6 +176,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewShowComponent }
 	},
 	resolve: [
+		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{

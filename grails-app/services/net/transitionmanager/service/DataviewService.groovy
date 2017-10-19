@@ -28,6 +28,9 @@ class DataviewService implements ServiceMethods {
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
+	// Limit the number of favorites that should be returned in queries.
+	static final int FAVORITES_MAX_SIZE = 10
+
 	/**
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
 	 * current person in session
@@ -324,11 +327,19 @@ class DataviewService implements ServiceMethods {
 		// Retrieve the current person.
 		Person person = securityService.getUserLoginPerson()
 		// Retrieve all the favorited views for the person.
-		def query = FavoriteDataview.where{
-			person == person
-		}.projections{property 'dataview'}
+		/* Using createCriteria instead of where because there's no way of limiting the number
+		  of results using DetachedCriteria */
+		List<FavoriteDataview> favorites = FavoriteDataview.createCriteria().list {
+			and {
+				person == person
+			}
+			projections {
+				property('dataview')
+			}
+			maxResults(FAVORITES_MAX_SIZE)
 
-		return query.list()
+		}
+		return favorites
 	}
 
 	/**

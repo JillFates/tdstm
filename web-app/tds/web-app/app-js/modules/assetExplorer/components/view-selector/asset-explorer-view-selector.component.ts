@@ -18,7 +18,7 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
 	]
 })
-export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit {
+export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
@@ -28,15 +28,12 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	constructor(
 		private service: AssetExplorerService,
 		private stateService: StateService,
-		private permissionService: PermissionService) {
-	}
-
-	ngOnInit(): void {
-		this.service.getReports()
-			.subscribe((result) => {
-				this.data = result;
-				this.reports = result.slice();
-			});
+		private permissionService: PermissionService,
+		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
+		reportsResolve.subscribe((result) => {
+			this.data = result;
+			this.reports = result.slice();
+		});
 	}
 
 	ngAfterViewInit(): void {

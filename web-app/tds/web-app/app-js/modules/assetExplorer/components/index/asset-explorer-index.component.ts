@@ -141,11 +141,18 @@ export class AssetExplorerIndexComponent {
 					this.loadData();
 				});
 		} else {
-			this.assetExpService.saveFavorite(report.id)
-				.subscribe(d => {
-					report.isFavorite = true;
-					this.loadData();
+			if (this.assetExpService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: 'Maximum number of favorite data views reached.'
 				});
+			} else {
+				this.assetExpService.saveFavorite(report.id)
+					.subscribe(d => {
+						report.isFavorite = true;
+						this.loadData();
+					});
+			}
 		}
 	}
 
