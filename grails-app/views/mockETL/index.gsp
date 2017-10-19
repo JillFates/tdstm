@@ -34,7 +34,7 @@
             <fieldset>
                 <legend>Test Data Source</legend>
                 <br>
-                <textarea class="form-control" name="mockData" rows="8" style="width: 100%;">${mockData}</textarea>
+                <textarea class="form-control" name="mockData" rows="${lineNumbers - 2}" style="width: 100%;">${mockData}</textarea>
                 <br>
 
                 <div class="col-md-12">
@@ -59,8 +59,7 @@
                 <br>
 
                 <div>
-                    <textarea id="script" class="form-control" name="script" rows=10
-                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
+                    <textarea id="script" class="form-control" name="script" rows="${lineNumbers}" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
                 </div>
                 <br>
                 <g:if test="${errorCollector}">
@@ -161,8 +160,13 @@
                 <fieldset>
                     <legend>JSON result</legend>
                     <br>
+
                     <textarea id="jsonResult" rows="50"
-                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${jsonResult}</textarea>
+                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">
+                        <code>
+                        ${jsonResult}
+                        </code>
+                    </textarea>
                 </fieldset>
             </g:if>
         </div>
