@@ -4,7 +4,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav"/>
 
-    <title>Datasource transformation</title>
+    <title>Data Ingestion</title>
+    <link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css" />
     <style type="text/css">
     #script {
         background: url(http://i.imgur.com/2cOaJ.png);
@@ -151,22 +152,21 @@
                     <br>
                     <textarea id="console" rows="15"
                               style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+                    <br>
                 </fieldset>
             </g:if>
         </div>
 
         <div class="col-md-6">
-            <g:if test="${jsonResult != '{}'}">
+            <g:if test="${jsonResult}">
                 <fieldset>
                     <legend>JSON result</legend>
                     <br>
-
-                    <textarea id="jsonResult" rows="50"
-                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">
-                        <code>
-                        ${jsonResult}
-                        </code>
-                    </textarea>
+                    <div id="json-collasped"></div>
+                    %{--<textarea id="jsonResult" rows="50"--}%
+                              %{--style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">--}%
+                        %{--${jsonResult.toString(true).stripIndent()}--}%
+                    %{--</textarea>--}%
                 </fieldset>
             </g:if>
         </div>
@@ -174,7 +174,17 @@
 </form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
+<script type="text/javascript" src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
 <script>
+
+    $(function() {
+
+
+
+        $("#json-collasped").JSONView( ${raw(jsonResult.toString(true))}, { collapsed: true });
+
+    });
+
 
     $('#script').textcomplete([
         { // tech companies
