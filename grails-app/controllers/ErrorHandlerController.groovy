@@ -111,7 +111,7 @@ class ErrorHandlerController implements ControllerMethods {
 		header 'Title', '404 Not Found'
 		header 'Content-Type', 'text/html'
 
-		if (errorHandlerService.isStaticContent(request)) {
+		if (errorHandlerService.isStaticContent(request) || WebUtil.isAjax(request)) {
 			response.status = 404
 			render ''
 		} else {
