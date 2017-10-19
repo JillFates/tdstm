@@ -12,6 +12,11 @@ class CoreService implements ServiceMethods {
 
 	static transactional = false
 
+	// The application property setting to use to determine where temporary files will reside
+	// TODO - Refactor the tempDirProperty to not be tied to graph
+	static final String tempDirProperty = 'graph.tmpDir'
+
+
 	GrailsApplication grailsApplication
 
 	/**
@@ -87,10 +92,9 @@ class CoreService implements ServiceMethods {
 	 * should use for writing files to.
 	 */
 	String getAppTempDirectory() {
-		String propName = 'graph.tmpDir'
-		String tmpDir = getConfigSetting(propName)
+		String tmpDir = getConfigSetting(tempDirProperty)
 		if (! tmpDir) {
-			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($propName)")
+			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($tempDirProperty)")
 		}
 		if (tmpDir[-1] == '/') {
 			tmpDir = tmpDir[0..-2]
