@@ -32,7 +32,7 @@
     <div class="row" class="form-group">
         <div class="col-md-6">
             <fieldset>
-                <legend>Mock Data</legend>
+                <legend>Test Data Source</legend>
                 <br>
                 <textarea class="form-control" name="mockData" rows="8" style="width: 100%;">${mockData}</textarea>
                 <br>
@@ -82,11 +82,11 @@
             </fieldset>
         </div>
     </div>
-
-    <fieldset>
+    <hr>
+    <g:if test="${etlProcessor?.columns}">
+        <fieldset>
         <legend>Raw data modified</legend>
         <br>
-
         <div>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#home">Results</a></li>
@@ -111,7 +111,7 @@
                                 </tr>
                                 <g:each in="${domainResults}" var="row" status="i">
                                     <tr>
-                                        <td>${row.reference?.id}</td>
+                                        <td>${row.reference}</td>
                                         <g:each in="${row.elements}" var="value">
                                             <td>${value.value}</td>
                                         </g:each>
@@ -142,7 +142,8 @@
             </div>
         </div>
     </fieldset>
-
+    </g:if>
+    <hr>
     <div class="row">
         <div class="col-md-6">
             <g:if test="${logContent}">
@@ -156,7 +157,7 @@
         </div>
 
         <div class="col-md-6">
-            <g:if test="${jsonResult}">
+            <g:if test="${jsonResult != '{}'}">
                 <fieldset>
                     <legend>JSON result</legend>
                     <br>
@@ -170,10 +171,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
 <script>
-    var elements = ['span', 'div', 'h1', 'h2', 'h3'];
+
     $('#script').textcomplete([
         { // tech companies
-            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with'],
+            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels'],
             match: /\b(\w{2,})$/,
             search: function (term, callback) {
                 callback($.map(this.words, function (word) {

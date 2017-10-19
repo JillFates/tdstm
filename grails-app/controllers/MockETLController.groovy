@@ -1,6 +1,7 @@
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import getl.tfs.TFS
+import getl.utils.FileUtils
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
@@ -18,8 +19,8 @@ class MockETLController implements ControllerMethods {
 152254,SRW24G4,LINKSYS,Prod
 152255,ZPHA MODULE,TippingPoint,Dev
 152256,Slideaway,ATEN,Prod
-152258,CCM4850",Avocent,Prod
-152259,DSR2035",Avocent,Dev
+152258,CCM4850,Avocent,Prod
+152259,DSR2035,Avocent,Dev
 152266,2U Cable Management,Generic,Prod
 152275,ProLiant BL465c G7,HP,Dev"""
 
@@ -32,6 +33,8 @@ iterate {
     extract 'MODEL NAME' transform lowercase load Name
     extract 2 transform uppercase  load description
     load environment with 'Production'
+    //reference id with id
+    reference assetName, id with Name, id
 
     domain Device
     extract 0 load id
@@ -64,28 +67,33 @@ iterate {
                 String basicAuth = "Basic " + userpass.encodeAsBase64()
                 connection.setRequestProperty("Authorization", basicAuth)
                 connection.setRequestProperty('Accept', 'application/csv')
-                params.mockData = connection.inputStream.text
+
+                String fileName = "${TFS.systemPath}/cmdb_ci_appl_list.csv".toString()
+                def file = new File(fileName).newOutputStream()
+                file << connection.inputStream
+                file.close()
 
                 params.script = "console on"
-//                file << connection.inputStream
-//                file.close()
+                script = params.script
+                params.mockData = new File(fileName).text?.replace('"', '')
+                mockData = params.mockData
+
+                etlProcessor = scriptProcessorService.execute(project, params.script, FileUtils.FileName(fileName))
 
             } else {
 
+                mockData = params.mockData ? """${params.mockData}""" : exampleData
+
+                List<List<String>> data = []
+
+                mockData.trim().eachLine { line, count ->
+                    data.addAll([line.split(',') as List])
+                }
+
+                script = params.script ?: exampleScript
+                etlProcessor = scriptProcessorService.execute(project, script, data)
             }
 
-            mockData = params.mockData ? """${params.mockData}""" : exampleData
-
-            List<List<String>> data = []
-
-            mockData.trim().eachLine { line, count ->
-                data.addAll([line.split(',') as List])
-            }
-
-            script = params.script ?: exampleScript
-
-
-            etlProcessor = scriptProcessorService.execute(project, script, data)
 
         } catch (MultipleCompilationErrorsException cfe) {
             errorCollector = cfe.getErrorCollector()
@@ -94,7 +102,7 @@ iterate {
             missingPropertyError = mpe.getMessage()
         } catch (ETLProcessorException pe) {
             missingPropertyError = pe.getMessage()
-        } catch (IOException ioe) {
+        } catch (Exception ioe) {
             missingPropertyError = ioe.getMessage()
         }
 

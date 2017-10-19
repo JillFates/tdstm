@@ -26,12 +26,7 @@ class AssetClassQueryHelper {
         assetClass
     }
 
-    static List<? extends AssetEntity> where (ETLDomain domain, List<String> fields, List values) {
-
-
-        Map<String, ?> fieldsSpec = fields.withIndex().collectEntries { def field, int i ->
-            [("$field".toString()): values[i]]
-        }
+    static List<? extends AssetEntity> where (ETLDomain domain, Map<String, ?> fieldsSpec) {
 
         String hqlWhere = hqlWhere(fieldsSpec)
 
