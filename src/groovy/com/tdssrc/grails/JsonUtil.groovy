@@ -72,11 +72,21 @@ class JsonUtil {
         return jsonMap
     }
 
+    /**
+     * Convert a JSONElement to map
+     * @param json
+     * @return
+     */
     static Map<String, ?> convertJsonToMap(JSONElement json) {
         if (json == null) return null
         return convertJsonToMap(json.toString())
     }
 
+    /**
+     * Convert a map to json string
+     * @param map
+     * @return
+     */
     static String convertMapToJsonString(Map<String, ?> map) {
         return JsonOutput.toJson(map)
     }
