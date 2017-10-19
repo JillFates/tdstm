@@ -353,7 +353,7 @@ class ETLProcessor {
             currentRowResult[selectedDomain] = new ReferenceResult()
         }
 
-        currentRowResult[selectedDomain].reference = assetEntity
+        currentRowResult[selectedDomain].reference = [id: assetEntity.id]
     }
 
     def methodMissing (String methodName, args) {

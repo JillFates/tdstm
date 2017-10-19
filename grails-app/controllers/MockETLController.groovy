@@ -109,6 +109,7 @@ iterate {
         [
                 mockData            : mockData,
                 script              : script?.trim(),
+                lineNumbers         : Math.max(script.readLines().size(), 10),
                 etlProcessor        : etlProcessor,
                 errorCollector      : errorCollector,
                 lineNumber          : lineNumber,
