@@ -356,7 +356,7 @@ class TaskService implements ServiceMethods {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
+	AssetComment setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
 
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
@@ -505,7 +505,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
-	def getCssClassForStatus(status) {
+	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
 
