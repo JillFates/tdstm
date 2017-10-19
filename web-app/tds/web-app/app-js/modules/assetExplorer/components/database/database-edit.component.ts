@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PreferenceService } from '../../../../shared/services/preference.service';
 import { CleanObjectPipe } from '../../../../shared/pipes/clean-object.pipe';
 import { DATABASE_DEFAULT_VALUES, DatabaseModel } from './database.model';
 declare var jQuery: any;
@@ -14,9 +15,16 @@ export function DatabaseEditComponent(template, editModel) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DatabaseShowComponent implements OnInit {
+
+		dateFormat: string;
+
 		constructor(
 			@Inject('model') private model: any,
-			private activeDialog: UIActiveDialogService) {
+			private activeDialog: UIActiveDialogService,
+			private preference: PreferenceService) {
+			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
+			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			console.log(this.dateFormat);
 			this.model.asset = Object.assign({}, DATABASE_DEFAULT_VALUES, this.model.asset) as DatabaseModel;
 			console.log(this.model.asset);
 		}

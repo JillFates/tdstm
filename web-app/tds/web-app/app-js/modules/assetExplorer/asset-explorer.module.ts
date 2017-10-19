@@ -22,6 +22,8 @@ import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { ExcelExportModule } from '@progress/kendo-angular-excel-export';
 import { SortableModule } from '@progress/kendo-angular-sortable';
+import { IntlModule } from '@progress/kendo-angular-intl';
+import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
 
@@ -34,6 +36,8 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		GridModule,
 		ExcelExportModule,
 		SortableModule,
+		IntlModule,
+		DateInputsModule,
 		UIRouterModule.forChild({ states: ASSET_EXPLORER_STATES })
 	],
 	declarations: [
