@@ -225,10 +225,10 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	@Ignore
 	def '8. tests not yet implemented'() {
-		expect: 'when calling invoke without a valid context that an exception occurs'
-			false
-		expect: 'when calling invoke with a defined parameter that references an undefined property that an an exception occurs'
-			false
+		//		expect: 'when calling invoke without a valid context that an exception occurs'
+		//			false
+		//		expect: 'when calling invoke with a defined parameter that references an undefined property that an an exception occurs'
+		//			false
 	}
 
 	/*
