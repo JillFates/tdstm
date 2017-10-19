@@ -9,6 +9,14 @@ import { HeaderComponent } from '../../shared/modules/header/header.component';
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
+import { PreferenceService } from '../../shared/services/preference.service';
+
+const assetsListSizeResolve = {
+	token: 'preferences',
+	policy: { async: 'RXWAIT', when: 'EAGER' },
+	deps: [PreferenceService],
+	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
+};
 
 const fieldsResolve = {
 	token: 'fields',
@@ -104,6 +112,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 	},
 	resolve: [
 		reportsResolve,
+		assetsListSizeResolve,
 		fieldsResolve,
 		{
 			token: 'report',
@@ -139,6 +148,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 	},
 	resolve: [
 		reportsResolve,
+		assetsListSizeResolve,
 		fieldsResolve,
 		{
 			token: 'report',
@@ -167,6 +177,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 	},
 	resolve: [
 		reportsResolve,
+		assetsListSizeResolve,
 		fieldsResolve,
 		{
 			token: 'report',
