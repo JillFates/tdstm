@@ -6,6 +6,8 @@ import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.DomainUpdateException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
+import test.helper.CredentialTestHelper
+import test.helper.ProviderTestHelper
 
 class CredentialServiceIntegrationSpec extends IntegrationSpec {
     CredentialService credentialService

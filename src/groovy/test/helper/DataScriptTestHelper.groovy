@@ -1,3 +1,5 @@
+package test.helper
+
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person

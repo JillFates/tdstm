@@ -5,6 +5,8 @@ import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.*
 import net.transitionmanager.service.*
 import spock.lang.Specification
+import test.helper.DataScriptTestHelper
+import test.helper.ProviderTestHelper
 
 class ProjectServiceIntegrationSpec extends Specification {
 

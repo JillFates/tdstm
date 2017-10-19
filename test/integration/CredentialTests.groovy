@@ -1,9 +1,12 @@
 import com.tdsops.tm.enums.domain.SecurityRole
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.*
-import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import test.helper.CredentialTestHelper
+import test.helper.ProjectTestHelper
+import test.helper.ProviderTestHelper
+import test.helper.PersonTestHelper
 
 class CredentialTests extends IntegrationSpec {
 
