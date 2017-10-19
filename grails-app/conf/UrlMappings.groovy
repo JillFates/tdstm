@@ -148,7 +148,7 @@ class UrlMappings {
 
 		/***************************/
 
-		"/ws/assetImport/invokeFetchAction/$id" {
+		"/ws/assetImport/invokeFetchAction" {
 			controller = 'wsAssetImport'
 			action = [POST: 'invokeFetchAction']
 		}
@@ -163,7 +163,7 @@ class UrlMappings {
 			action = [GET: 'manualFormOptions']
 		}
 
-		"/ws/assetImport/transformData/$id" {
+		"/ws/assetImport/transformData" {
 			controller = 'wsAssetImport'
 			action = [POST: 'transformData']
 		}
