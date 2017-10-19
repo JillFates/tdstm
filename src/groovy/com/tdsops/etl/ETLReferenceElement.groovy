@@ -18,15 +18,30 @@ class ETLReferenceElement {
      */
     ETLReferenceElement with (Object... dataSourceFieldNames) {
 
-        List dataSourceFields = processor.currentRowResult[processor.selectedDomain].elements.findAll {
-            it.field?.name in dataSourceFieldNames || it.field?.label in dataSourceFieldNames
+        Map<String, ?> fieldsMap = [:]
+
+        processor.currentRowResult[processor.selectedDomain].elements.each {
+            fieldsMap[it?.field?.name] = it
+            fieldsMap[it?.field?.label] = it
+        }
+
+        List<Map<String, ?>> dataSourceFields = []
+
+        dataSourceFieldNames.each {
+            if(fieldsMap.containsKey(it)){
+                dataSourceFields.add(fieldsMap[it])
+            }
         }
 
         if (dataSourceFields.size() != fields.size()) {
-            throw ETLProcessorException.invalidReferenceCommand(fields, new ArrayList(dataSourceFields))
+            throw ETLProcessorException.incorrectAmountOfParameters(fields, new ArrayList(dataSourceFieldNames))
         }
 
-        List assets = AssetClassQueryHelper.where(processor.selectedDomain, fields, dataSourceFields.collect {it.value})
+        Map<String, ?> fieldsSpec = fields.withIndex().collectEntries { def field, int i ->
+            [("$field".toString()): dataSourceFields[i].value]
+        }
+
+        List assets = AssetClassQueryHelper.where(processor.selectedDomain, fieldsSpec)
 
         if (assets.size() == 1) {
             processor.addAssetEntityReferenced(assets.first())

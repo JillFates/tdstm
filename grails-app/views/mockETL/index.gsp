@@ -4,7 +4,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav"/>
 
-    <title>Datasource transformation</title>
+    <title>Data Ingestion</title>
+    <link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css" />
     <style type="text/css">
     #script {
         background: url(http://i.imgur.com/2cOaJ.png);
@@ -32,9 +33,9 @@
     <div class="row" class="form-group">
         <div class="col-md-6">
             <fieldset>
-                <legend>Mock Data</legend>
+                <legend>Test Data Source</legend>
                 <br>
-                <textarea class="form-control" name="mockData" rows="8" style="width: 100%;">${mockData}</textarea>
+                <textarea class="form-control" name="mockData" rows="${lineNumbers - 2}" style="width: 100%;">${mockData}</textarea>
                 <br>
 
                 <div class="col-md-12">
@@ -59,8 +60,7 @@
                 <br>
 
                 <div>
-                    <textarea id="script" class="form-control" name="script" rows=10
-                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
+                    <textarea id="script" class="form-control" name="script" rows="${lineNumbers}" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
                 </div>
                 <br>
                 <g:if test="${errorCollector}">
@@ -82,11 +82,11 @@
             </fieldset>
         </div>
     </div>
-
-    <fieldset>
+    <hr>
+    <g:if test="${etlProcessor?.columns}">
+        <fieldset>
         <legend>Raw data modified</legend>
         <br>
-
         <div>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#home">Results</a></li>
@@ -111,7 +111,7 @@
                                 </tr>
                                 <g:each in="${domainResults}" var="row" status="i">
                                     <tr>
-                                        <td>${row.reference?.id}</td>
+                                        <td>${row.reference}</td>
                                         <g:each in="${row.elements}" var="value">
                                             <td>${value.value}</td>
                                         </g:each>
@@ -142,7 +142,8 @@
             </div>
         </div>
     </fieldset>
-
+    </g:if>
+    <hr>
     <div class="row">
         <div class="col-md-6">
             <g:if test="${logContent}">
@@ -151,6 +152,7 @@
                     <br>
                     <textarea id="console" rows="15"
                               style="background-color: black;color: green; width: 100%;">${logContent}</textarea>
+                    <br>
                 </fieldset>
             </g:if>
         </div>
@@ -160,8 +162,11 @@
                 <fieldset>
                     <legend>JSON result</legend>
                     <br>
-                    <textarea id="jsonResult" rows="50"
-                              style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${jsonResult}</textarea>
+                    <div id="json-collasped"></div>
+                    %{--<textarea id="jsonResult" rows="50"--}%
+                              %{--style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">--}%
+                        %{--${jsonResult.toString(true).stripIndent()}--}%
+                    %{--</textarea>--}%
                 </fieldset>
             </g:if>
         </div>
@@ -169,11 +174,21 @@
 </form>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
+<script type="text/javascript" src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
 <script>
-    var elements = ['span', 'div', 'h1', 'h2', 'h3'];
+
+    $(function() {
+
+
+
+        $("#json-collasped").JSONView( ${raw(jsonResult.toString(true))}, { collapsed: true });
+
+    });
+
+
     $('#script').textcomplete([
         { // tech companies
-            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with'],
+            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels'],
             match: /\b(\w{2,})$/,
             search: function (term, callback) {
                 callback($.map(this.words, function (word) {

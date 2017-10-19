@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import com.tds.asset.AssetEntity
-
 /**
  *
  * Collection row elements from an ETL Script.
@@ -9,7 +6,7 @@ import com.tds.asset.AssetEntity
  */
 class ReferenceResult {
 
-    AssetEntity reference
+    Map<String, ?> reference
     List<Map<String, ?>> elements = []
 
 }
