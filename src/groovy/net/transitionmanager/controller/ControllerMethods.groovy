@@ -42,6 +42,8 @@ trait ControllerMethods {
 	SecurityService securityService
 	LicenseAdminService licenseAdminService
 
+	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
+
 	void renderAsJson(data) {
 		render(data as JSON)
 	}
@@ -120,15 +122,38 @@ trait ControllerMethods {
 		sendError NOT_FOUND // 404
 	}
 
-	/** 
+	/**
 	 * Used to respond with a 400 Bad Request
 	 */
 	void sendBadRequest() {
 		response.sendError(400, 'Bad Request')
 	}
 
+	/**
+	 * Used to indicate that the request input was missing or improperly formatted
+	 * @param message - an optional error message as to why the input was invalid, when included will appear in an X header
+	 */
+	void sendInvalidInput(String message = '') {
+		if (message) {
+			response.addHeader(ERROR_MESG_HEADER, message)
+		}
+		render(status:400, text: 'Invalid Input')
+	}
+
 	void setContentTypeJson() {
 		response.contentType = 'text/json'
+	}
+
+	void setContentTypeCsv() {
+		response.contentType = 'text/csv'
+	}
+
+	void setContentTypeXml() {
+		response.contentType = 'text/xml'
+	}
+
+	void setContentTypeExcel() {
+		response.contentType = 'application/vnd.ms-excel'
 	}
 
 	void sendError(HttpStatus status, String message = null) {
@@ -301,8 +326,8 @@ trait ControllerMethods {
 	}
 
 	/**
-	 * Used to retrieve an domain record using the 
-	 * 
+	 * Used to retrieve an domain record using the
+	 *
 	 */
 	def <T> T fetchDomain(Class<T> clazz, Map params) {
 		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
@@ -327,5 +352,5 @@ trait ControllerMethods {
 			return null
 		}
 	}
-	
+
 }

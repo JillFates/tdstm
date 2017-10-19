@@ -171,6 +171,36 @@ class UrlMappings {
 			action = [GET:"listBundles"]
 		}
 
+
+		/***************************/
+
+		"/ws/assetImport/invokeFetchAction/$id" {
+			controller = 'wsAssetImport'
+			action = [POST: 'invokeFetchAction']
+		}
+
+		"/ws/assetImport/loadData" {
+			controller = 'wsAssetImport'
+			action = [POST: 'loadData']
+		}
+
+		"/ws/assetImport/manualFormOptions" {
+			controller = 'wsAssetImport'
+			action = [GET: 'manualFormOptions']
+		}
+
+		"/ws/assetImport/transformData/$id" {
+			controller = 'wsAssetImport'
+			action = [POST: 'transformData']
+		}
+
+		"/ws/assetImport/viewData" {
+			controller = 'wsAssetImport'
+			action = [GET: 'viewData']
+		}
+
+		/***************************/
+
 		"/ws/event/listEventsAndBundles" {
 			controller = "wsEvent"
 			action = [GET:"listEventsAndBundles"]
