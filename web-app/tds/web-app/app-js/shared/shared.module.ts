@@ -21,7 +21,6 @@ import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive'
 import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
-import { CleanObjectPipe } from './pipes/clean-object.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
@@ -50,7 +49,6 @@ import { DynamicComponent } from './components/dynamic.component';
 		UIBooleanPipe,
 		TranslatePipe,
 		FilterPipe,
-		CleanObjectPipe,
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
@@ -84,7 +82,6 @@ import { DynamicComponent } from './components/dynamic.component';
 		UISVGIconDirectiveDirective,
 		TranslatePipe,
 		FilterPipe,
-		CleanObjectPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,

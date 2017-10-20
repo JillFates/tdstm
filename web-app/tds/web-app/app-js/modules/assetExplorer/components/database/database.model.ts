@@ -1,9 +1,41 @@
-export class DatabaseModel {
-	lastUpdated: Date;
-}
+import * as R from 'ramda';
 
-export const DATABASE_DEFAULT_VALUES = {
+export class DatabaseModel {
+	assetName: string;
+	description: string;
+	dbFormat: string;
+	supportType: string;
+	environment: string;
+	size: string;
 	scale: {
-		name: null
+		name: string
+	};
+	retireDate: string;
+	moveBundle: string;
+	rateOfChange: string;
+	maintExpDate: string;
+	planStatus: string;
+	externalRefId: string;
+	validation: string;
+	customFields: any[];
+
+	constructor() {
+		this.assetName = '';
+		this.description = '';
+		this.dbFormat = '';
+		this.supportType = '';
+		this.environment = '';
+		this.size = '';
+		this.scale = {
+			name: ''
+		};
+		this.retireDate = '';
+		this.moveBundle = '';
+		this.rateOfChange = '';
+		this.maintExpDate = '';
+		this.planStatus = '';
+		this.externalRefId = '';
+		this.validation = '';
+		this.customFields = Array<any>();
 	}
-};
+}
