@@ -16,7 +16,7 @@ import org.apache.http.util.EntityUtils
 
 import java.security.MessageDigest
 
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 class ServiceNowService {
     private static final String DEFAULT_CHARACTER_ENCODING = 'UTF-8'
@@ -24,6 +24,9 @@ class ServiceNowService {
     private static final String USERNAME = "Dcorrea"
     private static final String PASSWORD = "boston2004"
 
+    private static final String FILENAME_PREFIX='servicenow-'
+
+    FileSystemService fileSystemService
     SecurityService securityService
 
     /**
@@ -32,13 +35,13 @@ class ServiceNowService {
      * @return
      */
     Map fetchAssets(Object payload) {
-        log.info('Fetching ServiceNow assets: {}', payload)
+        log.debug 'Fetching ServiceNow assets: {}', payload
         String filename = downloadAndSaveAssetsFile(payload)
         Map result = null
         if (filename) {
-            result = ['status': 'success', 'filename': filename]
+            result = [status: 'success', filename: filename]
         } else {
-            result = ['status': 'error', 'cause': 'Not able to download requested asset.']
+            result = [status: 'error', cause: 'Not able to download requested asset.']
         }
         return result
     }
@@ -104,23 +107,20 @@ class ServiceNowService {
             HttpGet httpGet = new HttpGet(serviceUrl(payload))
             response = httpClient.execute(httpGet)
 
-            log.info(response.getStatusLine().toString())
+            log.debug(response.getStatusLine().toString())
             HttpEntity entity = response.getEntity()
-            log.info('----------------------------------------')
-            log.info(entity.getContentType().toString())
-            log.info(response.getFirstHeader("Content-Disposition").getValue())
+            log.debug "----------------------------------------\n{}\n----------------------------------------",
+                entity.getContentType().toString()
+            log.debug response.getFirstHeader("Content-Disposition").getValue() +
 
             InputStream input = null
             OutputStream output = null
             byte[] buffer = new byte[1024]
 
             try {
-                filename = getDestinationFilename(response, payload)
-                log.info("Downloading file: {}", filename)
+                String extension = getFilenameExtension(response, payload)
+                (filename, output) = fileSystemService.createTemporaryFile(FILENAME_PREFIX, extension)
                 input = entity.getContent()
-                String saveDir = "/tmp/"
-
-                output = new FileOutputStream(saveDir + filename)
                 for (int length; (length = input.read(buffer)) > 0;) {
                     output.write(buffer, 0, length)
                 }
@@ -132,16 +132,18 @@ class ServiceNowService {
                     try {
                         output.close()
                     } catch (IOException logOrIgnore) {
+                        log.warn 'Failed to close output stream {}', filename
                     }
                 if (input != null)
                     try {
                         input.close()
                     } catch (IOException logOrIgnore) {
+                        log.warn 'Failed to close input stream to ServiceNow webservice'
                     }
             }
             EntityUtils.consume(entity)
         } catch (Exception e) {
-            log.error('Error fetching external resource from ServiceNow.', e)
+            log.warn('Error fetching external resource from ServiceNow.', e)
         } finally {
             response = null
         }
@@ -150,31 +152,29 @@ class ServiceNowService {
     }
 
     /**
-     * Construct the downloaded filename prefix
-     * @return
-     */
-    private String getFilenamePrefix() {
-        Date now = new Date()
-        MessageDigest.getInstance("MD5").digest(now.toString().bytes).encodeHex().toString()
-    }
-
-    /**
-     * Construct the destination filename
+     * Determines the proper file extension for the output file based on the response or service definition
      * @param response
      * @param payload
      * @return
      */
-    private String getDestinationFilename(HttpResponse response, Map payload) {
-        String filename = null
-        String dispositionValue = response.getFirstHeader("Content-Disposition").getValue()
-        int index = dispositionValue.toLowerCase().indexOf("filename=")
-        if (index > 0) {
-            // example: inline;filename=cmdb_ci_appl.csv
-            filename = getFilenamePrefix() + "-" + dispositionValue.substring(index + 9, dispositionValue.length() )
-        } else {
-            filename = getFilenamePrefix() + "." + payload['format'] == null ? 'csv' : payload['format']
-        }
-        return filename
-    }
+    private String getFilenameExtension(HttpResponse response, Map payload) {
+        String extension
 
+        // Attempt to strip out the filename extension from the download disposition (example: inline;filename=cmdb_ci_appl.csv)
+        String disposition = response.getFirstHeader('Content-Disposition').getValue()
+        List parts = disposition.toLowerCase().split('filename=')
+        if (parts.size() == 2) {
+            parts = parts.split(/\./)
+            if (parts.size() == 2) {
+                extension = parts[1]
+            }
+        }
+
+        // Fall back to the payload setting
+        if (! extension) {
+            extension = (payload.format ? payload.format.toLowerCase() : 'csv')
+        }
+
+        return extension
+    }
 }
