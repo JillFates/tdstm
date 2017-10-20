@@ -422,39 +422,8 @@ class TaskService implements ServiceMethods {
 				String errMsg
 
 				if (task.apiAction.isSync()) {
-//					log.error "invokeAction() task has synchronous action that is not supported (taskId=${task.id})"
-//					errMsg = 'Task has an synchronous action which are not supported'
-					try {
-						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
-						// Kick of the sync method and mark the task STARTED
-						apiActionService.invoke(task.apiAction, task)
-
-						// Update the task so that the we track that the action was invoked
-						task.apiActionInvokedAt = new Date()
-
-						// Update the task so that we track the task started at
-						task.actStart = new Date()
-
-						// Log a note that the API Action was called
-						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
-						addNote(task, whom, "Invoked action ${task.apiAction.name}")
-
-						// Make sure that the status is COMPLETED instead
-						status = AssetCommentStatus.COMPLETED
-						task.status = status
-
-						addNote(task, whom, "Completed action ${task.apiAction.name}")
-						task.apiActionCompletedAt = new Date()
-						task.actFinish = new Date()
-
-					} catch (InvalidRequestException e) {
-						errMsg = e.getMessage()
-					} catch (InvalidConfigurationException e) {
-						errMsg = e.getMessage()
-					} catch (e) {
-						errMsg = 'A runtime error occurred while attempting to process the action'
-						log.error ExceptionUtil.stackTraceToString('invokeAction() failed ', e)
-					}
+					log.error "invokeAction() task has synchronous action that is not supported (taskId=${task.id})"
+					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
 						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
