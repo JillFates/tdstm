@@ -1843,10 +1843,12 @@ class ETLProcessorSpec extends Specification {
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding)
                     .evaluate("""
+                        console on
                         read labels
                         iterate {
                             domain Application
-                            reference id, appVendor with id, appVendor
+                            extract 'APPLICATION ID' load id
+                            reference id with id
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
