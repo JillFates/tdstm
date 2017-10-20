@@ -14,7 +14,7 @@ export const importAssetsState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	url: ImportAssetsStates.IMPORT_ASSETS.url,
 	data: {
 		page: {
-			title: 'ASSET_IMPORT.MANUAL_ASSET_IMPORT',
+			title: 'IMPORT_ASSETS.MANUAL_IMPORT.MANUAL_ASSET_IMPORT',
 			instruction: '',
 			menu: []
 		},
