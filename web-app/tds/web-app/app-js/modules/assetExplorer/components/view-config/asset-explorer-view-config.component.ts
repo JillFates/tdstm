@@ -6,10 +6,11 @@ import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.
 import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
-import { ViewModel, ViewGroupModel } from '../../model/view.model';
+import { ViewModel } from '../../model/view.model';
 import { ViewColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
@@ -35,8 +36,9 @@ import { AlertType } from '../../../../shared/model/alert.model';
 })
 export class AssetExplorerViewConfigComponent {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
+	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
+
 	private dataSignature: string;
-	private reportGroupModels = Array<ViewGroupModel>();
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
 	filterModel = {
@@ -71,12 +73,10 @@ export class AssetExplorerViewConfigComponent {
 		private permissionService: PermissionService,
 		private state: StateService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>,
-		@Inject('reports') reports: Observable<ViewGroupModel[]>) {
-		Observable.zip(fields, report, reports).subscribe((result: [DomainModel[], ViewModel, ViewGroupModel[]]) => {
+		@Inject('fields') fields: Observable<DomainModel[]>) {
+		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = { ...result[1] };
-			this.reportGroupModels = result[2];
 			this.dataSignature = JSON.stringify(this.model);
 			if (this.model.id) {
 				this.updateFilterbyModel();
@@ -201,7 +201,7 @@ export class AssetExplorerViewConfigComponent {
 	protected openSaveDialog(): void {
 		this.dialogService.open(AssetExplorerViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: 'favorites', useValue: this.reportGroupModels.filter(x => x.name === 'Favorites')[0] }
+			{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
@@ -294,6 +294,7 @@ export class AssetExplorerViewConfigComponent {
 				this.assetExpService.saveReport(this.model)
 					.subscribe(result => {
 						this.dataSignature = JSON.stringify(this.model);
+						this.select.loadData();
 					});
 			} else {
 				this.openSaveDialog();
@@ -360,13 +361,10 @@ export class AssetExplorerViewConfigComponent {
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
-				const reportIndex = this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.findIndex(x => x.id === this.model.id);
-				if (reportIndex !== -1) {
-					this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.splice(reportIndex, 1);
-				}
+				this.select.loadData();
 			}
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExpService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

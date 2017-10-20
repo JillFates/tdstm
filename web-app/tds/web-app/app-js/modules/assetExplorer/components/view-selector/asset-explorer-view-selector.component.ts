@@ -12,6 +12,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	selector: 'asset-explorer-view-selector',
+	exportAs: 'assetExplorerViewSelector',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
@@ -22,7 +23,7 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
-	private data: ViewGroupModel[];
+	public data: ViewGroupModel[];
 	private search = '';
 
 	constructor(
@@ -100,5 +101,12 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 
+	}
+
+	public loadData() {
+		this.service.getReports()
+			.subscribe(result => {
+				this.data = result as ViewGroupModel[];
+			});
 	}
 }
