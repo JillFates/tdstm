@@ -1,6 +1,7 @@
 package net.transitionmanager.service.dataingestion
 
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
 /**
@@ -9,6 +10,7 @@ import spock.lang.Specification
 class ScriptProcessorServiceIntegrationSpec extends Specification {
 
     ScriptProcessorService scriptProcessorService
+    FileSystemService fileSystemService
 
     def setup () {
     }
