@@ -1,7 +1,6 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
-import grails.converters.JSON
 
 /**
  *
@@ -152,7 +151,7 @@ class ETLProcessor {
                 columns.add(column)
                 columnsMap[column.label] = column
             }
-            debugConsole.info "Reading labels ${columnsMap.values().collectEntries {[("${it.index}"): it.label]}}"
+            debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
         }
         this
     }
@@ -350,7 +349,7 @@ class ETLProcessor {
      * @param element
      */
     private def doDebug (Element element) {
-        debugConsole.debug "${([position: [element.columnIndex, element.rowIndex], value: element.value] as JSON).toString(false)}"
+        debugConsole.debug "${[position: [element.columnIndex, element.rowIndex], value: element.value]}"
         element
     }
 

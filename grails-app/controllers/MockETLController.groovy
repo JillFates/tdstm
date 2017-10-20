@@ -120,6 +120,4 @@ iterate {
                 jsonResult          : (etlProcessor?.results as JSON)
         ]
     }
-
-
 }
