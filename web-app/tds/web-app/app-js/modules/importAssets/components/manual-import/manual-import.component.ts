@@ -7,9 +7,9 @@ import {ImportAssetsService} from '../../service/import-assets.service';
 })
 export class ManualImportComponent implements OnInit {
 
-	private manualOptions = [];
+	private actionOptions = [];
 	private dataScriptOptions = [];
-	private selectedManualOption: any;
+	private selectedActionOption: any;
 	private selectedScriptOption: any;
 	private fetchResult: any;
 	private fetchInProcess = false;
@@ -25,10 +25,9 @@ export class ManualImportComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
-			this.manualOptions = result;
-		});
-		this.importAssetsService.getDataScriptOptions().subscribe( (result) => {
-			this.dataScriptOptions = result;
+			console.log(result);
+			this.actionOptions = result.actions;
+			this.dataScriptOptions = result.dataScripts;
 		});
 	}
 
@@ -37,25 +36,37 @@ export class ManualImportComponent implements OnInit {
 		this.fetchResult = null;
 		this.transformResult = null;
 		this.selectedScriptOption = null;
-		this.importAssetsService.postFetch(this.selectedManualOption).subscribe( (result) => {
-			setTimeout(() => { this.fetchResult = result; this.fetchInProcess = false; }, this.HARD_CODED_DELAY);
+		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
+			setTimeout(() => {
+				console.log(result);
+				this.fetchResult = result;
+				this.fetchInProcess = false;
+			}, this.HARD_CODED_DELAY );
 		} );
 	}
 
 	private onTransform(): void {
 		this.transformInProcess = true;
 		this.transformResult = null;
-		this.importAssetsService.postTransform(this.selectedScriptOption).subscribe( (result) => {
-			setTimeout(() => { this.transformResult = result; this.transformInProcess = false; }, this.HARD_CODED_DELAY);
+		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
+			setTimeout(() => {
+				console.log(result);
+				this.transformResult = result;
+				this.transformInProcess = false;
+				}, this.HARD_CODED_DELAY);
 		} );
 	}
 
 	private onImport(): void {
 		this.importInProcess = true;
 		this.importResult = null;
-		this.importAssetsService.postImport(this.transformResult.outputFilename).subscribe( (result) => {
-			setTimeout(() => { this.importResult = result; this.importInProcess = false; }, this.HARD_CODED_DELAY);
-		} );
+		this.importAssetsService.postImport(this.transformResult.filename).subscribe( (result) => {
+			setTimeout(() => {
+				console.log(result);
+				this.importResult = result;
+				this.importInProcess = false;
+			}, this.HARD_CODED_DELAY);
+		});
 	}
 
 	private getFileContentValue(): string {
@@ -70,11 +81,11 @@ export class ManualImportComponent implements OnInit {
 		this.fileContent = null;
 		this.viewDataType = type;
 		if (this.viewDataType === 'FETCH') {
-			this.importAssetsService.getFileContent(this.fetchResult.filename, this.fetchResult.extension).subscribe((result) => {
+			this.importAssetsService.getFileContent(this.fetchResult.filename).subscribe((result) => {
 				this.fileContent = result;
 			});
 		} else {
-			this.importAssetsService.getFileContent(this.transformResult.outputFilename, this.transformResult.outputFilenameExtension).subscribe((result) => {
+			this.importAssetsService.getFileContent(this.transformResult.filename).subscribe((result) => {
 				this.fileContent = result;
 			});
 		}

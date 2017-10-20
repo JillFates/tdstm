@@ -51,8 +51,17 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		}
 	},
-	'DEPENDENCY_INJECTION': {
-		'MANUAL_ASSET_IMPORT': 'Manual Asset Import'
+	'IMPORT_ASSETS': {
+		'MANUAL_IMPORT': {
+			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
+			'FETCH_DATA_ACTION': 'Fetch with Data Action:',
+			'TRANSFORM_DATA_SCRIPT': 'Transform with Data Script:',
+			'LOAD_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
+			'FETCH': 'Fetch',
+			'TRANSFORM': 'Transform',
+			'IMPORT': 'Import',
+			'VIEW_DATA': 'View Data'
+		}
 	},
 	'GLOBAL': {
 		'OK': 'Ok',
@@ -73,7 +82,9 @@ export const en_DICTIONARY: Object = {
 		'ADD_FAVORITES': 'Add to Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
-		'FREEZE': 'Freeze'
+		'FREEZE': 'Freeze',
+		'SORT': 'Sort',
+		'CLEAR': 'Clear'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
