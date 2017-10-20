@@ -17,19 +17,20 @@
                     </div>
                     <div class="box-body" style="margin-top: 30px;">
                         <div class="form-group row">
-                            <label class="col-sm-3 control-label" for="fetch">Fetch with data action: </label>
+                            <label class="col-sm-3 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-2">
-                                <select [(ngModel)]="selectedManualOption" name="fetch" id="fetch" class="form-control pd-top-5">
+                                <select [(ngModel)]="selectedActionOption" name="fetch" id="fetch" class="form-control pd-top-5">
                                     <option value></option>
-                                    <option *ngFor="let option of manualOptions" value="{{option.id}}">{{option.name}}</option>
+                                    <option *ngFor="let option of actionOptions" [ngValue]="option">{{option.name}}</option>
                                 </select>
                             </div>
-                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedManualOption">
+                            <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption">
                                 Fetch
                                 <i *ngIf="fetchInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="fetchResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="fetchResult?.status === 'success' " style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="fetchResult?.status === 'error' " style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="javascript:void(0);" *ngIf="fetchResult" (click)="onViewData('FETCH')" class="control-label col-md-1">View data</a>
+                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success'" (click)="onViewData('FETCH')" class="control-label col-md-1">View data</a>
 
                         </div>
 
@@ -38,23 +39,25 @@
                            <div class="col-sm-2">
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
                                    <option value></option>
-                                   <option *ngFor="let option of dataScriptOptions" value="{{option.id}}">{{option.name}}</option>
+                                   <option *ngFor="let option of dataScriptOptions" [ngValue]="option">{{option.name}}</option>
                                </select>
                             </div>
-                            <button [disabled]="!selectedScriptOption && !fetchResult" (click)="onTransform()" class="btn btn-default col-sm-1">
+                            <button [disabled]="!selectedScriptOption || !fetchResult || fetchResult?.status === 'error'" (click)="onTransform()" class="btn btn-default col-sm-1">
                                 Transform
                                 <i *ngIf="transformInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="transformResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="transformResult?.status === 'success'" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="transformResult?.status === 'error'" style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="javascript:void(0);" (click)="onViewData('TRANSFORM')" *ngIf="transformResult" class="control-label col-sm-1">View data</a>
+                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);" (click)="onViewData('TRANSFORM')" class="control-label col-sm-1">View data</a>
                         </div>
 
                         <div class="form-group row">
                             <label class="col-sm-3 control-label">Load transformed data into Import Batches: </label>
-                            <button [disabled]="!fetchResult || !transformResult" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">
+                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">
                                 Import
                                 <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="importResult" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="importResult?.status === 'success'" style="color: green;" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="importResult?.status === 'error'" style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
                             </button>
                             <a href="../dataTransferBatch/list" class="control-label col-sm-2">Go to Manage Import Batches</a>
                         </div>
