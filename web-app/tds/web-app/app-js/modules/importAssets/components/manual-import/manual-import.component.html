@@ -12,8 +12,7 @@
         <div>
             <form class="formly form-horizontal" role="form" novalidate >
                 <div class="box box-primary">
-                    <div class="box-header with-border">
-                        <h3 class="box-title"></h3>
+                    <div class="box-header">
                     </div>
                     <div class="box-body" style="margin-top: 30px;">
                         <div class="form-group row">
@@ -53,9 +52,10 @@
                             <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);" (click)="onViewData('TRANSFORM')" class="control-label col-sm-1">View data</a>
                         </div>
 
-                        <div class="form-group row">
+                            <div class="form-group row" style="margin-bottom: 20px;">
                             <label class="col-sm-3 control-label">Load transformed data into Import Batches: </label>
-                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'" (click)="onImport()" class="btn btn-default col-md-offset-2 col-sm-1">
+                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'" (click)="onImport()"
+                                    class="btn btn-default col-md-offset-2 col-sm-1">
                                 Import
                                 <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
                                 <i *ngIf="importResult?.status === 'success'" style="color: green;" class="glyphicon glyphicon-ok"></i>
@@ -64,23 +64,44 @@
                             <a href="../dataTransferBatch/list" class="control-label col-sm-2">Go to Manage Import Batches</a>
                         </div>
 
-                       <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="form-group row">
+                            <button (click)="onClear()" class="btn btn-default col-md-offset-5 col-sm-1">
+                                Clear
+                            </button>
+                        </div>
+
+                       <!--<div class="form-group row" style="margin-bottom: 0px;">
                            <label style="text-align: left;" class="col-sm-offset-1 col-sm-3 control-label">
                                <span *ngIf="viewDataType === 'FETCH'">Fetched Data</span>
                                <span *ngIf="viewDataType === 'TRANSFORM'">Transformed Data</span>
                            </label>
-                           <a href="javascript: void(0);" (click)="onClearTextArea()" style="text-align: right !important;" class="col-sm-offset-2 control-label col-sm-1">Clear</a>
-                       </div>
+                           <a href="javascript: void(0);" (click)="onCloseFileContents()" style="text-align: right !important;" class="col-sm-offset-2 control-label col-sm-1">Clear</a>
+                       </div>-->
 
                        <div class="form-group row">
                            <div class="col-sm-offset-1 col-sm-6" style="">
-                              <textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>
+                               <a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
+                                  href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">Close</a>
+                               <kendo-tabstrip>
+                                   <kendo-tabstrip-tab style="font-weight: bold;" [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
+                                       <ng-template kendoTabContent>
+                                           <div>{{getFetchFileContentValue()}}</div>
+                                           <!--<textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>-->
+                                       </ng-template>
+                                   </kendo-tabstrip-tab>
+                                   <kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'" *ngIf="transformFileContent">
+                                       <ng-template kendoTabContent>
+                                           <div>{{getTransformFileContentValue()}}</div>
+                                           <!--<textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>-->
+                                       </ng-template>
+                                   </kendo-tabstrip-tab>
+                               </kendo-tabstrip>
                            </div>
                        </div>
 
                     </div>
-                    <div class="box-footer">
-                    </div>
+                    <!--<div class="box-footer">
+                    </div>-->
                 </div>
             </form>
         </div>
