@@ -48,7 +48,7 @@
     "@progress/kendo-theme-default": "^2.12.25",
     "@types/jasmine": "^2.5.36",
     "@types/node": "^6.0.79",
-    "@types/ramda": "github:types/npm-ramda",
+    "@types/ramda": "^0.24.17",
     "@types/webpack": "^3.0.1",
     "browserify": "^14.1.0",
     "canonical-path": "0.0.2",

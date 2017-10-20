@@ -55,7 +55,7 @@
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
 										<td valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')}">
-											<kendo-datepicker [format]="dateFormat" [(value)]="model.asset.retireDate"></kendo-datepicker> <!-- [(ngModel)]="model.asset.retireDate" -->
+											<kendo-datepicker [format]="dateFormat" [(value)]="model.asset.retireDate"></kendo-datepicker>
 										</td>
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
@@ -73,7 +73,7 @@
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
 										<td valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')}">
-                                            <kendo-datepicker  [format]="dateFormat"  [(value)]="model.asset.maintExpDate"></kendo-datepicker> <!--  -->
+                                            <kendo-datepicker [format]="dateFormat" [(value)]="model.asset.maintExpDate"></kendo-datepicker> <!--  -->
 										</td>
 
 										<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>

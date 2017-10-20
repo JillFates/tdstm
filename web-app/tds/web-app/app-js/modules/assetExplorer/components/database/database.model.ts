@@ -17,7 +17,6 @@ export class DatabaseModel {
 	planStatus: string;
 	externalRefId: string;
 	validation: string;
-	customFields: any[];
 
 	constructor() {
 		this.assetName = '';
@@ -36,6 +35,5 @@ export class DatabaseModel {
 		this.planStatus = '';
 		this.externalRefId = '';
 		this.validation = '';
-		this.customFields = Array<any>();
 	}
 }
