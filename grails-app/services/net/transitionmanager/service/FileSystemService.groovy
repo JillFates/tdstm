@@ -39,7 +39,7 @@ class FileSystemService  implements InitializingBean {
      */
     List createTemporaryFile(String prefix='', String extension='tmp') {
         String filename = getUniqueFilename(temporaryDirectory, prefix, extension)
-        OutputStream os = new File(tempDirProperty,filename).newOutputStream()
+        OutputStream os = new File(temporaryDirectory + filename).newOutputStream()
 
         return [filename, os]
     }
@@ -53,7 +53,7 @@ class FileSystemService  implements InitializingBean {
         InputStream is
         validateFilename(filename)
         if (temporaryFileExists(filename)) {
-            is = File(temporaryDirectory + filename).newInputStream()
+            is = new File(temporaryDirectory + filename).newInputStream()
         }
         return is
     }
@@ -64,7 +64,7 @@ class FileSystemService  implements InitializingBean {
      * @return true if the file exists otherwise false
      */
     boolean temporaryFileExists(String filename) {
-        return File(temporaryDirectory + filename).exists()
+        return new File(temporaryDirectory + filename).exists()
     }
 
     /**
@@ -97,7 +97,7 @@ class FileSystemService  implements InitializingBean {
         validateFilename(filename)
 
         boolean success = false
-        File file = File(temporaryDirectory + filename)
+        File file = new File(temporaryDirectory + filename)
         if (file.exists()) {
             success = file.delete()
         }
