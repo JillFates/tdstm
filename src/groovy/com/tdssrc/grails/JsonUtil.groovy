@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grails.converters.JSON
 import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import groovy.json.JsonException
@@ -81,11 +82,20 @@ class JsonUtil {
     }
 
     /**
-     * Converts an object into a String in the JSON pretty format 
+     * Converts an object into a String in the JSON pretty format
      * @param object - the object to be converted
      * @return the object as JSON String
      */
     static String toPrettyJson(Object object) {
         JsonOutput.prettyPrint(toJson(object))
+    }
+
+    /**
+     * Parse the given file into an JSONObject instance.
+     * @param fileName
+     * @return
+     */
+    static JSONObject parseFile(String fileName) {
+        return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
     }
 }

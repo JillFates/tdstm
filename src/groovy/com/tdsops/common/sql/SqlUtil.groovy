@@ -345,7 +345,12 @@ class SqlUtil {
 		propName + ' ' + operator + ' :' + prop
 	}
 
-	private static String escapeStringParameter(String parameter) {
+	/**
+	 * Escape the given parameter.
+	 * @param parameter
+	 * @return
+	 */
+	static String escapeStringParameter(String parameter) {
 		return StringEscapeUtils.escapeJava(parameter.toString().trim())
 	}
 
