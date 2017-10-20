@@ -9,8 +9,6 @@ declare var jQuery: any;
 
 export function DatabaseEditComponent(template, editModel) {
 
-	editModel.asset = ObjectUtils.clean(editModel.asset, [R.isNil]);
-
 	@Component({
 		selector: `database-edit`,
 		template: template,

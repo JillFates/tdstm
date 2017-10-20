@@ -4,6 +4,7 @@ export class ObjectUtils {
 
 	/**
 	 * Merge two objects if the property exist in both
+	 * and is not null or undefined to avoid overwrite an initialised property
 	 * Value from Target persist
 	 * Value From Sources remains
 	 * @param source
@@ -11,7 +12,8 @@ export class ObjectUtils {
 	 * @returns {any} Composed Object
 	 */
 	public static compose(source: any, target: any): any {
-		let composed = R.clone(source);
+		target = ObjectUtils.clean(source, [R.isNil]);
+ 		let composed = R.clone(source);
 		const propNames = R.keys(source);
 		for (let i = 0; i < propNames.length; i++) {
 			let property = propNames[i];
@@ -24,9 +26,9 @@ export class ObjectUtils {
 	}
 
 	/**
-	 * Clean an Object by removing based on Filter Conditions
-	 * A Filter is an object that can contains any kind of expression or function
-	 * that result in a evaluable condition
+	 * Clean an Object by removing properties based on Filter Conditions
+	 * A Filter is a list that can contains any kind of expression or function that result in a evaluable condition
+	 * i.e. clean({ a: null, b: undefined, c:3, d:4}, [R.isNil, (k) => k === 4]): will result on {c:3}
 	 * @param value
 	 * @param filter
 	 * @returns {any}
