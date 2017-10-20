@@ -955,6 +955,47 @@ class ETLProcessorSpec extends Specification {
                     .toString()
     }
 
+    void 'test can debug a selected value for a column name' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, [
+                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
+            ])
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                            console on
+                            domain Device
+                            iterate {
+                                debug 'DEVICE ID'
+                            }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'A console content could be recovered after processing an ETL Scrtipt'
+            console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
+                    .append(System.lineSeparator())
+                    .append("INFO - Selected Domain: Device")
+                    .append(System.lineSeparator())
+                    .toString()
+    }
+
     void 'test can throw an ETLProcessorException for an invalid console status' () {
 
         given:

@@ -4,12 +4,14 @@ import com.tdsops.etl.*
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
-import getl.tfs.TFS
+import getl.utils.FileUtils
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
 
 @Transactional
+@Slf4j
 class ScriptProcessorService {
 
     CustomDomainService customDomainService
@@ -23,8 +25,9 @@ class ScriptProcessorService {
      * @param data
      * @return
      */
-    ETLProcessor execute (Project project, String scriptContent, List<List<String>> data) {
+    ETLProcessor executeForDemo (Project project, String scriptContent, List<List<String>> data) {
 
+        log.info 'Created temporary file {}{}'
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         def configureUsingDomain = { AssetClass assetClass ->
@@ -58,14 +61,14 @@ class ScriptProcessorService {
      *
      * @param project
      * @param scriptContent
-     * @param filename
+     * @param fileName a fully qualified filename
      * @return
      */
-    ETLProcessor execute (Project project, String scriptContent, String filename) {
 
+    ETLProcessor executeForDemo (Project project, String scriptContent, String fileName) {
 
-        CSVConnection csvCon = new CSVConnection(config: "csv", path: TFS.systemPath)
-        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: filename, header: true)
+        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
@@ -88,7 +91,7 @@ class ScriptProcessorService {
 
         dataset.eachRow { row ->
             data.add(fields.collect { columnName ->
-                row[columnName]?:""
+                row[columnName] ?: ""
             })
         }
 
@@ -104,6 +107,50 @@ class ScriptProcessorService {
         new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
         etlProcessor
+    }
+
+    Map<ETLDomain, List<ReferenceResult>> execute (Project project, String scriptContent, String fileName) {
+
+        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
+
+        DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        def configureUsingDomain = { AssetClass assetClass ->
+            customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
+        }
+
+        ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+
+        validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
+        validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
+        validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
+        validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
+
+        List<List<String>> data = []
+
+        def fields = dataset.connection.driver.fields(dataset)*.name
+
+        data.add(fields)
+
+        dataset.eachRow { row ->
+            data.add(fields.collect { columnName ->
+                row[columnName] ?: ""
+            })
+        }
+
+        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+                uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
+                first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
+                blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
+        ])
+
+        ETLBinding binding = new ETLBinding(etlProcessor)
+
+        new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+
+        etlProcessor.results
     }
 
 }
