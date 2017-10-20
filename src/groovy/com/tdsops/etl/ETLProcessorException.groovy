@@ -36,6 +36,10 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException extractMissingColumn (String columnName) {
+        new ETLProcessorException("Extracting a missing column name '$columnName'".toString())
+    }
+
+    static ETLProcessorException missingColumn (String columnName) {
         new ETLProcessorException("Missing column name '$columnName'".toString())
     }
 

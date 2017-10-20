@@ -82,7 +82,7 @@
             </fieldset>
         </div>
     </div>
-    <hr>
+    <g:if test="${etlProcessor?.columns}"><hr></g:if>
     <g:if test="${etlProcessor?.columns}">
         <fieldset>
         <legend>Raw data modified</legend>
@@ -95,6 +95,10 @@
 
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
+
+                <g:if test="${!(etlProcessor?.results)}">
+                    <h2>Note Results yet</h2>
+                </g:if>
 
                     <g:each in="${com.tdsops.etl.ETLDomain.values()}" var="domain">
                         <g:set var="domainResults" value="${etlProcessor?.results?.getAt(domain)}"></g:set>
@@ -143,9 +147,9 @@
         </div>
     </fieldset>
     </g:if>
-    <hr>
+    <g:if test="${logContent || jsonResult}"><hr></g:if>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-${(logContent && !jsonResult)?12:6}">
             <g:if test="${logContent}">
                 <fieldset>
                     <legend>Console output</legend>
@@ -157,7 +161,7 @@
             </g:if>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-${(!logContent && jsonResult)?12:6}">
             <g:if test="${jsonResult}">
                 <fieldset>
                     <legend>JSON result</legend>
@@ -178,17 +182,35 @@
 <script>
 
     $(function() {
-
-
-
-        $("#json-collasped").JSONView( ${raw(jsonResult.toString(true))}, { collapsed: true });
-
+        $("#json-collasped").JSONView( ${raw(jsonResult?.toString(true))}, { collapsed: true });
     });
 
-
     $('#script').textcomplete([
-        { // tech companies
-            words: ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels'],
+        {
+            id: 'available-methods',
+            words: ${raw(availableMethods)},
+            match: /\b(\w{1,})$/,
+            search: function (term, callback) {
+                callback($.map(this.words, function (word) {
+                    return word.indexOf(term) === 0 ? word : null;
+                }));
+            },
+            template: function (value) {
+                return '<strong style="text-align: left; display: block;">' + value + '</strong>';;
+            },
+            index: 1,
+            replace: function (word) {
+                if(word != "iterate") {
+                    return word + ' ';
+                } else {
+                    return word + ' {\n\n\n\n}';
+                }
+
+            }
+        },
+        {
+            id: 'asset-fields',
+            words: ${raw(assetFields)},
             match: /\b(\w{2,})$/,
             search: function (term, callback) {
                 callback($.map(this.words, function (word) {
@@ -200,7 +222,13 @@
                 return word + ' ';
             }
         }
-    ]);
+    ], {
+        onKeydown: function (e, commands) {
+            if (e.ctrlKey && e.keyCode === 74) { // CTRL-J
+                return commands.KEY_ENTER;
+            }
+        }
+    });
 </script>
 
 

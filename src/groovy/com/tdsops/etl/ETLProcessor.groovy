@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import grails.converters.JSON
 
 /**
  *
@@ -145,13 +146,13 @@ class ETLProcessor {
     ETLProcessor read (String dataPart) {
 
         if ("labels".equalsIgnoreCase(dataPart)) {
-            debugConsole.info "Reading labels"
 
             dataSource.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
                 Column column = new Column(label: columnName, index: index)
                 columns.add(column)
                 columnsMap[column.label] = column
             }
+            debugConsole.info "Reading labels ${columnsMap.values().collectEntries {[("${it.index}"): it.label]}}"
         }
         this
     }
@@ -287,6 +288,38 @@ class ETLProcessor {
     }
     /**
      *
+     * Add a message in console for an element from dataSource by its index in the row
+     *
+     * @param index
+     * @return
+     */
+    def debug (Integer index) {
+
+        if (index in (0..currentRow.size())) {
+            currentColumnIndex = index
+            doDebug currentRow.getElement(currentColumnIndex)
+        } else {
+            throw ETLProcessorException.missingColumn(index)
+        }
+    }
+    /**
+     *
+     * Add a message in console for an element from dataSource by its column name
+     *
+     * @param columnName
+     * @return
+     */
+    def debug (String columnName) {
+
+        if (columnsMap.containsKey(columnName)) {
+            currentColumnIndex = columnsMap[columnName].index
+            doDebug currentRow.getElement(currentColumnIndex)
+        } else {
+            throw ETLProcessorException.missingColumn(columnName)
+        }
+    }
+    /**
+     *
      * It looks up the field Spec for Domain by fieldName
      *
      * @param domain
@@ -309,6 +342,16 @@ class ETLProcessor {
             }
         }
         fieldSpec
+    }
+    /**
+     *
+     * Adds a message debug with element content in console
+     *
+     * @param element
+     */
+    private def doDebug (Element element) {
+        debugConsole.debug "${([position: [element.columnIndex, element.rowIndex], value: element.value] as JSON).toString(false)}"
+        element
     }
 
     private void addCrudRowData (Integer rowIndex, List<String> crudRowData) {
@@ -383,5 +426,13 @@ class ETLProcessor {
 
     Row getRow (Integer index) {
         rows[index]
+    }
+
+    List<String> getAvailableMethods () {
+        ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels', 'transform', 'translate', 'debug']
+    }
+
+    List<String> getAssetFields () {
+        ['id', 'assetName', 'moveBundle']
     }
 }
