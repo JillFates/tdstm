@@ -19,9 +19,10 @@
                         <div class="form-group row">
                             <label class="col-sm-3 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-2">
-                                <select [(ngModel)]="selectedActionOption" name="fetch" id="fetch" class="form-control pd-top-5">
+                                <select [(ngModel)]="selectedActionOption" (ngModelChange)="onActionScriptChange($event)" name="fetch" id="fetch" class="form-control pd-top-5" >
                                     <option value></option>
-                                    <option *ngFor="let option of actionOptions" [ngValue]="option">{{option.name}}</option>
+                                    <option *ngFor="let option of actionOptions"
+                                            [ngValue]="option">{{option.name}}</option>
                                 </select>
                             </div>
                             <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption">
@@ -39,7 +40,8 @@
                            <div class="col-sm-2">
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
                                    <option value></option>
-                                   <option *ngFor="let option of dataScriptOptions" [ngValue]="option">{{option.name}}</option>
+                                   <option *ngFor="let option of dataScriptOptions"
+                                           [ngValue]="option">{{option.name}}</option>
                                </select>
                             </div>
                             <button [disabled]="!selectedScriptOption || !fetchResult || fetchResult?.status === 'error'" (click)="onTransform()" class="btn btn-default col-sm-1">
