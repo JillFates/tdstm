@@ -2,11 +2,13 @@ package net.transitionmanager.service.dataingestion
 
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.FileSystemService
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
+@Ignore
 class ScriptProcessorServiceIntegrationSpec extends Specification {
 
     ScriptProcessorService scriptProcessorService
