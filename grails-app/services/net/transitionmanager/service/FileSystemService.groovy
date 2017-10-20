@@ -24,9 +24,12 @@ class FileSystemService  implements InitializingBean {
 
     public void afterPropertiesSet() throws Exception {
         // Load the temporary directory name and make sure that it has the
-        temporaryDirectory = coreService.getAppTempDirectory()
-        if (! temporaryDirectory.endsWith(File.separator)) {
-            temporaryDirectory << File.separator
+        String appTempDirectory = coreService.getAppTempDirectory()
+
+        if (! appTempDirectory.endsWith(File.separator)) {
+            temporaryDirectory = appTempDirectory + File.separator
+        } else {
+            temporaryDirectory = appTempDirectory
         }
     }
 
