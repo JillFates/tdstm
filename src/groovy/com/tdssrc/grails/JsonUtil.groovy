@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grails.converters.JSON
 import groovy.json.JsonBuilder
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
@@ -67,5 +68,14 @@ class JsonUtil {
     static Map<String, ?> convertJsonToMap(String json) {
         Map<String, Object> jsonMap = new ObjectMapper().readValue(json, HashMap.class)
         return jsonMap
+    }
+
+    /**
+     * Parse the given file into an JSONObject instance.
+     * @param fileName
+     * @return
+     */
+    static JSONObject parseFile(String fileName) {
+        return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
     }
 }
