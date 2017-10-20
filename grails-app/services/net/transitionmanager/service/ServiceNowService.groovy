@@ -14,16 +14,12 @@ import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
 
-import java.security.MessageDigest
-
 @Transactional(readOnly = true)
 @Slf4j
 class ServiceNowService {
     private static final String DEFAULT_CHARACTER_ENCODING = 'UTF-8'
-    private static final String SERVICE_NOW_FILENAME = 'SERVICE_NOW_FILENAME'
     private static final String USERNAME = "Dcorrea"
     private static final String PASSWORD = "boston2004"
-
     private static final String FILENAME_PREFIX='servicenow-'
 
     FileSystemService fileSystemService
@@ -44,19 +40,6 @@ class ServiceNowService {
             result = [status: 'error', cause: 'Not able to download requested asset.']
         }
         return result
-    }
-
-    /**
-     * Post actions executed by callback method
-     * @param options
-     */
-    void notifyFetchResults(Map options) {
-        log.info('Got called by callback method with params: {}', options)
-        if (options && options['filename']) {
-            securityService.session.setAttribute(SERVICE_NOW_FILENAME, options['filename'])
-        } else {
-            securityService.session.removeAttribute(SERVICE_NOW_FILENAME)
-        }
     }
 
     /**
@@ -111,7 +94,7 @@ class ServiceNowService {
             HttpEntity entity = response.getEntity()
             log.debug "----------------------------------------\n{}\n----------------------------------------",
                 entity.getContentType().toString()
-            log.debug response.getFirstHeader("Content-Disposition").getValue() +
+            log.debug response.getFirstHeader("Content-Disposition").getValue()
 
             InputStream input = null
             OutputStream output = null
@@ -164,7 +147,7 @@ class ServiceNowService {
         String disposition = response.getFirstHeader('Content-Disposition').getValue()
         List parts = disposition.toLowerCase().split('filename=')
         if (parts.size() == 2) {
-            parts = parts.split(/\./)
+            parts = parts[1].split(/\./)
             if (parts.size() == 2) {
                 extension = parts[1]
             }
