@@ -78,7 +78,7 @@ iterate {
                 params.mockData = new File(fileName).text?.replace('"', '')
                 mockData = params.mockData
 
-                etlProcessor = scriptProcessorService.execute(project, params.script, FileUtils.FileName(fileName))
+                etlProcessor = scriptProcessorService.executeForDemo(project, params.script, fileName)
 
             } else {
 
@@ -90,8 +90,8 @@ iterate {
                     data.addAll([line.split(',') as List])
                 }
 
-                script = params.script ?: exampleScript
-                etlProcessor = scriptProcessorService.execute(project, script, data)
+                script = params.script ?: ""
+                etlProcessor = scriptProcessorService.executeForDemo(project, script, data)
             }
 
 
@@ -113,6 +113,8 @@ iterate {
                 etlProcessor        : etlProcessor,
                 errorCollector      : errorCollector,
                 lineNumber          : lineNumber,
+                availableMethods    : (etlProcessor?.availableMethods as JSON).toString(),
+                assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
                 jsonResult          : (etlProcessor?.results as JSON)
