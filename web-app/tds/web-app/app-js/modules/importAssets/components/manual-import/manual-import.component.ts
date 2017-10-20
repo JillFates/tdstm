@@ -19,7 +19,8 @@ export class ManualImportComponent implements OnInit {
 	private transformInProcess = false;
 	private importResult: any;
 	private importInProcess = false;
-	private fileContent: any;
+	private fetchFileContent: any;
+	private transformFileContent: any;
 	private viewDataType: string;
 	private HARD_CODED_DELAY = 1000;
 
@@ -36,11 +37,13 @@ export class ManualImportComponent implements OnInit {
 	private onFetch(): void {
 		this.fetchInProcess = true;
 		this.fetchResult = null;
+		this.fetchFileContent = null;
 		this.transformResult = null;
+		this.transformFileContent = null;
+		this.importResult = null;
 		// this.selectedScriptOption = null;
 		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
 			setTimeout(() => {
-				console.log(result);
 				this.fetchResult = result;
 				if (result.status === 'error') {
 					this.notifier.broadcast({
@@ -63,10 +66,10 @@ export class ManualImportComponent implements OnInit {
 	private onTransform(): void {
 		this.transformInProcess = true;
 		this.transformResult = null;
+		this.transformFileContent = null;
 		this.importResult = null;
 		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
 			setTimeout(() => {
-				console.log(result);
 				this.transformResult = result;
 				if (result.status === 'error') {
 					this.notifier.broadcast({
@@ -84,38 +87,56 @@ export class ManualImportComponent implements OnInit {
 		this.importResult = null;
 		this.importAssetsService.postImport(this.transformResult.filename).subscribe( (result) => {
 			setTimeout(() => {
-				console.log(result);
 				this.importResult = result;
 				this.importInProcess = false;
 			}, this.HARD_CODED_DELAY);
 		});
 	}
 
-	private getFileContentValue(): string {
-		if (this.fileContent) {
-			return JSON.stringify(this.fileContent);
+	private getFetchFileContentValue(): string {
+		if (this.fetchFileContent) {
+			return JSON.stringify(this.fetchFileContent);
+		} else {
+			return '';
+		}
+	}
+
+	private getTransformFileContentValue(): string {
+		if (this.transformFileContent) {
+			return JSON.stringify(this.transformFileContent);
 		} else {
 			return '';
 		}
 	}
 
 	private onViewData(type: string): void {
-		this.fileContent = null;
 		this.viewDataType = type;
 		if (this.viewDataType === 'FETCH') {
+			this.fetchFileContent = null;
 			this.importAssetsService.getFileContent(this.fetchResult.filename).subscribe((result) => {
-				this.fileContent = result;
+				this.fetchFileContent = result;
 			});
 		} else {
+			this.transformFileContent = null;
 			this.importAssetsService.getFileContent(this.transformResult.filename).subscribe((result) => {
-				this.fileContent = result;
+				this.transformFileContent = result;
 			});
 		}
 	}
 
-	private onClearTextArea(): void {
-		this.fileContent = null;
+	private onCloseFileContents(): void {
+		this.fetchFileContent = null;
+		this.transformFileContent = null;
 		this.viewDataType = null;
+	}
+
+	private onClear(): void {
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+		this.viewDataType = null;
+		this.importResult = null;
 	}
 
 }
