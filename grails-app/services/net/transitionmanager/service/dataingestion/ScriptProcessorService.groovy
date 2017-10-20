@@ -108,7 +108,13 @@ class ScriptProcessorService {
 
         etlProcessor
     }
-
+    /**
+     *
+     * @param project
+     * @param scriptContent
+     * @param fileName
+     * @return
+     */
     Map<ETLDomain, List<ReferenceResult>> execute (Project project, String scriptContent, String fileName) {
 
         CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
