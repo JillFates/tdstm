@@ -2,7 +2,9 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.ApplicationService
 import org.apache.commons.lang3.RandomStringUtils
 
@@ -14,6 +16,8 @@ import org.apache.commons.lang3.RandomStringUtils
 @Secured('isAuthenticated()')
 @Slf4j(value='logger', category='grails.app.controllers.WsApplicationController')
 class WsAssetImportController implements ControllerMethods {
+
+	ApiActionService apiActionService
 
 	// mock data to use until methods are integrated with database
 	static final List<Map> actions = [
@@ -62,18 +66,19 @@ class WsAssetImportController implements ControllerMethods {
 		Map result = [status:'success', errors:[], filename:'']
 
 		// See if we can find an action to be invoked
-		Map action = actions.find {it.id == actionId}
+		ApiAction action = ApiAction.get(actionId)
 		if (!action) {
 			sendNotFound("Action $actionId Not Found")
 			return
 		}
 
-		// For testing we'll return success for even ids otherwise error
-		if (actionId % 2) {
+		// invoke action and eval the result
+		Map actionInvocationResult = apiActionService.invoke(action)
+		if (actionInvocationResult.status == 'error') {
 			result.status = 'error'
-			result.errors << 'Action failed to connect to service'
+			result.errors << actionInvocationResult.cause
 		} else {
-			result.filename = RandomStringUtils.randomAlphabetic(12) + '.csv'
+			result.filename = actionInvocationResult.filename
 		}
 
 		renderAsJson result

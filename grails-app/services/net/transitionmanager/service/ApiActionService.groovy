@@ -90,17 +90,32 @@ class ApiActionService {
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 
 			} else {
-				//throw new InvalidRequestException('Synchronous invocation not supported')
-				def agent = agentInstanceForAction(action)
-
-				// Lets try to invoke the method
-				logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}($remoteMethodParams)"
-				agent."${action.agentMethod}"(remoteMethodParams)
+				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
 		} else {
 			throw new InvalidRequestException(
-					'invoke() not implemented for class ' + context.getClass().getName() )
+				'invoke() not implemented for class ' + context.getClass().getName() )
 		}
+	}
+
+	/**
+	 * Used to invoke an agent method within action parameters solely.
+	 * @param action - the ApiAction to be invoked
+	 * @return
+	 */
+	Map invoke(ApiAction action) {
+		assert action != null : 'No action provided.'
+
+		// get the agent instance
+		def agent = agentInstanceForAction(action)
+
+		// methodParams will hold the parameters to pass to the remote method
+		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
+
+		logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}($remoteMethodParams)"
+
+		// execute action and return any result coming
+		return agent."${action.agentMethod}"(remoteMethodParams)
 	}
 
 	/**
@@ -138,7 +153,7 @@ class ApiActionService {
 		DictionaryItem methodDef = dict[action.agentMethod]
 		if (! methodDef) {
 			throw new InvalidRequestException(
-					"Action class ${action.agentClass} method ${action.agentMethod} not implemented" )
+				"Action class ${action.agentClass} method ${action.agentMethod} not implemented" )
 		}
 		methodDef
 	}

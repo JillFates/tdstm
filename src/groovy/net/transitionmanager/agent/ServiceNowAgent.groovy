@@ -39,26 +39,9 @@ class ServiceNowAgent extends AbstractAgent {
      */
     Map fetchAssets(Object payload) {
         Map result = serviceNowService.fetchAssets(payload)
-        callbackMethod(payload, result)
+        log.debug 'Result of fetch assets. {}', result
 
         return result
-    }
-
-    /**
-     * Used to execute post actions
-     * @param payload
-     * @param result
-     */
-    void callbackMethod(Object payload, Map result) {
-        try {
-            if (payload['callbackMethod'] && result && result['filename']) {
-                serviceNowService."${payload['callbackMethod']}"(result)
-            } else {
-                log.error('Error fetching assets. {}', result)
-            }
-        } catch (Exception e) {
-            log.error('Application error.', e)
-        }
     }
 
 }
