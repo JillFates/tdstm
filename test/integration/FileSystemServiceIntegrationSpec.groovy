@@ -47,7 +47,7 @@ class FileSystemServiceIntegrationSpec extends Specification {
 		then: 'the file should exist'
 			fileSystemService.temporaryFileExists(filename)
 
-		when: 'deleting the temporary'
+		when: 'the temporary file is deleted'
 			fileSystemService.deleteTemporaryFile(filename)
 		then: 'the file should no longer exist'
 			! fileSystemService.temporaryFileExists(filename)
