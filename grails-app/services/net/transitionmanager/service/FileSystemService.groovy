@@ -3,13 +3,14 @@ package net.transitionmanager.service
 import grails.transaction.Transactional
 import org.springframework.beans.factory.InitializingBean
 import org.apache.commons.lang3.RandomStringUtils
-
+import groovy.util.logging.Slf4j
 import javax.management.RuntimeErrorException
 
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
 @Transactional(readOnly = true)
+@Slf4j
 class FileSystemService  implements InitializingBean {
 
     // The maximum number of tries to get a unique filename so that the getUniqueFilename doens't get into infinite loop
@@ -40,7 +41,7 @@ class FileSystemService  implements InitializingBean {
     List createTemporaryFile(String prefix='', String extension='tmp') {
         String filename = getUniqueFilename(temporaryDirectory, prefix, extension)
         OutputStream os = new File(temporaryDirectory + filename).newOutputStream()
-
+        log.info 'Created temporary file {}{}', temporaryDirectory, filename
         return [filename, os]
     }
 
@@ -81,7 +82,8 @@ class FileSystemService  implements InitializingBean {
             if (! temporaryFileExists(filename) ) {
                 break
             }
-            if (! tries--) {
+            if (! --tries) {
+                log.error 'Failed to generate a unique filename in {} directory', temporaryDirectory
                 throw new RuntimeErrorException('getUniqueFilename unable to determine unique filename')
             }
         }
@@ -95,13 +97,15 @@ class FileSystemService  implements InitializingBean {
      */
     boolean deleteTemporaryFile(String filename) {
         validateFilename(filename)
-
         boolean success = false
         File file = new File(temporaryDirectory + filename)
         if (file.exists()) {
             success = file.delete()
         }
-        success
+
+        log.info 'Deletion of temporary file {}{} {}', temporaryDirectory, filename, (success ? 'succeeded' : 'failed')
+
+        return success
     }
 
     /**
