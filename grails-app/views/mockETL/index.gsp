@@ -58,7 +58,6 @@
             <fieldset>
                 <legend>ETL Scripting Sandbox</legend>
                 <br>
-
                 <div>
                     <textarea id="script" class="form-control" name="script" rows="${lineNumbers}" style="font: normal 10pt Consolas, Monaco, monospace; width: 100%;">${script}</textarea>
                 </div>
@@ -79,6 +78,25 @@
                 </g:if>
                 <br>
                 <input class="form-control" type="submit" value="Apply">
+                <br>
+                <div class="col-md-5">
+                     DataScript Id: <input type="text" size="3" name="dataScriptId" id="dataScriptId" value="${dataScriptId}"">
+                     <br>
+                     Provider: <input type="text" size="25" name="providerName" id="providerName" value="${providerName}">
+                     <br>
+                     Name: <input type="text" size="25" name="dataScriptName" id="dataScriptName" value="${dataScriptName}">
+                </div>
+
+                <div class="col-md-2">
+                    <input class="form-control" type="button" value="Load" onclick="loadDataScriptSource();">
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" type="button" value="Save" onclick="saveDataScriptSource();">
+                </div>
+                <div class="col-md-2">
+                    <input class="form-control" type="button" value="Create" onclick="createDataScriptSource();">
+                </div>
+
             </fieldset>
         </div>
     </div>
@@ -180,6 +198,103 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
 <script type="text/javascript" src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
 <script>
+
+    // Grab the dataScriptId input and fetch the script from the database and stick into the script input
+    function loadDataScriptSource() {
+        var dataScriptId = $("#dataScriptId").val();
+        $.ajax('/tdstm/mockETL/dataScriptSource?id='+dataScriptId, {
+              type: 'GET',
+              success: function(data) {
+                 $("#script").val(data.script);
+                 $("#providerName").val(data.provider);
+                 $("#dataScriptName").val(data.name);
+              },
+              error: function(xhr, status, text) {
+                if (xhr.status == '404') {
+                    alert('Script not found');
+                } else {
+                    var msg = xhr.getResponseHeader('X-TM-Error-Message');
+                    debugger;
+                    if (msg === null) {
+                        alert('Error(' + xhr.status + ') ' + xhr.responseText );
+                    } else {
+                        alert(msg);
+                    }
+                }
+              }
+        });
+    }
+
+    // Saves the current script to the specified Data Script id
+    function saveDataScriptSource() {
+        var dataScriptId = $("#dataScriptId").val();
+        var data = { "script": $("#script").val() };
+
+        $.ajax('/tdstm/mockETL/dataScriptSource?id='+dataScriptId, {
+              type: 'POST',
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              data: JSON.stringify(data),
+              success: function(data) {
+                 if (data.status) {
+                    alert(data.errors);
+                 } else {
+                    alert('Saved!');
+                }
+              },
+              error: function(xhr, status, text) {
+                if (xhr.status == '404') {
+                    alert('Script not found');
+                } else {
+                    var msg = xhr.getResponseHeader('X-TM-Error-Message');
+                    debugger;
+                    if (msg === null) {
+                        alert('Error(' + xhr.status + ') ' + xhr.responseText );
+                    } else {
+                        alert(msg);
+                    }
+                }
+              }
+        });
+    }
+
+    // Creates a new DataScript record for the current script, provider and script name
+    function createDataScriptSource() {
+        var data = {
+            "script": $("#script").val(),
+            "providerName": $("#providerName").val(),
+            "name": $("#dataScriptName").val()
+        };
+        // alert(JSON.stringify(data));
+
+        $.ajax('/tdstm/mockETL/dataScriptSource', {
+              type: 'PUT',
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              data: JSON.stringify(data),
+              success: function(data) {
+                 if (data.status == 'error') {
+                     alert(data.errors);
+                 } else {
+                     $("#dataScriptId").val(data.id),
+                     alert('Created!');
+                 }
+              },
+              error: function(xhr, status, text) {
+                if (xhr.status == '404') {
+                    alert('Script not found');
+                } else {
+                    var msg = xhr.getResponseHeader('X-TM-Error-Message');
+                    //debugger;
+                    if (msg === null) {
+                        alert('Error(' + xhr.status + ') ' + xhr.responseText );
+                    } else {
+                        alert(msg);
+                    }
+                }
+              }
+        });
+    }
 
     $(function() {
         $("#json-collasped").JSONView( ${raw(jsonResult?.toString(true))}, { collapsed: true });

@@ -198,6 +198,7 @@ databaseChangeLog = {
 	include file: '20171010-remove-legacy-field-settings.groovy'
 	include file: '20171011-create-credential-table.groovy'
 	include file: '20170816-add-api-action-permissions.groovy'
+	include file: '20171020-add-properties-for-api-etl.groovy'
 	include file: '20171025-create-default-bundle-for-projects.groovy'
 	include file: '20171026-add-assetclass-to-common-fields.groovy'
 	include file: '20171030-add-permissions-for-datascript.groovy'
