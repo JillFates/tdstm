@@ -43,10 +43,15 @@ class ETLReferenceElement {
 
         List assets = AssetClassQueryHelper.where(processor.selectedDomain, fieldsSpec)
 
-        if (assets.size() == 1) {
-            processor.addAssetEntityReferenced(assets.first())
-        } else if (assets.size() > 1) {
-            throw ETLProcessorException.nonUniqueResults(fields)
+        if (assets.size()) {
+            //processor.addAssetEntityReferenced(assets.first())
+            for (asset in assets) {
+                processor.addAssetEntityReferenced(asset)
+            }
+
+            // TODO - references should list all found assets
+        //} else if (assets.size() > 1) {
+        //    throw ETLProcessorException.nonUniqueResults(fields)
         }
         this
     }

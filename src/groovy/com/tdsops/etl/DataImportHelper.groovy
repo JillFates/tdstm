@@ -11,7 +11,7 @@ import net.transitionmanager.agent.Environment
  */
 class DataImportHelper {
 
-    static final String NAME_FIELD = "Name"
+    static final String NAME_FIELD = "assetName"
     static final String ID_FIELD = "id"
 
     /**
@@ -33,6 +33,8 @@ class DataImportHelper {
      *  and it's part of this project.
      */
     static final validateIdField = {asset, params ->
+        return null
+        /*
         String errorMsg = null
         // Retrieve the 'id' field from the json.
         def field = findFieldInAssetJson(asset, ID_FIELD)
@@ -61,11 +63,17 @@ class DataImportHelper {
                 errorMsg = "Wrong format for field 'id' for Asset No. ${params.assetIdx} in class ${params.assetClass}."
             }
         } else {
-            // The 'id' field is required, report the error if it couldn't been found.
-            errorMsg = "Missing required field 'id' for Asset No. ${params.assetIdx} in class ${params.assetClass}."
+
+            if (params.containsKey('reference')) {
+
+            } else {
+                // The 'id' field is required, report the error if it couldn't been found.
+                errorMsg = "Missing required field 'id' for asset (row ${params.assetIdx}) in class ${params.assetClass}"
+            }
         }
 
         return errorMsg
+        */
     }
 
     /**
@@ -218,6 +226,25 @@ class DataImportHelper {
      * @return
      */
     static findFieldInAssetJson(asset, fieldName) {
-        return asset.elements.find {it.field?.name == fieldName}
+        def field = asset.elements.find {it.field?.name == fieldName}
+
+        if (! field && fieldName == ID_FIELD) {
+            String value
+            // This is a special case that will potentially uses the reference and the the id element
+            if (asset.containsKey('reference')) {
+                if (asset.reference?.size() == 1) {
+                    value = asset.reference[0]
+                }
+            }
+            value = (value ?: '')
+            // Construct what looks like a field for the id
+            field = [
+                field: [ name: 'id', control:'Number', label: 'ID'],
+                originalValue: value,
+                value: value
+            ]
+        }
+println "**** findFieldInAssetJson fieldName:$fieldName, field:$field"
+        return field
     }
 }

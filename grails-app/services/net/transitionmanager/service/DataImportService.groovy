@@ -8,7 +8,10 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
+import net.transitionmanager.domain.DataTransferSet
+import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -16,50 +19,60 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 
+@Slf4j(value='log', category='net.transitionmanager.service.DataImportService')
 @Transactional
 class DataImportService implements ServiceMethods{
 
     SecurityService securityService
     JdbcTemplate jdbcTemplate
 
-    private Logger log = LoggerFactory.getLogger(DataImportService.class)
+    // private Logger log = LoggerFactory.getLogger(DataImportService.class)
 
 
     /**
      * Root of the SQL Statement to insert Data Transer Values into the database.
      */
     private static final String DTV_SQL_INSERT =
-            """
+            '''
             INSERT INTO data_transfer_value
             (asset_entity_id, data_transfer_batch_id, import_value, corrected_value, field_name, has_error, error_text, row_id)
             VALUES 
-            """
+            '''
 
 
     /**
      *
      * Entry point for the process of importing assets.
      *
-     * Create a DataTransfer batch for each asset class present in the
-     * JSON file being loaded for import.
+     * Create a DataTransfer batch for each asset class present in the JSON file being loaded for import.
      *
      * @param userLogin
      * @param project
-     * @param fqFilename
+     * @param fqFilename - the fully qualified path and filename of the source JSON file
+     * @return a map containing details about the import creation
+     *      batchesCreated: Integer - count of the number of batches created
+     *      domains: List - A list of each domain that assets were created
+     *          assetClass: String - name of the asset class
+     *          assetsCreated: Integer - a count of the number of assets created
      */
-    void loadJsonIntoImportBatch(UserLogin userLogin, Project project, String fqFilename) {
-        JSONObject assetClasses = JsonUtil.parseFile(fqFilename)
+    Map loadJsonIntoImportBatch(UserLogin userLogin, Project project, InputStream inputStream) {
+        JSONObject assetClasses = JsonUtil.parseFile(inputStream)
         // Iterate over the asset classes.
+        Map results = [ batchesCreated: 0, domains:[] ]
         assetClasses.each { assetClass, assets ->
             // Create a Transfer Batch for the asset class
             DataTransferBatch dataTransferBatch = createDataTransferBatch(assetClass, userLogin, project)
             if (dataTransferBatch) {
+                results.batchesCreated++
                 // Map with info for logging and validations during the process
                 Map params = [assetClass: assetClass, project: project, assetIdx: 0]
                 // Import the assets for this batch.
                 importAssetBatch(dataTransferBatch, assets, params)
+
+                results.domains << [assetClass: assetClass, assetsCreated: params.assetIdx]
             }
         }
+        return results
     }
 
     /**
@@ -70,12 +83,22 @@ class DataImportService implements ServiceMethods{
      * @return
      */
     private DataTransferBatch createDataTransferBatch(String assetClass, UserLogin currentUser, Project project) {
+        DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
+        if (!dts) {
+            dts = DataTransferSet.get(1)
+        }
         DataTransferBatch dataTransferBatch = new DataTransferBatch(
-                statusCode: "PENDING", transferMode: "I", project: project,
-                userLogin: currentUser, eavEntityType: EavEntityType.findByDomainName(assetClass))
+                statusCode: "PENDING",
+                transferMode: "I",
+                project: project,
+                userLogin: currentUser,
+                eavEntityType: EavEntityType.findByDomainName(assetClass),
+                dataTransferSet: dts
+                )
+
         // Check if the transfer batch is valid, report the error if not.
         if (!dataTransferBatch.save()) {
-            log.error "createDataTransferBatch() failed save - ${GormUtil.allErrorsString(dataTransferBatch)}"
+            log.error 'DataImportService.createDataTransferBatch() failed save - {}', GormUtil.allErrorsString(dataTransferBatch)
             dataTransferBatch = null
         }
         return dataTransferBatch
@@ -94,7 +117,7 @@ class DataImportService implements ServiceMethods{
             // Process the fields for this asset.
             importAssetFields(dataTransferBatch, asset, params)
             // Update the index for the next asset.
-            params.assetIdx = params.assetIdx + 1
+            params.assetIdx++
         }
     }
 
@@ -125,6 +148,7 @@ class DataImportService implements ServiceMethods{
      * @param params
      */
     private void importAssetFields(DataTransferBatch dataTransferBatch, asset, Long assetId, Map params) {
+/*
 
         // Build a list of statements for inserting all the DTVs for this asset.
         String sqlValues = buildInsertSQLForDtvValues(dataTransferBatch, asset, assetId, params)
@@ -132,6 +156,28 @@ class DataImportService implements ServiceMethods{
         String query = DTV_SQL_INSERT + sqlValues
         // Execute the query, inserting all the DTVs for the current asset.
         jdbcTemplate.execute(query)
+
+*/
+        insertDataTransferValuesForAsset(dataTransferBatch, asset, assetId, params)
+    }
+
+    def insertDataTransferValuesForAsset = { DataTransferBatch dataTransferBatch, asset, Long assetId, Map params ->
+        for (element in asset.elements) {
+            DataTransferValue dtv = new DataTransferValue(
+                dataTransferBatch: dataTransferBatch,
+                fieldName: element.field.name,
+                assetEntityId: assetId,
+                importValue: element.originalValue,
+                correctedValue: element.value,
+                rowId: params.assetIdx
+//                EavAttribute eavAttribute
+            )
+            if (!dtv.save()) {
+                //println "insertDataTransferValuesForAsset() failed to save"
+                //log.error 'DataImportService.insertDataTransferValuesForAsset() failed save - {}', GormUtil.allErrorsString(dtv)
+                println "DataImportService.insertDataTransferValuesForAsset() failed save - ${GormUtil.allErrorsString(dtv)}"
+            }
+        }
 
     }
 
@@ -182,7 +228,7 @@ class DataImportService implements ServiceMethods{
 
         // Parse the values for this field
         Map parsingResults = DataImportHelper.parseFieldValues(fieldJson, params)
-
+println "getDtvSqlValues(assetId=$assetId) parsingResults=$parsingResults"
         sqlValues.append(SqlUtil.LEFT_PARENTHESIS)
         sqlValues.append(assetId).append(SqlUtil.COMMA) // AssetId
         sqlValues.append(dataTransferBatch.id).append(SqlUtil.COMMA) // Batch Id
