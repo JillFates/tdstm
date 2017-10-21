@@ -98,4 +98,13 @@ class JsonUtil {
     static JSONObject parseFile(String fileName) {
         return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
     }
+
+    /**
+     * Parse the given inputStream of text into an JSONObject instance
+     * @param inputStream
+     * @return JSON
+     */
+    static JSONObject parseFile(InputStream inputStream) {
+        return (JSONObject)JSON.parse(inputStream.text)
+    }
 }
