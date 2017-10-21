@@ -4,12 +4,18 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
+
+@Slf4j(value='log', category='grails.app.controllers.MockETLController')
 @Secured('isAuthenticated()')
 class MockETLController implements ControllerMethods {
 
@@ -117,7 +123,109 @@ iterate {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.results as JSON)
+                jsonResult          : (etlProcessor?.results as JSON),
+                dataScriptId        : params.dataScriptId,
+                providerName        : params.providerName,
+                dataScriptName      : params.dataScriptName
+
         ]
+    }
+
+    /**
+     * Used to retrieve the ETL source code for a particular DataScript
+     * @param id
+     * @return
+     */
+    def dataScriptSource(Long id) {
+        Project project = getProjectForWs()
+
+        switch(request.method) {
+            case 'GET':
+                if (! id) {
+                    sendInvalidInput('Please provide Data Script Id')
+                    return
+                }
+                DataScript script = DataScript.findByProjectAndId(project, id)
+                if (script) {
+                    Map result = [id:script.id, script:script.etlSourceCode, provider: script.provider.name, name: script.name]
+                    renderAsJson(result)
+                } else {
+                    sendNotFound()
+                }
+                break
+
+            case 'POST':
+                if (! id) {
+                    sendInvalidInput('Please provide Data Script Id')
+                    return
+                }
+                DataScript script = DataScript.findByProjectAndId(project, id)
+                if (! script) {
+                    sendNotFound()
+                    return
+                }
+
+                if (! request.JSON.script) {
+                    sendInvalidInput('Update was missing the script or script was blank')
+                } else {
+                    script.etlSourceCode = request.JSON.script
+                    script.save(failOnError:true)
+                    log.debug 'Saved script: {}', request.JSON.script
+                    render text:'success'
+
+                }
+                break
+
+            case 'PUT':
+                if (! request.JSON.script) {
+                    sendInvalidInput('Can not create a blank script')
+                    return
+                }
+
+                if (! request.JSON.providerName) {
+                    sendInvalidInput('Must specify a Provider name')
+                    return
+                }
+
+                if (! request.JSON.name) {
+                    sendInvalidInput('Must specify a name for the script')
+                    return
+                }
+
+                Provider provider = Provider.findByProjectAndName(project, request.JSON.providerName)
+                if (!provider) {
+                    sendInvalidInput('Provider name was not found')
+                    return
+                }
+
+                // Check for existing Script by the same name
+                DataScript script = DataScript.findByProviderAndName(provider, request.JSON.name)
+                if (script) {
+                    sendInvalidInput('Script name already exists')
+                    return
+                }
+
+                script = new DataScript(
+                    project: project,
+                    name: request.JSON.name,
+                    mode:DataScriptMode.IMPORT,
+                    etlSourceCode: request.JSON.script,
+                    provider: provider,
+                    createdBy: currentPerson(),
+                    target: 'not null',
+                    description: 'some description'
+                )
+                //script.provider = provider
+
+                script.save(flush:true, failOnError:true)
+                Map results = [id:script.id]
+                renderAsJson(results)
+
+                break
+
+            default:
+                sendInvalidInput("Unsupported request method ${request.method}")
+        }
+
     }
 }

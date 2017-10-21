@@ -1,5 +1,10 @@
 package net.transitionmanager.domain
 
+/*
+ * The ApiAction domain represents the individual mapped API methods that can be
+ * invoked by the TransitionManager application in Tasks and other places.
+ */
+
 import com.tdssrc.grails.TimeUtil
 
 class Provider {
@@ -13,8 +18,9 @@ class Provider {
     static belongsTo = [ project: Project ]
 
     static hasMany = [
-        dataScripts: DataScript,
-        credentials: Credential
+        apiActions: ApiAction,
+        credentials: Credential,
+        dataScripts: DataScript
     ]
 
     static constraints = {
