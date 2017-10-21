@@ -24,8 +24,12 @@ class DataTransferBatch {
 
 	static hasMany = [dataTransferValue: DataTransferValue]
 
-	static belongsTo = [dataTransferSet: DataTransferSet, project: Project,
-	                    userLogin: UserLogin, eavEntityType: EavEntityType]
+	static belongsTo = [
+			dataTransferSet: DataTransferSet,
+			project: Project,
+			userLogin: UserLogin,
+			eavEntityType: EavEntityType
+		]
 
 	static mapping = {
 		version false

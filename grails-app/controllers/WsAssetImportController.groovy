@@ -5,10 +5,11 @@ import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.ApplicationService
+import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import net.transitionmanager.service.FileSystemService
 import org.apache.commons.lang3.RandomStringUtils
@@ -20,10 +21,11 @@ import org.hibernate.transform.Transformers
  * @author Esteban Robles Luna <esteban.roblesluna@gmail.com>
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsApplicationController')
+@Slf4j(value='log', category='grails.app.controllers.WsApplicationController')
 class WsAssetImportController implements ControllerMethods {
 
 	ApiActionService apiActionService
+	DataImportService dataImportService
 	FileSystemService fileSystemService
 	ScriptProcessorService scriptProcessorService
 
@@ -103,6 +105,9 @@ class WsAssetImportController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetImport)
 	def loadData(String filename) {
+		Project project = getProjectForWs()
+		Person person = currentPerson()
+
 		if (!filename) {
 			sendInvalidInput('Missing filename')
 			return
@@ -113,10 +118,18 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		Map result = [status:'success', errors:[], batchesCreated:0]
+		InputStream inputStream = fileSystemService.openTemporaryFile(filename)
+		if (!inputStream) {
+			sendInvalidInput 'Specified input file not found'
+			return
+		}
 
-		// See if we can find an action to be invoked
-		result.batchesCreated=1
+
+		Map importResults = dataImportService.loadJsonIntoImportBatch(person.userLogin, project, inputStream)
+
+		inputStream.close()
+
+		Map result = [status:'success', errors:[], batchesCreated: importResults.batchesCreated]
 
 		renderAsJson result
 	}

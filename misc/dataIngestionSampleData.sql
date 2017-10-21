@@ -22,13 +22,16 @@ delete from api_action where project_id = @pid;
 delete from provider where project_id = @pid;
 delete from data_script where project_id = @pid;
 
+insert into data_transfer_set (data_transfer_id, set_code,title,transfer_mode,template_filename) values(3, 'ETL', 'TM Data Ingestion', 'B', '')
+   ON DUPLICATE KEY UPDATE template_filename='';
+
+
 insert into provider(provider_id, name, description, project_id, date_created, version)
 values
    (1, 'TransitionManager', 'TransitionManager Application Web Services', @pid, now(), 0),
    (2, 'AWS', 'Amazon AWS Services', @pid, now(), 0),
    (3, 'REST', 'Standard REST Services', @pid, now(), 0),
    (4, 'ServiceNow', 'ServiceNow SaaS Web Services', @pid, now(), 0);
-
 
 
 INSERT INTO data_script (
@@ -44,8 +47,11 @@ INSERT INTO data_script (
 ) VALUES
     (1, 'Applications to TM', @pid, @personId, 4, now(), 0, 'IMPORT', 'read labels
 iterate {
-    domain Application
-    extract 0 load assetName
+   domain Application
+   extract 0 load assetName
+   extract 3 load externalRefId
+   reference externalRefId with externalRefId
+   reference assetName with assetName
 }'),
 
     (2, 'Servers to TM', @pid, @personId, 4, now(), 0, 'IMPORT', 'read labels

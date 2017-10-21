@@ -6,7 +6,7 @@ package com.tdsops.etl
  */
 class ReferenceResult {
 
-    Map<String, ?> reference
+    List<String> reference = []
     List<Map<String, ?>> elements = []
 
 }

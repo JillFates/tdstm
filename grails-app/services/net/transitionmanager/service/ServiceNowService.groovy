@@ -59,7 +59,9 @@ class ServiceNowService {
         url.append(URLEncoder.encode(payload['query'], DEFAULT_CHARACTER_ENCODING))
         url.append('&sysparm_fields=')
         url.append(URLEncoder.encode(payload['fieldNames'], DEFAULT_CHARACTER_ENCODING))
-        return url.toString()
+        String u = url.toString()
+        log.debug 'serviceUrl={}', u
+        return u
     }
 
     /**
@@ -92,8 +94,7 @@ class ServiceNowService {
 
             log.debug(response.getStatusLine().toString())
             HttpEntity entity = response.getEntity()
-            log.debug "----------------------------------------\n{}\n----------------------------------------",
-                entity.getContentType().toString()
+            log.debug entity.getContentType().toString()
             log.debug response.getFirstHeader("Content-Disposition").getValue()
 
             InputStream input = null

@@ -23,6 +23,7 @@ class DataTransferValue {
 		errorText nullable: true
 		hasError nullable: true
 		importValue nullable: true
+		eavAttribute nullable: true
 	}
 
 	static mapping = {

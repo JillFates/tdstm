@@ -395,7 +395,10 @@ class ETLProcessor {
             currentRowResult[selectedDomain] = new ReferenceResult()
         }
 
-        currentRowResult[selectedDomain].reference = [id: assetEntity.id]
+        // Add the Asset ID number to the reference list if it isn't already there
+        if (! currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
+            currentRowResult[selectedDomain].reference << assetEntity.id
+        }
     }
 
     def methodMissing (String methodName, args) {
