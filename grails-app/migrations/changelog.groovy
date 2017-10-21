@@ -187,4 +187,5 @@ databaseChangeLog = {
 	include file: '20171002-create-provider-and-datascript-tables.groovy'
 	include file: '20171011-create-credential-table.groovy'
 	include file: '20170816-add-api-action-permissions.groovy'
+	include file: '20171020-add-properties-for-api-etl.groovy'
 }

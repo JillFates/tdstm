@@ -52,6 +52,8 @@ class DataScript {
 
     DataScriptMode mode
 
+    Provider provider
+
     // The etl will contain the source code which will be compiled and executed. Eventually the
     // source code will be broken out and revisioned like how it is done in Recipes.
     String etlSourceCode
@@ -59,15 +61,15 @@ class DataScript {
     Person createdBy
     Person lastModifiedBy
 
-    Date dateCreated
+    Date dateCreated=new Date()
     Date lastUpdated
 
     static belongsTo = [ project: Project, provider: Provider ]
 
     static constraints = {
         name size: 1..255, unique: 'provider'
-        description size: 0..255
-        target size: 0..255
+        description size: 0..255, nullable: true
+        target size: 0..255, nullable: true
         lastModifiedBy nullable: true
         lastUpdated nullable: true
     }
@@ -75,11 +77,11 @@ class DataScript {
     static mapping = {
         id column: 'data_script_id'
         name 			sqlType: 'VARCHAR(255)'
-        description 		sqlType: 'VARCHAR(255)'
+        description 	sqlType: 'VARCHAR(255)'
         target			sqlType: 'VARCHAR(255)'
         etlSourceCode 	sqlType: 'MEDIUMTEXT'
-        createdBy column: 'created_by'
-        lastModifiedBy column: 'last_modified_by'
+        createdBy       column: 'created_by'
+        lastModifiedBy  column: 'last_modified_by'
     }
 
 }

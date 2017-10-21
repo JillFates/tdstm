@@ -22,6 +22,16 @@ class ApiAction {
 	// The method on the agentClass to invoke
 	String agentMethod
 
+	Provider provider
+
+	Project project
+
+	// The default DataScript that is intended to be used to transform the data that the action generates
+	DataScript defaultDataScript
+
+	// Flag that indicates if the action generates data that can be ingested
+	Integer producesData=0
+
 	/*
 	 * A JSON object that contains the mapping of method parameters and where the values will be sourced from
 	 * [ {	'param':'assetId',
@@ -57,16 +67,21 @@ class ApiAction {
 	Date dateCreated
 	Date lastModified
 
-	static belongsTo = [project: Project]
+	static belongsTo = [
+		project: Project,
+		provider: Provider
+	]
 
 	static constraints = {
 		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
-		callbackMode nullable: false
 		asyncQueue nullable: false, size: 0..64
+		callbackMode nullable: false
+		defaultDataScript nullable: true
 		name nullable: false, size: 1..64
 		methodParams nullable: true
 		lastModified nullable: true
+		producesData nullable: false, range:0..1
 	}
 
 	static mapping = {
@@ -110,8 +125,7 @@ class ApiAction {
 			try {
 				list = slurper.parseText(methodParams)
 			} catch (e) {
-				// println "JsonSlurper failed : ${e.getMessage()}"
-				log.error "getMethodParamsList() methodParams was not propertly formed JSON (value=$methodParams) : ${e.getMessage()}"
+				log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 			}
 		}
 		return list

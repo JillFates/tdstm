@@ -49,6 +49,26 @@ class FileSystemService  implements InitializingBean {
     }
 
     /**
+     * Used to get a temporary filename where the name will consist of fully qualified path + prefix + random + extension
+     * @param prefix
+     * @param extension
+     * @return the full qualified path and filename
+     */
+    String getTemporaryFilename(String prefix='', String extension='tmp') {
+        String filename = getUniqueFilename(temporaryDirectory, prefix, extension)
+        return temporaryDirectory + filename
+    }
+
+    /**
+     * Used to get the full path to a file in the application temporary directory
+     * @param filename
+     * @return the fully qualified path and filename of the temporary filename passed or null if not found
+     */
+    String getTemporaryFullFilename(String filename) {
+        temporaryFileExists(filename) ? temporaryDirectory + filename : null
+    }
+
+    /**
      * Used to open a previously created temporary file
      * @param filename
      * @return an InputStream to read the file contents if it exists otherwise NULL
