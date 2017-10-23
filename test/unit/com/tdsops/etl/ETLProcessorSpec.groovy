@@ -2,7 +2,6 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -10,7 +9,6 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
 import spock.lang.Specification
 
-@Mock([AssetEntity])
 class ETLProcessorSpec extends Specification {
 
     void 'test can define a the primary domain' () {
@@ -1830,13 +1828,19 @@ class ETLProcessorSpec extends Specification {
             ])
 
         and:
+            List<AssetEntity> applications = [
+                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"],
+                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center"]
+            ].collect {
+                AssetEntity mock = Mock()
+                mock.getId() >> it.id
+                mock.getAssetClass() >> it.assetClass
+                mock.getAssetName() >> it.assetName
+                mock
+            }
+
             AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                [
-                        Mock([assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"], AssetEntity),
-                        Mock([assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center"], AssetEntity)
-                ].findAll {
-                    it.id == args.id
-                }
+                applications.findAll { it.id == args.id }
             }
 
         and:
@@ -2002,26 +2006,167 @@ class ETLProcessorSpec extends Specification {
 
             with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-                elements[0].originalValue == "Production"
-                elements[0].value == "Production"
-                elements[0].field.name == "environment"
+                with(elements[0]) {
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
 
-                elements[1].originalValue == "152254"
-                elements[1].value == "152254"
-                elements[1].field.name == "id"
-                reference == ["152254"]
+                with(elements[1]) {
+                    originalValue == "152254"
+                    value == "152254"
+                    field.name == "id"
+                }
+
+                reference == [152254]
             }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
+
+                with(elements[1]) {
+                    originalValue == "152255"
+                    value == "152255"
+                    field.name == "id"
+                }
+
+                reference == [152255]
+            }
+    }
+
+    void 'test can reference multiple asset entities for a domain Property Name with loaded Data Value' () {
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
+            ]
+
+        and:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "appVendor",
+                     "imp"      : "N",
+                     "label"    : "Vendor",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "environment",
+                     "imp"      : "N",
+                     "label"    : "Environment",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ])
+
+        and:
+            List<AssetEntity> applications = [
+                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"],
+                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center"]
+            ].collect {
+                AssetEntity mock = Mock()
+                mock.getId() >> it.id
+                mock.getAssetClass() >> it.assetClass
+                mock.getAssetName() >> it.assetName
+                mock
+            }
+
+            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
+                applications.findAll { it.assetName == args.assetName }
+            }
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
+            ])
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        console on
+                        read labels
+                        iterate {
+                            domain Application
+                            load environment with Production
+                            extract 'LOCATION' load Vendor
+                            reference assetName with Vendor
+                        }
+                        """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain Application domain results associated'
 
             with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-                elements[0].originalValue == "Production"
-                elements[0].value == "Production"
-                elements[0].field.name == "environment"
+                with(elements[0]){
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
 
-                elements[1].originalValue == "152255"
-                elements[1].value == "152255"
-                elements[1].field.name == "id"
-                reference == ["152255"]
+                with(elements[1]){
+                    originalValue == "ACME Data Center"
+                    value == "ACME Data Center"
+                    field.name == "Vendor"
+                    field.label == "Vendor"
+                }
+
+                reference == [152254, 152255]
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]){
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
+
+                with(elements[1]){
+                    originalValue == "ACME Data Center"
+                    value == "ACME Data Center"
+                    field.name == "Vendor"
+                    field.label == "Vendor"
+                }
+
+                reference == [152254, 152255]
             }
     }
 
