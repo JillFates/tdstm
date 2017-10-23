@@ -36,7 +36,7 @@ class DataviewUserParamsCommand implements CommandObject {
         sortProperty blank: false
         sortOrder blank: false, inList: ['a', 'd']
         offset min: 0
-        limit min: 1
+        limit min: 0
         justPlanning nullable: true
     }
 }

@@ -100,10 +100,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
 			domains: this.domains,
-			previewMode: false,
-			queryId: this.model.id,
-			totalData: this.grid.gridData.total,
-			searchExecuted: true,
+			queryId: this.model.id
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
