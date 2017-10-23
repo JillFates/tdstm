@@ -50,7 +50,8 @@ export const en_DICTIONARY: Object = {
 		'DEFAULT': 'Default',
 		'SORT': 'Sort',
 		'ADD_FAVORITES': 'Add to Favorites',
-		'SHARE_WITH_USERS': 'Share with other users'
+		'SHARE_WITH_USERS': 'Share with other users',
+		'CLEAR_FILTERS': 'Clear filters'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
