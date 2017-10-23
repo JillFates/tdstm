@@ -1717,21 +1717,34 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain Application domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "environment"
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "environment"
+                with(elements[0]) {
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
 
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].value == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].field.name == "id"
+                with(elements[1]) {
+                    originalValue == "152254"
+                    value == "152254"
+                    field.name == "id"
+                }
+            }
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].value == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[1].field.name == "id"
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+                with(elements[0]) {
+                    originalValue == "Production"
+                    value == "Production"
+                    field.name == "environment"
+                }
+
+                with(elements[1]) {
+                    originalValue == "152255"
+                    value == "152255"
+                    field.name == "id"
+                }
+            }
 
         and: 'Results should contain Device domain results associated'
             etlProcessor.results.get(ETLDomain.Device)[0].elements[1].originalValue == "Development"
@@ -2135,13 +2148,13 @@ class ETLProcessorSpec extends Specification {
 
             with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-                with(elements[0]){
+                with(elements[0]) {
                     originalValue == "Production"
                     value == "Production"
                     field.name == "environment"
                 }
 
-                with(elements[1]){
+                with(elements[1]) {
                     originalValue == "ACME Data Center"
                     value == "ACME Data Center"
                     field.name == "Vendor"
@@ -2153,13 +2166,13 @@ class ETLProcessorSpec extends Specification {
 
             with(etlProcessor.results.get(ETLDomain.Application)[1]) {
 
-                with(elements[0]){
+                with(elements[0]) {
                     originalValue == "Production"
                     value == "Production"
                     field.name == "environment"
                 }
 
-                with(elements[1]){
+                with(elements[1]) {
                     originalValue == "ACME Data Center"
                     value == "ACME Data Center"
                     field.name == "Vendor"
