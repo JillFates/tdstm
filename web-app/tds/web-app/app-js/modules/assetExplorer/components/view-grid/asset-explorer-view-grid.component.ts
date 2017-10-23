@@ -8,7 +8,15 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html',
+	styles: [`
+	.btnClear {
+		margin-right: 20px !important;
+	}
+	.btnReload{
+		padding-top:7px;
+	}
+	`]
 })
 export class AssetExplorerViewGridComponent {
 
@@ -29,6 +37,16 @@ export class AssetExplorerViewGridComponent {
 
 	constructor(private userPref: PreferenceService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+	}
+
+	onClearFilters(): void {
+		this.model.columns.forEach((c: ViewColumn) => {
+			c.filter = '';
+		});
+	}
+
+	hasFilterApplied(): boolean {
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
 	}
 
 	clearText(column: ViewColumn): void {

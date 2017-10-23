@@ -1,10 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
-import {DomainModel} from '../../../fieldSettings/model/domain.model';
-import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
-import {AssetExportModel} from '../../model/asset-export-model';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import { Component, ViewChild } from '@angular/core';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { ExcelExportComponent } from '@progress/kendo-angular-excel-export';
+import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { FieldImportance } from '../../../fieldSettings/model/field-settings.model';
+import { AssetExportModel } from '../../model/asset-export-model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -19,7 +19,7 @@ export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
 	protected dataToExport: any[] = [];
-	private defaulLimitRows = 1000;
+	private defaultLimitRows = 0;
 	private defaultOffset = 0;
 	private allProperties = false;
 
@@ -27,7 +27,7 @@ export class AssetExplorerViewExportComponent {
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 
-		let configuredColumns = {...this.assetExportModel.assetQueryParams.filters.columns};
+		let configuredColumns = { ...this.assetExportModel.assetQueryParams.filters.columns };
 
 		this.columns = Object.keys(configuredColumns).map((key) => {
 			let definition = {
@@ -60,20 +60,14 @@ export class AssetExplorerViewExportComponent {
 	 */
 	private getExportData(): void {
 
-		if (this.allProperties) {
-			this.assetExportModel.assetQueryParams.limit = this.defaulLimitRows;
-			this.assetExportModel.assetQueryParams.offset = this.defaultOffset;
-		}
+		this.assetExportModel.assetQueryParams.limit = this.defaultLimitRows;
+		this.assetExportModel.assetQueryParams.offset = this.defaultOffset;
 
-		if (this.assetExportModel.previewMode) {
-			if (this.assetExportModel.searchExecuted) {
-				this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
-					.subscribe(result => {
-						this.onExportDataResponse(result['assets']);
-					}, err => console.log(err));
-			} else {
-				this.onExportDataResponse([]);
-			}
+		if (!this.assetExportModel.queryId) {
+			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
+				.subscribe(result => {
+					this.onExportDataResponse(result['assets']);
+				}, err => console.log(err));
 		} else {
 			this.assetExpService.query(this.assetExportModel.queryId, this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
