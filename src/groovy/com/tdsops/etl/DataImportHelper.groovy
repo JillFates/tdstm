@@ -225,26 +225,33 @@ class DataImportHelper {
      * @param fieldName
      * @return
      */
-    static findFieldInAssetJson(asset, fieldName) {
-        def field = asset.elements.find {it.field?.name == fieldName}
+    static Map findFieldInAssetJson(asset, fieldName) {
+        Map field = asset.elements.find {it.field?.name == fieldName}
 
-        if (! field && fieldName == ID_FIELD) {
-            String value
+
+        if (fieldName == ID_FIELD) {
+            if (! field ) {
+                // Construct what looks like a field for the id
+                field = [
+                    field: [name: 'id', control: 'Number', label: 'ID'],
+                ]
+            }
+
             // This is a special case that will potentially uses the reference and the the id element
             if (asset.containsKey('reference')) {
-                if (asset.reference?.size() == 1) {
-                    value = asset.reference[0]
+                int numIds = asset.reference?.size() ?: 0
+                if ( numIds == 1) {
+                    field.value = asset.reference[0]
+                    field.originalValue = asset.reference[0]
+                } else if (numIds > 1) {
+                    field.hasError = true
+                    field.error = 'Duplicate asset references'
                 }
             }
-            value = (value ?: '')
-            // Construct what looks like a field for the id
-            field = [
-                field: [ name: 'id', control:'Number', label: 'ID'],
-                originalValue: value,
-                value: value
-            ]
         }
-println "**** findFieldInAssetJson fieldName:$fieldName, field:$field"
+
+        println "**** findFieldInAssetJson fieldName:$fieldName, field:$field"
+
         return field
     }
 }
