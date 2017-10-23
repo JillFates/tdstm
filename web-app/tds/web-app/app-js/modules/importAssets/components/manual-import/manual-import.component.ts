@@ -11,8 +11,8 @@ export class ManualImportComponent implements OnInit {
 
 	private actionOptions = [];
 	private dataScriptOptions = [];
-	private selectedActionOption: any;
-	private selectedScriptOption: any;
+	private selectedActionOption = -1;
+	private selectedScriptOption = -1;
 	private fetchResult: any;
 	private fetchInProcess = false;
 	private transformResult: any;
