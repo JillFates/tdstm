@@ -1828,6 +1828,17 @@ class ETLProcessorSpec extends Specification {
                      "udf"      : 0
                     ]
             ])
+
+        and:
+            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
+                [
+                        Mock([assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"], AssetEntity),
+                        Mock([assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center"], AssetEntity)
+                ].findAll {
+                    it.id == args.id
+                }
+            }
+
         and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
@@ -1847,6 +1858,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         iterate {
                             domain Application
+                            load environment with Production
                             extract 'APPLICATION ID' load id
                             reference id with id
                         }
@@ -1987,38 +1999,30 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain Application domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0][0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[0][0].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Application)[1][0].originalValue == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1][0].value == "Production"
-            etlProcessor.results.get(ETLDomain.Application)[1][0].field.name == "environment"
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Application)[0][1].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].value == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0][1].field.name == "id"
+                elements[0].originalValue == "Production"
+                elements[0].value == "Production"
+                elements[0].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Application)[1][1].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1][1].value == "152255"
-            etlProcessor.results.get(ETLDomain.Application)[1][1].field.name == "id"
+                elements[1].originalValue == "152254"
+                elements[1].value == "152254"
+                elements[1].field.name == "id"
+                reference == ["152254"]
+            }
 
-        and: 'Results should contain Device domain results associated'
-            etlProcessor.results.get(ETLDomain.Device)[0][1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0][1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0][1].field.name == "location"
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Device)[1][1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1][1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1][1].field.name == "location"
+                elements[0].originalValue == "Production"
+                elements[0].value == "Production"
+                elements[0].field.name == "environment"
 
-            etlProcessor.results.get(ETLDomain.Device)[0][0].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0][0].value == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0][0].field.name == "id"
-
-            etlProcessor.results.get(ETLDomain.Device)[1][0].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1][0].value == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1][0].field.name == "id"
+                elements[1].originalValue == "152255"
+                elements[1].value == "152255"
+                elements[1].field.name == "id"
+                reference == ["152255"]
+            }
     }
 
 }
