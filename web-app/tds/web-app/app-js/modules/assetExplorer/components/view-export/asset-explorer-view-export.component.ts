@@ -19,7 +19,7 @@ export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
 	protected dataToExport: any[] = [];
-	private defaultLimitRows = 1000;
+	private defaultLimitRows = 0;
 	private defaultOffset = 0;
 	private allProperties = false;
 
