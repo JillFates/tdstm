@@ -163,6 +163,7 @@ class DataImportService implements ServiceMethods{
 
     def insertDataTransferValuesForAsset = { DataTransferBatch dataTransferBatch, asset, Long assetId, Map params ->
         for (element in asset.elements) {
+
             DataTransferValue dtv = new DataTransferValue(
                 dataTransferBatch: dataTransferBatch,
                 fieldName: element.field.name,
@@ -172,6 +173,13 @@ class DataImportService implements ServiceMethods{
                 rowId: params.assetIdx
 //                EavAttribute eavAttribute
             )
+            if (asset.reference) {
+                if (asset.reference.size() > 1) {
+                    dtv.hasError = 1
+                    dtv.errorText = "Multiple assets referenced"
+                }
+            }
+
             if (!dtv.save()) {
                 //println "insertDataTransferValuesForAsset() failed to save"
                 //log.error 'DataImportService.insertDataTransferValuesForAsset() failed save - {}', GormUtil.allErrorsString(dtv)
