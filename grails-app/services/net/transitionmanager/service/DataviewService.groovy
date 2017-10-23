@@ -443,7 +443,7 @@ class DataviewService implements ServiceMethods {
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
                 pagination: [
-                        offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
+                        offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
                 ],
                 assets    : assets.collect { columns ->
                     Map row = [:]
