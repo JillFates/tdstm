@@ -1,6 +1,6 @@
-<kendo-grid (mouseup)="onMouseUp()" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip"
- [sort]="state.sort" [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}"
- (mousemove)="onMouseMove($event)" (dataStateChange)="dataStateChange($event)"  (columnResize)="onWidthChange($event)">
+<kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+ [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
+ (columnResize)="onWidthChange($event)">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-2">
 			<div class="checkbox">
