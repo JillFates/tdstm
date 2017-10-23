@@ -16,9 +16,6 @@ export class AssetExplorerViewGridComponent {
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 
-	mouseDown = false;
-	lastEvent: MouseEvent;
-	selectColumn: ViewColumn;
 	justPlanning = false;
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
@@ -32,26 +29,6 @@ export class AssetExplorerViewGridComponent {
 
 	constructor(private userPref: PreferenceService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
-	}
-
-	onMouseUp(): void {
-		this.mouseDown = false;
-		this.selectColumn = null;
-	}
-
-	onMouseDown(event: MouseEvent, column: ViewColumn): void {
-		this.mouseDown = true;
-		this.selectColumn = column;
-		this.lastEvent = event;
-	}
-
-	onMouseMove(event: MouseEvent): void {
-		if (this.mouseDown) {
-			let xValueChange = event.clientX - this.lastEvent.clientX;
-			let width = this.selectColumn.width + (xValueChange);
-			this.selectColumn.width = width < (VIEW_COLUMN_MIN_WIDTH - 50) ? (VIEW_COLUMN_MIN_WIDTH - 50) : width;
-			this.lastEvent = event;
-		}
 	}
 
 	clearText(column: ViewColumn): void {
@@ -98,5 +75,13 @@ export class AssetExplorerViewGridComponent {
 			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
 		}
 		this.modelChange.emit();
+	}
+
+	onWidthChange(data: any) {
+		this.model.columns.filter((c: ViewColumn) =>
+			data[0].column.field === `${c.domain}_${c.property}`
+		).forEach((c: ViewColumn) => {
+			c.width = data[0].newWidth;
+		});
 	}
 }

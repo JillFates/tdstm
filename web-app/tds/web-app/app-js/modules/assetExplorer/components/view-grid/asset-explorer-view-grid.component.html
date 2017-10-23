@@ -1,21 +1,24 @@
 <kendo-grid (mouseup)="onMouseUp()" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip"
- [sort]="state.sort" [pageSize]="state.take" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (mousemove)="onMouseMove($event)"
- (dataStateChange)="dataStateChange($event)">
+ [sort]="state.sort" [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}"
+ (mousemove)="onMouseMove($event)" (dataStateChange)="dataStateChange($event)"  (columnResize)="onWidthChange($event)">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-xs-6">
 			<div class="checkbox">
-				<label><input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+				<label>
+					<input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
 		</div>
-		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn">
+			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+		</div>
 	</ng-template>
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
-	 [width]="column.width < VIEW_COLUMN_MIN_WIDTH ? VIEW_COLUMN_MIN_WIDTH : column.width">
+	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
 				<div>
 					<label for=""> {{column.label}}</label>
-					<i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
+					<!-- <i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i> -->
 				</div>
 			</div>
 		</ng-template>
