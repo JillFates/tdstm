@@ -1374,8 +1374,11 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass,
-				assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(
+				project, userLogin, domainClass,
+				assetEntityId, dataTransferBatch, dtvList,
+				eavAttributeSet, errorCount, errorConflictCount,
+				ignoredAssets, rowNum, fieldSpecs)
 			if (!asset)
 				continue
 
