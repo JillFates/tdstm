@@ -57,7 +57,7 @@ class AssetClassQueryHelper {
     private static final Map<String, Map> transformations = [
             "id"          : [
                     property     : "AE.id",
-                    namedParamter: "moveBundleName",
+                    namedParamter: "id",
                     join         : "",
                     transform    : { String value -> Long.parseLong(value) }
             ],
