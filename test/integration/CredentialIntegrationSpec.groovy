@@ -8,7 +8,7 @@ import test.helper.ProjectTestHelper
 import test.helper.ProviderTestHelper
 import test.helper.PersonTestHelper
 
-class CredentialTests extends IntegrationSpec {
+class CredentialIntegrationSpec extends IntegrationSpec {
 
     ProjectService projectService
     SecurityService securityService

@@ -38,7 +38,9 @@ class CredentialService {
      */
     Credential findById(Long id) {
         assert id != null : 'Invalid id param.'
-        return Credential.findById(id)
+        return Credential.where {
+            id == id
+        }.get()
     }
 
     /**
@@ -47,7 +49,9 @@ class CredentialService {
      * @return
      */
     List<Credential> findAllByProject(Project project) {
-        return Credential.findAllByProject(project)
+        return Credential.where {
+            project == project
+        }.list()
     }
 
     /**
@@ -56,7 +60,9 @@ class CredentialService {
      * @return
      */
     List<Credential> findAllByProvider(Provider provider) {
-        return Credential.findAllByProvider(provider)
+        return Credential.where {
+            provider == provider
+        }.list()
     }
 
     /**
