@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.domain.Project
 
 class AssetClassQueryHelper {
 
@@ -26,7 +27,7 @@ class AssetClassQueryHelper {
         assetClass
     }
 
-    static List<? extends AssetEntity> where (ETLDomain domain, Map<String, ?> fieldsSpec) {
+    static List<? extends AssetEntity> where (Project project, ETLDomain domain, Map<String, ?> fieldsSpec) {
 
         String hqlWhere = hqlWhere(fieldsSpec)
 
@@ -35,10 +36,10 @@ class AssetClassQueryHelper {
         String hql = """
             select AE
               from AssetEntity AE
-             where $hqlWhere  
+             where  AE.project = :project and $hqlWhere  
         """.stripIndent()
 
-        AssetEntity.executeQuery(hql, hqlParams(fieldsSpec))
+        AssetEntity.executeQuery(hql, [project: project] + hqlParams(fieldsSpec))
     }
 
     static String hqlWhere (Map<String, ?> fieldsSpec) {

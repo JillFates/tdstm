@@ -1863,7 +1863,7 @@ class ETLProcessorSpec extends Specification {
 
         and:
             AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.id == args.id && it.project.id == GMDEMO.id }
+                applications.findAll { it.id == args.id && it.project.id == args.project.id }
             }
 
         and:
@@ -2062,6 +2062,139 @@ class ETLProcessorSpec extends Specification {
             }
     }
 
+    void 'test can throw an Exception if script reference to a domain Property and it was not defined in the ETL Processor' () {
+
+        given:
+            List<List<String>> data = [
+                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
+            ]
+
+        and:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "appVendor",
+                     "imp"      : "N",
+                     "label"    : "Vendor",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "environment",
+                     "imp"      : "N",
+                     "label"    : "Environment",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ])
+            validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
+                    [constraints: [required: 0],
+                     "control"  : "Number",
+                     "default"  : "",
+                     "field"    : "id",
+                     "imp"      : "U",
+                     "label"    : "Id",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ],
+                    [constraints: [required: 0],
+                     "control"  : "String",
+                     "default"  : "",
+                     "field"    : "location",
+                     "imp"      : "N",
+                     "label"    : "Location",
+                     "order"    : 0,
+                     "shared"   : 0,
+                     "show"     : 0,
+                     "tip"      : "",
+                     "udf"      : 0
+                    ]
+            ])
+
+        and:
+            Project GMDEMO = Mock(Project)
+            GMDEMO.getId() >> 125612l
+
+            Project TMDEMO = Mock(Project)
+            TMDEMO.getId() >> 125612l
+
+            List<AssetEntity> applications = [
+                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+            ].collect {
+                AssetEntity mock = Mock()
+                mock.getId() >> it.id
+                mock.getAssetClass() >> it.assetClass
+                mock.getAssetName() >> it.assetName
+                mock.getProject() >> it.project
+                mock
+            }
+
+        and:
+            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
+                applications.findAll { it.id == args.id && it.project.id == args.project.id }
+            }
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
+                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
+            ])
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        console on
+                        read labels
+                        iterate {
+                            domain Application
+                            load environment with Production
+                            extract 'APPLICATION ID' load id
+                            reference id with id
+                        }
+                        """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'It throws an Exception because project was not defined'
+
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == 'Project not defined.'
+    }
+
     void 'test can reference multiple asset entities for a domain Property Name with loaded Data Value' () {
 
         given:
@@ -2133,8 +2266,8 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.assetName == args.assetName && it.project.id == GMDEMO.id }
+            AssetEntity.metaClass.static.executeQuery = {  String query, Map args ->
+                applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
         and:
