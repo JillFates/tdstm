@@ -228,7 +228,6 @@ class DataImportHelper {
     static Map findFieldInAssetJson(asset, fieldName) {
         Map field = asset.elements.find {it.field?.name == fieldName}
 
-
         if (fieldName == ID_FIELD) {
             if (! field ) {
                 // Construct what looks like a field for the id
@@ -244,7 +243,7 @@ class DataImportHelper {
                     field.value = asset.reference[0]
                     field.originalValue = asset.reference[0]
                 } else if (numIds > 1) {
-                    field.hasError = true
+                    field.hasError = 1
                     field.error = 'Duplicate asset references'
                 }
             }
