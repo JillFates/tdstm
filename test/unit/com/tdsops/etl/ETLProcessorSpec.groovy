@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -1841,26 +1842,35 @@ class ETLProcessorSpec extends Specification {
             ])
 
         and:
+            Project GMDEMO = Mock(Project)
+            GMDEMO.getId() >> 125612l
+
+            Project TMDEMO = Mock(Project)
+            TMDEMO.getId() >> 125612l
+
             List<AssetEntity> applications = [
-                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"],
-                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center"]
+                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
             ].collect {
                 AssetEntity mock = Mock()
                 mock.getId() >> it.id
                 mock.getAssetClass() >> it.assetClass
                 mock.getAssetName() >> it.assetName
+                mock.getProject() >> it.project
                 mock
             }
 
+        and:
             AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.id == args.id }
+                applications.findAll { it.id == args.id && it.project.id == GMDEMO.id }
             }
 
         and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator, [
                     uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
                     lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
             ])
@@ -2103,26 +2113,35 @@ class ETLProcessorSpec extends Specification {
             ])
 
         and:
+            Project GMDEMO = Mock(Project)
+            GMDEMO.getId() >> 125612l
+
+            Project TMDEMO = Mock(Project)
+            TMDEMO.getId() >> 125612l
+
             List<AssetEntity> applications = [
-                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center"],
-                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center"]
+                    [assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center", project: GMDEMO],
+                    [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
             ].collect {
                 AssetEntity mock = Mock()
                 mock.getId() >> it.id
                 mock.getAssetClass() >> it.assetClass
                 mock.getAssetName() >> it.assetName
+                mock.getProject() >> it.project
                 mock
             }
 
+        and:
             AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.assetName == args.assetName }
+                applications.findAll { it.assetName == args.assetName && it.project.id == GMDEMO.id }
             }
 
         and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator, [
                     uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
                     lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
             ])
