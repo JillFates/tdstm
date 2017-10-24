@@ -1,0 +1,39 @@
+groups: [
+
+	[
+		name: 'DB-ORACLE',
+		description: 'Oracle Databases moving replication',
+		filter : [
+			class: 'database',
+			asset: [
+				dbFormat: 'Oracle',
+				custom1: 'xx'
+			],
+		]
+	],
+
+],
+tasks: [
+	//
+	// PREP FOR MOVE EVENT
+	//
+	[
+		id: 1000,
+		title: 'MS: Prep for Move Event',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR'
+	]
+]
+
+
+
+/*
+Example of query generated .. .
+from Database a where a.moveBundle.id in (:bIds) and a.custom1 = :custom1 and a.dbFormat = :dbFormat
+0 = {LinkedHashMap$Entry@29304} "bIds" -> " size = 1"
+1 = {LinkedHashMap$Entry@31235} "custom1" -> "xx"
+2 = {LinkedHashMap$Entry@31236} "dbFormat" -> "Oracle"
+
+
+*/
