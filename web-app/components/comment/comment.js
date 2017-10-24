@@ -460,6 +460,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	$scope.isDirty = false;
 	// Edit/View Mode
 	$scope.actionTypeEdit = (action === 'edit');
+	//
+	$scope.dataFlowDirection = ['Unknown', 'bi-directional', 'incoming', 'outgoing'];
 
 	/**
 	 * Broadcast that the model has been opened
