@@ -27,6 +27,8 @@ class TaskManagerPage extends Page{
         createTaskBtLb              { $("#createtask_text_createTask")}
         taskTColLb                  { $("#jqgh_taskNumber")}
         firstElementTaskTbl         { $("#taskListIdGrid").$("tr")[1].$("td")[0].find("a")}
+        descriptionTColFlt          { $("#gs_comment")}
+        firstElementDesc            { $("#taskListIdGrid").$("tr")[1].$("td")[2]}
         //firstElementTaskTbl          { $("#table")}
 
 
