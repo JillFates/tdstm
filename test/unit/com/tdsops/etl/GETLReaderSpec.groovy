@@ -22,10 +22,10 @@ class GETLReaderSpec extends Specification {
 
         then: 'It can read all files'
             files.retrieveObjects().size() == 4
-            files.retrieveObjects()[0].name == "applications.csv"
-            files.retrieveObjects()[1].name == "applications.xlsx"
-            files.retrieveObjects()[2].name == "applications.xml"
-            files.retrieveObjects()[3].name == "service_now_applications.csv"
+            files.retrieveObjects().find{ it.name == "applications.csv"}
+            files.retrieveObjects().find{ it.name == "applications.xlsx"}
+            files.retrieveObjects().find{ it.name == "applications.xml"}
+            files.retrieveObjects().find{ it.name == "service_now_applications.csv"}
 
         and: 'It can read all CSV files'
             files.retrieveObjects(mask: "(?i).*[.]CSV").size() == 2
@@ -198,7 +198,7 @@ class GETLReaderSpec extends Specification {
 
             ExcelDataset excelDataset = new ExcelDataset(
                     connection: excelConnection,
-                    listName: "applications",
+                        listName: "applications",
                     header: true,
                     showWarnings: true,
                     manualSchema: true)
