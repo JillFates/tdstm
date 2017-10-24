@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import net.transitionmanager.domain.Project
 
 /**
  *
@@ -8,6 +9,7 @@ import com.tds.asset.AssetEntity
  */
 class ETLProcessor {
 
+    Project project
     List<List<String>> dataSource = []
     ETLFieldsValidator fieldsValidator
     Map<String, ETLTransformation> transformations = [:]
@@ -32,7 +34,7 @@ class ETLProcessor {
      *
      */
     ETLProcessor () {
-        this([], new DebugConsole(buffer: new StringBuffer()), null, [:])
+        this(null, [], new DebugConsole(buffer: new StringBuffer()), null, [:])
     }
     /**
      *
@@ -42,7 +44,7 @@ class ETLProcessor {
      * @param domainFieldsSpec
      */
     ETLProcessor (List<List<String>> data) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), null, [:])
+        this(null, data, new DebugConsole(buffer: new StringBuffer()), null, [:])
     }
     /**
      *
@@ -53,7 +55,7 @@ class ETLProcessor {
      * @param transformations
      */
     ETLProcessor (List<List<String>> data, Map<String, ETLTransformation> transformations) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), null, transformations)
+        this(null, data, new DebugConsole(buffer: new StringBuffer()), null, transformations)
     }
     /**
      *
@@ -63,7 +65,7 @@ class ETLProcessor {
      * @param transformations
      */
     ETLProcessor (List<List<String>> data, DebugConsole console, Map<String, ETLTransformation> transformations) {
-        this(data, console, null, transformations)
+        this(null, data, console, null, transformations)
     }
     /**
      *
@@ -73,7 +75,7 @@ class ETLProcessor {
      * @param fieldsValidator
      */
     ETLProcessor (List<List<String>> data, ETLFieldsValidator fieldsValidator) {
-        this(data, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
+        this(null, data, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
     }
     /**
      *
@@ -83,7 +85,7 @@ class ETLProcessor {
      * @param console
      */
     ETLProcessor (List<List<String>> data, DebugConsole console) {
-        this(data, console, [:])
+        this(null, data, console, [:])
     }
     /**
      *
@@ -114,6 +116,25 @@ class ETLProcessor {
                   DebugConsole console,
                   ETLFieldsValidator fieldsValidator,
                   Map<String, ETLTransformation> transformations) {
+        this(null, data, console, fieldsValidator, transformations)
+    }
+    /**
+     *
+     * Creates an instance of ETL processor with a source of data,
+     * a domain mapper validator and an instance of fieldsValidator
+     * with a map of available transformations
+     *
+     * @param project
+     * @param data
+     * @param console
+     * @param fieldsValidator
+     * @param transformations
+     */
+    ETLProcessor (Project project, List<List<String>> data,
+                  DebugConsole console,
+                  ETLFieldsValidator fieldsValidator,
+                  Map<String, ETLTransformation> transformations) {
+        this.project = project
         this.dataSource = data
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
@@ -396,7 +417,7 @@ class ETLProcessor {
         }
 
         // Add the Asset ID number to the reference list if it isn't already there
-        if (! currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
+        if (!currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
             currentRowResult[selectedDomain].reference << assetEntity.id
         }
     }
