@@ -8,9 +8,13 @@ import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.CustomDomainService
+
 @Transactional
 @Slf4j
 class ScriptProcessorService {
+
+    CustomDomainService customDomainService
 
     /**
      *
@@ -49,7 +53,7 @@ class ScriptProcessorService {
             })
         }
 
-        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator, [
                 uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
                 lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
                 first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
@@ -62,8 +66,6 @@ class ScriptProcessorService {
 
         etlProcessor.results
     }
-
-    CustomDomainService customDomainService
 
     /**
      *
@@ -90,7 +92,7 @@ class ScriptProcessorService {
         validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
         validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
 
-        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator, [
                 uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
                 lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
                 first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
@@ -143,7 +145,7 @@ class ScriptProcessorService {
             })
         }
 
-        ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
+        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator, [
                 uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
                 lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
                 first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
@@ -158,5 +160,3 @@ class ScriptProcessorService {
     }
 
 }
-
-import net.transitionmanager.service.CustomDomainService
