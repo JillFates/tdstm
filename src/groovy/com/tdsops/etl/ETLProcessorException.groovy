@@ -63,4 +63,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Incorrect amount of parameter for this command. Fields are:${fields?.size()}[${fields}] and values are:${values?.size()}[${values}]".toString())
     }
 
+    static ETLProcessorException nonProjectDefined () {
+        new ETLProcessorException('Project not defined.')
+    }
+
 }

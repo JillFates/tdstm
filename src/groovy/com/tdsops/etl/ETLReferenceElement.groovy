@@ -18,6 +18,10 @@ class ETLReferenceElement {
      */
     ETLReferenceElement with (Object... dataSourceFieldNames) {
 
+        if (!processor.project) {
+            throw ETLProcessorException.nonProjectDefined()
+        }
+
         Map<String, ?> fieldsMap = [:]
 
         processor.currentRowResult[processor.selectedDomain].elements.each {
@@ -28,7 +32,7 @@ class ETLReferenceElement {
         List<Map<String, ?>> dataSourceFields = []
 
         dataSourceFieldNames.each {
-            if(fieldsMap.containsKey(it)){
+            if (fieldsMap.containsKey(it)) {
                 dataSourceFields.add(fieldsMap[it])
             }
         }
@@ -41,7 +45,7 @@ class ETLReferenceElement {
             [("$field".toString()): dataSourceFields[i].value]
         }
 
-        List assets = AssetClassQueryHelper.where(processor.selectedDomain, fieldsSpec)
+        List assets = AssetClassQueryHelper.where(processor.project, processor.selectedDomain, fieldsSpec)
 
         if (assets.size()) {
             //processor.addAssetEntityReferenced(assets.first())
@@ -50,8 +54,8 @@ class ETLReferenceElement {
             }
 
             // TODO - references should list all found assets
-        //} else if (assets.size() > 1) {
-        //    throw ETLProcessorException.nonUniqueResults(fields)
+            //} else if (assets.size() > 1) {
+            //    throw ETLProcessorException.nonUniqueResults(fields)
         }
         this
     }
