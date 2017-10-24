@@ -238,15 +238,12 @@ class ETLProcessor {
      */
     def extract (Integer index) {
 
-        if (index in (0..currentRow.size())) {
-            currentColumnIndex = index
-
-            Element selectedElement = currentRow.getElement(currentColumnIndex)
-            debugConsole.info "Extract element: ${selectedElement.value} by index: $index"
-            selectedElement
-        } else {
+        if (!(index in (0..currentRow.size()))) {
             throw ETLProcessorException.extractInvalidColumn(index)
         }
+
+        currentColumnIndex = index
+        doExtract()
     }
     /**
      *
@@ -257,16 +254,12 @@ class ETLProcessor {
      */
     def extract (String columnName) {
 
-        if (columnsMap.containsKey(columnName)) {
-            currentColumnIndex = columnsMap[columnName].index
-
-            Element selectedElement = currentRow.getElement(currentColumnIndex)
-            debugConsole.info "Extract element: ${selectedElement.value} by column name: $columnName"
-
-            selectedElement
-        } else {
+        if (!columnsMap.containsKey(columnName)) {
             throw ETLProcessorException.extractMissingColumn(columnName)
         }
+        currentColumnIndex = columnsMap[columnName].index
+
+        doExtract()
     }
     /**
      *
@@ -378,6 +371,17 @@ class ETLProcessor {
         currentRow = new Row(rowIndex, crudRowData, this)
         rows.add(currentRow)
         currentRow
+    }
+    /**
+     *
+     * Private method that executes extract method command internally.
+     * @return
+     */
+    private def doExtract () {
+        Element selectedElement = currentRow.getElement(currentColumnIndex)
+        debugConsole.info "Extract element: ${selectedElement.value} by column index: ${currentColumnIndex}"
+
+        selectedElement
     }
     /**
      *
