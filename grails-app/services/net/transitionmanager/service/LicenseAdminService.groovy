@@ -253,7 +253,7 @@ class LicenseAdminService extends LicenseCommonService {
 
 		// If the license wasn't in the cache then one will be created and added
 		if(!licState) {
-			log.debug("LOAD LICENSE")
+			log.debug("LOAD LICENSE FROM STORE")
 			licState = [:]
 			cache.put(new Element(projectId, licState))
 			List<DomainLicense> licenses = DomainLicense.findAllByProjectAndStatus(projectId, DomainLicense.Status.ACTIVE) //dateCreated?
@@ -372,7 +372,7 @@ class LicenseAdminService extends LicenseCommonService {
 				}
 			}
 		} else {
-			log.debug("CACHED LICENSE")
+			log.debug("LICENSE LOADED FROM CACHE")
 		}
 
 		return licState
