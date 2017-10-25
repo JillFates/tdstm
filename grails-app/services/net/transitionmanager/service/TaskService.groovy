@@ -3939,7 +3939,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
             if (filter?.asset && contextObject.project) {
-                def fieldSpecs = customDomainService.fieldSpecs(contextObject.project, queryOn, CustomDomainService.CUSTOM_USER_FIELD,['field', 'label'])
+                def fieldSpecs = customDomainService.fieldSpecs(contextObject.project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
                 if (fieldSpecs) {
                     // Add WHERE clauses based on the field specs (custom fields) configured by project asset.
                     addWhereConditionsForFieldSpecs(fieldSpecs)
