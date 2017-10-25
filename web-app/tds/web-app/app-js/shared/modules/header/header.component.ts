@@ -16,7 +16,6 @@ export class HeaderComponent implements AfterViewInit {
 
 	private state: StateService;
 	private pageMetaData: {
-		pageTitle: string,
 		title: string,
 		instruction: string,
 		menu: Array<string>
@@ -65,7 +64,7 @@ export class HeaderComponent implements AfterViewInit {
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.pageMetaData = this.state.$current.data.page;
 
-			document.title = translatePipe.transform(this.pageMetaData.title || this.pageMetaData.pageTitle, []);
+			document.title = translatePipe.transform(this.pageMetaData.title, []);
 		}
 	}
 

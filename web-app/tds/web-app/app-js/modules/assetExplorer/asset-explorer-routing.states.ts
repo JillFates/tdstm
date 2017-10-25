@@ -98,7 +98,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 	url: AssetExplorerStates.REPORT_CREATE.url,
 	data: {
 		page: {
-			pageTitle: 'ASSET_EXPLORER.ASSET_EXPLORER',
+			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
 		},
@@ -134,7 +134,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 	url: AssetExplorerStates.REPORT_EDIT.url,
 	data: {
 		page: {
-			pageTitle: 'ASSET_EXPLORER.ASSET_EXPLORER',
+			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.EDIT']
 		},
@@ -164,7 +164,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 	url: AssetExplorerStates.REPORT_SHOW.url,
 	data: {
 		page: {
-			pageTitle: 'ASSET_EXPLORER.ASSET_EXPLORER',
+			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
 			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER']
 		},
