@@ -421,8 +421,10 @@ class ProjectController implements ControllerMethods {
 
 			userPreferenceService.setCurrentProjectId(project.id)
 
-			// Will create a bundle name TBD and set it as default bundle for project
-			project.getProjectDefaultBundle(params.defaultBundleName)
+			/* Create and assign the default Bundle for this project. Although the bundle
+			* is assigned in ProjectService::getDefaultBundle, it's done here too for visibility. */
+			project.defaultBundle = project.getProjectDefaultBundle(params.defaultBundleName)
+			project.save()
 
 			flash.message = "Project $project was created"
 			redirect( action:"show",  imageId:projectLogo?.id )
