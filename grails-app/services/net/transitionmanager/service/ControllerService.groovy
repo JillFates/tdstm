@@ -98,7 +98,7 @@ class ControllerService implements ServiceMethods {
 	 * @return The user's currently selected Project object or null if not seleted
 	 */
 	Project getRequiredProject() {
-		return securityService.userCurrentProjectOrException
+		return securityService.getUserCurrentProjectOrException()
 	}
 
 	/**

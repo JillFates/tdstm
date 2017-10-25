@@ -1,9 +1,28 @@
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.service.CookbookService
-import spock.lang.Specification
+import net.transitionmanager.service.SecurityService
+import test.AbstractUnitSpec
 
+@Mock([UserLogin, UserPreference, SecurityService])
+@TestMixin(ControllerUnitTestMixin)
 @TestFor(CookbookService)
-class CookbookServiceTests extends Specification {
+class CookbookServiceTests extends AbstractUnitSpec { //Specification {
+
+	void setup() {
+		login()
+		Project project = buildMockProject()
+
+		//Mocking up the Users Current Project
+		service.securityService.metaClass.getUserCurrentProject = {
+			project
+		}
+	}
 
 	private static final String goodGroup = '''[
 			name: 'ALL_APPS',
