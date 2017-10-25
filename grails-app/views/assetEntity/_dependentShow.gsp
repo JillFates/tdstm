@@ -6,7 +6,6 @@
 				<table style="min-width: 400px;" class="planning-application-table table-responsive">
 					<thead>
 						<tr>
-							<th>Frequency</th>
 							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
@@ -17,9 +16,6 @@
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
 							<tr onclick="EntityCrud.showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${support.status}">
-									${support?.dataFlowFreq}
-								</td>
 								<td class="dep-${support.status}">
 									${support?.asset?.assetType}
 								</td>
@@ -67,7 +63,6 @@
 							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
-							<th>Frequency</th>
 							<th>Type</th>
 							<th>Status</th>
 						</tr>
@@ -100,9 +95,6 @@
 										${dependent.dependent?.moveBundle}
 									</td>
 								 </g:else>
-								<td class="dep-${dependent.status}" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
-									${dependent.dataFlowFreq}
-								</td>
 								<td class="dep-${dependent.status}" nowrap="nowrap" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
 									${dependent.type}&nbsp;
 									<g:render template="../assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
