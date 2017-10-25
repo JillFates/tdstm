@@ -3,7 +3,7 @@ import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
-import {TranslatePipe} from '../../pipes/translate.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
@@ -16,6 +16,7 @@ export class HeaderComponent implements AfterViewInit {
 
 	private state: StateService;
 	private pageMetaData: {
+		pageTitle: string,
 		title: string,
 		instruction: string,
 		menu: Array<string>
@@ -64,7 +65,7 @@ export class HeaderComponent implements AfterViewInit {
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.pageMetaData = this.state.$current.data.page;
 
-			document.title = translatePipe.transform(this.pageMetaData.title, []);
+			document.title = translatePipe.transform(this.pageMetaData.title || this.pageMetaData.pageTitle, []);
 		}
 	}
 
