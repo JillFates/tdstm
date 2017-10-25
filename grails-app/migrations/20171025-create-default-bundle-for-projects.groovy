@@ -1,9 +1,7 @@
 import net.transitionmanager.domain.Project
 
 /**
- * This set of database changes will create the default_bundle_id column in project table and
- * Update all projects to set "default_bundle_id" and update asset_entity move_bundle_id to default bundle if null
- * and set asset_entity's move_bundle_id column to not null
+ * Create the default bundle for projects that have none.
  */
 
 databaseChangeLog = {
