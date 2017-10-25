@@ -225,7 +225,7 @@ int minPasswordLength = tds.minPasswordLength()
 								</g:link>
 							</li>
 							<li>
-								<g:link class="mmlink" controller="module" ction="assetexplorer" id="views">
+								<g:link class="mmlink" controller="module" ction="asset" id="views">
 									<g:img uri="/icons/magnifier.png" width="16" height="16"/>
 									<div>Asset Explorer</div>
 								</g:link>
