@@ -120,6 +120,10 @@ abstract class AbstractUnitSpec extends Specification {
 		return userLogin
 	}
 
+	/**
+	 * This Creates a Mock Project used in Unit Test
+	 * @return a MockProject
+	 */
 	protected Project buildMockProject() {
 		String projectName = 'projectName'
 		String projectDescription = 'description'
