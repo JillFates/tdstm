@@ -1,4 +1,6 @@
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.ProjectService
+
 
 /**
  * Create the default bundle for projects that have none.
@@ -10,11 +12,12 @@ databaseChangeLog = {
         comment("Create the default bundle for projects without one.")
         grailsChange {
             change {
-                def projects = Project.findAllByDefaultBundleIsNull()
-                def projectService = ctx.getBean('projectService')
-                projects.each{ project ->
-                    project.defaultBundle = projectService.getDefaultBundle(project)
-                    project.save()
+                Project.withNewSession() {
+                    List<Project> projects = Project.findAllByDefaultBundleIsNull()
+                    ProjectService projectService = ctx.getBean('projectService')
+                    for (project in projects) {
+                        projectService.createDefaultBundle(project)
+                    }
                 }
             }
         }
