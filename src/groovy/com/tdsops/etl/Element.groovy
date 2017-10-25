@@ -33,6 +33,21 @@ class Element {
     }
     /**
      *
+     * Transformations using parameters
+     *
+     * @param actions
+     * @return
+     */
+    def transform (Map actions) {
+        String action = actions.keySet().first()
+        ETLTransformation transformation = lookupTransformation(action)
+        processor.debugConsole.info "Applying transformation ${action} on element: $this"
+        transformation.apply(this, actions[action])
+        this
+    }
+
+    /**
+     * Translate a
      *
      * @param actions
      * @return
@@ -42,6 +57,19 @@ class Element {
             translateWith(actions.get('with'))
         }
         this
+    }
+    /**
+     *
+     *
+     * @param closure
+     * @return closure instance
+     */
+    Closure translate (Closure closure) {
+        closure
+        //closure.owner = etlProcessor
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure.delegate = this
+        closure
     }
     /**
      *

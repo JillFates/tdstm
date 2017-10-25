@@ -21,5 +21,8 @@ abstract class ETLTransformation {
         //TODO: Diego. Add every transformation to a list of applied transformation over an element
     }
 
+    void apply (Element element, def args) {
+        closure(element, args)
+    }
 
 }

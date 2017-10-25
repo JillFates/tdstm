@@ -7,7 +7,6 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
@@ -457,9 +456,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -481,9 +478,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(1).value == "slideaway"
     }
 
-    @Ignore
-    //TODO: DIego. I need to review how to work with command with 3 words!
-    void 'test can transform a field value with left 4 transformation' () {
+    void 'test can transform a field value with taking left 4 characters' () {
 
         given:
             List<List<String>> data = [
@@ -494,31 +489,90 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                    left     : new ElementTransformation(closure: { Element element ->
-                        [4: {
-                            element.value = element.value[0..4]
-                        }]
-
-                    })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
+            Closure closure = { dictionary ->
+                dictionary
+            }
+
             ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
-            etlProcessor.domain 'Device'
-            etlProcessor.read 'labels'
-            etlProcessor.iterate {}
+            //binding.setVariable('by', closure)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, binding)
                     .evaluate("""
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform left 4 and uppercase }
+                            extract 'MODEL NAME' transform left: 4 
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to left 4 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "SRW2"
+            etlProcessor.getRow(1).getElement(1).value == "ZPHA"
+            etlProcessor.getRow(2).getElement(1).value == "Slid"
+    }
+
+    void 'test can transform a field value with taking right 4 characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform right: 4 
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed with right 4 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "24G4"
+            etlProcessor.getRow(1).getElement(1).value == "dule"
+            etlProcessor.getRow(2).getElement(1).value == "away"
+    }
+
+    void 'test can transform a use left 4 transformation in a chain of transformations' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform left: 4 and lowercase 
+                        }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
@@ -539,10 +593,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2266,7 +2317,7 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = {  String query, Map args ->
+            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
                 applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
