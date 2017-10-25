@@ -16,7 +16,8 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
-	<kendo-grid-column [locked]="true" [width]="0"></kendo-grid-column><!-- temporary solution -->
+	<kendo-grid-column [locked]="true" [width]="0"></kendo-grid-column>
+	<!-- temporary solution -->
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width">
 		<ng-template kendoGridHeaderTemplate>
@@ -37,6 +38,15 @@
 		</ng-template>
 	</kendo-grid-column>
 	<ng-template kendoGridNoRecordsTemplate>
-		{{ gridMessage | translate }}
+
+	</ng-template>
+	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+		<kendo-pager-next-buttons></kendo-pager-next-buttons>
+		<kendo-pager-page-sizes [pageSizes]="[25,50,100,500,1000]"></kendo-pager-page-sizes>
+		<div *ngIf="showMessage" class="grid-message">
+			<label>{{ gridMessage | translate }}</label>
+		</div>
+		<kendo-pager-info></kendo-pager-info>
 	</ng-template>
 </kendo-grid>
