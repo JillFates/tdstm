@@ -67,6 +67,7 @@ class TaskService implements ServiceMethods {
 	Scheduler quartzScheduler
 	def securityService
 	def sequenceService
+    CustomDomainService customDomainService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -3870,6 +3871,27 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 			// log.info "bundleIds=[$bundleIds]"
 
+            /**
+             * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
+             * WHERE expressions based on the properties passed in the filter
+             * @param String[] - list of the properties FROM fieldSpecs of project asset domain to examine
+             */
+            def addWhereConditionsForFieldSpecs = { fieldSpecs ->
+                fieldSpecs.each { customField ->
+                    if (filter?.asset?.containsKey(customField.label)) {
+                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.label], customField.field)
+                        if (sm) {
+                            where = SqlUtil.appendToWhere(where, sm.sql)
+                            if (sm.param) {
+                                map[customField.field] = sm.param
+                            }
+                        } else {
+                            log.error "SqlUtil.whereExpression unable to resolve $customField.field expression [${filter.asset[customField.field]}]"
+                        }
+                    }
+                }
+            }
+
 			/**
 			 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
 			 * WHERE expressions based on the properties passed in the filter
@@ -3916,6 +3938,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
+            if (filter?.asset && contextObject.project) {
+                def fieldSpecs = customDomainService.fieldSpecs(contextObject.project, queryOn, CustomDomainService.CUSTOM_USER_FIELD,['field', 'label'])
+                if (fieldSpecs) {
+                    // Add WHERE clauses based on the field specs (custom fields) configured by project asset.
+                    addWhereConditionsForFieldSpecs(fieldSpecs)
+                }
+            }
 			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
 			addWhereConditions(commonFilterProperties)
 
