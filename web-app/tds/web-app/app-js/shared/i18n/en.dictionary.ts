@@ -16,9 +16,9 @@ export const en_DICTIONARY: Object = {
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'GRID': {
-			'NO_RECORDS': 'No records available.',
-			'SCHEMA_CHANGE': 'New results, click Preview button to see them.',
-			'INITIAL_VALUE': 'Hit Preview to populate grid.'
+			'NO_RECORDS': 'No records available',
+			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
+			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		}
 	},
 	'FIELD_SETTINGS': {

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
@@ -16,7 +16,15 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 	.btnReload{
 		padding-top:7px;
 	}
-	`]
+	.grid-message {
+		width:60vw;
+		text-align:center;
+	}
+	.grid-message label{
+		font-weight: normal;
+	}
+	`],
+	encapsulation: ViewEncapsulation.None
 })
 export class AssetExplorerViewGridComponent {
 
@@ -27,6 +35,7 @@ export class AssetExplorerViewGridComponent {
 	justPlanning = false;
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
+	showMessage = true;
 
 	state: State = {
 		skip: 0,
@@ -72,9 +81,11 @@ export class AssetExplorerViewGridComponent {
 			data: data.assets,
 			total: data.pagination.total
 		};
+		this.showMessage = data.pagination.total === 0;
 	}
 
 	clear(): void {
+		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
 		this.state = {
