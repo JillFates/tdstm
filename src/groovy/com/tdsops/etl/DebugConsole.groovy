@@ -33,7 +33,7 @@ class DebugConsole {
         if (status == ConsoleStatus.on) {
             buffer.append(level)
             buffer.append(" - ")
-            buffer.append(content)
+            buffer.append(content.toString())
             buffer.append(System.lineSeparator())
         }
     }
