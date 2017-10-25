@@ -18,7 +18,8 @@ databaseChangeLog = {
 				def phases = ValidationType.getListAsMap().keySet()
 				def attrValues
 
-				entityTypes.each { entityType ->
+				// TM-6622 - Below code has been commented because FieldImportance table and domain class no longer exists.
+				/*entityTypes.each { entityType ->
 					def fieldImportance = FieldImportance.findByProjectAndEntityType(defaultProject, entityType)
 					def configMap = JSON.parse(fieldImportance.config)
 					(1..Project.CUSTOM_FIELD_COUNT).each { i ->
@@ -31,7 +32,7 @@ databaseChangeLog = {
 
 					fieldImportance.config = (configMap as JSON).toString()
 					fieldImportance.save(flush: true)
-				}
+				}*/
 			}
 		}
 
