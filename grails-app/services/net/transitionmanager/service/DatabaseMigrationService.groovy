@@ -1,6 +1,9 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DatabaseMigrationService implements ServiceMethods {
 
@@ -115,6 +118,27 @@ class DatabaseMigrationService implements ServiceMethods {
 		perms.each { item ->
 			sql.execute(RemoveRolesSQL, [permName:item])
 			sql.execute(RemovePermSQL, [permName:item])
+		}
+	}
+
+	/**
+	 * Update a JSON field for a list of records by executing the given change script.
+	 * @param records - list of domain objects
+	 * @param jsonField - name of the field
+	 * @param changeScript
+	 */
+	void updateJsonObjects(List records, String jsonField, Closure changeScript) {
+		for (record in records) {
+			// Parse the given field to a JSON object.
+			JSONObject originalJson = JsonUtil.parseJson(record[jsonField])
+			// Execute the given script using the JSON object.
+			JSONObject transformedJson = changeScript(originalJson)
+			// Assign the result of the script execution to the same field, which may be a different object.
+			record[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
+			// Save the changes.
+			if (!record.validate() || !record.save(flush:true)) {
+				throw new DomainUpdateException(GormUtil.allErrorsString(record))
+			}
 		}
 	}
 }

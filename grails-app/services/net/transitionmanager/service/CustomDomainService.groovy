@@ -418,7 +418,7 @@ class CustomDomainService implements ServiceMethods {
         // Split the common fields from the individual ones
         def (commonFields, individualFields) = fields.split {
             AssetEntity.COMMON_FIELD_LIST.contains(it.field) ||
-                BooleanUtils.toBoolean(it.shared) == true
+                    (it.shared && BooleanUtils.toBoolean(it.shared))
         }
 
         def commonFieldNames = commonFields.collect { it.field }
