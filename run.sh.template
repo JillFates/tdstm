@@ -31,10 +31,10 @@ if [ "$1" == "update-ui" ]; then
    pushd ./web-app/tds > /dev/null
    npm update
    RC=$?
-   if [ $RC ]; then
-      echo An error occurred while updating npm packages
-   else
+   if [ "$RC" == "0" ]; then
       echo All npm packages have been updated
+   else
+      echo An error occurred while updating npm packages
    fi
    popd > /dev/null
    exit $RC
