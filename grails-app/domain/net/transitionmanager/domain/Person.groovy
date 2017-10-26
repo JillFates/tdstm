@@ -115,7 +115,6 @@ class Person extends Party {
 		[domain: ExceptionDates, 	onDelete: 'delete', properties: ['person'] ],
 		[domain: Model, 			onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
 		[domain: ModelSync, 		onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
-		[domain: ModelSyncBatch, 	onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: MoveEventNews, 	onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],
 		[domain: MoveEventStaff, 	onDelete: 'delete', properties: ['person'] ],
 		[domain: PartyRole, 		onDelete: 'delete', properties: ['party'] ],
@@ -125,7 +124,8 @@ class Person extends Party {
 		[domain: RecipeVersion, 	onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: TaskBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: UserLogin, 		onDelete: 'delete', properties: ['person'] ],
-		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ]
+		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ],
+		[domain: Notice, 			onDelete: 'null',   properties: ['createdBy'] ]
 	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
