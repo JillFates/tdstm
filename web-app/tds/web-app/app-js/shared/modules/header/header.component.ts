@@ -3,7 +3,7 @@ import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
-import {TranslatePipe} from '../../pipes/translate.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({

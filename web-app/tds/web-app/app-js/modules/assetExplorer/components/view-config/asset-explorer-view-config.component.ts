@@ -81,6 +81,7 @@ export class AssetExplorerViewConfigComponent {
 			if (this.model.id) {
 				this.updateFilterbyModel();
 				this.currentTab = 1;
+				this.state.$current.data.page.title = this.model.name;
 			}
 		}, (err) => console.log(err));
 	}
