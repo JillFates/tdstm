@@ -22,18 +22,20 @@ export class ManualImportComponent implements OnInit {
 	private fetchFileContent: any;
 	private transformFileContent: any;
 	private viewDataType: string;
-	private HARD_CODED_DELAY = 1000;
 
 	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) { }
 
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
-			console.log(result);
 			this.actionOptions = result.actions;
 			this.dataScriptOptions = result.dataScripts;
 		});
 	}
 
+	/**
+	 * Fetch button clicked event.
+	 * Calls the process of fetch.
+	 */
 	private onFetch(): void {
 		this.fetchInProcess = true;
 		this.fetchResult = null;
@@ -43,19 +45,21 @@ export class ManualImportComponent implements OnInit {
 		this.importResult = null;
 		// this.selectedScriptOption = null;
 		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
-			setTimeout(() => {
-				this.fetchResult = result;
-				if (result.status === 'error') {
-					this.notifier.broadcast({
-						name: AlertType.DANGER,
-						message: result.errors[0]
-					});
-				}
-				this.fetchInProcess = false;
-			}, this.HARD_CODED_DELAY );
+			this.fetchResult = result;
+			if (result.status === 'error') {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: result.errors[0]
+				});
+			}
+			this.fetchInProcess = false;
 		} );
 	}
 
+	/**
+	 * Event when action script select changes its value.
+	 * @param event
+	 */
 	private onActionScriptChange(event: any): void {
 		let matchedScript = this.dataScriptOptions.find( script => script.id === event.defaultDataScriptId );
 		if (matchedScript) {
@@ -63,36 +67,44 @@ export class ManualImportComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Transform button clicked event.
+	 * Calls Transform process on endpoint.
+	 */
 	private onTransform(): void {
 		this.transformInProcess = true;
 		this.transformResult = null;
 		this.transformFileContent = null;
 		this.importResult = null;
 		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
-			setTimeout(() => {
-				this.transformResult = result;
-				if (result.status === 'error') {
-					this.notifier.broadcast({
-						name: AlertType.DANGER,
-						message: result.errors[0]
-					});
-				}
-				this.transformInProcess = false;
-				}, this.HARD_CODED_DELAY);
+			this.transformResult = result;
+			if (result.status === 'error') {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: result.errors[0]
+				});
+			}
+			this.transformInProcess = false;
 		} );
 	}
 
+	/**
+	 * Import button clicked event.
+	 * Calls Import process on endpoint.
+	 */
 	private onImport(): void {
 		this.importInProcess = true;
 		this.importResult = null;
 		this.importAssetsService.postImport(this.transformResult.filename).subscribe( (result) => {
-			setTimeout(() => {
-				this.importResult = result;
-				this.importInProcess = false;
-			}, this.HARD_CODED_DELAY);
+			this.importResult = result;
+			this.importInProcess = false;
 		});
 	}
 
+	/**
+	 * Gets the raw data of the view data fetch file content result.
+	 * @returns {string}
+	 */
 	private getFetchFileContentValue(): string {
 		if (this.fetchFileContent) {
 			return JSON.stringify(this.fetchFileContent);
@@ -101,6 +113,10 @@ export class ManualImportComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Gets the raw data of the view data transform file content result.
+	 * @returns {string}
+	 */
 	private getTransformFileContentValue(): string {
 		if (this.transformFileContent) {
 			return JSON.stringify(this.transformFileContent);
@@ -109,6 +125,11 @@ export class ManualImportComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * View data clicked event.
+	 * Calls endpoint to get file content result.
+	 * @param {string} type : can be either 'Fetch' or 'Transform'
+	 */
 	private onViewData(type: string): void {
 		this.viewDataType = type;
 		if (this.viewDataType === 'FETCH') {
@@ -124,12 +145,20 @@ export class ManualImportComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Close clicked event.
+	 * Cleans out results for fetch and transform.
+	 */
 	private onCloseFileContents(): void {
 		this.fetchFileContent = null;
 		this.transformFileContent = null;
 		this.viewDataType = null;
 	}
 
+	/**
+	 * Clear clicked event.
+	 * Clears out most of results peformed on the page.
+	 */
 	private onClear(): void {
 		this.fetchResult = null;
 		this.fetchFileContent = null;
