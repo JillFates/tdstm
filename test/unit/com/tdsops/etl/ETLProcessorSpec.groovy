@@ -7,7 +7,6 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
@@ -258,7 +257,6 @@ class ETLProcessorSpec extends Specification {
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == dataSource.size() - 1
     }
-
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
      * 	The extract puts the value into a local register that can then be manipulated and eventually
@@ -457,9 +455,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -481,9 +477,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(1).value == "slideaway"
     }
 
-    @Ignore
-    //TODO: DIego. I need to review how to work with command with 3 words!
-    void 'test can transform a field value with left 4 transformation' () {
+    void 'test can transform a field value with taking left 4 characters' () {
 
         given:
             List<List<String>> data = [
@@ -494,31 +488,255 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                    left     : new ElementTransformation(closure: { Element element ->
-                        [4: {
-                            element.value = element.value[0..4]
-                        }]
-
-                    })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
+            Closure closure = { dictionary ->
+                dictionary
+            }
+
             ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
-            etlProcessor.domain 'Device'
-            etlProcessor.read 'labels'
-            etlProcessor.iterate {}
+            //binding.setVariable('by', closure)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, binding)
                     .evaluate("""
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform left 4 and uppercase }
+                            extract 'MODEL NAME' transform left: 4 
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to left 4 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "SRW2"
+            etlProcessor.getRow(1).getElement(1).value == "ZPHA"
+            etlProcessor.getRow(2).getElement(1).value == "Slid"
+    }
+
+    void 'test can transform a field value with taking middle 2 characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform middle take 2 from 3 transform lowercase  
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed with middle 2 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "w2"
+            etlProcessor.getRow(1).getElement(1).value == "ha"
+            etlProcessor.getRow(2).getElement(1).value == "id"
+    }
+
+    void 'test can transform a field value striping first A characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRA24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase transform strip first A
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row striping first "A" character'
+            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
+            etlProcessor.getRow(2).getElement(1).value == "SLIDEWAY"
+    }
+
+    void 'test can transform a field value striping last A characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRA24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase transform strip last A
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row striping last "A" character'
+            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
+            etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
+    }
+
+    void 'test can transform a field value striping all A characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRA24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase transform strip last A  
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row striping all "A" characters'
+            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
+            etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
+    }
+
+    void 'test can applyca another transformation for a field value after striping all A characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRA24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform uppercase transform strip last A transform lowercase
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row striping all "A" characters'
+            etlProcessor.getRow(0).getElement(1).value == "sr24g4"
+            etlProcessor.getRow(1).getElement(1).value == "zph module"
+            etlProcessor.getRow(2).getElement(1).value == "slideawy"
+    }
+
+    void 'test can transform a field value with taking right 4 characters' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform right: 4 
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed with right 4 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "24G4"
+            etlProcessor.getRow(1).getElement(1).value == "dule"
+            etlProcessor.getRow(2).getElement(1).value == "away"
+    }
+
+    void 'test can transform a use left 4 transformation in a chain of transformations' () {
+
+        given:
+            List<List<String>> data = [
+                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
+                    ["152254", "SRW24G4", "LINKSYS"],
+                    ["152255", "ZPHA Module", "TippingPoint"],
+                    ["152256", "Slideaway", "ATEN"]
+            ]
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'MODEL NAME' transform left: 4 and lowercase 
+                        }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
@@ -539,10 +757,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2133,7 +2348,7 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = {  String query, Map args ->
+            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
                 applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
