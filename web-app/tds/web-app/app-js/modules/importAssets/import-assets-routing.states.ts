@@ -32,7 +32,7 @@ export const IMPORT_ASSETS_STATES = [
 	importAssetsState,
 	{
 		name: 'tds.import',
-		url: '/x/x/',
+		url: '/importassets/',
 		redirectTo: 'tds.importassets'
 	}
 ];
