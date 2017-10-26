@@ -128,7 +128,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 100px; vertical-align: baseline;">
+                        <td style="width: 100px; vertical-align: top;">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">Frequency</label>
                             </div>
@@ -161,7 +161,7 @@
                                 <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                             </div>
                         </td>
-                        <td style="width: 200px; vertical-align: baseline;">
+                        <td style="width: 200px; vertical-align: top;">
                             <div class="form-group">
                                 <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
                                 <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.dataFlowFreq" ng-options="frequency as frequency for frequency in assetDependency.dataFlowFreq"></select>
