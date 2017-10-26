@@ -27,9 +27,8 @@ class Element {
      */
     def transform (String transformationName) {
         ETLTransformation transformation = lookupTransformation(transformationName)
-        transformation.apply(this)
         processor.debugConsole.info "Applying transformation on element: $this"
-        this
+        transformation.apply(this)
     }
     /**
      *
@@ -43,7 +42,6 @@ class Element {
         ETLTransformation transformation = lookupTransformation(action)
         processor.debugConsole.info "Applying transformation ${action} on element: $this"
         transformation.apply(this, actions[action])
-        this
     }
 
     /**
