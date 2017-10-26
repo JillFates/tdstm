@@ -424,7 +424,16 @@ class LicenseAdminService extends LicenseCommonService {
 		//strip the actual license from the envelope
 		hash = StringUtil.openEnvelop(LicenseCommonService.BEGIN_LIC_TAG, LicenseCommonService.END_LIC_TAG, hash)
 
+		/******
+		 * This LicenseManager variable is from the License Library, DO NOT confuse it with the TDS LM!
+		 ******/
 		LicenseManager manager = LicenseManager.getInstance()
+
+		/*******************
+		 * The License Library cache is clearead to guarantee that we are loading the latest license
+		 * from the storage instead of relying on the lib cache, for License CAche we use or own Cache
+		 * implementation using EhCache
+		 *******************/
 		manager.clearLicenseCache()
 
 		log.debug("ID: {}", id)
