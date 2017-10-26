@@ -5,6 +5,7 @@ import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
@@ -76,6 +77,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	apply(data: any): void {
+		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space 
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.gridData = {
 			data: data.assets,
@@ -88,6 +90,7 @@ export class AssetExplorerViewGridComponent {
 		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
+		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.state = {
 			skip: 0,
 			take: this.state.take,
