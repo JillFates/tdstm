@@ -84,7 +84,7 @@ class CookbookService implements ServiceMethods {
 	RecipeVersion createRecipe(String recipeName, String description, String recipeContext, cloneFrom) {
 		securityService.requirePermission Permission.RecipeCreate
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		//TODO check this checkAccess(project)
 
@@ -135,7 +135,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission Permission.RecipeEdit
 
 		// TODO: 170822 oluna, have to lookup Projects that the user has access to.
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		if (!name) {
 			throw new EmptyResultException()
@@ -184,7 +184,7 @@ class CookbookService implements ServiceMethods {
 	def deleteRecipe(recipeId) {
 		securityService.requirePermission Permission.RecipeDelete
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -223,7 +223,7 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -257,7 +257,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	Recipe updateRecipe(long recipeId, recipeName, description) {
 		//TODO check this checkAccess(project)
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -331,7 +331,7 @@ class CookbookService implements ServiceMethods {
 	void releaseRecipe(long recipeId) {
 		// securityService.requirePermission Permission.RecipeRelease
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -363,7 +363,7 @@ class CookbookService implements ServiceMethods {
 	Recipe revertRecipe(long recipeVersionId) {
 		// securityService.requirePermission Permission.RecipeRevert ?
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		RecipeVersion recipeVersion =  RecipeVersion.get(recipeVersionId)
 
@@ -395,7 +395,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	List<Map> validateSyntaxForUser(sourceCode) {
 		securityService.requirePermission Permission.RecipeEdit
-		securityService.userCurrentProjectOrException
+		securityService.getUserCurrentProjectOrException()
 
 		validateSyntax(sourceCode)
 	}
@@ -622,7 +622,7 @@ class CookbookService implements ServiceMethods {
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 	List<Map> findRecipeVersions(recipeId) {
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -680,7 +680,7 @@ class CookbookService implements ServiceMethods {
 	Recipe archivedUnarchived(recipeId, archived) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -777,7 +777,7 @@ class CookbookService implements ServiceMethods {
 
 		if ( !currentProject ) {
 			// Reference to current project
-			currentProject = securityService.userCurrentProjectOrException
+			currentProject = securityService.getUserCurrentProjectOrException()
 		}
 		// Keeps an in-memory list of all the possible Api Actions to querying multiple times.
 		List apiActions = ApiAction.findAllByProject(currentProject)
@@ -1430,7 +1430,7 @@ class CookbookService implements ServiceMethods {
 	void defineRecipeContext(recipeId, contextId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -1455,7 +1455,7 @@ class CookbookService implements ServiceMethods {
 	void deleteRecipeContext(recipeId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 

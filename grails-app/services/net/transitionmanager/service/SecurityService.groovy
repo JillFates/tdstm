@@ -159,7 +159,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	// TODO : getUserCurrentProject - move to userPreferenceService
 	@Transactional(readOnly=true)
 	Project getUserCurrentProject() {
-		Project.get userCurrentProjectId
+		Project project = null
+		String projectId = this.getUserCurrentProjectId()
+		if(projectId){
+			project = Project.get( this.getUserCurrentProjectId() )
+		}
+
+		return project
 	}
 
 	/**
@@ -180,11 +186,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	boolean isCurrentProjectId(projectId) {
-		userCurrentProjectId == projectId?.toString()
+		this.getUserCurrentProjectId() == projectId?.toString()
 	}
 
 	Project loadUserCurrentProject() {
-		String id = userCurrentProjectId
+		String id = this.getUserCurrentProjectId()
 		id ? Project.load(id as long) : null
 	}
 
