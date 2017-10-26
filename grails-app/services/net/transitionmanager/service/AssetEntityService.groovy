@@ -2973,8 +2973,10 @@ class AssetEntityService implements ServiceMethods {
 				if (!errors) {
 					clonedAsset = assetToClone.clone([
 							assetName : name,
-							validation: ValidationType.DIS
+							validation: ValidationType.DIS,
+							environment: '' // Removed as part of TM-7647
 					])
+
 					// Cloning assets dependencies if requested
 					if (clonedAsset.save() && cloneDependencies) {
 						for (dependency in assetToClone.supportedDependencies()) {
