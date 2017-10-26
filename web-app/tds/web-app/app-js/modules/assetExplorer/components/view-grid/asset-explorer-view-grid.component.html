@@ -1,6 +1,6 @@
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)">
+ (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-2">
 			<div class="checkbox">
@@ -19,7 +19,7 @@
 	<kendo-grid-column [locked]="true" [width]="0"></kendo-grid-column>
 	<!-- temporary solution -->
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
-	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width">
+	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="cellCallbackClass(column.domain)">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
 				<div>
