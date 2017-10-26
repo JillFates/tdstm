@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
-import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 
 declare var jQuery: any;
@@ -23,6 +23,12 @@ declare var jQuery: any;
 	}
 	.grid-message label{
 		font-weight: normal;
+	}
+	.application .dev, .application .dat, .application .sto,
+	.device .app, .device .dat, .device .sto,
+	.database .dev, .database .app, .database .sto,
+	.storage .dev, .storage .dat, .storage .app {
+		background-color:#f4f4f4;
 	}
 	`],
 	encapsulation: ViewEncapsulation.None
@@ -47,6 +53,18 @@ export class AssetExplorerViewGridComponent {
 
 	constructor(private userPref: PreferenceService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+	}
+
+	rowCallbackClass(context: RowClassArgs) {
+		let obj = {};
+		obj[context.dataItem.common_assetClass.toLowerCase()] = true;
+		return obj;
+	}
+
+	cellCallbackClass(domain: string) {
+		let obj = {};
+		obj[domain.toLowerCase().substr(0, 3)] = true;
+		return obj;
 	}
 
 	onClearFilters(): void {
