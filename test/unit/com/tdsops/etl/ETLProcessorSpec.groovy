@@ -669,15 +669,15 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform strip last A trasnforma lowercase
+                            extract 'MODEL NAME' transform uppercase transform strip last A transform lowercase
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping all "A" characters'
-            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
-            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEWAY"
+            etlProcessor.getRow(0).getElement(1).value == "sr24g4"
+            etlProcessor.getRow(1).getElement(1).value == "zph module"
+            etlProcessor.getRow(2).getElement(1).value == "slideawy"
     }
 
     void 'test can transform a field value with taking right 4 characters' () {
