@@ -10,9 +10,13 @@ import groovy.util.logging.Slf4j
 /**
  * Methods to interact with Camel components
  */
-@Slf4j(value='logger')
+@Slf4j
 // class CamelService implements ServiceMethods, InitializingBean {
 class AwsService implements InitializingBean {
+	// http://camel.apache.org/aws-sqs.html
+	static final int MAX_MESSAGES_PER_POLL = 1
+	static final int WAIT_TIME_SECONDS = 5
+
 
 	AuditService auditService
 	GrailsApplication grailsApplication
@@ -77,6 +81,13 @@ class AwsService implements InitializingBean {
 	 */
 	String sqsUrl(String topicName) {
 		StringBuilder url = serviceUrl('sqs', topicName)
+		if (url) {
+			//url.append('&defaultVisibilityTimeout=5000&deleteIfFiltered=false')
+			url.append('&maxMessagesPerPoll=')
+			url.append(MAX_MESSAGES_PER_POLL)
+			url.append('&waitTimeSeconds=')
+			url.append(WAIT_TIME_SECONDS)
+		}
 		url ? url.toString() : null
 	}
 
