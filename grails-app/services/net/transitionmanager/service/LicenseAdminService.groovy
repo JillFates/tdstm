@@ -21,11 +21,12 @@ import net.transitionmanager.service.license.prefs.*
 import net.transitionmanager.domain.PartyGroup
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
 
 
 @Slf4j
-class LicenseAdminService extends LicenseCommonService {
+class LicenseAdminService extends LicenseCommonService implements InitializingBean {
 	static transactional = false
 
 	private static int TTL = 15 * 60  //TODO: 20170124 Move to a config variable (default 15 min)
@@ -39,32 +40,24 @@ class LicenseAdminService extends LicenseCommonService {
 	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
 
-	private boolean loaded = false
 	AssetEntityService assetEntityService
 	MailService mailService
 	SecurityService	securityService
 
-	LicenseAdminService() {
+
+	/**
+	 * Initialize the license service, configuring the cache and the licensing library
+	 */
+	@Override
+	void afterPropertiesSet() throws Exception {
 		if(!licenseCache.getCache(CACHE_NAME)) {
 			log.debug("configuring cache")
 			Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, TTL, 0)
 			licenseCache.addCache(memoryOnlyCache)
 		}
-	}
 
-	/**
-	 * Initialize the license service, configuring the cache and the licensing library
-	 * this is run only once when invoked unless is forced (in testing)
-	 * syncronized for thread safety
-	 * @param force force the reinitialization of the Service (used in testing)
-	 * @return
-	 */
-	synchronized
-	def initialize(boolean force = false) {
-		//lazy initialization when called
-		if(force || isEnabled() && !loaded) {
-			log.debug("LAdmin is Enabled?: {} && !loaded: {}", isEnabled(), !loaded)
-			loaded = true
+		if(isEnabled()) {
+			log.debug("LAdmin is Enabled?: {}", isEnabled())
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
 			if(isLGen()) {
@@ -135,7 +128,6 @@ class LicenseAdminService extends LicenseCommonService {
 			// LicenseManager manager = LicenseManager.getInstance()
 			// log.debug("OLB: Load License")
 			// licenseProvider.addLicense("tst", "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
-			// log.debug("OLB: Loaded")
 			// License lic = manager.getLicense("tst") //set the license to test
 			// log.debug("License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}")
 			// END: TEST CLIENT LICENSE //
@@ -218,7 +210,6 @@ class LicenseAdminService extends LicenseCommonService {
 	 * 	 // alternative idea -- boolean isValid(projectGuid, featureName)
 	 */
 	Map getLicenseStateMap(Project project = null){
-		initialize()
 
 		Map defaultValidState = [
 			state	: State.VALID,

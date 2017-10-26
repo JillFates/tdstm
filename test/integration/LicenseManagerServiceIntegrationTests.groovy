@@ -51,7 +51,6 @@ class LicenseManagerServiceIntegrationTests extends Specification {
 				key: '/Users/octavio/Documents/TDS/tranman/trunk/licensePublicP.key',
 				password: '&5b4T#lNItA9^Zg'
 		]
-		licenseAdminService.initialize(true)
 
 		project = projectTestHelper.createProject()
 		adminPerson = personTestHelper.createStaff(project.owner)
