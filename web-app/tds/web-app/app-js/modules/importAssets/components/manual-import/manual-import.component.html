@@ -1,13 +1,4 @@
-<style>
-    .form-group {
-        margin-bottom: 40px;
-    }
-    a.control-label {
-        text-align: left !important;
-    }
-</style>
-
-<div class="content body">
+<div class="content body manual-import-component">
     <section>
         <div>
             <form class="formly form-horizontal" role="form" novalidate >
@@ -19,89 +10,88 @@
                             <label class="col-sm-3 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-2">
                                 <select [(ngModel)]="selectedActionOption" (ngModelChange)="onActionScriptChange($event)" name="fetch" id="fetch" class="form-control pd-top-5" >
-                                    <option value="-1">Please Select..</option>
+                                    <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>
                                 </select>
                             </div>
                             <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
-                                Fetch
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}
                                 <i *ngIf="fetchInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="fetchResult?.status === 'success' " style="color: green;" class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="fetchResult?.status === 'error' " style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
+                                <i *ngIf="fetchResult?.status === 'success' " class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="fetchResult?.status === 'error' " class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success'" (click)="onViewData('FETCH')" class="control-label col-md-1">View data</a>
+                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success'" (click)="onViewData('FETCH')" class="control-label col-md-1">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
+                            </a>
 
                         </div>
 
                         <div class="form-group row">
-                           <label class="col-sm-3 control-label" for="transform">Transform with Data Script: </label>
+                           <label class="col-sm-3 control-label" for="transform">
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_DATA_SCRIPT' | translate}}
+                           </label>
                            <div class="col-sm-2">
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
-                                   <option value="-1">Please Select..</option>
+                                   <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                    <option *ngFor="let option of dataScriptOptions"
                                            [ngValue]="option">{{option.name}}</option>
                                </select>
                             </div>
                             <button [disabled]="!selectedScriptOption || selectedScriptOption == -1 || !fetchResult || fetchResult?.status === 'error'" (click)="onTransform()" class="btn btn-default col-sm-1">
-                                Transform
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM' | translate}}
                                 <i *ngIf="transformInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="transformResult?.status === 'success'" style="color: green;" class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="transformResult?.status === 'error'" style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
+                                <i *ngIf="transformResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="transformResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);" (click)="onViewData('TRANSFORM')" class="control-label col-sm-1">View data</a>
+                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);" (click)="onViewData('TRANSFORM')" class="control-label col-sm-1">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
+                            </a>
                         </div>
 
                             <div class="form-group row" style="margin-bottom: 20px;">
-                            <label class="col-sm-3 control-label">Load transformed data into Import Batches: </label>
+                            <label class="col-sm-3 control-label">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_DATA_INTO_IMPORT' | translate}}
+                            </label>
                             <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'" (click)="onImport()"
                                     class="btn btn-default col-md-offset-2 col-sm-1">
-                                Import
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}
                                 <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="importResult?.status === 'success'" style="color: green;" class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="importResult?.status === 'error'" style="color: #d9534f;" class="glyphicon glyphicon-remove"></i>
+                                <i *ngIf="importResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="importResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="../dataTransferBatch/list" class="control-label col-sm-2">Go to Manage Import Batches</a>
+                            <a href="../dataTransferBatch/list" class="control-label col-sm-2">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_IMPORT_BATCHES' | translate}}
+                            </a>
                         </div>
 
                         <div class="form-group row">
                             <button (click)="onClear()" class="btn btn-default col-md-offset-5 col-sm-1">
-                                Clear
+                                {{'GLOBAL.CLEAR' | translate}}
                             </button>
                         </div>
 
-                       <!--<div class="form-group row" style="margin-bottom: 0px;">
-                           <label style="text-align: left;" class="col-sm-offset-1 col-sm-3 control-label">
-                               <span *ngIf="viewDataType === 'FETCH'">Fetched Data</span>
-                               <span *ngIf="viewDataType === 'TRANSFORM'">Transformed Data</span>
-                           </label>
-                           <a href="javascript: void(0);" (click)="onCloseFileContents()" style="text-align: right !important;" class="col-sm-offset-2 control-label col-sm-1">Clear</a>
-                       </div>-->
-
                        <div class="form-group row">
-                           <div class="col-sm-offset-1 col-sm-6" style="">
+                           <div class="col-sm-offset-1 col-sm-6" >
                                <a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
-                                  href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">Close</a>
+                                  href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">
+                                   {{'GLOBAL.CLOSE' | translate}}
+                               </a>
                                <kendo-tabstrip>
-                                   <kendo-tabstrip-tab style="font-weight: bold;" [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
+                                   <kendo-tabstrip-tab [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
                                        <ng-template kendoTabContent>
                                            <div>{{getFetchFileContentValue()}}</div>
-                                           <!--<textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>-->
                                        </ng-template>
                                    </kendo-tabstrip-tab>
                                    <kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'" *ngIf="transformFileContent">
                                        <ng-template kendoTabContent>
                                            <div>{{getTransformFileContentValue()}}</div>
-                                           <!--<textarea name="fileContent" [ngModel]="getFileContentValue()" class="form-control" rows="10" cols="10"></textarea>-->
                                        </ng-template>
                                    </kendo-tabstrip-tab>
                                </kendo-tabstrip>
                            </div>
                        </div>
-
                     </div>
-                    <!--<div class="box-footer">
-                    </div>-->
                 </div>
             </form>
         </div>

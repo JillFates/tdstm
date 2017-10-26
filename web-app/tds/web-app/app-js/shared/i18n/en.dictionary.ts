@@ -58,6 +58,7 @@ export const en_DICTIONARY: Object = {
 			'FETCH_DATA_ACTION': 'Fetch with Data Action:',
 			'TRANSFORM_DATA_SCRIPT': 'Transform with Data Script:',
 			'LOAD_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
+			'GOTO_IMPORT_BATCHES': 'Go to Manage Import Batches',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',
@@ -85,7 +86,8 @@ export const en_DICTIONARY: Object = {
 		'CLEAR_FILTERS': 'Clear filters',
 		'FREEZE': 'Freeze',
 		'SORT': 'Sort',
-		'CLEAR': 'Clear'
+		'CLEAR': 'Clear',
+		'PLEASE_SELECT': 'Please Select..'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
