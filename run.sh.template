@@ -5,13 +5,40 @@
 # ./runapp.sh
 # ./runapp.sh test-app -unit RunbookService
 # ./runapp.sh test-app -integration GormUtil
+# ./runapp.sh build-ui
+# ./runapp.sh update-ui
 #
 
 # Configuration Settings
 SDK_INIT=~/.sdkman/bin/sdkman-init.sh
 GRAILS_VERSION=2.5.4
-JVM_MEMORY=1526m
-JVM_PERMGEN=378m
+JVM_MAX_MEMORY=2048m
+#
+
+if [ "$1" == "build-ui" ]; then
+   npm run build-prod
+   echo Build of Legacy complete
+   pushd ./web-app/tds > /dev/null
+   npm run build-prod
+   echo Build of Angular complete
+   echo
+   popd > /dev/null
+   exit 0
+fi
+
+if [ "$1" == "update-ui" ]; then
+   echo Staring npm update of packages
+   pushd ./web-app/tds > /dev/null
+   npm update
+   RC=$?
+   if [ $RC ]; then
+      echo An error occurred while updating npm packages
+   else
+      echo All npm packages have been updated
+   fi
+   popd > /dev/null
+   exit $RC
+fi
 
 if [ ! -f $SDK_INIT ]; then
    echo "Please install the SDKMan! before trying to use this script (see http://sdkman.io/)"
@@ -38,7 +65,7 @@ fi
 GRAILS_OPTS="-Xdebug -server -XX:+UseParallelGC -Djava.net.preferIPv4Stack=true"
 
 # Memory Settings
-GRAILS_OPTS="$GRAILS_OPTS -Xmx$JVM_MEMORY -Xms$JVM_MEMORY -XX:PermSize=$JVM_PERMGEN -XX:MaxPermSize=$JVM_PERMGEN"
+GRAILS_OPTS="$GRAILS_OPTS -XX:MetaspaceSize=$JVM_MAX_MEMORY -Xmx$JVM_MAX_MEMORY"
 
 # Set the JNI inflation to high value to limit only methods call excessively
 #    see https://blogs.oracle.com/buck/entry/inflation_system_properties
