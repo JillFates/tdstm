@@ -16,13 +16,15 @@ abstract class ETLTransformation {
      *
      * @param element and ETL Processor element to be modified
      */
-    void apply (Element element) {
+    def apply (Element element) {
         closure(element)
+        element
         //TODO: Diego. Add every transformation to a list of applied transformation over an element
     }
 
-    void apply (Element element, def args) {
+    def apply (Element element, def args) {
         closure(element, args)
+        element
     }
 
 }
