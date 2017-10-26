@@ -1,18 +1,21 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<form class="form-horizontal" style="min-width: 578px;">
+<form class="form-horizontal" style="min-width: 780px;">
     <div class="form-group" style="height: 50px;">
-        <label for="newAssetName" class="col-sm-4 control-label">New asset name: </label>
+        <label for="newAssetName" class="col-sm-3 control-label">New asset name: </label>
         <div class="col-sm-6">
             <input type="text" class="form-control" id="newAssetName" placeholder="Change Asset Name" autocomplete="off" required value="${asset.assetEntityInstance.assetName}">
             <label class="lbl-clone-exist" style="font-weight: bold;font-size: 11px;width: 272px;"><span style=" color: red;" class="lbl-error-text">Change name appropriately</span> <span style="cursor: pointer; color: #1c94c4 !important; display: none;" class="open-asset-detail-btn">click here to view </span></label>
             <label class="lbl-clone-name-missing" style="font-weight: bold;font-size: 11px;width: 272px; display: none;"><span style=" color: red;">Asset Name is required</span></label>
         </div>
+        <div class="col-sm-3 tooltip-container" style="padding-left: 0px; padding-top: 6px;">
+            <i data-toggle="tooltip" data-placement="right" title="Cloned asset will have Environment = 'Select...' and the next available Asset Tag number for device class" class="fa fa-fw fa-question-circle"></i>
+        </div>
     </div>
     <tds:hasPermission permission="${Permission.AssetCloneDependencies}">
         <div class="form-group">
-            <label for="includeDependencies" class="col-sm-4 control-label">Include Dependencies:</label>
+            <label for="includeDependencies" class="col-sm-3 control-label">Include Dependencies:</label>
             <div class="col-sm-7">
                 <input type="checkbox" id="includeDependencies" style="margin-top: 11px;"> <i data-toggle="tooltip" data-placement="right" title="Clone all existing dependencies as well but will change the status of each to Questioned." class="fa fa-fw fa-question-circle"></i>
             </div>
@@ -51,6 +54,12 @@
 <style>
     /* it's going to be removed on refactor */
     .top110 { top: 110px !important; }
+    div.tooltip-container div.tooltip {
+        top: 0px !important;
+    }
+    div.tooltip-container div.tooltip div.tooltip-arrow {
+        top: 24% !important;
+    }
 </style>
 <script>
 
