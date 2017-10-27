@@ -102,6 +102,7 @@ class MoveBundleService implements ServiceMethods {
 		MoveBundle.executeUpdate('UPDATE MoveBundle SET moveEvent=null where moveEvent=:me', [me: moveEvent])
 		for (id in moveBundleIds) {
 			moveEvent.addToMoveBundles(MoveBundle.get(id))
+
 		}
 	}
 
@@ -215,6 +216,7 @@ class MoveBundleService implements ServiceMethods {
 			AssetEntity.where {
 				moveBundle == moveBundle
 			}.updateAll(moveBundle: project.getProjectDefaultBundle())
+
 			//remove bundle and associated data
 			deleteBundle(moveBundle, project)
 		} catch (e) {
@@ -244,8 +246,14 @@ class MoveBundleService implements ServiceMethods {
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
 			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
+			List<MoveEvent> events = MoveEvent.findAll() // TODO this fix the issue, but change it to a more neat way
+			events.each {
+				if (it.moveBundles.contains(moveBundle)) {
+					it.removeFromMoveBundles(moveBundle)
+				}
+			}
+			// Finally, delete the Bundle
 			moveBundle.delete()
-
 			return "MoveBundle $moveBundle deleted"
 		}
 		catch (e) {

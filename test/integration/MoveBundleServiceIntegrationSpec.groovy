@@ -2,6 +2,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.MoveBundle
@@ -13,6 +14,7 @@ import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.SecurityService
 import com.tdsops.tm.enums.domain.SecurityRole
 import net.transitionmanager.service.SettingService
+import net.transitionmanager.service.UserPreferenceService
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import spock.lang.See
@@ -27,6 +29,7 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     SettingService settingService
     SecurityService securityService
     SessionFactory sessionFactory
+    UserPreferenceService userPreferenceService
 
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
     private PersonTestHelper personHelper = new PersonTestHelper()
@@ -84,12 +87,12 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     }
 
     @See('TM-6847')
-    @Ignore
     void '04. Test delete Bundle & Assets' () {
         setup:
             Project project = projectHelper.createProject()
             Person person = personHelper.createPerson(null, project.client, project)
             UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"])
+            userPreferenceService.setPreference(userLogin, UserPreferenceEnum.CURR_PROJ, project.id)
             securityService.assumeUserIdentity(userLogin.username, false)
         when: 'A new bundle is created'
             MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
@@ -101,11 +104,10 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM.toString(), [moveBundle: bundle])
             AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER.toString(), [moveBundle: bundle])
         and: 'some tasks for the event are generated'
-            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK)
-            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK)
+            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project:project).save(flush:true, failOnError:true)
+            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project:project).save(flush:true, failOnError:true)
         and: 'the Delete Bundle & Assets button is triggered'
             moveBundleService.deleteBundleAndAssets(bundle)
-            sessionFactory.currentSession.flush()
         then: 'the bundle is deleted'
             MoveBundle.get(bundle.id) == null
         and: 'the assigned assets are deleted'
