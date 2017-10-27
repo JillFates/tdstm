@@ -22,11 +22,13 @@ export class DataScriptColumnModel {
 		}, {
 			label: 'Date Create',
 			property: 'dateCreated',
-			type: 'date'
+			type: 'date',
+			width: 80
 		}, {
 			label: 'Last Modified',
 			property: 'lastModified',
-			type: 'date'
+			type: 'date',
+			width: 80
 		}];
 	}
 }
@@ -38,3 +40,11 @@ export class DataScriptRowModel {
 	dateCreated: Date;
 	lastModified: Date;
 }
+
+export const Flatten = filter => {
+	const filters = filter.filters;
+	if (filters) {
+		return filters.reduce((acc, curr) => acc.concat(curr.filters ? Flatten(curr) : [curr]), []);
+	}
+	return [];
+};

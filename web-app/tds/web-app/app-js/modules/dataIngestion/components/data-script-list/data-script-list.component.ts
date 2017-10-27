@@ -6,8 +6,8 @@ import { DataIngestionService } from '../../service/data-ingestion.service';
 
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptRowModel } from '../../model/data-script.model';
-import { GridDataResult } from '@progress/kendo-angular-grid';
+import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptRowModel, Flatten} from '../../model/data-script.model';
+import { filterBy, CompositeFilterDescriptor } from '@progress/kendo-data-query';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 
 @Component({
@@ -16,10 +16,11 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 })
 export class DataScriptListComponent {
 
-	private dataScriptsModels = Array<DataScriptRowModel>();
-	dataScriptColumnModel = new DataScriptColumnModel();
-	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	gridData: GridDataResult;
+	public filter: CompositeFilterDescriptor;
+	public dataScriptColumnModel = new DataScriptColumnModel();
+	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public gridData: any[];
+	public resultSet: DataScriptRowModel[];
 
 	constructor(
 		private stateService: StateService,
@@ -30,12 +31,42 @@ export class DataScriptListComponent {
 		private notifier: NotifierService) {
 		dataScripts.subscribe(
 			(result) => {
-				this.gridData = {
-					data: result,
-					total: result.length
-				};
+				this.resultSet = result;
+				this.gridData = filterBy(this.resultSet, this.filter);
 			},
 			(err) => console.log(err));
-		console.log(this.dataScriptColumnModel);
+	}
+
+	protected filterChange(filter: CompositeFilterDescriptor): void {
+		this.filter = filter;
+		this.gridData = filterBy(this.resultSet, filter);
+	}
+
+	public onFilter(column: any): void {
+		let root = this.filter || { logic: 'and', filters: []};
+
+		let [filter] = Flatten(root).filter(x => x.field === column.property);
+
+		if (column.type === 'text') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'contains',
+					value: column.filter,
+					ignoreCase: true
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
+		}
+		this.filterChange(root);
+	}
+
+	public clearValue(column: any): void {
+		column.filter = '';
+		this.onFilter(column);
 	}
 }
