@@ -6,7 +6,7 @@
 				<kendo-grid [data]="gridData" [filter]="filter" [filterable]="true" (filterChange)="filterChange($event)" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<button class="btn btn-default" id="btnCreateDataScript" type="button" (click)="onCreateDataScript()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'DATA_INGESTION.CREATE_DATA_SCRIPT' | translate }}</button>
-						<div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+						<div (click)="reloadDataScripts()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
 					<kendo-grid-column title="Action" [width]="60">
 						<ng-template kendoGridHeaderTemplate>

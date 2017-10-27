@@ -12,7 +12,6 @@ import {DataIngestionService} from '../../service/data-ingestion.service';
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
-        .k-widget.form-control .k-input, .form-control.k-block .k-input {height: 2.9rem;}
 	`]
 })
 export class DataScriptViewEditComponent {
