@@ -1,18 +1,22 @@
 import { Component, Inject } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Observable';
+import { filterBy, CompositeFilterDescriptor } from '@progress/kendo-data-query';
 
 import { DataIngestionService } from '../../service/data-ingestion.service';
-
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptRowModel, Flatten} from '../../model/data-script.model';
-import { filterBy, CompositeFilterDescriptor } from '@progress/kendo-data-query';
+import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, ModeType, ModalType} from '../../model/data-script.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
+import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
 
 @Component({
 	selector: 'data-script-list',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
+	styles: [`
+        #btnCreateDataScript { margin-left: 16px; }
+	`]
 })
 export class DataScriptListComponent {
 
@@ -20,11 +24,12 @@ export class DataScriptListComponent {
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public gridData: any[];
-	public resultSet: DataScriptRowModel[];
+	public resultSet: DataScriptModel[];
 
 	constructor(
 		private stateService: StateService,
-		@Inject('dataScripts') dataScripts: Observable<DataScriptRowModel[]>,
+		private dialogService: UIDialogService,
+		@Inject('dataScripts') dataScripts: Observable<DataScriptModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: DataIngestionService,
 		private prompt: UIPromptService,
@@ -47,7 +52,7 @@ export class DataScriptListComponent {
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
-		if (column.type === 'text') {
+		if (column.type === 'text' || column.type === 'object') {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
@@ -68,5 +73,24 @@ export class DataScriptListComponent {
 	public clearValue(column: any): void {
 		column.filter = '';
 		this.onFilter(column);
+	}
+
+	public onCreateDataScript(): void {
+		let dataScriptModel: DataScriptModel = {
+			name: '',
+			description: '',
+			mode: ModeType.IMPORT,
+			provider: { id: null, name: ''}
+		};
+
+		this.dialogService.open(DataScriptViewEditComponent, [
+			{ provide: DataScriptModel, useValue: dataScriptModel },
+			{ provide: Number, useValue: ModalType.CREATE}
+		]).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('error');
+		});
+
 	}
 }

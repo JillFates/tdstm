@@ -1,0 +1,50 @@
+import {Component, Inject} from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DataScriptModel, ModalType} from '../../model/data-script.model';
+import {ProviderModel} from '../../model/provider.model';
+import {DataIngestionService} from '../../service/data-ingestion.service';
+
+@Component({
+	selector: 'data-script-view-edit',
+	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-view-edit/data-script-view-edit.component.html',
+	styles: [`
+        .has-error, .has-error:focus {
+            border: 1px #f00 solid;
+        }
+        .k-widget.form-control .k-input, .form-control.k-block .k-input {height: 2.9rem;}
+	`]
+})
+export class DataScriptViewEditComponent {
+
+	public providerList: ProviderModel[];
+	public modalTitle: string;
+
+	constructor(
+		public dataScriptModel: DataScriptModel,
+		public modalType: ModalType,
+		public activeDialog: UIActiveDialogService,
+		private dataIngestionService: DataIngestionService) {
+		this.getProviders();
+		this.modalTitle = (this.modalType === ModalType.CREATE) ? 'Create' : 'Edit';
+
+	}
+
+	/**
+	 * Get the List of Providers
+	 */
+	getProviders(): void {
+		this.dataIngestionService.getProviders().subscribe(
+			(result: any) => {
+				this.providerList = result;
+				if (this.modalType === ModalType.CREATE) {
+					this.dataScriptModel.provider = this.providerList[0];
+				}
+			},
+			(err) => console.log(err));
+	}
+
+	cancelCloseDialog(): void {
+		this.activeDialog.dismiss();
+	}
+}
