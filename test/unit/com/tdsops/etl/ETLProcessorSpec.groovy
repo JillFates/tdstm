@@ -420,9 +420,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -433,7 +431,9 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase
+                            extract 'MODEL NAME' transform {
+                                    uppercase
+                            } 
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -455,7 +455,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -466,7 +466,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform lowercase
+                            extract 'MODEL NAME' transform { lowercase }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -488,15 +488,10 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
-            Closure closure = { dictionary ->
-                dictionary
-            }
-
             ETLBinding binding = new ETLBinding(etlProcessor)
-            //binding.setVariable('by', closure)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(etlProcessor.class.classLoader, binding)
@@ -504,7 +499,9 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform left: 4 
+                            extract 'MODEL NAME' transform { 
+                                        left 4
+                                  }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -526,7 +523,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -537,7 +534,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform middle take 2 from 3 transform lowercase  
+                            extract 'MODEL NAME' transform { 
+                                    middle 2, 3 
+                                    lowercase  
+                                }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -559,7 +559,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -570,7 +570,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform strip first A
+                            extract 'MODEL NAME' transform { 
+                                    uppercase 
+                                    first 'A'
+                                }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -592,7 +595,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -603,7 +606,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform strip last A
+                            extract 'MODEL NAME' transform { 
+                                        uppercase 
+                                        last 'A'
+                                     }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -625,7 +631,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -636,7 +642,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform strip last A  
+                            extract 'MODEL NAME' transform { 
+                                    uppercase 
+                                    last 'A'
+                            }  
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -647,7 +656,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
     }
 
-    void 'test can applyca another transformation for a field value after striping all A characters' () {
+    void 'test can apply another transformation for a field value after striping all A characters' () {
 
         given:
             List<List<String>> data = [
@@ -658,7 +667,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -669,7 +678,11 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform strip last A transform lowercase
+                            extract 'MODEL NAME' transform { 
+                                        uppercase
+                                        last 'A' 
+                                        lowercase
+                                    }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -691,7 +704,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -702,7 +715,9 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform right: 4 
+                            extract 'MODEL NAME' transform {
+                                right 4
+                            } 
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -724,7 +739,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -735,7 +750,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform left: 4 and lowercase 
+                            extract 'MODEL NAME' transform { 
+                                    left 4 
+                                    lowercase
+                            } 
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -757,7 +775,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, ElementTransformation.transformationsMap)
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -768,43 +786,10 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform uppercase transform lowercase
-                        }
-                    """.stripIndent(),
-                    ETLProcessor.class.name)
-
-        then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "srw24g4"
-            etlProcessor.getRow(1).getElement(1).value == "zpha module"
-            etlProcessor.getRow(2).getElement(1).value == "slideaway"
-    }
-
-    void 'test can apply transformations using and on a field value many times' () {
-
-        given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
-
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
-                    .evaluate("""
-                        domain Device
-                        read labels
-                        iterate {
-                            extract 'MODEL NAME' transform uppercase and lowercase
+                            extract 'MODEL NAME' transform  { 
+                                uppercase 
+                                lowercase
+                            }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -826,10 +811,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -840,7 +822,9 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate 
-                            extract 'MODEL NAME' transform unknown
+                            extract 'MODEL NAME' transform { 
+                                    unknown
+                            }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -860,10 +844,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -872,15 +853,14 @@ class ETLProcessorSpec extends Specification {
             new GroovyShell(this.class.classLoader, binding)
                     .evaluate("""domain Device
                         read labels
-                        iterate {
-                            extract 'MODEL NAME' transform unknown
+                        iterate 
+                            extract 'MODEL NAME' 
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
-        then: 'An ETLProcessorException exception is thrown'
-            ETLProcessorException etlProcessorException = thrown ETLProcessorException
-            etlProcessorException.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber == 4
+        then: 'An MultipleCompilationErrorsException exception is thrown'
+            thrown MultipleCompilationErrorsException
     }
 
     void 'test can disallow closure creation using a secure syntax with AST customizer' () {
@@ -894,10 +874,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -946,10 +923,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -995,10 +969,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1046,10 +1017,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1098,10 +1066,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1148,10 +1113,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1186,10 +1148,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1236,10 +1195,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1268,10 +1224,7 @@ class ETLProcessorSpec extends Specification {
             ]
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1279,10 +1232,14 @@ class ETLProcessorSpec extends Specification {
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding)
                     .evaluate("""domain Device
-                            dictionary = [prod: 'Production', dev: 'Development']
+                            def final dictionary = [prod: 'Production', dev: 'Development']
                             read labels
                             iterate {
-                                extract 'ENVIRONMENT' transform lowercase translate with: dictionary
+                                extract 'ENVIRONMENT' transform { 
+                                            lowercase
+                                            translate with: dictionary
+                                } 
+                                        
                             }""".stripIndent(),
                     ETLProcessor.class.name)
 
@@ -1334,10 +1291,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1424,10 +1378,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1476,10 +1427,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1542,10 +1490,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1613,10 +1558,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1684,10 +1626,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1793,10 +1732,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1905,10 +1841,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2085,10 +2018,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2221,10 +2151,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2489,10 +2416,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator, [
-                    uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                    lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() })
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
