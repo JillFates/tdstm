@@ -16,7 +16,6 @@ import { DataScriptViewEditComponent } from '../data-script-view-edit/data-scrip
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
 	styles: [`
         #btnCreateDataScript { margin-left: 16px; }
-        .k-grid .k-grid-header .k-grid-header-wrap th.k-header { font-weight: 700 !important; }
 	`]
 })
 export class DataScriptListComponent {
@@ -32,7 +31,7 @@ export class DataScriptListComponent {
 		private dialogService: UIDialogService,
 		@Inject('dataScripts') dataScripts: Observable<DataScriptModel[]>,
 		private permissionService: PermissionService,
-		private assetExpService: DataIngestionService,
+		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService) {
 		dataScripts.subscribe(
@@ -93,5 +92,14 @@ export class DataScriptListComponent {
 			console.log('error');
 		});
 
+	}
+
+	public reloadDataScripts(): void {
+		this.dataIngestionService.getDataScripts().subscribe(
+			(result) => {
+				this.resultSet = result;
+				this.gridData = filterBy(this.resultSet, this.filter);
+			},
+			(err) => console.log(err));
 	}
 }
