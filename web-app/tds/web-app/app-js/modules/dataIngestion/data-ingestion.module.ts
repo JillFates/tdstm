@@ -7,6 +7,7 @@ import {UIRouterModule} from '@uirouter/angular';
 import {DATA_INGESTION_STATES} from './data-ingestion-routing.states';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
+import {DataScriptViewEditComponent} from './components/data-script-view-edit/data-script-view-edit.component';
 import {SharedModule} from '../../shared/shared.module';
 import {Permission} from '../../shared/model/permission.model';
 // Import Kendo Modules
@@ -28,10 +29,14 @@ import {DataIngestionService} from './service/data-ingestion.service';
 	],
 	declarations: [
 		DataScriptListComponent,
+		DataScriptViewEditComponent
 	],
 	providers: [DataIngestionService],
-	exports: [DataScriptListComponent],
+	exports: [
+		DataScriptListComponent,
+		DataScriptViewEditComponent],
 	entryComponents: [
+		DataScriptViewEditComponent
 	]
 })
 

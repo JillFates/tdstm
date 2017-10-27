@@ -13,8 +13,8 @@ export class DataScriptColumnModel {
 			type: 'text'
 		}, {
 			label: 'Provider',
-			property: 'provider',
-			type: 'text'
+			property: 'provider.name',
+			type: 'object'
 		}, {
 			label: 'Description',
 			property: 'description',
@@ -33,12 +33,20 @@ export class DataScriptColumnModel {
 	}
 }
 
-export class DataScriptRowModel {
+export class DataScriptModel {
 	name: String;
-	provider: String;
+	provider?: {
+		id: number,
+		name: String
+	};
 	description: String;
-	dateCreated: Date;
-	lastModified: Date;
+	mode: ModeType;
+	view?: {
+		id: number,
+		name: String
+	};
+	dateCreated?: Date;
+	lastModified?: Date;
 }
 
 export const Flatten = filter => {
@@ -48,3 +56,14 @@ export const Flatten = filter => {
 	}
 	return [];
 };
+
+export enum ModalType {
+	VIEW,
+	CREATE,
+	EDIT
+};
+
+export enum ModeType {
+	IMPORT,
+	EXPORT
+}
