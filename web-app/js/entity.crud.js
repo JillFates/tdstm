@@ -1102,6 +1102,12 @@ var EntityCrud = (function ($) {
 	};
 	// Private method used by fetchAssetDependencyEditView to fetch the edit view for the asset dependencies
 	var fetchAssetDependencyEditView = function (assetA, assetB, action) {
+		var editModal = pub.getEditModal();
+
+		if (editModal.length) {
+			pub.closeShowModal();
+		}
+
 		var assetDependencies = {
 			assetAId: assetA.id,
 			assetBId: assetB.id
@@ -1114,7 +1120,11 @@ var EntityCrud = (function ($) {
 			success: function (resp) {
 				var currentScope = angular.element('.body').scope();
 				if(currentScope) {
-					currentScope.$emit('viewAssetDependency', resp.data, action);
+					if(currentScope.commentsScope) {
+						currentScope.commentsScope.$emit('viewAssetDependency', resp.data, action);
+					} else {
+						currentScope.$emit('viewAssetDependency', resp.data, action);
+					}
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
