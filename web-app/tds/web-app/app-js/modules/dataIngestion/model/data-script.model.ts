@@ -2,34 +2,35 @@ export const COLUMN_MIN_WIDTH = 200;
 
 export class DataScriptColumnModel {
 	columns: any[];
+
 	constructor() {
-		this.columns = [{
-			label: 'Action',
-			type: 'action',
-			width: 80
-		}, {
-			label: 'Name',
-			property: 'name',
-			type: 'text'
-		}, {
-			label: 'Provider',
-			property: 'provider.name',
-			type: 'object'
-		}, {
-			label: 'Description',
-			property: 'description',
-			type: 'text'
-		}, {
-			label: 'Date Create',
-			property: 'dateCreated',
-			type: 'date',
-			width: 80
-		}, {
-			label: 'Last Modified',
-			property: 'lastModified',
-			type: 'date',
-			width: 80
-		}];
+		this.columns = [
+			{
+				label: 'Name',
+				property: 'name',
+				type: 'text'
+			}, {
+				label: 'Provider',
+				property: 'provider.name',
+				type: 'text'
+			}, {
+				label: 'Description',
+				property: 'description',
+				type: 'text'
+			}, {
+				label: 'Date Create',
+				property: 'dateCreated',
+				type: 'date',
+				format: '{0:d}',
+				width: 80
+			}, {
+				label: 'Last Modified',
+				property: 'lastModified',
+				type: 'date',
+				format: '{0:d}',
+				width: 80
+			}
+		];
 	}
 }
 

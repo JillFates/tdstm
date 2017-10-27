@@ -16,6 +16,7 @@ import { DataScriptViewEditComponent } from '../data-script-view-edit/data-scrip
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
 	styles: [`
         #btnCreateDataScript { margin-left: 16px; }
+        .k-grid .k-grid-header .k-grid-header-wrap th.k-header { font-weight: 700 !important; }
 	`]
 })
 export class DataScriptListComponent {
@@ -52,7 +53,7 @@ export class DataScriptListComponent {
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
-		if (column.type === 'text' || column.type === 'object') {
+		if (column.type === 'text') {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
