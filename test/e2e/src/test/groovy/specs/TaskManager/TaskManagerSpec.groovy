@@ -2,14 +2,20 @@ package specs.TaskManager
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.Cookbook.CreateRecipePage
+import javafx.scene.control.Alert
 import pages.TaskManager.TaskManagerPage
 import pages.TaskManager.CreateTaskPage
 import pages.common.LoginPage
 import pages.Dashboards.UserDashboardPage
 import spock.lang.Stepwise
+import spock.util.Exceptions
 
 @Stepwise
 class TaskManagerSpec extends GebReportingSpec{
+
+    //Define the names of the tasks you will Create and Edit
+    def  taskName = "01 Testing QA Automation Task Manager Run"
+    def  taskNameEdit = "QA Automation Edited"
 
     def setupSpec() {
         given:
@@ -28,7 +34,6 @@ class TaskManagerSpec extends GebReportingSpec{
 
 
     def "open Task Manager"() {
-
         given:
         at UserDashboardPage
 
@@ -44,9 +49,6 @@ class TaskManagerSpec extends GebReportingSpec{
 
     def "open Create Task Pop Up"() {
 
-        //given:
-        //at TaskManagerPage
-
         when:
         createTaskBtLb.click()
 
@@ -54,35 +56,36 @@ class TaskManagerSpec extends GebReportingSpec{
         at CreateTaskPage
         ctModalTitle.text() == "Create Task"
 
-        //print CreateTaskPage.ctModalTitle.text() //Does not work if I instantiate CreateTaskPage
 
     }
 
     def "Create Task"() {
 
-
         when:
-        ctModalNameTA = "QA Automation"
+
+        ctModalNameTA = taskName
         waitFor { ctModalSaveBt.click() }
 
+
+
         then:
-        ctModalNameTA == "QA Automation"
+
         at TaskManagerPage
 
     }
 
 
     def "Open Edit Task"() {
-//Cambiarlo a escribir en el filtro y buscar mi tarea
+
         when:
-        waitFor { taskTColLb.click() }
-        Thread.sleep(950)
-        taskTColLb.click()
-        Thread.sleep(950)
-        firstElementTaskTbl.click()
+        waitFor {descriptionTColFlt.click()}
+        descriptionTColFlt = taskName
+        waitFor{firstElementDesc.text() == taskName}
+        waitFor{firstElementTaskTbl.click()}
 
         then:
         at CreateTaskPage
+        ctModalTitle.text() == "Edit Task"
 
     }
 
@@ -90,13 +93,23 @@ class TaskManagerSpec extends GebReportingSpec{
     def "Edit Task"() {
 
         when:
-        ctModalNameTA = "QA Automation Edited"
+        ctModalNameTA = taskNameEdit
         waitFor { ctModalSaveBt.click() }
 
         then:
-        ctModalNameTA == "QA Automation Edited"
-        at TaskManagerPage
+        waitFor{ctModalEdited == taskNameEdit}
+        at CreateTaskPage
 
+    }
+
+
+    def "Delete Task"() {
+
+        when:
+        withConfirm(true){waitFor { deletebtn.click() }}
+
+        then:
+        at TaskManagerPage
 
     }
 
