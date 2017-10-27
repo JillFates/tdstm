@@ -122,22 +122,25 @@ class DatabaseMigrationService implements ServiceMethods {
 	}
 
 	/**
-	 * Update a JSON field for a list of records by executing the given change script.
-	 * @param records - list of domain objects
-	 * @param jsonField - name of the field
-	 * @param changeScript
+	 * Update a JSON field for a list of domain objects by executing the given script.
+	 * This script must return the transformed JSON so this method can update the corresponding
+	 * field appropriately.
+	 *
+	 * @param domainObjects - list of domain objects
+	 * @param jsonField - name of the field to be updated.
+	 * @param changeScript - the script to be executed.
 	 */
-	void updateJsonObjects(List records, String jsonField, Closure changeScript) {
-		for (record in records) {
+	void updateJsonObjects(List domainObjects, String jsonField, Closure changeScript) {
+		for (domainObject in domainObjects) {
 			// Parse the given field to a JSON object.
-			JSONObject originalJson = JsonUtil.parseJson(record[jsonField])
+			JSONObject originalJson = JsonUtil.parseJson(domainObject[jsonField])
 			// Execute the given script using the JSON object.
 			JSONObject transformedJson = changeScript(originalJson)
 			// Assign the result of the script execution to the same field, which may be a different object.
-			record[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
-			// Save the changes.
-			if (!record.validate() || !record.save(flush:true)) {
-				throw new DomainUpdateException(GormUtil.allErrorsString(record))
+			domainObject[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
+			// Save the changes or throw an exception.
+			if (!domainObject.save(flush:true)) {
+				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
 			}
 		}
 	}
