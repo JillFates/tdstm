@@ -34,7 +34,7 @@ class ETLProcessor {
      *
      */
     ETLProcessor () {
-        this(null, [], new DebugConsole(buffer: new StringBuffer()), null, [:])
+        this(null, [], new DebugConsole(buffer: new StringBuffer()), null)
     }
     /**
      *
@@ -44,28 +44,7 @@ class ETLProcessor {
      * @param domainFieldsSpec
      */
     ETLProcessor (List<List<String>> data) {
-        this(null, data, new DebugConsole(buffer: new StringBuffer()), null, [:])
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data
-     * and a map with available transformations
-     *
-     * @param data
-     * @param transformations
-     */
-    ETLProcessor (List<List<String>> data, Map<String, ETLTransformation> transformations) {
-        this(null, data, new DebugConsole(buffer: new StringBuffer()), null, transformations)
-    }
-    /**
-     *
-     *
-     * @param data
-     * @param console
-     * @param transformations
-     */
-    ETLProcessor (List<List<String>> data, DebugConsole console, Map<String, ETLTransformation> transformations) {
-        this(null, data, console, null, transformations)
+        this(null, data, new DebugConsole(buffer: new StringBuffer()), null)
     }
     /**
      *
@@ -85,7 +64,7 @@ class ETLProcessor {
      * @param console
      */
     ETLProcessor (List<List<String>> data, DebugConsole console) {
-        this(null, data, console, [:])
+        this(null, data, console, null)
     }
     /**
      *
@@ -107,38 +86,18 @@ class ETLProcessor {
      * a domain mapper validator and an instance of fieldsValidator
      * with a map of available transformations
      *
-     * @param data
-     * @param console
-     * @param fieldsValidator
-     * @param transformations
-     */
-    ETLProcessor (List<List<String>> data,
-                  DebugConsole console,
-                  ETLFieldsValidator fieldsValidator,
-                  Map<String, ETLTransformation> transformations) {
-        this(null, data, console, fieldsValidator, transformations)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data,
-     * a domain mapper validator and an instance of fieldsValidator
-     * with a map of available transformations
-     *
      * @param project
      * @param data
      * @param console
      * @param fieldsValidator
-     * @param transformations
      */
     ETLProcessor (Project project, List<List<String>> data,
                   DebugConsole console,
-                  ETLFieldsValidator fieldsValidator,
-                  Map<String, ETLTransformation> transformations) {
+                  ETLFieldsValidator fieldsValidator) {
         this.project = project
         this.dataSource = data
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
-        this.transformations = transformations
     }
     /**
      *

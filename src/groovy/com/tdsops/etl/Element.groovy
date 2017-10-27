@@ -45,6 +45,21 @@ class Element {
     }
 
     /**
+     *
+     *
+     *
+     * @param closure
+     * @return
+     */
+    def transform (Closure closure) {
+        Transformer transformer = new Transformer(this)
+        def code = closure.rehydrate(transformer, transformer, transformer)
+        code.resolveStrategy = Closure.DELEGATE_FIRST
+        code()
+        this
+    }
+
+    /**
      * Translate a
      *
      * @param actions
@@ -100,6 +115,10 @@ class Element {
     def methodMissing (String methodName, args) {
         processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
         throw ETLProcessorException.methodMissing(methodName, args)
+    }
+
+    def propertyMissing(String name) {
+        println "Missing property $name"
     }
 
     /** Private Methods. Non public API for ETL processor */
