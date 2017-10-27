@@ -3,7 +3,7 @@
 	<section>
 		<div>
 			<div class="box-body box-with-empty-header">
-				<kendo-grid [data]="gridData" [filterable]="true" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
+				<kendo-grid [data]="gridData" [filter]="filter" [filterable]="true" (filterChange)="filterChange($event)" [pageSize]="10" [pageable]="{ pageSizes: true, info: true}">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<button class="btn btn-default" id="btnEdit" type="button" (click)="onCreateTask()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'DATA_INGESTION.CREATE_DATA_SCRIPT' | translate }}</button>
 						<div (click)="reloadNoticeList()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
@@ -21,8 +21,8 @@
 						</ng-template>
 						<ng-template kendoGridFilterCellTemplate>
 							<div class=" has-feedback" *ngIf="column.property" style="margin-bottom:0px;">
-								<input type="text" (keyup.enter)="onFilter()" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-								<span (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+								<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+								<span (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 							</div>
 						</ng-template>
 					</kendo-grid-column>

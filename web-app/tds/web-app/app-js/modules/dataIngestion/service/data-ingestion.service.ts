@@ -15,7 +15,28 @@ export class DataIngestionService {
 		{
 			name: 'sn_dependencies',
 			provider: 'Service Now',
-			description: 'dependencies datasource for Servide Now',
+			description: 'Dependencies datasource for Servide Now',
+			dateCreated: new Date(),
+			lastModified: new Date()
+		},
+		{
+			name: 'sn_database',
+			provider: 'Service Now',
+			description: 'Database datasource for Servide Now',
+			dateCreated: new Date(),
+			lastModified: new Date()
+		},
+		{
+			name: 'tm_application_plan',
+			provider: 'TransitionManager',
+			description: 'Application plan data from Master Project',
+			dateCreated: new Date(),
+			lastModified: new Date()
+		},
+		{
+			name: 'd42_ipaddr',
+			provider: 'Device42',
+			description: 'IP datasource for Device 42',
 			dateCreated: new Date(),
 			lastModified: new Date()
 		}
