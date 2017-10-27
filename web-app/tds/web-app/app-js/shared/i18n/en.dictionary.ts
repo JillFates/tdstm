@@ -22,6 +22,11 @@ export const en_DICTIONARY: Object = {
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		}
 	},
+	'DATA_INGESTION': {
+		'DATA_INGESTION': 'Data Ingestion',
+		'DATA_SCRIPT': 'Data Scripts',
+		'CREATE_DATA_SCRIPT': 'Create Data Scripts'
+	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
