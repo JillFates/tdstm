@@ -30,6 +30,10 @@ declare var jQuery: any;
 	.storage .dev, .storage .dat, .storage .app {
 		background-color:#f4f4f4;
 	}
+	.k-grid-content-locked,
+	.k-grid-header-locked {
+		border-right: 2px solid;
+	}
 	`],
 	encapsulation: ViewEncapsulation.None
 })
@@ -95,7 +99,7 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	apply(data: any): void {
-		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space 
+		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.gridData = {
 			data: data.assets,
