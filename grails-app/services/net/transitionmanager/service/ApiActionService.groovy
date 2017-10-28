@@ -25,10 +25,11 @@ class ApiActionService {
 		return ApiAction.get(id)
 	}
 
-	ApiAction findOrCreateApiAction(Long id, Project project) {
-		ApiAction apiAction = ApiAction.findByIdAndProject(id, project)
-
-		return apiAction
+	ApiAction find(Long id, Project project) {
+		return ApiAction.where {
+			id == id
+			project == project
+		}.get()
 	}
 
 	List<Map> list(Project project) {
