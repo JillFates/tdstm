@@ -58,6 +58,13 @@ tdstm {
 		}
 	}
 
+	jms {
+	    // AWS SQS queue name used within ApiAction async execution
+	    aws {
+	        responseQueueName = ''
+	    }
+	}
+
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)
