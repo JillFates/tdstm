@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DataScriptModel, ModalType} from '../../model/data-script.model';
+import {DataScriptModel, ModalType, ModeType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 
@@ -18,6 +18,7 @@ export class DataScriptViewEditComponent {
 
 	public providerList: ProviderModel[];
 	public modalTitle: string;
+	public modeType = ModeType;
 
 	constructor(
 		public dataScriptModel: DataScriptModel,

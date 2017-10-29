@@ -1,7 +1,21 @@
-<kendo-dropdownlist #kendoDropDown="kendoDropDownList" [defaultItem]="{name:'Saved Views',default:true}" [data]="data"
- (close)="onAction($event)" (open)="onAction($event)" [valueField]="'name'" [textField]="'name'" style="width: 266px;">
+<kendo-dropdownlist #kendoDropDown="kendoDropDownList"
+					[defaultItem]="defaultItem"
+					[data]="data"
+					[disabled]="isDisabled"
+					(close)="onAction($event)"
+					(open)="onAction($event)"
+					[valueField]="'name'"
+					[textField]="'name'"
+					style="width: 266px;">
 	<ng-template kendoDropDownListValueTemplate let-dataItem>
 		<span style="cursor:pointer;width:100%;" (click)="onToggle()">{{dataItem.name}}</span>
+			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
+				{{selectedItem}}
+			</div>
+			<ng-template #noneSelectedItem>
+				{{dataItem.name}}
+			</ng-template>
+		</span>
 	</ng-template>
 	<ng-template kendoDropDownListHeaderTemplate>
 		<div class="has-feedback" style="margin-top:-20px;">
@@ -20,7 +34,12 @@
 				</li>
 				<li>
 					<ul style="padding-left:10px;margin-top:5px;" *ngFor="let value of dataItem.items">
+						<div *ngIf="!nameAsUrl; else as_url">
+							<a href="javascript:void(null);" (click)="onSelectItem(dataItem, value)"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
+						</div>
+						<ng-template #as_url>
 						<a href="./asset/views/{{value.id}}/show"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
+						</ng-template>
 					</ul>
 				</li>
 			</div>
