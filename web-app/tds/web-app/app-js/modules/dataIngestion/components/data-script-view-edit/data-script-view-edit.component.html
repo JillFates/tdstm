@@ -33,18 +33,18 @@
 							<div class="col-sm-8">
 								<div class="radio">
 									<label>
-										<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+										<input type="radio" name="dataScriptModeType" [value]="modeType.IMPORT" [(ngModel)]="dataScriptModel.mode" checked>
 										Import
 									</label>
 								</div>
 								<div class="radio">
 									<label>
-										<input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+										<input type="radio" name="dataScriptModeType" [value]="modeType.EXPORT" [(ngModel)]="dataScriptModel.mode">
 										Export
 									</label>
 								</div>
 								<div style="margin-top: 10px;">
-									<kendo-dropdownlist id="dataScriptTarget" name="dataScriptTarget" class="form-control" [data]="providerList" [textField]="'name'" [valueField]="'id'" [(ngModel)]="dataScriptModel.provider"></kendo-dropdownlist>
+                                    <asset-explorer-view-selector [isDisabled]="dataScriptModel.mode === modeType.IMPORT" [nameAsUrl]="false" [showCreate]="false"></asset-explorer-view-selector>
 								</div>
 							</div>
 						</div>

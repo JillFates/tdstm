@@ -9,6 +9,7 @@ import {DATA_INGESTION_STATES} from './data-ingestion-routing.states';
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
 import {DataScriptViewEditComponent} from './components/data-script-view-edit/data-script-view-edit.component';
 import {SharedModule} from '../../shared/shared.module';
+import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 import {Permission} from '../../shared/model/permission.model';
 // Import Kendo Modules
 import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
@@ -25,6 +26,7 @@ import {DataIngestionService} from './service/data-ingestion.service';
 		DropDownListModule,
 		GridModule,
 		SortableModule,
+		AssetExplorerModule, // So we can use Shared components that belongs to this module
 		UIRouterModule.forChild({states: DATA_INGESTION_STATES})
 	],
 	declarations: [

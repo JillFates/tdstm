@@ -44,7 +44,10 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		AssetExplorerViewShowComponent
 	],
 	providers: [AssetExplorerService],
-	exports: [AssetExplorerIndexComponent],
+	exports: [
+		AssetExplorerIndexComponent,
+		AssetExplorerViewSelectorComponent // So we can use it outside this module
+	],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent
