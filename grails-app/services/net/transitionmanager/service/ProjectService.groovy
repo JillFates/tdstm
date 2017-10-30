@@ -748,7 +748,7 @@ class ProjectService implements ServiceMethods {
 	 * @param defaultBundleName name to be given to the default bundle, should it be created.
 	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
-	@Transactional
+	@Transactional()
 	MoveBundle getDefaultBundle(Project project, String defaultBundleName = null) {
 		return project.defaultBundle ?: createDefaultBundle(project, defaultBundleName)
 	}
@@ -759,30 +759,33 @@ class ProjectService implements ServiceMethods {
 	 * @param defaultBundle
 	 * @return project's default move bundle
 	 */
-	@Transactional
-	MoveBundle createDefaultBundle (Project project, String defaultBundleName) {
-		def defaultCode = defaultBundleName?:'TBD'
+	@Transactional()
+	MoveBundle createDefaultBundle(Project project, String defaultBundleName='TBD') {
+		MoveBundle moveBundle
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
-		if(!project.defaultBundle){
-			def moveBundle = MoveBundle.findByNameAndProject(defaultCode, project)
-			if(moveBundle)
-				return moveBundle
-			else
+		if (!project.defaultBundle) {
+			moveBundle = MoveBundle.findByNameAndProject(defaultBundleName, project)
+			if (! moveBundle) {
 				moveBundle = new MoveBundle(
-					name:defaultCode,
-					project:project,
-					useForPlanning:true,
-					workflowCode:project.workflowCode,
-					startTime: project.startDate,
-					completionTime:project.completionDate
+						name: defaultBundleName,
+						project: project,
+						useForPlanning: true,
+						workflowCode: project.workflowCode,
+						startTime: project.startDate,
+						completionTime: project.completionDate
 				)
 
-			if (!moveBundle.save(flush:true)){
-				log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
-				return null
+				if (!moveBundle.save(flush: true)) {
+					log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
+					throw new RuntimeException('Unable to create default bundle')
+				}
+				log.info "Default bundle ${moveBundle.name} was created for project $project"
 			}
-			return moveBundle
+			if (moveBundle) {
+				project.defaultBundle = moveBundle
+			}
 		}
+		return moveBundle
 	}
 
 	/**
