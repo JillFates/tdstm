@@ -2010,8 +2010,9 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.id == args.id && it.project.id == args.project.id }
+            GroovyMock(AssetEntity, global: true)
+            AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+                applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
         and:
@@ -2301,8 +2302,9 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
-                applications.findAll { it.id == args.id && it.project.id == args.project.id }
+            GroovyMock(AssetEntity, global: true)
+            AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+                applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
         and:
@@ -2408,7 +2410,8 @@ class ETLProcessorSpec extends Specification {
             }
 
         and:
-            AssetEntity.metaClass.static.executeQuery = { String query, Map args ->
+            GroovyMock(AssetEntity, global: true)
+            AssetEntity.executeQuery(_, _) >> { String query, Map args ->
                 applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
 
