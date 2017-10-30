@@ -86,6 +86,12 @@ class ETLProcessorSpec extends Specification {
             updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
             updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
         }
+
+        List<List<String>> data = [
+                ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
+                ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
+                ["152255", "Mozilla", "NGM", "ACME Data Center"]
+        ]
     }
 
     void 'test can define a the primary domain' () {
@@ -1541,13 +1547,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can load values without extract previously' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1617,7 +1616,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1632,7 +1631,7 @@ class ETLProcessorSpec extends Specification {
                             domain Application
                             load environment with Production
                             extract 0 load id
-                            extract 'VENDOR NAME' load appVendor
+                            extract 'vendor name' load appVendor
                             
                             domain Device
                             extract 0 load id 
@@ -1692,13 +1691,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can reference a domain Property Name with loaded Data Value' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1795,7 +1787,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1808,7 +1800,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             domain Application
                             load environment with Production
-                            extract 'APPLICATION ID' load id
+                            extract 'application id' load id
                             reference id with id
                         }
                         """.stripIndent(),
@@ -1928,7 +1920,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1984,13 +1976,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if script reference to a domain Property and it was not defined in the ETL Processor' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -2103,7 +2088,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             domain Application
                             load environment with Production
-                            extract 'APPLICATION ID' load id
+                            extract 'application id' load id
                             reference id with id
                         }
                         """.stripIndent(),
@@ -2118,13 +2103,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can reference multiple asset entities for a domain Property Name with loaded Data Value' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -2195,7 +2173,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2208,7 +2186,7 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             domain Application
                             load environment with Production
-                            extract 'LOCATION' load Vendor
+                            extract 'location' load Vendor
                             reference assetName with Vendor
                         }
                         """.stripIndent(),
