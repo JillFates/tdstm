@@ -1509,10 +1509,10 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                             domain Application
                             extract 0 load id
-                            extract 'VENDOR NAME' load appVendor
+                            extract 'vendor name' load appVendor
                             
                             domain Device
-                            extract 'LOCATION' load location
+                            extract 'location' load location
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
