@@ -16,7 +16,7 @@ databaseChangeLog = {
                     List<Project> projects = Project.findAllByDefaultBundleIsNull()
                     ProjectService projectService = ctx.getBean('projectService')
                     for (project in projects) {
-                        projectService.createDefaultBundle(project)
+                        projectService.createDefaultBundle(project, 'TBD')
                     }
                 }
             }
