@@ -32,6 +32,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
         .N { background-color: #FFF;}
 		.U { background-color: #F3F4F6;}
 		li.active a { font-weight:bold;}
+		.drag-icon { padding: 8px 10px 0px 5px; color: #9f9f9f;}
 	`]
 })
 export class AssetExplorerViewConfigComponent {
