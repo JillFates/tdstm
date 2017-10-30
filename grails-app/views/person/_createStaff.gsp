@@ -1,6 +1,6 @@
 <%@ page import="net.transitionmanager.domain.Person" %>
 <div class="dialog">
-        <g:form action="save" id="createDivFormId" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
+        <form action="save" id="createDivFormId" method="post" name="createDialogForm" onsubmit="return validatePersonForm('createDialogForm')">
           <input type="hidden"  id="createstaff" name="createstaff" value="${forWhom}" />
           <div class="dialog">
             <table>
@@ -179,7 +179,7 @@
             	<input class="delete" type="button" id="cancelBId" value="Cancel" onClick="Person.closePersonDiv('createStaffDialog')"/>
 			</span>
           </div>
-        </g:form>
+        </form>
 </div>
       <script type="text/javascript"> 
        function addFunctionsCreate(){
