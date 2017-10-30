@@ -2,14 +2,91 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import getl.csv.CSVConnection
+import getl.csv.CSVDataset
+import getl.proc.Flow
+import getl.tfs.TFS
+import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
+import spock.lang.Shared
 import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
+
+
+    @Shared
+    Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
+
+    @Shared
+    CSVConnection csvConnection
+
+    CSVDataset simpleDataSet
+    CSVDataset environmentDataSet
+    CSVDataset applicationDataSet
+    CSVDataset sixRowsDataSet
+
+    def setupSpec () {
+        csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
+        FileUtils.ValidPath(conParams.path)
+    }
+
+    def cleanupSpec () {
+        new File(conParams.path).deleteOnExit()
+    }
+
+    def setup () {
+        simpleDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+        simpleDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+        simpleDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
+        simpleDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
+
+        new Flow().writeTo(dest: simpleDataSet, dest_append: true) { updater ->
+            updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
+            updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
+            updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
+        }
+
+        environmentDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+        environmentDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+        environmentDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
+        environmentDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
+        environmentDataSet.field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING", isNull: false, trim: true)
+
+        new Flow().writeTo(dest: environmentDataSet, dest_append: true) { updater ->
+            updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'environment': 'Prod'])
+            updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'environment': 'Prod'])
+            updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'environment': 'Dev'])
+        }
+
+        sixRowsDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+        sixRowsDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+        sixRowsDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
+        sixRowsDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
+
+        new Flow().writeTo(dest: sixRowsDataSet, dest_append: true) { updater ->
+            updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
+            updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
+            updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
+            updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
+            updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
+            updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
+        }
+
+        applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+        applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
+        applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
+        applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
+        applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+
+        new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
+            updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+            updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+        }
+    }
 
     void 'test can define a the primary domain' () {
 
@@ -100,47 +177,10 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.selectedDomain == ETLDomain.Storage
     }
 
-    void 'test can skip a fixed number of rows' () {
-
-        given:
-            ETLProcessor etlProcessor = new ETLProcessor([
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152251", "SRW24G1", "LINKSYS"],
-                    ["152252", "SRW24G2", "LINKSYS"],
-                    ["152253", "SRW24G3", "LINKSYS"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "SRW24G5", "LINKSYS"],
-                    ["152256", "ZPHA MODULE", "TippingPoint"]
-            ])
-
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
-                    .evaluate("""
-                    
-                        skip 2
-                        
-                    """.stripIndent(),
-                    ETLProcessor.class.name)
-
-        then: 'The current row index is increased by 2'
-            etlProcessor.currentRowIndex == 2
-    }
-
     void 'test can throw an Exception if the skip parameter is bigger that rows count' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor([
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152251", "SRW24G1", "LINKSYS"],
-                    ["152252", "SRW24G2", "LINKSYS"],
-                    ["152253", "SRW24G3", "LINKSYS"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "SRW24G5", "LINKSYS"],
-                    ["152256", "ZPHA MODULE", "TippingPoint"]
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -157,15 +197,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if the scrip command is not recognized' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor([
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152251", "SRW24G1", "LINKSYS"],
-                    ["152252", "SRW24G2", "LINKSYS"],
-                    ["152253", "SRW24G3", "LINKSYS"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "SRW24G5", "LINKSYS"],
-                    ["152256", "ZPHA MODULE", "TippingPoint"]
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -181,39 +213,30 @@ class ETLProcessorSpec extends Specification {
 
     void 'test can read labels from dataSource and create a map of columns' () {
 
-        // Reads the labels and creates a map of column names and ordinal positions. Upon reading the header
-        // it increments to row pointer automatically.
-
         given:
-            String scriptText = """
-            domain Device
-            read labels
-        """
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor([
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"]
-            ])
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding)
-                    .evaluate(scriptText, ETLProcessor.class.name)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                    """.stripIndent(), ETLProcessor.class.name)
 
         then: 'A column map is created'
-            etlProcessor.column("DEVICE ID").index == 0
-            etlProcessor.column(0).label == "DEVICE ID"
+            etlProcessor.column('device id').index == 0
+            etlProcessor.column(0).label == 'device id'
 
         and:
-            etlProcessor.column("MODEL NAME").index == 1
-            etlProcessor.column(1).label == "MODEL NAME"
+            etlProcessor.column('model name').index == 1
+            etlProcessor.column(1).label == 'model name'
 
         and:
-            etlProcessor.column("MANUFACTURER NAME").index == 2
-            etlProcessor.column(2).label == "MANUFACTURER NAME"
+            etlProcessor.column('manufacturer name').index == 2
+            etlProcessor.column(2).label == 'manufacturer name'
 
         and:
             etlProcessor.currentRowIndex == 1
@@ -223,22 +246,8 @@ class ETLProcessorSpec extends Specification {
      */
     void 'test can iterate over all data source rows' () {
 
-        // Reads the labels and creates a map of column names and ordinal positions. Upon reading the header
-        // it increments to row pointer automatically.
-
         given:
-            List<List<String>> dataSource = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"],
-                    ["152258", "CCM4850", "Avocent"],
-                    ["152259", "DSR2035", "Avocent"],
-                    ["152266", "2U Cable Management", "Generic"],
-                    ["152275", "ProLiant BL465c G7", "HP"]
-            ]
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource)
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -255,7 +264,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'The current row index is the last row in data source'
-            etlProcessor.currentRowIndex == dataSource.size() - 1
+            etlProcessor.currentRowIndex == sixRowsDataSet.readRows
     }
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
@@ -265,15 +274,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column ordinal position' () {
 
         given:
-            List<List<String>> dataSource = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(dataSource)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -306,15 +307,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column name' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -326,7 +319,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME'
+                            extract 'model name'
                         }
                         
                     """.stripIndent(),
@@ -343,15 +336,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if a column name is invalid' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -363,7 +348,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAM'
+                            extract 'model'
                         }
                         
                     """.stripIndent(),
@@ -371,22 +356,14 @@ class ETLProcessorSpec extends Specification {
 
         then: 'An ETLProcessorException is thrown'
             ETLProcessorException e = thrown ETLProcessorException
-            e.message == "Extracting a missing column name 'MODEL NAM'"
+            e.message == "Extracting a missing column name 'model'"
 
     }
 
     void 'test can throw an Exception if a column index is not between row elements range' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA MODULE", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -412,15 +389,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with uppercase transformation' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -431,7 +400,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform {
+                            extract 'model name' transform {
                                     uppercase
                             } 
                         }
@@ -439,23 +408,15 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "SRW24G4"
-            etlProcessor.getRow(1).getElement(1).value == "ZPHA MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEAWAY"
+            etlProcessor.getRow(0).getElement(1).value == 'SRW24G1'
+            etlProcessor.getRow(1).getElement(1).value == 'ZPHA MODULE'
+            etlProcessor.getRow(2).getElement(1).value == 'SLIDEAWAY'
     }
 
     void 'test can transform a field value to lowercase transformation' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -466,29 +427,21 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { lowercase }
+                            extract 'model name' transform { lowercase }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "srw24g4"
-            etlProcessor.getRow(1).getElement(1).value == "zpha module"
-            etlProcessor.getRow(2).getElement(1).value == "slideaway"
+            etlProcessor.getRow(0).getElement(1).value == 'srw24g1'
+            etlProcessor.getRow(1).getElement(1).value == 'zpha module'
+            etlProcessor.getRow(2).getElement(1).value == 'slideaway'
     }
 
     void 'test can transform a field value with taking left 4 characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -499,7 +452,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                         left 4
                                   }
                         }
@@ -515,15 +468,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking middle 2 characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -534,7 +479,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                     middle 2, 3 
                                     lowercase  
                                 }
@@ -551,15 +496,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping first A characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRA24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -570,7 +507,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                     uppercase 
                                     first 'A'
                                 }
@@ -579,7 +516,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping first "A" character'
-            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
             etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
             etlProcessor.getRow(2).getElement(1).value == "SLIDEWAY"
     }
@@ -587,15 +524,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping last A characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRA24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -606,7 +535,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                         uppercase 
                                         last 'A'
                                      }
@@ -615,7 +544,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping last "A" character'
-            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
             etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
             etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
     }
@@ -623,15 +552,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping all A characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRA24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -642,7 +563,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                     uppercase 
                                     last 'A'
                             }  
@@ -651,7 +572,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping all "A" characters'
-            etlProcessor.getRow(0).getElement(1).value == "SR24G4"
+            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
             etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
             etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
     }
@@ -659,15 +580,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can apply another transformation for a field value after striping all A characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRA24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -678,7 +591,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                         uppercase
                                         last 'A' 
                                         lowercase
@@ -688,7 +601,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping all "A" characters'
-            etlProcessor.getRow(0).getElement(1).value == "sr24g4"
+            etlProcessor.getRow(0).getElement(1).value == "srw24g1"
             etlProcessor.getRow(1).getElement(1).value == "zph module"
             etlProcessor.getRow(2).getElement(1).value == "slideawy"
     }
@@ -696,15 +609,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking right 4 characters' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -715,7 +620,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform {
+                            extract 'model name' transform {
                                 right 4
                             } 
                         }
@@ -723,23 +628,15 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed with right 4 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "24G4"
-            etlProcessor.getRow(1).getElement(1).value == "dule"
+            etlProcessor.getRow(0).getElement(1).value == "24G1"
+            etlProcessor.getRow(1).getElement(1).value == "DULE"
             etlProcessor.getRow(2).getElement(1).value == "away"
     }
 
     void 'test can transform a use left 4 transformation in a chain of transformations' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -750,7 +647,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform { 
+                            extract 'model name' transform { 
                                     left 4 
                                     lowercase
                             } 
@@ -767,15 +664,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can apply transformations on a field value many times' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -786,7 +675,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'MODEL NAME' transform  { 
+                            extract 'model name' transform  { 
                                 uppercase 
                                 lowercase
                             }
@@ -795,7 +684,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "srw24g4"
+            etlProcessor.getRow(0).getElement(1).value == "srw24g1"
             etlProcessor.getRow(1).getElement(1).value == "zpha module"
             etlProcessor.getRow(2).getElement(1).value == "slideaway"
     }
@@ -803,15 +692,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at parsing time' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -836,15 +717,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at evaluation time' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -866,15 +739,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow closure creation using a secure syntax with AST customizer' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -915,15 +780,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow method creation using a secure syntax with AST customizer' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -961,15 +818,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary imports using a secure syntax with AST customizer' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1009,15 +858,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1058,15 +899,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can allow stars imports using a secure syntax with AST customizer' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1102,18 +935,10 @@ class ETLProcessorSpec extends Specification {
     void 'test can enable console and log domain selected' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1137,18 +962,10 @@ class ETLProcessorSpec extends Specification {
     void 'test can debug a selected value for a column name' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1160,7 +977,7 @@ class ETLProcessorSpec extends Specification {
                             read labels
                             domain Device
                             iterate {
-                                debug 'DEVICE ID'
+                                debug 'device id'
                             }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -1168,7 +985,7 @@ class ETLProcessorSpec extends Specification {
         then: 'A console content could be recovered after processing an ETL Scrtipt'
             console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
                     .append(System.lineSeparator())
-                    .append("INFO - Reading labels [0:DEVICE ID, 1:MODEL NAME, 2:MANUFACTURER NAME]")
+                    .append("INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name]")
                     .append(System.lineSeparator())
                     .append("INFO - Selected Domain: Device")
                     .append(System.lineSeparator())
@@ -1184,18 +1001,10 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an ETLProcessorException for an invalid console status' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME"],
-                    ["152254", "SRW24G4", "LINKSYS"],
-                    ["152255", "ZPHA Module", "TippingPoint"],
-                    ["152256", "Slideaway", "ATEN"]
-            ]
-
-        and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console)
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1216,15 +1025,10 @@ class ETLProcessorSpec extends Specification {
     void 'test can translate an extracted value using a dictionary' () {
 
         given:
-            List<List<String>> data = [
-                    ["DEVICE ID", "MODEL NAME", "MANUFACTURER NAME", "ENVIRONMENT"],
-                    ["152254", "SRW24G4", "LINKSYS", "Prod"],
-                    ["152255", "ZPHA Module", "TippingPoint", "Prod"],
-                    ["152256", "Slideaway", "ATEN", "Dev"]
-            ]
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data)
+            ETLProcessor etlProcessor = new ETLProcessor(environmentDataSet, console)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1235,7 +1039,7 @@ class ETLProcessorSpec extends Specification {
                             def final dictionary = [prod: 'Production', dev: 'Development']
                             read labels
                             iterate {
-                                extract 'ENVIRONMENT' transform { 
+                                extract 'environment' transform { 
                                             lowercase
                                             translate with: dictionary
                                 } 
@@ -1252,13 +1056,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can load field with an extracted element value after validate fields specs' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1291,7 +1088,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1302,7 +1099,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 domain Application
                                 iterate {
-                                    extract 'VENDOR NAME' load appVendor
+                                    extract 'vendor name' load appVendor
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
 
@@ -1327,13 +1124,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can load field many times with the same extracted value' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1378,7 +1168,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1389,7 +1179,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 domain Application
                                 iterate {
-                                    extract 'VENDOR NAME' load appVendor load description
+                                    extract 'vendor name' load appVendor load description
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
 
@@ -1414,20 +1204,13 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an ETLProcessorException when try to load without domain definition' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
 
         and:
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1438,7 +1221,7 @@ class ETLProcessorSpec extends Specification {
                                 domain Application
                                 read labels
                                 iterate {
-                                    extract 'VENDOR NAME' load appVendor
+                                    extract 'vendor name' load appVendor
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
 
@@ -1451,13 +1234,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification ' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1490,7 +1266,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1501,7 +1277,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 domain Application
                                 iterate {
-                                    extract 'VENDOR NAME' load vendor
+                                    extract 'vendor name' load vendor
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
 

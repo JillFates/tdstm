@@ -12,12 +12,12 @@ class Row {
         elements = []
     }
 
-    Row (Integer index, List<String> values, ETLProcessor processor) {
+    Row (Integer index, List<?> values, ETLProcessor processor) {
         this.index = index
-        this.elements = values.withIndex().collect { String value, int i ->
+        this.elements = values.withIndex().collect { def value, int i ->
             new Element(
                     originalValue: value,
-                    value: value,
+                    value: "${value}".toString(),
                     rowIndex: index,
                     columnIndex: i,
                     processor: processor)
