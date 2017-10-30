@@ -32,7 +32,8 @@ import static com.tdsops.validators.CustomValidators.validateCustomFields
 class AssetEntity extends EavEntity {
 	CustomDomainService customDomainService
 	static final List<String> COMMON_FIELD_LIST = [
-		'assetName', 
+		'assetClass',
+		'assetName',
 		'description', 
 		'environment', 
 		'externalRefId',

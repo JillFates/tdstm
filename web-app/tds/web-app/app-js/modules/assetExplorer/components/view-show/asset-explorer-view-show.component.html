@@ -1,14 +1,11 @@
 <div class="content body">
     <section class="page-asset-explorer-config">
         <div>
-            <div class="btn-group asset-view-title" *ngIf="model.name && model.name !== ''">
-                <h3>{{model.name}}</h3>
-            </div>
             <button type="button" [disabled]="!isSaveAsAvailable()" class="btn btn-default" id="btnSaveAs" (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
             <span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" [ngClass]="model.isFavorite? 'fa-star' : 'fa-star-o'" class="fa text-yellow"></i></span>
             <button type="button" class="btn btn-default" id="btnExport" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
             <asset-explorer-view-selector #select="assetExplorerViewSelector"></asset-explorer-view-selector>
-            <span class="btn" (click)="onEdit()" *ngIf="isEditAvailable()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog"></i></span>
+            <span class="btn" (click)="onEdit()" *ngIf="isEditAvailable()" style="margin:0 10px;padding:5px 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog"></i></span>
         </div>
         <br>
         <div>

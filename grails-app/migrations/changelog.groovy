@@ -184,4 +184,5 @@ databaseChangeLog = {
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
 	include file: '20170925-create-favorite-dataview-table.groovy'
 	include file: '20171025-create-default-bundle-for-projects.groovy'
+	include file: '20171026-add-assetclass-to-common-fields.groovy'
 }
