@@ -15,7 +15,7 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="dataScriptName" class="col-sm-4 control-label">Name:</label>
+							<label for="dataScriptName" class="col-sm-4 control-label">Name:<span style="color: red;">*</span></label>
 							<div class="col-sm-8">
 								<input type="text" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name" required [ngClass]="{'has-error': !dataScriptForm.form.valid}"/>
 							</div>
@@ -43,8 +43,15 @@
 										Export
 									</label>
 								</div>
-								<div style="margin-top: 10px;">
-                                    <asset-explorer-view-selector [isDisabled]="dataScriptModel.mode === modeType.IMPORT" [nameAsUrl]="false" [showCreate]="false"></asset-explorer-view-selector>
+								<div style="margin-top: 10px;" >
+                                    <asset-explorer-view-selector
+											#assetExplorerViewSelector
+											(onSelectView)="onSelectView($event)"
+											[isDisabled]="dataScriptModel.mode === modeType.IMPORT"
+											[nameAsUrl]="false"
+											[showCreate]="false"
+											[ngClass]="{'has-error-custom': dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view}">
+									</asset-explorer-view-selector>
 								</div>
 							</div>
 						</div>
@@ -54,7 +61,7 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" (click)="getExportData()" class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
+		<button type="button" (click)="onCreateDataScript()" class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || (dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view)"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
 
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 	</div>

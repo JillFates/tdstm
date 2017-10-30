@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
+import { Response } from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, ModeType} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
@@ -10,7 +11,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class DataIngestionService {
 
-	private assetExplorerUrl = '../ws/';
+	private dataIngestionUrl = '../ws/dataingestion/dataScript/';
 
 	private mockData: Array<DataScriptModel> = [
 		{
@@ -75,5 +76,14 @@ export class DataIngestionService {
 
 	getProviders(): Observable<ProviderModel[]> {
 		return Observable.from(this.mockDataProvider).bufferCount(this.mockDataProvider.length);
+	}
+
+	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
+		return this.http.post(`${this.dataIngestionUrl}/view`, JSON.stringify(model))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.dataView;
+			})
+			.catch((error: any) => error.json());
 	}
 }

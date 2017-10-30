@@ -4,6 +4,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {DataScriptModel, ModalType, ModeType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: 'data-script-view-edit',
@@ -19,15 +20,17 @@ export class DataScriptViewEditComponent {
 	public providerList: ProviderModel[];
 	public modalTitle: string;
 	public modeType = ModeType;
+	private dataSignature: string;
 
 	constructor(
 		public dataScriptModel: DataScriptModel,
 		public modalType: ModalType,
+		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private dataIngestionService: DataIngestionService) {
 		this.getProviders();
 		this.modalTitle = (this.modalType === ModalType.CREATE) ? 'Create' : 'Edit';
-
+		this.dataSignature = JSON.stringify(this.dataScriptModel);
 	}
 
 	/**
@@ -44,7 +47,38 @@ export class DataScriptViewEditComponent {
 			(err) => console.log(err));
 	}
 
+	/**
+	 * Create a new DataScript
+	 */
+	protected onCreateDataScript(): void {
+		// this.dataIngestionService.saveDataScript();
+		console.log(this.dataScriptModel);
+	}
+
+	/**
+	 * Pass the number of selected rows
+	 * @param event
+	 */
+	protected onSelectView(selectedView: any): void {
+		this.dataScriptModel.view = selectedView;
+	}
+
+	protected isDirty(): boolean {
+		return this.dataSignature !== JSON.stringify(this.dataScriptModel);
+	}
+
 	cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		if(this.isDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel').then(result => {
+				if (result) {
+					this.activeDialog.dismiss();
+				}
+			});
+		} else {
+			this.activeDialog.dismiss();
+		}
 	}
 }
