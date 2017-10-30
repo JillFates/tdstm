@@ -459,6 +459,7 @@
 															  onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 					</tds:hasPermission>
 					<span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#createEntityView').dialog('close'); $('#showEntityView').dialog('close'); $('#editEntityView').dialog('close');"/> </span>
+                    <input type="submit" id="assetUpdateSubmit" style="display:none;">
 				</div>
 			</td>
 		</tr>
