@@ -28,6 +28,9 @@ class DataviewService implements ServiceMethods {
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
+	// Limit the number of favorites that should be returned in queries.
+	static final int FAVORITES_MAX_SIZE = 10
+
 	/**
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
 	 * current person in session
@@ -77,11 +80,23 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
+		Long currentPersonId = securityService.currentPersonId
+
+		// Check if the view is favorite and must be unfavorited.
+		if (dataview.isFavorite(currentPersonId) && !dataviewJson.isFavorite) {
+			deleteFavoriteDataview(dataview.id)
+		} else {
+			// Check if the view must be favorited
+			if (!dataview.isFavorite(currentPersonId) && dataviewJson.isFavorite) {
+				addFavoriteDataview(dataview.id)
+			}
+		}
+
 		return dataview
 	}
 
 	/**
-	 * Creates a Dataview object
+	 * Create a Dataview object and add it to the person's favorite if needed.
 	 * Dataview person and project are taken from current session.
 	 * @param json JSONObject to take changes from.
 	 * @return the Dataview object that was created
@@ -102,6 +117,10 @@ class DataviewService implements ServiceMethods {
 
 		if (!dataview.save()) {
 			throw new DomainUpdateException('Error on create', dataview)
+		}
+
+		if (dataviewJson.isFavorite) {
+			addFavoriteDataview(dataview.id)
 		}
 
 		return dataview
@@ -272,6 +291,8 @@ class DataviewService implements ServiceMethods {
     // TODO : Annotate READONLY
     Map previewQuery(Project project, DataviewSpec dataviewSpec) {
 
+		dataviewSpec = addRequieredColumns(dataviewSpec)
+
         String hqlColumns = hqlColumns(dataviewSpec)
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
@@ -285,7 +306,7 @@ class DataviewService implements ServiceMethods {
           order by $hqlOrder  
         """
 
-        String countHql = """
+		String countHql = """
             select count(*)
               from AssetEntity AE
                 $hqlJoins
@@ -308,11 +329,19 @@ class DataviewService implements ServiceMethods {
 		// Retrieve the current person.
 		Person person = securityService.getUserLoginPerson()
 		// Retrieve all the favorited views for the person.
-		def query = FavoriteDataview.where{
-			person == person
-		}.projections{property 'dataview'}
+		/* Using createCriteria instead of where because there's no way of limiting the number
+		  of results using DetachedCriteria */
+		List<FavoriteDataview> favorites = FavoriteDataview.createCriteria().list {
+			and {
+				person == person
+			}
+			projections {
+				property('dataview')
+			}
+			maxResults(FAVORITES_MAX_SIZE)
 
-		return query.list()
+		}
+		return favorites
 	}
 
 	/**
@@ -414,7 +443,7 @@ class DataviewService implements ServiceMethods {
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
                 pagination: [
-                        offset: dataviewSpec.offset, max: dataviewSpec.max, total: total
+                        offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
                 ],
                 assets    : assets.collect { columns ->
                     Map row = [:]
@@ -476,9 +505,9 @@ class DataviewService implements ServiceMethods {
      * @return
      */
 	private String hqlColumns(DataviewSpec dataviewSpec){
-        dataviewSpec.columns.collect { Map column ->
-            "${propertyFor(column)}"
-        }.join(", ")
+		dataviewSpec.columns.collect { Map column ->
+			"${propertyFor(column)}"
+		}.join(", ")
     }
     /**
      *
@@ -560,7 +589,7 @@ class DataviewService implements ServiceMethods {
     }
 
     private static String propertyFor(Map column) {
-        transformations[column.property].property
+		transformations[column.property].property
     }
 
     private static String joinFor(Map column) {
@@ -569,6 +598,7 @@ class DataviewService implements ServiceMethods {
 
     private static final Map<String, Map> transformations = [
             "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: ""],
+			"assetClass"  : [property: "str(AE.assetClass)", type: String, namedParameter: "assetClass", join: ''],
             "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle"],
             "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project"],
             "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer"],
@@ -579,4 +609,22 @@ class DataviewService implements ServiceMethods {
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
     }
+
+	/**
+	 * Mutate DataViewSpec to add the requiered Columns when querying the DB
+	 * This mutates the original Object
+	 * @param dataviewSpec Original DataViewSpec
+	 * @return the mutated dataViewSpec
+	 */
+	private DataviewSpec addRequieredColumns(DataviewSpec dataviewSpec){
+		HashSet<String> requiredColumns = ['id', 'assetClass']
+
+		requiredColumns = requiredColumns - dataviewSpec.columns*.property
+
+		for(String property: requiredColumns) {
+			dataviewSpec.addColumn(DataviewSpec.COMMON, property)
+		}
+
+		return dataviewSpec
+	}
 }

@@ -186,4 +186,6 @@ databaseChangeLog = {
 	include file: '20171002-create-provider-and-datascript-tables.groovy'
 	include file: '20171010-remove-legacy-field-settings.groovy'
 	include file: '20171011-create-credential-table.groovy'
+	include file: '20171025-create-default-bundle-for-projects.groovy'
+	include file: '20171026-add-assetclass-to-common-fields.groovy'
 }

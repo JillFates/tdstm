@@ -460,6 +460,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	$scope.isDirty = false;
 	// Edit/View Mode
 	$scope.actionTypeEdit = (action === 'edit');
+	//
+	$scope.dataFlowDirection = ['Unknown', 'bi-directional', 'incoming', 'outgoing'];
 
 	/**
 	 * Broadcast that the model has been opened
@@ -512,7 +514,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 			}
 
 			commentService.deleteDependency(assetDependency).then(function(){
-				warningChangeGraph();
+				warningChangeGraph($scope.assetDependency[asset]);
 				if(toClose) {
 					$scope.close();
 				}
@@ -554,7 +556,7 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 		}
 
 		$q.all(qPromises).then(function(){
-			warningChangeGraph();
+			warningChangeGraph($scope.assetDependency.assetA);
 			$scope.close();
 		});
 	};
@@ -616,8 +618,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	/**
 	 * Let the user know that something has change
 	 */
-	function warningChangeGraph() {
-		$(document).trigger('entityAssetUpdated', {});
+	function warningChangeGraph(asset) {
+		$(document).trigger('entityAssetUpdated', { asset: { assetName: asset.name }});
 	}
 
 };

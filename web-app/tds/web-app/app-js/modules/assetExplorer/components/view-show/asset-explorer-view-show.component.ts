@@ -8,13 +8,16 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { ViewModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { Permission } from '../../../../shared/model/permission.model';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { AlertType } from '../../../../shared/model/alert.model';
 
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
-import {AssetQueryParams} from '../../model/asset-query-params';
-import {DomainModel} from '../../../fieldSettings/model/domain.model';
-import {AssetExportModel} from '../../model/asset-export-model';
+import { AssetQueryParams } from '../../model/asset-query-params';
+import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { AssetExportModel } from '../../model/asset-export-model';
 
 @Component({
 	selector: 'asset-explorer-view-show',
@@ -23,7 +26,9 @@ import {AssetExportModel} from '../../model/asset-export-model';
 export class AssetExplorerViewShowComponent implements OnInit {
 	model: ViewModel;
 	domains: DomainModel[] = [];
+
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
+	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
@@ -31,14 +36,12 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
 		private stateService: StateService,
+		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
-		report.subscribe(
-			(result) => {
-				this.model = result;
-			},
-			(err) => console.log(err));
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
+			this.model = result[1];
+			this.stateService.$current.data.page.title = this.model.name;
 		}, (err) => console.log(err));
 	}
 
@@ -81,7 +84,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	protected onSaveAs(): void {
 		if (this.isSaveAsAvailable()) {
 			this.dialogService.open(AssetExplorerViewSaveComponent, [
-				{ provide: ViewModel, useValue: this.model }
+				{ provide: ViewModel, useValue: this.model },
+				{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
 			]).then(result => {
 				this.model = result;
 				setTimeout(() => {
@@ -96,11 +100,8 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains:  this.domains,
-			previewMode: false,
-			queryId: this.model.id,
-			totalData: this.grid.gridData.total,
-			searchExecuted: true,
+			domains: this.domains,
+			queryId: this.model.id
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
@@ -110,6 +111,29 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		}).catch(result => {
 			console.log('error');
 		});
+	}
+
+	protected onFavorite(): void {
+		if (this.model.isFavorite) {
+			this.assetService.deleteFavorite(this.model.id)
+				.subscribe(d => {
+					this.model.isFavorite = false;
+					this.select.loadData();
+				});
+		} else {
+			if (this.assetService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: 'Maximum number of favorite data views reached.'
+				});
+			} else {
+				this.assetService.saveFavorite(this.model.id)
+					.subscribe(d => {
+						this.model.isFavorite = true;
+						this.select.loadData();
+					});
+			}
+		}
 	}
 
 	/**

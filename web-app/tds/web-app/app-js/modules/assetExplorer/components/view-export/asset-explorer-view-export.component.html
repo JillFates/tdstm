@@ -7,15 +7,6 @@
 		<form name="exportForm" role="form" data-toggle="validator" #exportForm='ngForm'>
 			<div class="box-body">
 				<div class="form-group">
-					<label class="control-label">Properties to include in export:</label>
-					<div class="radio" style="padding-left:20px;">
-						<label><input type="radio" id="allPropertiesInList" [value]="false"  [(ngModel)]="allProperties" name="export">Properties in List</label>
-					</div>
-					<div class="radio" style="padding-left:20px;">
-						<label><input type="radio" id="allProperties" [value]="true" [(ngModel)]="allProperties" name="export">All Properties</label>
-					</div>
-				</div>
-				<div class="form-group">
 					<label for="fileName" class="control-label">File Name </label>
 					<input type="text" class="form-control" id="fileName" [(ngModel)]="fileName" name="fileName" required [ngClass]="{'has-error': !exportForm.form.valid}"/>
 				</div>

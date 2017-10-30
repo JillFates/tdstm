@@ -652,7 +652,7 @@ class AssetEntityService implements ServiceMethods {
 
 		validateAssetsAssocToProject([assetEntity.id], project)
 
-		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
+		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'dataFlowDirection', 'comment', 'c1', 'c2', 'c3', 'c4']
 
 		AssetDependency assetDependency = AssetDependency.get(dependencyId)
 		if (!assetDependency) {

@@ -379,6 +379,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/manager/license/${id}/delete" {
+			controller = "wsLicenseManager"
+			action = [
+					DELETE: "deleteLicense"
+			]
+		}
+
 		"/ws/manager/license/${id}/activate" {
 			controller = "wsLicenseManager"
 			action = [

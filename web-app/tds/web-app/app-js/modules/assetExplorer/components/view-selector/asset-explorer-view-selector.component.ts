@@ -12,31 +12,29 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	selector: 'asset-explorer-view-selector',
+	exportAs: 'assetExplorerViewSelector',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
 		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
 	]
 })
-export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit {
+export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
-	private data: ViewGroupModel[];
+	public data: ViewGroupModel[];
 	private search = '';
 
 	constructor(
 		private service: AssetExplorerService,
 		private stateService: StateService,
-		private permissionService: PermissionService) {
-	}
-
-	ngOnInit(): void {
-		this.service.getReports()
-			.subscribe((result) => {
-				this.data = result;
-				this.reports = result.slice();
-			});
+		private permissionService: PermissionService,
+		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
+		reportsResolve.subscribe((result) => {
+			this.data = result;
+			this.reports = result.slice();
+		});
 	}
 
 	ngAfterViewInit(): void {
@@ -103,5 +101,12 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
 			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 
+	}
+
+	public loadData() {
+		this.service.getReports()
+			.subscribe(result => {
+				this.data = result as ViewGroupModel[];
+			});
 	}
 }
