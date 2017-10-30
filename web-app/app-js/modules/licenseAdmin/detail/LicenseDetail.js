@@ -110,7 +110,7 @@ export default class LicenseDetail {
 						size: 'sm',
 						resolve: {
 								params: () => {
-										return { title: 'Confirmation Required', message: 'Are you sure you want to delete it? This action cannot be undone.'};
+										return { title: 'Confirmation Required', message: 'You are about to delete the selected license. Are you sure? Click Confirm to delete otherwise press Cancel.'};
 								}
 						}
 				});
