@@ -1,4 +1,4 @@
-import {Component, Inject, ViewChild, OnInit, AfterViewInit, Input, ViewEncapsulation} from '@angular/core';
+import {Component, Inject, ViewChild, OnInit, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {StateService} from '@uirouter/angular';
@@ -27,10 +27,11 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	@Input() nameAsUrl? = true;
 	@Input() showCreate? = true;
 	@Input() isDisabled? = false;
+	@Output() onSelectView = new EventEmitter<any>();
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
 	private data: ViewGroupModel[];
-	private search = '';
+	private searchFilterSelector = '';
 	public defaultItem = {
 		name: 'Saved Views',
 		default: true
@@ -63,7 +64,7 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	}
 
 	protected onSearch(): void {
-		let regex = new RegExp(this.search, 'i');
+		let regex = new RegExp(this.searchFilterSelector, 'i');
 		this.data = this.reports.map((reportGrp) => {
 			let item = {...reportGrp};
 			item.items = item.items.filter(report => regex.test(report.name));
@@ -120,6 +121,7 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	 */
 	protected onSelectItem(parent: any, item: any): void {
 		this.selectedItem = parent.name + ' > ' + item.name;
+		this.onSelectView.next({ id: item.id, name: item.name});
 		this.onToggle();
 	}
 }
