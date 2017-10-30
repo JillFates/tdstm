@@ -557,6 +557,36 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/datascript/list" {
+			controller = "wsDataScript"
+			action = [
+			        GET: "getDataScripts"
+			]
+		}
+
+		"/ws/dataingestion/datascript/" {
+			controller = "wsDataScript"
+			action = [
+					POST: "createDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/$id?" {
+			controller = "wsDataScript"
+			action = [
+					GET: "getDataScript",
+			        PUT: "updateDataScript",
+					DELETE: "deleteDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/validateunique/$name" {
+			controller = "wsDataScript"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
