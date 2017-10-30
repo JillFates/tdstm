@@ -2012,7 +2012,7 @@ class ETLProcessorSpec extends Specification {
         and:
             GroovyMock(AssetEntity, global: true)
             AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-                applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
+                applications.findAll { it.id == args.id && it.project.id == args.project.id }
             }
 
         and:
