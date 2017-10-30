@@ -86,12 +86,6 @@ class ETLProcessorSpec extends Specification {
             updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
             updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
         }
-
-        List<List<String>> data = [
-                ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                ["152255", "Mozilla", "NGM", "ACME Data Center"]
-        ]
     }
 
     void 'test can define a the primary domain' () {
@@ -1300,14 +1294,6 @@ class ETLProcessorSpec extends Specification {
         // with an explaination that the property does not exist and reference the line of the error if possible.
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
-                    ["152254", "Microsoft", "(xlsx updated)"],
-                    ["152255", "Mozilla", "NGM"],
-                    ["152256", "VMWare", ""]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1340,7 +1326,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1351,7 +1337,7 @@ class ETLProcessorSpec extends Specification {
                         domain Application
                         read labels
                         iterate {
-                            extract 'VENDOR NAME' load appVendor
+                            extract 'vendor name' load appVendor
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -1368,14 +1354,6 @@ class ETLProcessorSpec extends Specification {
     void 'test can process a selected domain rows' () {
 
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY"],
-                    ["152254", "Microsoft", "(xlsx updated)"],
-                    ["152255", "Mozilla", "NGM"],
-                    ["152256", "VMWare", ""]
-            ]
-
-        and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
@@ -1408,7 +1386,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1419,7 +1397,7 @@ class ETLProcessorSpec extends Specification {
                         domain Application
                         read labels
                         iterate {
-                            extract 'VENDOR NAME' load appVendor
+                            extract 'vendor name' load appVendor
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
@@ -1448,12 +1426,17 @@ class ETLProcessorSpec extends Specification {
         // should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
         // with an explaination that the property does not exist and reference the line of the error if possible.
         given:
-            List<List<String>> data = [
-                    ["APPLICATION ID", "VENDOR NAME", "TECHNOLOGY", "LOCATION"],
-                    ["152254", "Microsoft", "(xlsx updated)", "ACME Data Center"],
-                    ["152255", "Mozilla", "NGM", "ACME Data Center"],
-                    ["152256", "VMWare", "VMWare", "VMWare offices"]
-            ]
+            applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+            applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
+            applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
+            applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
+            applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+
+            new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
+                updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+                updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+                updater(['application id': '152256', 'vendor name': 'VMWare', 'technology': 'VMWare', 'location': 'VMWare offices'])
+            }
 
         and:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -1514,7 +1497,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(data, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
