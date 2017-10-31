@@ -23,11 +23,10 @@ class AwsService implements InitializingBean {
 	static transactional=false
 
 	// Queue name used for inbound responses to method invocations
-	// static final String responseQueueName = 'TransitionManager_Response_Queue'
+	static final String responseQueueName = 'TransitionManager_Response_Queue'
 
 	String accessKey
 	String secretKey
-	String responseQueueName
 
 	void afterPropertiesSet() {
 		def config = grailsApplication.config
@@ -39,7 +38,6 @@ class AwsService implements InitializingBean {
 		// TODO : The credentials should be loaded based on the project
 		accessKey = config?.tdstm?.credentials?.aws?.accessKey ?: null
 		secretKey = config?.tdstm?.credentials?.aws?.secretKey ?: null
-		responseQueueName = config?.tdstm?.jms?.aws?.responseQueueName ?: null
 	}
 
 	/**
