@@ -17,6 +17,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 })
 export class DataScriptViewEditComponent implements OnInit {
 
+	public dataScriptModel: DataScriptModel;
 	public providerList: ProviderModel[];
 	public modalTitle: string;
 	public modeType = ModeType;
@@ -26,12 +27,14 @@ export class DataScriptViewEditComponent implements OnInit {
 	private datasourceName = new Subject<String>();
 
 	constructor(
-		public dataScriptModel: DataScriptModel,
+		public originalModel: DataScriptModel,
 		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService) {
+
+		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail' );
 		this.dataSignature = JSON.stringify(this.dataScriptModel);
