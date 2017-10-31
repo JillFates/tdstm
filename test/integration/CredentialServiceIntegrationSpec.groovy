@@ -1,9 +1,11 @@
 import grails.test.spock.IntegrationSpec
+import net.transitionmanager.command.CredentialCO
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import test.helper.CredentialTestHelper
@@ -24,10 +26,10 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
 
     void '1. test create credential without project throws exception'() {
         setup:
-            Credential credential = credentialTestHelper.createCredential(null, null)
+            CredentialCO credentialCO = credentialTestHelper.createCredentialCO(null, null)
 
         when:
-            credentialService.createCredential(credential)
+            credentialService.createCredential(credentialCO)
 
         then:
             AssertionError e = thrown()
@@ -37,10 +39,10 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
     void '2. test create credential without provider throws exception'() {
         setup:
             Project project = projectTestHelper.createProject()
-            Credential credential = credentialTestHelper.createCredential(project, null)
+            CredentialCO credentialCO = credentialTestHelper.createCredentialCO(project, null)
 
         when:
-            credentialService.createCredential(credential)
+            credentialService.createCredential(credentialCO)
 
         then:
             AssertionError e = thrown()
@@ -111,9 +113,11 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             final Long id = credential.id
             final String newCredentialName = "***Credential name updated***"
 
+            CredentialCO credentialCO = new CredentialCO()
+            credentialCO.populateFromDomain(credential)
+            credentialCO.name = newCredentialName
         when:
-            credential.name = newCredentialName
-            credentialService.updateCredential(credential)
+            credentialService.updateCredential(credentialCO)
 
         then:
             credentialService.findById(id).name == newCredentialName
@@ -125,11 +129,13 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             Provider provider = providerTestHelper.createProvider(project)
             Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
             final Long id = credential.id
-            Credential credentialToUpdate = new Credential()
-            credentialToUpdate.id = id
-            credentialToUpdate.version = -1
+
+            CredentialCO credentialCO = new CredentialCO()
+            credentialCO.populateFromDomain(credential)
+            credentialCO.id = id
+            credentialCO.version = -1
         when:
-            credentialService.updateCredential(credentialToUpdate)
+            credentialService.updateCredential(credentialCO)
 
         then:
             thrown DomainUpdateException

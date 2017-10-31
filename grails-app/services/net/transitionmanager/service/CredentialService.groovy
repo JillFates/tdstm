@@ -6,6 +6,7 @@ import com.tdssrc.grails.JsonUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.CredentialCO
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -22,11 +23,18 @@ class CredentialService {
      * @param credential
      * @return
      */
-    Credential createCredential(Credential credential) {
-        assert credential.project != null : 'Invalid project param.'
-        assert credential.provider != null : 'Invalid provider param.'
+    Credential createCredential(CredentialCO credentialCO) {
+        assert credentialCO.project != null : 'Invalid project param.'
+        assert credentialCO.provider != null : 'Invalid provider param.'
 
-        Credential credentialInstance = new Credential(credential.properties)
+        if (credentialCO.hasErrors()) {
+            throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
+        }
+
+        Credential credentialInstance = new Credential()
+        credentialCO.populateDomain(credentialInstance)
+        credentialInstance.salt = '{sha}'
+
         credentialInstance.save()
         return credentialInstance
     }
@@ -70,20 +78,17 @@ class CredentialService {
      * @param credential
      * @return
      */
-    Credential updateCredential(Credential credential) {
-        Credential credentialInstance = findById(credential.id)
-        GormUtil.optimisticLockCheck(credentialInstance, credential.properties, 'Credential')
+    Credential updateCredential(CredentialCO credentialCO) {
+        Credential credentialInstance = findById(credentialCO.id)
+        GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
 
-        credentialInstance.name = credential.name
-        credentialInstance.type = credential.type
-        credentialInstance.status = credential.status
-        credentialInstance.salt = credential.salt
-        credentialInstance.accessKey = credential.accessKey
-        credentialInstance.password = credential.password
-        credentialInstance.authenticationUrl = credential.authenticationUrl
-        credentialInstance.renewTokenUrl = credential.renewTokenUrl
-        credentialInstance.expirationDate = credential.expirationDate
+        credentialCO.populateDomain(credentialInstance, true)
         credentialInstance.lastUpdated = new Date()
+
+        if (credentialCO.hasErrors()) {
+            throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
+        }
+
         credentialInstance.save()
 
         return credentialInstance
