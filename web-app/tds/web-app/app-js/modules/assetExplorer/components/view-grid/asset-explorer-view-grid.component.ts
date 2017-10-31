@@ -164,8 +164,6 @@ export class AssetExplorerViewGridComponent {
 			});
 	}
 
-	
-
 	onWidthChange(data: any) {
 		this.model.columns.filter((c: ViewColumn) =>
 			data[0].column.field === `${c.domain}_${c.property}`

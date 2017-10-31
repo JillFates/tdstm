@@ -83,6 +83,9 @@
 						</div>
 					</td>
 				</tr>
+				<tr id="deps">
+					<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
+				</tr>
 			</table>
 		</div>
 	</div>

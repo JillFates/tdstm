@@ -22,6 +22,9 @@
 						</div>
 					</td>
 				</tr>
+				<tr id="deps">
+					<g:render template="/angular/common/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
+				</tr>
 			</table>
 		</div>
 	</div>

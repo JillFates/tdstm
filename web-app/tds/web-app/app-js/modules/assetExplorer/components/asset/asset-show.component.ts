@@ -42,7 +42,7 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 					break;
 				case 'DATABASE':
 					this.registerAndCreate(DatabaseShowComponent(template), this.view);
-					break
+					break;
 				case 'DEVICE':
 					this.registerAndCreate(DeviceShowComponent(template), this.view);
 					break;

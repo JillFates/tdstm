@@ -229,6 +229,9 @@
 						</div>
 					</td>
 				</tr>
+				<tr id="deps">
+					<g:render template="/angular/common/dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
+				</tr>
 			</table>
 
 		</div>

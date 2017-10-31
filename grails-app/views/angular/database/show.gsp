@@ -99,6 +99,9 @@
                         </div>
                     </td>
                 </tr>
+                <tr id="deps">
+                    <g:render template="/angular/common/dependentShow" model="[asset:asset]" ></g:render>
+                </tr>
             </table>
         </div>
     </div>
