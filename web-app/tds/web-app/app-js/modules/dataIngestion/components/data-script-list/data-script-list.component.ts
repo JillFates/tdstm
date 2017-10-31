@@ -97,7 +97,7 @@ export class DataScriptListComponent {
 			name: dataItem.name,
 			description: dataItem.description,
 			mode: dataItem.mode,
-			provider: dataItem.providerList
+			provider: dataItem.provider
 		};
 		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.EDIT);
 	}
@@ -107,6 +107,16 @@ export class DataScriptListComponent {
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(dataItem: any): void {
+		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+						(result) => {
+							this.reloadDataScripts();
+						},
+						(err) => console.log(err));
+				}
+			});
 		console.log(dataItem);
 	}
 
@@ -115,7 +125,9 @@ export class DataScriptListComponent {
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
+		if (event.columnIndex > 0) {
+			this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
+		}
 	}
 
 	protected reloadDataScripts(): void {
@@ -137,9 +149,10 @@ export class DataScriptListComponent {
 			{ provide: DataScriptModel, useValue: dataScriptModel },
 			{ provide: Number, useValue: actionType}
 		]).then(result => {
-			console.log(result);
+			// update the list to reflect changes, it keeps the filter
+			this.reloadDataScripts();
 		}).catch(result => {
-			console.log('error');
+			console.log('Dismissed Dialog');
 		});
 	}
 }

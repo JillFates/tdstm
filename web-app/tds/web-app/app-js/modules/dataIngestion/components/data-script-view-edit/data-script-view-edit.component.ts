@@ -20,6 +20,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	public providerList: ProviderModel[];
 	public modalTitle: string;
 	public modeType = ModeType;
+	public actionTypes = ActionType;
 	private dataSignature: string;
 	private isUnique = true;
 	private datasourceName = new Subject<String>();
@@ -29,6 +30,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
+		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService) {
 		this.getProviders();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail' );
@@ -99,7 +101,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	cancelCloseDialog(): void {
+	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
@@ -112,5 +114,29 @@ export class DataScriptViewEditComponent implements OnInit {
 		} else {
 			this.activeDialog.dismiss();
 		}
+	}
+
+	/**
+	 * Change the View Mode to Edit Mode
+	 */
+	protected changeToEditDataScript(): void {
+		this.modalType = this.actionTypes.EDIT;
+	}
+
+	/**
+	 * Delete the selected Data Script
+	 * @param dataItem
+	 */
+	protected onDeleteDataScript(dataItem: any): void {
+		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+						(result) => {
+							this.activeDialog.close(result);
+						},
+						(err) => console.log(err));
+				}
+			});
 	}
 }

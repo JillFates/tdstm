@@ -30,10 +30,17 @@
 							<label> {{column.label}}</label>
 						</ng-template>
 						<ng-template kendoGridFilterCellTemplate>
-							<div class=" has-feedback" *ngIf="column.property" style="margin-bottom:0px;">
-								<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-								<span (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
+							<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
+
+							<ng-template #dateFilter>
+								<kendo-grid-date-filter-cell [column]="column" [showOperators]="false" [filter]="filter"></kendo-grid-date-filter-cell>
+							</ng-template>
+							<ng-template #stringFilter>
+								<div class=" has-feedback" *ngIf="column.property" style="margin-bottom:0px;">
+									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+									<span (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+								</div>
+							</ng-template>
 						</ng-template>
 					</kendo-grid-column>
 				</kendo-grid>
