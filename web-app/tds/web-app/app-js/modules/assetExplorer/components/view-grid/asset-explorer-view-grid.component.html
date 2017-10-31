@@ -16,13 +16,10 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
-	<kendo-grid-column title="Action" [locked]="true" [width]="101">
+	<kendo-grid-column title="Action" [locked]="true" [width]="65">
 					<button class="btn btn-default" (click)="onShow(dataItem)">
 						<span class="fa fa-search"></span>
 					</button>
-					<!-- <button class="btn btn-default" (click)="onEdit(dataItem)">
-						<span class="fa fa-pencil"></span>
-					</button> -->
 				</div>
 			</div>
 		</ng-template>

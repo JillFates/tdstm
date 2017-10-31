@@ -3,11 +3,11 @@ import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.ser
 
 declare var jQuery: any;
 
-export function ApplicationShowComponent(template) {
+export function DeviceShowComponent(template) {
 	@Component({
-		selector: `application-show`,
+		selector: `device-show`,
 		template: template
-	}) class ApplicationShowComponent implements OnInit {
+	}) class DeviceShowComponent implements OnInit {
 		constructor(private activeDialog: UIActiveDialogService) {
 
 		}
@@ -24,5 +24,5 @@ export function ApplicationShowComponent(template) {
 		}
 
 	}
-	return ApplicationShowComponent;
+	return DeviceShowComponent;
 }

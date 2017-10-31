@@ -125,6 +125,11 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 				model.isShared = params.shared || false;
 				return Observable.from([model]);
 			}
+		},	{
+			token: 'reports',
+			policy: { async: 'RXWAIT' },
+			deps: [AssetExplorerService],
+			resolveFn: (service: AssetExplorerService) => service.getReports()
 		}
 	]
 };
@@ -155,6 +160,11 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService, Transition],
 			resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
+		},	{
+			token: 'reports',
+			policy: { async: 'RXWAIT' },
+			deps: [AssetExplorerService],
+			resolveFn: (service: AssetExplorerService) => service.getReports()
 		}
 	]
 };
@@ -184,6 +194,11 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 			policy: { async: 'RXWAIT' },
 			deps: [AssetExplorerService, Transition],
 			resolveFn: (service: AssetExplorerService, trans: Transition) => service.getReport(trans.params().id)
+		},		{
+			token: 'reports',
+			policy: { async: 'RXWAIT' },
+			deps: [AssetExplorerService],
+			resolveFn: (service: AssetExplorerService) => service.getReports()
 		}
 	]
 };

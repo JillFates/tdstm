@@ -14,6 +14,8 @@ import { DynamicComponent } from '../../../../shared/components/dynamic.componen
 
 import { DatabaseShowComponent } from '../database/database-show.component';
 import { ApplicationShowComponent } from '../application/application-show.component';
+import { DeviceShowComponent } from '../device/device-show.component';
+import { StorageShowComponent } from '../storage/storage-show.component';
 
 @Component({
 	selector: `asset-database-show`,
@@ -39,10 +41,13 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 					this.registerAndCreate(ApplicationShowComponent(template), this.view);
 					break;
 				case 'DATABASE':
-				case 'DEVICE':
-				case 'STORAGE':
-				default:
 					this.registerAndCreate(DatabaseShowComponent(template), this.view);
+					break
+				case 'DEVICE':
+					this.registerAndCreate(DeviceShowComponent(template), this.view);
+					break;
+				case 'STORAGE':
+					this.registerAndCreate(StorageShowComponent(template), this.view);
 					break;
 			}
 		});

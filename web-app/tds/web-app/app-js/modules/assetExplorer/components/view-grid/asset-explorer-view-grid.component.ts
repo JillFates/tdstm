@@ -156,7 +156,7 @@ export class AssetExplorerViewGridComponent {
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
-			{ provide: 'ASSET', useValue: 'DATABASE' }],
+			{ provide: 'ASSET', useValue:  data['common_assetClass'] }],
 			'lg').then(x => {
 				console.log(x);
 			}).catch(x => {
@@ -164,14 +164,13 @@ export class AssetExplorerViewGridComponent {
 			});
 	}
 
-	protected onEdit(data: any) {
-		this.dialog.open(AssetEditComponent, [
-			{ provide: 'ID', useValue: data['common_id'] },
-			{ provide: 'ASSET', useValue: 'DATABASE' }],
-			'xlg').then(x => {
-				console.log(x);
-			}).catch(x => {
-				console.log(x);
-			});
+	
+
+	onWidthChange(data: any) {
+		this.model.columns.filter((c: ViewColumn) =>
+			data[0].column.field === `${c.domain}_${c.property}`
+		).forEach((c: ViewColumn) => {
+			c.width = data[0].newWidth;
+		});
 	}
 }
