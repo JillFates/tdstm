@@ -58,7 +58,7 @@ export const Flatten = filter => {
 	return [];
 };
 
-export enum ModalType {
+export enum ActionType {
 	VIEW,
 	CREATE,
 	EDIT

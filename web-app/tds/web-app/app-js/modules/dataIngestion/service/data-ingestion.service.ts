@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
-import { Response } from '@angular/http';
+import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, ModeType} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
@@ -11,7 +11,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class DataIngestionService {
 
-	private dataIngestionUrl = '../ws/dataingestion/dataScript/';
+	private dataIngestionUrl = '../ws/dataingestion/datascript';
 
 	private mockData: Array<DataScriptModel> = [
 		{
@@ -79,10 +79,30 @@ export class DataIngestionService {
 	}
 
 	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
-		return this.http.post(`${this.dataIngestionUrl}/view`, JSON.stringify(model))
+		let postRequest = {
+			name: model.name,
+			description: model.description,
+			target: model.view,
+			mode: model.mode === ModeType.IMPORT ? 'Import' : 'Export',
+			providerId: model.provider.id
+		};
+		return this.http.post(`${this.dataIngestionUrl}/`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.dataView;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	validateUniqueness(model: DataScriptModel): Observable<DataScriptModel> {
+		let postRequest = {
+			providerId: model.provider.id
+		};
+
+		return this.http.post(`${this.dataIngestionUrl}/validateunique/${model.name}`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
