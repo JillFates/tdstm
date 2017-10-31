@@ -1,7 +1,7 @@
-import {Component, Inject} from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import {Component, OnInit} from '@angular/core';
+import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DataScriptModel, ModalType, ModeType} from '../../model/data-script.model';
+import {DataScriptModel, ActionType, ModeType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -15,22 +15,25 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
         }
 	`]
 })
-export class DataScriptViewEditComponent {
+export class DataScriptViewEditComponent implements OnInit {
 
 	public providerList: ProviderModel[];
 	public modalTitle: string;
 	public modeType = ModeType;
 	private dataSignature: string;
+	private isUnique = true;
+	private datasourceName = new Subject<String>();
 
 	constructor(
 		public dataScriptModel: DataScriptModel,
-		public modalType: ModalType,
+		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private dataIngestionService: DataIngestionService) {
 		this.getProviders();
-		this.modalTitle = (this.modalType === ModalType.CREATE) ? 'Create' : 'Edit';
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail' );
 		this.dataSignature = JSON.stringify(this.dataScriptModel);
+		this.datasourceName.next(this.dataScriptModel.name);
 	}
 
 	/**
@@ -40,7 +43,7 @@ export class DataScriptViewEditComponent {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				this.providerList = result;
-				if (this.modalType === ModalType.CREATE) {
+				if (this.modalType === ActionType.CREATE) {
 					this.dataScriptModel.provider = this.providerList[0];
 				}
 			},
@@ -51,8 +54,26 @@ export class DataScriptViewEditComponent {
 	 * Create a new DataScript
 	 */
 	protected onCreateDataScript(): void {
-		// this.dataIngestionService.saveDataScript();
-		console.log(this.dataScriptModel);
+		this.dataIngestionService.saveDataScript(this.dataScriptModel).subscribe(
+			(result: any) => {
+				this.activeDialog.close(result);
+			},
+			(err) => console.log(err));
+	}
+
+	ngOnInit(): void {
+		this.datasourceName
+			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
+			.distinctUntilChanged()   // ignore if next search term is same as previous
+			.subscribe(term => {
+				if (term && term !== '') {
+					this.dataIngestionService.validateUniqueness(this.dataScriptModel).subscribe(
+						(result: any) => {
+							this.isUnique = result.isUnique;
+						},
+						(err) => console.log(err));
+				}
+			});
 	}
 
 	/**
@@ -63,12 +84,23 @@ export class DataScriptViewEditComponent {
 		this.dataScriptModel.view = selectedView;
 	}
 
+	protected onValidateUniqueness(): void {
+		this.datasourceName.next(this.dataScriptModel.name);
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.dataScriptModel);
 	}
 
+	/**
+	 * Close the Dialog but first it verify is not Dirty
+	 */
 	cancelCloseDialog(): void {
-		if(this.isDirty()) {
+		if (this.isDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',

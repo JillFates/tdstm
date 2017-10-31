@@ -1,15 +1,16 @@
-import { Component, Inject } from '@angular/core';
-import { StateService } from '@uirouter/angular';
-import { Observable } from 'rxjs/Observable';
-import { filterBy, CompositeFilterDescriptor } from '@progress/kendo-data-query';
+import {Component, Inject, ViewChild} from '@angular/core';
+import {StateService} from '@uirouter/angular';
+import {Observable} from 'rxjs/Observable';
+import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
+import {CellClickEvent} from '@progress/kendo-angular-grid';
 
-import { DataIngestionService } from '../../service/data-ingestion.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, ModeType, ModalType} from '../../model/data-script.model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
+import {DataIngestionService} from '../../service/data-ingestion.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, ModeType, ActionType} from '../../model/data-script.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {DataScriptViewEditComponent} from '../data-script-view-edit/data-script-view-edit.component';
 
 @Component({
 	selector: 'data-script-list',
@@ -23,6 +24,7 @@ export class DataScriptListComponent {
 	public filter: CompositeFilterDescriptor;
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public actionType = ActionType;
 	public gridData: any[];
 	public resultSet: DataScriptModel[];
 
@@ -47,7 +49,7 @@ export class DataScriptListComponent {
 		this.gridData = filterBy(this.resultSet, filter);
 	}
 
-	public onFilter(column: any): void {
+	protected onFilter(column: any): void {
 		let root = this.filter || { logic: 'and', filters: []};
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
@@ -70,36 +72,74 @@ export class DataScriptListComponent {
 		this.filterChange(root);
 	}
 
-	public clearValue(column: any): void {
+	protected clearValue(column: any): void {
 		column.filter = '';
 		this.onFilter(column);
 	}
 
-	public onCreateDataScript(): void {
+	protected onCreateDataScript(): void {
 		let dataScriptModel: DataScriptModel = {
 			name: '',
 			description: '',
 			mode: ModeType.IMPORT,
 			provider: { id: null, name: ''}
 		};
-
-		this.dialogService.open(DataScriptViewEditComponent, [
-			{ provide: DataScriptModel, useValue: dataScriptModel },
-			{ provide: Number, useValue: ModalType.CREATE}
-		]).then(result => {
-			console.log(result);
-		}).catch(result => {
-			console.log('error');
-		});
-
+		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
 
-	public reloadDataScripts(): void {
+	/**
+	 * Select the current element and open the Edit Dialog
+	 * @param {ModalType} type
+	 * @param dataItem
+	 */
+	protected onEditDataScript(type: ActionType, dataItem: any): void {
+		let dataScriptModel: DataScriptModel = {
+			name: dataItem.name,
+			description: dataItem.description,
+			mode: dataItem.mode,
+			provider: dataItem.providerList
+		};
+		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.EDIT);
+	}
+
+	/**
+	 * Delete the selected Data Script
+	 * @param dataItem
+	 */
+	protected onDeleteDataScript(dataItem: any): void {
+		console.log(dataItem);
+	}
+
+	/**
+	 * Catch the Selected Row
+	 * @param {SelectionEvent} event
+	 */
+	protected cellClick(event: CellClickEvent): void {
+		this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
+	}
+
+	protected reloadDataScripts(): void {
 		this.dataIngestionService.getDataScripts().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = filterBy(this.resultSet, this.filter);
 			},
 			(err) => console.log(err));
+	}
+
+	/**
+	 * Open The Dialog to Create, View or Edit the DataScript
+	 * @param {DataScriptModel} dataScriptModel
+	 * @param {number} actionType
+	 */
+	private openDataScriptDialogViewEdit(dataScriptModel: DataScriptModel, actionType: number): void {
+		this.dialogService.open(DataScriptViewEditComponent, [
+			{ provide: DataScriptModel, useValue: dataScriptModel },
+			{ provide: Number, useValue: actionType}
+		]).then(result => {
+			console.log(result);
+		}).catch(result => {
+			console.log('error');
+		});
 	}
 }
