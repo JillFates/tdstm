@@ -1,4 +1,5 @@
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
 import com.tdsops.common.security.spring.TdsPasswordEncoder
 import com.tdsops.common.security.spring.TdsPermissionEvaluator
@@ -172,5 +173,7 @@ beans = {
 			log.debug("TDSTM LDAP configuration skipped due to either no domains configured or ldap is disabled")
 		}
 	}
+
+	camelHostnameIdentifier(CamelHostnameIdentifier)
 
 }
