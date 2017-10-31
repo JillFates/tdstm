@@ -35,7 +35,7 @@
             <fieldset>
                 <legend>Test Data Source</legend>
                 <br>
-                <textarea class="form-control" name="mockData" rows="${lineNumbers - 2}" style="width: 100%;">${mockData}</textarea>
+                <textarea class="form-control" name="dataSet" rows="${lineNumbers - 2}" style="width: 100%;">${dataSet}</textarea>
                 <br>
 
                 <div class="col-md-12">
