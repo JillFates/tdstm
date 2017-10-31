@@ -214,6 +214,15 @@
 						read: "${raw(createLink(action:'importTaskReviewData', params:paramsForReviewDataRequest))}"
 					},
 					error: processErrors,
+                    schema: {
+                        model: {
+                            fields: {
+            					<g:each var="propName" in="${properties}">${propName}: { type: "string" },</g:each>
+								errors: { type: "string" },
+            					matches: { type: "string" }
+        						}
+        					}
+        				},
 					pageSize: 0
 				},
 				columns: [
