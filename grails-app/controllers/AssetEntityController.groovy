@@ -3316,8 +3316,8 @@ class AssetEntityController implements ControllerMethods {
 		def list = []
 		projectStaff.each {
 			list << [ id:it.staff.id,
-				nameRole:"${it.role.description}: ${it.staff}",
-				sortOn:"${it.role.description},$it.staff.firstName $it.staff.lastName"
+				nameRole:"${it.role.description.split(':')[1]?.trim()}: $it.staff",
+				sortOn:"${it.role.description.split(':')[1]?.trim()},$it.staff.firstName $it.staff.lastName"
 			]
 		}
 		list.sort { it.sortOn }
