@@ -577,7 +577,11 @@ class TaskService implements ServiceMethods {
 			query.append("AND a.id != :taskId ")
 			params["taskId"] = taskToIgnore.id
 
-			if (taskToIgnore.moveEvent) {
+			// If moveEventId param is given use it as filter, if not then user taskToIgnore.moveEvent (if exists).
+			if (moveEventId) {
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = moveEventId
+			} else if (taskToIgnore.moveEvent) {
 				query.append("AND a.moveEvent.id = :moveEventId ")
 				params["moveEventId"] = taskToIgnore.moveEvent.id
 			}
