@@ -100,12 +100,12 @@
 						<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}"  nowrap="nowrap" id="rackId">
 							<label for="sourceRackId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
 						</td>
-                        <td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRack.imp?:''}" >
+                        <td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.sourceRack.imp?:''}" >
                             <tds:tooltipSpan field="${standardFieldSpecs.sourceRack}" >
                                 ${assetEntity.rackSource?.tag}
                             </tds:tooltipSpan>
                         </td>
-                        <td class="valueNW nonVMLabel ${standardFieldSpecs.targetRack.imp?:''}" >
+                        <td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.targetRack.imp?:''}" >
                             <tds:tooltipSpan field="${standardFieldSpecs.targetRack}" >
                                 ${assetEntity.rackTarget?.tag}
                             </tds:tooltipSpan>
@@ -115,11 +115,15 @@
 						<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display: none">
 							<label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceChassis.tip?: standardFieldSpecs.sourceChassis.label}">
-							${sourceChassis}
+						<td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" >
+                            <tds:tooltipSpan field="${standardFieldSpecs.sourceChassis}" >
+                                ${sourceChassis}
+                            </tds:tooltipSpan>
 						</td>
-						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}" style="display: none" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetChassis.tip?: standardFieldSpecs.targetChassis.label}">
-							${targetChassis}
+						<td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}">
+                            <tds:tooltipSpan field="${standardFieldSpecs.targetChassis}" >
+                                ${targetChassis}
+                            </tds:tooltipSpan>
 						</td>
 
 					</tr>
