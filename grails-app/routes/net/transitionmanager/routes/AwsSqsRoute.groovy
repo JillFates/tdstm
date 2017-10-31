@@ -1,8 +1,8 @@
 package net.transitionmanager.routes
 
+import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import org.apache.camel.builder.RouteBuilder
 import net.transitionmanager.service.AwsService
-import net.transitionmanager.service.RoutingService
 import groovy.util.logging.Slf4j
 
 /**
@@ -10,20 +10,23 @@ import groovy.util.logging.Slf4j
  */
 @Slf4j(value='logger')
 class AwsSqsRoute extends RouteBuilder {
-	RoutingService routingService
 	AwsService awsService
+	CamelHostnameIdentifier camelHostnameIdentifier
 
 	@Override
 	void configure() {
 		String url = awsService.sqsUrl(awsService.responseQueueName)
 		if (url) {
-			println '**** Intializing the AwsSqsRoute'
+			logger.info '**** Initializing the AwsSqsRoute'
 			from(url)
-				.log('AwsSqsRoute received a message and forwarded it')
-				.to('bean:routingService?method=processMessage')
+			.filter {
+				it.in.body.contains(camelHostnameIdentifier.hostnameIdentifierDigest)
+			}
+			.log('AwsSqsRoute received a message and forwarded it')
+			.to('bean:routingService?method=processMessage')
 		} else {
-			println '**** AwsSqsRoute initialization was skipped'
-			log.info '**** AwsSqsRoute initialization was skipped'
+			logger.info '**** AwsSqsRoute initialization was skipped'
 		}
 	}
+
 }

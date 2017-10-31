@@ -1,18 +1,18 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import groovy.util.logging.Slf4j
-import grails.converters.JSON
 import grails.transaction.Transactional
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
-import net.transitionmanager.service.InvalidRequestException
 
-@Slf4j(value='logger')
+@Slf4j
 @Transactional
 class ApiActionService {
+	CamelHostnameIdentifier camelHostnameIdentifier
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -51,7 +51,7 @@ class ApiActionService {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 		if (context.hasErrors()) {
-			logger.debug "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
+			log.debug "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
 		}
 		if (! context) {
 			throw new InvalidRequestException('invoke() required context was null')
@@ -69,11 +69,14 @@ class ApiActionService {
 			// We only need to implement Task for the moment
 			remoteMethodParams = buildMethodParamsWithContext(action, context)
 
+			// add Camel hostname message identifier
+			remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
+
 			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
 
 			if (methodRequiresCallbackMethod) {
 				if (! action.callbackMethod) {
-					logger.info action.toString()
+					log.info action.toString()
 					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
 				}
 				remoteMethodParams << [callbackMethod: action.callbackMethod]
@@ -87,7 +90,7 @@ class ApiActionService {
 				def agent = agentInstanceForAction(action)
 
 				// Lets try to invoke the method
-				logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
+				log.info "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 
 			} else {

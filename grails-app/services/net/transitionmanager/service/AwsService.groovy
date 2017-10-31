@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-// import com.amazonaws.auth.BasicAWSCredentials
 import org.springframework.beans.factory.InitializingBean
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import groovy.json.JsonOutput
@@ -16,6 +15,7 @@ class AwsService implements InitializingBean {
 	// http://camel.apache.org/aws-sqs.html
 	static final int MAX_MESSAGES_PER_POLL = 1
 	static final int WAIT_TIME_SECONDS = 5
+	static final boolean DELETE_IF_FILTERED = false
 
 
 	AuditService auditService
@@ -24,11 +24,10 @@ class AwsService implements InitializingBean {
 	static transactional=false
 
 	// Queue name used for inbound responses to method invocations
-	// static final String responseQueueName = 'TransitionManager_Response_Queue'
+	static final String responseQueueName = 'TransitionManager_Response_Queue'
 
 	String accessKey
 	String secretKey
-	String responseQueueName
 
 	void afterPropertiesSet() {
 		def config = grailsApplication.config
@@ -40,7 +39,6 @@ class AwsService implements InitializingBean {
 		// TODO : The credentials should be loaded based on the project
 		accessKey = config?.tdstm?.credentials?.aws?.accessKey ?: null
 		secretKey = config?.tdstm?.credentials?.aws?.secretKey ?: null
-		responseQueueName = config?.tdstm?.jms?.aws?.responseQueueName ?: null
 	}
 
 	/**
@@ -88,6 +86,8 @@ class AwsService implements InitializingBean {
 			url.append(MAX_MESSAGES_PER_POLL)
 			url.append('&waitTimeSeconds=')
 			url.append(WAIT_TIME_SECONDS)
+			url.append('&deleteIfFiltered=')
+			url.append(DELETE_IF_FILTERED)
 		}
 		url ? url.toString() : null
 	}
