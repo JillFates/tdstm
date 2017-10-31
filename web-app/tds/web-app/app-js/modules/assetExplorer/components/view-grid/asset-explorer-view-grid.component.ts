@@ -32,7 +32,8 @@ declare var jQuery: any;
 	}
 	.k-grid-content-locked,
 	.k-grid-header-locked {
-		border-right: 2px solid;
+		border-right-width: 5px;
+		border-right-color: #ebebeb;
 	}
 	`],
 	encapsulation: ViewEncapsulation.None
