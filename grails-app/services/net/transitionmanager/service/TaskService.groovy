@@ -581,8 +581,11 @@ class TaskService implements ServiceMethods {
 				category=''
 			}
 		}
-		if (filterDesc) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
-			query.append("AND (a.taskNumber like '%$filterDesc%' or a.comment like '%$filterDesc%') ")
+		if (filterDesc) { 
+			//160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
+			// TODO : JPM 20171031 : genSelectForPredecessors - the taskNumber should only be filtered if the value is numeric
+			// TODO : JPM 20171031 : genSelectForPredecessors - SQL INJECTION!!!
+			query.append("AND (a.taskNumber like '%${filterDesc}%' or a.comment like '%${filterDesc}%') ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
@@ -605,9 +608,11 @@ class TaskService implements ServiceMethods {
 
 		// Add the sort and generate the list
 		query.append('ORDER BY a.taskNumber ASC')
-		log.info(query)
-		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
+		log.debug 'genSelectForPredecessors query for tasks: {}', query.toString()
 
+		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
+		log.debug 'genSelectForPredecessors found {} tasks', resultTotal
+		
 		Map paginationArgs = page == -1 ? [:] : [max: pageSize, offset: ((page - 1) * pageSize)]
 		[list: AssetComment.executeQuery(queryList.append(query).toString(), [:], paginationArgs),
 		 total: resultTotal[0]]
