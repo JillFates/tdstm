@@ -10,25 +10,35 @@
 					<div class="col-md-6 ">
 						<div class="form-group">
 							<label for="dataScriptProvider" class="col-sm-4 control-label">Provider:</label>
-							<div class="col-sm-8">
+							<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 								<kendo-dropdownlist id="dataScriptProvider" name="dataScriptProvider" class="form-control"
 													[data]="providerList"
 													[textField]="'name'"
 													[valueField]="'id'"
-													[(ngModel)]="dataScriptModel.provider"></kendo-dropdownlist>
+													[(ngModel)]="dataScriptModel.provider"
+													></kendo-dropdownlist>
+							</div>
+							<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+								<label class="control-label label-detail">{{dataScriptModel.provider.name}}</label>
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="dataScriptName" class="col-sm-4 control-label">Name:<span style="color: red;">*</span></label>
-							<div class="col-sm-8">
+							<label for="dataScriptName" class="col-sm-4 control-label">Name:<span style="color: red;" *ngIf="modalType === actionTypes.EDIT">*</span></label>
+							<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 								<input type="text" (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name" required [ngClass]="{'has-error': !dataScriptForm.form.valid}"/>
 								<span *ngIf="!isUnique" style="color: red; font-weight: bold;">Datasource name must be unique</span>
+							</div>
+							<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+								<label class="control-label label-detail">{{dataScriptModel.name}}</label>
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="dataScriptDescription" class="col-sm-4 control-label">Description:</label>
-							<div class="col-sm-8">
+							<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 								<textarea id="dataScriptDescription" name="dataScriptDescription" class="form-control" [(ngModel)]="dataScriptModel.description"></textarea>
+							</div>
+							<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+								<label class="control-label label-detail">{{dataScriptModel.description}}</label>
 							</div>
 						</div>
 					</div>
@@ -38,13 +48,13 @@
 							<div class="col-sm-8">
 								<div class="radio">
 									<label>
-										<input type="radio" name="dataScriptModeType" [value]="modeType.IMPORT" [(ngModel)]="dataScriptModel.mode" checked>
+										<input type="radio" name="dataScriptModeType" [value]="modeType.IMPORT" [(ngModel)]="dataScriptModel.mode" checked [disabled]="modalType === actionTypes.VIEW">
 										Import
 									</label>
 								</div>
 								<div class="radio">
 									<label>
-										<input type="radio" name="dataScriptModeType" [value]="modeType.EXPORT" [(ngModel)]="dataScriptModel.mode">
+										<input type="radio" name="dataScriptModeType" [value]="modeType.EXPORT" [(ngModel)]="dataScriptModel.mode" [disabled]="modalType === actionTypes.VIEW">
 										Export
 									</label>
 								</div>
@@ -52,10 +62,10 @@
                                     <asset-explorer-view-selector
 											#assetExplorerViewSelector
 											(onSelectView)="onSelectView($event)"
-											[isDisabled]="dataScriptModel.mode === modeType.IMPORT"
+											[isDisabled]="dataScriptModel.mode === modeType.IMPORT || modalType === actionTypes.VIEW"
 											[nameAsUrl]="false"
 											[showCreate]="false"
-											[ngClass]="{'has-error-custom': dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view}">
+											[ngClass]="{'has-error-custom': (dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view) && modalType !== actionTypes.VIEW}">
 									</asset-explorer-view-selector>
 								</div>
 							</div>
@@ -66,8 +76,10 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" (click)="onCreateDataScript()" class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || (dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view) || !isUnique"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
-
+		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onCreateDataScript()" class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || (dataScriptModel.mode === modeType.EXPORT && !dataScriptModel.view) || !isUnique"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
+		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditDataScript()" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteDataScript()" class="btn btn-danger" [ngClass]="{'pull-left': modalType === actionTypes.VIEW}"><span class="fa fa-fw fa-trash"></span> Delete</button>
+		<button type="button" *ngIf="modalType === actionTypes.VIEW" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-eye-open"></span> Data Script Designer</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right"><span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 	</div>
 </div>
