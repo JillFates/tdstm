@@ -152,7 +152,7 @@
 											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
 											<div class="checkbox pull-right" style="margin:5px;">
 												<label for="">
-													<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> Freeze
+													<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
 												</label>
 											</div>
 										</div>
