@@ -13,9 +13,7 @@ class ETLProcessor {
     Project project
     Dataset dataSet
     List<getl.data.Field> fields
-
     ETLFieldsValidator fieldsValidator
-    Map<String, ETLTransformation> transformations = [:]
 
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
@@ -30,6 +28,8 @@ class ETLProcessor {
     ETLDomain selectedDomain
     Map<ETLDomain, List<ReferenceResult>> results = [:]
     Map<ETLDomain, ReferenceResult> currentRowResult = [:]
+
+    List globalTransformers = []
 
     /**
      *
@@ -92,9 +92,7 @@ class ETLProcessor {
      * @param console
      * @param fieldsValidator
      */
-    ETLProcessor (Project project, Dataset dataset,
-                  DebugConsole console,
-                  ETLFieldsValidator fieldsValidator) {
+    ETLProcessor (Project project, Dataset dataset, DebugConsole console, ETLFieldsValidator fieldsValidator) {
         this.project = project
         this.dataSet = dataset
         this.debugConsole = console
@@ -187,6 +185,57 @@ class ETLProcessor {
         }
         debugConsole.status = consoleStatus
         debugConsole.info "Console status changed: $consoleStatus"
+        this
+    }
+    /**
+     *
+     * Removes leading and trailing whitespace from a string.
+     *
+     * @param status
+     * @return the instance of ETLProcessor who received this message
+     */
+    ETLProcessor trim (String status) {
+
+        if (status == 'on') {
+
+        } else if (status == 'of') {
+
+        }
+
+        debugConsole.info "Global trim status changed: $status"
+        this
+    }
+    /**
+     *
+     * Replace all of the escape characters
+     * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
+     * and replaces any non-printable, control and special unicode character
+     * with a tilda ( ~ ).
+     *
+     * The method will also remove any leading and trailing whitespaces
+     *
+     * @param status
+     * @return the instance of ETLProcessor who received this message
+     */
+    ETLProcessor sanitize (String status) {
+
+
+        debugConsole.info "Global sanitize status changed: $status"
+        this
+    }
+    /**
+     *
+     *
+     * @param status
+     * @return
+     */
+    def replace (String regex) {
+
+        if (regex == 'ControlCharacters') {
+
+        }
+
+        debugConsole.info "Global trm status changed: $status"
         this
     }
 
@@ -337,7 +386,7 @@ class ETLProcessor {
     }
 
     private void addCrudRowData (Integer rowIndex, Map row) {
-        currentRow = new Row(rowIndex, fields.collect{ row[it.name]?:"" }, this)
+        currentRow = new Row(rowIndex, fields.collect { row[it.name] ?: "" }, this)
         rows.add(currentRow)
         currentRow
     }

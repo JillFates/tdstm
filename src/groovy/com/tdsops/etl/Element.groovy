@@ -13,62 +13,15 @@ class Element {
     /**
      *
      *
-     * @param transformationName
-     * @return
-     */
-    Element and (String transformationName) {
-        transform(transformationName)
-    }
-    /**
-     *
-     *
-     * @param transformationName
-     * @return
-     */
-    def transform (String transformationName) {
-        ETLTransformation transformation = lookupTransformation(transformationName)
-        processor.debugConsole.info "Applying transformation on element: $this"
-        transformation.apply(this)
-    }
-    /**
-     *
-     * Transformations using parameters
-     *
-     * @param actions
-     * @return
-     */
-    def transform (Map actions) {
-        String action = actions.keySet().first()
-        ETLTransformation transformation = lookupTransformation(action)
-        processor.debugConsole.info "Applying transformation ${action} on element: $this"
-        transformation.apply(this, actions[action])
-    }
-
-    /**
-     *
-     *
      *
      * @param closure
      * @return
      */
     def transform (Closure closure) {
-        Transformer transformer = new Transformer(this)
-        def code = closure.rehydrate(transformer, transformer, transformer)
+        Transformation transformation = new Transformation(this)
+        def code = closure.rehydrate(transformation, transformation, transformation)
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
-        this
-    }
-
-    /**
-     * Translate a
-     *
-     * @param actions
-     * @return
-     */
-    Element translate (Map actions) {
-        if (actions.containsKey('with')) {
-            translateWith(actions.get('with'))
-        }
         this
     }
     /**
@@ -117,32 +70,7 @@ class Element {
         throw ETLProcessorException.methodMissing(methodName, args)
     }
 
-    def propertyMissing(String name) {
+    def propertyMissing (String name) {
         println "Missing property $name"
-    }
-
-    /** Private Methods. Non public API for ETL processor */
-
-    private ETLTransformation lookupTransformation (String name) {
-        if (processor.transformations
-                && processor.transformations.containsKey(name)) {
-            processor.transformations[name]
-        } else {
-            processor.debugConsole.error "Unknown transformation: $name"
-            throw ETLProcessorException.unknownTransformation(name)
-        }
-    }
-
-    private Element translateWith (Map dictionary) {
-
-        if (dictionary.containsKey(value)) {
-            String oldValue = value
-            value = dictionary[value]
-
-            processor.debugConsole.info "Translate $oldValue -> ${value}"
-        } else {
-            processor.debugConsole.warn "Could not translate ${value}"
-        }
-        this
     }
 }

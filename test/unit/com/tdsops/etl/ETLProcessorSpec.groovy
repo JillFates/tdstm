@@ -27,7 +27,10 @@ class ETLProcessorSpec extends Specification {
     CSVDataset simpleDataSet
     CSVDataset environmentDataSet
     CSVDataset applicationDataSet
+    CSVDataset nonSanitizedDataSet
     CSVDataset sixRowsDataSet
+    DebugConsole debugConsole
+    ETLFieldsValidator applicationFieldsValidator
 
     def setupSpec () {
         csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
@@ -85,6 +88,47 @@ class ETLProcessorSpec extends Specification {
         new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
             updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
             updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+        }
+
+        debugConsole = new DebugConsole(buffer: new StringBuffer())
+
+        applicationFieldsValidator = new ETLAssetClassFieldsValidator()
+        applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                [constraints: [required: 0],
+                 "control"  : "Number",
+                 "default"  : "",
+                 "field"    : "id",
+                 "imp"      : "U",
+                 "label"    : "Id",
+                 "order"    : 0,
+                 "shared"   : 0,
+                 "show"     : 0,
+                 "tip"      : "",
+                 "udf"      : 0
+                ],
+                [constraints: [required: 0],
+                 "control"  : "String",
+                 "default"  : "",
+                 "field"    : "appVendor",
+                 "imp"      : "N",
+                 "label"    : "Vendor",
+                 "order"    : 0,
+                 "shared"   : 0,
+                 "show"     : 0,
+                 "tip"      : "",
+                 "udf"      : 0
+                ]
+        ])
+
+        nonSanitizedDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+
+        new Flow().writeTo(dest: nonSanitizedDataSet, dest_append: true) { updater ->
+            updater(['application id': '152254', 'vendor name': '  Microsoft  ', '     technology     ': '(xlsx updated)', 'location': 'ACME Data Center'])
+            updater(['application id': '152255', 'vendor name': '   Mozilla    ', '      technology    ': 'NGM', 'location': 'ACME Data Center'])
         }
     }
 
@@ -2207,6 +2251,58 @@ class ETLProcessorSpec extends Specification {
 
                 reference == [152254, 152255]
             }
+    }
+
+    void 'test can turn on trim command to remove leading and trailing whitespaces' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        trim on
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
+    void 'test can turn on sanitize command to replace all of the escape characters ' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        trim on
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
     }
 
 }
