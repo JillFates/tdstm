@@ -44,8 +44,8 @@ class ETLProcessorSpec extends Specification {
     def setup () {
         simpleDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
         simpleDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-        simpleDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
-        simpleDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
+        simpleDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
+        simpleDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
 
         new Flow().writeTo(dest: simpleDataSet, dest_append: true) { updater ->
             updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
@@ -54,10 +54,10 @@ class ETLProcessorSpec extends Specification {
         }
 
         environmentDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-        environmentDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-        environmentDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
-        environmentDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
-        environmentDataSet.field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING", isNull: false, trim: true)
+        environmentDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
+        environmentDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
+        environmentDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
+        environmentDataSet.field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING")
 
         new Flow().writeTo(dest: environmentDataSet, dest_append: true) { updater ->
             updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'environment': 'Prod'])
@@ -66,9 +66,9 @@ class ETLProcessorSpec extends Specification {
         }
 
         sixRowsDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-        sixRowsDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-        sixRowsDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false, trim: true)
-        sixRowsDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false, trim: true)
+        sixRowsDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
+        sixRowsDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
+        sixRowsDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
 
         new Flow().writeTo(dest: sixRowsDataSet, dest_append: true) { updater ->
             updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
@@ -80,10 +80,10 @@ class ETLProcessorSpec extends Specification {
         }
 
         applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-        applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
-        applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
-        applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
-        applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+        applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
+        applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
+        applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
+        applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
         new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
             updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
@@ -121,14 +121,14 @@ class ETLProcessorSpec extends Specification {
         ])
 
         nonSanitizedDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-        nonSanitizedDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
-        nonSanitizedDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
-        nonSanitizedDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
-        nonSanitizedDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
+        nonSanitizedDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
         new Flow().writeTo(dest: nonSanitizedDataSet, dest_append: true) { updater ->
-            updater(['application id': '152254', 'vendor name': '  Microsoft  ', '     technology     ': '(xlsx updated)', 'location': 'ACME Data Center'])
-            updater(['application id': '152255', 'vendor name': '   Mozilla    ', '      technology    ': 'NGM', 'location': 'ACME Data Center'])
+            updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+            updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\tInc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
         }
     }
 
@@ -1466,10 +1466,10 @@ class ETLProcessorSpec extends Specification {
         // with an explaination that the property does not exist and reference the line of the error if possible.
         given:
             applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-            applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isNull: false, isKey: true)
-            applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING", isNull: false, trim: true)
-            applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING", isNull: false, trim: true)
-            applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING", isNull: false, trim: true)
+            applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
+            applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
+            applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
+            applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
             new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
                 updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
@@ -2253,36 +2253,64 @@ class ETLProcessorSpec extends Specification {
             }
     }
 
-    void 'test can turn on trim command to remove leading and trailing whitespaces' () {
+    void 'test can trim element values to remove leading and trailing whitespaces' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
                     .evaluate("""
-                        trim on
                         domain Application
                         read labels
                         iterate {
-                            extract 'vendor name' load appVendor
+                            extract 'vendor name' transform {
+                                trim 
+                            } load appVendor
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tInc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
 
-    void 'test can turn on sanitize command to replace all of the escape characters ' () {
+    void 'test can sanitize element value to replace all of the escape characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' transform {
+                                sanitize 
+                            } load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft+Inc"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla++Inc"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
+    void 'test can turn on globally trim command to remove leading and trailing whitespaces' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2297,10 +2325,36 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tInc"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
+    void 'test can turn on globally sanitize command to replace all of the escape characters' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        sanitize on
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft+Inc"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla++Inc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
