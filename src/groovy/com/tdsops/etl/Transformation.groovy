@@ -1,10 +1,12 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.StringUtil
+
 class Transformation extends Expando {
 
     Element element
 
-    Transformation (Element element = null) {
+    Transformation (Element element) {
         this.element = element
     }
 
@@ -21,7 +23,7 @@ class Transformation extends Expando {
     }
 
     def propertyMissing (String name) {
-        if (name in ['lowercase', 'uppercase', 'trim']) {
+        if (name in ['lowercase', 'uppercase', 'trim', 'sanitize']) {
             this."$name"()
         }
     }
@@ -37,6 +39,18 @@ class Transformation extends Expando {
         if (dictionary.containsKey(element.value)) {
             element.value = dictionary[element.value]
         }
+    }
+    /**
+     * Replace all of the escape characters
+     * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
+     * and replaces any non-printable, control and special unicode character
+     * with a tilda ( ~ ).
+     *
+     * The method will also remove any leading and trailing whitespaces
+     * @return
+     */
+    def sanitize () {
+        element.value = StringUtil.sanitizeAndStripSpaces(element.value)
     }
 
     def trim () {

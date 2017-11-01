@@ -17,7 +17,7 @@ class Row {
         this.elements = values.withIndex().collect { def value, int i ->
             new Element(
                     originalValue: value,
-                    value: "${value}".toString(),
+                    value: "${value?:''}".toString(),
                     rowIndex: index,
                     columnIndex: i,
                     processor: processor)
