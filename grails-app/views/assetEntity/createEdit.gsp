@@ -503,6 +503,12 @@
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
         $('[data-toggle="popover"]').popover();
+
+        $('.select2-drop.select2-display-none').bind('display', function (e) {
+           // $('div.popover').hide();
+            console.log($(this).attr('style'));
+        });
+
 	})(jQuery);
 
 </script>
