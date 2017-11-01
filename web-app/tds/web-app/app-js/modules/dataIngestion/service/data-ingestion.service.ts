@@ -11,9 +11,9 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class DataIngestionService {
 
-	private dataIngestionUrl = '../ws/dataingestion/datascript';
+	private dataIngestionUrl = '../ws/dataingestion';
 
-	private mockData: Array<DataScriptModel> = [
+	private mockDataScripts: Array<DataScriptModel> = [
 		{
 			name: 'sn_dependencies',
 			provider: {
@@ -64,6 +64,9 @@ export class DataIngestionService {
 		{
 			id: 1,
 			name: 'Service Now',
+			description: 'Description',
+			comment: 'My comment',
+			dateCreated: new Date()
 		}
 	];
 
@@ -71,7 +74,7 @@ export class DataIngestionService {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
-		return Observable.from(this.mockData).bufferCount(this.mockData.length);
+		return Observable.from(this.mockDataScripts).bufferCount(this.mockDataScripts.length);
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
@@ -86,20 +89,42 @@ export class DataIngestionService {
 			mode: model.mode === ModeType.IMPORT ? 'Import' : 'Export',
 			providerId: model.provider.id
 		};
-		return this.http.post(`${this.dataIngestionUrl}/`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.dataView;
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}
 
-	validateUniqueness(model: DataScriptModel): Observable<DataScriptModel> {
+	saveProvider(model: ProviderModel): Observable<ProviderModel> {
+		let postRequest = {
+			name: model.name,
+			description: model.description
+		};
+		return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
 		let postRequest = {
 			providerId: model.provider.id
 		};
 
-		return this.http.post(`${this.dataIngestionUrl}/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -108,7 +133,16 @@ export class DataIngestionService {
 	}
 
 	deleteDataScript(id: number): Observable<string> {
-		return this.http.delete(`${this.dataIngestionUrl}/${id}`)
+		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteProvider(id: number): Observable<string> {
+		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

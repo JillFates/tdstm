@@ -35,9 +35,10 @@ export class DataScriptColumnModel {
 }
 
 export class DataScriptModel {
+	id?: number;
 	name: String;
 	provider?: {
-		id: number,
+		id?: number,
 		name: String
 	};
 	description: String;
