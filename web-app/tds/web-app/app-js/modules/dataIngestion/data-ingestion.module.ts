@@ -8,6 +8,8 @@ import {DATA_INGESTION_STATES} from './data-ingestion-routing.states';
 // Components
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
 import {DataScriptViewEditComponent} from './components/data-script-view-edit/data-script-view-edit.component';
+import {ProviderListComponent} from './components/provider-list/provider-list.component';
+import {ProviderViewEditComponent} from './components/provider-view-edit/provider-view-edit.component';
 import {SharedModule} from '../../shared/shared.module';
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 import {Permission} from '../../shared/model/permission.model';
@@ -31,14 +33,20 @@ import {DataIngestionService} from './service/data-ingestion.service';
 	],
 	declarations: [
 		DataScriptListComponent,
-		DataScriptViewEditComponent
+		DataScriptViewEditComponent,
+		ProviderListComponent,
+		ProviderViewEditComponent
 	],
 	providers: [DataIngestionService],
 	exports: [
 		DataScriptListComponent,
-		DataScriptViewEditComponent],
+		DataScriptViewEditComponent,
+		ProviderListComponent,
+		ProviderViewEditComponent
+	],
 	entryComponents: [
-		DataScriptViewEditComponent
+		DataScriptViewEditComponent,
+		ProviderViewEditComponent
 	]
 })
 

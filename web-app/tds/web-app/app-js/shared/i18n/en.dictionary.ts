@@ -24,8 +24,10 @@ export const en_DICTIONARY: Object = {
 	},
 	'DATA_INGESTION': {
 		'DATA_INGESTION': 'Data Ingestion',
-		'DATA_SCRIPT': 'Data Scripts',
-		'CREATE_DATA_SCRIPT': 'Create Data Scripts'
+		'DATA_SCRIPTS': 'Data Scripts',
+		'PROVIDERS': 'Providers',
+		'CREATE_DATA_SCRIPT': 'Create Data Script',
+		'CREATE_PROVIDER': 'Create Provider',
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',

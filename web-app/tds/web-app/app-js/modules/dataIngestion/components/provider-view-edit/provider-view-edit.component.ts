@@ -1,65 +1,49 @@
 import {Component, OnInit} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DataScriptModel, ActionType, ModeType} from '../../model/data-script.model';
+import {ActionType, ModeType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
-	selector: 'data-script-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-view-edit/data-script-view-edit.component.html',
+	selector: 'provider-view-edit',
+	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/provider-view-edit/provider-view-edit.component.html',
 	styles: [`
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
 	`]
 })
-export class DataScriptViewEditComponent implements OnInit {
+export class ProviderViewEditComponent implements OnInit {
 
-	public dataScriptModel: DataScriptModel;
-	public providerList: ProviderModel[];
+	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public modeType = ModeType;
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private isUnique = true;
-	private datasourceName = new Subject<String>();
+	private providerName = new Subject<String>();
 
 	constructor(
-		public originalModel: DataScriptModel,
+		public originalModel: ProviderModel,
 		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService) {
 
-		this.dataScriptModel = Object.assign({}, this.originalModel);
-		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail' );
-		this.dataSignature = JSON.stringify(this.dataScriptModel);
-		this.datasourceName.next(this.dataScriptModel.name);
+		this.providerModel = Object.assign({}, this.originalModel);
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Provider' : (this.modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
+		this.dataSignature = JSON.stringify(this.providerModel);
+		this.providerName.next(this.providerModel.name);
 	}
 
 	/**
-	 * Get the List of Providers
+	 * Create a new Provider
 	 */
-	getProviders(): void {
-		this.dataIngestionService.getProviders().subscribe(
-			(result: any) => {
-				this.providerList = result;
-				if (this.modalType === ActionType.CREATE) {
-					this.dataScriptModel.provider = this.providerList[0];
-				}
-			},
-			(err) => console.log(err));
-	}
-
-	/**
-	 * Create a new DataScript
-	 */
-	protected onCreateDataScript(): void {
-		this.dataIngestionService.saveDataScript(this.dataScriptModel).subscribe(
+	protected onCreateProvider(): void {
+		this.dataIngestionService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
 			},
@@ -67,12 +51,12 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.datasourceName
+		this.providerName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
 			.subscribe(term => {
 				if (term && term !== '') {
-					this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel).subscribe(
+					this.dataIngestionService.validateUniquenessProviderByName(this.providerModel).subscribe(
 						(result: any) => {
 							this.isUnique = result.isUnique;
 						},
@@ -81,16 +65,8 @@ export class DataScriptViewEditComponent implements OnInit {
 			});
 	}
 
-	/**
-	 * Pass the number of selected rows
-	 * @param event
-	 */
-	protected onSelectView(selectedView: any): void {
-		this.dataScriptModel.view = selectedView;
-	}
-
 	protected onValidateUniqueness(): void {
-		this.datasourceName.next(this.dataScriptModel.name);
+		this.providerName.next(this.providerModel.name);
 	}
 
 	/**
@@ -98,7 +74,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.dataScriptModel);
+		return this.dataSignature !== JSON.stringify(this.providerModel);
 	}
 
 	/**
@@ -122,7 +98,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	/**
 	 * Change the View Mode to Edit Mode
 	 */
-	protected changeToEditDataScript(): void {
+	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
 	}
 
@@ -130,11 +106,11 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * Delete the selected Data Script
 	 * @param dataItem
 	 */
-	protected onDeleteDataScript(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
+	protected onDeleteProvider(dataItem: any): void {
+		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+					this.dataIngestionService.deleteProvider(dataItem.id).subscribe(
 						(result) => {
 							this.activeDialog.close(result);
 						},
