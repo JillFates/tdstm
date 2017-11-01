@@ -29,7 +29,7 @@ class ETLProcessor {
     Map<ETLDomain, List<ReferenceResult>> results = [:]
     Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
-    List globalTransformers = []
+    Set globalTransformers = [] as Set
 
     /**
      *
@@ -197,9 +197,9 @@ class ETLProcessor {
     ETLProcessor trim (String status) {
 
         if (status == 'on') {
-
+            globalTransformers.add(Transformer.Trimmer)
         } else if (status == 'of') {
-
+            globalTransformers.remove(Transformer.Trimmer)
         }
 
         debugConsole.info "Global trim status changed: $status"
@@ -207,18 +207,17 @@ class ETLProcessor {
     }
     /**
      *
-     * Replace all of the escape characters
-     * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
-     * and replaces any non-printable, control and special unicode character
-     * with a tilda ( ~ ).
-     *
-     * The method will also remove any leading and trailing whitespaces
      *
      * @param status
      * @return the instance of ETLProcessor who received this message
      */
     ETLProcessor sanitize (String status) {
 
+        if (status == 'on') {
+            globalTransformers.add(Transformer.Sanitizer)
+        } else if (status == 'of') {
+            globalTransformers.remove(Transformer.Sanitizer)
+        }
 
         debugConsole.info "Global sanitize status changed: $status"
         this
@@ -235,7 +234,7 @@ class ETLProcessor {
 
         }
 
-        debugConsole.info "Global trm status changed: $status"
+        debugConsole.info "Global trm status changed: $regex"
         this
     }
 
@@ -386,7 +385,7 @@ class ETLProcessor {
     }
 
     private void addCrudRowData (Integer rowIndex, Map row) {
-        currentRow = new Row(rowIndex, fields.collect { row[it.name] ?: "" }, this)
+        currentRow = new Row(rowIndex, fields.collect { row[it.name] }, this)
         rows.add(currentRow)
         currentRow
     }
@@ -398,7 +397,7 @@ class ETLProcessor {
     private def doExtract () {
         Element selectedElement = currentRow.getElement(currentColumnIndex)
         debugConsole.info "Extract element: ${selectedElement.value} by column index: ${currentColumnIndex}"
-
+        applyGlobalTransformations(selectedElement)
         selectedElement
     }
     /**
@@ -441,6 +440,13 @@ class ETLProcessor {
         // Add the Asset ID number to the reference list if it isn't already there
         if (!currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
             currentRowResult[selectedDomain].reference << assetEntity.id
+        }
+    }
+
+    void applyGlobalTransformations(Element element) {
+
+        globalTransformers.each { transformer ->
+            transformer(new Transformation(element))
         }
     }
 
