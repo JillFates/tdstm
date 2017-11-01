@@ -739,7 +739,6 @@ class ProjectService implements ServiceMethods {
 
 		if (includeProject) {
 			Project.executeUpdate("delete from Project p where p.id = $projectInstance.id")
-			///projectInstance.delete()
 		}
 
 		return message
