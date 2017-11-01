@@ -1,10 +1,10 @@
 package com.tdsops.etl
 
-class Transformer extends Expando {
+class Transformation extends Expando {
 
     Element element
 
-    Transformer (Element element) {
+    Transformation (Element element = null) {
         this.element = element
     }
 
