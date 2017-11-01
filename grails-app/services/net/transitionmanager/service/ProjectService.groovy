@@ -732,11 +732,14 @@ class ProjectService implements ServiceMethods {
 		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
+		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")
+
 		PartyGroup.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 		Party.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 
 		if (includeProject) {
 			Project.executeUpdate("delete from Project p where p.id = $projectInstance.id")
+			///projectInstance.delete()
 		}
 
 		return message
