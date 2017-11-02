@@ -53,7 +53,7 @@ export class DataScriptListComponent {
 		this.gridData = filterBy(this.resultSet, filter);
 	}
 
-	protected onFilter(column: any, data?: any): void {
+	protected onFilter(column: any): void {
 		let root = this.filter || { logic: 'and', filters: []};
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
@@ -83,22 +83,26 @@ export class DataScriptListComponent {
 				root.filters.push({
 					field: column.property,
 					operator: 'gte',
-					value: data,
+					value: column.filter,
 				});
 			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
 				});
-				filter.value = data;
+				filter.value = column.filter;
 			}
 		}
 
 		this.filterChange(root);
 	}
 
-	protected clearValue(column: any): void {
+	protected clearValue(column: any, value?: any): void {
 		column.filter = '';
-		this.onFilter(column);
+		if (this.filter && this.filter.filters.length > 0) {
+			const filterIndex = this.filter.filters.findIndex((r: any) => r.field === column.property);
+			this.filter.filters.splice(filterIndex, 1);
+			this.filterChange(this.filter);
+		}
 	}
 
 	protected onCreateDataScript(): void {
