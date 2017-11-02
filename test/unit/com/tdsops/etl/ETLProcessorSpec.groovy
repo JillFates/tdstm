@@ -700,7 +700,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform with uppercase() last('A')
+                            extract 'model name' transform with uppercase() all('A')
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -708,7 +708,7 @@ class ETLProcessorSpec extends Specification {
         then: 'Every column for every row striping all "A" characters'
             etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
             etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
+            etlProcessor.getRow(2).getElement(1).value == "SLIDEWY"
     }
 
     void 'test can apply another transformation for a field value after striping all A characters' () {
@@ -725,7 +725,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform with uppercase() last('A') lowercase()
+                            extract 'model name' transform with uppercase() all('A') lowercase()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -733,7 +733,7 @@ class ETLProcessorSpec extends Specification {
         then: 'Every column for every row striping all "A" characters'
             etlProcessor.getRow(0).getElement(1).value == "srw24g1"
             etlProcessor.getRow(1).getElement(1).value == "zph module"
-            etlProcessor.getRow(2).getElement(1).value == "slideawy"
+            etlProcessor.getRow(2).getElement(1).value == "slidewy"
     }
 
     void 'test can transform a field value with taking right 4 characters' () {
@@ -784,6 +784,56 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(0).getElement(1).value == "srw2"
             etlProcessor.getRow(1).getElement(1).value == "zpha"
             etlProcessor.getRow(2).getElement(1).value == "slid"
+    }
+
+    void 'test can transform a field value using replace command with a String value' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' transform with trim() replace(Inc, Incorporated) load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nIncorporated"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tIncorporated"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
+    void 'test can transform a field value using replace command with a Regular expression value' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' transform with trim() replace(/a|b|c/, '') load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Mirosoft\nIn"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozill\t\tIn"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
     }
 
     void 'test can apply transformations on a field value many times' () {
@@ -2423,6 +2473,33 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
             etlProcessor.getRow(1).getElement(1).value == "Mozilla++Inc"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
+    void 'test can transform globally a field value using replace command with a String value' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        trim on
+                        replace Inc, Incorporated
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nIncorporated"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tIncorporated"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
