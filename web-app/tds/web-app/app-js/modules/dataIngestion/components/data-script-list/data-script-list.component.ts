@@ -1,16 +1,13 @@
-import {Component, Inject, ViewChild} from '@angular/core';
-import {StateService} from '@uirouter/angular';
+import {Component, Inject} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent, GridComponent, RowArgs} from '@progress/kendo-angular-grid';
+import {CellClickEvent, RowArgs} from '@progress/kendo-angular-grid';
 
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, DataScriptMode, ActionType} from '../../model/data-script.model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AlertType} from '../../../../shared/model/alert.model';
+import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType} from '../../model/data-script.model';
 import {DataScriptViewEditComponent} from '../data-script-view-edit/data-script-view-edit.component';
 
 @Component({
@@ -26,20 +23,17 @@ export class DataScriptListComponent {
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
-	public dataScriptMode = DataScriptMode;
 	public gridData: any[];
 	public resultSet: DataScriptModel[];
 	public selectedRows = [];
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
-		private stateService: StateService,
 		private dialogService: UIDialogService,
 		@Inject('dataScripts') dataScripts: Observable<DataScriptModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService,
-		private notifierService: NotifierService) {
+		private prompt: UIPromptService) {
 		dataScripts.subscribe(
 			(result) => {
 				this.resultSet = result;
@@ -120,7 +114,7 @@ export class DataScriptListComponent {
 	 * @param {ModalType} type
 	 * @param dataItem
 	 */
-	protected onEditDataScript(type: ActionType, dataItem: any): void {
+	protected onEditDataScript(dataItem: any): void {
 		this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
@@ -139,7 +133,6 @@ export class DataScriptListComponent {
 						(err) => console.log(err));
 				}
 			});
-		console.log(dataItem);
 	}
 
 	/**

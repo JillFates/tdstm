@@ -22,7 +22,7 @@
 							<label> Action </label>
 						</ng-template>
 						<ng-template kendoGridCellTemplate let-dataItem>
-							<button class="btn btn-default" (click)="onEditDataScript(actionType.EDIT, dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
+							<button class="btn btn-default" (click)="onEditDataScript(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
 							<button class="btn btn-default" (click)="onDeleteDataScript(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 						</ng-template>
 					</kendo-grid-column>
@@ -35,11 +35,11 @@
 								<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
 								<ng-template #dateFilter>
 									<kendo-datepicker (valueChange)="onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
-									<span (click)="clearValue(column)" style="right: 25px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									<span *ngIf="column.filter" (click)="clearValue(column)" style="right: 25px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 								</ng-template>
 								<ng-template #stringFilter>
 									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-									<span (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 								</ng-template>
 							</div>
 						</ng-template>
