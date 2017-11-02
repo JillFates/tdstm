@@ -44,6 +44,11 @@ class ETLProcessor {
             element.replace(regex, replacement)
         }
     }
+    /**
+     *
+     *  https://en.wikipedia.org/wiki/Control_character
+     */
+    static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
 
     /**
      *
@@ -247,17 +252,21 @@ class ETLProcessor {
     /**
      *
      *
-     * @param status
+     * @param control
      * @return
      */
-    def replace (String regex) {
+    def replace (String control) {
 
-        if (regex == 'ControlCharacters') {
+        debugConsole.info "Global trm status changed: $control"
+        if (control == 'ControlCharacters') {
+            [with: { y ->
+                globalTransformers.add(Replacer(ControlCharactersRegex, y))
+            },
+             off : { ->
 
+             }]
         }
 
-        debugConsole.info "Global trm status changed: $regex"
-        this
     }
 
     ETLProcessor skip (Integer amount) {
@@ -465,7 +474,7 @@ class ETLProcessor {
         }
     }
 
-    void applyGlobalTransformations(Element element) {
+    void applyGlobalTransformations (Element element) {
 
         globalTransformers.each { transformer ->
             transformer(element)
