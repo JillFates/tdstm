@@ -49,6 +49,15 @@ class DataScriptService implements ServiceMethods{
             }
         }
 
+        // Find the provider
+        Provider providerInstance = Provider.where {
+            id == dataScriptJson.providerId
+            project == currentProject
+        }.find()
+
+        if (!providerInstance) {
+            throw new DomainUpdateException("No Provider with id ${dataScriptJson.providerId} exists for this project.")
+        }
         // Copy the values received from the JSON Object over to the DataScript instance.
         dataScript.with {
             name = dataScriptJson.name
@@ -56,7 +65,7 @@ class DataScriptService implements ServiceMethods{
             target = dataScriptJson.target
             mode = DataScriptMode.forLabel(dataScriptJson.mode)
             etlSourceCode = dataScriptJson.etlSourceCode
-            provider = Provider.get(dataScriptJson.providerId)
+            provider = providerInstance
             // if it's an existing instance, update the lastModifiedBy field
             if (id) {
                 lastModifiedBy = currentPerson
@@ -156,5 +165,4 @@ class DataScriptService implements ServiceMethods{
             throw new DomainUpdateException("Cannot DataScript. Not DataScript with id ${dataScriptId} exists for this project.")
         }
     }
-
 }
