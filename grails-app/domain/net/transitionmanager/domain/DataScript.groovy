@@ -71,10 +71,11 @@ class DataScript {
 
     static constraints = {
         name size: 1..255, unique: 'provider'
-        description size: 0..255
-        target size: 0..255
+        description size: 0..255, nullable: true
+        target size: 0..255, nullable: true
         lastModifiedBy nullable: true
         lastUpdated nullable: true
+        etlSourceCode nullable: true
     }
 
     static mapping = {
