@@ -43,7 +43,7 @@ trait PaginationMethods {
      * @return the requested page number or default 1
      */
     Integer paginationPage(CharSequence paramName='page') {
-        Pagination.pageForParam(param[paramName])
+        Pagination.pageForParam(params[paramName])
     }
 
     /**
