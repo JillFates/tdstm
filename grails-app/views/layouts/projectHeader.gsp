@@ -361,7 +361,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</tds:hasPermission>
 
 			<%-- Task Menu --%>
-			<tds:hasPermission permission="${Permission.BundleMenuView}">
+			<tds:hasPermission permission="${Permission.TaskView}">
 			<li id="teamMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
 				<div class="megamenu rooms inActive" id="teamMegaMenu" >
 					<table class="mmtable"><tr>
