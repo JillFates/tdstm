@@ -31,6 +31,20 @@ class ETLProcessor {
 
     Set globalTransformers = [] as Set
 
+    static Trimmer = { Element element ->
+        element.trim()
+    }
+
+    static Sanitizer = { Element element ->
+        element.sanitize()
+    }
+
+    static Replacer = { String regex, String replacement ->
+        { Element element ->
+            element.replace(regex, replacement)
+        }
+    }
+
     /**
      *
      * Creates an instance of ETL Processor with all default values
@@ -197,9 +211,9 @@ class ETLProcessor {
     ETLProcessor trim (String status) {
 
         if (status == 'on') {
-            globalTransformers.add(Transformer.Trimmer)
+            globalTransformers.add(Trimmer)
         } else if (status == 'of') {
-            globalTransformers.remove(Transformer.Trimmer)
+            globalTransformers.remove(Trimmer)
         }
 
         debugConsole.info "Global trim status changed: $status"
@@ -214,14 +228,22 @@ class ETLProcessor {
     ETLProcessor sanitize (String status) {
 
         if (status == 'on') {
-            globalTransformers.add(Transformer.Sanitizer)
+            globalTransformers.add(Sanitizer)
         } else if (status == 'of') {
-            globalTransformers.remove(Transformer.Sanitizer)
+            globalTransformers.remove(Sanitizer)
         }
 
         debugConsole.info "Global sanitize status changed: $status"
         this
     }
+
+    ETLProcessor replace (String regex, String replacement) {
+
+        globalTransformers.add(Replacer(regex, replacement))
+        debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
+        this
+    }
+
     /**
      *
      *
@@ -446,7 +468,7 @@ class ETLProcessor {
     void applyGlobalTransformations(Element element) {
 
         globalTransformers.each { transformer ->
-            transformer(new Transformation(element))
+            transformer(element)
         }
     }
 
