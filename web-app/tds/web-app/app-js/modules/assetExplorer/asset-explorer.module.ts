@@ -13,11 +13,12 @@ import { AssetExplorerViewExportComponent } from './components/view-export/asset
 import { AssetExplorerViewGridComponent } from './components/view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewShowComponent } from './components/view-show/asset-explorer-view-show.component';
 import { AssetExplorerIndexComponent } from './components/index/asset-explorer-index.component';
-import { TaskCommentComponent } from './components/task-comment/task-comment-component';
 import { AssetShowComponent } from './components/asset/asset-show.component';
 import { AssetEditComponent } from './components/asset/asset-edit.component';
 import { SharedModule } from '../../shared/shared.module';
 import { Permission } from '../../shared/model/permission.model';
+import { TaskCommentComponent } from './components/task-comment/task-comment.component';
+
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -27,6 +28,7 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
+import { TaskCommentService } from './service/task-comment.service';
 
 @NgModule({
 	imports: [
@@ -53,14 +55,14 @@ import { AssetExplorerService } from './service/asset-explorer.service';
 		AssetEditComponent,
 		TaskCommentComponent
 	],
-	providers: [AssetExplorerService],
-	exports: [AssetExplorerIndexComponent],
+	providers: [AssetExplorerService, TaskCommentService],
+	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
 		AssetEditComponent
-	]
+	],
 })
 
 export class AssetExplorerModule {

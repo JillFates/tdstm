@@ -17,6 +17,8 @@ import { ApplicationShowComponent } from '../application/application-show.compon
 import { DeviceShowComponent } from '../device/device-show.component';
 import { StorageShowComponent } from '../storage/storage-show.component';
 
+import { AssetExplorerModule } from '../../asset-explorer.module';
+
 @Component({
 	selector: `asset-database-show`,
 	template: `<div #view></div>`
@@ -36,18 +38,19 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 	ngAfterViewInit() {
 		this.http.get(`../ws/asset/showTemplate/${this.modelId}`).subscribe(res => {
 			let template = res.text();
+			const additionalImports = [AssetExplorerModule];
 			switch (this.asset) {
 				case 'APPLICATION':
-					this.registerAndCreate(ApplicationShowComponent(template), this.view);
+					this.registerAndCreate(ApplicationShowComponent(template), this.view, additionalImports);
 					break;
 				case 'DATABASE':
-					this.registerAndCreate(DatabaseShowComponent(template), this.view);
+					this.registerAndCreate(DatabaseShowComponent(template), this.view, additionalImports);
 					break;
 				case 'DEVICE':
-					this.registerAndCreate(DeviceShowComponent(template), this.view);
+					this.registerAndCreate(DeviceShowComponent(template), this.view, additionalImports);
 					break;
 				case 'STORAGE':
-					this.registerAndCreate(StorageShowComponent(template), this.view);
+					this.registerAndCreate(StorageShowComponent(template), this.view, additionalImports);
 					break;
 			}
 		});

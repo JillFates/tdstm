@@ -86,6 +86,9 @@
 				<tr id="deps">
 					<g:render template="/angular/common/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 				</tr>
+				<tr id="commentListId">
+					<g:render template="/angular/common/commentList" model="['asset':filesInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]"></g:render>
+				</tr>
 			</table>
 		</div>
 	</div>

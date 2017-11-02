@@ -232,6 +232,9 @@
 				<tr id="deps">
 					<g:render template="/angular/common/dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
 				</tr>
+				<tr id="commentListId">
+					<g:render template="/angular/common/commentList" model="['asset':assetEntity, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasPublishPermission':hasPublishPermission, 'canEdit': canEdit]" ></g:render>
+				</tr>
 			</table>
 
 		</div>

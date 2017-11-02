@@ -53,7 +53,7 @@ module.exports = function (env, argv) {
 		],
 		cache: true,
 		context: __dirname,
-		// watch: devEnv,
+		watch: devEnv,
 		watchOptions: {
 			ignored: /node_modules/,
 			aggregateTimeout: 300,

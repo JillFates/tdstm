@@ -25,6 +25,9 @@
 				<tr id="deps">
 					<g:render template="/angular/common/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
 				</tr>
+				<tr id="commentListId">
+					<g:render template="/angular/common/commentList" model="[asset:applicationInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
+				</tr>
 			</table>
 		</div>
 	</div>
