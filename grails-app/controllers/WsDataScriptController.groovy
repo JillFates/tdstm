@@ -95,7 +95,7 @@ class WsDataScriptController implements ControllerMethods{
         try {
             Long providerId = NumberUtil.toLong(request.JSON.providerId)
             List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)
-            renderSuccessJson([dataScripts: dataScripts*.toMap()])
+            renderSuccessJson(dataScripts*.toMap())
         }catch(Exception e) {
             handleException(e, logger)
         }
