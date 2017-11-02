@@ -151,4 +151,8 @@ class Element {
         this
     }
 
+    Element replace (String regex, String replacement) {
+        value = value.replaceAll(regex, replacement)
+        this
+    }
 }
