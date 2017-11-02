@@ -504,11 +504,20 @@
 			$("select.assetSelect").select2();
         $('[data-toggle="popover"]').popover();
 
-        $('.select2-drop.select2-display-none').bind('display', function (e) {
-           // $('div.popover').hide();
-            console.log($(this).attr('style'));
-        });
+        // TM-7943 - mozilla browser based hack-fix for this particular scenario when displaying tooltip popover w/ select2 component.
+        if (isMozillaBrowser) {
+            $('div.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+            $('select.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+        }
 
-	})(jQuery);
+    })(jQuery);
 
 </script>
