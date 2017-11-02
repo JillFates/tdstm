@@ -9,6 +9,7 @@ import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -1084,7 +1085,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					formatterMap: formatterMap,
 			        staffRoles: taskService.getTeamRolesForTasks(),
 					assetCommentFields: assetCommentFields.sort { it.value },
-			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25',
+			        sizePref: userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
 			        partyGroupList: companiesList,
 					company: project.client,
 					step: params.step]
@@ -1188,8 +1189,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
 		
 		// Get the pagination and set the user preference appropriately
-		// TODO : JPM 11/2017 : listTaskJSON - should use TASK_LIST_SIZE instead of ASSET_LIST_SIZE
-		Integer maxRows = paginationMaxRowValue('max', PREF.ASSET_LIST_SIZE, true) 
+		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true) 
 		Integer currentPage = paginationPage()
 		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
