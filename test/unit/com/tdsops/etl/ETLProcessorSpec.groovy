@@ -127,8 +127,8 @@ class ETLProcessorSpec extends Specification {
         nonSanitizedDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
         new Flow().writeTo(dest: nonSanitizedDataSet, dest_append: true) { updater ->
-            updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-            updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\tInc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
+            updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+            updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
         }
     }
 
@@ -803,10 +803,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nIncorporated"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nIncorporated"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tIncorporated"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Incorporated"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -828,10 +828,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Mirosoft\nIn"
+            etlProcessor.getRow(0).getElement(1).value == "Mirosoft\b\nIn"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozill\t\tIn"
+            etlProcessor.getRow(1).getElement(1).value == "Mozill\t\t\0In"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -2392,10 +2392,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nInc"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tInc"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -2417,10 +2417,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft+Inc"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla++Inc"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -2443,10 +2443,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nInc"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tInc"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -2469,10 +2469,10 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft+Inc"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla++Inc"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
 
     }
@@ -2496,12 +2496,36 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\nIncorporated"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nIncorporated"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\tIncorporated"
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Incorporated"
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
-
     }
 
+    void 'test can transform globally a field value using replace ControlCharacters command' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        trim on
+                        replace ControlCharacters with '~'
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft~\nInc"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+    }
 }
