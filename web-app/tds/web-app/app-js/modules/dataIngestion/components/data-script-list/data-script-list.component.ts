@@ -26,6 +26,7 @@ export class DataScriptListComponent {
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
+	public dataScriptMode = DataScriptMode;
 	public gridData: any[];
 	public resultSet: DataScriptModel[];
 
@@ -43,10 +44,6 @@ export class DataScriptListComponent {
 				this.gridData = filterBy(this.resultSet, this.filter);
 			},
 			(err) => console.log(err));
-		/* this.notifierService.broadcast({
-			name: AlertType.SUCCESS,
-			message: 'What a worderful message'
-		}); */
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -98,13 +95,7 @@ export class DataScriptListComponent {
 	 * @param dataItem
 	 */
 	protected onEditDataScript(type: ActionType, dataItem: any): void {
-		let dataScriptModel: DataScriptModel = {
-			name: dataItem.name,
-			description: dataItem.description,
-			mode: dataItem.mode,
-			provider: dataItem.provider
-		};
-		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.EDIT);
+		this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
 	/**
@@ -151,10 +142,15 @@ export class DataScriptListComponent {
 	 */
 	private openDataScriptDialogViewEdit(dataScriptModel: DataScriptModel, actionType: number): void {
 		this.dialogService.open(DataScriptViewEditComponent, [
-			{ provide: DataScriptModel, useValue: dataScriptModel },
-			{ provide: Number, useValue: actionType}
+			{provide: DataScriptModel, useValue: dataScriptModel},
+			{provide: Number, useValue: actionType}
 		]).then(result => {
-			// update the list to reflect changes, it keeps the filter
+			/* if (actionType === ActionType.CREATE) {
+				this.notifierService.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'Data Script created successfully'
+				});
+			} */
 			this.reloadDataScripts();
 		}).catch(result => {
 			console.log('Dismissed Dialog');

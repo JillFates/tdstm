@@ -58,7 +58,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	/**
 	 * Create a new DataScript
 	 */
-	protected onCreateDataScript(): void {
+	protected onSaveDataScript(): void {
 		this.dataIngestionService.saveDataScript(this.dataScriptModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
@@ -79,14 +79,6 @@ export class DataScriptViewEditComponent implements OnInit {
 						(err) => console.log(err));
 				}
 			});
-	}
-
-	/**
-	 * Pass the number of selected rows
-	 * @param event
-	 */
-	protected onSelectView(selectedView: any): void {
-		this.dataScriptModel.target = selectedView;
 	}
 
 	protected onValidateUniqueness(): void {
@@ -130,11 +122,11 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * Delete the selected Data Script
 	 * @param dataItem
 	 */
-	protected onDeleteDataScript(dataItem: any): void {
+	protected onDeleteDataScript(): void {
 		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+					this.dataIngestionService.deleteDataScript(this.dataScriptModel.id).subscribe(
 						(result) => {
 							this.activeDialog.close(result);
 						},
