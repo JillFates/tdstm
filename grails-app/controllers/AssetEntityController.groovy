@@ -30,6 +30,7 @@ import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
@@ -88,7 +89,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class AssetEntityController implements ControllerMethods {
+class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -1185,11 +1186,12 @@ class AssetEntityController implements ControllerMethods {
 	def listTaskJSON() {
 		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
 		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
-
-		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
+		
+		// Get the pagination and set the user preference appropriately
+		// TODO : JPM 11/2017 : listTaskJSON - should use TASK_LIST_SIZE instead of ASSET_LIST_SIZE
+		Integer maxRows = paginationMaxRowValue('max', PREF.ASSET_LIST_SIZE, true) 
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
 		def today = new Date().clearTime()
