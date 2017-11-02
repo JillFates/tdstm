@@ -444,9 +444,34 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform {
-                                    uppercase
-                            } 
+                            extract 'model name' transform with uppercase() 
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to uppercase'
+            etlProcessor.getRow(0).getElement(1).value == 'SRW24G1'
+            etlProcessor.getRow(1).getElement(1).value == 'ZPHA MODULE'
+            etlProcessor.getRow(2).getElement(1).value == 'SLIDEAWAY'
+    }
+
+    void 'test can transform a field value with uppercase transformation inside a closure' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'model name' transform { 
+                                uppercase() 
+                            }
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -471,7 +496,34 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { lowercase }
+                            extract 'model name' transform with lowercase()
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to uppercase'
+            etlProcessor.getRow(0).getElement(1).value == 'srw24g1'
+            etlProcessor.getRow(1).getElement(1).value == 'zpha module'
+            etlProcessor.getRow(2).getElement(1).value == 'slideaway'
+    }
+
+    void 'test can transform a field value to lowercase transformation inside a closure' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'model name' transform { 
+                                lowercase()
+                            }    
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -496,8 +548,33 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                        left 4
+                            extract 'model name' transform with left(4)
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed to left 4 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "SRW2"
+            etlProcessor.getRow(1).getElement(1).value == "ZPHA"
+            etlProcessor.getRow(2).getElement(1).value == "Slid"
+    }
+
+    void 'test can transform a field value with taking left 4 characters inside a closure' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'model name' transform {
+                                        left(4)
                                   }
                         }
                     """.stripIndent(),
@@ -523,10 +600,32 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                    middle 2, 3 
-                                    lowercase  
-                                }
+                            extract 'model name' transform with middle(2, 3) lowercase()
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every column for every row is transformed with middle 2 transformation'
+            etlProcessor.getRow(0).getElement(1).value == "w2"
+            etlProcessor.getRow(1).getElement(1).value == "ha"
+            etlProcessor.getRow(2).getElement(1).value == "id"
+    }
+
+    void 'test can transform a field value with taking middle 2 characters inside a closure' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'model name' transform with middle(2, 3) lowercase()  
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -551,10 +650,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                    uppercase 
-                                    first 'A'
-                                }
+                            extract 'model name' transform with uppercase() first('A')
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -579,10 +675,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                        uppercase 
-                                        last 'A'
-                                     }
+                            extract 'model name' transform with uppercase() last('A')
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -607,10 +700,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                    uppercase 
-                                    last 'A'
-                            }  
+                            extract 'model name' transform with uppercase() last('A')
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -635,11 +725,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                        uppercase
-                                        last 'A' 
-                                        lowercase
-                                    }
+                            extract 'model name' transform with uppercase() last('A') lowercase()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -664,9 +750,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform {
-                                right 4
-                            } 
+                            extract 'model name' transform with right(4)
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -691,10 +775,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform { 
-                                    left 4 
-                                    lowercase
-                            } 
+                            extract 'model name' transform with left(4) lowercase()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -719,10 +800,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform  { 
-                                uppercase 
-                                lowercase
-                            }
+                            extract 'model name' transform with uppercase() lowercase()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -747,9 +825,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate 
-                            extract 'MODEL NAME' transform { 
-                                    unknown
-                            }
+                            extract 'MODEL NAME' transform with unknown()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -1083,11 +1159,7 @@ class ETLProcessorSpec extends Specification {
                             def final dictionary = [prod: 'Production', dev: 'Development']
                             read labels
                             iterate {
-                                extract 'environment' transform { 
-                                            lowercase
-                                            translate with: dictionary
-                                } 
-                                        
+                                extract 'environment' transform with lowercase() translate with: dictionary
                             }""".stripIndent(),
                     ETLProcessor.class.name)
 
@@ -2264,9 +2336,7 @@ class ETLProcessorSpec extends Specification {
                         domain Application
                         read labels
                         iterate {
-                            extract 'vendor name' transform {
-                                trim 
-                            } load appVendor
+                            extract 'vendor name' transform with trim() load appVendor
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -2291,9 +2361,7 @@ class ETLProcessorSpec extends Specification {
                         domain Application
                         read labels
                         iterate {
-                            extract 'vendor name' transform {
-                                sanitize 
-                            } load appVendor
+                            extract 'vendor name' transform with sanitize() load appVendor
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
