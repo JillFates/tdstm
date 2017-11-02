@@ -30,7 +30,9 @@ export class DataIngestionService {
 		return this.http.get(`${this.dataIngestionUrl}/datascript/list`)
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				let dataScriptModels = result && result.status === 'success' && result.data;
+				dataScriptModels.forEach((r) => r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT));
+				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -43,16 +45,24 @@ export class DataIngestionService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			target: model.target,
 			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
 			providerId: model.provider.id
 		};
-		return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
+		if (!model.id) {
+			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
 	}
 
 	saveProvider(model: ProviderModel): Observable<ProviderModel> {

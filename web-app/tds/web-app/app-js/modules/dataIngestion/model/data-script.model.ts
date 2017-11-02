@@ -25,7 +25,7 @@ export class DataScriptColumnModel {
 				width: 80
 			}, {
 				label: 'Last Modified',
-				property: 'lastModified',
+				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
 				width: 80
@@ -38,7 +38,6 @@ export class DataScriptModel {
 	id?: number;
 	name: string;
 	description: string;
-	target?: string;
 	mode: DataScriptMode;
 	etlSourceCode?: string;
 	provider?: {

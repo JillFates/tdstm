@@ -25,7 +25,7 @@
 							<button class="btn btn-default" (click)="onDeleteDataScript(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 						</ng-template>
 					</kendo-grid-column>
-					<kendo-grid-column *ngFor="let column of dataScriptColumnModel.columns" field="{{column.property}}" [class]='hola' format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+					<kendo-grid-column *ngFor="let column of dataScriptColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 						<ng-template kendoGridHeaderTemplate>
 							<label> {{column.label}}</label>
 						</ng-template>
