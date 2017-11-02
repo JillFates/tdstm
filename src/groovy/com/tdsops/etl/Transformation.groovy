@@ -22,23 +22,26 @@ class Transformation extends Expando {
         }
     }
 
+
     def propertyMissing (String name) {
         if (name in ['lowercase', 'uppercase', 'trim', 'sanitize']) {
             this."$name"()
         }
     }
 
-    def middle (int take, int position) {
+    Transformation middle (int take, int position) {
         int start = (position - 1)
         int to = (start + take - 1)
         this.element.value = this.element.value[start..to]
+        this
     }
 
-    def translate (def map) {
+    Transformation translate (def map) {
         Map dictionary = map['with']
         if (dictionary.containsKey(element.value)) {
             element.value = dictionary[element.value]
         }
+        this
     }
     /**
      * Replace all of the escape characters
@@ -49,39 +52,48 @@ class Transformation extends Expando {
      * The method will also remove any leading and trailing whitespaces
      * @return
      */
-    def sanitize () {
+    Transformation sanitize () {
         element.value = StringUtil.sanitizeAndStripSpaces(element.value)
+        this
     }
 
-    def trim () {
+    Transformation trim () {
         this.element.value = this.element.value.trim()
+        this
     }
 
-    def first (String content) {
+    Transformation first (String content) {
         this.element.value = this.element.value.replaceFirst(content, '')
+        this
     }
 
-    def all (String content) {
+    Transformation all (String content) {
         this.element.value = this.element.value.replaceAll(content, '')
+        this
     }
 
-    def last (String content) {
+    Transformation last (String content) {
         this.element.value = this.element.value.reverse().replaceFirst(content, '').reverse()
+        this
     }
 
-    def uppercase () {
+    Transformation uppercase () {
         this.element.value = this.element.value.toUpperCase()
+        this
     }
 
-    def lowercase () {
+    Transformation lowercase () {
         this.element.value = this.element.value.toLowerCase()
+        this
     }
 
-    def left (Integer amount) {
+    Transformation left (Integer amount) {
         element.value = element.value.take(amount)
+        this
     }
 
-    def right (Integer amount) {
+    Transformation right (Integer amount) {
         element.value = element.value.reverse().take(amount).reverse()
+        this
     }
 }
