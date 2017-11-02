@@ -1,4 +1,15 @@
 // Some elements are not always inside a form, this allow to workaround some scenarios
+
+/* Applicable to All Forms */
+form
+    .form-horizontal
+    &.left-alignment
+        div.form-group
+            label
+                text-align: left
+            &.sub-option-50
+                padding-left: 50px
+
 .has-danger .form-control-feedback,
 .has-danger .form-control-label,
 .has-danger .control-label,
