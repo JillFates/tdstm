@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DataScriptModel, ActionType, ModeType} from '../../model/data-script.model';
+import {DataScriptModel, ActionType, DataScriptMode} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -20,7 +20,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	public dataScriptModel: DataScriptModel;
 	public providerList: ProviderModel[];
 	public modalTitle: string;
-	public modeType = ModeType;
+	public dataScriptMode = DataScriptMode;
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private isUnique = true;
@@ -86,7 +86,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @param event
 	 */
 	protected onSelectView(selectedView: any): void {
-		this.dataScriptModel.view = selectedView;
+		this.dataScriptModel.target = selectedView;
 	}
 
 	protected onValidateUniqueness(): void {

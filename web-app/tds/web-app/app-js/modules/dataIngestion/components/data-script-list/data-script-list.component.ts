@@ -8,8 +8,9 @@ import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, ModeType, ActionType} from '../../model/data-script.model';
+import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, Flatten, DataScriptMode, ActionType} from '../../model/data-script.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AlertType} from '../../../../shared/model/alert.model';
 import {DataScriptViewEditComponent} from '../data-script-view-edit/data-script-view-edit.component';
 
 @Component({
@@ -35,13 +36,17 @@ export class DataScriptListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService,
-		private notifier: NotifierService) {
+		private notifierService: NotifierService) {
 		dataScripts.subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = filterBy(this.resultSet, this.filter);
 			},
 			(err) => console.log(err));
+		/* this.notifierService.broadcast({
+			name: AlertType.SUCCESS,
+			message: 'What a worderful message'
+		}); */
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -81,7 +86,7 @@ export class DataScriptListComponent {
 		let dataScriptModel: DataScriptModel = {
 			name: '',
 			description: '',
-			mode: ModeType.IMPORT,
+			mode: DataScriptMode.IMPORT,
 			provider: { id: null, name: ''}
 		};
 		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
