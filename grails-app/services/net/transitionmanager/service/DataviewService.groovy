@@ -605,7 +605,13 @@ class DataviewService implements ServiceMethods {
             "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme"],
             "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2"],
             "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model"],
-            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner"]
+            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner"],
+			"sourceLocation" : [property: "AE.roomSource.location", type: String, namedParameter: "sourceLocation", join: "left outer join AE.roomSource"],
+			"sourceRack" : [property: "AE.rackSource.tag", type: String, namedParameter: "sourceRack", join: "left outer join AE.rackSource"],
+			"sourceRoom" : [property: "AE.roomSource.roomName", type: String, namedParameter: "sourceRack", join: "left outer join AE.roomSource"],
+			"targetLocation" : [property: "AE.roomTarget.location", type: String, namedParameter: "targetLocation", join: "left outer join AE.roomTarget"],
+			"targetRack" : [property: "AE.rackTarget.tag", type: String, namedParameter: "targetRack", join: "left outer join AE.rackTarget"],
+			"targetRoom" : [property: "AE.roomTarget.roomName", type: String, namedParameter: "targetRack", join: "left outer join AE.roomTarget"]
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
     }
