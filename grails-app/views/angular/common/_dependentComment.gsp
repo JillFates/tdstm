@@ -24,7 +24,7 @@ if type is blank, the extra underscore(_) will be avoided --%>
 <g:else>
  	<g:if test="${ dependency.comment }" >
  		<a title="" data-toggle="popover" data-trigger="hover" data-content="${ dependency.comment }">
-			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
+			 <i class="fa fa-commenting"></i>
 		</a>
    	</g:if>
 </g:else>
