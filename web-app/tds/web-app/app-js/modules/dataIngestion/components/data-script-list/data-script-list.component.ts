@@ -53,7 +53,7 @@ export class DataScriptListComponent {
 		this.gridData = filterBy(this.resultSet, filter);
 	}
 
-	protected onFilter(column: any): void {
+	protected onFilter(column: any, data?: any): void {
 		let root = this.filter || { logic: 'and', filters: []};
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
@@ -77,6 +77,22 @@ export class DataScriptListComponent {
 				filter.value = column.filter;
 			}
 		}
+
+		if (column.type === 'date') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'gte',
+					value: data,
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = data;
+			}
+		}
+
 		this.filterChange(root);
 	}
 
