@@ -30,11 +30,11 @@
 						<ng-template kendoGridHeaderTemplate>
 							<label> {{column.label}}</label>
 						</ng-template>
-						<ng-template kendoGridFilterCellTemplate>
+						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
 
 							<ng-template #dateFilter>
-								<kendo-grid-date-filter-cell [column]="column" [showOperators]="false" [filter]="filter"></kendo-grid-date-filter-cell>
+								<kendo-datepicker (valueChange)="onFilter(column, $event)"></kendo-datepicker>
 							</ng-template>
 							<ng-template #stringFilter>
 								<div class=" has-feedback" *ngIf="column.property" style="margin-bottom:0px;">

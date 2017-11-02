@@ -16,6 +16,7 @@ import {Permission} from '../../shared/model/permission.model';
 // Import Kendo Modules
 import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
+import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {SortableModule} from '@progress/kendo-angular-sortable';
 // Services
 import {DataIngestionService} from './service/data-ingestion.service';
@@ -27,6 +28,7 @@ import {DataIngestionService} from './service/data-ingestion.service';
 		FormsModule,
 		DropDownListModule,
 		GridModule,
+		DateInputsModule,
 		SortableModule,
 		AssetExplorerModule, // So we can use Shared components that belongs to this module
 		UIRouterModule.forChild({states: DATA_INGESTION_STATES})
