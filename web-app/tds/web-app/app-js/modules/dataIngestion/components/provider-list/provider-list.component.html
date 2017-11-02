@@ -11,7 +11,8 @@
 						[pageSize]="10"
 						[pageable]="{ pageSizes: true, info: true}"
 						(cellClick)="cellClick($event)"
-						[selectable]="true">
+						[selectable]="true"
+						[rowSelected]="isRowSelected">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<button class="btn btn-default" id="btnCreateProvider" type="button" (click)="onCreateProvider()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'DATA_INGESTION.CREATE_PROVIDER' | translate }}</button>
 						<div (click)="reloadProviders()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
@@ -29,18 +30,18 @@
 						<ng-template kendoGridHeaderTemplate>
 							<label> {{column.label}}</label>
 						</ng-template>
-						<ng-template kendoGridFilterCellTemplate>
-							<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
-
-							<ng-template #dateFilter>
-								<kendo-grid-date-filter-cell [column]="column" [showOperators]="false" [filter]="filter"></kendo-grid-date-filter-cell>
-							</ng-template>
-							<ng-template #stringFilter>
-								<div class="has-feedback" *ngIf="column.property" style="margin-bottom:0px;">
+						<ng-template kendoGridFilterCellTemplate let-filter>
+							<div class="has-feedback" *ngIf="column.property" style="margin-bottom:0px;">
+								<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
+								<ng-template #dateFilter>
+									<kendo-datepicker (valueChange)="onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+									<span *ngIf="column.filter" (click)="clearValue(column)" style="right: 25px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+								</ng-template>
+								<ng-template #stringFilter>
 									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-									<span (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-								</div>
-							</ng-template>
+									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+								</ng-template>
+							</div>
 						</ng-template>
 					</kendo-grid-column>
 				</kendo-grid>

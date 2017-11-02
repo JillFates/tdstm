@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent} from '@progress/kendo-angular-grid';
+import {CellClickEvent, RowArgs} from '@progress/kendo-angular-grid';
 
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -9,7 +9,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
-import {NotifierService} from '../../../../shared/services/notifier.service';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 
 @Component({
@@ -24,16 +23,18 @@ export class ProviderListComponent {
 	public filter: CompositeFilterDescriptor;
 	public providerColumnModel = new ProviderColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public actionType = ActionType;
 	public gridData: any[];
 	public resultSet: ProviderModel[];
+	public selectedRows = [];
+	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
 		private dialogService: UIDialogService,
 		@Inject('providers') providers: Observable<ProviderModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
-		private prompt: UIPromptService,
-		private notifier: NotifierService) {
+		private prompt: UIPromptService) {
 		providers.subscribe(
 			(result) => {
 				this.resultSet = result;
@@ -52,6 +53,10 @@ export class ProviderListComponent {
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
+		if (!column.filter) {
+			column.filter = '';
+		}
+
 		if (column.type === 'text') {
 			if (!filter) {
 				root.filters.push({
@@ -67,12 +72,32 @@ export class ProviderListComponent {
 				filter.value = column.filter;
 			}
 		}
+
+		if (column.type === 'date') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'gte',
+					value: column.filter,
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
+		}
+
 		this.filterChange(root);
 	}
 
-	protected clearValue(column: any): void {
+	protected clearValue(column: any, value?: any): void {
 		column.filter = '';
-		this.onFilter(column);
+		if (this.filter && this.filter.filters.length > 0) {
+			const filterIndex = this.filter.filters.findIndex((r: any) => r.field === column.property);
+			this.filter.filters.splice(filterIndex, 1);
+			this.filterChange(this.filter);
+		}
 	}
 
 	protected onCreateProvider(): void {
@@ -89,12 +114,7 @@ export class ProviderListComponent {
 	 * @param dataItem
 	 */
 	protected onEditProvider(dataItem: any): void {
-		let providerModel: ProviderModel = {
-			name: dataItem.name,
-			description: dataItem.description,
-			comment: dataItem.comment
-		};
-		this.openProviderDialogViewEdit(providerModel, ActionType.EDIT);
+		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
 	/**
@@ -120,6 +140,7 @@ export class ProviderListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
+			this.selectRow(event['dataItem'].id);
 			this.openProviderDialogViewEdit(event['dataItem'], ActionType.VIEW);
 		}
 	}
@@ -145,8 +166,19 @@ export class ProviderListComponent {
 		]).then(result => {
 			// update the list to reflect changes, it keeps the filter
 			this.reloadProviders();
+			if (actionType === ActionType.CREATE) {
+				setTimeout(() => {
+					this.selectRow(result.provider.id);
+					this.openProviderDialogViewEdit(result.provider, ActionType.VIEW);
+				}, 500);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	private selectRow(dataItemId: number): void {
+		this.selectedRows = [];
+		this.selectedRows.push(dataItemId);
 	}
 }

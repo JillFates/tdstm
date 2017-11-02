@@ -22,13 +22,13 @@ export class DataScriptColumnModel {
 				property: 'dateCreated',
 				type: 'date',
 				format: '{0:d}',
-				width: 80
+				width: 90
 			}, {
 				label: 'Last Modified',
 				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
-				width: 80
+				width: 90
 			}
 		];
 	}
