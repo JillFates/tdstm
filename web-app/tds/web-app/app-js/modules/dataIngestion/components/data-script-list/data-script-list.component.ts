@@ -2,7 +2,7 @@ import {Component, Inject, ViewChild} from '@angular/core';
 import {StateService} from '@uirouter/angular';
 import {Observable} from 'rxjs/Observable';
 import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent} from '@progress/kendo-angular-grid';
+import {CellClickEvent, GridComponent, RowArgs} from '@progress/kendo-angular-grid';
 
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -29,6 +29,8 @@ export class DataScriptListComponent {
 	public dataScriptMode = DataScriptMode;
 	public gridData: any[];
 	public resultSet: DataScriptModel[];
+	public selectedRows = [];
+	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
 		private stateService: StateService,
@@ -55,6 +57,10 @@ export class DataScriptListComponent {
 		let root = this.filter || { logic: 'and', filters: []};
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
+
+		if (!column.filter) {
+			column.filter = '';
+		}
 
 		if (column.type === 'text') {
 			if (!filter) {
@@ -122,6 +128,7 @@ export class DataScriptListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
+			this.selectRow(event['dataItem'].id);
 			this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
 		}
 	}
@@ -145,15 +152,20 @@ export class DataScriptListComponent {
 			{provide: DataScriptModel, useValue: dataScriptModel},
 			{provide: Number, useValue: actionType}
 		]).then(result => {
-			/* if (actionType === ActionType.CREATE) {
-				this.notifierService.broadcast({
-					name: AlertType.SUCCESS,
-					message: 'Data Script created successfully'
-				});
-			} */
 			this.reloadDataScripts();
+			if (actionType === ActionType.CREATE) {
+				setTimeout(() => {
+					this.selectRow(result.dataScript.id);
+					this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
+				}, 500);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	private selectRow(dataItemId: number): void {
+		this.selectedRows = [];
+		this.selectedRows.push(dataItemId);
 	}
 }

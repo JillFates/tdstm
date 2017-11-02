@@ -31,7 +31,11 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
-				dataScriptModels.forEach((r) => r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT));
+				dataScriptModels.forEach((r) => {
+					r.mode = ((r.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT);
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
+				});
 				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
@@ -52,7 +56,9 @@ export class DataIngestionService {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
-					return result && result.status === 'success' && result.data;
+					let dataItem = (result && result.status === 'success' && result.data);
+					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
+					return dataItem;
 				})
 				.catch((error: any) => error.json());
 		} else {

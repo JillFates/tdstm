@@ -11,7 +11,8 @@
 						[pageSize]="10"
 						[pageable]="{ pageSizes: true, info: true}"
 						(cellClick)="cellClick($event)"
-						[selectable]="true">
+						[selectable]="true"
+						[rowSelected]="isRowSelected">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<button class="btn btn-default" id="btnCreateDataScript" type="button" (click)="onCreateDataScript()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'DATA_INGESTION.CREATE_DATA_SCRIPT' | translate }}</button>
 						<div (click)="reloadDataScripts()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
