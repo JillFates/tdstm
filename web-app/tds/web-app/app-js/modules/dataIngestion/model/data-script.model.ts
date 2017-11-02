@@ -36,19 +36,17 @@ export class DataScriptColumnModel {
 
 export class DataScriptModel {
 	id?: number;
-	name: String;
+	name: string;
+	description: string;
+	target?: string;
+	mode: DataScriptMode;
+	etlSourceCode?: string;
 	provider?: {
 		id?: number,
-		name: String
-	};
-	description: String;
-	mode: ModeType;
-	view?: {
-		id: number,
-		name: String
+		name: string
 	};
 	dateCreated?: Date;
-	lastModified?: Date;
+	lastUpdated?: Date;
 }
 
 export const Flatten = filter => {
@@ -65,7 +63,7 @@ export enum ActionType {
 	EDIT
 };
 
-export enum ModeType {
+export enum DataScriptMode {
 	IMPORT,
 	EXPORT
 }

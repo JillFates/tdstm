@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ActionType, ModeType} from '../../model/data-script.model';
+import {ActionType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -19,7 +19,6 @@ export class ProviderViewEditComponent implements OnInit {
 
 	public providerModel: ProviderModel;
 	public modalTitle: string;
-	public modeType = ModeType;
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private isUnique = true;
