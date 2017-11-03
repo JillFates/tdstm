@@ -122,7 +122,6 @@ form.groups{
 	box-sizing: content-box;
 	width: 100%;
 	height: 300px;
-	overflow-y: auto;
 	margin: 0 0 10px 0;
 }
 
