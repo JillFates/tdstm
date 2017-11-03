@@ -11,7 +11,7 @@ import net.transitionmanager.service.DataScriptService
  * Provide the endpoints for working with DataScripts.
  */
 @Secured("isAuthenticated()")
-@Slf4j(value='logger', category='grails.app.controllers.WsDatasourceController')
+@Slf4j(value='logger', category='grails.app.controllers.WsDataScriptController')
 class WsDataScriptController implements ControllerMethods{
 
     private final static DELETE_OK_MESSAGE = "DataScript deleted successfully.";
@@ -19,7 +19,7 @@ class WsDataScriptController implements ControllerMethods{
     DataScriptService dataScriptService
 
     /**
-     * Endpoint for creating a new datascript.
+     * Endpoint for creating a new DataScript.
      */
     @HasPermission(Permission.DataScriptCreate)
     def createDataScript() {
@@ -104,7 +104,7 @@ class WsDataScriptController implements ControllerMethods{
     /**
      * Delete a given DataScript from the system.
      *
-     * @param id DataScript - id
+     * @param id - id of the DataScript that has to be deleted.
      * @return
      */
     @HasPermission(Permission.DataScriptDelete)

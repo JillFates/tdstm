@@ -187,4 +187,5 @@ databaseChangeLog = {
 	include file: '20171010-remove-legacy-field-settings.groovy'
 	include file: '20171011-create-credential-table.groovy'
 	include file: '20171030-add-permissions-for-datascript.groovy'
+	include file: '20171102-add-permissions-for-provider.groovy'
 }
