@@ -39,9 +39,9 @@ export class ProviderViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Create a new Provider
+	 * Create Edit a Provider
 	 */
-	protected onCreateProvider(): void {
+	protected onSaveProvider(): void {
 		this.dataIngestionService.saveProvider(this.providerModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
@@ -105,11 +105,11 @@ export class ProviderViewEditComponent implements OnInit {
 	 * Delete the selected Data Script
 	 * @param dataItem
 	 */
-	protected onDeleteProvider(dataItem: any): void {
+	protected onDeleteProvider(): void {
 		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteProvider(dataItem.id).subscribe(
+					this.dataIngestionService.deleteProvider(this.providerModel.id).subscribe(
 						(result) => {
 							this.activeDialog.close(result);
 						},

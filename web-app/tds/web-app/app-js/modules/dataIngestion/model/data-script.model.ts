@@ -10,8 +10,7 @@ export class DataScriptColumnModel {
 				property: 'action',
 				type: 'action',
 				width: 120
-			},
-			{
+			}, {
 				label: 'Name',
 				property: 'name',
 				type: 'text'
