@@ -337,6 +337,29 @@ class ETLProcessorSpec extends Specification {
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == 2
     }
+
+    void 'test can iterate over a list of data source rows' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        using 0, 1, 2 iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'The current row index is the last row in data source'
+            etlProcessor.currentRowIndex == 3
+    }
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
      * 	The extract puts the value into a local register that can then be manipulated and eventually
