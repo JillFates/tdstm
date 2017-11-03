@@ -1,7 +1,5 @@
 package com.tdsops.etl
 
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
@@ -15,10 +13,10 @@ class ETLBinding extends Binding {
 
     ETLBinding (ETLProcessor etlProcessor, Map vars = [:]) {
         this.variables.putAll([
-                *: etlProcessor.metaClass.methods.collectEntries {
+                *      : etlProcessor.metaClass.methods.collectEntries {
                     [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
                 },
-                *: vars
+                *      : vars
         ])
     }
 
