@@ -13,10 +13,9 @@ import groovy.util.logging.Slf4j
 // class CamelService implements ServiceMethods, InitializingBean {
 class AwsService implements InitializingBean {
 	// http://camel.apache.org/aws-sqs.html
-	static final int MAX_MESSAGES_PER_POLL = 1
+	static final int MAX_MESSAGES_PER_POLL = 10
 	static final int WAIT_TIME_SECONDS = 5
 	static final boolean DELETE_IF_FILTERED = false
-
 
 	AuditService auditService
 	GrailsApplication grailsApplication
