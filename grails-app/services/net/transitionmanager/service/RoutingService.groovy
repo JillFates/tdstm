@@ -3,7 +3,8 @@ package net.transitionmanager.service
 import net.transitionmanager.domain.Person
 import net.transitionmanager.service.InvalidRequestException
 import com.tdsops.common.lang.ExceptionUtil
-
+import org.apache.camel.Exchange
+import org.apache.camel.Message
 import org.springframework.beans.factory.InitializingBean
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import groovy.json.JsonSlurper
@@ -37,11 +38,26 @@ class RoutingService implements InitializingBean {
 	}
 
 	/**
-	 * Used to send a message object to the SNS service
+	 * Used to process aggregated messages coming from SQS Service
+	 * @param exchangeList
+	 *
+	 * @see net.transitionmanager.routes.AwsSqsRoute#configure()
+	 */
+	void processMessages(List<String> exchangeList) {
+		if (exchangeList) {
+			logger.debug 'Received {} messages, attempting to proccess them.', exchangeList.size()
+			for (String exchange : exchangeList) {
+				processMessage(exchange)
+			}
+		}
+	}
+
+	/**
+	 * Used to process messages coming from SQS Service
 	 * @param topicName - the name of the queue configured in AWS SNS
 	 * @param message - an object to be sent with the message. This will be a JSON payload.
 	 */
-	void processMessage(Object message) {
+	void processMessage(String message) {
 		String method
 		if (! (message instanceof String) ) {
 			log.warn "processMessage() called with invalid message (type=${message?.getClass().getName()}, value=$message)"
