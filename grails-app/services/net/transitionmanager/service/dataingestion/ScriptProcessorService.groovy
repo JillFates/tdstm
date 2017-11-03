@@ -92,12 +92,7 @@ class ScriptProcessorService {
         validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
         validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator, [
-                uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
-                blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
-        ])
+        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator)
 
         ETLBinding binding = new ETLBinding(etlProcessor)
 
@@ -145,12 +140,7 @@ class ScriptProcessorService {
             })
         }
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator, [
-                uppercase: new ElementTransformation(closure: { it.value = it.value.toUpperCase() }),
-                lowercase: new ElementTransformation(closure: { it.value = it.value.toLowerCase() }),
-                first    : new ElementTransformation(closure: { String value -> value.size() > 0 ? value[0] : "" }),
-                blanks   : new ElementTransformation(closure: { String value -> value.replaceAll(" ", "") })
-        ])
+        ETLProcessor etlProcessor = new ETLProcessor(project, data, console, validator)
 
         ETLBinding binding = new ETLBinding(etlProcessor)
 
