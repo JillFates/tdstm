@@ -10,6 +10,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DataScriptService implements ServiceMethods{
 
+    ProviderService providerService
     SecurityService securityService
 
     /**
@@ -39,25 +40,12 @@ class DataScriptService implements ServiceMethods{
             dataScript = new DataScript()
         } else {
             // Fetch the DataScript with the given id.
-            dataScript = DataScript.where {
-                id == dataScriptId
-                project == currentProject
-            }.find()
-            // Fail if no DataScript was found
-            if (!dataScript) {
-                throw new DomainUpdateException("No DataScript with id ${dataScriptId} exists for this project.")
-            }
+            dataScript = getDataScript(dataScriptId, currentProject)
         }
 
         // Find the provider
-        Provider providerInstance = Provider.where {
-            id == dataScriptJson.providerId
-            project == currentProject
-        }.find()
+        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject)
 
-        if (!providerInstance) {
-            throw new DomainUpdateException("No Provider with id ${dataScriptJson.providerId} exists for this project.")
-        }
         // Copy the values received from the JSON Object over to the DataScript instance.
         dataScript.with {
             name = dataScriptJson.name
@@ -89,8 +77,10 @@ class DataScriptService implements ServiceMethods{
      * @param dataScriptId
      * @return
      */
-    DataScript getDataScript(Long dataScriptId) {
-        Project project = securityService.userCurrentProject
+    DataScript getDataScript(Long dataScriptId, Project project = null) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
         // Find a datascript with the given id for this project.
         DataScript dataScript = DataScript.where{
             id == dataScriptId
@@ -141,9 +131,8 @@ class DataScriptService implements ServiceMethods{
      * @return
      */
     List<DataScript> getDataScripts(Long providerId = null) {
-        Project project = securityService.userCurrentProject
         return DataScript.where {
-            project == project
+            project == securityService.userCurrentProject
             if (providerId) {
                 provider.id == providerId
             }
@@ -161,8 +150,6 @@ class DataScriptService implements ServiceMethods{
         // Delete the DataScript if found.
         if (dataScript) {
             dataScript.delete()
-        } else { // Fail if the DataScript wasn't found
-            throw new DomainUpdateException("Cannot DataScript. Not DataScript with id ${dataScriptId} exists for this project.")
         }
     }
 }

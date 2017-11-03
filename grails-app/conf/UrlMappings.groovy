@@ -587,6 +587,36 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/provider/list" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProviders"
+			]
+		}
+
+		"/ws/dataingestion/provider/" {
+			controller = "wsProvider"
+			action = [
+					POST: "createProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/$id?" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProvider",
+					PUT: "updateProvider",
+					DELETE: "deleteProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/validateunique/$name" {
+			controller = "wsProvider"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

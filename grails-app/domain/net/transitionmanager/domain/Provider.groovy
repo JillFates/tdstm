@@ -1,5 +1,7 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.TimeUtil
+
 class Provider {
     String name
     String description
@@ -17,8 +19,8 @@ class Provider {
 
     static constraints = {
         name size:1..255, unique: 'project'
-        description size:0..255
-        comment size:0..65254
+        description size:0..255, nullable: true
+        comment size:0..65254, nullable: true
         lastUpdated nullable: true
     }
 
@@ -30,5 +32,28 @@ class Provider {
 
         sort 'name'
 
+    }
+
+    def beforeInsert = {
+        dateCreated = TimeUtil.nowGMT()
+    }
+    def beforeUpdate = {
+        lastUpdated = TimeUtil.nowGMT()
+    }
+
+    /**
+     * Return a map representation of this Provider.
+     * @return
+     */
+    Map toMap() {
+        Map dataMap = [
+                id: id,
+                name: name,
+                description: description,
+                comment: comment,
+                dateCreated: dateCreated,
+                lastUpdated: lastUpdated
+        ]
+        return dataMap
     }
 }
