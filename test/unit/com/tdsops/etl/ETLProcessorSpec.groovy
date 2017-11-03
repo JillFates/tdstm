@@ -12,6 +12,7 @@ import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -309,6 +310,32 @@ class ETLProcessorSpec extends Specification {
 
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == sixRowsDataSet.readRows
+    }
+    /**
+     *
+     *
+     */
+    void 'test can iterate over a range of data source rows' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        from 1 to 3 iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'The current row index is the last row in data source'
+            etlProcessor.currentRowIndex == 2
     }
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
@@ -1123,6 +1150,34 @@ class ETLProcessorSpec extends Specification {
 
         then: 'A console content could be recovered after processing an ETL Scrtipt'
             console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
+                    .append(System.lineSeparator())
+                    .append("INFO - Selected Domain: Device")
+                    .append(System.lineSeparator())
+                    .toString()
+    }
+
+    @Ignore
+    void 'test can enable console without defining on parameter' () {
+
+        given:
+            DebugConsole debugConsole = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, debugConsole)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                            console
+                            domain Device
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'A console content could be recovered after processing an ETL Scrtipt'
+            debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
                     .append(System.lineSeparator())
                     .append("INFO - Selected Domain: Device")
                     .append(System.lineSeparator())
@@ -2451,6 +2506,32 @@ class ETLProcessorSpec extends Specification {
 
     }
 
+    void 'test can turn on globally trim command without defining on parameter' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+                    .evaluate("""
+                        trim on
+                        domain Application
+                        read labels
+                        iterate {
+                            extract 'vendor name' load appVendor
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Every field property is assigned to the correct element'
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
+            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+
+            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
+            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+
+    }
+
     void 'test can turn on globally sanitize command to replace all of the escape characters' () {
 
         given:
@@ -2503,7 +2584,7 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
     }
 
-    void 'test can transform globally a field value using replace ControlCharacters command' () {
+    void 'test can transform globally a field value using replace command using a range in the iteration' () {
 
         given:
             ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
@@ -2515,7 +2596,7 @@ class ETLProcessorSpec extends Specification {
                         replace ControlCharacters with '~'
                         domain Application
                         read labels
-                        iterate {
+                        from 0 to 1 iterate {
                             extract 'vendor name' load appVendor
                         }
                     """.stripIndent(),
@@ -2524,8 +2605,5 @@ class ETLProcessorSpec extends Specification {
         then: 'Every field property is assigned to the correct element'
             etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
-
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
     }
 }

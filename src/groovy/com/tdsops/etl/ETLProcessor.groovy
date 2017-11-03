@@ -151,15 +151,41 @@ class ETLProcessor {
                 columnsMap[column.label] = column
             }
             currentRowIndex++
-//
-//            dataSet.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
-//                Column column = new Column(label: columnName, index: index)
-//                columns.add(column)
-//                columnsMap[column.label] = column
-//            }
             debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
         }
         this
+    }
+    /**
+     *
+     *
+     * @param from
+     * @return
+     */
+    def from (int from) {
+        [to: { int to ->
+            [iterate: { Closure closure ->
+
+                List subList = dataSet.rows().subList(from, to)
+                subList.each { def row ->
+                    currentColumnIndex = from
+                    closure(addCrudRowData(currentRowIndex, row))
+
+                    currentRowResult.each { ETLDomain key, ReferenceResult value ->
+                        if (!results.containsKey(key)) {
+                            results[key] = []
+                        }
+                        results[key].add(value)
+                    }
+
+                    currentRowResult = [:]
+                    currentRowIndex++
+                }
+
+                currentRowIndex--
+
+
+            }]
+        }]
     }
     /**
      *
