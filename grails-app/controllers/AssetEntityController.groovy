@@ -1012,7 +1012,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
 
 			// column name and its associated javascript cell formatter name
-			def formatterMap = [assetEntity:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
+			def formatterMap = [assetEntity:'assetFormatter', assetName:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
 			def moveEvent
 
 
