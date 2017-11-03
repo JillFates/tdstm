@@ -2522,7 +2522,7 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft~\nInc"
+            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
             etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
