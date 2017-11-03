@@ -162,41 +162,40 @@ class ETLProcessor {
      * @return
      */
     def from (int from) {
+
         [to: { int to ->
             [iterate: { Closure closure ->
-
                 List subList = dataSet.rows().subList(from, to)
-                subList.each { def row ->
-                    currentColumnIndex = from
-                    closure(addCrudRowData(currentRowIndex, row))
-
-                    currentRowResult.each { ETLDomain key, ReferenceResult value ->
-                        if (!results.containsKey(key)) {
-                            results[key] = []
-                        }
-                        results[key].add(value)
-                    }
-
-                    currentRowResult = [:]
-                    currentRowIndex++
-                }
-
-                currentRowIndex--
-
-
+                doIterate(subList, closure)
             }]
         }]
     }
     /**
      *
-     * Iterates and applies closure to every row in the dataSource
      *
+     *
+     * @param numbers
+     * @return
+     */
+    def using (int[] numbers) {
+
+        [iterate: { Closure closure ->
+            List rowNumbers = numbers as List
+            List rows = dataSet.rows()
+            List subList = rowNumbers.collect { rows.get(it) }
+            doIterate(subList, closure)
+        }]
+    }
+    /**
+     *
+     *
+     * @param rows
      * @param closure
      * @return
      */
-    ETLProcessor iterate (Closure closure) {
+    ETLProcessor doIterate (List rows, Closure closure) {
 
-        dataSet.eachRow { def row ->
+        rows.each { def row ->
             currentColumnIndex = 0
             closure(addCrudRowData(currentRowIndex, row))
 
@@ -213,6 +212,16 @@ class ETLProcessor {
 
         currentRowIndex--
         this
+    }
+    /**
+     *
+     * Iterates and applies closure to every row in the dataSource
+     *
+     * @param closure
+     * @return
+     */
+    ETLProcessor iterate (Closure closure) {
+        doIterate(dataSet.rows(), closure)
     }
     /**
      *
