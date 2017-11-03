@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-// import com.amazonaws.auth.BasicAWSCredentials
 import org.springframework.beans.factory.InitializingBean
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import groovy.json.JsonOutput
@@ -14,9 +13,9 @@ import groovy.util.logging.Slf4j
 // class CamelService implements ServiceMethods, InitializingBean {
 class AwsService implements InitializingBean {
 	// http://camel.apache.org/aws-sqs.html
-	static final int MAX_MESSAGES_PER_POLL = 1
+	static final int MAX_MESSAGES_PER_POLL = 10
 	static final int WAIT_TIME_SECONDS = 5
-
+	static final boolean DELETE_IF_FILTERED = false
 
 	AuditService auditService
 	GrailsApplication grailsApplication
@@ -39,7 +38,6 @@ class AwsService implements InitializingBean {
 		// TODO : The credentials should be loaded based on the project
 		accessKey = config?.tdstm?.credentials?.aws?.accessKey ?: null
 		secretKey = config?.tdstm?.credentials?.aws?.secretKey ?: null
-
 	}
 
 	/**
@@ -87,6 +85,8 @@ class AwsService implements InitializingBean {
 			url.append(MAX_MESSAGES_PER_POLL)
 			url.append('&waitTimeSeconds=')
 			url.append(WAIT_TIME_SECONDS)
+			url.append('&deleteIfFiltered=')
+			url.append(DELETE_IF_FILTERED)
 		}
 		url ? url.toString() : null
 	}
