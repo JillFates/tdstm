@@ -4,6 +4,11 @@ export class ProviderColumnModel {
 	constructor() {
 		this.columns = [
 			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 80
+			}, {
 				label: 'Name',
 				property: 'name',
 				type: 'text'
@@ -16,7 +21,7 @@ export class ProviderColumnModel {
 				property: 'dateCreated',
 				type: 'date',
 				format: '{0:d}',
-				width: 80
+				width: 170
 			}
 		];
 	}

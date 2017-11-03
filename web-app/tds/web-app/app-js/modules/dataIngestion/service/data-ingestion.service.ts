@@ -13,16 +13,6 @@ export class DataIngestionService {
 
 	private dataIngestionUrl = '../ws/dataingestion';
 
-	private mockDataProvider: Array<ProviderModel> = [
-		{
-			id: 1,
-			name: 'Service Now',
-			description: 'Description',
-			comment: 'My comment',
-			dateCreated: new Date()
-		}
-	];
-
 	constructor(private http: HttpInterceptor) {
 	}
 
@@ -42,7 +32,17 @@ export class DataIngestionService {
 	}
 
 	getProviders(): Observable<ProviderModel[]> {
-		return Observable.from(this.mockDataProvider).bufferCount(this.mockDataProvider.length);
+		return this.http.get(`${this.dataIngestionUrl}/provider/list`)
+			.map((res: Response) => {
+				let result = res.json();
+				let providerModels = result && result.status === 'success' && result.data;
+				providerModels.forEach((r) => {
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
+				});
+				return providerModels;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
@@ -74,21 +74,33 @@ export class DataIngestionService {
 	saveProvider(model: ProviderModel): Observable<ProviderModel> {
 		let postRequest = {
 			name: model.name,
-			description: model.description
+			description: model.description,
+			comment: model.comment
 		};
-		return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
+		if (!model.id) {
+			return this.http.post(`${this.dataIngestionUrl}/provider`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			return this.http.put(`${this.dataIngestionUrl}/provider/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
 	}
 
 	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
 		let postRequest = {
 			providerId: model.provider.id
 		};
-
+		if (model.id) {
+			postRequest['dataScriptId'] = model.id;
+		}
 		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
@@ -98,7 +110,11 @@ export class DataIngestionService {
 	}
 
 	validateUniquenessProviderByName(model: ProviderModel): Observable<ProviderModel> {
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, null)
+		let postRequest = {};
+		if (model.id) {
+			postRequest['providerId'] = model.id;
+		}
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

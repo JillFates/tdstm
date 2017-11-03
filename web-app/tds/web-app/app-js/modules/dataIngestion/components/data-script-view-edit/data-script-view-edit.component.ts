@@ -51,6 +51,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				if (this.modalType === ActionType.CREATE) {
 					this.dataScriptModel.provider = this.providerList[0];
 				}
+				this.dataSignature = JSON.stringify(this.dataScriptModel);
 			},
 			(err) => console.log(err));
 	}
