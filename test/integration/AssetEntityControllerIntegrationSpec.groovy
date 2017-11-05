@@ -1,6 +1,7 @@
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Shared
+import spock.lang.Unroll
 
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -63,26 +64,21 @@ class AssetEntityControllerIntegrationSpec extends Specification {
 		personService.addToProjectSecured(project, adminPerson)
 	}
 
+	@Unroll
 	def 'Test PaginationMethods.paginationMaxRowValue without user preferences'() {
-		when: 'a number is not amoung the acceptable values'
-			controller.params.max = '42'
-		then: 'the default value should be returned'
-			Pagination.MAX_DEFAULT == controller.paginationMaxRowValue('max')
+		when: 'setting the max param to a value'
+			controller.params.max = maxValue
+		then: 'the PaginationMethod.paginationMaxRowValue method should return the expect result'
+			result == controller.paginationMaxRowValue('max')
 
-		when: 'a non-numeric value is provided'	
-			controller.params.max = 'try this one'
-		then: 'the default value should be returned'
-			Pagination.MAX_DEFAULT == controller.paginationMaxRowValue('max')
-			
-		when: 'a valid value is provided'	
-			controller.params.max = Pagination.MAX_DEFAULT.toString()
-		then: 'the expected value should be returned'
-			Pagination.MAX_DEFAULT == controller.paginationMaxRowValue('max')
-			
-		when: 'the last value in the Pagination.MAX_OPTIONS is passed'	
-			controller.params.max = Pagination.MAX_OPTIONS[-1].toString()
-		then: 'the expected value should be returned'
-			Pagination.MAX_OPTIONS[-1] == controller.paginationMaxRowValue('max')
+		where:
+			maxValue							  | result					
+			'42'							   	  | Pagination.MAX_DEFAULT		// a number is not amoung the acceptable values
+			'text'								  | Pagination.MAX_DEFAULT		// a non-numeric value is provided
+			Pagination.MAX_DEFAULT.toString() 	  | Pagination.MAX_DEFAULT		// a valid value is provided
+			Pagination.MAX_OPTIONS[-1].toString() | Pagination.MAX_OPTIONS[-1]	// the last value in the Pagination.MAX_OPTIONS is passed
+			null								  | Pagination.MAX_DEFAULT		// a NULL value
+			''									  | Pagination.MAX_DEFAULT		// a blank value
 	}
 
 	def 'Test PaginationMethods.paginationMaxRowValue with user preferences'() {
