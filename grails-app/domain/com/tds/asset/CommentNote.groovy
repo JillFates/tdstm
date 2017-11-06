@@ -31,10 +31,14 @@ class CommentNote {
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()
+		// Bump the last updated date for the task this comment belongs to.
+		assetComment.lastUpdated = dateCreated
 	}
 
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+		// Bump the last updated date for the task this comment belongs to.
+		assetComment.lastUpdated = lastUpdated
 	}
 
 	String toString() {

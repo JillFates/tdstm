@@ -1,0 +1,24 @@
+<div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front"
+     style="width: 300px; left: 40%; margin-left: -100px; top: 0px;" tabindex="-1" data-keyboard="false">
+    <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+        <span id="ui-id-5" class="ui-dialog-title">Confirmation Required</span>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close"
+                role="button" aria-disabled="false" title="close" ng-click="closeConfirmation()">
+            <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
+            <span class="ui-button-text">close</span>
+        </button>
+    </div>
+    <div class="comment-dialog-content">
+        <div class="modal-body">
+            <form class="form-horizontal left-alignment ng-pristine ng-valid" data-toggle="validator" name="dialogActionForm" role="form">
+                <div class="box-body">
+                    <p style="font-size: 12px;">{{confirmMessage}}</p>
+                </div>
+            </form>
+        </div>
+        <div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
+            <button class="btn btn-primary pull-left" type="button" ng-click="onConfirmAction()"><span class="glyphicon glyphicon-ok"></span> Confirm</button>
+            <button type="button" class="pull-right btn btn-default tablesave cancel" ng-click="closeConfirmation()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
+        </div>
+    </div>
+</div>

@@ -22,6 +22,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.utils.Profiler
 import org.apache.poi.openxml4j.util.ZipSecureFile
 import org.apache.poi.ss.usermodel.*
+import org.apache.poi.xssf.streaming.SXSSFSheet
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.*
 import org.hibernate.transform.Transformers
@@ -141,7 +142,7 @@ class AssetExportService {
             // Will hold the list of the assets for each of the classes
             List asset, application, database, files
 
-            Sheet serverSheet, appSheet, dbSheet, storageSheet, titleSheet
+            Sheet serverSheet, appSheet, dbSheet, storageSheet, titleSheet, dependencySheet, roomSheet
             def exportedEntity = ""
 
             // Flags to indicate which tabs to export based on which checkboxes selected in the UI
@@ -296,12 +297,15 @@ class AssetExportService {
 
             profiler.lap(mainProfTag, 'Loaded DTAMaps')
 
-            String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
-            List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
-            Map assetDepBundleMap = new HashMap(assetDepBundleList.size())
-            assetDepBundleList.each {
-                assetDepBundleMap.put(it[0].toString(), it[1])
+            List assetDepBundleList = AssetDependencyBundle.executeQuery(
+                'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project',
+                [project:project]
+            )
+
+            Map<Long, Integer> assetDepBundleMap = assetDepBundleList.collectEntries {
+                [(it[0]): it[1]]
             }
+
             profiler.lap(mainProfTag, 'Created asset dep bundles')
 
             // Prevent! Zip bomb
@@ -318,26 +322,44 @@ class AssetExportService {
             // Device
             serverSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DEVICES)
             SpreadsheetColumnMapper serverMap = mapSheetColumnsToFields(AssetClass.DEVICE, serverSheet, project)
+			List<CellStyle> serverStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, serverSheet)
 
             // Application
             appSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.APPLICATIONS)
-            SpreadsheetColumnMapper appMap = mapSheetColumnsToFields(AssetClass.APPLICATION, appSheet, project)
+			SpreadsheetColumnMapper appMap = mapSheetColumnsToFields(AssetClass.APPLICATION, appSheet, project)
+			List<CellStyle> appStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, appSheet)
 
             // Database
             dbSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DATABASES)
             SpreadsheetColumnMapper dbMap = mapSheetColumnsToFields(AssetClass.DATABASE, dbSheet, project)
+			List<CellStyle> dbStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, dbSheet)
 
             // Storage
             storageSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.STORAGE)
             SpreadsheetColumnMapper fileMap = mapSheetColumnsToFields(AssetClass.STORAGE, storageSheet, project)
+			List<CellStyle> storageStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, storageSheet)
+
+			// Dependency
+			dependencySheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.DEPENDENCIES)
+			List<CellStyle> dependencyStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, dependencySheet)
+
+			// Room
+			roomSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.ROOM)
+			List<CellStyle> roomStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, roomSheet)
 
             // Rack
             def rackSheetColumns = []
             def rackSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.RACK)
+			List<CellStyle> rackStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, rackSheet)
+
             Row refRackRow = rackSheet.getRow(0)
             for ( int c = 0; c < refRackRow.getLastCellNum(); c++ ) {
                 rackSheetColumns << refRackRow.getCell(c).getStringCellValue()
             }
+
+			// Comments
+			def commentSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.COMMENTS)
+			List<CellStyle> commentStyles = WorkbookUtil.getHeaderStyles(workbookCellStyles, commentSheet)
 
             profiler.lap(mainProfTag, 'Read Spreadsheet Tabs')
 
@@ -511,6 +533,9 @@ class AssetExportService {
 
                 profiler.lap('Devices', 'Entering while loop')
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(serverSheet, autoResizeCols)
+
                 while (scrollableResults.next()) {
                     AssetEntity currentAsset = (AssetEntity)scrollableResults.get()[0]
                     profiler.beginSilent(silentTag)
@@ -562,16 +587,14 @@ class AssetExportService {
                             }
                         }
 
+						def colVal = ''
                         switch(colName) {
                             case 'Id':
-								WorkbookUtil.addCell(row, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+								colVal = currentAsset.id
                                 break
 
                             case 'DepGroup':
-                                def depGroupId = assetDepBundleMap[currentAsset.id.toString()]
-                                if (depGroupId != null) {
-									WorkbookUtil.addCell(row, colNum, depGroupId)
-                                }
+								colVal = assetDepBundleMap[currentAsset.id]
                                 break
 
                             case ~/usize|SourcePos|TargetPos/:
@@ -580,16 +603,16 @@ class AssetExportService {
                                 if (pos == 0) {
                                     continue
                                 }
-								WorkbookUtil.addCell(row, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+								colVal = (Double)pos
                                 break
 
                             case ~/Retire Date|Maint Expiration/:
-								WorkbookUtil.addCell(row, colNum, TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE))
+								colVal = TimeUtil.formatDate(userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE)
                                 break
 
                             case ~/Modified Date/:
                                 if (currentAsset[field]) {
-                                    WorkbookUtil.addCell(row, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE_TIME))
+                                    colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentAsset[field], TimeUtil.FORMAT_DATE_TIME)
                                 }
                                 break
 
@@ -599,13 +622,14 @@ class AssetExportService {
                                 if (chassis) {
                                     value = "id:" + chassis.id + " " + chassis.assetName
                                 }
-                                WorkbookUtil.addCell(row, colNum, value)
+                                colVal = value
                                 break
 
                             default:
-                                def value = currentAsset[field]
-                                WorkbookUtil.addCell(row, colNum, value ?: "")
+								colVal = currentAsset[field]
                         }
+
+						WorkbookUtil.addCellAndStyle(row, colNum, colVal, serverStyles)
 
                         if (profilingRow) {
                             lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
@@ -657,6 +681,7 @@ class AssetExportService {
                 } // asset.each
 
                 session.close()
+				postSheetProcess(serverSheet, autoResizeCols)
 
                 profiler.endInfo("Devices", "processed %d rows", [assetSize])
                 if (profileThresholdViolations > 0) {
@@ -705,6 +730,9 @@ class AssetExportService {
                 def numericCols = ['Id']
                 def stringCols = ['Version']
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(appSheet, autoResizeCols)
+
                 int applicationCount = 1 // Header Offset
                 while (scrollableResults.next()) {
                     Application app = (Application)scrollableResults.get()[0]
@@ -729,7 +757,7 @@ class AssetExportService {
                                 break
                             case 'DepGroup':
                                 // Find the Dependency Group that this app is bound to
-                                colVal = assetDepBundleMap[app.id.toString()]
+                                colVal = assetDepBundleMap[app.id]
                                 break
                             case ~/ShutdownBy|StartupBy|TestingBy/:
                                 colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
@@ -747,19 +775,8 @@ class AssetExportService {
                                 colVal = app[field]
                         }
 
-                        if ( colVal != null || ( (colVal instanceof String) && colVal.size() > 0 )) {
-                            if (colVal?.class.name == 'Person') {
-                                colVal = colVal.toString()
-                            }
+                        WorkbookUtil.addCellAndStyle(row, colNum, colVal, appStyles)
 
-                            if ( numericCols.contains(colName) )
-                                WorkbookUtil.addCell(row, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                            else if ( stringCols.contains(colName) ){
-                                WorkbookUtil.addCell(row, colNum, colVal.toString(), Cell.CELL_TYPE_STRING, workbookCellStyles)
-                            } else {
-                                WorkbookUtil.addCell(row, colNum, colVal.toString())
-                            }
-                        }
                     } // end columns loop
 
                     session.evict(app)
@@ -767,6 +784,9 @@ class AssetExportService {
                 } // application.each
 
                 session.close()
+
+				postSheetProcess(appSheet, autoResizeCols)
+
                 profiler.endInfo("Applications", "processed %d rows", [appSize])
             } else {
                 // Add validation for the first row
@@ -790,6 +810,9 @@ class AssetExportService {
 
                 profiler.lap("Databases", "Validations added.")
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(dbSheet, autoResizeCols)
+
                 exportedEntity += "D"
                 int databaseCount = 1 // Header Offset
 
@@ -806,31 +829,29 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-                        if (colName == "Id") {
-                            WorkbookUtil.addCell(row, colNum, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        } else if (colName == "DepGroup") {
-                            String depGroupId = assetDepBundleMap[currentDatabase.id.toString()]
-                            if (depGroupId != null) {
-                                WorkbookUtil.addCell(row, colNum, depGroupId)
-                            }
-                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            def dateValue = currentDatabase[field]
-                            if (dateValue) {
-                                if (field == 'lastUpdated') {
-                                    dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
-                                } else {
-                                    dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
-                                }
-                            } else {
-                                dateValue = ""
-                            }
-                            WorkbookUtil.addCell(row, colNum, dateValue)
-                        } else {
-                            def prop = currentDatabase[field]
-                            if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                WorkbookUtil.addCell(row, colNum, String.valueOf(currentDatabase[field]))
-                            }
-                        }
+						def colVal
+
+						switch (colName) {
+							case 'Id':
+								colVal = currentDatabase.id
+								break
+
+							case 'DepGroup':
+								colVal = assetDepBundleMap[currentDatabase.id]
+								break
+
+							default:
+								colVal = currentDatabase[field]
+								if (colVal && (field in ['retireDate', 'maintExpDate', 'lastUpdated'])) {
+									if (field == 'lastUpdated') {
+										colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
+									} else {
+										colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
+									}
+								}
+						}
+
+						WorkbookUtil.addCellAndStyle(row, colNum, colVal, dbStyles)
                     } // end columns loop
 
                     session.evict(currentDatabase)
@@ -838,6 +859,8 @@ class AssetExportService {
                 }
 
                 session.close()
+				postSheetProcess(dbSheet, autoResizeCols)
+
                 profiler.endInfo("Databases", "processed %d rows", [dbSize])
             } else {
                 // Adds validation to just the first row
@@ -861,6 +884,9 @@ class AssetExportService {
 
                 profiler.lap("Logical Storage", "Validations added.")
 
+				List<Integer> autoResizeCols = ['Id'].collect { serverMap.getColumnIndexByHeader(it) }
+				preSheetProcess(storageSheet, autoResizeCols)
+
                 exportedEntity += "F"
 
                 int filesCount = 1
@@ -876,31 +902,29 @@ class AssetExportService {
                         def field = entry.value["field"]
                         def colNum = entry.value["order"] as int
 
-                        if (colName == "Id") {
-                            WorkbookUtil.addCell(row, colNum, (currentFile.id), Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        } else if (colName == "DepGroup") {
-                            String depGroupId = assetDepBundleMap[currentFile.id.toString()]
-                            if (depGroupId != null) {
-                                WorkbookUtil.addCell(row, colNum, depGroupId)
-                            }
-                        } else if (field in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-                            def dateValue = currentFile[field]
-                            if (dateValue) {
-                                if (field == 'lastUpdated') {
-                                    dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME)
-                                } else {
-                                    dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE)
-                                }
-                            } else {
-                                dateValue = ""
-                            }
-                            WorkbookUtil.addCell(row, colNum, dateValue)
-                        } else {
-                            def prop = currentFile[field]
-                            if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                WorkbookUtil.addCell(row, colNum, String.valueOf(prop))
-                            }
-                        }
+						def colVal
+
+						switch (colName) {
+							case 'Id':
+								colVal = currentFile.id
+								break
+
+							case 'DepGroup':
+								colVal = assetDepBundleMap[currentFile.id]
+								break
+
+							default:
+								colVal = currentFile[field]
+								if (colVal && (field in ['retireDate', 'maintExpDate', 'lastUpdated'])) {
+									if (field == 'lastUpdated') {
+										colVal = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, colVal, TimeUtil.FORMAT_DATE_TIME)
+									} else {
+										colVal = TimeUtil.formatDate(userDTFormat, colVal, TimeUtil.FORMAT_DATE)
+									}
+								}
+						}
+
+						WorkbookUtil.addCellAndStyle(row, colNum, colVal, storageStyles)
 
                     } // end columns loop
 
@@ -909,6 +933,8 @@ class AssetExportService {
                 } // files.each
 
                 session.close()
+				postSheetProcess(storageSheet, autoResizeCols)
+
                 profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
             } else {
                 // Adds validations to the first row
@@ -919,7 +945,7 @@ class AssetExportService {
             //
             // Dependencies
             //
-            def dependencySheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.DEPENDENCIES)
+            dependencySheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.DEPENDENCIES)
             List depProjectionFields = [
                     'id',
                     'asset.id',
@@ -948,6 +974,9 @@ class AssetExportService {
                 WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 4, 1, optionsSize["DepStatus"],  depProjectionFields.indexOf("status"), 1, dependencySize)
                 profiler.lap("Dependencies", "Validations added.")
 
+				List<Integer> autoResizeCols = [0,1]
+				preSheetProcess(dependencySheet, autoResizeCols)
+
                 List results = AssetDependency.createCriteria().list {
                     createAlias("asset", "a")
                     createAlias("dependent", "d")
@@ -973,13 +1002,15 @@ class AssetExportService {
                     for(int i = 0; i < depProjectionFields.size(); i++){
                         def prop = dependency[i]
                         if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                            WorkbookUtil.addCell(row, i, dependency[i])
+							WorkbookUtil.addCellAndStyle(row, i, prop, dependencyStyles)
                         }
+
                     }
 					r++
                 }
 
-                profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
+				postSheetProcess(dependencySheet, autoResizeCols)
+				profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
             } else {
                 // Adds validations to the first dependency row
                 WorkbookUtil.addCellValidation(validationSheet, dependencySheet, 3, 1, optionsSize["DepType"],  depProjectionFields.indexOf("type"), 1, 1)
@@ -996,7 +1027,7 @@ class AssetExportService {
 
                 exportedEntity += "R"
 
-                def roomSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.ROOM)
+                roomSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.ROOM)
 
                 List projectionFields = [
                         "id",
@@ -1034,6 +1065,9 @@ class AssetExportService {
                     readOnly true
                 }
 
+				List<Integer> autoResizeCols = [0]
+				preSheetProcess(roomSheet, autoResizeCols)
+
                 int r = 1
                 for (Object room : results) {
                     progressCount++
@@ -1044,22 +1078,21 @@ class AssetExportService {
                     regularFields.each { col ->
                         def prop = room[col]
                         if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                            if (col == 0) {
-                                WorkbookUtil.addCell(row, 0, room[0], Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                            } else {
-                                WorkbookUtil.addCell(row, col, String.valueOf(prop ?: ""))
-                            }
+							WorkbookUtil.addCellAndStyle(row, col, prop, roomStyles)
                         }
 
                     }
                     // Export date fields using the user's TZ.
                     dateFields.each{ col->
-                        WorkbookUtil.addCell(row, col, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE_TIME) : "")
+						def prop = room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE_TIME) : ""
+						WorkbookUtil.addCellAndStyle(row, col, prop, roomStyles)
                     }
                     // Export 'source' or 'target' accordingly.
-                    WorkbookUtil.addCell(row, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
+                    WorkbookUtil.addCellAndStyle(row, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ), roomStyles)
 					r++
                 }
+
+				postSheetProcess(roomSheet, autoResizeCols)
                 profiler.endInfo("Rooms", "processed %d rows", [roomSize])
             }
 
@@ -1085,6 +1118,9 @@ class AssetExportService {
                                'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
                 ]
 
+				List<Integer> autoResizeCols = [0, 1]
+				preSheetProcess(rackSheet, autoResizeCols)
+
                 int idx = 1 //Header Offset
                 for (Object rack : racks) {
 					Row row = WorkbookUtil.getOrCreateRow(rackSheet, idx)
@@ -1094,22 +1130,21 @@ class AssetExportService {
 
                     rackSheetColumns.eachWithIndex{column, i->
                         if(column == 'rackId'){
-                            WorkbookUtil.addCell(row, 0, currentRack.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
+							WorkbookUtil.addCellAndStyle(row, 0, currentRack.id, rackStyles)
                         } else {
                             def prop = currentRack[rackMap[column]]
-                            if(column =="Source")
-                                WorkbookUtil.addCell(row, i, String.valueOf(prop == 1 ? "Source" : "Target" ))
-                            else{
-                                if ( !(prop == null || ( (prop instanceof String) && prop.size() == 0 )) ) {
-                                    WorkbookUtil.addCell(row, i, String.valueOf(prop))
-                                }
+                            if(column =="Source") {
+								prop = (prop == 1) ? 'Source' : 'Target'
+							}
 
-                            }
+							WorkbookUtil.addCellAndStyle(row, i, prop, rackStyles)
                         }
                     }
 					idx++
                 }
-                profiler.endInfo("Racks", "processed %d rows", [rackSize])
+
+				postSheetProcess(rackSheet, autoResizeCols)
+				profiler.endInfo("Racks", "processed %d rows", [rackSize])
             }
 
             //}
@@ -1151,7 +1186,7 @@ class AssetExportService {
                 exportedEntity += "M"
 
                 if (commentSize > 0) {
-                    def commentSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.COMMENTS)
+                    commentSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.COMMENTS)
 
                     def c = AssetComment.createCriteria()
                     List commentList = c {
@@ -1165,6 +1200,9 @@ class AssetExportService {
                         setReadOnly true
                     }
 
+					List<Integer> autoResizeCols = [0, 1]
+					preSheetProcess(commentSheet, autoResizeCols)
+
                     int idx = 1 //HEADER Offset
                     for (Object comm : commentList) {
                         Row row = WorkbookUtil.getOrCreateRow(commentSheet, idx)
@@ -1176,14 +1214,16 @@ class AssetExportService {
                         if (currentComment.dateCreated) {
                             dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currentComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
                         }
-                        WorkbookUtil.addCell(row, 0, currentComment.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        WorkbookUtil.addCell(row, 1, currentComment.assetEntity.id, Cell.CELL_TYPE_NUMERIC, workbookCellStyles)
-                        WorkbookUtil.addCell(row, 2, String.valueOf(currentComment.category))
-                        WorkbookUtil.addCell(row, 3, String.valueOf(dateCommentCreated))
-                        WorkbookUtil.addCell(row, 4, String.valueOf(currentComment.createdBy))
-                        WorkbookUtil.addCell(row, 5, String.valueOf(currentComment.comment))
+                        WorkbookUtil.addCellAndStyle(row, 0, currentComment.id, commentStyles)
+                        WorkbookUtil.addCellAndStyle(row, 1, currentComment.assetEntity.id, commentStyles)
+                        WorkbookUtil.addCellAndStyle(row, 2, currentComment.category, commentStyles)
+                        WorkbookUtil.addCellAndStyle(row, 3, dateCommentCreated, commentStyles)
+                        WorkbookUtil.addCellAndStyle(row, 4, currentComment.createdBy, commentStyles)
+                        WorkbookUtil.addCellAndStyle(row, 5, currentComment.comment, commentStyles)
                         idx++
                     }
+
+					postSheetProcess(commentSheet, autoResizeCols)
                 }
                 profiler.endInfo("Comments", "processed %d rows", [commentSize])
             }
@@ -1234,6 +1274,36 @@ class AssetExportService {
 
         }
     }
+
+    /**
+     * Perform some pre-process on the sheet, like the track of a column to resize it
+     * @param sheet
+     * @param autoResizeColList
+     */
+	private void preSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
+		if(sheet instanceof SXSSFSheet){
+			// Autoresize columns
+			for( Integer colIdx in autoResizeColList ) {
+				((SXSSFSheet)sheet).trackColumnForAutoSizing(colIdx)
+			}
+		}
+	}
+
+    /**
+     * Perform some post-process on the sheet, like autorisizing columns
+     * @param sheet
+     * @param autoResizeColList
+     */
+	private void postSheetProcess(Sheet sheet, List<Integer> autoResizeColList) {
+		for( Integer colIdx in autoResizeColList ) {
+			int oldColSize = sheet.getColumnWidth(colIdx)
+			sheet.autoSizeColumn(colIdx)
+			int newColSize = sheet.getColumnWidth(colIdx)
+			if(newColSize < oldColSize) {
+				sheet.setColumnWidth(colIdx, oldColSize)
+			}
+		}
+	}
 
     /**
      * This method is used to update sheet's column header with custom labels
@@ -1339,6 +1409,9 @@ class AssetExportService {
      * @param cablingSheet
      */
     void cablingReportData(List assetCablesList, Sheet cablingSheet, Map<Integer, CellStyle> workbookCellStyles) {
+		List<Integer> autoResizeCols = [1, 4]
+		preSheetProcess(cablingSheet, autoResizeCols)
+
         int rowNum = 2
         for (Object element : assetCablesList) {
 			Row row = WorkbookUtil.getOrCreateRow(cablingSheet, rowNum)
@@ -1368,6 +1441,8 @@ class AssetExportService {
             WorkbookUtil.addCell(row, 11, String.valueOf(cabling.assetLoc ?: ""))
             rowNum++
         }
+
+		postSheetProcess(cablingSheet, autoResizeCols)
     }
 
     /**

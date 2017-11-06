@@ -23,8 +23,7 @@ class AssetCommentBean implements Serializable {
 	Integer succCount
 	Long assetEntityId
 
-	// CSS class names used for the Updated, Due and Status columns
-	String updatedClass=''
+	// CSS class names used for the Due and Status columns
 	String dueClass=''
 	String statusClass=''
 	String elapsedAgo=''

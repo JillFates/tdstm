@@ -54,8 +54,6 @@
     var currentMenuId = '';
 </script>
 
-<script src="${resource(dir: 'tds/node_modules/tinymce', file: 'tinymce.min.js')}"></script>
-<script src="${resource(dir: 'tds/node_modules/tinymce/themes/modern', file: 'theme.min.js')}"></script>
 <!-- LEGACY CODE END -->
 
 <!-- Boosttrap -->

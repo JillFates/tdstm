@@ -1,14 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
+import com.tds.asset.*
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -16,24 +9,14 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.spreadsheet.SheetWrapper
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventSnapshot
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectAssetMap
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.StepSnapshot
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.domain.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -220,8 +203,8 @@ class MoveBundleService implements ServiceMethods {
 			//remove bundle and associated data
 			deleteBundle(moveBundle, project)
 		} catch (e) {
-			e.message = "Unable to remove the $moveBundle and Assets Error: $e.message"
-			throw e
+			log.error ExceptionUtil.stackTraceToString('deleting bundle and assets', e, 60)
+			throw new DomainUpdateException('Unable to remove the bundle and assets')
 		}
 	}
 
@@ -805,5 +788,19 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		return bundles
+	}
+
+	/**
+	 * Returns the bundle with the name associated to the project. If it not exist, a new bundle is created.
+	 * @param bundleName the name of the bundle to check for existence
+	 * @return project the project
+	 */
+	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
+		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
+
+		if (!moveBundle) {
+			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
+		}
+		return moveBundle
 	}
 }

@@ -817,10 +817,10 @@ class PartyRelationshipService implements ServiceMethods {
 		List<PartyRole> existingRoles = PartyRole.executeQuery('''
 			from PartyRole
 			where party = :person
-			  and roleType.description like :type
+			  and roleType.type = :type
 			  and roleType.id not in (:roles)
 			group by roleType
-		''', [person: person, type: type + '%', roles: assignedRoles])?.roleType
+		''', [person: person, type: type, roles: assignedRoles])?.roleType
 
 		if (existingRoles) {
 			PartyRole.executeUpdate('''
@@ -1050,12 +1050,12 @@ class PartyRelationshipService implements ServiceMethods {
 
 	/**
 	 * Used to get a list of Projects that a company owns, is participating as a Partner, or the client
-	 * @param company - the company to find the prjoects for
+	 * @param company - the company to find the projects for
 	 * @param project - used to filter the list to a particular project (optional)
 	 * @param sortOn - the property to sort on (default 'name')
 	 * @return A list of partners for the company
 	 */
-	List<Project> companyProjects(PartyGroup company, Project project = null) {
+	List<Project> companyProjects(PartyGroup company, Project project = null, String sortOn = 'name') {
 		assert company
 
 		def args = [company: company]
@@ -1090,6 +1090,9 @@ class PartyRelationshipService implements ServiceMethods {
 				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
 		}
+		if (projects && sortOn ) {
+			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
+		}
 
 		return projects
 	}
@@ -1121,7 +1124,7 @@ class PartyRelationshipService implements ServiceMethods {
 			 (
 				SELECT pr.party_id_to_id AS personId,
 					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
-				FROM tdstm.party_relationship pr
+				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
 					INNER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
@@ -1143,7 +1146,7 @@ class PartyRelationshipService implements ServiceMethods {
 			(
 				SELECT pr.party_id_to_id AS personId,
 					CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS fullName
-				FROM tdstm.party_relationship pr
+				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
 				WHERE pr.role_type_code_to_id in ('STAFF')

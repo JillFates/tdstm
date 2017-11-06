@@ -40,7 +40,7 @@ class DashboardController implements ControllerMethods {
 
 	@HasPermission(Permission.DashboardMenuView)
 	def index() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this, 'to view User Dashboard')
 		if (!project) return
 

@@ -203,10 +203,13 @@
 			var currentValue,currentdependencyBundle;
 
 			$(document).on('entityAssetUpdated',function (e,obj) {
-				getList(currentValue,currentdependencyBundle);
+				$('#refreshButtonId').prop('title', 'Refresh to reflect pending changes');
+				$('#refreshButtonId').addClass('warning-change');
 			});
 
 			function getList(value,dependencyBundle, force, distance, labels) {
+				$('#refreshButtonId').removeClass('warning-change');
+				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
 				var id = 'all'
 				if(dependencyBundle != null) id = dependencyBundle

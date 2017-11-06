@@ -72,14 +72,14 @@ class WorkbookUtil {
 	 * @param type
 	 * @return
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
 		CellStyle style = null
 
 		if (type != null) {
 			style = createCellStyle(sheet, type)
 		}
 
-		addCell(sheet, columnIdx, rowIdx, value, type, style)
+		return addCell(sheet, columnIdx, rowIdx, value, type, style)
 	}
 
 	/**
@@ -91,7 +91,7 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
 		Cell cell = getOrCreateCell(row, colIdx)
 
 		if(cellType) {
@@ -100,7 +100,8 @@ class WorkbookUtil {
 		if (cellStyle != null) {
 			cell.setCellStyle(cellStyle)
 		}
-		setCellValue(cell, value)
+
+		return setCellValue(cell, value)
 	}
 
 	/**
@@ -112,12 +113,12 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		CellStyle cellStyle = null
 		if(cellType){
 			cellStyle = getCellStyle(row.sheet, cellType, workbookCellStyles)
 		}
-		addCell(row, colIdx, value, cellType, cellStyle)
+		return addCell(row, colIdx, value, cellType, cellStyle)
 	}
 
 		/**
@@ -129,9 +130,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, columnIdx, value, cellType, cellStyle)
+		return addCell(row, columnIdx, value, cellType, cellStyle)
 	}
 
 	/**
@@ -143,9 +144,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, colIdx, value, cellType, workbookCellStyles)
+		return addCell(row, colIdx, value, cellType, workbookCellStyles)
 	}
 
 
@@ -171,12 +172,40 @@ class WorkbookUtil {
 	 * @param cell
 	 * @param value
 	 */
-	static void setCellValue(Cell cell, Object value) {
-		if (value instanceof Long || value instanceof Integer || value instanceof Double) {
-			cell.setCellValue((Double) value)
-		} else {
-			cell.setCellValue(value.toString())
+	static Cell setCellValue(Cell cell, Object value) {
+		switch (value) {
+			case Number :
+				cell.setCellValue((double) value)
+				break
+
+			default :
+				cell.setCellValue(value.toString())
 		}
+
+		return cell
+	}
+
+	/**
+	 * Add a cell to a row and the style
+	 * @param row
+	 * @param col
+	 * @param value
+	 * @param cellStyles
+	 * @return
+	 */
+	static Cell addCellAndStyle(Row row, int col, Object value , List<CellStyle> cellStyles) {
+		Cell cell = null
+
+		if ( value != null || ( (value instanceof String) && ((String)value).length() > 0 )) {
+			cell = addCell(row, col, value)
+
+			CellStyle cellStyle = cellStyles[col]
+			if (cellStyle) {
+				cell.cellStyle = cellStyle
+			}
+		}
+
+		return cell
 	}
 
 	static int getColumnsCount(Sheet sheet) {
@@ -308,7 +337,6 @@ class WorkbookUtil {
 	static Date getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormatter, failedIndicator=-1) {
 		Date result = null
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
-		// println "getDateTimeCellValue() called for $columnIdx,$rowIdx, cellType=${cell.getCellType()} FORMAT:'${ dateFormatter.toPattern() }'"
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BLANK:
@@ -319,34 +347,25 @@ class WorkbookUtil {
 					// Dates stored in the spreadsheet are done since they are already stored without TZ
 					Date dateInTz = cell.getDateCellValue()
 
-				// Now we need to shift the date to GMT so that it is correct TZ
+					// Now we need to shift the date to GMT so that it is correct TZ
 					result = TimeUtil.moveDateToGMT(dateInTz, tzId)
-					// println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
-
 					break
-
-				case Cell.CELL_TYPE_STRING:						String str = cell.getStringCellValue()
+				case Cell.CELL_TYPE_STRING:
+					String str = cell.getStringCellValue()
 					if (str) {
 						try {
 							// Let's not assume that the user set the Timezone on the parser
-							// println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-						TimeZone tz=TimeZone.getTimeZone(tzId)
+							TimeZone tz=TimeZone.getTimeZone(tzId)
 							dateFormatter.setTimeZone(tz)
 							result = dateFormatter.parse(str)
-					} catch (e) {
-						log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
-							// println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }"
-						//result = failedIndicator
+						} catch (e) {
+							log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
 							result = null
 						}
-						// println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-					// println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
 					}
 					break
-
 				default:
 					// If the cell type is any other value just fail
-					//result = failedIndicator
 					result = null
 					break
 			}
@@ -678,5 +697,37 @@ class WorkbookUtil {
 			}
 		}
 		return true
+	}
+
+	/**
+	 * Get a list of the Cellstyles from the header of the Spreadsheet
+	 * @param workbookCellStyles
+	 * @param sheet
+	 * @return
+	 */
+	static List<CellStyle> getHeaderStyles(Map<Integer, CellStyle> workbookCellStyles, Sheet sheet) {
+		List<CellStyle> rowStyles = []
+		Row rowHeader =  sheet.getRow(0)
+		int lastCellNum = rowHeader.getLastCellNum()
+
+		for( int i = 0; i <= lastCellNum; i++ ) {
+
+			CellStyle cellStyle = null
+			Cell cell = rowHeader.getCell(i)
+			if(cell) {
+				short dataFormat = cell.cellStyle.dataFormat
+
+				cellStyle = workbookCellStyles.get(dataFormat)
+
+				if( cellStyle == null ) {
+					cellStyle = sheet.workbook.createCellStyle()
+					cellStyle.dataFormat = dataFormat
+				}
+			}
+
+			rowStyles << cellStyle
+		}
+
+		return rowStyles
 	}
 }

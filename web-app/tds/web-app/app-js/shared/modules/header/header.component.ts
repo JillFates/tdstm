@@ -3,11 +3,10 @@ import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
-import {TranslatePipe} from '../../pipes/translate.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
-	moduleId: module.id,
 	selector: 'header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
 	providers: [TranslatePipe]
@@ -29,7 +28,7 @@ export class HeaderComponent implements AfterViewInit {
 		state: StateService,
 		notifierService: NotifierService,
 		promptService: UIPromptService) {
-		jQuery('.navbar-nav a[href!="#"]').on('click', function (e) {
+		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (state.$current.data.hasPendingChanges) {
 				e.preventDefault();
 				promptService.open(

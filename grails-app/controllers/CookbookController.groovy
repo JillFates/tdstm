@@ -11,7 +11,7 @@ class CookbookController implements ControllerMethods {
 
 	@HasPermission(Permission.CookbookView)
 	def index() {
-		licenseAdminService.checkValidForLicense()
+		licenseAdminService.checkValidForLicenseOrThrowException()
 		[userPreferenceService: userPreferenceService]
 	}
 }

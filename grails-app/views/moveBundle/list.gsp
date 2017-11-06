@@ -10,7 +10,14 @@
 			div.content-wrapper {
 				background-color: #ecf0f5 !important;
 			}
+			.k-grid-content tr td {
+				padding: 8px 12px;
+			}
+			 .k-grid{
+				 height: auto !important;
+			 }
 		</style>
+
 	</head>
 	<body>
 		<tds:subHeader title="Bundle List" crumbs="['Planning','Bundles', 'List']"/>
@@ -36,6 +43,30 @@
 		$(".menu-parent-planning-list-bundles").addClass('active');
 		$(".menu-parent-planning").addClass('active');
 		var currentDtFormat, currentTz;
+
+		function onDataBound() {
+			resizeKendo();
+		}
+
+		var toResize;
+		$(window).resize(function() {
+			clearTimeout(toResize);
+			toResize = setTimeout(function() {
+				resizeKendo();
+			}, 100);
+		});
+
+		function resizeKendo() {
+			var gridElement = $("#gridBundleList"),
+				otherElements = gridElement.children().not(".k-grid-content"),
+				otherElementsHeight = 0;
+
+			otherElements.each(function(){
+				otherElementsHeight += $(this).outerHeight();
+			});
+
+			gridElement.children(".k-grid-content").height($(window).height() - otherElementsHeight - 180);
+		}
 
 		/**
 		 * Implementing Kendo Grid for Bundle List
@@ -132,7 +163,6 @@
 						}
 					}
 				],
-                height: 540,
 				sortable: true,
 				filterable: {
 					mode: "row",
@@ -143,10 +173,10 @@
 						}
 					}
 				},
-				pageable: {
-					pageSize: 25,
-					pageSizes: [25, 100, 500, 1000]
-				}
+			 	dataBound: onDataBound,
+				 pageable: {
+					 pageSize: 50,
+				 },
 			}).data("kendoGrid");
 
 			grid.dataSource.originalFilter = grid.dataSource.filter;

@@ -77,8 +77,6 @@
                     <input type="hidden" name="id" id="moveEventId"  value="${moveEventInstance?.id}" />
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any news and any related step data?');" value="Delete" /></span>
-                    <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val())"/></span>
-                    <span class="button"><input type="button" class="delete" value="Delete Generated Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete')"/></span>
                     <span class="button"><input type="button" class="edit" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
                  </tds:hasPermission>
                 </g:form>
@@ -88,42 +86,6 @@
 	currentMenuId = "#eventMenu";
 	$(".menu-parent-planning-event-detail-list").addClass('active');
 	$(".menu-parent-planning").addClass('active');
-	function clearHistoricData( moveEventId ){
-        $("#messageDiv").hide();
-        $("#messageDiv").html("");
-        var confirmStatus = confirm("Are you sure you want to permanently clear the dashboard data for this move event?")
-        if(confirmStatus){
-        	${remoteFunction(action:'clearHistoricData', params:'\'moveEventId=\' + moveEventId ', 
-				onSuccess:"jQuery('#messageDiv').html('Dashboard History has been cleaned successfully');jQuery('#messageDiv').show()")}
-        }
-	}
-
-   	function clearTaskData(moveEventId, type){
-        $("#messageDiv").hide();
-        $("#messageDiv").html("");
-       	var confirmStatus=confirm("This process ONLY deletes tasks that were generated prior to the Cookbook feature. Any tasks that were " +
-            "created in the Cookbook must be deleted in the Cookbook History tab.\n\nAre you sure you want to permanently " +
-            type.toUpperCase() + " the recipe generated tasks for this move event?")
- 		if (confirmStatus) {
-		   	$("#messageDiv").show();
-	      	$("#messageDiv").html((type=='reset' ? 'Resetting':'Deleting')+' tasks for the move event');
-     		$.ajax({
-    			url:'../clearTaskData',type:'POST',
-    			data: {'moveEventId':moveEventId, 'type':type},
-    			success: function(data, status, xhr) {
-					var url = xhr.getResponseHeader('X-Login-URL');
-					if (url) {
-						window.location.href = url;
-					} else {
-	   					$('#messageDiv').html(xhr.status==200 ? data  : "Unexpected error occurred");						
-					}
-    			},
-    			error: function(xhr, textStatus, errorThrown) {
-    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
-    			}
-    		});		
-       	}
-   	}
 
    	function markAssetsMoved( moveEventId ){
    		 $("#messageDiv").hide();

@@ -116,7 +116,7 @@
 								<tds:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}" tabindex="16"/>
 
 								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
-								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}">
+								<td data-for="appOwner" class="${standardFieldSpecs.appOwner.imp?:''} suffleTd">
 								<tds:tooltipSpan field="${standardFieldSpecs.appOwner}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
@@ -300,6 +300,21 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366');
     $('[data-toggle="popover"]').popover();
+
+    $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
+
+        // TM-7943 - mozilla browser based hack-fix for this particular scenario when displaying tooltip popover w/ select2 component.
+        if (isMozillaBrowser) {
+            $('.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+        }
+
+    });
+
 </script>
 <style>
 	#select2-drop{ width: 200px !important; }

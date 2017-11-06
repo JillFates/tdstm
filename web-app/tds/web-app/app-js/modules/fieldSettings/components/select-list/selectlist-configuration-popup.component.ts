@@ -11,7 +11,6 @@ declare var jQuery: any;
  *
  */
 @Component({
-	moduleId: module.id,
 	selector: 'selectlist-configuration-popup',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/select-list/selectlist-configuration-popup.component.html',
 	encapsulation: ViewEncapsulation.None,
@@ -34,13 +33,15 @@ export class SelectListConfigurationPopupComponent {
 	 * Custom Field to edit.
 	 */
 	@Input() field: FieldSettingsModel;
-
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
 
 	public items: any[] = [];
 	public newItem = '';
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
+	protected sortType: string;
+	private ASCENDING_ORDER = 'asc';
+	private DESCENDING_ORDER = 'desc';
 
 	/**
 	 * Class constructor.
@@ -54,33 +55,35 @@ export class SelectListConfigurationPopupComponent {
 	 */
 	private load(): void {
 		this.newItem = '';
+		this.sortType = null;
 		this.defaultValue = null;
 		this.customService.getDistinctValues(this.domain, this.field)
-			.subscribe((value: string[]) => {
-				let udfValues: any[] = [];
-				if (this.field.constraints.values) {
-					udfValues = this.field.constraints.values
-						.filter(i => value.indexOf(i) === -1)
-						.map(i => {
-							return {
-								deletable: true,
-								value: i
-							};
-						});
-				}
-				let indexOfBlank = value.indexOf('');
+			.subscribe((distinctValues: string[]) => {
+
+				let indexOfBlank = distinctValues.indexOf('');
+				// Add blank(empty) option if its a required field or remove it if opposite.
 				if (this.field.constraints.required && indexOfBlank !== -1) {
-					value.splice(indexOfBlank, 1);
+					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === -1) {
-					value.splice(0, 0, '');
+					this.items.splice(0, 0, '');
 				}
-				let distinct = value.map(i => {
-					return {
-						deletable: false,
-						value: i
-					};
-				});
-				this.items = distinct.concat(udfValues);
+
+				// build the option items list based on distinctValues and current stored values (maintain the order).
+				if (this.field.constraints.values) {
+					for (let option of this.field.constraints.values) {
+						let indexOfDistinctValue = distinctValues.indexOf(option);
+						if (indexOfDistinctValue === -1) {
+							this.items.push( {deletable: true, value: option} );
+						} else {
+							distinctValues.splice(indexOfDistinctValue, 1);
+							this.items.push( {deletable: false, value: option} );
+						}
+					}
+				}
+
+				// add any distinctValue that was not found on original field.constraint.values at the end.
+				this.items = this.items.concat( distinctValues.map( o => { return {deletable: false, value: o}; }) );
+
 			});
 		this.defaultValue = this.field.default;
 	}
@@ -107,6 +110,10 @@ export class SelectListConfigurationPopupComponent {
 				value: this.newItem
 			});
 			this.newItem = '';
+			// sort if needed.
+			if (this.sortType) {
+				this.sortItems();
+			}
 			setTimeout(function () {
 				jQuery('#newItem').focus();
 			});
@@ -148,14 +155,33 @@ export class SelectListConfigurationPopupComponent {
 	 * Function to handle onclick Sort button event.
 	 * Auto-sort the items array, sort order is alphabetic ascending (up).
 	 */
-	public onSort(): void {
-		this.items.sort(comparator);
+	public toggleSort(): void {
+		if (!this.sortType || this.sortType === this.DESCENDING_ORDER) {
+			this.sortType = this.ASCENDING_ORDER;
+		} else {
+			this.sortType = this.DESCENDING_ORDER;
+		}
+		this.sortItems();
+	}
 
-		function comparator(a, b) {
-			if (a.value < b.value) {
+	private sortItems(): void {
+		this.items.sort(this.sortType === this.ASCENDING_ORDER ? ascendingSort : descendingSort);
+
+		function ascendingSort(a, b) {
+			if (a.value.toUpperCase() < b.value.toUpperCase()) {
 				return -1;
 			}
-			if (a.value > b.value) {
+			if (a.value.toUpperCase() > b.value.toUpperCase()) {
+				return 1;
+			}
+			return 0;
+		}
+
+		function descendingSort(a, b) {
+			if (a.value.toUpperCase() > b.value.toUpperCase()) {
+				return -1;
+			}
+			if (a.value.toUpperCase() < b.value.toUpperCase()) {
 				return 1;
 			}
 			return 0;

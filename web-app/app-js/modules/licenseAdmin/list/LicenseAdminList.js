@@ -37,7 +37,7 @@ export default class LicenseAdminList {
                 {field: 'type.name', title: 'Type',  template: '#if(data.type && data.type.name === "MULTI_PROJECT"){# Global # } else {# Single #}#'},
                 {field: 'method.name', title: 'Method', template: '<span style="text-transform: capitalize;">#=((data.method && data.method.name)? data.method.name.toLowerCase(): "" )#</span>'},
                 {field: 'method.max', title: 'Server/Tokens'},
-                {field: 'requestDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}', template: '{{ dataItem.activationDate | convertDateIntoTimeZone }}' },
+                {field: 'activationDate', title: 'Inception', type: 'date', format : '{0:dd/MMM/yyyy}', template: '{{ dataItem.activationDate | convertDateIntoTimeZone }}' },
                 {field: 'expirationDate', title: 'Expiration', type: 'date', format : '{0:dd/MMM/yyyy}', template: '{{ dataItem.expirationDate | convertDateIntoTimeZone }}' },
                 {field: 'environment', title: 'Environment', template: '<span style="text-transform: capitalize;">#=((data.environment)? data.environment.toLowerCase(): "" )#</span>'}
             ],

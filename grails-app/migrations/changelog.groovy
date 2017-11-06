@@ -178,4 +178,11 @@ databaseChangeLog = {
 	include file: '20170731-null-out-move-event-orphans-for-tasks.groovy'
 	include file: '20170816-Clear-out-possible-corrupted-Tasks-referencing-not-existing-Assets.groovy'
 	include file: '20170817-add-ProjectManageDefaults-permission.groovy'
+	include file: '20170830-Assign-a-company-as-the-owner-for-the-default-project.groovy'
+	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
+	include file: '20170814-create-dataview-table.groovy'
+	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
+	include file: '20170925-create-favorite-dataview-table.groovy'
+	include file: '20171025-create-default-bundle-for-projects.groovy'
+	include file: '20171026-add-assetclass-to-common-fields.groovy'
 }

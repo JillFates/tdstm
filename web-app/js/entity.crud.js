@@ -1100,6 +1100,40 @@ var EntityCrud = (function ($) {
 			}
 		});
 	};
+	// Private method used by fetchAssetDependencyEditView to fetch the edit view for the asset dependencies
+	var fetchAssetDependencyEditView = function (assetA, assetB, action) {
+		var editModal = pub.getEditModal();
+
+		if (editModal.length) {
+			pub.closeShowModal();
+		}
+
+		var assetDependencies = {
+			assetAId: assetA.id,
+			assetBId: assetB.id
+		};
+		var url = tdsCommon.createAppURL('/ws/asset/dependencies');
+		jQuery.ajax({
+			url: url,
+			type: 'POST',
+			data: assetDependencies,
+			success: function (resp) {
+				var currentScope = angular.element('.body').scope();
+				if(currentScope) {
+					if(currentScope.commentsScope) {
+						currentScope.commentsScope.$emit('viewAssetDependency', resp.data, action);
+					} else {
+						currentScope.$emit('viewAssetDependency', resp.data, action);
+					}
+				}
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText;
+				alert("An error occurred while loading the asset edit form." + err.substring(err.indexOf("<span>") + 6, err.indexOf("</span>")));
+				return false;
+			}
+		});
+	};
 	// Used to display the various asset class edit modal views
 	// This replaces editEntity()
 	pub.showAssetEditView = function (assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
@@ -1121,6 +1155,10 @@ var EntityCrud = (function ($) {
 				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
 				return false;
 		}
+	};
+	// Used to display the Asset Dependency modal view
+	pub.showAssetDependencyEditView = function (assetA, assetB, type) {
+		return fetchAssetDependencyEditView(assetA, assetB, type);
 	};
 
 	// Displays the detail view of the asset from ajax call in model popup

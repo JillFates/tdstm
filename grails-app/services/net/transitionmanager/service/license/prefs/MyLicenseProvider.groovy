@@ -38,13 +38,13 @@ class MyLicenseProvider extends DeserializingLicenseProvider{
 
 	@Override
 	protected byte[] getLicenseData(Object o) {
-		log.info("License to retrieve: {}", o)
+		log.debug("License to retrieve: {}", o)
 
 		String license = licenses[o]
 		if(license) {
 			try {
 				return license.decodeBase64()
-			}catch(e){
+			} catch(e) {
 				log.error(e.message)
 			}
 		}

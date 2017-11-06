@@ -119,7 +119,7 @@ class CommentService implements ServiceMethods {
 				}
 
 				// Check if the user can create comments
-				if ((params.commentType != AssetCommentType.TASK) && !canEditAsset) {
+				if ((params.commentType != AssetCommentType.TASK) && !securityService.hasPermission(Permission.CommentCreate)) {
 					log.error "saveUpdateCommentAndNotes: User don't have permission to create comments"
 					errorMsg = "User don't have permission to create comments"
 					securityService.reportViolation("User don't have permission to create comments")
@@ -724,5 +724,17 @@ class CommentService implements ServiceMethods {
 
 			[(pref.toString()): userPreferenceService.getPreference(null, pref, defaultVal)]
 		}
+	}
+
+	/**
+	 *
+	 *  Finds All Comments by an assetEntity.
+	 *
+	 *  A Comment instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity
+	 */
+	def findAllByAssetEntity(def assetEntity) {
+		AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
 	}
 }

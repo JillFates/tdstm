@@ -54,6 +54,15 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/dependencies" {
+			controller = "wsAsset"
+			action = [
+					POST:"getAssetDependencies",
+					PUT:"updateCommonAssetDependencyFields",
+					DELETE:"deleteAssetDependency",
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -370,6 +379,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/manager/license/${id}/delete" {
+			controller = "wsLicenseManager"
+			action = [
+					DELETE: "deleteLicense"
+			]
+		}
+
 		"/ws/manager/license/${id}/activate" {
 			controller = "wsLicenseManager"
 			action = [
@@ -450,10 +466,63 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/customDomain/fieldSpecsWithCommon" {
+			controller = "wsCustomDomain"
+			action = [
+				GET: "fieldSpecsWithCommon"
+			]
+		}
+
 		"/ws/security/permissions" {
 			controller = "wsSecurity"
 			action = [
 			        GET: "permissions"
+			]
+		}
+
+		"/ws/assetExplorer/views" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "listDataviews"
+			]
+		}
+
+		"/ws/assetExplorer/view/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "getDataview",
+					POST: "createDataview",
+					PUT: "updateDataview",
+					DELETE: "deleteDataview"
+			]
+		}
+
+		"/ws/assetExplorer/previewQuery" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "previewQuery"
+			]
+		}
+
+		"/ws/assetExplorer/query/$id" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "query"
+			]
+		}
+
+		"/ws/assetExplorer/favoriteDataviews" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "favoriteDataviews"
+			]
+		}
+
+		"/ws/assetExplorer/favoriteDataview/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "addFavoriteDataview",
+					DELETE: "deleteFavoriteDataview"
 			]
 		}
 

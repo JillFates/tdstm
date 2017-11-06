@@ -421,7 +421,7 @@ class UserService implements ServiceMethods {
 			def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, securityService.loadCurrentPerson()).role
 			if (teams){
 				upcomingEvents[event.id] = [moveEvent: event,
-                    teams: WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
+                    teams: WebUtil.listAsMultiValueString(teams.collect { team-> team.toString() }),
                     daysToGo: startTime > dateNow ? startTime - dateNow : (" + " + (dateNow - startTime))
 				]
 			}
@@ -561,9 +561,9 @@ class UserService implements ServiceMethods {
 
 		if (users) {
 			users.each { r ->
-				personName = (r.last_name ? r.last_name + ', ' : '') + r.first_name + (r.middle_name ? ' ' + r.middle_name : '')
+				personName = r.first_name + (r.middle_name ? ' ' + r.middle_name : '') + (r.last_name ? " " + r.last_name : '')
 				recentLogin << [personId: r.person_id, projectName: r.project_name,
-				                personName: personName, lastActivity: r.lastPage]
+				                personName: personName, lastActivity: TimeUtil.formatDateTime(r.lastPage)]
 			}
 		}
 

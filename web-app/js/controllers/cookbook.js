@@ -429,7 +429,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 		}
 
 		recipeGridActions[recipeGridAvailableActions[ind]](row);
-	}
+	};
 
 	scope.createRecipe = function() {
 		var showDialog = true;
@@ -445,7 +445,17 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			},
 			100);
 		}
-	}
+	};
+
+	// Initialize Component after rendered
+	scope.init = function() {
+		jQuery('.gridStyle').resizable({
+			minHeight: 154,
+			handles: 's'
+		})
+	};
+
+	scope.init();
 };
 
 tds.cookbook.controller.RecipesController.$inject = ['$scope', '$rootScope', '$timeout', '$log', '$location', '$anchorScroll', '$sce', '$state', '$stateParams', 'utils', 'cookbookService', 'alerts', 'recipeManager'];

@@ -1,6 +1,7 @@
 import { Ng2StateDeclaration } from '@uirouter/angular';
 import { FieldSettingsListComponent } from './components/list/field-settings-list.component';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
+import { Permission } from '../../shared/model/permission.model';
 import { FieldSettingsService } from './service/field-settings.service';
 
 export class FieldSettingsStates {
@@ -25,7 +26,7 @@ export const fieldSettingListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
 		},
 		requiresAuth: true,
-		requiresPermission: 'ProjectFieldSettingsView',
+		requiresPermission: Permission.ProjectFieldSettingsView,
 		hasPendingChanges: false
 	},
 	views: {

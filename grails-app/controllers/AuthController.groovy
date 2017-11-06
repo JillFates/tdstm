@@ -242,7 +242,7 @@ class AuthController implements ControllerMethods {
 	@Secured('! isAuthenticated()')
 	def applyNewPassword() {
 		try {
-			PasswordReset pr = securityService.applyPasswordFromPasswordReset(params.token, params.password, params.email)
+			PasswordReset pr = securityService.applyPasswordFromPasswordReset(params.token, params.password, params.confirmPassword, params.email)
 
 			EmailDispatch ed = emailDispatchService.basicEmailDispatchEntity(
 				EmailDispatchOrigin.PASSWORD_RESET,
@@ -258,7 +258,7 @@ class AuthController implements ControllerMethods {
 
 			// Login and redirect to home page
 			params.username = pr.userLogin.username
-			flash.message = 'Your new password was successfully changed.'
+			flash.message = 'Your password was changed successfully.'
 			signIn()
 		}
 		catch (e) {

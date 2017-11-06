@@ -85,11 +85,26 @@
 				if (environment.length <= 20) {
 					${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
 				} else {
-					alert(option+" can't have more than 20 characters.")
+                  	option = camelCaseToRegularForm(option);
+					alert(option + " can't have more than 20 characters.")
 				}
 			} else {
-				alert(option+" can't be blank.")
+			  	option = camelCaseToRegularForm(option);
+				alert(option + " can't be blank.")
 			}
+	}
+
+    /**
+	 * Transform a Camel Case string to a Normal Form
+	 * e.g. thisIsGood => This Is Good
+     * @param str
+     */
+	function camelCaseToRegularForm(str) {
+	  return str
+      		// insert a space before all caps
+    		.replace(/([A-Z])/g, ' $1').trim()
+      		// uppercase the first character
+      		.replace(/^./, function(str){ return str.toUpperCase(); });
 	}
 	
 	// add an asset option to the table specified by @param option (This only affects the UI)

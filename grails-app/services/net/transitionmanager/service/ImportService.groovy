@@ -48,6 +48,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.DateFormat
+import java.text.ParseException
 import java.util.regex.Matcher
 
 import static com.tdsops.tm.enums.domain.AssetClass.*
@@ -2011,6 +2012,12 @@ class ImportService implements ServiceMethods {
 			titleSheet = workbook.getSheet("Title")
 
 			if (titleSheet != null) {
+				// Validate spreadsheet project Id with current user project Id.
+				String sheetProjectId = WorkbookUtil.getStringCellValue(titleSheet, 1, 3)
+				if (!project.id.toString().equals(sheetProjectId)) {
+					throw new InvalidParamException("The spreadsheet provided project Id does not match current user project.")
+				}
+
 				try {
 					String tzId = WorkbookUtil.getStringCellValue(titleSheet, 1, 8)
 					String dateFormatType = WorkbookUtil.getStringCellValue(titleSheet, 1, 9)

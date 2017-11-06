@@ -2,7 +2,6 @@
  * Jorge Morayta
  * Defines the top-level states such as home, welcome, and login
  */
-import { Injector } from '@angular/core';
 import { TDSAppComponent } from './tds-app.component';
 import { UIRouter, TransitionService } from '@uirouter/core';
 import { AuthService } from '../shared/services/auth.service';
@@ -88,6 +87,11 @@ export function PermissionConfig(router: UIRouter) {
 }
 
 export function MiscConfig(router: UIRouter) {
+	router.stateService.defaultErrorHandler((error) => {
+		console.log(error);
+		router.stateService.go(SharedStates.ERROR.name);
+	});
+
 	const transitionService = router.transitionService;
 	transitionService.onStart({
 		to: (state) => state.data,
@@ -101,13 +105,6 @@ export function MiscConfig(router: UIRouter) {
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
 		setTimeout(() => loaderService.hide());
-	}, { priority: 10 });
-
-	transitionService.onError({
-		to: (state) => state.data
-	}, (transition) => {
-		const $state = transition.router.stateService;
-		return $state.target(SharedStates.ERROR.name, undefined, { location: false });
 	}, { priority: 10 });
 
 	transitionService.onExit({

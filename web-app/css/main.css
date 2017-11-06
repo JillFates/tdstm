@@ -370,11 +370,19 @@ tr#applicationDependentId td.class-wrap-depend {
 }
 
 .dashboard_stat_exec_tdmc_title {
-	width: 48px;
-	max-width: 48px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+    background-color: transparent;
+}
+div.dashboard_stat_exec_tdmc_title {
+    /*
+        ellipsis(text-truncate) configuration
+    */
+    min-height: 45px;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 /* ACTION BUTTONS */
@@ -582,16 +590,14 @@ td[data-for].I .select2-choice,
 	background-image: none !important;
 }
 /* NORMAL */
-td[data-for].N .select2-choice,
-.N{
+td[data-for].N.label, td.N.label {
 	background-color: #ddd !important;
 	background-image: none !important;
 }
 /* UNIMPORTANT */
-td[data-for].U .select2-choice,
-.U{
-	background-color: #F4F4F4 !important;
-	background-image: none !important;
+td[data-for].U label, td.U label{
+    background-color: #F4F4F4 !important;
+    background-image: none !important;
 }
 /* HIDDEN */
 td[data-for].H .select2-choice,

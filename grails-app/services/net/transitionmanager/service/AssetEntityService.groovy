@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
+import net.transitionmanager.domain.AppMoveEvent
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -170,7 +171,8 @@ class AssetEntityService implements ServiceMethods {
 	def securityService
 	def taskService
 	def userPreferenceService
-	def assetService
+    def assetService
+    def commentService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -604,6 +606,90 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Helper Method to de Delete a Dependency from an Asset Entity
+	 * @param project
+	 * @param assetEntity
+	 * @param dependencyId
+	 */
+	void deleteAssetEntityDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId) {
+		String error
+		try {
+			if (!assetEntity.validate() || !assetEntity.save(flush:true)) {
+				throw new DomainUpdateException('Unable to update asset ' + GormUtil.errorsAsUL(assetEntity))
+			}
+
+			// Verifying assetEntity assigned to the project
+			validateAssetsAssocToProject([assetEntity.id], project)
+
+			// Collecting dependency id and fetching the instance
+			AssetDependency toDelDepObj = dependencyId ? AssetDependency.get(dependencyId).find() : []
+
+			// Delete dependency
+			if (toDelDepObj) {
+				// Gather the assets referenced by the dependendency and make sure is associated to the project
+				validateAssetsAssocToProject([toDelDepObj.id], project)
+
+				// Delete the dependencies
+				AssetDependency.executeUpdate('delete AssetDependency where id = (:id)', [id: toDelDepObj.id])
+			}
+
+		} catch (DomainUpdateException | InvalidRequestException e) {
+			error = e.message
+		} catch (RuntimeException rte) {
+			//rte.printStackTrace()
+			log.error ExceptionUtil.stackTraceToString(rte, 60)
+			error = 'An error occurred that prevented the update'
+		}
+
+		if (error) {
+			assetEntity.discard()
+			transactionStatus.setRollbackOnly()
+			throw new DomainUpdateException(error)
+		}
+	}
+
+	private void updateAssetDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
+
+		validateAssetsAssocToProject([assetEntity.id], project)
+
+		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'dataFlowDirection', 'comment', 'c1', 'c2', 'c3', 'c4']
+
+		AssetDependency assetDependency = AssetDependency.get(dependencyId)
+		if (!assetDependency) {
+			throw new InvalidRequestException("Unable to find referenced dependency ($dependencyId)")
+		}
+
+		AssetEntity depAsset = AssetEntity.get(assetEntity.id)
+		if (!depAsset) {
+			throw new InvalidRequestException("Unable to find asset ($depAssetId)")
+		}
+
+		AssetDependency.withNewSession { hibernateSession ->
+			AssetDependency dupAd = AssetDependency.findByAssetAndDependent(assetEntity, depAsset)
+			if (dupAd && (dependencyId < 1 || (dependencyId > 0 && dependencyId != dupAd.id))) {
+				throw new InvalidRequestException("Duplicate dependencies not allow for $depAsset.assetName")
+			}
+		}
+
+		// Update the fields
+		propNames.each { String paramName ->
+			if (params.containsKey(paramName)) {
+				assetDependency[paramName] = params[paramName]
+			} else {
+				log.warn "addOrUpdateDependencies() request was missing property $paramName, user=$securityService.currentUsername, asset=$asset"
+			}
+		}
+
+		assetDependency.updatedBy = securityService.loadCurrentPerson()
+
+		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
+		if (!assetDependency.validate() || !assetDependency.save(force:true)) {
+			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
+		}
+
+	}
+
+	/**
 	 * A helper method for createOrUpdateAssetEntityAndDependencies which does the actual adds and
 	 * updates of dependencies from the web request
 	 * @param project - instance of the user's currently assigned project
@@ -861,27 +947,31 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Delete asset and associated records - use this method when we want to delete any asset
+	 * @param asset - the asset object to be deleted
 	 */
 	void deleteAsset(AssetEntity asset) {
 		deleteAssets([asset.id])
 	}
 
 	/**
-	 * Delete a List of assets and associated records - use this method when we want to delete any List of assets
-	 * @param assetIds
+	 * Used to delete a list of any of the asset class domain records. It will also delete or null the
+	 * references in other domains appropriately.
+	 * @param assetIds - a list of validated asset ids to be deleted
+	 * @return the number of assets that were deleted
 	 */
-	void deleteAssets(List<Long> assetIds) {
-		ProjectAssetMap.executeUpdate('DELETE ProjectAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
-		AssetEntityVarchar.executeUpdate('DELETE AssetEntityVarchar WHERE assetEntity.id in (:assets)', [assets: assetIds])
+	int deleteAssets(List<Long> assetIds) {
+		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
+
+		ProjectAssetMap.where { asset in assets }.deleteAll()
+		AssetEntityVarchar.where { assetEntity in assets }.deleteAll()
+
 		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
 
 		// Delete asset comments
-		AssetComment.executeUpdate('''
-			DELETE AssetComment c
-			WHERE c.assetEntity.id IN (:assets)
-			AND c.commentType != :taskType
-			''',
-			[assets: assetIds, taskType: AssetCommentType.TASK])
+		AssetComment.where {
+			assetEntity in assets
+			commentType != AssetCommentType.TASK
+		}.deleteAll()
 
 		// Null out asset references in Tasks
 		AssetComment.executeUpdate('''
@@ -891,7 +981,7 @@ class AssetEntityService implements ServiceMethods {
 			[assets: assetIds])
 
 		// Delete cabling where asset is the From in the relationship
-		AssetCableMap.executeUpdate('DELETE AssetCableMap WHERE assetFrom.id in (:assets)', [assets: assetIds])
+		AssetCableMap.where { assetFrom in assets }.deleteAll()
 
 		// Null out cable references where the asset is the To in the relationship
 		AssetCableMap.executeUpdate('''
@@ -899,13 +989,11 @@ class AssetEntityService implements ServiceMethods {
 			SET cableStatus=:status, assetTo=null, assetToPort=null
 			WHERE assetTo.id in (:assets)''', [assets: assetIds] + [status: AssetCableStatus.UNKNOWN])
 
-		AssetDependency.executeUpdate(
-			'DELETE AssetDependency WHERE asset.id in (:assets) or dependent.id in (:assets) ',
-			[assets: assetIds])
+		AssetDependency.where {
+			asset in assets || dependent in assets
+		}.deleteAll()
 
-		AssetDependencyBundle.executeUpdate(
-			'DELETE AssetDependencyBundle WHERE asset.id in (:assets)',
-			[assets: assetIds])
+		AssetDependencyBundle.where { asset in assets }.deleteAll()
 
 		// Clear any possible Chassis references
 		AssetEntity.executeUpdate('''
@@ -920,17 +1008,22 @@ class AssetEntityService implements ServiceMethods {
 			''',
 			[assets: assetIds])
 
-		ApplicationAssetMap.executeUpdate('DELETE ApplicationAssetMap WHERE asset.id in (:assets)', [assets: assetIds])
+		// Delete a few Application related domains for those where the id matches an Application. This
+		// shouldn't be an issue when deleting other asset classes because nothing will be found.
+		ApplicationAssetMap.executeUpdate('''
+			DELETE ApplicationAssetMap
+			WHERE application.id in :assetIds OR asset.id in :assetIds''',
+			[assetIds:assetIds])
 
-		// Last but not least, delete the asset itself if it is a DEVICE.
-		AssetEntity.where {
-			id in assetIds
-			assetClass == AssetClass.DEVICE
-		}.deleteAll()
-		// Then, take care of the rest (APPLICATION, DATABASE and FILES)
-		AssetEntity.where {
-			id in assetIds
-		}.deleteAll()
+		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application.id in :assetIds',
+			[assetIds:assetIds] )
+
+		// Last but not least, delete the asset itself. Note that GORM/Hibernate is smart
+		// enough to know when a subclass of AssetEntity is being references so deleting AssetEntity will
+		// delete Application, Database or other domains that extend it. Pretty cool - huh!
+		int count = AssetEntity.where { id in assetIds }.deleteAll()
+
+		return count
 	}
 
 	/**
@@ -1313,10 +1406,19 @@ class AssetEntityService implements ServiceMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 
 		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
+		def assetCommentList = []
+
+        if(securityService.hasPermission(Permission.TaskView)) {
+            assetCommentList = taskService.findAllByAssetEntity(assetEntity)
+        }
+
+        if(securityService.hasPermission(Permission.CommentView)) {
+            assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
+        }
 
 		[	assetId: assetEntity?.id,
 			assetComment: assetComment,
-			assetCommentList: AssetComment.findAllByAssetEntity(assetEntity),
+			assetCommentList: assetCommentList,
 			dependencyBundleNumber: depBundle,
 			dependentAssets: dependentAssets,
 			errors: params.errors,
@@ -1352,7 +1454,11 @@ class AssetEntityService implements ServiceMethods {
 			event: params.moveEvent,
 			fixedFilter: params.filter as Boolean,
 			filter: params.filter,
-			hasPerm: securityService.hasPermission(Permission.AssetEdit),
+            hasPerm: securityService.hasPermission(Permission.AssetEdit),
+            canViewComments: securityService.hasPermission(Permission.CommentView),
+            canViewTasks: securityService.hasPermission(Permission.TaskView),
+            canCreateComments: securityService.hasPermission(Permission.CommentCreate),
+            canCreateTasks: securityService.hasPermission(Permission.TaskCreate),
 			justPlanning: userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true',
 			modelPref: null,        // Set below
 			moveBundleId: params.moveBundleId,
@@ -1688,36 +1794,50 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Delete assets by asset type.
-	 * @param type
-	 * @param assetList - list of ids for which assets are requested to deleted
-	 * @return
+	 * Used to delete assets in bulk with a list of asset ids for a specific project
+	 * @param project - the project that the assets should belong to
+	 * @param domainToDelete - the name of the domain to be deleted
+	 * @param assetIdList - list of ids for which assets are requested to deleted
+	 * @return a count of the number of records that are deleted
 	 */
-	String deleteBulkAssets(type, assetList) {
+	String deleteBulkAssets(Project project, String type, List<String> assetIdList) {
 		def resp
-		def assetNames = []
-		try {
-			//Collecting as a list of data type long
-			assetList = assetList*.toLong()
-			if (type == "dependencies") {
-				AssetDependency.getAll(assetList).findAll().each { ad ->
-					assetNames << ad.dependent?.assetName + "  AND Asset  " + ad.asset?.assetName
-					ad.delete()
-				}
+
+		List<Long> assetIds = []
+		assetIdList.each { v ->
+			Long id = NumberUtil.toPositiveLong(v, -1)
+			if (id > 0) {
+				assetIds << id
 			}
-			else {
-				AssetEntity.getAll(assetList).findAll().each { ae ->
-					assetNames << ae.assetName
-					deleteAsset(ae)
-					ae.delete()
-				}
-			}
-			resp = "$type ${WebUtil.listAsMultiValueString(assetNames)} deleted."
-		}catch(Exception e) {
-			e.printStackTrace()
-			resp = "Error while deleting $type"
 		}
-		return resp
+		log.debug "deleteBulkAssets: $assetIds to be deleted"
+		int count = assetIds.size()
+
+		// Now make sure that the ids are associated to the project
+		List<Long> validatedAssetIds =
+			AssetEntity.where {
+				project == project
+				id in assetIds
+			}
+			.projections { property 'id' }
+			.list()
+
+		if (count != validatedAssetIds.size()) {
+			List<Long> idsNotInProject = assetIds - validatedAssetIds
+			log.warn "deleteBulkAssets called with asset ids not assigned to project ($assetIds)"
+		}
+
+		if (validatedAssetIds.size() > 0) {
+			if (type == "dependencies") {
+				count = AssetDependency.where {
+					id in validatedAssetIds
+				}.deleteAll()
+			} else {
+				count = deleteAssets(validatedAssetIds)
+			}
+		}
+
+		return "$count $type records were deleted"
 	}
 
 	/**

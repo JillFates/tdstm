@@ -49,6 +49,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	SecurityService securityService
+	MoveBundleService moveBundleService
 
 	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
 	protected static final Map<String, String> targetTeamType = [MOVE_TECH: 'targetTeamMt', CLEANER: 'targetTeamLog',
@@ -190,48 +191,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			}
 		}
 		!map.containsValue(null)
-	}
-
-	/**
-	 * Assign Assets to Bundles
-	 */
-	@Transactional
-	List<AssetEntity> saveAssetsToBundle(bundleTo, bundleFrom, assetIds) {
-		List<AssetEntity> moveBundleAssets
-
-		// remove assets from source bundle
-		if (bundleTo) {
-			MoveBundle moveBundleTo = MoveBundle.get(bundleTo)
-			assetIds.split(',')
-
-			getStringArray(assetIds).each { String assetId ->
-				if (bundleFrom) {
-					AssetEntity.executeUpdate('''
-						UPDATE AssetEntity
-						SET moveBundle=:bundleTo, project=:project
-						WHERE moveBundle.id=:bundleFromId
-						  AND id=:id
-					''', [bundleTo: bundleTo, project:  moveBundleTo.project, bundleFromId: bundleFrom.toLong()])
-				}
-				else {
-					AssetEntity.executeUpdate('''
-						UPDATE AssetEntity
-						SET moveBundle=:bundleTo, sourceTeamMt=null, targetTeamMt=null
-						WHERE id=:id
-					''', [bundleTo: bundleTo, id: assetId.toLong()])
-				}
-			}
-			moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = $bundleTo ")
-		} else{
-			AssetEntity.executeUpdate('''
-				UPDATE AssetEntity
-				SET moveBundle=null, sourceTeamMt=null, targetTeamMt=null
-				WHERE moveBundle=:bundleFrom
-				  AND id IN (:assets)''',
-				[bundleFrom: bundleFrom, assets: assetIds])
-		}
-
-		return moveBundleAssets
 	}
 
 	// get StringArray from StringList
@@ -409,24 +368,14 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	 */
 	 private MoveBundle getDtvMoveBundle(def dtv, Project project) {
 		if (dtv.correctedValue && dtv.correctedValue.toUpperCase().trim() != "NULL") {
-			return createBundleIfNotExist(dtv.correctedValue, project)
+			return moveBundleService.createBundleIfNotExist(dtv.correctedValue, project)
 		}
 		if (dtv.importValue && dtv.importValue.toUpperCase().trim() != "NULL") {
-			return createBundleIfNotExist(dtv.importValue, project)
+			return moveBundleService.createBundleIfNotExist(dtv.importValue, project)
 		}
 		if (!dtv.importValue) {
 			return project.getProjectDefaultBundle()
 		}
-	}
-
-	@Transactional
-	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
-		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
-		if (!moveBundle) {
-			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project)
-			save moveBundle
-		}
-		return moveBundle
 	}
 
 	/**

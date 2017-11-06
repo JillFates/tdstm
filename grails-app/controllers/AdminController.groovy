@@ -8,6 +8,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
@@ -87,14 +88,19 @@ class AdminController implements ControllerMethods {
 		Shell.systemLog(logStr)
 		log.info(logStr)
 
-		List results = Shell.executeCommand(cmd)
+
+		Map results = Shell.executeCommand(cmd)
 
 		// Now log the results
 		logStr = message(code: 'tdstm.admin.serviceRestartCommand.results', args: [results.toString()])
 		Shell.systemLog(logStr)
 		log.info(logStr)
 
-		render 'OK'
+		if (results.exitValue == 0) {
+			renderSuccessJson(results)
+		} else {
+			renderFailureJson(results)
+		}
 	}
 
 	@HasPermission(Permission.AdminUtilitiesAccess)

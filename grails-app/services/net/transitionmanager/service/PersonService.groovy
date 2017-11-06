@@ -1504,7 +1504,7 @@ class PersonService implements ServiceMethods {
 			// logger.debug 'getAvailableProjects() list 3: {}', projects*.id
 		}
 
-		projects.sort { it.name }
+		return projects
 	}
 
 	/**
@@ -1676,7 +1676,7 @@ class PersonService implements ServiceMethods {
 						throw new DomainUpdateException('Minimum period for changing your password has not been met')
 					}
 				}
-				securityService.setUserLoginPassword(userLogin, params.newPassword)
+				securityService.setUserLoginPassword(userLogin, params.newPassword, params.confirmPassword)
 			}
 
 			if (byAdmin && params.expiryDate && params.expiryDate != "null") {

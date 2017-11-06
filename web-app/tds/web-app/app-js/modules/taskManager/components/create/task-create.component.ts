@@ -9,7 +9,6 @@ import {StateService} from '@uirouter/angular';
 import {TaskStates} from '../../task-manager-routing.states';
 
 @Component({
-	moduleId: module.id,
 	selector: 'task-create',
 	templateUrl: '../tds/web-app/app-js/modules/taskManager/components/create/task-create.component.html'
 })

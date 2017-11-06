@@ -111,7 +111,6 @@ var Menu = function() {
 		this.getExportRunbook = function() {return this.getItem('menu-parent-planning-export-runbook');};
 		this.getListBundles = function() {return this.getItem('menu-parent-planning-list-bundles');};
 		this.getBundleDetails = function() {return this.getItem('menu-parent-planning-selected-bundle');};
-		this.getBundledAssets = function() {return this.getItem('menu-parent-planning-bundled-assets');};
 	};
 
 	this.tasks = new function() {

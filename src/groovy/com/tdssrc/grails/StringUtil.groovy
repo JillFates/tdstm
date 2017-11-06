@@ -369,4 +369,50 @@ class StringUtil {
 	static String base64DecodeToString(String str) {
 		return new String(Base64.decodeBase64(str))
 	}
+
+	/**
+	 * Returns a copy of the original string showing a number of characters in the edges and the rest of it
+	 * is changed to the given one
+	 *
+	 * "anita lava la tina" mask with 4 characters in each of the edges using '*' becomes:
+	 * "anit**********tina"
+	 *
+	 * in case that the string is shorter than the sum of the visible edges we return the original string
+	 * @param numOfCharsInEdges
+	 * @return
+	 */
+	static String maskStringCenter(String original, int numOfCharsInEdges, String character = '*') {
+
+		if ( original == null || original.size() < (numOfCharsInEdges * 2) ){
+			return original
+		}
+
+		String left = StringUtils.left(original, numOfCharsInEdges)
+		String right = StringUtils.right(original, numOfCharsInEdges)
+
+		left = StringUtils.rightPad(left, original.size() - numOfCharsInEdges, character)
+
+		return left + right
+	}
+
+	/**
+	 * Performs a check to determine if the string compareTo is similar to the given string str.
+	 * For instance for compareTo='hello', will return true if str is 'h', 'he', 'hel', 'elo' etc.
+	 * Also checks for nullity and blank of str (returns false).
+	 *
+	 * @param str - the string to compare
+	 * @param compareTo - the string to be compared to
+	 * @param caseInsensitive - flag if true will perform the comparison case insensitive (default true)
+	 * @return True if str is like compareTo.
+	 */
+	static boolean isLike( String str, String compareTo, boolean caseInsensitive=true) {
+		if (isBlank(str) || isBlank(compareTo)) {
+			return false
+		}
+		if (caseInsensitive) {
+			str = str.toUpperCase()
+			compareTo = compareTo.toUpperCase()
+		}
+		return compareTo.contains(str)
+	}
 }

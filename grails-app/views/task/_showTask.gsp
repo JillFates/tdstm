@@ -101,6 +101,10 @@
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>
 					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>
+						<td valign="top" class="value" id="taskSpecIdShowId" colspan="1" style="width: 20%">{{acData.taskSpecId}}&nbsp;</td>
+					</tr>
 					<%-- Dependencies Section --%>
 					<tr>
 						<td valign="top"><label>Dependencies:</label></td>
@@ -187,6 +191,12 @@
 					<tr>
 						<td valign="top" class="name" nowrap="nowrap"><label for="resolvedBy">Resolved By:</label></td>
 						<td valign="top" class="value" id="resolvedById" nowrap="nowrap">{{acData.personResolvedObj}}</td>
+					</tr>
+					<tr>
+						<td valign="top" class="name" nowrap="nowrap">
+							<label for="lastUpdated">Last Updated:</label>
+						</td>
+						<td valign="top" class="value" id="lastUpdated" nowrap="nowrap">{{acData.lastUpdated}}</td>
 					</tr>
 				</table>
 

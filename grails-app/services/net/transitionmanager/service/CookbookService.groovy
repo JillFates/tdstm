@@ -18,7 +18,6 @@ import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.security.Permission
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
@@ -46,15 +45,13 @@ class CookbookService implements ServiceMethods {
 	private static final List<String> allowedCatalogs = ['Event', 'Bundle', 'Application'].asImmutable()
 	private static final List<String> searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application'].asImmutable()
 
-	def controllerService
-	GrailsApplication grailsApplication
-	JdbcTemplate jdbcTemplate
-	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	def partyRelationshipService
-	def personService
-	def projectService
-	def securityService
-	def taskService
+	NamedParameterJdbcTemplate 	namedParameterJdbcTemplate
+	PartyRelationshipService 	partyRelationshipService
+	JdbcTemplate 	jdbcTemplate
+	PersonService 	personService
+	ProjectService 	projectService
+	SecurityService securityService
+	TaskService		taskService
 
 	/**
 	 * Checks if current user can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -84,7 +81,7 @@ class CookbookService implements ServiceMethods {
 	RecipeVersion createRecipe(String recipeName, String description, String recipeContext, cloneFrom) {
 		securityService.requirePermission Permission.RecipeCreate
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 
 		//TODO check this checkAccess(project)
 
@@ -134,7 +131,8 @@ class CookbookService implements ServiceMethods {
 	RecipeVersion cloneRecipe(recipeVersionId, String name, String description) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = controllerService.requiredProject
+		// TODO: 170822 oluna, have to lookup Projects that the user has access to.
+		Project project = securityService.userCurrentProjectOrException
 
 		if (!name) {
 			throw new EmptyResultException()
@@ -183,9 +181,9 @@ class CookbookService implements ServiceMethods {
 	def deleteRecipe(recipeId) {
 		securityService.requirePermission Permission.RecipeDelete
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		// Update all TaskBatch to null the reference to the recipe
 		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?', [recipe])
@@ -222,9 +220,9 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
 		if (rv == null) {
@@ -247,14 +245,23 @@ class CookbookService implements ServiceMethods {
 		return rv
 	}
 
-	void updateRecipe(long recipeId, recipeName, description) {
+	/**
+	 * Update Existing Recipe data
+	 * @param recipeId
+	 * @param recipeName
+	 * @param description
+	 * @return return the edited Recipe object
+	 */
+	Recipe updateRecipe(long recipeId, recipeName, description) {
 		//TODO check this checkAccess(project)
-		controllerService.getRequiredProject()
-
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
+		assertProject(recipe, project)
+
 		recipe.name = recipeName
 		recipe.description = description
 		save recipe
+		return recipe
 	}
 
 	/**
@@ -321,8 +328,9 @@ class CookbookService implements ServiceMethods {
 	void releaseRecipe(long recipeId) {
 		// securityService.requirePermission Permission.RecipeRelease
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
+		assertProject(recipe, project)
 
 		//TODO check this checkAccess(project)
 		def wip = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
@@ -347,21 +355,33 @@ class CookbookService implements ServiceMethods {
 	/**
 	 * Reverts the recipe to the recipeVersionId version
 	 * @param recipeVersionId the id of the recipeVersion
+	 * @return Recipe Version Applied
 	 */
-	void revertRecipe(long recipeVersionId) {
+	Recipe revertRecipe(long recipeVersionId) {
 		// securityService.requirePermission Permission.RecipeRevert ?
 
-		Project project = controllerService.requiredProject
-		RecipeVersion recipeVersion = Recipe.get(recipeVersionId)
+		Project project = securityService.userCurrentProjectOrException
+
+		RecipeVersion recipeVersion =  RecipeVersion.get(recipeVersionId)
+
+		if (recipeVersion == null) {
+			throw new IllegalArgumentException('Recipe Version Not found!')
+		}
+
 		if (recipeVersion.versionNumber == 0) {
 			throw new IllegalArgumentException('Trying to revert a WIP')
 		}
 
-		def recipe = recipeVersion.recipe
-		assertProject recipe, project
+		Recipe recipe = recipeVersion.recipe
+		assertProject(recipe, project)
 
 		recipe.releasedVersion = recipeVersion
-		recipe.save(failOnError: true)
+
+		if (! recipe.save()) {
+			throw new DomainUpdateException('Unable to save change', recipe)
+		}
+
+		return recipe
 	}
 
 	/**
@@ -372,7 +392,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	List<Map> validateSyntaxForUser(sourceCode) {
 		securityService.requirePermission Permission.RecipeEdit
-		controllerService.getRequiredProject()
+		securityService.userCurrentProjectOrException
 
 		validateSyntax(sourceCode)
 	}
@@ -599,9 +619,9 @@ class CookbookService implements ServiceMethods {
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 	List<Map> findRecipeVersions(recipeId) {
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		def arguments = [
 				"recipeId" : recipeId
@@ -659,9 +679,9 @@ class CookbookService implements ServiceMethods {
 	Recipe archivedUnarchived(recipeId, archived) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		recipe.archived = archived
 		return save(recipe)
@@ -1373,9 +1393,9 @@ class CookbookService implements ServiceMethods {
 	void defineRecipeContext(recipeId, contextId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		if (contextId == null || !contextId.isNumber()) {
 			throw new EmptyResultException('Invalid contextId')
@@ -1398,9 +1418,9 @@ class CookbookService implements ServiceMethods {
 	void deleteRecipeContext(recipeId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = controllerService.requiredProject
+		Project project = securityService.userCurrentProjectOrException
 		Recipe recipe = Recipe.get(recipeId)
-		assertProject recipe, project
+		assertProject(recipe, project)
 
 		recipe.defaultAssetId = null
 		recipe.save(flush:true, failOnError: true)

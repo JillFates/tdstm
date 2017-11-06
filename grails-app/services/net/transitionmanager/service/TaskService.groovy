@@ -28,6 +28,7 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils
@@ -53,6 +54,7 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
  * @author John Martin
  */
 @Transactional
+@Slf4j
 class TaskService implements ServiceMethods {
 
 	def controllerService
@@ -354,11 +356,11 @@ class TaskService implements ServiceMethods {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
+	AssetComment setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
 
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
-			return
+			return task
 		}
 
 		def now = TimeUtil.nowGMT()
@@ -503,7 +505,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
-	def getCssClassForStatus(status) {
+	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
 
@@ -544,7 +546,6 @@ class TaskService implements ServiceMethods {
 	/**
 	 * Returns a list of tasks paginated and filtered
 	 * @param project - the project object to filter tasks to include
-	 * @param category - a task category to filter on (optional)
 	 * @param taskToIgnore - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	 * @param moveEventId - an optionel move event to filter on
 	 * @param page - page to load
@@ -552,22 +553,13 @@ class TaskService implements ServiceMethods {
 	 * @param searchText - an optional filter to search by either task id or comment
 	 * @return
 	 */
-	def search(Project project, String category, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
+	def search(Project project, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
 
 		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
 		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
 		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
 		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
-		if (category) {
-			if (categoryList.contains(category)) {
-				query.append("AND a.category = :category ")
-				params["category"] = category
-			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '${category}'"
-				category = ""
-			}
-		}
 		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
 			// if searchText is a number, then only using task taskNumber attribute
 			if (searchText ==~ /^[0-9]+$/) {
@@ -580,10 +572,6 @@ class TaskService implements ServiceMethods {
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
 		if (taskToIgnore) {
-			if (!category && taskToIgnore.category) {
-				query.append("AND a.category = :category ")
-				params["category"] = taskToIgnore.category
-			}
 			query.append("AND a.id != :taskId ")
 			params["taskId"] = taskToIgnore.id
 
@@ -615,8 +603,22 @@ class TaskService implements ServiceMethods {
 		return [list: list, total: resultTotal[0]]
 	}
 
-	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+	/**
+	 * Calculate the index for the task in the task selection drop-down.
+	 *
+	 * @param project
+	 * @param category
+	 * @param task
+	 * @param moveEventId
+	 * @param taskId
+	 * @return 0 if the task doesn't exist, the index if it does.
+	 */
+	int searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
+		// If no task id was given, return 0.
+		if (!taskId) {
+			return 0
+		}
 		def taskIndex = 0
 
 		StringBuffer query = new StringBuffer("""
@@ -716,20 +718,6 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to clear all Task data that are associated to a specified event
-	 * @param moveEventId
-	 */
-	def resetTaskData(MoveEvent moveEvent) {
-		try {
-			def tasksMap = getMoveEventTaskLists(moveEvent.id)
-			return resetTaskDataForTasks(tasksMap)
-		} catch(e) {
-			log.error "An error occurred while trying to Reset tasks for moveEvent $moveEvent on project $moveEvent.project\n$e"
-			throw new RuntimeException("An unexpected error occured")
-		}
-	}
-
-	/**
 	 * Used to clear all Task data that are associated to a task batch
 	 * @param moveEventId
 	 */
@@ -778,45 +766,6 @@ class TaskService implements ServiceMethods {
 			throw new RuntimeException("An unexpected error occurred")
 		}
 		return msg
-	}
-
-	/**
-	 *Used to delete all Task data that are associated to a specified event. This deletes the task, notes and dependencies on other tasks.
-	 * It does not attempt to delete any tasks created by the new Batch process. This method to be deprecated post the 3.1 release.
-	 * @param moveEvent - the MoveEvent domain object that tasks are to be deleting for
-	 * @param deleteManual - boolean used to determine if manually created tasks should be deleted as well (default false)
-	 *
-	 */
-	def deleteTaskData(MoveEvent moveEvent, boolean deleteManual=false) {
-		try {
-			int depDeleted = 0
-			int taskDeleted = 0
-			int notesDeleted = 0
-
-			String andClause = deleteManual ? '' : 'AND t.autoGenerated=true'
-
-			def taskList = AssetComment.executeQuery(
-				'FROM AssetComment WHERE moveEvent=:me AND t.taskBatch IS NULL ' + andClause,
-				[me: moveEvent])
-
-			if (taskList) {
-				def ids = taskList*.id
-				depDeleted = TaskDependency.executeUpdate(
-					'DELETE FROM TaskDependency WHERE (predecessor IN (:tasks) OR assetComment IN (:tasks))',
-					[tasks: taskList])
-				notesDeleted = CommentNote.executeUpdate(
-					'DELETE FROM CommentNote WHERE assetComment.id IN (:ids)', [ids:ids])
-				taskDeleted = AssetComment.executeUpdate(
-					'DELETE FROM AssetComment WHERE id IN (:ids) AND taskBatch.id IS NULL ' + andClause,
-					[ids: ids])
-			}
-
-			"Deleted $taskDeleted tasks, $depDeleted dependencies and $notesDeleted task notes"
-		}
-		catch(e) {
-			log.error "An unexpected error occured while trying to delete autogenerated tasks for event $moveEvent for project $moveEvent.project\n$e.message"
-			throw new RuntimeException("An unexpected error occured")
-		}
 	}
 
 	/**
@@ -1147,9 +1096,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Now morph the list into a list of name: Role names
 		def list = []
 		projectStaff.each {
+			String roleDescription = it.role.toString()
 			list << [id:it.staff.id,
-				nameRole:"${it.role.description.split(':')[1]?.trim()}: $it.staff",
-				sortOn:"${it.role.description.split(':')[1]?.trim()},$it.staff.firstName $it.staff.lastName"
+				nameRole:"${roleDescription}: $it.staff",
+				sortOn:"${roleDescription},$it.staff.firstName $it.staff.lastName"
 			]
 		}
 		list.sort { it.sortOn }
@@ -5099,5 +5049,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (project == null) {
 			throw new EmptyResultException('No project selected')
 		}
+	}
+	/**
+	 *
+	 *  Finds All tasks by an assetEntity.
+     *
+     *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.TASK
+	 *
+	 * @param assetEntity
+	 */
+	def findAllByAssetEntity(def assetEntity) {
+        AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.TASK)
 	}
 }

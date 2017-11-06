@@ -1,10 +1,7 @@
 <table style="border: 0px;">
     <tbody>
     <tr class="task-template-dependency-list" ng-repeat="dependency in ngModel">
-        <td>
-            <select kendo-drop-down-list ng-model="dependency.category" k-options="categoryOptions" k-on-change="updateDependencyList(dependency)" style="width: 120px;"></select>
-        </td>
-        <td>
+        <td style="width: 313px;">
             <select class="kendo-drop-down-dependencies-subset dependencies-subset-dropdown" kendo-drop-down-list="dependency.dropdown" ng-model="dependency.taskId" k-options="taskOptionsDS(dependency, false)" style="width: 310px;"></select>
         </td>
         <td>

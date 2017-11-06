@@ -19,37 +19,36 @@ import org.codehaus.groovy.grails.web.json.JSONElement
  */
 //@CompileStatic
 @Slf4j
-class LicenseManagerService extends LicenseCommonService{
-	LicenseAdminService licenseAdminService
+class LicenseManagerService extends LicenseCommonService {
 	MailService mailService
 
-	Collection<LicensedClient> list(){
+	Collection<LicensedClient> list() {
 		LicensedClient.findAll()
 	}
 
-	LicensedClient fetch(String id){
+	LicensedClient fetch(String id) {
 		LicensedClient lic
-		if(id) {
+		if (id) {
 			lic = LicensedClient.get(id)
 		}
 
 		return lic
 	}
 
-	LicensedClient delete(String id){
+	LicensedClient delete(String id) {
 		LicensedClient lic = fetch(id)
 
-		if(lic) {
+		if (lic) {
 			lic.delete()
 		}
 
 		return lic
 	}
 
-	LicensedClient revoke(String id){
+	LicensedClient revoke(String id) {
 		LicensedClient lic = fetch(id)
 
-		if(lic) {
+		if (lic) {
 			lic.status = License.Status.TERMINATED
 			lic.save()
 		}
@@ -57,7 +56,7 @@ class LicenseManagerService extends LicenseCommonService{
 		return lic
 	}
 
-	def loadRequest(String body){
+	def loadRequest(String body) {
 		body = StringUtil.openEnvelop(License.BEGIN_REQ_TAG, License.END_REQ_TAG, body)
 		String decodedString = Smaz.decompress(Base64.decodeBase64(body))
 		JSONElement json = grails.converters.JSON.parse(decodedString)
@@ -70,10 +69,10 @@ class LicenseManagerService extends LicenseCommonService{
 		getLicenseKey(lic)
 	}
 
-	String getLicenseKey(LicensedClient lic) throws InvalidLicenseException{
-		if(lic && lic.status == License.Status.ACTIVE) {
+	String getLicenseKey(LicensedClient lic) throws InvalidLicenseException {
+		if (lic && lic.status == License.Status.ACTIVE) {
 			String errors = lic.missingPropertyErrors()
-			if(errors){
+			if (errors) {
 				throw new InvalidLicenseException(errors)
 			}
 
@@ -97,7 +96,7 @@ class LicenseManagerService extends LicenseCommonService{
 			String licString = ""
 
 			log.debug("Lets Generate a License!!")
-			if (productKey != null && validAfter != null && validBefore != null && numberOfInstances > 0){
+			if (productKey != null && validAfter != null && validBefore != null && numberOfInstances > 0) {
 				log.debug("Generating the License!!")
 				licString = generateLicense(productKey, holder, subject, numberOfInstances, validAfter, validBefore)
 			}
@@ -105,7 +104,7 @@ class LicenseManagerService extends LicenseCommonService{
 			licString = "${BEGIN_LIC_TAG}\n${licString}\n${END_LIC_TAG}"
 			log.debug("License String: {}", licString)
 			licString
-		}else{
+		} else {
 			""
 		}
 	}
@@ -121,8 +120,7 @@ class LicenseManagerService extends LicenseCommonService{
 	 * @param goodBefore
 	 * @return
 	 */
-	private String generateLicense(String productKey, String holder, String subject, int numberOfLicenses, Date goodAfter, Date goodBefore){
-		licenseAdminService.initialize()
+	private String generateLicense(String productKey, String holder, String subject, int numberOfLicenses, Date goodAfter, Date goodBefore) {
 
 		net.nicholaswilliams.java.licensing.License.Builder licenseBuilder = new net.nicholaswilliams.java.licensing.License.Builder().
 				withProductKey(productKey).
@@ -146,10 +144,15 @@ class LicenseManagerService extends LicenseCommonService{
 				build()
 		*/
 
-		byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
-		String trns = new String(Base64.encodeBase64(licenseData))
+		try {
+			byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
+			String trns = new String(Base64.encodeBase64(licenseData))
 
-		return trns
+			return trns
+		}catch(e){
+			log.error("License Creation Problem", e)
+			throw e
+		}
 	}
 
 	/**
@@ -160,9 +163,9 @@ class LicenseManagerService extends LicenseCommonService{
 	 */
 	String activate(String id) throws InvalidLicenseException{
 		LicensedClient lic = fetch(id)
-		if(lic) {
+		if (lic) {
 			String errors = lic.missingPropertyErrors()
-			if(errors){
+			if (errors) {
 				throw new InvalidLicenseException(errors)
 			}
 
@@ -177,10 +180,10 @@ class LicenseManagerService extends LicenseCommonService{
 	 * @param uuid identifier of the License to get the log from
 	 * @return List of activity tracks
 	 */
-	List<LicenseActivityTrack> activityLog(String uuid){
+	List<LicenseActivityTrack> activityLog(String uuid) {
 		LicensedClient licensedClient = fetch(uuid)
 		List<LicenseActivityTrack> log = []
-		if(licensedClient){
+		if (licensedClient) {
 			log = LicenseActivityTrack.findAllByLicensedClient(licensedClient, [sort: "dateCreated", order:"desc"])
 		}
 		log
@@ -191,7 +194,7 @@ class LicenseManagerService extends LicenseCommonService{
 	 * @param uuid identifier of the license
 	 * @return
 	 */
-	boolean emailLicense(String uuid){
+	boolean emailLicense(String uuid) {
 		LicensedClient licensedClient = fetch(uuid)
 		emailLicense(licensedClient)
 	}
@@ -201,18 +204,18 @@ class LicenseManagerService extends LicenseCommonService{
 	 * @param licensedClient license client object with the license information
 	 * @return
 	 */
-	boolean emailLicense(LicensedClient licensedClient){
+	boolean emailLicense(LicensedClient licensedClient) {
 		log.debug("SEND License Request")
 		String toEmail = licensedClient.email
 
-		if(toEmail) {
+		if (toEmail) {
 			String message = """
 				|Website Name: ${licensedClient.websitename}
 				|
 				|${getLicenseKey(licensedClient)}
 			""".stripMargin().trim()
 			String buff = ""
-			message.eachLine{ line ->
+			message.eachLine { line ->
 				buff += line.split("(?<=\\G.{50})").join('\n') +'\n'
 			}
 
@@ -223,7 +226,7 @@ class LicenseManagerService extends LicenseCommonService{
 			}
 			true
 
-		}else{
+		} else {
 			log.error("no email found for the client")
 			false
 		}

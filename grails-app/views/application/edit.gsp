@@ -290,7 +290,7 @@
 								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}" tabindex="29"/>
 
 								<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
-								<td colspan="1" nowrap="nowrap" class="${standardFieldSpecs.testingBy.imp?:''}">
+								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
@@ -338,6 +338,16 @@
 
     $(document).ready(function() {
         $('[data-toggle="popover"]').popover();
+
+        // TM-7943 - mozilla browser based hack-fix for this particular scenario when displaying tooltip popover w/ select2 component.
+        if (isMozillaBrowser) {
+            $('.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+        }
+
     });
 
 	currentMenuId = "#assetMenu";

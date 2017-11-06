@@ -43,6 +43,10 @@
 		div.timeline-wrapper #timeline {
             margin-right: 21px;
         }
+
+		div.content-wrapper div.ui-widget-header div.ui-jqgrid-view span input:disabled {
+			color: #ccc !important;
+		}
 </style>
 
 	<g:render template="../layouts/responsiveAngularResources" />
@@ -94,10 +98,10 @@
 			var step = "${step}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks"
-			var listCaption ="Tasks: \
+			var listCaption ="<label for='lbl-task-list-title'>Tasks</label>: \
 				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>\
-				<tdsactionbutton id='clearFilters' icon='' label='Clear Filters' link='" + taskManagerUrl + "'></tdsactionbutton>"
+				<span class=\"capBtn task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary action-button\"><input style=\"border: 0px; color: #2C61AA; padding:3px; font-weight: bold;\" type=\"button\" class=\"clearFilterId\" value=\"Clear Filters\" disabled=\"disabled\" onclick=\"clearFilter('taskListId')\"></span>";
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due Date', 'Status',
@@ -177,7 +181,7 @@
 		 }
 
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
+			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
 			return '<span id="span_'+options.rowId+'" class="cellWithoutBackground ' +
@@ -215,7 +219,7 @@
                 rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
         }
 		function assetFormatter(cellVal,options,rowObject){
-			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + _.escape(cellVal) + '</span>' :
+			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[17]+'\', '+rowObject[15]+')\" >' + _.escape(cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
 		}
 
@@ -292,7 +296,7 @@
             <div class="row action-bar-wrapper">
                 <div class="pull-left">
                     <div id="controlRowId">
-                        <b>Event </b>
+                        <label for="lbl-task-event-title">Event</label>
                         <g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
                         <span class="checkboxContainer action-bar">
                             <input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" />

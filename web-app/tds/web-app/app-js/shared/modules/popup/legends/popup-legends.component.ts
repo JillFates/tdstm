@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 
 @Component({
-	moduleId: module.id,
 	selector: 'popup-legends',
 	templateUrl: '../tds/web-app/app-js/shared/modules/popup/legends/popup-legends.component.html',
 	styles: [`

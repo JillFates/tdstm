@@ -8,7 +8,6 @@ class MoveBundle extends Party {
 	static final ContextType contextType = ContextType.B
 	static final String USE_FOR_PLANNING = 'useForPlanning'
 
-	Project project
 	String name
 	String description
 	Date startTime                   // Time that the MoveBundle Tasks will begin
@@ -22,6 +21,10 @@ class MoveBundle extends Party {
 	Boolean tasksCreated = false
 
 	static hasMany = [assets: AssetEntity, moveBundleSteps: MoveBundleStep, sourceRacks: Rack, targetRacks: Rack]
+
+	static belongsTo = [project: Project]
+
+	static mappedBy = [project: 'none'] // remove bidirectional mapping
 
 	static constraints = {
 		completionTime nullable: true
@@ -47,6 +50,7 @@ class MoveBundle extends Party {
 		}
 		sourceRacks joinTable: [name: 'asset_entity', key: 'move_bundle_id', column: 'rack_source_id']
 		targetRacks joinTable: [name: 'asset_entity', key: 'move_bundle_id', column: 'rack_target_id']
+		project column: 'project_id'
 	}
 
 	def beforeDelete() {

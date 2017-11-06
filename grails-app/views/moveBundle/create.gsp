@@ -1,5 +1,3 @@
-
-
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -11,7 +9,7 @@
         width: 180px;
       }
     </style>
-    <script type="text/javascript">
+     <script type="text/javascript">
       function initialize(){
 
       // This is called when the page loads to initialize Managers
@@ -118,7 +116,7 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#startTime").kendoDateTimePicker();
+                      $("#startTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="startTime" name="startTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />"
@@ -138,7 +136,7 @@
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
                     $(document).ready(function(){
-                      $("#completionTime").kendoDateTimePicker();
+                      $("#completionTime").kendoDateTimePicker({ animation: false, format:tdsCommon.kendoDateTimeFormat() });
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 180px;" id="completionTime" name="completionTime"
                                    value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />"
@@ -205,7 +203,7 @@
 
                <tr class="prop">
                 <td valign="top" class="name"><label for="useForPlanning">Use for Planning:</label></td>
-               <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" checked="checked"/></td>
+               <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked"/></td>
               </tr>
             </tbody>
           </table>
@@ -216,14 +214,13 @@
           <span class="button"><input class="save" type="submit" value="Save" onclick="return validateDates()"/></span>
         </div>
       </g:form>
-      <g:javascript>
+      <script>
         initialize();
-      </g:javascript>
+      </script>
     </div>
     <script>
     currentMenuId = "#eventMenu";
     $(".menu-parent-planning-list-bundles").addClass('active');
     $(".menu-parent-planning").addClass('active');
    </script>
-  </body>
 </html>

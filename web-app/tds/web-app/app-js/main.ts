@@ -12,7 +12,6 @@ import 'zone.js/dist/long-stack-trace-zone';
 
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {environment} from './environment/environment';
 import {TDSAppModule} from './config/tds-app.module';
 
 enableProdMode();

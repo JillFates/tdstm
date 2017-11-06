@@ -12,9 +12,9 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
+import { Permission } from '../../../../shared/model/permission.model';
 
 @Component({
-	moduleId: module.id,
 	selector: 'field-settings-list',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/list/field-settings-list.component.html'
 })
@@ -29,6 +29,8 @@ export class FieldSettingsListComponent implements OnInit {
 		search: '',
 		fieldType: 'All'
 	};
+
+	private fieldsToDelete = {};
 
 	constructor(
 		@Inject('fields') fields: Observable<DomainModel[]>,
@@ -50,6 +52,9 @@ export class FieldSettingsListComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.dataSignature = JSON.stringify(this.domains);
+		for (let domain of this.domains) {
+			this.fieldsToDelete[domain.domain] = [];
+		}
 	}
 
 	protected onTabChange(domain: string): void {
@@ -60,10 +65,23 @@ export class FieldSettingsListComponent implements OnInit {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback): void {
+	protected onSaveAll(callback: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
+
+				// remove(delete) fields if user requested
+				for (let domain of this.domains) {
+					if (this.fieldsToDelete[domain.domain].length > 0) {
+						this.fieldsToDelete[domain.domain].forEach(field => {
+							let index = domain.fields.findIndex(x => x.field === field);
+							if (index) {
+								domain.fields.splice(index, 1);
+							}
+						});
+					}
+				}
+
 				this.domains.forEach(domain => {
 					domain.fields.filter(x => x['isNew'])
 						.forEach(x => {
@@ -71,6 +89,7 @@ export class FieldSettingsListComponent implements OnInit {
 							delete x['count'];
 						});
 				});
+
 				this.fieldService.saveFieldSettings(this.domains)
 					.subscribe((res: any) => {
 						if (res.status === 'error') {
@@ -110,7 +129,7 @@ export class FieldSettingsListComponent implements OnInit {
 	}
 
 	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission('ProjectFieldSettingsEdit');
+		return this.permissionService.hasPermission(Permission.ProjectFieldSettingsEdit);
 	}
 
 	protected isDirty(): boolean {
@@ -118,6 +137,7 @@ export class FieldSettingsListComponent implements OnInit {
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.state.$current.data.hasPendingChanges = result;
 		}
+		result = result || this.hasPendingDeletes();
 		return result;
 	}
 
@@ -190,16 +210,28 @@ export class FieldSettingsListComponent implements OnInit {
 		} else {
 			this.handleSharedField(value.field, value.domain);
 		}
-
 	}
 
-	protected onDelete(value: { field: FieldSettingsModel, domain: string, callback: any }): void {
-		this.domains.filter(domain =>
-			value.field.shared ?
-				true : domain.domain === value.domain).forEach(domain => {
-					domain.fields.splice(domain.fields.indexOf(value.field), 1);
-				});
-		this.refreshGrids(value.field.shared, value.callback);
+	/**
+	 * Checks if there are any pending fields to be deleted on all the domains.
+	 * @returns {boolean}
+	 */
+	private hasPendingDeletes(): boolean {
+		for (let domain in this.fieldsToDelete) {
+			if (this.fieldsToDelete[domain].length > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Whenever the user clicks Delete button for a field on the grid, this event is called and
+	 * #this.fieldsToDelete gets updated.
+	 * @param {{domain: string; fieldsToDelete: string[]}} value
+	 */
+	protected onDelete(value: { domain: string, fieldsToDelete: string[] }): void {
+		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
 	}
 
 	protected onFilter(): void {

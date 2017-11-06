@@ -20,6 +20,23 @@ var PasswordValidation = (function ($) {
 		element.find('.ok').html(text);
 		return returnVal;
 	}
+
+    public.confirmPasswordMatch = function (password, retypedPassword, element, noMatch) {
+        var returnVal = 0;
+        color = '#cc0000';
+        text = '';
+
+        if ((password == retypedPassword)){
+            color = '#00aa00';
+            text = ' OK';
+            returnVal = 1;
+        } else {
+          //  noMatch.item = element;
+        }
+        element.css('color', color);
+        element.find('.ok').html(text);
+        return returnVal;
+    }
 	
 	public.checkPassword = function (field) {
 		var requirements = 0;
@@ -32,7 +49,7 @@ var PasswordValidation = (function ($) {
 		
 		var noMatch = {item:null};
 		var score = 0;
-		var parent = $(field).parent().parent().parent()
+		var parent = $(field).parent().parent().parent();
 		var requiredLength = parent.find('#lengthRequirementId').attr('size');
 		score += public.passwordMatch(password.toLowerCase(), parent.find('#usernameRequirementId'), new RegExp('.*' + username + '.*'), noMatch);
 		score += public.passwordMatch(password, parent.find('#lengthRequirementId'), RegExp('.{' + requiredLength + '}'), noMatch);
@@ -48,6 +65,16 @@ var PasswordValidation = (function ($) {
 		
 		return (score == 3);
 	}
+
+    public.confirmPassword = function (passwordField, retypedPasswordField) {
+        var result = 0;
+        var password = passwordField.value;
+        var retypedPassword = retypedPasswordField.value;
+        var parent = $(retypedPasswordField).parent().parent().parent();
+        var element = parent.find('#retypedPasswordMatchRequirementId');
+        result = public.confirmPasswordMatch(password.toLowerCase(), retypedPassword.toLowerCase(), element);
+        return result;
+    }
 	
 	public.togglePasswordVisibility = function (box) {
 		var newState = "text";

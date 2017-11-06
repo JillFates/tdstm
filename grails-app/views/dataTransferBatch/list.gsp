@@ -252,8 +252,8 @@
                         }
                     },
                     sort: {
-                        field: "name",
-                        dir: "asc"
+                        field: "importedAt",
+                        dir: "desc"
                     }
                 },
                 columns: [

@@ -6,12 +6,12 @@ import { NoticeFormComponent } from '../form/notice-form.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { ActionType } from '../../../../shared/model/action-type.enum';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
 import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
 import { process, State, FilterDescriptor } from '@progress/kendo-data-query';
 
 @Component({
-	moduleId: module.id,
 	selector: 'notice-list',
 	encapsulation: ViewEncapsulation.None,
 	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
@@ -136,11 +136,11 @@ export class NoticeListComponent {
 	}
 
 	protected isEditAvailable(): boolean {
-		return this.permissionService.hasPermission('NoticeEdit');
+		return this.permissionService.hasPermission(Permission.NoticeEdit);
 	}
 
 	protected isCreateAvailable(): boolean {
-		return this.permissionService.hasPermission('NoticeCreate');
+		return this.permissionService.hasPermission(Permission.NoticeCreate);
 	}
 
 }

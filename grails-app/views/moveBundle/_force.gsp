@@ -781,10 +781,9 @@ function reoptimizeGraph () {
 function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
-		/*debugger;*/
 		if (event.shiftKey)
 			return;
-		var validTags = ['use', 'svg', 'g'];
+		var validTags = ['use', 'svg', 'g', 'line'];
 		var target = event.target.correspondingUseElement || event.target;
 		var tag = target.tagName;
 
@@ -801,7 +800,6 @@ function drawContextMenu() {
 
 				$("#consoleOutputItemId").on('click', function (a, b) {
 					closeMenu();
-					console.log(data);
 				});
 
 				var showAssetItem = '<li class="tempItem show" id="showAssetItemId">Show Asset</li>';
@@ -819,7 +817,33 @@ function drawContextMenu() {
 					EntityCrud.showAssetEditView(data.assetClass, data.id);
 				});
 				//</tds:hasPermission>
+			}
 
+			// node specific items
+			if (tag == 'line') {
+
+				var data = target.__data__;
+				//console.log(data);
+
+				$("#consoleOutputItemId").on('click', function (a, b) {
+					closeMenu();
+				});
+
+				var showDependencyItem = '<li class="tempItem show" id="showDependencyItemId">Show Dependency</li>';
+				$(".customMenu").append(showDependencyItem);
+				$("#showDependencyItemId").on('click', function (a, b) {
+					closeMenu();
+					EntityCrud.showAssetDependencyEditView(data.source, data.target, 'view');
+				});
+
+				//<tds:hasPermission permission="${Permission.AssetEdit}">
+				var editDependencyItemId = '<li class="tempItem edit" id="editDependencyItemId">Edit Dependency</li>';
+				$(".customMenu").append(editDependencyItemId);
+				$("#editDependencyItemId").on('click', function (a, b) {
+					closeMenu();
+					EntityCrud.showAssetDependencyEditView(data.source, data.target, 'edit');
+				});
+				//</tds:hasPermission>
 			}
 
 			$(".customMenu").css({

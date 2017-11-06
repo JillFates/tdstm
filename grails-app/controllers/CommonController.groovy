@@ -124,7 +124,8 @@ class CommonController implements ControllerMethods {
 	def tmLinkableUrl() {
 		String errMsg
 		try {
-			def linkableUrl = params["linkableUrl"]
+			def jsonData = request.JSON
+			def linkableUrl = jsonData.linkableUrl
 			def isLinkableUrl = HtmlUtil.isMarkupURL(linkableUrl)
 			if(!isLinkableUrl){
 				errMsg = "The format of the linkable URL is invalid."

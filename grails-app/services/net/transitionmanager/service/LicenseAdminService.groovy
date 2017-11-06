@@ -19,44 +19,47 @@ import net.transitionmanager.domain.License as DomainLicense
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.license.prefs.*
 import net.transitionmanager.domain.PartyGroup
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
 
 
 @Slf4j
-class LicenseAdminService extends LicenseCommonService {
+class LicenseAdminService extends LicenseCommonService implements InitializingBean {
 	static transactional = false
 
+	private static int TTL = 15 * 60  //TODO: 20170124 Move to a config variable (default 15 min)
+
+	/**
+	 * States that can have a license in the system
+	 */
 	static enum State {
 		UNLICENSED, TERMINATED, EXPIRED, INBREACH, NONCOMPLIANT, VALID
 	}
 	static final String CACHE_NAME = "LIC_STATE"
 	CacheManager licenseCache = CacheManager.getInstance()
 
-	private boolean loaded = false
 	AssetEntityService assetEntityService
 	MailService mailService
 	SecurityService	securityService
 
+
 	/**
-	 * Initialize the license service
-	 * @param force force the reinitialization of the Service (userd in testing)
-	 * @return
+	 * Initialize the license service, configuring the cache and the licensing library
 	 */
-	def initialize(boolean force = false) {
-		log.debug("LAdmin is Enabled?: ${isEnabled()} && !loaded: ${!loaded}")
-		if(force || isEnabled() && !loaded) {
-			loaded = true
+	@Override
+	void afterPropertiesSet() throws Exception {
+		if(!licenseCache.getCache(CACHE_NAME)) {
+			log.debug("configuring cache")
+			Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, TTL, 0)
+			licenseCache.addCache(memoryOnlyCache)
+		}
+
+		if(isEnabled()) {
+			log.debug("LAdmin is Enabled?: {}", isEnabled())
 			MyLicenseProvider licenseProvider = MyLicenseProvider.getInstance()
 
-			if(!licenseCache.getCache(CACHE_NAME)) {
-				log.debug("configuring cache")
-				int ttl = 15 * 60  //TODO: 20170124 Move to a config variable
-				Cache memoryOnlyCache = new Cache(CACHE_NAME, 200, false, false, ttl, 0)
-				licenseCache.addCache(memoryOnlyCache)
-			}
-
-			log.debug("load LM?: ${isLGen()}")
 			if(isLGen()) {
 				log.debug("License Manager Enabled")
 				String keyFile = grailsApplication.config.manager?.license?.key
@@ -125,7 +128,6 @@ class LicenseAdminService extends LicenseCommonService {
 			// LicenseManager manager = LicenseManager.getInstance()
 			// log.debug("OLB: Load License")
 			// licenseProvider.addLicense("tst", "rO0ABXNyADFuZXQubmljaG9sYXN3aWxsaWFtcy5qYXZhLmxpY2Vuc2luZy5TaWduZWRMaWNlbnNlioT/n36yaoQCAAJbAA5saWNlbnNlQ29udGVudHQAAltCWwAQc2lnbmF0dXJlQ29udGVudHEAfgABeHB1cgACW0Ks8xf4BghU4AIAAHhwAAABICRMR4APL4M1cNX0873tLulzM4u0iHsTGjR3+QqdnAB3dVJIGYI15o5rDMfVcO+WtAOnzjhJobAQunl6wniNYvrzBZNYEFX+w/siIxVkVNlI98UL7kXPzWMn/sjM/UvKvKHNCYLdRBD+mpwG/IGo4YSQuxYSOlCx65kB2yHGrSEhqNQqFX5p3+6/hMePjb3ZOgOujYkosrH8Q9xenTv9jeNPdH5xBC8wjcw5HefMJJHO2RlEzuq8otkYdyd4dUEdpTjCvMN3SzUxvwqQEg4RrnGZd+cdV3bcPFFLVx233rpMw74Gdh1YMXLk82v89IRldvh2/7d8pIA5DD2334vb/4mSj8SUrNxYFvLsMnKYm64p0yLQGQGRnjv7dAgf8EQ/6HVxAH4AAwAAAQBXcYEC7z81w9XHS6lotp/ys1Nvnw1pv7F0NPhPS8CstiGdQrSbeiMU4bJ/XosTzI8uV+y4db2uJI8wq2mBoqc/iTrRFgBeEZZ3kuEtlbsywblcKFsuHcuKDEWWQOBiyzhMcb25nuJj/UDSGIl90mHiwl11YtBlbEhvnMvsa8fWOBlVE5SZgbebAs5Yf8D8ACf1bkSzf1iv1m8Op6bMcmQRYFaXtf/CD0CKyVjK9S2UfimmKQ9sse8b6zsBgvDrlBjMP+itZxY7tIflwkZhdIbIbxTRVco4Gey1GHVhMWg5UYJuMKEidpBtBGDaAqHytG1oBQ9aNoAjnLvnfTXGXf+L")
-			// log.debug("OLB: Loaded")
 			// License lic = manager.getLicense("tst") //set the license to test
 			// log.debug("License loaded (${lic.productKey} ${lic.issuer})? ${lic.goodAfterDate} - ${lic.goodBeforeDate}")
 			// END: TEST CLIENT LICENSE //
@@ -133,6 +135,11 @@ class LicenseAdminService extends LicenseCommonService {
 
 	}
 
+	/**
+	 * is the license Administrator Enabled to manage licenses
+	 * if not the system is license-free
+	 * @return
+	 */
 	boolean isEnabled(){
 		return isAdminEnabled()
 	}
@@ -154,20 +161,22 @@ class LicenseAdminService extends LicenseCommonService {
 		return getLicenseStateMap(project)?.message
 	}
 
+	/**
+	 * License Baner of the current license
+	 * @param project
+	 * @return
+	 */
 	String getLicenseBannerMessage(Project project = null){
 		return getLicenseStateMap(project)?.banner
 	}
 
+	/**
+	 * Current license State
+	 * @param project
+	 * @return
+	 */
 	State getLicenseState(Project project = null){
 		return getLicenseStateMap(project)?.state
-	}
-
-	boolean hasModule(String projectGuid, String moduleName){
-		LicenseManager manager = LicenseManager.getInstance()
-		License license = manager.getLicense("global")
-		//License license = manager.getLicense("project:<Guid>")
-		//This is only for the current license
-		license.hasLicenseForAllFeatures("module:$moduleName")
 	}
 
 	/**
@@ -183,7 +192,12 @@ class LicenseAdminService extends LicenseCommonService {
 		return licState.valid
 	}
 
-	void checkValidForLicense(Project project = null) throws InvalidLicenseException{
+	/**
+	 * check if a license exists valid to the passed project or throw an InvalidLicenseException
+	 * @param project
+	 * @throws InvalidLicenseException
+	 */
+	void checkValidForLicenseOrThrowException(Project project = null) throws InvalidLicenseException{
 		if(!isValid(project)){
 			throw new InvalidLicenseException()
 		}
@@ -196,7 +210,6 @@ class LicenseAdminService extends LicenseCommonService {
 	 * 	 // alternative idea -- boolean isValid(projectGuid, featureName)
 	 */
 	Map getLicenseStateMap(Project project = null){
-		initialize()
 
 		Map defaultValidState = [
 			state	: State.VALID,
@@ -226,11 +239,12 @@ class LicenseAdminService extends LicenseCommonService {
 		def cacheEl = cache.get(projectId)
 
 		Map licState = (Map)cacheEl?.getObjectValue()
-		licState = null  //testing proposes
 
-		// If the license wasn't in the cache then one will be created and
-		// added to the cache
+		// licState = null  //testing proposes
+
+		// If the license wasn't in the cache then one will be created and added
 		if(!licState) {
+			log.debug("LOAD LICENSE FROM STORE")
 			licState = [:]
 			cache.put(new Element(projectId, licState))
 			List<DomainLicense> licenses = DomainLicense.findAllByProjectAndStatus(projectId, DomainLicense.Status.ACTIVE) //dateCreated?
@@ -277,7 +291,10 @@ class LicenseAdminService extends LicenseCommonService {
 				licState.banner = license.bannerMessage
 
 				String currentHost = getHostName()
-				if(DomainLicense.WILDCARD != hostName && currentHost != hostName){
+				if (
+					DomainLicense.WILDCARD != hostName &&
+					! StringUtils.equalsIgnoreCase(currentHost, hostName)
+				){
 					licState.message = """
 						|Error loading license:<br/> 
 						|current host:<br/><strong>${currentHost}</strong><br/>
@@ -288,7 +305,10 @@ class LicenseAdminService extends LicenseCommonService {
 				}
 
 				String fqdn = getFQDN()
-				if(DomainLicense.WILDCARD != websitename && fqdn != websitename){
+				if (
+					DomainLicense.WILDCARD != websitename &&
+					! StringUtils.equalsIgnoreCase(fqdn, websitename)
+				){
 					licState.message = """
 						|Error loading license:<br/> 
 						|current website:<br/><strong>${fqdn}</strong><br/>
@@ -342,17 +362,29 @@ class LicenseAdminService extends LicenseCommonService {
 					license.save()
 				}
 			}
+		} else {
+			log.debug("LICENSE LOADED FROM CACHE")
 		}
 
 		return licState
 	}
 
+	/**
+	 * Check if a project is compliant to a license
+	 * @param project
+	 * @return
+	 */
 	boolean isLicenseCompliant(Project project){
  		Map licState = getLicenseStateMap(project)
 		return licState.state != State.NONCOMPLIANT
 	}
 
-
+	/**
+	 * Grace period remaining
+	 * @param gracePeriodDays
+	 * @param lastCompliantDate
+	 * @return
+	 */
 	int gracePeriodDaysRemaining(int gracePeriodDays=5, Date lastCompliantDate){
 		lastCompliantDate = lastCompliantDate ?: new Date()
 		Date graceDate = DateUtils.addDays(lastCompliantDate, gracePeriodDays)
@@ -361,19 +393,38 @@ class LicenseAdminService extends LicenseCommonService {
 	}
 
 	/**
-	 * Comments, comments, comments
+	 * loads a license provided as Domain License into the system verifying that is valid
 	 * @param license
 	 * @return
 	 */
-	boolean load(DomainLicense license){
-		initialize()
+	boolean load(DomainLicense license) {
+		//first we clear the catched licenses to validate them
+		clearCachedLicenses()
+		return checkLicense(license)
+	}
+
+	/**
+	 * check the provided license checking that is valid against the data stored in the database
+	 * @param license
+	 * @return
+	 */
+	private boolean checkLicense(DomainLicense license){
 		String id = license.id
 		String hash = license.hash
 
 		//strip the actual license from the envelope
 		hash = StringUtil.openEnvelop(LicenseCommonService.BEGIN_LIC_TAG, LicenseCommonService.END_LIC_TAG, hash)
 
+		/******
+		 * This LicenseManager variable is from the License Library, DO NOT confuse it with the TDS LM!
+		 ******/
 		LicenseManager manager = LicenseManager.getInstance()
+
+		/*******************
+		 * The License Library cache is clearead to guarantee that we are loading the latest license
+		 * from the storage instead of relying on the lib cache, for License CAche we use or own Cache
+		 * implementation using EhCache
+		 *******************/
 		manager.clearLicenseCache()
 
 		log.debug("ID: {}", id)
@@ -400,7 +451,7 @@ class LicenseAdminService extends LicenseCommonService {
 		if(licObj == null) return false
 
 		if(license.id != licObj?.productKey){
-			log.debug("[${license.id}] == [${licObj?.productKey}]")
+			log.debug("[{}] == [{}]", license.id, licObj?.productKey)
 			log.error("Error loading license data: Wrong product Key")
 		}
 
@@ -412,16 +463,22 @@ class LicenseAdminService extends LicenseCommonService {
 		String hostName 	   = jsonData.hostName
 		String websitename 	   = jsonData.websitename
 
-		log.debug("LicenseAdminService - Project: " + project)
+		log.debug("LicenseAdminService - Project: {}", project)
 
 		//if is not wildcard and Sites don't match, FAIL
-		if(DomainLicense.WILDCARD != hostName && getHostName() != hostName){
-			log.debug("[${getHostName()}] == [$hostName]")
+		if(
+			DomainLicense.WILDCARD != hostName &&
+			! StringUtils.equalsIgnoreCase(getHostName(), hostName)
+		){
+			log.debug("[{}] == [{}]", getHostName(), hostName)
 			log.error("Error loading license data: Wrong Host Name")
 		}
 
 		//if is not wildcard and sitename don't match, FAIL
-		if(DomainLicense.WILDCARD != websitename && getFQDN() != websitename){
+		if(
+			DomainLicense.WILDCARD != websitename &&
+			! StringUtils.equalsIgnoreCase(getFQDN(), websitename)
+		){
 			log.debug("[${getFQDN()}] == [$websitename]")
 			log.error("Error loading license data: Wrong Website Name")
 		}
@@ -443,8 +500,13 @@ class LicenseAdminService extends LicenseCommonService {
 
 	}
 
+	/**
+	 * Get a License Object from the LicenseLibrary
+	 * @param license
+	 * @return
+	 */
 	private License getLicenseObj(DomainLicense license){
-		load(license)
+		checkLicense(license)
 		LicenseManager manager = LicenseManager.getInstance()
 		return manager.getLicense(license.id)
 	}
@@ -525,7 +587,7 @@ class LicenseAdminService extends LicenseCommonService {
 		if(license){
 			sendMailRequest(license)
 		}else{
-			log.error("License Request identified by '${uuid}' not found")
+			log.error("License Request identified by '{}' not found", uuid)
 			false
 		}
 	}
@@ -587,6 +649,7 @@ class LicenseAdminService extends LicenseCommonService {
 		String buff
 		if(lic) {
 			String body = """
+				|from: ${lic.email}
 				|Website Name: ${lic.websitename}
 				|
 				|${lic.toEncodedMessage()}
@@ -612,7 +675,8 @@ class LicenseAdminService extends LicenseCommonService {
 
 		if(emailData) {
 			mailService.sendMail {
-				from emailData.from
+				// oluna: Next is commented since it's not needed and causes SPAM issues (TM-6738)
+				// from emailData.from
 				to emailData.toEmail
 				subject emailData.subject
 				body emailData.body
@@ -632,6 +696,9 @@ class LicenseAdminService extends LicenseCommonService {
      *
      */
     boolean deleteLicense(String uuid){
+		//Clear catched licenses forcing to recheck them
+		clearCachedLicenses()
+
 		if(uuid) {
 			DomainLicense lic = DomainLicense.get(uuid)
 			if(lic) {
@@ -644,6 +711,16 @@ class LicenseAdminService extends LicenseCommonService {
             return false
         }
     }
+
+	/**
+	 * Clears Cached licenses values to re-check them against the license API
+	 * @return
+	 */
+	private clearCachedLicenses() {
+		//I don't care removing all since only a few are enabled per instance
+		Cache cache = licenseCache.getCache(CACHE_NAME)
+		cache.removeAll()
+	}
 
 	/**
 	 * Objecto to hold the Email data in static Type style

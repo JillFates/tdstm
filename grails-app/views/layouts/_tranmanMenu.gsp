@@ -119,6 +119,12 @@
                                 Summary Table
                             </g:link>
                         </li>
+                        <li>
+                            <g:link class="mmlink" controller="module" action="asset" id="views">
+                                <g:img uri="/icons/magnifier.png" width="16" height="16"/>
+                                Asset Explorer
+                            </g:link>
+                        </li>
                         <li class="menu-child-item menu-parent-assets-application-list">
                             <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                 <tds:svgIcon name="application_menu" width="16" height="16" />
@@ -227,7 +233,6 @@
                         <li class="menu-child-item menu-parent-planning-list-bundles"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
                         <g:if test="${currProject && moveBundle}">
                             <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link></li>
-                            <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundle.id]">Bundled Assets</g:link> </li>
                         </g:if>
                         <tds:hasPermission permission="${Permission.HelpMenuView}">
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
@@ -235,7 +240,7 @@
                     </ul>
                 </li>
             </tds:hasPermission>
-            <tds:hasPermission permission="${Permission.BundleMenuView}">
+            <tds:hasPermission permission="${Permission.TaskView}">
                 <li class="dropdown menu-parent-tasks">
                     <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">

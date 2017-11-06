@@ -14,6 +14,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.UserPreferenceService
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.GormUtil
@@ -26,6 +27,7 @@ class PersonTestHelper {
 	PersonService personService
 	SecurityService securityService
 	PartyRelationshipService partyRelationshipService
+	UserPreferenceService userPreferenceService
 
 	Long adminPersonId = 100
 
@@ -33,9 +35,11 @@ class PersonTestHelper {
 		personService = ApplicationContextHolder.getService('personService')
 		securityService = ApplicationContextHolder.getService('securityService')
 		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
+		userPreferenceService = ApplicationContextHolder.getService('userPreferenceService')
 		assert (personService instanceof PersonService)
 		assert (securityService instanceof SecurityService)
 		assert (partyRelationshipService instanceof PartyRelationshipService)
+		assert (userPreferenceService instanceof UserPreferenceService)
 	}
 
 	/**
@@ -125,8 +129,15 @@ class PersonTestHelper {
 	 * @param roles - a list of role codes to create (optionally)
 	 * @return the newly created UserLogin
 	 */
-	UserLogin createUserLoginWithRoles(Person person, List roles=[]) {
-		UserLogin u = createUserLogin(person)
+	UserLogin createUserLoginWithRoles(Person person, List roles=[], Project project=null, Boolean signIn=false) {
+
+		UserLogin u
+		if (project) {
+			u = createUserLogin(person, [:], project, signIn)
+		} else {
+			u = createUserLogin(person, [:], signIn)
+		}
+
 		if (roles.size()) {
 			securityService.assignRoleCodes(person, roles)
 		}
@@ -134,13 +145,29 @@ class PersonTestHelper {
 		return u
 	}
 
+
+	/**
+	 * Used to create a UserLogin for a person with optional properties and set as default project
+	 * @param person - the person for whom to create the UserLogin
+	 * @param props - a map containing the various UserLogin properties to be set
+	 * @param project - a project object to associate the user to as the default project
+	 * @param signIn - a flag to control if the user will be logged (default false)
+	 * @return a newly minted UserLogin object
+	 */
+	UserLogin createUserLogin(Person person, Map props=null, Project project, Boolean signIn=false) {
+		UserLogin user = createUserLogin(person, props, signIn)
+		userPreferenceService.setCurrentProjectId(user, project.id)
+		return user
+	}
+
 	/**
 	 * Used to create a UserLogin for a person with optional properties
 	 * @param person - the person for whom to create the UserLogin
 	 * @param props - a map containing the various UserLogin properties to be set
+	 * @param signIn - a flag to control if the user will be logged (default false)
 	 * @return a newly minted UserLogin object
 	 */
-	UserLogin createUserLogin(Person person, Map props=null) {
+	UserLogin createUserLogin(Person person, Map props=null, Boolean signIn=false) {
 		UserLogin user = new UserLogin(person:person)
 		user.username = RandomStringUtils.randomAlphabetic(12)
 		if (props) {
@@ -158,6 +185,10 @@ class PersonTestHelper {
 
 		if (! user.save(flush:true)) {
 			throw new RuntimeException("Unable to save new UserLogin due to " + GormUtil.allErrorsString(user))
+		}
+
+		if (signIn) {
+            securityService.assumeUserIdentity(user.username, false)
 		}
 
 		return user

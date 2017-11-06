@@ -25,23 +25,20 @@ String appName = this.appName ?: null
 // Set the DEFAULT URL to use for the site
 grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
-// Restart application command
-tdstm.admin.serviceRestartCommand = "service tomcat_tranman01 restart"
-
 tdstm {
-  license.request_email = "*** EMAIL ADDRESS ***"
+	license.request_email = "*** EMAIL ADDRESS ***"
 
 	admin {
-		// The command to be executed to restart the application
-		serviceRestartCommand='service tomcat_tranman01 restart'
+		// The command to trigger the cron to restart the application. The file location will be managed in the
+		// installer.
+		serviceRestartCommand='touch /tmp/tm-restartme.now'
 	}
 
-  qztray{
-	  //relative to the WEB-INF, if it can't be found there, fallback to the Application's Home directory
-    keypath = 'tdstm/qztray.transitionmanager.net.key'
-    passphrase = '3#AKk3XHTc'
-  }
-
+	qztray{
+		// relative to the WEB-INF, if it can't be found there, fallback to the Application's Home directory
+		keypath = 'tdstm/qztray.transitionmanager.net.key'
+		passphrase = '3#AKk3XHTc'
+	}
 
 	security {
 
