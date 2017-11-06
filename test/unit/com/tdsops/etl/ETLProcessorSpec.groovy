@@ -1143,9 +1143,9 @@ class ETLProcessorSpec extends Specification {
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, binding, configuration)
                     .evaluate("""
-            read labels
-            max 10, 100
-        """.stripIndent(),
+                        read labels
+                        max 10, 100
+                    """.stripIndent(),
                     ETLProcessor.class.name)
 
         then: 'An MultipleCompilationErrorsException exception is not thrown'
@@ -1287,7 +1287,7 @@ class ETLProcessorSpec extends Specification {
                             def final dictionary = [prod: 'Production', dev: 'Development']
                             read labels
                             iterate {
-                                extract 'environment' transform with lowercase() translate with: dictionary
+                                extract 'environment' transform with lowercase() translate(dictionary)
                             }""".stripIndent(),
                     ETLProcessor.class.name)
 

@@ -334,10 +334,10 @@ class CommentService implements ServiceMethods {
 				}
 			}
 
-			//Save ApiAction data
+			// Assign ApiAction to task
 			if(params.containsKey("apiActionId")){
 				long id = Long.parseLong(params.apiActionId)
-				assetComment.apiAction = apiActionService.findOrCreateApiAction(id, assetComment.project)
+				assetComment.apiAction = apiActionService.find(id, assetComment.project)
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
