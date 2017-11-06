@@ -2,7 +2,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.MoveBundle
@@ -14,7 +13,6 @@ import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.SecurityService
 import com.tdsops.tm.enums.domain.SecurityRole
 import net.transitionmanager.service.SettingService
-import net.transitionmanager.service.UserPreferenceService
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import spock.lang.See
@@ -29,7 +27,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     SettingService settingService
     SecurityService securityService
     SessionFactory sessionFactory
-    UserPreferenceService userPreferenceService
 
     private ProjectTestHelper projectHelper = new ProjectTestHelper()
     private PersonTestHelper personHelper = new PersonTestHelper()
