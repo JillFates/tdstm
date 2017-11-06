@@ -4,6 +4,8 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.json.JSONConnection
+import getl.json.JSONDataset
 import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
@@ -25,7 +27,11 @@ class ETLProcessorSpec extends Specification {
     @Shared
     CSVConnection csvConnection
 
+    @Shared
+    JSONConnection jsonConnection
+
     CSVDataset simpleDataSet
+    JSONDataset jsonDataSet
     CSVDataset environmentDataSet
     CSVDataset applicationDataSet
     CSVDataset nonSanitizedDataSet
@@ -35,6 +41,7 @@ class ETLProcessorSpec extends Specification {
 
     def setupSpec () {
         csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
+        jsonConnection = new JSONConnection(config: 'json')
         FileUtils.ValidPath(conParams.path)
     }
 
@@ -53,6 +60,18 @@ class ETLProcessorSpec extends Specification {
             updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
             updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
         }
+
+        File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
+        jsonFile << """[
+                { "device id": "152254", "model name": "SRW24G1", "manufacturer name": "LINKSYS"},
+                { "device id": "152255", "model name": "ZPHA MODULE", "manufacturer name": "TippingPoint"},
+                { "device id": "152256", "model name": "Slideaway", "manufacturer name": "ATEN"}
+        ]""".stripIndent()
+
+        jsonDataSet = new JSONDataset(connection: jsonConnection, fileName: jsonFile.path, rootNode: ".", convertToList: true)
+        jsonDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+        jsonDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
+        jsonDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
 
         environmentDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
         environmentDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
@@ -311,6 +330,30 @@ class ETLProcessorSpec extends Specification {
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == sixRowsDataSet.readRows
     }
+
+    void 'test can iterate over all data source rows from a json dataset' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(jsonDataSet)
+
+        and:
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'The current row index is the last row in data source'
+            etlProcessor.currentRowIndex == jsonDataSet.readRows
+    }
+
     /**
      *
      *
