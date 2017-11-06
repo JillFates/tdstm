@@ -503,6 +503,16 @@
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
         $('[data-toggle="popover"]').popover();
-	})(jQuery);
+
+        // TM-7943 - mozilla browser based hack-fix for this particular scenario when displaying tooltip popover w/ select2 component.
+        if (isMozillaBrowser) {
+            $('.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+        }
+
+    })(jQuery);
 
 </script>
