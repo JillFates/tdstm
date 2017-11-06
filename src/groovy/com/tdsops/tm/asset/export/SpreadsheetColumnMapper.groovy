@@ -44,23 +44,6 @@ class SpreadsheetColumnMapper {
     }
 
     /**
-     * Evaluate whether the spreadsheet has missing headers with respect to the standard fields
-     * @return
-     */
-    boolean hasMissingHeaders() {
-        return CollectionUtils.isNotEmpty(getMissingHeaders())
-    }
-
-    /**
-     * Find and returns the list of missing standard column headers in the spreadsheet
-     * @return
-     */
-    Set<String> getMissingHeaders() {
-        List<String> standardHeaders = standardFields*.label
-        return standardHeaders - templateHeaders
-    }
-
-    /**
      * Get current column mapper sheet name
      * @return
      */

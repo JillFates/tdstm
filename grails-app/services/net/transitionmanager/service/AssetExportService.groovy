@@ -371,17 +371,6 @@ class AssetExportService {
                 return out
             }
 
-            // If there are standard headers not found in the workbook, it will return Error message
-            def missingHeaders = []
-            for (SpreadsheetColumnMapper spreadsheetColumnMapper in [serverMap, appMap, dbMap, fileMap]) {
-                if (spreadsheetColumnMapper.hasMissingHeaders()) {
-                    missingHeaders.add("${spreadsheetColumnMapper.getSheetName()} sheet template is missing headers: ${spreadsheetColumnMapper.getMissingHeaders()}")
-                }
-            }
-            if (CollectionUtils.isNotEmpty(missingHeaders)) {
-                progressService.update(key, 100, 'Cancelled', missingHeaders.join("<br/>"))
-                return
-            }
 
             //Add Title Information to master SpreadSheet
             titleSheet = WorkbookUtil.getSheetFromWorkbook(initWorkbook, WorkbookSheetName.TITLE)
