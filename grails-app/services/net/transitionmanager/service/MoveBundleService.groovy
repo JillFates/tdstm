@@ -246,7 +246,7 @@ class MoveBundleService implements ServiceMethods {
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
 			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
-			List<MoveEvent> events = MoveEvent.findAll() // TODO this fix the issue, but change it to a more neat way
+			List<MoveEvent> events = MoveEvent.findAll()
 			events.each {
 				if (it.moveBundles.contains(moveBundle)) {
 					it.removeFromMoveBundles(moveBundle)
