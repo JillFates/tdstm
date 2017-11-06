@@ -1,52 +1,40 @@
-import {Component, Inject, ViewChild, OnInit, AfterViewInit, Input, Output, ViewEncapsulation, EventEmitter} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {StateService} from '@uirouter/angular';
+import { Component, Inject, ViewChild, OnInit, AfterViewInit, Input, ViewEncapsulation } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
+import { StateService } from '@uirouter/angular';
 
-import {ViewGroupModel} from '../../model/view.model';
-import {ViewType} from '../../model/view.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {Permission} from '../../../../shared/model/permission.model';
+import { ViewGroupModel } from '../../model/view.model';
+import { ViewType } from '../../model/view.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 
-import {AssetExplorerService} from '../../service/asset-explorer.service';
-import {AssetExplorerStates} from '../../asset-explorer-routing.states';
-
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 @Component({
 	selector: 'asset-explorer-view-selector',
+	exportAs: 'assetExplorerViewSelector',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
-			`ul.k-list .k-item.k-state-selected, ul.k-list .k-item.k-state-selected:hover {
-            color: #656565;
-            background-color: #ededed;
-        }`
+		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
 	]
 })
-export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit {
-	@Input() open? = false;
-	@Input() nameAsUrl? = true;
-	@Input() showCreate? = true;
-	@Input() isDisabled? = false;
-	@Output() onSelectView = new EventEmitter<any>();
+export class AssetExplorerViewSelectorComponent implements AfterViewInit {
+	@Input() open?= false;
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
-	private data: ViewGroupModel[];
-	private searchFilterSelector = '';
-	public defaultItem = {
-		name: 'Saved Views',
-		default: true
-	};
-	public selectedItem = '';
+	public data: ViewGroupModel[];
+	private search = '';
 
-	constructor(private service: AssetExplorerService, private stateService: StateService, private permissionService: PermissionService) {
-	}
-
-	ngOnInit(): void {
-		this.service.getReports()
-			.subscribe((result) => {
-				this.data = result;
-				this.reports = result.slice();
-			});
+	constructor(
+		private service: AssetExplorerService,
+		private stateService: StateService,
+		private permissionService: PermissionService,
+		@Inject('reports') reportsResolve: Observable<ViewGroupModel[]>) {
+		reportsResolve.subscribe((result) => {
+			this.data = result;
+			this.reports = result.slice();
+		});
 	}
 
 	ngAfterViewInit(): void {
@@ -64,9 +52,9 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	}
 
 	protected onSearch(): void {
-		let regex = new RegExp(this.searchFilterSelector, 'i');
+		let regex = new RegExp(this.search, 'i');
 		this.data = this.reports.map((reportGrp) => {
-			let item = {...reportGrp};
+			let item = { ...reportGrp };
 			item.items = item.items.filter(report => regex.test(report.name));
 			return item;
 		});
@@ -90,7 +78,7 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	protected onCreateNew(item: ViewGroupModel): void {
 		if (this.isCreateAvailable(item)) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
-				{system: item.type === ViewType.SYSTEM_VIEWS});
+				{ system: item.type === ViewType.SYSTEM_VIEWS });
 		}
 	}
 
@@ -99,7 +87,7 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 	 * @returns {boolean}
 	 */
 	protected isCreateVisible(item: ViewGroupModel): boolean {
-		return (this.showCreate && item.type !== ViewType.ALL &&
+		return (item.type !== ViewType.ALL &&
 			item.type !== ViewType.FAVORITES &&
 			item.type !== ViewType.RECENT) && this.isCreateAvailable(item);
 	}
@@ -115,13 +103,10 @@ export class AssetExplorerViewSelectorComponent implements OnInit, AfterViewInit
 
 	}
 
-	/**
-	 * When select the value, changes the title of the Select to reflect the selected item.
-	 * @param item
-	 */
-	protected onSelectItem(parent: any, item: any): void {
-		this.selectedItem = parent.name + ' > ' + item.name;
-		this.onSelectView.next({ id: item.id, name: item.name});
-		this.onToggle();
+	public loadData() {
+		this.service.getReports()
+			.subscribe(result => {
+				this.data = result as ViewGroupModel[];
+			});
 	}
 }

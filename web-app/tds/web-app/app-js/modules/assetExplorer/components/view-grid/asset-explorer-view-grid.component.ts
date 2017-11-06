@@ -1,14 +1,42 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
-import { GridDataResult, DataStateChangeEvent } from '@progress/kendo-angular-grid';
+import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-grid/asset-explorer-view-grid.component.html',
+	styles: [`
+	.btnClear {
+		margin-right: 20px !important;
+	}
+	.btnReload{
+		padding-top:7px;
+	}
+	.grid-message {
+		width:60vw;
+		text-align:center;
+	}
+	.grid-message label{
+		font-weight: normal;
+	}
+	.application .dev, .application .dat, .application .sto,
+	.device .app, .device .dat, .device .sto,
+	.database .dev, .database .app, .database .sto,
+	.storage .dev, .storage .dat, .storage .app {
+		background-color:#f4f4f4;
+	}
+	.k-grid-content-locked,
+	.k-grid-header-locked {
+		border-right-width: 5px;
+		border-right-color: #ebebeb;
+	}
+	`],
+	encapsulation: ViewEncapsulation.None
 })
 export class AssetExplorerViewGridComponent {
 
@@ -16,12 +44,10 @@ export class AssetExplorerViewGridComponent {
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 
-	mouseDown = false;
-	lastEvent: MouseEvent;
-	selectColumn: ViewColumn;
 	justPlanning = false;
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
+	showMessage = true;
 
 	state: State = {
 		skip: 0,
@@ -34,24 +60,26 @@ export class AssetExplorerViewGridComponent {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
 	}
 
-	onMouseUp(): void {
-		this.mouseDown = false;
-		this.selectColumn = null;
+	rowCallbackClass(context: RowClassArgs) {
+		let obj = {};
+		obj[context.dataItem.common_assetClass.toLowerCase()] = true;
+		return obj;
 	}
 
-	onMouseDown(event: MouseEvent, column: ViewColumn): void {
-		this.mouseDown = true;
-		this.selectColumn = column;
-		this.lastEvent = event;
+	cellCallbackClass(domain: string) {
+		let obj = {};
+		obj[domain.toLowerCase().substr(0, 3)] = true;
+		return obj;
 	}
 
-	onMouseMove(event: MouseEvent): void {
-		if (this.mouseDown) {
-			let xValueChange = event.clientX - this.lastEvent.clientX;
-			let width = this.selectColumn.width + (xValueChange);
-			this.selectColumn.width = width < (VIEW_COLUMN_MIN_WIDTH - 50) ? (VIEW_COLUMN_MIN_WIDTH - 50) : width;
-			this.lastEvent = event;
-		}
+	onClearFilters(): void {
+		this.model.columns.forEach((c: ViewColumn) => {
+			c.filter = '';
+		});
+	}
+
+	hasFilterApplied(): boolean {
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
 	}
 
 	clearText(column: ViewColumn): void {
@@ -72,16 +100,20 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	apply(data: any): void {
+		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
 		};
+		this.showMessage = data.pagination.total === 0;
 	}
 
 	clear(): void {
+		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
+		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.state = {
 			skip: 0,
 			take: this.state.take,
@@ -98,5 +130,13 @@ export class AssetExplorerViewGridComponent {
 			this.model.sort.order = state.sort[0].dir === 'asc' ? 'a' : 'd';
 		}
 		this.modelChange.emit();
+	}
+
+	onWidthChange(data: any) {
+		this.model.columns.filter((c: ViewColumn) =>
+			data[0].column.field === `${c.domain}_${c.property}`
+		).forEach((c: ViewColumn) => {
+			c.width = data[0].newWidth;
+		});
 	}
 }

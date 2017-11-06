@@ -16,9 +16,9 @@ export const en_DICTIONARY: Object = {
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'GRID': {
-			'NO_RECORDS': 'No records available.',
-			'SCHEMA_CHANGE': 'New results, click Preview button to see them.',
-			'INITIAL_VALUE': 'Hit Preview to populate grid.'
+			'NO_RECORDS': 'No records available',
+			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
+			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		}
 	},
 	'DATA_INGESTION': {
@@ -53,8 +53,13 @@ export const en_DICTIONARY: Object = {
 		'LEGEND': 'Legend',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
+		'SAVE_AS': 'Save As',
 		'DEFAULT': 'Default',
-		'SORT': 'Sort'
+		'SORT': 'Sort',
+		'ADD_FAVORITES': 'Add to Favorites',
+		'SHARE_WITH_USERS': 'Share with other users',
+		'CLEAR_FILTERS': 'Clear filters',
+		'FREEZE': 'Freeze'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

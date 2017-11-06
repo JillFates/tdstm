@@ -33,6 +33,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -64,6 +65,7 @@ class MoveBundleController implements ControllerMethods {
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+    CustomDomainService customDomainService
 
 	@HasPermission(Permission.BundleView)
 	def list() {}
@@ -642,6 +644,24 @@ class MoveBundleController implements ControllerMethods {
 
 			groups
 		}
+
+		// sort values based on custom field setting configuration
+		def customFieldSetting = customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+			it.field == customField
+		}
+
+		if (customFieldSetting?.constraints?.values) {
+			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
+				if ( ! it ) {
+					result[Application.UNKNOWN] = 0
+				} else if (groupPlanMethodologyCount[it]) {
+					result[it] = 0
+				}
+				result
+			}
+			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
+		}
+
 /*
 		// TODO - this is unnecessary and could just load the map
 

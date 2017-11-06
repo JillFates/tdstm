@@ -1,34 +1,52 @@
-<kendo-grid (mouseup)="onMouseUp()" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip"
- [sort]="state.sort" [pageSize]="state.take" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (mousemove)="onMouseMove($event)"
- (dataStateChange)="dataStateChange($event)">
+<kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+ [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
+ (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
-		<div class="col-xs-6">
+		<div class="col-sm-2">
 			<div class="checkbox">
-				<label><input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+				<label>
+					<input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
 		</div>
-		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
+			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+		</div>
+		<div class="kendo-grid-toolbar__refresh-btn btnClear">
+			<button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
+				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+		</div>
 	</ng-template>
+	<kendo-grid-column [locked]="true" [width]="0"></kendo-grid-column>
+	<!-- temporary solution -->
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
-	 [width]="column.width < VIEW_COLUMN_MIN_WIDTH ? VIEW_COLUMN_MIN_WIDTH : column.width">
+	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="cellCallbackClass(column.domain)">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
 				<div>
 					<label for=""> {{column.label}}</label>
-					<i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
+					<!-- <i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i> -->
 				</div>
 			</div>
 		</ng-template>
 		<ng-template kendoGridFilterCellTemplate>
 			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" (keyup.enter)="onFilter()" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter"
-				 placeholder="Default Filter" value="">
-				<span (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+				 placeholder="Filter" value="">
+				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
 				 aria-hidden="true"></span>
 			</div>
 		</ng-template>
 	</kendo-grid-column>
 	<ng-template kendoGridNoRecordsTemplate>
-		{{ gridMessage | translate }}
+
+	</ng-template>
+	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+		<kendo-pager-next-buttons></kendo-pager-next-buttons>
+		<kendo-pager-page-sizes [pageSizes]="[25,50,100,500,1000]"></kendo-pager-page-sizes>
+		<div *ngIf="showMessage" class="grid-message">
+			<label>{{ gridMessage | translate }}</label>
+		</div>
+		<kendo-pager-info></kendo-pager-info>
 	</ng-template>
 </kendo-grid>

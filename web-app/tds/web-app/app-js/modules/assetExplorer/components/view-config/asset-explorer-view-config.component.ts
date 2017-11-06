@@ -10,12 +10,15 @@ import { ViewModel } from '../../model/view.model';
 import { ViewColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
 import { Permission } from '../../../../shared/model/permission.model';
 import { VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { AssetQueryParams } from '../../model/asset-query-params';
 import { AssetExportModel } from '../../model/asset-export-model';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { AlertType } from '../../../../shared/model/alert.model';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -29,10 +32,13 @@ import { AssetExportModel } from '../../model/asset-export-model';
         .N { background-color: #FFF;}
 		.U { background-color: #F3F4F6;}
 		li.active a { font-weight:bold;}
+		.drag-icon { padding: 8px 10px 0px 5px; color: #9f9f9f;}
 	`]
 })
 export class AssetExplorerViewConfigComponent {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
+	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
+
 	private dataSignature: string;
 	// There will be more custom classes, but this are the list who has already an Icon
 	assetClasses = ['APPLICATION', 'DEVICE', 'DATABASE', 'STORAGE'];
@@ -67,6 +73,7 @@ export class AssetExplorerViewConfigComponent {
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private state: StateService,
+		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
@@ -75,6 +82,7 @@ export class AssetExplorerViewConfigComponent {
 			if (this.model.id) {
 				this.updateFilterbyModel();
 				this.currentTab = 1;
+				this.state.$current.data.page.title = this.model.name;
 			}
 		}, (err) => console.log(err));
 	}
@@ -194,7 +202,8 @@ export class AssetExplorerViewConfigComponent {
 
 	protected openSaveDialog(): void {
 		this.dialogService.open(AssetExplorerViewSaveComponent, [
-			{ provide: ViewModel, useValue: this.model }
+			{ provide: ViewModel, useValue: this.model },
+			{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
@@ -287,6 +296,7 @@ export class AssetExplorerViewConfigComponent {
 				this.assetExpService.saveReport(this.model)
 					.subscribe(result => {
 						this.dataSignature = JSON.stringify(this.model);
+						this.select.loadData();
 					});
 			} else {
 				this.openSaveDialog();
@@ -297,9 +307,7 @@ export class AssetExplorerViewConfigComponent {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains: this.domains,
-			previewMode: true,
-			searchExecuted: this.previewButtonClicked
+			domains: this.domains
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
@@ -309,11 +317,6 @@ export class AssetExplorerViewConfigComponent {
 		}).catch(result => {
 			console.log('error');
 		});
-	}
-
-	protected onFavorite() {
-		// this.model.favorite = !this.model.favorite;
-		console.log('no empty');
 	}
 
 	protected onFieldSelection(field: FieldSettingsModel) {
@@ -352,6 +355,25 @@ export class AssetExplorerViewConfigComponent {
 		}
 		this.grid.clear();
 		this.previewButtonClicked = false;
+	}
+
+	protected onFavorite() {
+		if (this.model.isFavorite) {
+			this.model.isFavorite = false;
+			if (this.model.id) {
+				this.select.loadData();
+			}
+		} else {
+			if (this.assetExpService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+				this.notifier.broadcast({
+					name: AlertType.DANGER,
+					message: 'Maximum number of favorite data views reached.'
+				});
+			} else {
+				this.model.isFavorite = true;
+			}
+		}
+
 	}
 
 	protected onPreview(): void {

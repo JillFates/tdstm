@@ -52,7 +52,6 @@ class LicenseAdminServiceIntegrationTests extends Specification {
                 enabled : true,
                 request_email: "oluna@tdsi.com"
         ]
-        licenseAdminService.initialize(true)
 
         // Create and admin user to be able to login
         project = projectTestHelper.createProject()

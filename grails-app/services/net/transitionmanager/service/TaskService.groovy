@@ -28,6 +28,7 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils
@@ -53,6 +54,7 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
  * @author John Martin
  */
 @Transactional
+@Slf4j
 class TaskService implements ServiceMethods {
 
 	def controllerService
@@ -355,11 +357,11 @@ class TaskService implements ServiceMethods {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
+	AssetComment setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
 
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
-			return
+			return task
 		}
 
 		def now = TimeUtil.nowGMT()
@@ -504,7 +506,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
-	def getCssClassForStatus(status) {
+	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
 
@@ -574,7 +576,11 @@ class TaskService implements ServiceMethods {
 			query.append("AND a.id != :taskId ")
 			params["taskId"] = taskToIgnore.id
 
-			if (taskToIgnore.moveEvent) {
+			// If moveEventId param is given use it as filter, if not then user taskToIgnore.moveEvent (if exists).
+			if (moveEventId) {
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = moveEventId
+			} else if (taskToIgnore.moveEvent) {
 				query.append("AND a.moveEvent.id = :moveEventId ")
 				params["moveEventId"] = taskToIgnore.moveEvent.id
 			}
@@ -602,8 +608,22 @@ class TaskService implements ServiceMethods {
 		return [list: list, total: resultTotal[0]]
 	}
 
-	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+	/**
+	 * Calculate the index for the task in the task selection drop-down.
+	 *
+	 * @param project
+	 * @param category
+	 * @param task
+	 * @param moveEventId
+	 * @param taskId
+	 * @return 0 if the task doesn't exist, the index if it does.
+	 */
+	int searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
+		// If no task id was given, return 0.
+		if (!taskId) {
+			return 0
+		}
 		def taskIndex = 0
 
 		StringBuffer query = new StringBuffer("""

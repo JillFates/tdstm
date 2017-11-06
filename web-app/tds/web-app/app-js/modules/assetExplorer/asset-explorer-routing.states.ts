@@ -11,6 +11,13 @@ import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 import { PreferenceService } from '../../shared/services/preference.service';
 
+const assetsListSizeResolve = {
+	token: 'preferences',
+	policy: { async: 'RXWAIT', when: 'EAGER' },
+	deps: [PreferenceService],
+	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
+};
+
 const fieldsResolve = {
 	token: 'fields',
 	policy: { async: 'RXWAIT' },
@@ -29,29 +36,22 @@ const fieldsResolve = {
 	})
 };
 
-const assetsListSizeResolve = {
-	token: 'preferences',
-	policy: { async: 'RXWAIT', when: 'EAGER' },
-	deps: [PreferenceService],
-	resolveFn: (service: PreferenceService) => service.getPreference('assetListSize')
-};
-
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
 		name: 'tds.assetexplorer',
-		url: '/assetexplorer/views'
+		url: '/asset/views'
 	};
 	public static readonly REPORT_CREATE = {
 		name: 'tds.assetexplorer_create',
-		url: '/assetexplorer/views/create'
+		url: '/asset/views/create'
 	};
 	public static readonly REPORT_EDIT = {
 		name: 'tds.assetexplorer_edit',
-		url: '/assetexplorer/views/:id/edit'
+		url: '/asset/views/:id/edit'
 	};
 	public static readonly REPORT_SHOW = {
 		name: 'tds.assetexplorer_show',
-		url: '/assetexplorer/views/:id/show'
+		url: '/asset/views/:id/show'
 	};
 }
 
@@ -185,7 +185,7 @@ export const ASSET_EXPLORER_STATES = [
 	assetExplorerReportShowState,
 	{
 		name: 'tds.assetexplorerCopy',
-		url: '/assetexplorer/views/',
+		url: '/asset/views/',
 		redirectTo: 'tds.assetexplorer'
 	}
 ];

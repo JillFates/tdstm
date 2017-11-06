@@ -45,14 +45,11 @@
 
         form.dependency-edit-fields label.control-label {
             text-align: left;
-            text-decoration: underline;
-            cursor: pointer;
+            font-weight: inherit;
         }
 
         form.dependency-edit-fields label.control-label-title {
             font-weight: bold;
-            text-decoration: none;
-            cursor: inherit;
         }
 
         .btn-default {
@@ -132,7 +129,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 100px; vertical-align: baseline;">
+                        <td style="width: 100px; vertical-align: top;">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">Frequency</label>
                             </div>
@@ -142,7 +139,9 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">Status</label>
                             </div>
-
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label control-label-title">Direction</label>
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">C1</label>
                             </div>
@@ -163,39 +162,41 @@
                                 <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                             </div>
                         </td>
-                        <td style="width: 200px; vertical-align: baseline;">
+                        <td style="width: 200px; vertical-align: top;">
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
                                 <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.dataFlowFreq" ng-options="frequency as frequency for frequency in assetDependency.dataFlowFreq"></select>
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.type}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.type}}</label>
                                 <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.type" ng-options="type as type for type in assetDependency.dependencyType"></select>
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.status}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.status}}</label>
                                 <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.status" ng-options="status as status for status in assetDependency.dependencyStatus"></select>
                             </div>
-
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.c1}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.dataFlowDirection}}</label>
+                                <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.dataFlowDirection" ng-options="status as status for status in dataFlowDirection"></select>
+                            </div>
+                            <div class="form-group">
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.c1}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.c1" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.c2}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.c2}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.c2" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.c3}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.c3}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.c3" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.c4}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.c4}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.c4" />
                             </div>
-
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit"  class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetA)">{{assetDependency.assetA.dependency.comment}}</label>
+                                <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetA.dependency.comment}}</label>
                                 <textarea style="width: 188px;" ng-class="{'delete-property': assetDependency.assetA.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetA.dependency.comment"></textarea>
                             </div>
                             <div class="form-group" ng-if="!actionTypeEdit && (assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id) && assetDependency.editPermission">
@@ -204,37 +205,40 @@
                         </td>
                         <td ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id" style="width: 200px; vertical-align: baseline;">
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.dataFlowFreq}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.dataFlowFreq}}</label>
                                 <select ng-if="actionTypeEdit" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" class="form-control" ng-model="assetDependency.assetB.dependency.dataFlowFreq" ng-options="frequency as frequency for frequency in assetDependency.dataFlowFreq"></select>
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.type}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.type}}</label>
                                 <select ng-if="actionTypeEdit" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" class="form-control" ng-model="assetDependency.assetB.dependency.type" ng-options="type as type for type in assetDependency.dependencyType"></select>
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.status}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.status}}</label>
                                 <select ng-if="actionTypeEdit" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" class="form-control" ng-model="assetDependency.assetB.dependency.status" ng-options="status as status for status in assetDependency.dependencyStatus"></select>
                             </div>
-
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.c1}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.dataFlowDirection}}</label>
+                                <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.dataFlowDirection" ng-options="status as status for status in dataFlowDirection"></select>
+                            </div>
+                            <div class="form-group">
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.c1}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.c1" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.c2}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.c2}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.c2" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.c3}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.c3}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.c3" />
                             </div>
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit" class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.c4}}</label>
+                                <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.c4}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.c4" />
                             </div>
 
                             <div class="form-group">
-                                <label ng-if="!actionTypeEdit"  class="col-sm-4 control-label" ng-click="openDependencyView(assetDependency.assetB)">{{assetDependency.assetB.dependency.comment}}</label>
+                                <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetB.dependency.comment}}</label>
                                 <textarea style="width: 188px;" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetB.dependency.comment"></textarea>
                             </div>
                             <div class="form-group" ng-if="!actionTypeEdit && assetDependency.editPermission">

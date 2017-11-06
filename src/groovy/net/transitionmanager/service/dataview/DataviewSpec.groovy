@@ -63,7 +63,10 @@ class DataviewSpec {
     DataviewSpec(DataviewUserParamsCommand command, Dataview dataview = null) {
         spec = command.filters
         justPlanning = command.justPlanning
-        args = [max: command.limit, offset: command.offset]
+        args = [offset: command.offset]
+        if(command.limit != 0){
+            args.max = command.limit
+        }
         order = [property: command.sortProperty, sort: command.sortOrder == ASCENDING ? 'asc' : 'desc']
 
         if(dataview) {
@@ -74,10 +77,18 @@ class DataviewSpec {
                 dataviewColumn.domain = dataviewColumn.domain?.toLowerCase() // Fixing because Dataview is saving Uppercase domain
                 Map specColumn = spec.columns.find { it.domain == dataviewColumn.domain && it.property == dataviewColumn.property}
                 if(!specColumn){
-                    spec.columns += ([domain: dataviewColumn.domain , property: dataviewColumn.property , filter :dataviewColumn.filter?:"" ])
+                    addColumn( dataviewColumn.domain , dataviewColumn.property, dataviewColumn.filter )
                 }
             }
         }
+    }
+
+    void addColumn(domain, property, filter = null){
+        spec.columns += [
+            domain: domain,
+            property: property,
+            filter: (filter ?: '')
+        ]
     }
 
     /**

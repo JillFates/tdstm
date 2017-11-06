@@ -58,31 +58,32 @@ export class SelectListConfigurationPopupComponent {
 		this.sortType = null;
 		this.defaultValue = null;
 		this.customService.getDistinctValues(this.domain, this.field)
-			.subscribe((value: string[]) => {
-				let udfValues: any[] = [];
-				if (this.field.constraints.values) {
-					udfValues = this.field.constraints.values
-						.filter(i => value.indexOf(i) === -1)
-						.map(i => {
-							return {
-								deletable: true,
-								value: i
-							};
-						});
-				}
-				let indexOfBlank = value.indexOf('');
+			.subscribe((distinctValues: string[]) => {
+
+				let indexOfBlank = distinctValues.indexOf('');
+				// Add blank(empty) option if its a required field or remove it if opposite.
 				if (this.field.constraints.required && indexOfBlank !== -1) {
-					value.splice(indexOfBlank, 1);
+					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === -1) {
-					value.splice(0, 0, '');
+					this.items.splice(0, 0, '');
 				}
-				let distinct = value.map(i => {
-					return {
-						deletable: false,
-						value: i
-					};
-				});
-				this.items = distinct.concat(udfValues);
+
+				// build the option items list based on distinctValues and current stored values (maintain the order).
+				if (this.field.constraints.values) {
+					for (let option of this.field.constraints.values) {
+						let indexOfDistinctValue = distinctValues.indexOf(option);
+						if (indexOfDistinctValue === -1) {
+							this.items.push( {deletable: true, value: option} );
+						} else {
+							distinctValues.splice(indexOfDistinctValue, 1);
+							this.items.push( {deletable: false, value: option} );
+						}
+					}
+				}
+
+				// add any distinctValue that was not found on original field.constraint.values at the end.
+				this.items = this.items.concat( distinctValues.map( o => { return {deletable: false, value: o}; }) );
+
 			});
 		this.defaultValue = this.field.default;
 	}

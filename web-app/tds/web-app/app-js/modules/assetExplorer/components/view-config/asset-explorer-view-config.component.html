@@ -1,39 +1,46 @@
 <div class="content body">
 	<section class="page-asset-explorer-config">
 		<div>
-			<div class="btn-group asset-view-title" *ngIf="model.name && model.name !== ''">
-				<h3>{{model.name}}</h3>
-			</div>
 			<div class="btn-group" *ngIf="model.id && (model.isOwner || (model.isSystem && (isSystemSaveAvailable(true) && isSystemSaveAvailable(false))));else saveButton">
 				<button type="button" id="btnSaveAs" *ngIf="!model.isOwner" [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+				 (click)="onSaveAs()">
+					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}</button>
 				<button type="button" id="btnSave" *ngIf="model.isOwner" [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+				 (click)="onSave()">
+					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}</button>
 				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
 				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
 				</button>
 				<ul class="dropdown-menu">
 					<li>
-						<a (click)="onSave()">Save</a>
+						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
 					</li>
 					<li>
-						<a (click)="onSaveAs()">Save As</a>
+						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
 					</li>
 				</ul>
 			</div>
 			<ng-template #saveButton>
 				<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))" [disabled]="!isSaveAvailable() || !isValid()"
 				 class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 (click)="onSave()"><i class="fa fa-fw fa-floppy-o"></i> Save</button>
+				 (click)="onSave()">
+					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}</button>
 				<button type="button" id="btnSaveAs" *ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
 				 [disabled]="!isSaveAsAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 (click)="onSaveAs()"><i class="fa fa-fw fa-floppy-o"></i> Save As</button>
+				 (click)="onSaveAs()">
+					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}</button>
 			</ng-template>
-			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;"><i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.favorite,'fa-star-o':!model.favorite}"></i></span>
-			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()" (click)="onExport()"><i class="fa fa-fw fa-download"></i> Export</button>
-			<asset-explorer-view-selector></asset-explorer-view-selector>
-			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:0 10px;float:right;"><i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed" ></i></span>
+			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
+				<i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+			</span>
+			<button type="button" class="btn btn-default" id="btnExport" [disabled]="!isSaveAvailable() || !isValid()" (click)="onExport()">
+				<i class="fa fa-fw fa-download"></i> Export</button>
+			<asset-explorer-view-selector #select="assetExplorerViewSelector"></asset-explorer-view-selector>
+			<span class="btn" (click)="onToggleConfig()" style="margin:0 10px;padding:5px 10px;float:right;">
+				<i style="font-size:20px;" class="fa fa-cog" *ngIf="collapsed"></i>
+			</span>
 		</div>
 		<br />
 		<div class="nav-tabs-custom" *ngIf="!collapsed">
@@ -55,7 +62,9 @@
 					</ng-template>
 				</li>
 				<li class="pull-right" role="presentation">
-					<button class="btn btn-default" (click)="onToggleConfig()"><i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i></button>
+					<button class="btn btn-default" (click)="onToggleConfig()">
+						<i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i>
+					</button>
 				</li>
 				<li class="pull-right" role="presentation">
 					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}" name="btnPreview"
@@ -67,14 +76,17 @@
 			</ul>
 			<div class="tab-content" [hidden]="collapsed">
 				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
-					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label> <br>
+					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label>
+					<br>
 					<div class="checkbox" *ngFor="let asset of assetClasses">
 						<label>
-							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]"> <tds-ui-svg-icon [name]="getAssetIcon(asset)" [height]="'16'" [width]="'16'"></tds-ui-svg-icon> {{ 'ASSETS.'+asset  | translate }}
+							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()" [(ngModel)]="filterModel.assets[asset]">
+							<tds-ui-svg-icon [name]="getAssetIcon(asset)" [height]="'16'" [width]="'16'"></tds-ui-svg-icon> {{ 'ASSETS.'+asset | translate }}
 						</label>
 					</div>
 					<button class="btn" [disabled]="!isAssetSelected()" (click)="setCurrentTab(1)" onclick="$('a[href=#tab_2]').trigger('click')"
-					 [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}"><i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
+					 [ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}">
+						<i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next</button>
 				</div>
 				<div class="tab-pane" id="tab_2" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}">
 					<div class="row">
@@ -88,7 +100,8 @@
 								</div>
 							</div>
 							<div class="col-sm-3">
-								<button type="button" class="btn btn-default" id="btnFilter" (click)="applyFilters()"><i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
+								<button type="button" class="btn btn-default" id="btnFilter" (click)="applyFilters()">
+									<i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
 							</div>
 						</div>
 						<div class="col-md-8 col-sm-12">
@@ -105,7 +118,7 @@
 								<div class="form-group">
 									<select name="show" (change)="applyFilters()" id="show" class="form-control pd-top-5" [(ngModel)]="filterModel.asset">
 										<option value="all">All Classes</option>
-										<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset  | translate }} Fields</option>
+										<option *ngFor="let asset of selectedAssetClasses()" value="{{asset}}"> {{ 'ASSETS.'+asset | translate }} Fields</option>
 									</select>
 								</div>
 							</div>
@@ -117,7 +130,8 @@
 							<div [ngStyle]="position[fieldIndex]" class="checkbox" *ngFor="let field of fields;let fieldIndex = index">
 								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label" *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.'+field.domain | uppercase | translate}} Fields</label>
 								<ng-template #defaultField>
-									<label style="width:100%" class="{{field.imp}}"><input type="checkbox" (change)="onFieldSelection(field)"  name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
+									<label style="width:100%;padding-left:25px;" class="{{field.imp}}">
+										<input type="checkbox" (change)="onFieldSelection(field)" name="{{field.field+'_'+fieldIndex}}" [(ngModel)]="field.selected"> {{ field.label }}</label>
 								</ng-template>
 							</div>
 						</div>
@@ -130,14 +144,15 @@
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
-								 class="row" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active"
+								 class="row" style="margin-right:0px;" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active"
 								 disabledItemClass="item col-sm-3 col-md-3 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
 										<div>
+											<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
 											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
 											<div class="checkbox pull-right" style="margin:5px;">
 												<label for="">
-														<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> Locked
+													<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
 												</label>
 											</div>
 										</div>

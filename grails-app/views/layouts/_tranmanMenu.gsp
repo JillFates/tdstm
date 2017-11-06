@@ -120,7 +120,7 @@
                             </g:link>
                         </li>
                         <li>
-                            <g:link class="mmlink" controller="module" action="assetexplorer" id="views">
+                            <g:link class="mmlink" controller="module" action="asset" id="views">
                                 <g:img uri="/icons/magnifier.png" width="16" height="16"/>
                                 Asset Explorer
                             </g:link>
