@@ -78,7 +78,13 @@ class UrlMappings {
 		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
 			mode = 'edit'
 		}
-		
+
+		"/ws/asset/deleteAssets" {
+			controller = "wsAsset"
+			action = [
+			        POST: "deleteAssets"
+			]
+		}		
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
