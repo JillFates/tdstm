@@ -560,9 +560,8 @@ class TaskService implements ServiceMethods {
 		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
 		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
-		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
-			// if searchText is a number, then only using task taskNumber attribute
-			if (searchText ==~ /^[0-9]+$/) {
+		if (searchText) {
+			if ( NumberUtils.isDigits(searchText) ) {
 				query.append("AND a.taskNumber like '%${searchText}%' ")
 			} else {
 				query.append("AND a.comment like :searchText ")
@@ -632,7 +631,7 @@ class TaskService implements ServiceMethods {
 			if (categoryList.contains(category)) {
 				query.append("AND ac.category='$category' ")
 			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
+				log.warn "unexpected category filter '$category'"
 				category=''
 			}
 		}
