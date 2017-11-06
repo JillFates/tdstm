@@ -124,42 +124,47 @@
 
                             <h3>Results for Domain ${domain}</h3>
 
-                            <table style="width:100%" class="table table-condensed table-hover">
-                                <tr>
-                                    <th># Reference</th>
-                                    <g:each in="${domainResults[0].elements}" var="header">
-                                        <th>${header.field.label}</th>
-                                    </g:each>
-                                </tr>
-                                <g:each in="${domainResults}" var="row" status="i">
+                            <div class="table-responsive">
+                                <table style="width:100%" class="table table-condensed table-hover">
                                     <tr>
-                                        <td>${row.reference}</td>
-                                        <g:each in="${row.elements}" var="value">
-                                            <td>${value.value}</td>
+                                        <th># Reference</th>
+                                        <g:each in="${domainResults[0].elements}" var="header">
+                                            <th>${header.field.label}</th>
                                         </g:each>
                                     </tr>
-                                </g:each>
-                            </table>
+                                    <g:each in="${domainResults}" var="row" status="i">
+                                        <tr>
+                                            <td>${row.reference}</td>
+                                            <g:each in="${row.elements}" var="value">
+                                                <td>${value.value}</td>
+                                            </g:each>
+                                        </tr>
+                                    </g:each>
+                                </table>
+                            </div>
                         </g:if>
                     </g:each>
                 </div>
 
                 <div id="menu1" class="tab-pane fade">
                     <h3>Source</h3>
-                    <table style="width:100%" class="table table-condensed table-hover">
-                        <tr>
-                            <g:each in="${etlProcessor?.columns}" var="column">
-                                <th>${column.label}</th>
-                            </g:each>
-                        </tr>
-                        <g:each in="${etlProcessor?.rows}" var="row">
+
+                    <div class="table-responsive">
+                        <table style="width:100%" class="table table-condensed table-hover">
                             <tr>
-                                <g:each in="${row.elements}" var="element">
-                                    <td>${element.value}</td>
+                                <g:each in="${etlProcessor?.columns}" var="column">
+                                    <th>${column.label}</th>
                                 </g:each>
                             </tr>
-                        </g:each>
-                    </table>
+                            <g:each in="${etlProcessor?.rows}" var="row">
+                                <tr>
+                                    <g:each in="${row.elements}" var="element">
+                                        <td>${element.value}</td>
+                                    </g:each>
+                                </tr>
+                            </g:each>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
