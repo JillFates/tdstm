@@ -11,12 +11,14 @@
 						<div class="form-group">
 							<label for="dataScriptProvider" class="col-sm-2 control-label">Provider:</label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<kendo-dropdownlist id="dataScriptProvider" name="dataScriptProvider" class="form-control"
+								<kendo-dropdownlist #dataScriptProvider id="dataScriptProvider" name="dataScriptProvider" class="form-control"
 													[data]="providerList"
 													[textField]="'name'"
 													[valueField]="'id'"
 													[(ngModel)]="dataScriptModel.provider"
-													required [ngClass]="{'has-error': !dataScriptForm.form.valid && dataScriptForm.touched}"
+													required
+													class="form-control"
+													[ngClass]="{'has-error':  (!dataScriptForm.form.valid && dataScriptForm.touched) && !dataScriptModel.provider}"
 													></kendo-dropdownlist>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
@@ -26,7 +28,7 @@
 						<div class="form-group">
 							<label for="dataScriptName" class="col-sm-2 control-label">Name:<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span></label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<input type="text" (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name" required [ngClass]="{'has-error': !dataScriptForm.form.valid}"/>
+								<input type="text" (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name" required [ngClass]="{'has-error': (!dataScriptForm.form.valid && dataScriptForm.touched) && dataScriptModel.name.length <= 0}"/>
 								<span *ngIf="!isUnique" style="color: red; font-weight: bold;">Datasource name must be unique</span>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
