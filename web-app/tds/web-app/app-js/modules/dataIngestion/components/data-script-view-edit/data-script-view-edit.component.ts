@@ -1,5 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DataScriptModel, ActionType, DataScriptMode} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
@@ -17,8 +18,9 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 })
 export class DataScriptViewEditComponent implements OnInit {
 
+	@ViewChild('dataScriptProvider', {read: DropDownListComponent}) dataScriptProvider: DropDownListComponent;
 	public dataScriptModel: DataScriptModel;
-	public providerList: ProviderModel[];
+	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
 	public dataScriptMode = DataScriptMode;
 	public actionTypes = ActionType;
@@ -47,11 +49,18 @@ export class DataScriptViewEditComponent implements OnInit {
 	getProviders(): void {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
-				this.providerList = result;
 				if (this.modalType === ActionType.CREATE) {
+					this.providerList.push({id: 0, name: 'Select...'});
 					this.dataScriptModel.provider = this.providerList[0];
 				}
+				this.providerList.push(...result);
 				this.dataSignature = JSON.stringify(this.dataScriptModel);
+				setTimeout(() => { // Delay issues on Auto Focus
+					if (this.dataScriptProvider) {
+						this.dataScriptProvider.focus();
+					}
+				}, 500);
+
 			},
 			(err) => console.log(err));
 	}

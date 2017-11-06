@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ElementRef, Component, OnInit, ViewChild} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../model/data-script.model';
@@ -17,6 +17,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 })
 export class ProviderViewEditComponent implements OnInit {
 
+	@ViewChild('providerNameElement', {read: ElementRef}) providerNameElement: ElementRef;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -62,6 +63,11 @@ export class ProviderViewEditComponent implements OnInit {
 						(err) => console.log(err));
 				}
 			});
+		setTimeout(() => { // Delay issues on Auto Focus
+			if (this.providerNameElement) {
+				this.providerNameElement.nativeElement.focus();
+			}
+		}, 500);
 	}
 
 	protected onValidateUniqueness(): void {

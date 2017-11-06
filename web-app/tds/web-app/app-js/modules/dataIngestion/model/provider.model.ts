@@ -30,7 +30,7 @@ export class ProviderColumnModel {
 export class ProviderModel {
 	id?: number;
 	name: string;
-	description: string;
-	comment: string;
+	description?: string;
+	comment?: string;
 	dateCreated?: Date;
 }
