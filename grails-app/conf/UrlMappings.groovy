@@ -63,6 +63,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/deleteAssets" {
+			controller = "wsAsset"
+			action = [
+			        POST: "deleteAssets"
+			]
+		}
+
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
