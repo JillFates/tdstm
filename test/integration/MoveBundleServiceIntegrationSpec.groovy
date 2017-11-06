@@ -90,34 +90,34 @@ class MoveBundleServiceIntegrationSpec extends Specification {
         and: 'create a person associated with the project'
             Person person = personHelper.createPerson(null, project.client, project)
         and: 'create a user that is logged in and the project is their default'
-        UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
+            UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
         when: 'a new Bundle is created'
-        MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
+            MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
         and: 'a new Event is created'
-        MoveEvent event = moveEventService.create(project, 'Test Event')
+            MoveEvent event = moveEventService.create(project, 'Test Event')
         and: 'the above Bundle is assigned to the Event'
-        moveBundleService.assignMoveEvent(event, [bundle.id])
+            moveBundleService.assignMoveEvent(event, [bundle.id])
         and: 'some assets are created and assigned to the Bundle'
-        AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: bundle])
-        AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: bundle])
+            AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: bundle])
+            AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: bundle])
         and: 'an asset not assigned to the Bundle (associated with the Default Bundle by default) is created'
-        AssetEntity asset3 = assetHelper.createDevice(project, AssetType.SERVER)
+            AssetEntity asset3 = assetHelper.createDevice(project, AssetType.SERVER)
         and: 'some tasks are generated for the Event'
-        def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
-        def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
+            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
+            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
         and: 'the deleteBundleAndAssets method is called'
-        moveBundleService.deleteBundleAndAssets(bundle)
+            moveBundleService.deleteBundleAndAssets(bundle)
         then: 'the Bundle should be deleted'
-        MoveBundle.get(bundle.id) == null
+            MoveBundle.get(bundle.id) == null
         and: 'the assigned assets should be deleted'
-        AssetEntity.withNewSession {
-            AssetEntity.get(asset1.id) == null
-            AssetEntity.get(asset2.id) == null
-        }
+            AssetEntity.withNewSession {
+                AssetEntity.get(asset1.id) == null
+                AssetEntity.get(asset2.id) == null
+            }
         and: 'the asset not assigned to the deleted Bundle should still exist'
-        AssetEntity.get(asset3.id) != null
+            AssetEntity.get(asset3.id) != null
         and: 'the Event should still exist'
-        MoveEvent.get(event.id) != null
+            MoveEvent.get(event.id) != null
         and: 'the tasks should still exist '
             def task1Test = AssetComment.get(task1.id)
             task1Test
