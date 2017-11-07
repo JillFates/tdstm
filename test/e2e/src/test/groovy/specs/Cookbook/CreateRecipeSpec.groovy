@@ -3,7 +3,7 @@ package specs.Cookbook
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CreateRecipePage
 import pages.common.LoginPage
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 import pages.Cookbook.CookbookPage
 import spock.lang.Stepwise
 
@@ -59,7 +59,7 @@ class CreateRecipeSpec extends GebReportingSpec {
     def "04 context selector options"() {
         when:
             contextSelector.click()
-            //interact { moveToElement(contextSelector) }
+            //interact { moveToElement(contextSelector2) }
         then:
             contextSelector.$("option")[0].text() == 'Select context'
             contextSelector.$("option")[1].text() == 'Event'

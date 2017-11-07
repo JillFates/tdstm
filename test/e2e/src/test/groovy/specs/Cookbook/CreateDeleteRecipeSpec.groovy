@@ -4,7 +4,7 @@ import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.Cookbook.CreateRecipePage
 import pages.common.LoginPage
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -70,7 +70,7 @@ class CreateDeleteRecipeSpec extends GebReportingSpec {
         testKey = "TM-7182"
         when:
             contextSelector.click()
-            //interact { moveToElement(contextSelector) }
+            //interact { moveToElement(contextSelector2) }
         then:
             contextSelector.$("option")[0].text() == 'Select context'
             contextSelector.$("option")[1].text() == 'Event'

@@ -3,7 +3,7 @@ package specs.Cookbook
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.common.LoginPage
-import pages.Cookbook.UserDashboardPage
+import pages.Dashboards.UserDashboardPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -21,7 +21,7 @@ class DeleteRecipeSpec extends GebReportingSpec {
             at UserDashboardPage
     }
 
-    def "01 open Cookbook page"() {
+    def "open Cookbook page"() {
         given:
             at UserDashboardPage
 
@@ -34,7 +34,7 @@ class DeleteRecipeSpec extends GebReportingSpec {
 
     }
 
-    def "02 List Recipes"() {
+    def "List Recipes"() {
         when:
             println "Geb Recipes Count = " + gebRecipes.size()
             gebRecipes.each { println it.text() }
@@ -42,7 +42,7 @@ class DeleteRecipeSpec extends GebReportingSpec {
             gebRecipes.size() > 0
     }
 
-    def "03 Remove Recipe"() {
+    def "Remove Recipe"() {
         when: "Top most Geb Recipe is deleted"
             def gebRecipeCountBeforeDelete = gebRecipes.size()
             println "cleanupSpec(): Geb Recipes count = " + gebRecipeCountBeforeDelete

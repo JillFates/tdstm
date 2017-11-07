@@ -13,7 +13,7 @@ class CreateRecipePage extends Page {
         nameFieldContents.text() == ""
         contextSelectorLabel2 == "Context*"
         descriptionLabel == "Description"
-        descriptionContents == ""
+
     }
 
     static content = {

@@ -8,27 +8,16 @@ import pages.Cookbook.EditRecipePage
 import pages.Cookbook.ErrorMessagePage
 import pages.Cookbook.TabEditorPage
 import pages.Cookbook.TabEditorTabSyntaxErrorsPage
+import pages.Cookbook.TabHistoryPage
+import pages.Cookbook.TabHistoryTabActionsPage
+import pages.Cookbook.TabHistoryTabGenLogPage
+import pages.Cookbook.TabHistoryTabTasksPage
 import pages.Cookbook.TabTaskGenPage
 import pages.Cookbook.TabTaskGenTabSummaryPage
+import pages.Cookbook.TaskDetailsPage
 import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
 import spock.lang.Stepwise
-
-//TM-2995  Unable to regenerate tasks after reverting and deleting version of a recipe
-/*TM-2912 
-user should not be able to delete the release version
-delete the WIP / should only delete the WIP and not the release version
-If the user delete the WIP and  this is the only recipe version , the editor should be cleared.
-When you create a recipe description is not required, but it is required when you clone a recipe. - should not have the same behavior on both?
-# tabs are not displayed if recipe list is is empty
-# if you have 1 or more recipes, the  tabs are displayed and the 1st recipe is selected.
-
-#  Task Generation 
- checkbox : 
- Generate using WIP recipe - > is only displayed when you select a recipe with wip created
- Delete previously generated tasks that were created using this context & recipe ->  This is only displayed if task are created using that wip recipe 
- # Clone create recipe -> description is not mandatory
-*/
 
 @Stepwise
 class CookbookSpec extends GebReportingSpec {
@@ -78,7 +67,7 @@ class CookbookSpec extends GebReportingSpec {
 
         then:
         at CookbookPage
-        waitFor(5) { gebRecipes.size() >= 0 }
+        waitFor(5) { gebRecipes.size() > 0 }
     }
 
     def "Check Cookbook page active elements"() {
@@ -88,25 +77,32 @@ class CookbookSpec extends GebReportingSpec {
         at CookbookPage
 
         then:
+        pageTitle.text().trim() == "Cookbook"
         taskGenerationTab.parent(".active")
+        recipeGridHeaderCols.getAt(0).text().trim() == "Recipe"
+        recipeGridHeaderCols.getAt(1).text().trim() == "Description"
+        recipeGridHeaderCols.getAt(2).text().trim() == "Context"
+        recipeGridHeaderCols.getAt(3).text().trim() == "Editor"
+        recipeGridHeaderCols.getAt(4).text().trim() == "Last Updated"
+        recipeGridHeaderCols.getAt(5).text().trim() == "Version"
+        recipeGridHeaderCols.getAt(6).text().trim() == "WIP"
+        recipeGridHeaderCols.getAt(7).text().trim() == "Actions"
     }
 
-    def "Open Create Recipe page"() {
+    def "Open 'Create Recipe' page"() {
         testKey = "TM-7180"
 
         given:
         at CookbookPage
 
         when:
-        // hover over createRecipeButton
-        //interact { moveToElement(createRecipeButton) }
         createRecipeButton.click()
 
         then:
         at CreateRecipePage
     }
 
-    def "Check Create Recipe page active elements"() {
+    def "Check 'Create Recipe' page active elements"() {
         testKey = "TM-XXXX"
 
         when:
@@ -114,12 +110,12 @@ class CookbookSpec extends GebReportingSpec {
 
         then:
         saveButton.@disabled == "true"
-        nameFieldContents.@required
-        contextSelector2.@required
+        nameFieldContents.@required == "true"
+        contextSelector2.@required == "true"
         brandNewRecipeTab.parent(".active")
     }
 
-    def "Add a Recipe Name"() {
+    def "Add a recipe name"() {
         testKey = "TM-7181"
 
         given:
@@ -133,7 +129,7 @@ class CookbookSpec extends GebReportingSpec {
         saveButton.@disabled == "true"
     }
 
-    def "Check Context selector options"() {
+    def "Check 'Context' selector options"() {
         testKey = "TM-7182"
 
         given:
@@ -141,7 +137,6 @@ class CookbookSpec extends GebReportingSpec {
 
         when:
         contextSelector2.click()
-        //interact { moveToElement(contextSelector2) }
 
         then:
         contextSelector2.$("option")[0].text() == 'Select context'
@@ -150,7 +145,7 @@ class CookbookSpec extends GebReportingSpec {
         contextSelector2.$("option")[3].text() == 'Application'
     }
 
-    def "Select an Event context"() {
+    def "Select an 'Event' context"() {
         testKey = "TM-7183"
 
         when:
@@ -160,7 +155,7 @@ class CookbookSpec extends GebReportingSpec {
         contextSelector2 == "Event"
     }
 
-    def "Check the Save Button status"() {
+    def "Check the 'Save' Button status"() {
         testKey = "TM-XXXX"
 
         when:
@@ -170,38 +165,41 @@ class CookbookSpec extends GebReportingSpec {
         saveButton.@disabled == ""
     }
 
-    def "Save Recipe"() {
-        testKey = "TM-7184"
+    def "Add description contents"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at CreateRecipePage
 
         when:
         descriptionContents = "This is a Geb created recipe for an Event context"
-        saveButton
+
+        then:
+        saveButton.@disable == ""
+    }
+
+    def "Save recipe and check the description"() {
+        testKey = "TM-7184"
+        def selectedRow = 0
+
+        given:
+        at CreateRecipePage
+
+        when:
         saveButton.click()
 
         then:
         at CookbookPage
+        (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe for an Event context")
+        recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
+        recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe for an Event context"
+        recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "Event"
+        recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == "e2e user"
+        // TODO next line will check dates for the new recipe. Verify actual local time
+        // recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == now()
+        recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == ""
+        recipeGridRowsCols.getAt(selectedRow*rowSize+6).text().trim() == "yes"
     }
-
-/*
-// Editor Tab
-
-   def "diff button should be enabled" () {
-
-//    }
-
-// It used to be that when editing a recipe you could click the Diff button and see the changes between the currently edited recipe and WIP or Release. For some reason right now the button is always disabled.
-// The button should be enabled when:
-  // The user has changed the syntax of recipe
-  // user has changed the syntax of a recipe
-
-// The button should be disabled when:
-  // Recipe first loaded
-  // After Save WIP or Release buttons are clicked successfully
-
-// There are two situations for comparison:
-//     When there is a WIP recipe, should compare the local changes to WIP
-//     When there is a Version/Release of a recipe and no WIP exists, should compare the local changes to the Version.
-*/
 
     def "Check 'Editor' tab selected after recipe is created"() {
         testKey = "TM-XXXX"
@@ -226,7 +224,7 @@ class CookbookSpec extends GebReportingSpec {
         edTabDiffBtn.@disabled == "true"
     }
 
-    def "Open Editor modal window"() {
+    def "Open editor modal window"() {
         testKey = "TM-XXXX"
 
         given:
@@ -237,7 +235,6 @@ class CookbookSpec extends GebReportingSpec {
 
         then:
         at EditRecipePage
- //       editorModalTextArea.text() == " "
     }
 
     def "Add a recipe form should add text to editor"() {
@@ -268,11 +265,10 @@ class CookbookSpec extends GebReportingSpec {
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
 
         then:
-//        editorModalTextArea.text() == recipeText
         editorModalTextArea
     }
 
-    def "Close Modal and return to Editor Tab"() {
+    def "Close Modal and return to 'Editor' Tab"() {
         testKey = "TM-XXXX"
 
         when:
@@ -285,7 +281,7 @@ class CookbookSpec extends GebReportingSpec {
 
     // Save WIP Button
 
-    def "Check Save WIP Button enabled"() {
+    def "Check 'Save WIP' Button enabled"() {
         testKey = "TM-XXXX"
 
         when:
@@ -305,7 +301,7 @@ class CookbookSpec extends GebReportingSpec {
         edTabSaveWipBtn.click()
 
         then:
-//        edTabTextArea == recipeText
+//   TODO should compare the recipe text vs textarea
         waitFor {edTabSaveWipBtn.@disabled == "true"}
     }
 
@@ -348,7 +344,7 @@ class CookbookSpec extends GebReportingSpec {
 
         then:
         at EditRecipePage
-        //       editorModalTextArea.text() == " "
+//   TODO should compare the recipe text vs textarea
     }
 
     def "Add text to editor"() {
@@ -378,7 +374,7 @@ class CookbookSpec extends GebReportingSpec {
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
 
         then:
-//        editorModalTextArea.text() == recipeText
+//   TODO should compare the recipe text vs textarea
         editorModalTextArea
     }
 
@@ -393,7 +389,7 @@ class CookbookSpec extends GebReportingSpec {
 
         then:
         at TabEditorPage
-        //waitFor {editorModalWindow.isDisplayed() == false}
+//   TODO should verify if the modal is closed
      }
 
     def "Check Save WIP Button enabled again"() {
@@ -416,7 +412,7 @@ class CookbookSpec extends GebReportingSpec {
         waitFor {edTabSaveWipBtn.click()}
 
         then:
-//        edTabTextArea == recipeText
+//   TODO should compare the recipe text vs textarea eg: edTabTextArea == recipeText
         waitFor {edTabSaveWipBtn.@disabled == "true"}
     }
 
@@ -436,6 +432,112 @@ class CookbookSpec extends GebReportingSpec {
 
     }
 
+    // History Tab (empty)
+
+    def "Go to empty 'History' tab"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at CookbookPage
+
+        when:
+        historyTab.click()
+
+        then:
+        at TabHistoryPage
+        waitFor { historyTab.parent(".active") }
+    }
+
+    def "Check 'History' tab empty elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryPage
+
+        then:
+        historyTab.parent(".active")
+        hisTabBatchGridHeadCols.getAt(0).find("div",class:"ngHeaderText").text().trim() == "Message"
+        hisTabBatchGridRowsCols.getAt(0).find("div",class:"ngCellText").text().trim() == "No results found"
+    }
+
+    def "Check Cookbook page title changed"(){
+        testKey = "TM-XXXX"
+
+        when:
+        at CookbookPage
+
+        then:
+        pageTitle.text().trim() == "Generation History"
+    }
+
+    def "Go to empty 'Actions' tab"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryPage
+
+        when:
+        hisTabActTab.click()
+
+        then:
+        at TabHistoryTabActionsPage
+        waitFor { hisTabActTab.parent(".active") }
+    }
+
+    def "Check 'Actions' tab blocked elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryTabActionsPage
+
+        then:
+        hisTabActTab.parent(".active")
+        hisTabActTabPublishBtn.text() == "Publish"
+        hisTabActTabPublishBtn.@disabled == "true"
+        hisTabActTabResetBtn.@disabled == "true"
+        hisTabActTabRefreshBtn.@disabled == "true"
+        hisTabActTabDeleteBtn.@disabled == "true"
+    }
+
+    def "Go to empty 'Generation Log' tab"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryPage
+
+        when:
+        hisTabGenLogTab.click()
+
+        then:
+        at TabHistoryTabGenLogPage
+        waitFor { hisTabGenLogTab.parent(".active") }
+    }
+
+    def "Check 'Generation Log' tab 'Exception' empty text"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryTabGenLogPage
+
+        then:
+        hisTabGenLogTabExcpRadio == "exceptionLog"
+        hisTabGenLogTabTxt.text().trim() == ""
+    }
+
+    def "Check 'Generation Log' tab 'Info/Warning' empty text"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryTabGenLogPage
+
+        when:
+        hisTabGenLogTabInfoRadio.click()
+
+        then:
+        hisTabGenLogTabInfoRadio == "infoLog"
+        hisTabGenLogTabTxt.text().trim() == ""
+    }
+
     // Task Generation Tab
 
     def "Go to Task Generation tab"() {
@@ -451,8 +553,6 @@ class CookbookSpec extends GebReportingSpec {
         at TabTaskGenPage
         waitFor {tskGTab.parent(".active")}
     }
-
-    // Event Dropdown
 
     def "Event Dropdown should have 'Please Select' option selected by default"() {
         testKey = "TM-XXXX"
@@ -472,7 +572,6 @@ class CookbookSpec extends GebReportingSpec {
 
         when:
         tskGTabEventSelector.click()
-        //interact { moveToElement(contextSelector2) }
 
         then:
         tskGTabEventSelector.$("option").size() > 1
@@ -485,7 +584,7 @@ class CookbookSpec extends GebReportingSpec {
         at TabTaskGenPage
 
         then:
-        tskGTabSetDefaultLink.attr("class")!="ng-hide"
+        tskGTabSetDefaultLink.@class !="ng-hide"
         tskGTabSetDefaultLink.@disabled == "true"
         tskGTabSetDefaultLink.text()== "Set as Default"
     }
@@ -638,7 +737,7 @@ class CookbookSpec extends GebReportingSpec {
     }
     // Generate Tasks with previously tasks created
 
-    def "should click on generate task button"() {
+    def "Click on generate task button again alerts for tasks previously created"() {
         testKey = "TM-XXXX"
 
         given:
@@ -654,6 +753,181 @@ class CookbookSpec extends GebReportingSpec {
                 "Press Okay to delete or Cancel to abort."
     }
 
+    // History tab wirh non published recipe
+    def "Go to History tab with non published recipe"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at CookbookPage
+
+        when:
+        historyTab.click()
+
+        then:
+        at TabHistoryPage
+        waitFor {historyTab.parent(".active")}
+    }
+
+    def "Check History tab active elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryPage
+
+        then:
+        waitFor {hisTabActTab.parent(".active")}
+        hisTabBatchGridHeadCols.getAt(0).text().trim() == "Context Target"
+        hisTabBatchGridHeadCols.getAt(1).text().trim() == "Tasks"
+        hisTabBatchGridHeadCols.getAt(2).text().trim() == "Exceptions"
+        hisTabBatchGridHeadCols.getAt(3).text().trim() == "Generated By"
+        hisTabBatchGridHeadCols.getAt(4).text().trim() == "Generated At"
+        hisTabBatchGridHeadCols.getAt(5).text().trim() == "Status"
+        hisTabBatchGridHeadCols.getAt(6).text().trim() == "Version"
+        hisTabBatchGridHeadCols.getAt(7).text().trim() == "Published"
+        hisTabBatchGridHeadCols.getAt(8).text().trim() == "Actions"
+    }
+
+    def "Go to Actions tab with actived buttons"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryPage
+
+        when:
+        hisTabActTab.click()
+
+        then:
+        at TabHistoryTabActionsPage
+    }
+
+    def "Check Actions tab active elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryTabActionsPage
+
+        then:
+        hisTabActTabPublishBtn.text() == "Publish"
+        hisTabActTabPublishBtn.@disabled == ""
+        hisTabActTabResetBtn.@disabled == ""
+        hisTabActTabRefreshBtn.@disabled == ""
+        hisTabActTabDeleteBtn.@disabled == ""
+    }
+
+    def "Go to Tasks tab with recipe tasks values "() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryPage
+
+        when:
+        hisTabTasksTab.click()
+
+        then:
+        at TabHistoryTabTasksPage
+        waitFor(5) {hisTabTasksTabTasksList.size() > 0 }
+    }
+
+    def "Check Tasks tab active elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryTabTasksPage
+
+        then:
+        waitFor(5) {hisTabTasksTabTasksList.size() > 0 }
+        hisTabTasksTabTasksGridHeadCols.getAt(0).text() == "Task #"
+        hisTabTasksTabTasksGridHeadCols.getAt(1).text() == "Description"
+        hisTabTasksTabTasksGridHeadCols.getAt(2).text() == "Asset"
+        hisTabTasksTabTasksGridHeadCols.getAt(3).text() == "Team"
+        hisTabTasksTabTasksGridHeadCols.getAt(4).text() == "Person"
+        hisTabTasksTabTasksGridHeadCols.getAt(5).text() == "Due date"
+        hisTabTasksTabTasksGridHeadCols.getAt(6).text() == "Status"
+    }
+
+    def "Select the first task for get its details"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryTabTasksPage
+
+        when:
+        waitFor {hisTabTasksTabTasksList[0].click()}
+
+        then:
+        at TaskDetailsPage
+    }
+
+    def "Check Tasks Details values"() {
+        testKey = "TM-XXXX"
+        def taskNumber
+        def taskName
+
+        given:
+        at TabHistoryTabTasksPage
+        taskNumber = hisTabTasksTabTasksFirstRowValues.getAt(0).find("div",class:"ngCellText").text()
+        taskName = hisTabTasksTabTasksFirstRowValues.getAt(1).find("div",class:"ngCellText").text()
+
+        when:
+        at TaskDetailsPage
+
+        then:
+        // TODO Compare the Tasks table value first row vs selected Task Details value
+        taskName == taskDetailsTaskName.text().trim()
+        taskNumber == taskDetailsNumber.text().trim()
+    }
+
+    def "Close 'Tasks Details' modal window"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TaskDetailsPage
+
+        then:
+        waitFor {taskDetailsModalCloseBtn.click()}
+        // TODO check window modal closed
+    }
+
+    def "Go to Generation Log tab"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryPage
+
+        when:
+        hisTabGenLogTab.click()
+
+        then:
+        at TabHistoryTabGenLogPage
+    }
+
+    def "Check Generation Log tab active elements"() {
+        testKey = "TM-XXXX"
+
+        when:
+        at TabHistoryTabGenLogPage
+
+        then:
+        hisTabGenLogTabExcpRadio == "exceptionLog"
+        hisTabGenLogTabTxt.text().contains("has no predecessor tasks")
+    }
+
+    def "Click on Info/Warning radio"() {
+        testKey = "TM-XXXX"
+
+        given:
+        at TabHistoryTabGenLogPage
+
+        when:
+        hisTabGenLogTabInfoRadio.click()
+
+        then:
+        hisTabGenLogTabInfoRadio == "infoLog"
+        hisTabGenLogTabTxt.text().contains("A total of")
+        hisTabGenLogTabTxt.text().contains("Tasks and")
+        hisTabGenLogTabTxt.text().contains("Dependencies created in")
+    }
+
     def "Delete Recipe"() {
         testKey = "TM-7243"
 
@@ -663,7 +937,6 @@ class CookbookSpec extends GebReportingSpec {
         when: "Top most Geb Recipe is deleted"
         def gebRecipeCountBeforeDelete = gebRecipes.size()
         println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
-        //deleteRecipeButtons.each { println it.@title }
         withConfirm(true) { deleteRecipeButtons[0].click() }
         println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
 
