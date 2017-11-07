@@ -1,9 +1,13 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, Inject } from '@angular/core';
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
+import { Observable } from 'rxjs/Rx';
+
+import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 
 declare var jQuery: any;
 @Component({
@@ -44,6 +48,7 @@ export class AssetExplorerViewGridComponent {
 	@Output() modelChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
 
+	fields = [];
 	justPlanning = false;
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
@@ -56,8 +61,22 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 
-	constructor(private userPref: PreferenceService) {
+	constructor(private userPref: PreferenceService, @Inject('fields') fields: Observable<DomainModel[]>) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+		fields.subscribe((result: DomainModel[]) => {
+			this.fields = result.reduce((p, c) => {
+				return p.concat(c.fields);
+			}, []).map((f: FieldSettingsModel) => {
+				return {
+					key: `${f['domain']}_${f.field}`,
+					label: f.label
+				};
+			});
+		}, (err) => console.log(err));
+	}
+
+	getPropertyLabel(column: ViewColumn): string {
+		return this.fields.filter(f => f.key === `${column.domain}_${column.property}`)[0].label;
 	}
 
 	rowCallbackClass(context: RowClassArgs) {
