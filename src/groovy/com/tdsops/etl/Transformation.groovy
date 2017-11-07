@@ -2,31 +2,12 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.StringUtil
 
-class Transformation extends Expando {
+class Transformation {
 
     Element element
 
     Transformation (Element element) {
         this.element = element
-    }
-
-    /**
-     *
-     *
-     * @param methodName
-     * @param args
-     */
-    def methodMissing (String methodName, args) {
-        if (methodName in ['first', 'last']) {
-            this."$methodName"(args)
-        }
-    }
-
-
-    def propertyMissing (String name) {
-        if (name in ['lowercase', 'uppercase', 'trim', 'sanitize']) {
-            this."$name"()
-        }
     }
 
     Transformation middle (int take, int position) {
