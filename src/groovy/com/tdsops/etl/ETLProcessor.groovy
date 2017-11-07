@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import getl.data.Dataset
 import net.transitionmanager.domain.Project
 
 /**
@@ -10,7 +11,9 @@ import net.transitionmanager.domain.Project
 class ETLProcessor {
 
     Project project
-    List<List<String>> dataSource = []
+    Dataset dataSet
+    List<getl.data.Field> fields
+
     ETLFieldsValidator fieldsValidator
     Map<String, ETLTransformation> transformations = [:]
 
@@ -34,17 +37,17 @@ class ETLProcessor {
      *
      */
     ETLProcessor () {
-        this(null, [], new DebugConsole(buffer: new StringBuffer()), null)
+        this(null, null, new DebugConsole(buffer: new StringBuffer()), null)
     }
     /**
      *
      * Creates an instance of ETL processor with a source of data
      *
-     * @param data
+     * @param dataset
      * @param domainFieldsSpec
      */
-    ETLProcessor (List<List<String>> data) {
-        this(null, data, new DebugConsole(buffer: new StringBuffer()), null)
+    ETLProcessor (Dataset dataset) {
+        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), null)
     }
     /**
      *
@@ -53,8 +56,8 @@ class ETLProcessor {
      * @param data
      * @param fieldsValidator
      */
-    ETLProcessor (List<List<String>> data, ETLFieldsValidator fieldsValidator) {
-        this(null, data, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
+    ETLProcessor (Dataset dataset, ETLFieldsValidator fieldsValidator) {
+        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
     }
     /**
      *
@@ -63,22 +66,20 @@ class ETLProcessor {
      * @param data
      * @param console
      */
-    ETLProcessor (List<List<String>> data, DebugConsole console) {
-        this(null, data, console, null)
+    ETLProcessor (Dataset dataset, DebugConsole console) {
+        this(null, dataset, console, null)
     }
     /**
      *
      * Creates an instance of ETL processor with a source of data,
      * a domain mapper validator and an instance of fieldsValidator
      *
-     * @param data
+     * @param dataset
      * @param console
      * @param fieldsValidator
      */
-    ETLProcessor (List<List<String>> data, DebugConsole console, ETLFieldsValidator fieldsValidator) {
-        this.dataSource = data
-        this.debugConsole = console
-        this.fieldsValidator = fieldsValidator
+    ETLProcessor (Dataset dataset, DebugConsole console, ETLFieldsValidator fieldsValidator) {
+        this(null, dataset, console, fieldsValidator)
     }
     /**
      *
@@ -87,15 +88,15 @@ class ETLProcessor {
      * with a map of available transformations
      *
      * @param project
-     * @param data
+     * @param dataset
      * @param console
      * @param fieldsValidator
      */
-    ETLProcessor (Project project, List<List<String>> data,
+    ETLProcessor (Project project, Dataset dataset,
                   DebugConsole console,
                   ETLFieldsValidator fieldsValidator) {
         this.project = project
-        this.dataSource = data
+        this.dataSet = dataset
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
     }
@@ -126,11 +127,19 @@ class ETLProcessor {
 
         if ("labels".equalsIgnoreCase(dataPart)) {
 
-            dataSource.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
-                Column column = new Column(label: columnName, index: index)
+            fields = dataSet.connection.driver.fields(dataSet)
+            fields.eachWithIndex { getl.data.Field field, Integer index ->
+                Column column = new Column(label: field.name, index: index)
                 columns.add(column)
                 columnsMap[column.label] = column
             }
+            currentRowIndex++
+//
+//            dataSet.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
+//                Column column = new Column(label: columnName, index: index)
+//                columns.add(column)
+//                columnsMap[column.label] = column
+//            }
             debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
         }
         this
@@ -144,9 +153,9 @@ class ETLProcessor {
      */
     ETLProcessor iterate (Closure closure) {
 
-        dataSource[currentRowIndex..(dataSource.size() - 1)].each { List<String> crudRowData ->
+        dataSet.eachRow { def row ->
             currentColumnIndex = 0
-            closure(addCrudRowData(currentRowIndex, crudRowData))
+            closure(addCrudRowData(currentRowIndex, row))
 
             currentRowResult.each { ETLDomain key, ReferenceResult value ->
                 if (!results.containsKey(key)) {
@@ -158,6 +167,7 @@ class ETLProcessor {
             currentRowResult = [:]
             currentRowIndex++
         }
+
         currentRowIndex--
         this
     }
@@ -181,7 +191,7 @@ class ETLProcessor {
     }
 
     ETLProcessor skip (Integer amount) {
-        if (amount + currentRowIndex <= dataSource.size()) {
+        if (amount + currentRowIndex <= dataSet.readRows) {
             currentRowIndex += amount
         } else {
             throw ETLProcessorException.invalidSkipStep(amount)
@@ -326,8 +336,8 @@ class ETLProcessor {
         element
     }
 
-    private void addCrudRowData (Integer rowIndex, List<String> crudRowData) {
-        currentRow = new Row(rowIndex, crudRowData, this)
+    private void addCrudRowData (Integer rowIndex, Map row) {
+        currentRow = new Row(rowIndex, fields.collect{ row[it.name]?:"" }, this)
         rows.add(currentRow)
         currentRow
     }
