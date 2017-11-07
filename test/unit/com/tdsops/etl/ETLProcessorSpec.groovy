@@ -4,6 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.data.Dataset
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import getl.proc.Flow
@@ -155,7 +156,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can define a the primary domain' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor()
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -175,7 +176,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can add groovy comments' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor()
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -199,7 +200,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an exception if an invalid domain is defined' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor()
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -221,7 +222,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can define a domain more than once within the script' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor()
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -244,7 +245,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if the skip parameter is bigger that rows count' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -261,7 +262,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if the scrip command is not recognized' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -278,7 +279,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can read labels from dataSource and create a map of columns' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -311,7 +312,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can iterate over all data source rows' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -334,7 +335,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can iterate over all data source rows from a json dataset' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(jsonDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), jsonDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -361,7 +362,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can iterate over a range of data source rows' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -384,7 +385,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can iterate over a list of data source rows' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(sixRowsDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -411,7 +412,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column ordinal position' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -444,7 +445,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can extract a field value over all rows based on column name' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -473,7 +474,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if a column name is invalid' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -500,7 +501,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can throw an Exception if a column index is not between row elements range' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -526,7 +527,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with uppercase transformation' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -551,7 +552,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with uppercase transformation inside a closure' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -578,7 +579,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value to lowercase transformation' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -603,7 +604,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value to lowercase transformation inside a closure' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -630,7 +631,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking left 4 characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -655,7 +656,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking left 4 characters inside a closure' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -682,7 +683,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking middle 2 characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -707,7 +708,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking middle 2 characters inside a closure' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -732,7 +733,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping first A characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -757,7 +758,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping last A characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -782,7 +783,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value striping all A characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -807,7 +808,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can apply another transformation for a field value after striping all A characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -832,7 +833,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value with taking right 4 characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -857,7 +858,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a use left 4 transformation in a chain of transformations' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -882,7 +883,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value using replace command with a String value' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -907,7 +908,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform a field value using replace command with a Regular expression value' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -932,7 +933,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can apply transformations on a field value many times' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -957,7 +958,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at parsing time' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -980,7 +981,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can check syntax errors at evaluation time' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1002,7 +1003,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow closure creation using a secure syntax with AST customizer' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1043,7 +1044,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow method creation using a secure syntax with AST customizer' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1081,7 +1082,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary imports using a secure syntax with AST customizer' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1121,7 +1122,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1162,7 +1163,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can allow stars imports using a secure syntax with AST customizer' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1201,7 +1202,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1256,7 +1257,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1295,7 +1296,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, console)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1319,7 +1320,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(environmentDataSet, console)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), environmentDataSet, console, GroovyMock(ETLFieldsValidator))
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1375,7 +1376,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1455,7 +1456,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1497,7 +1498,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1553,7 +1554,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1613,7 +1614,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1673,7 +1674,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1779,7 +1780,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -1881,7 +1882,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2185,7 +2186,7 @@ class ETLProcessorSpec extends Specification {
             DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
         and:
-            ETLProcessor etlProcessor = new ETLProcessor(applicationDataSet, console, validator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         and:
             ETLBinding binding = new ETLBinding(etlProcessor)
@@ -2499,7 +2500,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can trim element values to remove leading and trailing whitespaces' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2524,7 +2525,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can sanitize element value to replace all of the escape characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2549,7 +2550,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can turn on globally trim command to remove leading and trailing whitespaces' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2575,7 +2576,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can turn on globally trim command without defining on parameter' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2601,7 +2602,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can turn on globally sanitize command to replace all of the escape characters' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2627,7 +2628,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform globally a field value using replace command with a String value' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
@@ -2653,7 +2654,7 @@ class ETLProcessorSpec extends Specification {
     void 'test can transform globally a field value using replace command using a range in the iteration' () {
 
         given:
-            ETLProcessor etlProcessor = new ETLProcessor(nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
             new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
