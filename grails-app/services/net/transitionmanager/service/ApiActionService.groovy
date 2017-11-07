@@ -51,7 +51,7 @@ class ApiActionService {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 		if (context.hasErrors()) {
-			log.debug "TASK ERRORS: ${com.tdssrc.grails.GormUtil.allErrorsString(context)}"
+			log.warn 'Invoke() encountered data errors in context: {}', com.tdssrc.grails.GormUtil.allErrorsString(context)
 		}
 		if (! context) {
 			throw new InvalidRequestException('invoke() required context was null')
@@ -76,7 +76,7 @@ class ApiActionService {
 
 			if (methodRequiresCallbackMethod) {
 				if (! action.callbackMethod) {
-					log.info action.toString()
+					log.warn 'Action is missing required callback: {}', action.toString()
 					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
 				}
 				remoteMethodParams << [callbackMethod: action.callbackMethod]
@@ -90,7 +90,7 @@ class ApiActionService {
 				def agent = agentInstanceForAction(action)
 
 				// Lets try to invoke the method
-				log.info "About to invoke the following command: ${agent.name}.${action.agentMethod}('${action.asyncQueue}', ($remoteMethodParams))"
+				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', agent.name, action.agentMethod, action.asyncQueue, remoteMethodParams
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 
 			} else {
@@ -116,7 +116,7 @@ class ApiActionService {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
-		logger.info "About to invoke the following command: ${agent.name}.${action.agentMethod}($remoteMethodParams)"
+		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
 		// execute action and return any result coming
 		return agent."${action.agentMethod}"(remoteMethodParams)
