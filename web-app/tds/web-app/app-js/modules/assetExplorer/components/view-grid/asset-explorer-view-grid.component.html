@@ -32,7 +32,7 @@
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
 				<div>
-					<label for=""> {{column.label}}</label>
+					<label for=""> {{getPropertyLabel(column)}}</label>
 					<!-- <i style="cursor:e-resize" *ngIf="edit" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i> -->
 				</div>
 			</div>
