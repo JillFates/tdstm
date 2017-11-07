@@ -49,57 +49,6 @@ class ETLProcessor {
      *  https://en.wikipedia.org/wiki/Control_character
      */
     static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
-
-    /**
-     *
-     * Creates an instance of ETL Processor with all default values
-     *
-     */
-    ETLProcessor () {
-        this(null, null, new DebugConsole(buffer: new StringBuffer()), null)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data
-     *
-     * @param dataset
-     * @param domainFieldsSpec
-     */
-    ETLProcessor (Dataset dataset) {
-        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), null)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data and a domain mapper validator
-     *
-     * @param data
-     * @param fieldsValidator
-     */
-    ETLProcessor (Dataset dataset, ETLFieldsValidator fieldsValidator) {
-        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data and a debugguer console
-     *
-     * @param data
-     * @param console
-     */
-    ETLProcessor (Dataset dataset, DebugConsole console) {
-        this(null, dataset, console, null)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data,
-     * a domain mapper validator and an instance of fieldsValidator
-     *
-     * @param dataset
-     * @param console
-     * @param fieldsValidator
-     */
-    ETLProcessor (Dataset dataset, DebugConsole console, ETLFieldsValidator fieldsValidator) {
-        this(null, dataset, console, fieldsValidator)
-    }
     /**
      *
      * Creates an instance of ETL processor with a source of data,
@@ -107,13 +56,13 @@ class ETLProcessor {
      * with a map of available transformations
      *
      * @param project
-     * @param dataset
+     * @param dataSet
      * @param console
      * @param fieldsValidator
      */
-    ETLProcessor (Project project, Dataset dataset, DebugConsole console, ETLFieldsValidator fieldsValidator) {
+    ETLProcessor (Project project, Dataset dataSet, DebugConsole console, ETLFieldsValidator fieldsValidator) {
         this.project = project
-        this.dataSet = dataset
+        this.dataSet = dataSet
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
     }
@@ -144,7 +93,7 @@ class ETLProcessor {
 
         if ("labels".equalsIgnoreCase(dataPart)) {
 
-            fields = dataSet.connection.driver.fields(dataSet)
+            fields = this.dataSet.connection.driver.fields(this.dataSet)
             fields.eachWithIndex { getl.data.Field field, Integer index ->
                 Column column = new Column(label: field.name, index: index)
                 columns.add(column)
@@ -165,7 +114,7 @@ class ETLProcessor {
 
         [to: { int to ->
             [iterate: { Closure closure ->
-                List subList = dataSet.rows().subList(from, to)
+                List subList = this.dataSet.rows().subList(from, to)
                 doIterate(subList, closure)
             }]
         }]
@@ -181,7 +130,7 @@ class ETLProcessor {
 
         [iterate: { Closure closure ->
             List rowNumbers = numbers as List
-            List rows = dataSet.rows()
+            List rows = this.dataSet.rows()
             List subList = rowNumbers.collect { rows.get(it) }
             doIterate(subList, closure)
         }]
@@ -221,7 +170,7 @@ class ETLProcessor {
      * @return
      */
     ETLProcessor iterate (Closure closure) {
-        doIterate(dataSet.rows(), closure)
+        doIterate(this.dataSet.rows(), closure)
     }
     /**
      *
@@ -305,7 +254,7 @@ class ETLProcessor {
     }
 
     ETLProcessor skip (Integer amount) {
-        if (amount + currentRowIndex <= dataSet.readRows) {
+        if (amount + currentRowIndex <= this.dataSet.readRows) {
             currentRowIndex += amount
         } else {
             throw ETLProcessorException.invalidSkipStep(amount)
