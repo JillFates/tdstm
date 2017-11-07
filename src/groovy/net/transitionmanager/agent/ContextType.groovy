@@ -13,7 +13,7 @@ enum ContextType {
 	EVENT,
 	PROJECT,
 	STORAGE,
-	SERVER,
+	//SERVER, TM-7692
 	TASK,
 	USER_DEF
 }
