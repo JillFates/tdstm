@@ -95,13 +95,12 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             Person person = personHelper.createPerson(null, project.client, project)
         and: 'create a user that is logged in and the project is their default'
             UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-
         when: 'a new bundle is created'
             MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
         and: 'a new event is created'
-           MoveEvent event = moveEventService.create(project, 'Test Event')
+            MoveEvent event = moveEventService.create(project, 'Test Event')
         and: 'the above bundle is assigned to it'
-           moveBundleService.assignMoveEvent(event, [bundle.id])
+            moveBundleService.assignMoveEvent(event, [bundle.id])
         and: 'some assets are created and assigned to the bundle'
             AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: bundle])
             AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: bundle])
