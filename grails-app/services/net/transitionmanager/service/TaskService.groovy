@@ -561,12 +561,14 @@ class TaskService implements ServiceMethods {
 		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
 		if (searchText) {
+			query.append("AND ( ")
+
 			if ( NumberUtils.isDigits(searchText) ) {
-				query.append("AND a.taskNumber like '%${searchText}%' ")
-			} else {
-				query.append("AND a.comment like :searchText ")
-				params["searchText"] = "%" + searchText + "%"
+				query.append("cast(a.taskNumber as string) like :searchText OR ")
 			}
+
+			query.append("a.comment like :searchText )")
+			params["searchText"] = "%" + searchText + "%"
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
