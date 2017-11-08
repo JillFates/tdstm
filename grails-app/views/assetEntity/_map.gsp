@@ -3,6 +3,7 @@
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">
 		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div>
+		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('dependencies')"><h4>Dependencies</h4></div>
 		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
 		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
@@ -38,7 +39,7 @@
 	<div id="controlPanelId" class="graphPanel">
 		<form id="preferencesformId">
 			<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
-				
+
 				<!-- Miscellaneous settings and controls -->
 				<tr>
 					<td colspan="3" class="noPadding">
@@ -50,7 +51,7 @@
 						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="pointer fullButton graphButton" onclick="setIdealGraphPosition()">
 					</td>
 				</tr>
-				
+
 				<!-- Suggest splits controls -->
 				<tr>
 					<td colspan="3" class="noPadding" >
@@ -65,12 +66,12 @@
 						--><label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Max dependencies cut</label>
 					</td>
 				</tr>
-				
-				
+
+
 				<!-- Spacer -->
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-				
-				
+
+
 				<!-- Color By grouping selector -->
 				<tr title="Sets the criteria used to determine node fill color">
 					<td colspan="3" style="padding-left :0px">
@@ -80,7 +81,7 @@
 						</span>
 					</td>
 				</tr>
-				
+
 				<!-- More display controls -->
 				<tr title="If checked, bundle conflicts will be highlighted">
 					<td colspan="3" style="padding-left :0px">
@@ -88,7 +89,7 @@
 							<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
 							<label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
 						</span>
-						
+
 					</td>
 				</tr>
 				<tr title="Sets the color of the background to black">
@@ -99,12 +100,12 @@
 						</span>
 					</td>
 				</tr>
-				
-				
+
+
 				<!-- Spacer -->
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-				
-				
+
+
 				<!-- The twistie for the hide/show graph labels section -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
@@ -139,11 +140,11 @@
 					</g:each>
 				</table>
 			</div>
-			
+
 			<table class="labelTree" cellpadding="0" cellspacing="0">
 				<!-- Spacer -->
 				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-				
+
 				<!-- The twistie for the force layout settings section -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
@@ -155,7 +156,7 @@
 				</tr>
 			</table>
 		</form>
-		
+
 		<!-- layout controls -->
 		<div id="layoutControlContainerId">
 			<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
@@ -193,13 +194,13 @@
 				</tr>
 			</table>
 		</div>
-		
+
 		<!-- Preference controls -->
 		<table class="labelTree" cellpadding="0" cellspacing="0">
-				
+
 			<!-- Spacer -->
 			<tr><td colspan="3" class="noPadding"><br /></td></tr>
-			
+
 			<!-- Save preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
@@ -213,6 +214,53 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	<!-- The dependencies panel div containing the checkboxes -->
+	<div id="dependenciesPanelId" class="graphPanel">
+		<label>Connection Type <i class="fa fa-fw fa-caret-right"></i></label>
+		<div class="checkboxdiv_control">
+			<table>
+				<tr>
+					<th style="width: 134px;"></th>
+					<th style="text-align: center;">Show</th>
+					<th style="text-align: center;">Highlight</th>
+				</tr>
+				<tr>
+					<td>All</td>
+					<td style="text-align: center;"><input type="checkbox" id="dependencyTypeControl_show_all" name="dependencyTypeControl_show__all"/></td>
+					<td></td>
+				</tr>
+				<g:each in="${dependencyType}" var="dependency">
+					<tr>
+						<td style="width: 134px;"><span id="dependencyTypeControl_${dependency}"> ${dependency}</span></td>
+						<td style="text-align: center;"><input type="checkbox" id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}"/></td>
+						<td style="text-align: center;"><input type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}"/></td>
+					</tr>
+				</g:each>
+			</table>
+		</div>
+		<label>Connection Status <i class="fa fa-fw fa-caret-right"></i></label>
+		<div class="checkboxdiv_control">
+			<table>
+				<tr>
+					<th style="width: 134px;"></th>
+					<th style="text-align: center;">Show</th>
+					<th style="text-align: center;">Highlight</th>
+				</tr>
+				<tr>
+					<td>All</td>
+					<td style="text-align: center;"><input type="checkbox" id="show_all" name="dependencyControl_show_all"/></td>
+					<td></td>
+				</tr>
+				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+					<tr>
+						<td style="width: 134px;"><span id="dependecy_${dependency}"> ${dependencyStatusInst}</span></td>
+						<td style="text-align: center;"><input type="checkbox" id="show_${dependency}" name="dependencyControl_show_${dependency}"/></td>
+						<td style="text-align: center;"><input type="checkbox" id="highlight_${dependency}"name="dependencyControl_highlight_${dependency}"/></td>
+					</tr>
+				</g:each>
+			</table>
+		</div>
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
 	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref]}" />

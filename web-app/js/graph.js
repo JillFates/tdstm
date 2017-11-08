@@ -85,7 +85,7 @@ var GraphUtil = (function ($) {
 		if (public.graphExists()) {
 			var dimensions = public.getProperGraphDimensions();
 			resizeGraph(dimensions.width, dimensions.height);
-			public.correctBothPanelSizes();
+			public.correctPanelSizes();
 		}
 	}
 
@@ -136,10 +136,16 @@ var GraphUtil = (function ($) {
 		public.correctPanelSize('controlPanelId');
 	}
 
+	// sets the size of the Dependency Panel so that it can scroll when longer than the user's window
+	public.correctDependenciesPanelSize = function () {
+		public.correctPanelSize('dependenciesPanelId');
+	}
+
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
-	public.correctBothPanelSizes = function () {
+	public.correctPanelSizes = function () {
 		public.correctLegendSize();
 		public.correctControlPanelSize();
+		public.correctDependenciesPanelSize();
 	}
 
 	// sets the size of a panel so that it can scroll when longer than the user's window
@@ -258,6 +264,9 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
+		} else if (panel == 'dependencies') {
+			$('#dependenciesPanelId').removeClass('openPanel');
+			$('#dependenciesPanelTabId').removeClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').removeClass('openPanel');
 			$('#legendTabId').removeClass('activeTab');
@@ -269,6 +278,9 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
+		} else if (panel == 'dependencies') {
+			$('#dependenciesPanelId').addClass('openPanel');
+			$('#dependenciesPanelTabId').addClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').addClass('openPanel');
 			$('#legendTabId').addClass('activeTab');
@@ -283,17 +295,27 @@ var GraphUtil = (function ($) {
 			else
 				public.openPanel('control');
 			public.hidePanel('legend');
+			public.hidePanel('dependencies');
+		} else if (panel == 'dependencies') {
+			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
+				public.hidePanel('dependencies');
+			else
+				public.openPanel('dependencies');
+			public.hidePanel('legend');
+			public.hidePanel('control');
 		} else if (panel == 'legend') {
 			if ($('#legendTabId.activeTab').size() > 0)
 				public.hidePanel('legend');
 			else
 				public.openPanel('legend');
 			public.hidePanel('control');
+			public.hidePanel('dependencies');
 		} else if (panel == 'hide') {
 			public.hidePanel('control');
 			public.hidePanel('legend');
+			public.hidePanel('dependencies');
 		}
-		public.correctBothPanelSizes();
+		public.correctPanelSizes();
 	}
 
 	// populates the team select
