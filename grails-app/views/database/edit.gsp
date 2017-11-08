@@ -12,7 +12,7 @@
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${databaseInstance.id}'
 		populateDependency(assetId, 'database','edit')
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm">

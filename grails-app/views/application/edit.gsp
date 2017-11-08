@@ -29,7 +29,7 @@
 		$("#testingByEditId").val('${raw(applicationInstance.testingBy)}')
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
