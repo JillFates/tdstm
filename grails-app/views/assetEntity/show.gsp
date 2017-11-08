@@ -246,6 +246,6 @@
 
 		EntityCrud.toggleAssetTypeFields( assetType );
 
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	});
 </script>
