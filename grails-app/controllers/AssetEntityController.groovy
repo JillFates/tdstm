@@ -2097,6 +2097,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					graphNodes[it.target].supports.add(it.id)
 				}
 
+				def entities = assetEntityService.entityInfo(project)
+
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
 				model.defaultsJson = defaults as JSON
@@ -2116,6 +2118,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.moveBundleMap = moveBundleIndexMap as JSON
 				model.moveEventMap = moveEventIndexMap as JSON
 				model.depGroup = params.dependencyBundle
+				model.dependencyType = entities.dependencyType
+				model.dependencyStatus = entities.dependencyStatus
 
 				// Render dependency graph
 				render(template:'dependencyGraph', model:model)

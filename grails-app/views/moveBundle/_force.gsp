@@ -308,7 +308,7 @@ function createGraph (config) {
 	// bind the "color by" radio buttons
 	$('#colorBySelectId').unbind('change').on('change', setColorBy)
 	setColorBy()
-	GraphUtil.correctBothPanelSizes()
+	GraphUtil.correctPanelSizes()
 	
 	// bind the show budle conflicts checkbox
 	$('#bundleConflictsId').unbind('change').on('change', function (e) {
