@@ -36,12 +36,8 @@ iterate {
     domain Application
     
     extract 0 load id
-    extract 'model name' transform { 
-        lowercase 
-    } load Name
-    extract 2 transform {
-        uppercase 
-    } load description
+    extract 'model name' transform with lowercase() load Name
+    extract 2 transform with uppercase() load description
     
     load environment with 'Production'
     //reference id with id
@@ -50,10 +46,7 @@ iterate {
     domain Device
     
     extract 0 load id
-    extract 'model name' transform { 
-        uppercase 
-    } load Name
-
+    extract 'model name' transform with uppercase() load Name
 }
 """.stripIndent()
 
@@ -84,7 +77,7 @@ iterate {
                 script = "console on"
 
             } else {
-                dataSet = params.dataSet?:exampleDataSet
+                dataSet = params.dataSet ?: exampleDataSet
                 script = params.script ?: exampleScript
             }
 
@@ -108,7 +101,7 @@ iterate {
         }
 
         [
-                dataSet            : dataSet,
+                dataSet             : dataSet,
                 script              : script?.trim(),
                 lineNumbers         : Math.max(script.readLines().size(), 10),
                 etlProcessor        : etlProcessor,

@@ -13,9 +13,7 @@ class ETLProcessor {
     Project project
     Dataset dataSet
     List<getl.data.Field> fields
-
     ETLFieldsValidator fieldsValidator
-    Map<String, ETLTransformation> transformations = [:]
 
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
@@ -31,56 +29,26 @@ class ETLProcessor {
     Map<ETLDomain, List<ReferenceResult>> results = [:]
     Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
-    /**
-     *
-     * Creates an instance of ETL Processor with all default values
-     *
-     */
-    ETLProcessor () {
-        this(null, null, new DebugConsole(buffer: new StringBuffer()), null)
+    Set globalTransformers = [] as Set
+
+    static Trimmer = { Element element ->
+        element.trim()
+    }
+
+    static Sanitizer = { Element element ->
+        element.sanitize()
+    }
+
+    static Replacer = { String regex, String replacement ->
+        { Element element ->
+            element.replace(regex, replacement)
+        }
     }
     /**
      *
-     * Creates an instance of ETL processor with a source of data
-     *
-     * @param dataset
-     * @param domainFieldsSpec
+     *  https://en.wikipedia.org/wiki/Control_character
      */
-    ETLProcessor (Dataset dataset) {
-        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), null)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data and a domain mapper validator
-     *
-     * @param data
-     * @param fieldsValidator
-     */
-    ETLProcessor (Dataset dataset, ETLFieldsValidator fieldsValidator) {
-        this(null, dataset, new DebugConsole(buffer: new StringBuffer()), fieldsValidator)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data and a debugguer console
-     *
-     * @param data
-     * @param console
-     */
-    ETLProcessor (Dataset dataset, DebugConsole console) {
-        this(null, dataset, console, null)
-    }
-    /**
-     *
-     * Creates an instance of ETL processor with a source of data,
-     * a domain mapper validator and an instance of fieldsValidator
-     *
-     * @param dataset
-     * @param console
-     * @param fieldsValidator
-     */
-    ETLProcessor (Dataset dataset, DebugConsole console, ETLFieldsValidator fieldsValidator) {
-        this(null, dataset, console, fieldsValidator)
-    }
+    static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
     /**
      *
      * Creates an instance of ETL processor with a source of data,
@@ -88,15 +56,13 @@ class ETLProcessor {
      * with a map of available transformations
      *
      * @param project
-     * @param dataset
+     * @param dataSet
      * @param console
      * @param fieldsValidator
      */
-    ETLProcessor (Project project, Dataset dataset,
-                  DebugConsole console,
-                  ETLFieldsValidator fieldsValidator) {
+    ETLProcessor (Project project, Dataset dataSet, DebugConsole console, ETLFieldsValidator fieldsValidator) {
         this.project = project
-        this.dataSet = dataset
+        this.dataSet = dataSet
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
     }
@@ -127,33 +93,58 @@ class ETLProcessor {
 
         if ("labels".equalsIgnoreCase(dataPart)) {
 
-            fields = dataSet.connection.driver.fields(dataSet)
+            fields = this.dataSet.connection.driver.fields(this.dataSet)
             fields.eachWithIndex { getl.data.Field field, Integer index ->
                 Column column = new Column(label: field.name, index: index)
                 columns.add(column)
                 columnsMap[column.label] = column
             }
             currentRowIndex++
-//
-//            dataSet.get(currentRowIndex++).eachWithIndex { String columnName, Integer index ->
-//                Column column = new Column(label: columnName, index: index)
-//                columns.add(column)
-//                columnsMap[column.label] = column
-//            }
             debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
         }
         this
     }
     /**
      *
-     * Iterates and applies closure to every row in the dataSource
      *
+     * @param from
+     * @return
+     */
+    def from (int from) {
+
+        [to: { int to ->
+            [iterate: { Closure closure ->
+                List subList = this.dataSet.rows().subList(from, to)
+                doIterate(subList, closure)
+            }]
+        }]
+    }
+    /**
+     *
+     *
+     *
+     * @param numbers
+     * @return
+     */
+    def using (int[] numbers) {
+
+        [iterate: { Closure closure ->
+            List rowNumbers = numbers as List
+            List rows = this.dataSet.rows()
+            List subList = rowNumbers.collect { rows.get(it) }
+            doIterate(subList, closure)
+        }]
+    }
+    /**
+     *
+     *
+     * @param rows
      * @param closure
      * @return
      */
-    ETLProcessor iterate (Closure closure) {
+    ETLProcessor doIterate (List rows, Closure closure) {
 
-        dataSet.eachRow { def row ->
+        rows.each { def row ->
             currentColumnIndex = 0
             closure(addCrudRowData(currentRowIndex, row))
 
@@ -173,6 +164,16 @@ class ETLProcessor {
     }
     /**
      *
+     * Iterates and applies closure to every row in the dataSource
+     *
+     * @param closure
+     * @return
+     */
+    ETLProcessor iterate (Closure closure) {
+        doIterate(this.dataSet.rows(), closure)
+    }
+    /**
+     *
      * Sets Status console to on/off for allow/disallow log messages.
      *
      * @param status
@@ -189,9 +190,71 @@ class ETLProcessor {
         debugConsole.info "Console status changed: $consoleStatus"
         this
     }
+    /**
+     *
+     * Removes leading and trailing whitespace from a string.
+     *
+     * @param status
+     * @return the instance of ETLProcessor who received this message
+     */
+    ETLProcessor trim (String status) {
+
+        if (status == 'on') {
+            globalTransformers.add(Trimmer)
+        } else if (status == 'of') {
+            globalTransformers.remove(Trimmer)
+        }
+
+        debugConsole.info "Global trim status changed: $status"
+        this
+    }
+    /**
+     *
+     *
+     * @param status
+     * @return the instance of ETLProcessor who received this message
+     */
+    ETLProcessor sanitize (String status) {
+
+        if (status == 'on') {
+            globalTransformers.add(Sanitizer)
+        } else if (status == 'of') {
+            globalTransformers.remove(Sanitizer)
+        }
+
+        debugConsole.info "Global sanitize status changed: $status"
+        this
+    }
+
+    ETLProcessor replace (String regex, String replacement) {
+
+        globalTransformers.add(Replacer(regex, replacement))
+        debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
+        this
+    }
+
+    /**
+     *
+     *
+     * @param control
+     * @return
+     */
+    def replace (String control) {
+
+        debugConsole.info "Global trm status changed: $control"
+        if (control == 'ControlCharacters') {
+            [with: { y ->
+                globalTransformers.add(Replacer(ControlCharactersRegex, y))
+            },
+             off : { ->
+
+             }]
+        }
+
+    }
 
     ETLProcessor skip (Integer amount) {
-        if (amount + currentRowIndex <= dataSet.readRows) {
+        if (amount + currentRowIndex <= this.dataSet.readRows) {
             currentRowIndex += amount
         } else {
             throw ETLProcessorException.invalidSkipStep(amount)
@@ -337,7 +400,7 @@ class ETLProcessor {
     }
 
     private void addCrudRowData (Integer rowIndex, Map row) {
-        currentRow = new Row(rowIndex, fields.collect{ row[it.name]?:"" }, this)
+        currentRow = new Row(rowIndex, fields.collect { row[it.name] }, this)
         rows.add(currentRow)
         currentRow
     }
@@ -349,7 +412,7 @@ class ETLProcessor {
     private def doExtract () {
         Element selectedElement = currentRow.getElement(currentColumnIndex)
         debugConsole.info "Extract element: ${selectedElement.value} by column index: ${currentColumnIndex}"
-
+        applyGlobalTransformations(selectedElement)
         selectedElement
     }
     /**
@@ -395,6 +458,13 @@ class ETLProcessor {
         }
     }
 
+    void applyGlobalTransformations (Element element) {
+
+        globalTransformers.each { transformer ->
+            transformer(element)
+        }
+    }
+
     def methodMissing (String methodName, args) {
         debugConsole.info "Method missing: ${methodName}, args: ${args}"
         throw ETLProcessorException.methodMissing(methodName, args)
@@ -425,7 +495,10 @@ class ETLProcessor {
     }
 
     List<String> getAvailableMethods () {
-        ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels', 'transform', 'translate', 'debug']
+        ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
+         'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
+         'uppercase()', 'lowercase()', 'first(content)', 'last(content)', 'all(content)',
+         'left(amount)', 'right(amount)', 'replace(regex, replacement)']
     }
 
     List<String> getAssetFields () {
