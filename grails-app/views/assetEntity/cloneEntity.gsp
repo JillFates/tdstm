@@ -68,7 +68,7 @@
     $("#assetMenuId a").css('background-color','#003366')
 
     $(document).ready(function() {
-        changeDocTitle('${asset.assetEntityInstance.assetName} Clone');
+        changeDocTitle('${raw(asset.assetEntityInstance.assetName)} Clone');
     });
 
     var currentAssetId = ${asset.assetEntityInstance.id};
