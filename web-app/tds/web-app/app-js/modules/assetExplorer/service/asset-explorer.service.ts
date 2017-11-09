@@ -31,11 +31,6 @@ export class AssetExplorerService {
 						open: true,
 						type: ViewType.ALL
 					}, {
-						name: 'Recent',
-						items: [],
-						open: false,
-						type: ViewType.RECENT
-					}, {
 						name: 'Favorites',
 						items: reportGroupModel.filter(r => r['isFavorite']),
 						open: false,
