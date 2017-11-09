@@ -487,6 +487,7 @@ var GraphUtil = (function ($) {
 				+ ((d.future) ? ' future' : '')
 				+ ((d.cut) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
+				+ ((d.hide === 'y') ? ' hide_link' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
@@ -512,10 +513,13 @@ var GraphUtil = (function ($) {
 	}
 
 	// updates the class list for ever graph element
-	public.updateAllClasses = function () {
+	public.updateAllClasses = function (callback) {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
+		if(callback){
+			return callback();
+		}
 	}
 
 
@@ -1079,7 +1083,32 @@ var GraphUtil = (function ($) {
 		}
 		public.updateAllClasses();
 		public.createCutShadows(fill);
-	}
+	};
+
+	public.applyShowHideDependencies = function () {
+		var links = public.force.links();
+		var showTypeItems = $('.dependencyTypeControlsShow:checked').map(function() { return this.value; }).get();
+		var highlightTypeItems = $('.dependencyTypeControlsHighlight:checked').map(function() { return this.value; }).get();
+		var showStatusItems = $('.dependencyStatusControlsShow:checked').map(function() { return this.value; }).get();
+		var highlightStatusItems = $('.dependencyStatusControlsHighlight:checked').map(function() { return this.value; }).get();
+
+		var hideList = [];
+		var highlightList = [];
+		for (var i = 0; i < links.length; ++i) {
+			var link = links[i];
+			var dependencyStatus = link.dependencyStatus;
+			var dependencyType = link.dependencyType;
+			link.hide = (showTypeItems.indexOf(dependencyType) === -1)? 'y' : 'n';
+			link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : 'n';
+		}
+
+		public.updateAllClasses(function(){
+			$('.link').show();
+			$('.hide_link').hide();
+			public.createCutShadows(fill);
+			console.log(links);
+		});
+	};
 
 	// removes the value in the source filter field and performs a new search
 	public.clearFilter = function (source) {

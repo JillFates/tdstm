@@ -149,6 +149,7 @@ var cancelCut = false
 
 // Build the layout model
 function buildMap () {
+	debugger;
 	// get the default graph configuration
 	var config = getForceConfig()
 	widthCurrent = config.width
@@ -248,7 +249,7 @@ function createForceLayout (config) {
 
 // creates the graph SVG and sets up the bindings and behaviors for it
 function createGraph (config) {
-	
+	debugger;
 	// updates the current fillMode
 	fillMode = GraphUtil.getFillMode()
 	
@@ -606,6 +607,7 @@ function toggleNodeSelection (id) {
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height) {
+	debugger;
 	// handle resizing when not in fullscreen mode
 	if (!GraphUtil.isFullscreen() && (width && height))
 		resizeGraph(width, height)
@@ -781,6 +783,7 @@ function reoptimizeGraph () {
 function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
+
 		if (event.shiftKey)
 			return;
 		var validTags = ['use', 'svg', 'g', 'line'];
@@ -823,7 +826,7 @@ function drawContextMenu() {
 			if (tag == 'line') {
 
 				var data = target.__data__;
-				//console.log(data);
+				debugger;
 
 				$("#consoleOutputItemId").on('click', function (a, b) {
 					closeMenu();

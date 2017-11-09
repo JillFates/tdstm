@@ -2031,7 +2031,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					depGroups = -1
 
 				def assetDependencies = AssetDependency.executeQuery('''
-					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
+					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.type as type, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
 					                (CASE WHEN ad.asset.moveBundle != ad.dependent.moveBundle
 					                       AND ad.status in (:statuses)
@@ -2073,6 +2073,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						notApplicable = true
 					}
 
+					def dependencyStatus = it.status
+					def dependencyType = it.type
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if (sourceIndex != -1 && targetIndex != -1) {
@@ -2085,6 +2087,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 
 						graphLinks << [id: i, source: sourceIndex, target: targetIndex, value: 2, statusColor: statusColor,
+								       dependencyStatus: dependencyStatus, dependencyType: dependencyType,
 						               opacity: opacity, unresolved: !it.resolved, notApplicable: notApplicable,
 						               future: future, bundleConflict: it.bundleConflict, duplicate: duplicate]
 						i++

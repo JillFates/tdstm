@@ -131,6 +131,22 @@ function listCheck () {
 	return labelsList
 }
 
+// --------  DEPENDENCY PANEL
+/**
+ * Used on _map.gsp to select/unselect all items of a given class type
+ * @param checkboxSelectorClass string
+ * @param event (native)
+ */
+function onSelectAllDependency(checkboxSelectorClass, event) {
+	$('.' + checkboxSelectorClass).prop('checked', event.checked);
+}
+
+function toggleDependencyPanel(dependencyPanel) {
+	$('.'+dependencyPanel).toggle();
+}
+
+// --------  DEPENDENCY PANEL
+
 $('#tabTypeId').val('graph')
 
 </script>
