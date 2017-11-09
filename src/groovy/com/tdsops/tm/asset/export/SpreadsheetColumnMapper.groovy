@@ -7,8 +7,6 @@ import net.transitionmanager.service.CustomDomainService
  * Asset export spreadsheet column mapper
  */
 class SpreadsheetColumnMapper {
-    // List of Asset Field labels that are not to be included in the Asset Export.
-    private List<String> ignoredAssetLabels = ["Asset Class"]
     private String sheetName
     private List<String> templateHeaders
     private List<Map<String, ?>> customFields = []
@@ -59,7 +57,7 @@ class SpreadsheetColumnMapper {
      */
     Set<String> getMissingHeaders() {
         List<String> standardHeaders = standardFields*.label
-        return standardHeaders - templateHeaders - ignoredAssetLabels
+        return standardHeaders - templateHeaders
     }
 
     /**
