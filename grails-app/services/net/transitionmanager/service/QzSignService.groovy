@@ -13,6 +13,9 @@ import java.security.Signature
 
 @Transactional
 class QzSignService {
+	static final DEFAULT_KEYPATH = 'bin/certs/qztray.transitionmanager.net.key'
+	static final DEFAULT_CERTPATH = 'bin/certs/qztray.digital-certificate'
+
 	def grailsApplication
 
 	/**
@@ -24,7 +27,7 @@ class QzSignService {
 	File findPrivateKeyFile() {
 		if(!grailsApplication.config.tdstm.qztray.keypath){
 			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.keyPath')")
-			grailsApplication.config.tdstm.qztray.keypath = "bin/certs/qztray.transitionmanager.net.key"
+			grailsApplication.config.tdstm.qztray.keypath = DEFAULT_KEYPATH
 		}
 
 		findFileInternal( grailsApplication.config.tdstm.qztray.keypath )
@@ -37,7 +40,7 @@ class QzSignService {
 	File findCertificateFile() {
 		if(!grailsApplication.config.tdstm.qztray.cert){
 			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.cert')")
-			grailsApplication.config.tdstm.qztray.cert = "bin/certs/qztray.digital-certificate"
+			grailsApplication.config.tdstm.qztray.cert = DEFAULT_CERTPATH
 		}
 
 		findFileInternal( grailsApplication.config.tdstm.qztray.cert )
