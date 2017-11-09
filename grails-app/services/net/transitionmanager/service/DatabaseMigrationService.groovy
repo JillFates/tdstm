@@ -3,12 +3,14 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DatabaseMigrationService implements ServiceMethods {
 
 	// The DB Migration Plugin is responsible for managing the transactions
 	static transactional = false
+    def dataSource
 
 	/**
 	 * Utility method used to add permissions to the security tables
@@ -143,5 +145,20 @@ class DatabaseMigrationService implements ServiceMethods {
 				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
 			}
 		}
+	}
+    /**
+     *
+     * Adds a new System Dataview defining the id parameter a the Dataview spec in JSON format
+     *
+     * @param id - a new Id between 1-1000 to be used in Dataview creation
+     * @param name - the name of the new system Dataview
+     * @param jsonSpec - a json spec for the new Dataview.
+     */
+	void addSystemView(Long id, String name, String jsonSpec) {
+
+        final Sql sql = new Sql(dataSource)
+
+        List params = [id, name, Project.DEFAULT_PROJECT_ID, true, new Date(), jsonSpec]
+        sql.execute 'insert into dataview(id, name, project_id, is_system, date_created, report_schema) values(?,?,?,?,?,?)',  params
 	}
 }
