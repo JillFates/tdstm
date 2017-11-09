@@ -4,6 +4,8 @@ import { Response } from '@angular/http';
 import { ViewModel, ViewGroupModel, ViewType } from '../model/view.model';
 import { QuerySpec } from '../model/view-spec.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
+import { Permission } from '../../../shared/model/permission.model';
+import { PermissionService } from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -14,7 +16,7 @@ export class AssetExplorerService {
 	private assetExplorerUrl = '../ws/assetExplorer';
 	private FAVORITES_MAX_SIZE = 10;
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
 
 	getReports(): Observable<ViewGroupModel[]> {
@@ -24,7 +26,7 @@ export class AssetExplorerService {
 				let reportGroupModel: ViewGroupModel[] = Object.keys(response).map(key => {
 					return response[key];
 				});
-				return [
+				let folders = [
 					{
 						name: 'All',
 						items: reportGroupModel,
@@ -50,13 +52,17 @@ export class AssetExplorerService {
 						items: reportGroupModel.filter(r => r['isShared']),
 						open: false,
 						type: ViewType.SHARED_VIEWS
-					}, {
+					}
+				];
+				if (this.permissionService.hasPermission(Permission.AssetExplorerSystemList)) {
+					folders.push({
 						name: 'System Views',
 						items: reportGroupModel.filter(r => r['isSystem']),
 						open: false,
 						type: ViewType.SYSTEM_VIEWS
-					}
-				] as any;
+					});
+				}
+				return folders as any;
 			})
 			.catch((error: any) => error.json());
 	}

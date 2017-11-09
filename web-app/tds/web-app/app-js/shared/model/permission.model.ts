@@ -16,6 +16,7 @@ export class Permission {
 	static AssetExplorerSystemDelete = 'AssetExplorerSystemDelete';
 	static AssetExplorerSystemEdit = 'AssetExplorerSystemEdit';
 	static AssetExplorerSystemSaveAs = 'AssetExplorerSystemSaveAs';
+	static AssetExplorerSystemList = 'AssetExplorerSystemList';
 	static AssetExplorerPublish = 'AssetExplorerPublish';
 	static AssetExplorerUnPublish = 'AssetExplorerUnPublish';
 	static AssetImport = 'AssetImport';
