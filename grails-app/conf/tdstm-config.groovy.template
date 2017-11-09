@@ -38,8 +38,9 @@ tdstm {
 
   qztray{
 	  //relative to the WEB-INF, if it can't be found there, fallback to the Application's Home directory
-    keypath = 'tdstm/qztray.transitionmanager.net.key'
-    passphrase = '3#AKk3XHTc'
+	  keypath = 'bin/certs/qztray.transitionmanager.net.key'
+      cert = 'bin/certs/qztray.digital-certificate
+      passphrase = '3#AKk3XHTc'
   }
 
 

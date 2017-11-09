@@ -152,6 +152,11 @@ class UrlMappings {
 			action = [GET:"taskCreateDefaults"]
 		}
 
+		"/ws/qzCertificate" {
+			controller = 'wsApplication'
+			action = [GET:'qzCertificate']
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
