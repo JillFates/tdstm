@@ -2995,10 +2995,16 @@ class AssetEntityService implements ServiceMethods {
 					errors << "Asset not found in current project"
 				}
 				if (!errors) {
-					clonedAsset = assetToClone.clone([
-							assetName : name,
-							validation: ValidationType.DIS
-					])
+					Map defaultValues = [
+						assetName : name,
+						validation: ValidationType.DIS,
+						environment: ''
+					]
+					if (assetToClone.isaDevice()) {
+						defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
+					}
+					clonedAsset = assetToClone.clone(defaultValues)
+
 					// Cloning assets dependencies if requested
 					if (clonedAsset.save() && cloneDependencies) {
 						for (dependency in assetToClone.supportedDependencies()) {
