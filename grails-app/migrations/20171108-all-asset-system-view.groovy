@@ -46,7 +46,7 @@ databaseChangeLog = {
 
                 DatabaseMigrationService databaseMigrationService = ctx.getBean("databaseMigrationService")
                 // Update the different settings with the Asset Class fields.
-                databaseMigrationService.addSystemView(1l, 'All assets', viewSpec)
+                databaseMigrationService.addSystemView(sql, 1l, 'All assets', viewSpec)
 
             }
         }
