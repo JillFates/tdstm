@@ -813,8 +813,11 @@ digraph runbook {
 		List eventList = MoveEvent.findAllByProject(project)
 		def selectedEventId = 0
 
-		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
-		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPref}) {
+		String eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
+		Long eventPrefId = NumberUtil.toPositiveLong(eventPref)
+
+		// Ask if there's an event id first to avoid iterating unnecessarily over all the events.
+		if (eventPrefId > 0 && !(eventList.find {it.id == eventPrefId})) {
 			// The user preference references an invalid event so we should clear it out
 			eventPref = "0"
 			userPreferenceService.removePreference(PREF.MOVE_EVENT)
