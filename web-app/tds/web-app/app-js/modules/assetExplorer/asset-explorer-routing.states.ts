@@ -100,7 +100,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.CREATE']
+			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.CREATE']
 		},
 		requiresAuth: true,
 		requiresPermission: 'AssetExplorerCreate',
@@ -136,7 +136,7 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER', 'ASSET_EXPLORER.EDIT']
+			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.EDIT']
 		},
 		requiresAuth: true,
 		requiresPermission: 'AssetExplorerEdit',
@@ -166,7 +166,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER']
+			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW']
 		},
 		requiresAuth: true,
 		hasPendingChanges: false
