@@ -329,8 +329,9 @@ class ProjectServiceIntegrationSpec extends Specification {
 			projectService.deleteProject(project.id, true)
 
 		then: 'Then the dataview record should be deleted'
-			null == Dataview.where {
-				id == dataview.id && project.id == project.id
-			}.get()
+			null == Dataview.createCriteria().get {
+				eq('id', dataview.id)
+				eq('project', project)
+			}
 	}
 }
