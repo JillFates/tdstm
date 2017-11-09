@@ -148,9 +148,9 @@
 								 disabledItemClass="item col-sm-4 col-md-4 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
 										<div class="row">
-											<div class="col-sm-8" style="padding:0">
+											<div class="col-sm-8 drag-label">
 												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
-												<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
+												{{item.label}}
 											</div>
 											<div class="col-sm-4" style="padding:0">
 												<div class="checkbox">

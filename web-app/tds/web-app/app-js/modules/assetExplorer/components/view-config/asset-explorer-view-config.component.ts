@@ -33,6 +33,12 @@ import { AlertType } from '../../../../shared/model/alert.model';
 		.U { background-color: #F3F4F6;}
 		li.active a { font-weight:bold;}
 		.drag-icon { padding: 8px 10px 0px 5px; color: #9f9f9f;}
+		.drag-label {
+			padding: 0;
+			overflow: hidden;
+			height: 20px;
+			word-break: break-all;
+		}
 	`]
 })
 export class AssetExplorerViewConfigComponent {
