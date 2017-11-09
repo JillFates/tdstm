@@ -221,6 +221,6 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetDelete)
 	def deleteAssets() {
 		Project project = projectForWs
-		renderAsJson(resp: assetEntityService.deleteBulkAssets(project, 'Assets', request.getJSON().ids))
+		renderSuccessJson(assetEntityService.deleteBulkAssets(project, 'Assets', request.getJSON().ids))
 	}
 }
