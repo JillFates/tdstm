@@ -204,6 +204,24 @@ var GraphUtil = (function ($) {
 		}
 	}
 
+
+	public.toggleDependencyPanel = function(dependencyPanel, event) {
+		var panelStatusOpen = $('.'+dependencyPanel).hasClass('open');
+		if(panelStatusOpen){
+			$(event).find('i.fa-fw').removeClass('fa-caret-down').addClass('fa-caret-right');
+			$('.'+dependencyPanel).removeClass('open').addClass('closed');
+			$('.'+dependencyPanel).slideUp(300, function(){
+				public.correctDependenciesPanelSize();
+			});
+		} else {
+			$(event).find('i.fa-fw').removeClass('fa-caret-right').addClass('fa-caret-down');
+			$('.'+dependencyPanel).removeClass('closed').addClass('open');
+			$('.'+dependencyPanel).slideDown(300, function(){
+				public.correctDependenciesPanelSize();
+			});
+		}
+	}
+
 	// adds the move bundle color indicator to the legend
 	public.updateLegendColorKey = function (dataMap, colors, fillMode) {
 		var template = $('#colorKeyTemplateId');
@@ -1098,7 +1116,7 @@ var GraphUtil = (function ($) {
 			var link = links[i];
 			var dependencyStatus = link.dependencyStatus;
 			var dependencyType = link.dependencyType;
-			link.hide = (showTypeItems.indexOf(dependencyType) === -1)? 'y' : 'n';
+			link.hide = ((showTypeItems.indexOf(dependencyType) === -1) || (showStatusItems.indexOf(dependencyStatus) === -1))? 'y' : 'n';
 			link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : 'n';
 		}
 

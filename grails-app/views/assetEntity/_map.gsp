@@ -223,19 +223,32 @@
 		table.dependency-control-table th {
 			background: none;
 		}
-		span.dependency-control-title {
+		label.dependency-control-title span {
 			text-decoration: underline;
 			cursor: pointer;
 		}
-		div.checkboxdiv_control {
-			margin-top: -10px;
-			margin-bottom: 14px;
+		label.dependency-control-title i.caret-icon{
+			width: 1em;
+		}
+		label.dependency-control-title i.caret-icon:hover {
+			background-color: #cccccc;
+			width: 1em;
+		}
+		div.dependency_panel_action_buttons {
+			position: fixed;
+			bottom: 47px;
+			background: white;
+			height: 33px;
+		}
+		div.fullscreen div.dependency_panel_action_buttons {
+			bottom: 6px;
 		}
 	</style>
 	<div id="dependenciesPanelId" class="graphPanel">
-		<label onclick="toggleDependencyPanel('dependency-type-panel')"><span class="dependency-control-title">Connection Type</span> <i class="fa fa-fw fa-caret-down"></i></label>
-		<div class="checkboxdiv_control dependency-type-panel">
-			<table class="dependency-control-table">
+		<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i class="fa fa-fw fa-caret-down"></i></label>
+		<br />
+		<div class="checkboxdiv_control dependency-type-panel open">
+			<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 				<tr>
 					<th style="width: 134px;"></th>
 					<th style="text-align: center;">Show</th>
@@ -256,9 +269,10 @@
 			</table>
 		</div>
 		<br />
-		<label onclick="toggleDependencyPanel('dependency-show-panel')"><span class="dependency-control-title">Connection Status</span> <i class="fa fa-fw fa-caret-right"></i></label>
-		<div class="checkboxdiv_control dependency-show-panel">
-			<table class="dependency-control-table">
+		<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i class="fa fa-fw fa-caret-down"></i></label>
+		<br />
+		<div class="checkboxdiv_control dependency-show-panel open">
+			<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 				<tr>
 					<th style="width: 134px;"></th>
 					<th style="text-align: center;">Show</th>
@@ -279,7 +293,9 @@
 			</table>
 		</div>
 		<br />
-		<input type="button" value="Apply" class="pointer fullButton graphButton" onclick="GraphUtil.applyShowHideDependencies()">
+		<div class="dependency_panel_action_buttons">
+			<input style="width: 241px;" type="button" value="Apply" class="pointer fullButton graphButton" onclick="GraphUtil.applyShowHideDependencies()">
+		</div>
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
 	<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:false, displayCycles:false, displayBundleConflicts:true, arrowheadOffset:true, displayCuts:true, legendTwistiePref:legendTwistiePref]}" />
