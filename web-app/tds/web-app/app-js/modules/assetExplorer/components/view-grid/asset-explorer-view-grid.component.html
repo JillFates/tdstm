@@ -1,5 +1,5 @@
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="edit" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-2">
