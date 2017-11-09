@@ -141,10 +141,6 @@ function onSelectAllDependency(checkboxSelectorClass, event) {
 	$('.' + checkboxSelectorClass).prop('checked', event.checked);
 }
 
-function toggleDependencyPanel(dependencyPanel) {
-	$('.'+dependencyPanel).toggle();
-}
-
 // --------  DEPENDENCY PANEL
 
 $('#tabTypeId').val('graph')
