@@ -2,12 +2,15 @@
  * Created by David Ontiveros
  */
 
+
+import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.Project
@@ -25,7 +28,7 @@ import net.transitionmanager.service.dataview.DataviewSpec
 @Secured('isAuthenticated()')
 // TODO: John. Can we remove this logger since we aren't using in this class? Also we have an implementation in ControllerMethods.handleException
 @Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
-class WsAssetExplorerController implements ControllerMethods {
+class WsAssetExplorerController implements ControllerMethods, PaginationMethods {
 
 	private final static DELETE_OK_STATUS = "Dataview deleted successfully";
 
@@ -188,8 +191,10 @@ class WsAssetExplorerController implements ControllerMethods {
 			return
 		}
 
+		Integer limit = Pagination.maxRowForParam(userParams.limit as String)
+		userParams.limit = limit
+		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
 		Map queryResult = dataviewService.query(project, dataview, userParams)
-		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, userParams.limit)
 
         renderSuccessJson(queryResult)
     }
