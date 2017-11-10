@@ -235,13 +235,16 @@
 			width: 1em;
 		}
 		div.dependency_panel_action_buttons {
-			position: fixed;
+			position: absolute;
 			bottom: 47px;
 			background: white;
 			height: 33px;
 		}
 		div.fullscreen div.dependency_panel_action_buttons {
-			bottom: 6px;
+			bottom: 7px !important;
+		}
+		td.groupingControl {
+			background-color: #dddddd;
 		}
 	</style>
 	<div id="dependenciesPanelId" class="graphPanel">
@@ -256,19 +259,19 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input type="checkbox" id="dependencyTypeControl_show_all" name="dependencyTypeControl_show__all" onclick="onSelectAllDependency('dependencyTypeControlsShow', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependency('dependencyTypeControlsShow', 'dependencyType', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyType}" var="dependency">
 					<tr>
 						<td style="width: 134px;"><span> ${dependency}</span></td>
-						<td style="text-align: center;"><input class="dependencyTypeControlsShow" type="checkbox" id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}" value="${dependency}"/></td>
+						<td style="text-align: center;"><input class="dependencyTypeControlsShow" type="checkbox" checked id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}" value="${dependency}"/></td>
 						<td style="text-align: center;"><input class="dependencyTypeControlsHighlight" type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}" value="${dependency}"/></td>
 					</tr>
 				</g:each>
 			</table>
 		</div>
-		<br />
+
 		<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i class="fa fa-fw fa-caret-down"></i></label>
 		<br />
 		<div class="checkboxdiv_control dependency-show-panel open">
@@ -280,19 +283,19 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input type="checkbox" id="show_all" name="dependencyControl_show_all" onclick="onSelectAllDependency('dependencyStatusControlsShow', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependency('dependencyStatusControlsShow', 'dependencyStatus', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 					<tr>
 						<td style="width: 134px;"><span > ${dependencyStatusInst}</span></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsShow" type="checkbox" id="show_${dependency}" name="dependencyControl_show_${dependency}" value="${dependencyStatusInst}"/></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyControl_highlight_${dependency}" value="${dependencyStatusInst}"/></td>
+						<td style="text-align: center;"><input class="dependencyStatusControlsShow" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" value="${dependencyStatusInst}"/></td>
+						<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyStatusControl_highlight_${dependency}" value="${dependencyStatusInst}"/></td>
 					</tr>
 				</g:each>
 			</table>
 		</div>
-		<br />
+		<br /><br />
 		<div class="dependency_panel_action_buttons">
 			<input style="width: 241px;" type="button" value="Apply" class="pointer fullButton graphButton" onclick="GraphUtil.applyShowHideDependencies()">
 		</div>

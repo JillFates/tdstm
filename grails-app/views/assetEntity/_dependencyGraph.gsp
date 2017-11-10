@@ -11,8 +11,8 @@ $(document).ready(function() {
 	}
 
 	// List of the dependency types and statuses used for the dependency group generation
-	var connectionTypes = ${raw(connectionTypes)};
-	var statusTypes = ${raw(statusTypes)};
+	GraphUtil.dependencyPanelConfig.dependencyStatus.groupingControl = ${raw(statusTypes)};
+	GraphUtil.dependencyPanelConfig.dependencyType.groupingControl = ${raw(connectionTypes)};
 
 	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
@@ -137,15 +137,13 @@ function listCheck () {
 }
 
 // --------  DEPENDENCY PANEL
-/**
- * Used on _map.gsp to select/unselect all items of a given class type
- * @param checkboxSelectorClass string
- * @param event (native)
- */
-function onSelectAllDependency(checkboxSelectorClass, event) {
-	$('.' + checkboxSelectorClass).prop('checked', event.checked);
-}
-
+(function($) {
+	$.fn.has_scrollbar = function() {
+		var divnode = this.get(0);
+		if(divnode.scrollHeight > divnode.clientHeight)
+			return true;
+	}
+})(jQuery);
 // --------  DEPENDENCY PANEL
 
 $('#tabTypeId').val('graph')
