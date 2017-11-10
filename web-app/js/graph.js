@@ -814,6 +814,23 @@ var GraphUtil = (function ($) {
 			cutShadow.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
 		});
 		public.reorderDOM();
+	};
+
+	public.createLineShadows = function (color) {
+		public.force.links().each(function (o, i) {
+			// get the cut shadow object (create it if it doesn't exist)
+			var lineShadow = $(o.linkElement[0][0]);
+
+			lineShadow.css('opacity', null);
+			if (o.highlighted == 'y') {
+				lineShadow.css('opacity', 1);
+				lineShadow.css('stroke-width', 2);
+			} else if (o.highlighted == 'n'){
+				lineShadow.css('opacity', 0.3);
+				lineShadow.css('stroke-width', 1);
+			}
+		});
+		public.reorderDOM();
 	}
 
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
@@ -1159,7 +1176,13 @@ var GraphUtil = (function ($) {
 		}
 	};
 
-	public.onSelectAllDependency = function(checkboxSelectorClass, config, event) {
+	public.onSelectItemHighlightDependencyPanel = function(event){
+		if($(event).is(":checked")) {
+			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', true);
+		}
+	};
+
+	public.onSelectAllDependencyPanel = function(checkboxSelectorClass, config, event) {
 		var state = parseInt($(event).attr('state'));
 		$('.' + checkboxSelectorClass).parent().removeClass('groupingControl');
 		if(state === 1) {
@@ -1213,6 +1236,7 @@ var GraphUtil = (function ($) {
 			$('.link').show();
 			$('.hide_link').hide();
 			public.createCutShadows(fill);
+			public.createLineShadows(fill)
 		});
 	};
 

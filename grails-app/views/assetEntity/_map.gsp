@@ -259,14 +259,14 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependency('dependencyTypeControlsShow', 'dependencyType', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyTypeControlsShow', 'dependencyType', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyType}" var="dependency">
 					<tr>
 						<td style="width: 134px;"><span> ${dependency}</span></td>
 						<td style="text-align: center;"><input class="dependencyTypeControlsShow" type="checkbox" checked id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}" value="${dependency}"/></td>
-						<td style="text-align: center;"><input class="dependencyTypeControlsHighlight" type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}" value="${dependency}"/></td>
+						<td style="text-align: center;"><input class="dependencyTypeControlsHighlight" type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependency}"/></td>
 					</tr>
 				</g:each>
 			</table>
@@ -283,7 +283,7 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependency('dependencyStatusControlsShow', 'dependencyStatus', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyStatusControlsShow', 'dependencyStatus', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
