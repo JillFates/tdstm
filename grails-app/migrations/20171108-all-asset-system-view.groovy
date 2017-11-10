@@ -1,8 +1,14 @@
-import com.tdsops.tm.enums.domain.SettingType
-import net.transitionmanager.domain.Setting
 import net.transitionmanager.service.DatabaseMigrationService
 
 databaseChangeLog = {
+    changeSet(author: "oluna", id: "20171109 TM-8094-0") {
+        comment('Delete all Favorite Dataview dependencies')
+
+        sql("""
+             delete from favorite_dataview;
+			""")
+    }
+
     changeSet(author: "dcorrea", id: "20171109 TM-8094-1") {
         comment('Increments current dataview ids above 1000 ')
 
@@ -18,7 +24,6 @@ databaseChangeLog = {
              ALTER TABLE dataview AUTO_INCREMENT=1001;
 			""")
     }
-
 
     changeSet(author: "dcorrea", id: "20171109 TM-8094-3") {
         comment("Add a All Assets ")
