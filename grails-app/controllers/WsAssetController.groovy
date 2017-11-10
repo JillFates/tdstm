@@ -218,9 +218,14 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+	/**
+	 * Used to delete one or more assets for the current project 
+	 * @params ids - a list of asset id numbers
+	 * @return JSON Success response with data.message with results
+	 */
 	@HasPermission(Permission.AssetDelete)
 	def deleteAssets() {
-		Project project = projectForWs
-		renderSuccessJson(assetEntityService.deleteBulkAssets(project, 'Assets', request.getJSON().ids))
+		String message = assetEntityService.deleteBulkAssets(projectForWs, 'Assets', request.getJSON().ids)
+		renderSuccessJson(message:message)
 	}
 }
