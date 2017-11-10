@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
@@ -67,5 +68,24 @@ class JsonUtil {
     static Map<String, ?> convertJsonToMap(String json) {
         Map<String, Object> jsonMap = new ObjectMapper().readValue(json, HashMap.class)
         return jsonMap
+    }
+
+    /**
+     * Converts an object into a String in the JSON format
+     * @param object - the object to be converted
+     * @return the object as JSON String
+     */
+    static String toJson(Object object) {
+        // new JsonBuilder(object).toString()
+        JsonOutput.toJson(object)
+    }
+
+    /**
+     * Converts an object into a String in the JSON pretty format 
+     * @param object - the object to be converted
+     * @return the object as JSON String
+     */
+    static String toPrettyJson(Object object) {
+        JsonOutput.prettyPrint(toJson(object))
     }
 }
