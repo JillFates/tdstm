@@ -12,6 +12,9 @@ import com.tds.asset.CommentNote
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.UserAudit
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.Notice
+import net.transitionmanager.domain.NoticeAcknowledgment
 
 class Person extends Party {
 
@@ -110,6 +113,7 @@ class Person extends Party {
 		[domain: AssetDependency, 	onDelete: 'null',   properties: ['createdBy','updatedBy'] ],
 		[domain: AssetEntity, 		onDelete: 'null',   properties: ['appOwner', 'modifiedBy'] ],
 		[domain: CommentNote, 		onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: Dataview, 			onDelete: 'null',   properties: ['person'] ],
 		[domain: EmailDispatch, 	onDelete: 'delete', properties: ['toPerson'] ],
 		[domain: EmailDispatch, 	onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: ExceptionDates, 	onDelete: 'delete', properties: ['person'] ],
@@ -117,6 +121,8 @@ class Person extends Party {
 		[domain: ModelSync, 		onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
 		[domain: MoveEventNews, 	onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],
 		[domain: MoveEventStaff, 	onDelete: 'delete', properties: ['person'] ],
+		[domain: Notice, 			onDelete: 'null',   properties: ['createdBy'] ],
+		[domain: NoticeAcknowledgment, onDelete: 'null',   properties: ['person'] ],
 		[domain: PartyRole, 		onDelete: 'delete', properties: ['party'] ],
 		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdFrom'] ],
 		[domain: PartyRelationship, onDelete: 'delete', properties: ['partyIdTo'] ],
@@ -124,8 +130,7 @@ class Person extends Party {
 		[domain: RecipeVersion, 	onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: TaskBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: UserLogin, 		onDelete: 'delete', properties: ['person'] ],
-		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ],
-		[domain: Notice, 			onDelete: 'null',   properties: ['createdBy'] ]
+		[domain: Workflow, 			onDelete: 'null',   properties: ['updatedBy'] ]
 	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
