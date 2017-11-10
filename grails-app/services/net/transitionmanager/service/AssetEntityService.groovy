@@ -1835,9 +1835,11 @@ class AssetEntityService implements ServiceMethods {
 			} else {
 				count = deleteAssets(validatedAssetIds)
 			}
+		} else {
+			count = 0
 		}
 
-		return "$count $type records were deleted"
+		return "$count $type record${count==1? ' was' : 's were'} deleted"
 	}
 
 	/**
