@@ -22,6 +22,7 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -2086,10 +2087,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						linkTable[sourceIndex][targetIndex] = true
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 
-						graphLinks << [id: i, source: sourceIndex, target: targetIndex, value: 2, statusColor: statusColor,
-								       dependencyStatus: dependencyStatus, dependencyType: dependencyType,
-						               opacity: opacity, unresolved: !it.resolved, notApplicable: notApplicable,
-						               future: future, bundleConflict: it.bundleConflict, duplicate: duplicate]
+						graphLinks << [
+								id: i, 
+								source: sourceIndex, 
+								target: targetIndex, 
+								value: 2, 
+								statusColor: statusColor,
+								bundleConflict: it.bundleConflict, 
+								dependencyStatus: dependencyStatus, 
+								dependencyType: dependencyType,
+								duplicate: duplicate,
+								future: future, 
+								opacity: opacity, 
+								unresolved: !it.resolved, 
+								notApplicable: notApplicable,
+							]
 						i++
 					}
 				}
@@ -2123,6 +2135,17 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.depGroup = params.dependencyBundle
 				model.dependencyType = entities.dependencyType
 				model.dependencyStatus = entities.dependencyStatus
+				model.connectionTypes = '{}'
+				model.statusTypes = '{}'
+				if (project.depConsoleCriteria) {
+					def depConsoleCriteria = JsonUtil.parseJson(project.depConsoleCriteria)
+					if (depConsoleCriteria.connectionTypes) {
+						model.connectionTypes = JsonUtil.toJson(depConsoleCriteria.connectionTypes)
+					}
+					if (depConsoleCriteria.statusTypes) {
+						model.statusTypes = JsonUtil.toJson(depConsoleCriteria.statusTypes)
+					}
+				}
 
 				// Render dependency graph
 				render(template:'dependencyGraph', model:model)

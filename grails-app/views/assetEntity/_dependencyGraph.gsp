@@ -6,8 +6,13 @@ $(document).ready(function() {
 
 	// handle detecting whether this graph is being opened in the fullscreen state
 	var fullscreen = ${fullscreen};
-	if (fullscreen)
+	if (fullscreen) {
 		GraphUtil.enableFullscreen();
+	}
+
+	// List of the dependency types and statuses used for the dependency group generation
+	var connectionTypes = ${raw(connectionTypes)};
+	var statusTypes = ${raw(statusTypes)};
 
 	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
