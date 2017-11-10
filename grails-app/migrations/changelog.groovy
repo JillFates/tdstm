@@ -109,7 +109,8 @@ databaseChangeLog = {
 	include file: '20150616-timezones.groovy'
 	include file: '20150626-add-column-timezone-to-project.groovy'
 	include file: '20150827-set-timezone-and-datetime-user-preferences.groovy'
-	include file: '20151020-set-custom-fields-to-hidden.groovy'
+	// TM-8152 - This property was removed 
+	// include file: '20151020-set-custom-fields-to-hidden.groovy'
 	include file: '20151214-fix-invalid-status-and-type-values-in-assetdep.groovy'
 	include file: '20151214-remove-new-or-old-column-from-asset-entity.groovy'
 	include file: '20151209-nullout-invalid-person-ref.groovy'
@@ -128,14 +129,26 @@ databaseChangeLog = {
 	include file: '20160712-add-additional-Application-criticality-options.groovy'
 	include file: '20160721-delete-PRINTER_NAME-preference.groovy'
 	include file: '20160725-change-engine-to-InnoDB-for-MyISAM-tables.groovy'
+
+	// Had to reshuffle the creating of these tables that are now part of the person delete / merge logic
+	// which the 20160727-delete-orphaned-persons.groovy script references and started breaking when the
+	// PersonService.deletePerson was updated to address these tables as well.
+	// See ticket TM-8152
+	include file: '20170814-create-dataview-table.groovy'
+	include file: '20170925-create-favorite-dataview-table.groovy'
+	include file: '20160920-create-license-table.groovy'
+	include file: '20160920-create-licensed_client-table.groovy'
+	include file: '20170220-create-license-activity-track-table.groovy'
+	// The Delete Orphans using the PersonService.deletePerson can be temperamental with changes to the service
+	// like adding new references.
  	include file: '20160727-delete-orphaned-persons.groovy'
+	// Back to our regularly scheduled program
+
 	include file: '20160727-drop-notnull-for-created-by.groovy'
  	include file: '20160805-update-person-middle-and-last-name-default-value.groovy'
 	include file: '20160815-add-permission-company-crud-admin.groovy'
 	include file: '20160817-delete-source-target-team-eav-attributes.groovy'
 	include file: '20160909-add-duration-locked-to-tasks.groovy'
-	include file: '20160920-create-license-table.groovy'
-	include file: '20160920-create-licensed_client-table.groovy'
 	include file: '20161006-update-user-preference-code-legendTwistieState.groovy'
 	include file: '20161010-notice-support.groovy'
 	include file: '20161010-notice-support-change-noticetype-column.groovy'
@@ -152,7 +165,6 @@ databaseChangeLog = {
 	include file: '20170125-drop_not_null_dbFormat_constraint_on_database_table.groovy'
 	include file: '20170125-drop_not_null_fileFormat_constraint_on_files_table.groovy'
 	include file: '20170209-delete-model-manufacturer-aliases-matching-their-parents-name.groovy'
-	include file: '20170220-create-license-activity-track-table.groovy'
 	include file: '20170224-add-autotimestamp-license-and-licensedclient.groovy'
 	include file: '20170224-change-license-enum-columns.groovy'
 	include file: '20170224-change-licensedclient-enum-columns.groovy'
@@ -180,9 +192,7 @@ databaseChangeLog = {
 	include file: '20170817-add-ProjectManageDefaults-permission.groovy'
 	include file: '20170830-Assign-a-company-as-the-owner-for-the-default-project.groovy'
 	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
-	include file: '20170814-create-dataview-table.groovy'
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
-	include file: '20170925-create-favorite-dataview-table.groovy'
 	include file: '20171025-create-default-bundle-for-projects.groovy'
 	include file: '20171026-add-assetclass-to-common-fields.groovy'
 	include file: '20171108-all-asset-system-view.groovy'
