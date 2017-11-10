@@ -43,6 +43,21 @@ var GraphUtil = (function ($) {
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
+	// Stored only on the current page session
+	public.dependencyPanelConfig = {
+		dependencyStatus: {
+			status: 'true',
+			show: [],
+			highlight: [],
+			groupingControl: []
+		},
+		dependencyType: {
+			status: 'true',
+			show: [],
+			highlight: [],
+			groupingControl: []
+		}
+	};
 
 	// ############################################################## graph UI functions ##############################################################
 
@@ -104,6 +119,8 @@ var GraphUtil = (function ($) {
 			else
 				public.enableFullscreen();
 		}
+
+		public.correctActionButtons();
 	}
 
 	// changes the graph to fullscreen mode
@@ -168,8 +185,19 @@ var GraphUtil = (function ($) {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
 		}
+
+		public.correctActionButtons();
 	}
 
+	public.correctActionButtons = function() {
+		if($('#dependenciesPanelId').has_scrollbar()) {
+			$('.dependency_panel_action_buttons').css('position', 'fixed');
+			$('.dependency_panel_action_buttons').css('bottom', '49px');
+		} else {
+			$('.dependency_panel_action_buttons').css('position', '');
+			$('.dependency_panel_action_buttons').css('bottom', '5px');
+		}
+	};
 
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
@@ -317,8 +345,11 @@ var GraphUtil = (function ($) {
 		} else if (panel == 'dependencies') {
 			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
 				public.hidePanel('dependencies');
-			else
+			else {
 				public.openPanel('dependencies');
+				public.restoreDependencyPanel('Type');
+				public.restoreDependencyPanel('Status');
+			}
 			public.hidePanel('legend');
 			public.hidePanel('control');
 		} else if (panel == 'legend') {
@@ -1103,6 +1134,58 @@ var GraphUtil = (function ($) {
 		public.createCutShadows(fill);
 	};
 
+	public.restoreDependencyPanel = function(type) {
+		if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
+			$('#dependency' + type + 'Control_show_all').prop('checked', true);
+			$('#dependency' + type + 'Control_show_all').attr('state', 1);
+			$('.dependency' + type + 'ControlsShow').parent().removeClass('groupingControl');
+			$('.dependency' + type + 'ControlsShow').prop('checked', true);
+		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
+			$('#dependency' + type + 'Control_show_all').prop('checked', false);
+			$('#dependency' + type + 'Control_show_all').attr('state', 3);
+			$('.dependency' + type + 'ControlsShow').each(function () {
+				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
+			});
+		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'indeterminate'){
+			$('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
+			$('#dependency' + type + 'Control_show_all').attr('state', 2);
+			$('.dependency' + type + 'ControlsShow').each(function(){
+				var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+				$(this).prop('checked', selected);
+				if(selected) {
+					$(this).parent().addClass('groupingControl');
+				}
+			});
+		}
+	};
+
+	public.onSelectAllDependency = function(checkboxSelectorClass, config, event) {
+		var state = parseInt($(event).attr('state'));
+		$('.' + checkboxSelectorClass).parent().removeClass('groupingControl');
+		if(state === 1) {
+			state = 3;
+			$('.' + checkboxSelectorClass).prop('checked', false);
+			GraphUtil.dependencyPanelConfig[config].status = 'false';
+		} else if(state === 2) {
+			state = 1;
+			$('.' + checkboxSelectorClass).prop('checked', true);
+			$(event).prop("checked", true);
+			GraphUtil.dependencyPanelConfig[config].status = 'true';
+		} else if(state === 3) {
+			state = 2;
+			$(event).prop("indeterminate", true);
+			$('.' + checkboxSelectorClass).each(function(){
+				var selected = GraphUtil.dependencyPanelConfig[config].groupingControl.indexOf($(this).val()) !== -1;
+				$(this).prop('checked', selected);
+				if(selected) {
+					$(this).parent().addClass('groupingControl');
+				}
+			});
+			GraphUtil.dependencyPanelConfig[config].status = 'indeterminate';
+		}
+		$(event).attr('state', state);
+	};
+
 	public.applyShowHideDependencies = function () {
 		var links = public.force.links();
 		var showTypeItems = $('.dependencyTypeControlsShow:checked').map(function() { return this.value; }).get();
@@ -1120,11 +1203,16 @@ var GraphUtil = (function ($) {
 			link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : 'n';
 		}
 
+		public.dependencyPanelConfig.dependencyType.show = showTypeItems;
+		public.dependencyPanelConfig.dependencyType.highlight = highlightTypeItems;
+
+		public.dependencyPanelConfig.dependencyStatus.show = showStatusItems;
+		public.dependencyPanelConfig.dependencyStatus.highlight = highlightStatusItems;
+
 		public.updateAllClasses(function(){
 			$('.link').show();
 			$('.hide_link').hide();
 			public.createCutShadows(fill);
-			console.log(links);
 		});
 	};
 

@@ -149,7 +149,7 @@ var cancelCut = false
 
 // Build the layout model
 function buildMap () {
-	debugger;
+	debugger
 	// get the default graph configuration
 	var config = getForceConfig()
 	widthCurrent = config.width
