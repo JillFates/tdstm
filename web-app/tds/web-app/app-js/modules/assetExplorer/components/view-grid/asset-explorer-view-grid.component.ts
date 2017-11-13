@@ -78,6 +78,7 @@ export class AssetExplorerViewGridComponent {
 		this.model.columns.forEach((c: ViewColumn) => {
 			c.filter = '';
 		});
+		this.onFilter();
 	}
 
 	hasFilterApplied(): boolean {
