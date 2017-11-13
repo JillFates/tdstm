@@ -186,4 +186,5 @@ databaseChangeLog = {
 	include file: '20171025-create-default-bundle-for-projects.groovy'
 	include file: '20171026-add-assetclass-to-common-fields.groovy'
 	include file: '20171108-all-asset-system-view.groovy'
+	include file: '20171110-create-new-permission-asset-explorer-system-list.groovy'
 }
