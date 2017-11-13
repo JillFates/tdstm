@@ -1,0 +1,1 @@
+export const SEARCH_QUITE_PERIOD = 500;
