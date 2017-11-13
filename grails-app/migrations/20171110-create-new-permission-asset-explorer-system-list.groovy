@@ -30,8 +30,9 @@ databaseChangeLog = {
             change {
 
                 Permissions permission = Permissions.findByPermissionItem ('AssetExplorerCreate')
-                permission.permissionItem = 'Can create one\'s own asset views'
-                permission.save(flush:true)
+                permission.description = 'Can create one\'s own asset views'
+                assert permission.validate(), 'Permission AssetExplorerCreate is not valid to be updated in database'
+                permission.save(flush: true)
             }
         }
     }
@@ -46,8 +47,9 @@ databaseChangeLog = {
             change {
 
                 Permissions permission = Permissions.findByPermissionItem('AssetExplorerDelete')
-                permission.permissionItem = 'Can delete one\'s own asset views'
-                permission.save(flush:true)
+                permission.description = 'Can delete one\'s own asset views'
+                assert permission.validate(), 'Permission AssetExplorerDelete is not valid to be updated in database'
+                permission.save(flush: true)
             }
         }
     }
@@ -62,8 +64,9 @@ databaseChangeLog = {
             change {
 
                 Permissions permission = Permissions.findByPermissionItem ('AssetExplorerEdit')
-                permission.permissionItem = 'Can edit one\'s own asset views'
-                permission.save(flush:true)
+                permission.description = 'Can edit one\'s own asset views'
+                assert permission.validate(), 'Permission AssetExplorerEdit is not valid to be updated in database'
+                permission.save(flush: true)
             }
         }
     }
