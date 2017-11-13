@@ -122,7 +122,7 @@
                         <li>
                             <g:link class="mmlink" controller="module" action="asset" id="views">
                                 <g:img uri="/icons/magnifier.png" width="16" height="16"/>
-                                Asset Explorer
+                                View Manager
                             </g:link>
                         </li>
                         <li class="menu-child-item menu-parent-assets-application-list">
