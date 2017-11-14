@@ -35,6 +35,7 @@ class AssetExportService {
 	private static final ASSET_EXPORT_TEMPLATE_XLS = "/templates/TDSMaster_template.xls"
 	private static final XLSX_EXTENSION = "xlsx"
 	private static final XLS_EXTENSION = "xls"
+	private static final MAX_XLS_RECORDS = 64000
 	private static double MIN_INFLATE_RATIO = 0.0001d
 	private static final String ALL_BUNDLES_OPTION = 'All'
 
@@ -312,7 +313,7 @@ class AssetExportService {
 			ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO)
 
 			Workbook initWorkbook
-			if ( progressTotal < 64000 ) {
+			if ( progressTotal < MAX_XLS_RECORDS ) {
 				initWorkbook = getInitWorkbookInstance( ASSET_EXPORT_TEMPLATE_XLS )
 			} else {
 				initWorkbook = getInitWorkbookInstance( ASSET_EXPORT_TEMPLATE_XLSX )
