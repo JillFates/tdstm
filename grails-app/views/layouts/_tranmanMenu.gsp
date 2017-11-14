@@ -119,28 +119,22 @@
                                 Summary Table
                             </g:link>
                         </li>
-                        <li>
-                            <g:link class="mmlink" controller="module" action="asset" id="views">
-                                <g:img uri="/icons/magnifier.png" width="16" height="16"/>
-                                View Manager
-                            </g:link>
-                        </li>
                         <li class="menu-child-item menu-parent-assets-application-list">
                             <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                 <tds:svgIcon name="application_menu" width="16" height="16" />
                                 Applications
                             </g:link>
                         </li>
+                        <li class="menu-child-item menu-parent-assets-all-list" >
+                            <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
+                                <tds:svgIcon name="other_menu" width="16" height="16" />
+                                Devices
+                            </g:link>
+                        </li>
                         <li class="menu-child-item menu-parent-assets-server-list">
                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
                                 <tds:svgIcon name="serverPhysical_menu" width="16" height="16" />
                                 Servers
-                            </g:link>
-                        </li>
-                        <li class="menu-child-item menu-parent-assets-all-list" >
-                            <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
-                                <tds:svgIcon name="other_menu" width="16" height="16" />
-                                All Devices
                             </g:link>
                         </li>
                         <li class="menu-child-item menu-parent-assets-database-list">
@@ -161,18 +155,20 @@
                                 Storage-Logical
                             </g:link>
                         </li>
-                        <li class="menu-child-item menu-parent-assets-comments-list">
-                            <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
-                                <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments"/>
-                                Comments
-                            </g:link>
-                        </li>
+                        <li class="divider"></li>
                         <li class="menu-child-item menu-parent-assets-dependencies-list">
                             <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
                                 <g:img uri="/icons/bricks.png" width="16" height="16" alt="Dependencies"/>
                                 Dependencies
                             </g:link>
                         </li>
+                        <li class="menu-child-item menu-parent-assets-comments-list">
+                            <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
+                                <g:img uri="/icons/comments.png" width="16" height="16" alt="Comments"/>
+                                Comments
+                            </g:link>
+                        </li>
+                        <li class="divider"></li>
                         <tds:hasPermission permission="${Permission.DepAnalyzerView}">
                             <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                 <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
@@ -193,7 +189,6 @@
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');">help</a></li>
                         </tds:hasPermission>
                         <li class="divider"></li>
-                        <li class="menu-parent-item">Manage Data</li>
                         <tds:hasPermission permission="${Permission.AssetImport}">
                             <li class="menu-child-item menu-parent-assets-import-assets"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
                         </tds:hasPermission>
@@ -206,6 +201,12 @@
                         <tds:hasPermission permission="${Permission.HelpMenuView}">
                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a></li>
                         </tds:hasPermission>
+                        <li class="divider"></li>
+                        <li>
+                            <g:link class="mmlink" controller="module" action="asset" id="views">
+                                View Manager
+                            </g:link>
+                        </li>
                     </ul>
                 </li>
             </tds:hasPermission>
