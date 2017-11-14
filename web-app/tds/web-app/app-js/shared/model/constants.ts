@@ -1,1 +1,1 @@
-export const SEARCH_QUITE_PERIOD = 500;
+export const SEARCH_QUITE_PERIOD = 600;
