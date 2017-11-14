@@ -539,7 +539,7 @@ class TaskImportExportService implements ServiceMethods {
 								TimeScale ts = TimeScale.asEnum(value)
 								if (ts == null) {
 									task[prop] = value
-									setErrorValue(task, prop, "Invalid Time Scale value")
+									setErrorValue(task, prop, "Invalid Duration Scale value")
 								} else {
 									value = ts
 								}
