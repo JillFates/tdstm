@@ -74,6 +74,7 @@ import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -1643,23 +1644,68 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
+		Boolean justPlanning = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
 		int totalAsset = 0
 		int totalPhysical = 0
 		int totalApplication = 0
 		int totalDatabase = 0
 		int totalFiles = 0
 
-		List assetSummaryList = MoveBundle.findAllByProject(project, [sort: 'name']).collect { MoveBundle moveBundle ->
-			int physicalCount = AssetEntity.executeQuery('''
-				select count(*) from AssetEntity
-				where moveBundle=:mb
-				  and assetClass=:ac
-				  and coalesce(assetType) not in (:at)
-			''', [mb: moveBundle, ac: AssetClass.DEVICE, at: AssetType.virtualServerTypes])[0]
-			int assetCount = AssetEntity.countByMoveBundleAndAssetTypeInList(moveBundle, AssetType.serverTypes, params)
-			int applicationCount = Application.countByMoveBundle(moveBundle)
-			int databaseCount = Database.countByMoveBundle(moveBundle)
-			int filesCount = Files.countByMoveBundle(moveBundle)
+		def moveBundles = MoveBundle.withCriteria {
+			eq('project', project)
+			order('name', 'asc')
+		}
+
+		List assetSummaryList = moveBundles.collect { MoveBundle moveBundle ->
+			int physicalCount = AssetEntity.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				eq('assetClass', AssetClass.DEVICE)
+				or {
+					isNull('assetType')
+					not {
+						'in'('assetType', AssetType.virtualServerTypes)
+					}
+				}
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int assetCount = AssetEntity.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				and {
+					'in' ('assetType', AssetType.serverTypes)
+				}
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int applicationCount = Application.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int databaseCount = Database.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int filesCount = Files.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
 
 			totalAsset += assetCount
 			totalPhysical += physicalCount
@@ -1671,6 +1717,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
 		}
 
+		moveBundles = null
 		[assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
 		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
 	}

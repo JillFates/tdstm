@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.codec.net.URLCodec
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.validator.routines.UrlValidator
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
@@ -319,10 +320,21 @@ class CustomTagLib implements InitializingBean {
 	def subHeader = { Map attrs ->
 		String title = attrs.title
 		def crumbs = attrs.crumbs
+		Boolean justPlanningOptIn = BooleanUtils.toBoolean(attrs.justPlanningOptIn as String)
 
 		out << "<!-- Content Header (Page header) -->"
 		out << "<section class=\"content-header\">"
-			out << "<h1> " << title << " </h1>"
+		out << "<h1> " << title
+		if (justPlanningOptIn) {
+			Boolean justPlanning  = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
+			out << " <span style=\"margin-left: 15px; font-size: 15px;\"><input type=\"checkbox\" id=\"justPlanning\" onclick=\"toggleJustPlanning(\$(this))\" "
+			if (justPlanning) {
+				out << "checked=\"checked\""
+			}
+			out << "/><label style=\"font-weight: 600 !important;\" for=\"justPlanning\">&nbsp;Just Planning</label></span>"
+		}
+		out << " </h1>"
+
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
 		if(isLicenseAdminEnabled) {
 			def bannerMessage = licenseAdminService.getLicenseBannerMessage()

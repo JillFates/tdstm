@@ -7,7 +7,7 @@
 <title>Asset Summary Table</title>
 </head>
 <body>
-<tds:subHeader title="Asset Summary Table" crumbs="['Assets', 'Summary']"/>
+<tds:subHeader title="Asset Summary Table" crumbs="['Assets', 'Summary']" justPlanningOptIn="true" />
   <div class="body" style="width: 900px">
   <table class="asset-summary-table" style="width:700px;">
      <thead>
@@ -75,8 +75,21 @@
 
   </div>
 	<script>
-		$(".menu-parent-assets-summary-table").addClass('active');
-		$(".menu-parent-assets").addClass('active');
+		$(document).load(function() {
+            $(".menu-parent-assets-summary-table").addClass('active');
+            $(".menu-parent-assets").addClass('active');
+		});
+        function toggleJustPlanning(input) {
+            var isChecked = $(input).attr('checked') === 'checked';
+            jQuery.ajax({
+                url: tdsCommon.createAppURL('/ws/user/preference'),
+                data: { 'value': isChecked, 'code': 'assetJustPlanning' },
+                type: 'POST',
+                success: function (data) {
+                    window.location.reload();
+                }
+            });
+        }
 	</script>
 </body>
 </html>
