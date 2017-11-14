@@ -107,8 +107,10 @@ export class AssetExplorerViewGridComponent {
 		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 	}
 
-	onFilterKeyDown(): void {
-		clearTimeout(this.typingTimeout);
+	onFilterKeyDown(e: KeyboardEvent): void {
+		if (e.code !== 'Tab') {
+			clearTimeout(this.typingTimeout);
+		}
 	}
 
 	apply(data: any): void {
