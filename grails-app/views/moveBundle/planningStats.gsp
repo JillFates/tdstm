@@ -504,7 +504,7 @@ $(document).ready(function() {
                                                     <th class="dashboard_stat_exec_tdmc" style="text-align: right !important; padding-right: 0px !important;">
                                                         <div class="dashboard_stat_exec_tdmc_title">
                                                             <g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
-                                                                ${event}
+                                                                ${event.toString().length() > 18 ? event.toString().substring(0,15) + '...' : event}
                                                             </g:link>
                                                         </div>
                                                     </th>

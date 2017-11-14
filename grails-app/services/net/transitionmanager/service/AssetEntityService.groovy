@@ -1811,9 +1811,11 @@ class AssetEntityService implements ServiceMethods {
 			} else {
 				count = deleteAssets(validatedAssetIds)
 			}
+		} else {
+			count = 0
 		}
 
-		return "$count $type records were deleted"
+		return "$count $type record${count==1? ' was' : 's were'} deleted"
 	}
 
 	/**
@@ -2971,11 +2973,15 @@ class AssetEntityService implements ServiceMethods {
 					errors << "Asset not found in current project"
 				}
 				if (!errors) {
-					clonedAsset = assetToClone.clone([
-							assetName : name,
-							validation: ValidationType.DIS,
-							environment: '' // Removed as part of TM-7647
-					])
+					Map defaultValues = [
+						assetName : name,
+						validation: ValidationType.DIS,
+						environment: ''
+					]
+					if (assetToClone.isaDevice()) {
+						defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
+					}
+					clonedAsset = assetToClone.clone(defaultValues)
 
 					// Cloning assets dependencies if requested
 					if (clonedAsset.save() && cloneDependencies) {

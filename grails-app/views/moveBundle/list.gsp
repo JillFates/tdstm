@@ -11,7 +11,7 @@
 				background-color: #ecf0f5 !important;
 			}
 			.k-grid-content tr td {
-				padding: 8px 12px;
+				padding: 4px 12px;
 			}
 			 .k-grid{
 				 height: auto !important;

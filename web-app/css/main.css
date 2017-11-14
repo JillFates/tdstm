@@ -373,16 +373,7 @@ tr#applicationDependentId td.class-wrap-depend {
     background-color: transparent;
 }
 div.dashboard_stat_exec_tdmc_title {
-    /*
-        ellipsis(text-truncate) configuration
-    */
     min-height: 45px;
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
 }
 
 /* ACTION BUTTONS */
@@ -1124,4 +1115,8 @@ div.dialog input#description {
 
 #dependencyTableId .labelColumn {
 	position: static !important;
+}
+
+.k-grid-content tr td {
+	padding: 4px 12px;
 }

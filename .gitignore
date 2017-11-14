@@ -9,6 +9,8 @@ run.sh
 .slcache/
 node_modules/
 specs-dist/
+web-app/css/managerStyle.css
+web-app/css/style.css
 web-app/dist/App.js
 web-app/dist/Vendors.js
 web-app/tds/web-app/dist/app.js

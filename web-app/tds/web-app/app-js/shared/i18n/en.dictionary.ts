@@ -12,9 +12,10 @@ export const en_DICTIONARY: Object = {
 		'COMMON': 'Common'
 	},
 	'ASSET_EXPLORER': {
-		'ASSET_EXPLORER': 'Asset Explorer',
+		'ASSET_EXPLORER': 'View Manager',
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
+		'SHOW': 'Show View',
 		'GRID': {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',

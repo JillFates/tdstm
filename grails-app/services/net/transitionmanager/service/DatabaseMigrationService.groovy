@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DatabaseMigrationService implements ServiceMethods {
@@ -143,5 +144,18 @@ class DatabaseMigrationService implements ServiceMethods {
 				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
 			}
 		}
+	}
+    /**
+     *
+     * Adds a new System Dataview defining the id parameter a the Dataview spec in JSON format
+     *
+     * @param sql - the SQL connection from the migration script
+     * @param id - a new Id between 1-1000 to be used in Dataview creation
+     * @param name - the name of the new system Dataview
+     * @param jsonSpec - a json spec for the new Dataview.     */
+	void addSystemView(Sql sql, Long id, String name, String jsonSpec) {
+
+        List params = [id, name, Project.DEFAULT_PROJECT_ID, true, new Date(), jsonSpec]
+        sql.execute 'insert into dataview(id, name, project_id, is_system, date_created, report_schema) values(?,?,?,?,?,?)',  params
 	}
 }

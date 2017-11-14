@@ -100,7 +100,8 @@ def moveEvent = tds.currentMoveEvent() ?: null
             var taskManagerTimePref = "60"
             var contextPath = "${request.contextPath}"
             // TODO: This should be removed later, and it-s being created on migrateScript/jqueryDeprecated.js
-            var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false
+            var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false;
+            var isMozillaBrowser = jQuery.browser.mozilla;
         </script>
 
 <!-- LEGACY CODE END -->

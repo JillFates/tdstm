@@ -47,7 +47,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	static final xfrmInteger = {val, options -> return NumberUtil.toInteger(val)}
 	// Transform a string, changing null to blank
-	static final xfrmString = { val, options -> val ?: '' }
+	static final xfrmString = { val, options -> val ? val.toString(): '' }
 
 	// Transforms a List to a comma separated list
 	// @IntegrationTest
@@ -137,6 +137,9 @@ class TaskImportExportService implements ServiceMethods {
 
 		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:true,
 										label: 'Task Description', template:changeTmpl('comment'), modifiable:true],
+
+		errors                 : [type:'list',    ssPos:null, formPos:2,  domain:'T', width:240, locked:false, label:'Errors',
+								  template:errorListTmpl, templateClass:'error', transform:xfrmListToPipedString ],
 
 		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:false,
 										label: 'Related Asset', template:changeTmpl('assetEntity'), transform:xfrmString],
@@ -826,9 +829,8 @@ class TaskImportExportService implements ServiceMethods {
 				Map personInfo = personService.findPersonByFullName(task.assignedTo)
 				if (personInfo.isAmbiguous) {
 					task.errors << 'Found multiple people by name'
-				}else{
-					task["_assignedTo"] = personInfo.person
 				}
+				task["_assignedTo"] = personInfo.person
 			}
 			if (!StringUtil.isBlank(task.role)){
 				String team = allTeamCodes.find { it == task.role }
@@ -1100,17 +1102,18 @@ class TaskImportExportService implements ServiceMethods {
 				origValue.clearTime()
 			}
 
+			def origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
+			def chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
+
 			// Check if it's a FK reference
 			if(info["foreignKey"]){
 				def reference = task["_${prop}"]
-				if(reference && reference.id != assetComment[prop]?.id){
+				if (origValueTransformed != chgValueTransformed) {
 					assetComment[prop] = reference
+					setOriginalValue(task, prop, origValueTransformed)
 				}
 
 			} else {
-				def origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
-				def chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
-
 				boolean valuesEqual = origValueTransformed == chgValueTransformed
 				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed.toString())
 				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed.toString())
@@ -1133,10 +1136,6 @@ class TaskImportExportService implements ServiceMethods {
 					}
 				}
 
-			}
-
-			if (propertyHasError(task, prop)) {
-				task.errors << "Unplanned change(s) for task."
 			}
 		}
 
