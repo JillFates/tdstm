@@ -114,7 +114,7 @@
 							<span>${asset.vmCount ?: '&nbsp;' }</span>
 						</td>
 						<g:if test="${asset.dependencyBundle == 0}">
-							<td id="server_onePlus">
+							<td id="vm_onePlus">
 								<span>${gridStats.vm[1] ?: '&nbsp;' }</span>
 							</td>
 						</g:if>
