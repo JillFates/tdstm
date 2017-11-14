@@ -41,13 +41,22 @@
 					<td id="span_all" class="pointer" onclick="getList($('#tabTypeId').val(), null)" title="All Groups:&#013;Apps: &Tab;${gridStats.app[0]}&#013;Servers: &Tab;${gridStats.server[0] + gridStats.vm[0]}&#013;DBs: &Tab;${gridStats.db[0]}&#013;Storage: &Tab;${gridStats.storage[0]}">
 						<span class="depGroup">All</span>
 					</td>
-					<td id="span_onePlus" class="pointer" onclick="getList( $('#tabTypeId').val(), 'onePlus')" title="Group 1+:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
-						<span class="depGroup">1+</span>
-					</td>
-					<g:each in="${dependencyConsoleList}" var="asset">
-						<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" title="Group ${asset.dependencyBundle}:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
-							<span class="depGroup">${asset.dependencyBundle}</span>
-						</td>
+
+					<g:each in="${dependencyConsoleList}" var="asset" status="depIndex">
+						<g:if test="${depIndex == 0}">
+							<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" title="Group Orphans:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
+								<span class="depGroup">Orphans</span>
+							</td>
+							<td id="span_onePlus" class="pointer" onclick="getList( $('#tabTypeId').val(), 'onePlus')" title="Group Grouped:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
+								<span class="depGroup">Grouped</span>
+							</td>
+						</g:if>
+						<g:else>
+							<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" title="Group ${asset.dependencyBundle}:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
+								<span class="depGroup">${asset.dependencyBundle}</span>
+							</td>
+						</g:else>
+
 					</g:each>
 				</tr>
 				<tr class="even">
