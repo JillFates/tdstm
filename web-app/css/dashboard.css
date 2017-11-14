@@ -479,6 +479,10 @@ text-align: center;
 list-style-type:none;
 }
 
+.bdetails li {
+	min-height: 30px
+}
+
 .bdetails li.heading{
 	font-size:16px;
 	font-weight:bold;
