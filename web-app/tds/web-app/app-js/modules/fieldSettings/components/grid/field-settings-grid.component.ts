@@ -94,7 +94,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			this.state.filter.filters.push({
 				field: 'udf',
 				operator: 'eq',
-				value: this.gridState.filter.fieldType === 'Custom Fields'
+				value: this.gridState.filter.fieldType === 'Custom Fields' ? 1 : 0
 			});
 			this.state.filter.filters.push({
 				field: 'isNew',
