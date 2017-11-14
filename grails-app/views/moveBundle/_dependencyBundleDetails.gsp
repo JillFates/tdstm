@@ -50,7 +50,7 @@
 							<td id="span_${asset.dependencyBundle}" class="pointer" 
 								
 								onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" 
-								title="Assets with no Dependencies:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
+								title="Assets with no matching Dependencies:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 								<span class="depGroup">Orphans</span>
 							</td>
 							<td id="span_onePlus" class="pointer" 
