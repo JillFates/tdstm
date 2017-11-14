@@ -4,6 +4,7 @@ import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-sp
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
+import { SEARCH_QUITE_PERIOD } from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 @Component({
@@ -48,6 +49,7 @@ export class AssetExplorerViewGridComponent {
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
+	typingTimeout: any;
 
 	state: State = {
 		skip: 0,
@@ -76,6 +78,7 @@ export class AssetExplorerViewGridComponent {
 		this.model.columns.forEach((c: ViewColumn) => {
 			c.filter = '';
 		});
+		this.onFilter();
 	}
 
 	hasFilterApplied(): boolean {
@@ -97,6 +100,15 @@ export class AssetExplorerViewGridComponent {
 	onFilter(): void {
 		this.state.skip = 0;
 		this.onReload();
+	}
+
+	onFilterKeyUp(): void {
+		clearTimeout(this.typingTimeout);
+		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+	}
+
+	onFilterKeyDown(): void {
+		clearTimeout(this.typingTimeout);
 	}
 
 	apply(data: any): void {
