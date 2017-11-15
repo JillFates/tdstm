@@ -5,13 +5,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.FavoriteDataview
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -32,23 +27,52 @@ class DataviewService implements ServiceMethods {
 	static final int FAVORITES_MAX_SIZE = 10
 
 	/**
+	 *
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
 	 * current person in session
+	 *
+	 * @param person
+	 * @param project
 	 * @return
 	 */
-	List<Dataview> list() {
-		Person currentPerson = securityService.loadCurrentPerson()
-		Project currentProject = securityService.userCurrentProject
+    List<Dataview> list (Person person, Project project) {
 
-		def query = Dataview.where {
-			project == currentProject
-			(isSystem == true || isShared == true || person == currentPerson)
-		}
+        def query
 
-		return query.list()
-	}
+        boolean canSeeSystemViews = securityService.hasPermission(person, Permission.AssetExplorerSystemList)
 
-	/**
+        if (canSeeSystemViews) {
+
+            query = Dataview.where {
+                (project == project && (isShared == true || person == person)) ||
+                        (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
+            }
+
+        } else {
+
+            List<Long> favoriteSystemViewIds = FavoriteDataview.where {
+                person == person
+            }.projections {
+                property('id')
+            }.list()
+
+            if (favoriteSystemViewIds) {
+                query = Dataview.where {
+                    (project == project && (isShared == true || person == person)) ||
+                            (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
+                }
+            } else {
+                query = Dataview.where {
+                    (project == project && (isShared == true || person == person)) ||
+                            (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
+                }
+            }
+        }
+
+        return query.list()
+    }
+
+    /**
 	 * Gets a Dataview by id.
 	 * @param id
 	 * @return
@@ -67,7 +91,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Dataview update(Integer id, JSONObject dataviewJson) {
+	Dataview update(Person person, Project project, Integer id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
 
@@ -80,15 +104,15 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
-		Long currentPersonId = securityService.currentPersonId
+		Long currentPersonId = person.id
 
 		// Check if the view is favorite and must be unfavorited.
 		if (dataview.isFavorite(currentPersonId) && !dataviewJson.isFavorite) {
-			deleteFavoriteDataview(dataview.id)
+			deleteFavoriteDataview(person, project, dataview.id)
 		} else {
 			// Check if the view must be favorited
 			if (!dataview.isFavorite(currentPersonId) && dataviewJson.isFavorite) {
-				addFavoriteDataview(dataview.id)
+				addFavoriteDataview(person, project, dataview.id)
 			}
 		}
 
@@ -96,19 +120,23 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
+	 *
 	 * Create a Dataview object and add it to the person's favorite if needed.
-	 * Dataview person and project are taken from current session.
-	 * @param json JSONObject to take changes from.
+	 * Dataview person and project should be passed as a parameter
+	 *
+	 * @param currentPerson
+	 * @param currentProject
+	 * @param dataviewJson - JSONObject to take changes from.
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Dataview create(JSONObject dataviewJson) {
+	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
 		validateDataviewCreateAccessOrException(dataviewJson)
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			person = securityService.loadCurrentPerson()
-			project = securityService.userCurrentProject
+			person = currentPerson
+            project = currentProject
 			name = dataviewJson.name
 			isSystem = dataviewJson.isSystem
 			isShared = dataviewJson.isShared
@@ -120,7 +148,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		if (dataviewJson.isFavorite) {
-			addFavoriteDataview(dataview.id)
+			addFavoriteDataview(currentPerson, currentProject, dataview.id)
 		}
 
 		return dataview
@@ -152,11 +180,16 @@ class DataviewService implements ServiceMethods {
 			throwNotFound = true
 		}
 
+        boolean canAccess = (dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) ||
+                (dataview.project.id == securityService.userCurrentProject.id)
+
 		// Validate Dataview belongs to the project
-		if (!throwNotFound && dataview.project.id != securityService.userCurrentProject.id) {
+		if (!throwNotFound && !canAccess) {
 			securityService.reportViolation("attempted to access Dataview $dataview.id unrelated to project")
 			throwNotFound = true
 		}
+
+
 
 		if (!throwNotFound) {
 			// Make sure the user has proper access to the Dataview
@@ -325,9 +358,7 @@ class DataviewService implements ServiceMethods {
 	 * Retrieve the list of favorite data views for the current person,
 	 * @return List of dataviews (DataView instances) the user has favorited.
 	 */
-	List<Dataview> getFavorites(Long personId) {
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
+	List<Dataview> getFavorites(Person person) {
 		// Retrieve all the favorited views for the person.
 		/* Using createCriteria instead of where because there's no way of limiting the number
 		  of results using DetachedCriteria */
@@ -349,12 +380,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewId
 	 * @return
 	 */
-	void deleteFavoriteDataview(Long dataviewId) throws EmptyResultException, DomainUpdateException{
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
-		// Retrieve the current project
-		Project currentProject = securityService.getUserCurrentProject()
-
+	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
 		// Error message
 		String cannotDeleteErrorMsg = "Cannot delete favorite dataview for ${person.toString()}"
 
@@ -389,11 +415,7 @@ class DataviewService implements ServiceMethods {
 	 * Add the given dataview to the current person's favorites.
 	 * @param dataviewId
 	 */
-	void addFavoriteDataview(Long dataviewId) {
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
-		// Retrieve the current project
-		Project currentProject = securityService.getUserCurrentProject()
+	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
 
 		// Error message
 		String cannotFavoriteErrorMsg = "Cannot favorite dataview for ${person.toString()}"

@@ -5,19 +5,19 @@
 
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.FavoriteDataview
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.dataview.DataviewSpec
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  *
@@ -39,11 +39,15 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	/**
 	 * Returns the list of available dataviews as a map(json) result.
 	 * All Dataviews returned belong to current user project in session.
+     *
 	 * @return
 	 */
     def listDataviews() {
 		try {
-			List<Map> listMap = dataviewService.list()*.toMap(securityService.currentPersonId)
+			Person currentPerson = securityService.loadCurrentPerson()
+			Project currentProject = securityService.userCurrentProject
+
+			List<Map> listMap = dataviewService.list(currentPerson, currentProject)*.toMap(securityService.currentPersonId)
 			renderSuccessJson(listMap)
 		} catch (Exception e) {
 			handleException e, log
@@ -73,7 +77,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured('isAuthenticated()')
 	def updateDataview(Integer id) {
 		try {
-			Map dataviewMap = dataviewService.update(id, request.JSON).toMap(securityService.currentPersonId)
+            Person currentPerson = securityService.loadCurrentPerson()
+            Project currentProject = securityService.userCurrentProject
+
+			Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
 			renderSuccessJson([dataView: dataviewMap])
 		} catch (Exception e) {
 			handleException e, log
@@ -89,7 +96,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured('isAuthenticated()')
 	def createDataview() {
 		try {
-			Map dataviewMap = dataviewService.create(request.JSON).toMap(securityService.currentPersonId)
+
+            JSONObject dataviewJson = request.JSON
+			Person person = securityService.loadCurrentPerson()
+			Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
+
+			Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
 			renderSuccessJson([dataView: dataviewMap])
 		} catch (Exception e) {
 			handleException e, log
@@ -248,7 +260,8 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured("isAuthenticated()")
 	def favoriteDataviews() {
 		try{
-			def favorites = dataviewService.getFavorites()
+            Person person = securityService.getUserLoginPerson()
+			def favorites = dataviewService.getFavorites(person)
 			renderSuccessJson(favorites)
 		} catch (Exception e) {
 			renderErrorJson(e.getMessage())
@@ -262,7 +275,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured("isAuthenticated()")
 	def addFavoriteDataview(Long id) {
 		try{
-			dataviewService.addFavoriteDataview(id)
+            Person person = securityService.getUserLoginPerson()
+            Project currentProject = securityService.getUserCurrentProject()
+
+			dataviewService.addFavoriteDataview(person, currentProject, id)
 			renderSuccessJson("Dataview ${id} favorited")
 		} catch (Exception e) {
 			renderErrorJson(e.getMessage())
@@ -276,7 +292,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured("isAuthenticated()")
 	def deleteFavoriteDataview(Long id) {
 		try{
-			dataviewService.deleteFavoriteDataview(id)
+            Person person = securityService.getUserLoginPerson()
+            Project currentProject = securityService.getUserCurrentProject()
+
+			dataviewService.deleteFavoriteDataview(person, currentProject, id)
 			renderSuccessJson("Dataview ${id} removed from the person's favorites.")
 		} catch (Exception e) {
 			renderErrorJson(e.getMessage())
