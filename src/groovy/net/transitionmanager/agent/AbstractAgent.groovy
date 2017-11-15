@@ -58,7 +58,7 @@ class AbstractAgent {
 					methodParams << [ (param.param) : task[param.property] ]
 					break
 				case ContextType.ASSET:
-				case ContextType.SERVER:
+				//case ContextType.SERVER:
 					methodParams << [ (param.param) : task?.assetEntity[param.property] ]
 					break
 				case ContextType.USER_DEF:
