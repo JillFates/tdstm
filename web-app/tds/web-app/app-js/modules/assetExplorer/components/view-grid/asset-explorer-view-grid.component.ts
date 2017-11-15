@@ -102,9 +102,13 @@ export class AssetExplorerViewGridComponent {
 		this.onReload();
 	}
 
-	onFilterKeyUp(): void {
-		clearTimeout(this.typingTimeout);
-		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+	onFilterKeyUp(e: KeyboardEvent): void {
+		if (e.code === 'Enter') {
+			this.onFilter();
+		} else if (e.code !== 'Tab' && e.code !== 'ShiftRight' && e.code !== 'ShiftLeft') {
+			clearTimeout(this.typingTimeout);
+			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+		}
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
