@@ -122,7 +122,7 @@
                         <li>
                             <g:link class="mmlink" controller="module" action="asset" id="views">
                                 <g:img uri="/icons/magnifier.png" width="16" height="16"/>
-                                Asset Explorer
+                                View Manager
                             </g:link>
                         </li>
                         <li class="menu-child-item menu-parent-assets-application-list">
@@ -240,7 +240,7 @@
                     </ul>
                 </li>
             </tds:hasPermission>
-            <tds:hasPermission permission="${Permission.BundleMenuView}">
+            <tds:hasPermission permission="${Permission.TaskView}">
                 <li class="dropdown menu-parent-tasks">
                     <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">

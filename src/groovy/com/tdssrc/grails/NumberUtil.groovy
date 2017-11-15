@@ -106,6 +106,18 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types (String/GString/CharSequence, or other Number type) into a Integer value
+	 *
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Integer value if valid else the default value or null
+	 */
+	static Integer toPositiveInteger(value, Integer defVal = null) {
+		Long defLong = defVal ? new Long(defVal) : null
+		toPositiveLong(value, defLong)?.toInteger()
+	}
+
+	/**
 	 * Convert various types to TINYINT (0-255)
 	 * @param value - the value to convert
 	 * @param defVal - the value to set to if it can't be converted (default null)

@@ -1,13 +1,25 @@
-import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
-import com.tdsops.tm.enums.domain.SecurityRole
-import com.tdsops.tm.enums.domain.SettingType
-import grails.test.spock.IntegrationSpec
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.*
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
+import com.tdsops.tm.enums.domain.SettingType
+import com.tdsops.tm.enums.domain.SecurityRole
 
-class ProjectServiceTests extends IntegrationSpec {
+import com.tdsops.common.exceptions.ConfigurationException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+
+import spock.lang.Specification
+
+class ProjectServiceIntegrationSpec extends Specification {
 
 	// IOC
 	ProjectService projectService
@@ -251,7 +263,13 @@ class ProjectServiceTests extends IntegrationSpec {
 	void '11. Test the cloneDefaultSettings method'() {
 		when: 'a new project is created directly'
 			Project p = projectHelper.createProject()
-		then: 'there should be no Asset Field Settings for the project'
+		// <SL> Commenting this out since projectHelper.createProject() is already calling
+		// cloneDefaultSettings(), then because of that this part of the test fails
+		//then: 'there should be no Asset Field Settings for the project'
+		//	0 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+		//then: 'the cloneDefaultSettings method is called for the new project'
+		//	projectService.cloneDefaultSettings(p)
+		then: 'the project should have 4 Asset Field Settings'
 			4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
 
 		// The new project service for creating a project now prepopulates the project from the default so this test
@@ -289,44 +307,38 @@ class ProjectServiceTests extends IntegrationSpec {
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
-        then: 'a person should have been created'
-	        userPerson
-        and: 'a user login should have been created'
-    	    userLogin
-        then: 'the person does not access to the default project because he is not an admin'
-        	!securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
-        and: 'filting for ANY status should return one project.'
-        	1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
-        and: 'filting for ACTIVE status should return one project.'
-        	1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
-        and: 'filting for COMPLETED status should return zero projects'
-        	0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
-    }
-
-	void "13. Validate that deleting Project deletes the new Provider"() {
-		setup: 'create a Project with a Provider'
-			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-			providerTestHelper.createProvider(project)
-
-		when: 'the project is deleted'
-			projectService.deleteProject(project.id, true)
-
-		then: 'querying providers for the project should find none'
-			[] == Provider.findAllByProject(project)
+		then: 'a person should have been created'
+			userPerson
+		and: 'a user login should have been created'
+			userLogin
+		then: 'the person does not access to the default project because he is not an admin'
+			! securityService.hasPermission(userPerson, Permission.ProjectManageDefaults)
+		and: 'filting for ANY status should return one project.'
+			1 == projectService.getUserProjects(false, ProjectStatus.ANY, [personId: userPerson.id]).size()
+		and: 'filting for ACTIVE status should return one project.'
+			1 == projectService.getUserProjects(false, ProjectStatus.ACTIVE, [personId: userPerson.id]).size()
+		and: 'filting for COMPLETED status should return zero projects'
+			0 == projectService.getUserProjects(false, ProjectStatus.COMPLETED, [personId: userPerson.id]).size()
 	}
 
-	void "14. Validate that deleting Project deletes the new DataScript"() {
-		setup: 'create a project with Provider and DataScript objects'
-			ProviderTestHelper providerTestHelper = new ProviderTestHelper()
-			DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
-			Provider provider = providerTestHelper.createProvider(project)
-			dataScriptTestHelper.createDataScript(project, provider, adminPerson)
+	void '13. Test deleting a project will delete Dataviews belonging to the project'() {
+		setup: 'Given a project is created'
+			Person userPerson = personHelper.createStaff(project.owner)
+			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
+			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
+			securityService.assumeUserIdentity(userLogin.username, false)
+		and: 'Dataview is created for the project'
 
-		when: 'the project is deleted'
+			DataviewTestHelper dataviewTestHelper = new DataviewTestHelper()
+			Dataview dataview = dataviewTestHelper.createDataview(project)
+
+		when: 'project is deleted with the ProjectService.deleteProject method'
 			projectService.deleteProject(project.id, true)
 
-		then: 'querying DataScripts for the project should find none'
-			[] == DataScript.findAllByProject(project)
+		then: 'Then the dataview record should be deleted'
+			null == Dataview.createCriteria().get {
+				eq('id', dataview.id)
+				eq('project', project)
+			}
 	}
-
 }

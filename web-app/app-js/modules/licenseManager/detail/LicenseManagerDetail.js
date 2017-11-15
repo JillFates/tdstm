@@ -213,7 +213,7 @@ export default class LicenseManagerDetail extends FormValidator{
             size: 'sm',
             resolve: {
                 params: () => {
-                    return { title: 'Confirmation Required', message: 'You are about to delete selected license. Are you sure? Click OK to delete otherwise press Cancel.'};
+                    return { title: 'Confirmation Required', message: 'You are about to delete the selected license. Are you sure? Click Confirm to delete otherwise press Cancel.'};
                 }
             }
         });

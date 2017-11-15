@@ -144,18 +144,24 @@
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
-								 class="row" style="margin-right:0px;" itemClass="item col-sm-3 col-md-3 col-lg-2" activeItemClass="item col-sm-3 col-md-3 col-lg-2 active"
-								 disabledItemClass="item col-sm-3 col-md-3 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
+								 class="row" style="margin-right:0px;" itemClass="item col-sm-4 col-md-4 col-lg-2" activeItemClass="item col-sm-4 col-md-4 col-lg-2 active"
+								 disabledItemClass="item col-sm-4 col-md-4 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
-										<div>
-											<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
-											<label style="margin-top:5px;font-weight: normal" for="">{{item.label}}</label>
-											<div class="checkbox pull-right" style="margin:5px;">
-												<label for="">
-													<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
-												</label>
+										<div class="row">
+											<div class="col-sm-8 drag-label">
+												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
+												{{item.label}}
+											</div>
+											<div class="col-sm-4" style="padding:0">
+												<div class="checkbox">
+													<label for="">
+														<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
+													</label>
+												</div>
 											</div>
 										</div>
+
+
 									</ng-template>
 								</kendo-sortable>
 							</div>

@@ -84,10 +84,6 @@ class MoveBundleServiceIntegrationSpec extends Specification {
     }
 
     @See('TM-6847')
-    @Ignore
-    // The test was ignored 8/24 because the hibernate flush is throwing an exception but the code
-    // appears to be working. Need to research the problem. Ticket TM-7069 was created to resolve
-    // this issue.
     void '04. Test deleteBundleAndAssets method' () {
         setup: 'create a project'
             Project project = projectHelper.createProjectWithDefaultBundle()
@@ -95,37 +91,32 @@ class MoveBundleServiceIntegrationSpec extends Specification {
             Person person = personHelper.createPerson(null, project.client, project)
         and: 'create a user that is logged in and the project is their default'
             UserLogin userLogin = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ADMIN}"], project, true)
-
-        when: 'a new bundle is created'
+        when: 'a new Bundle is created'
             MoveBundle bundle = moveBundleHelper.createBundle(project, 'Test Bundle')
-        and: 'a new event is created'
-           MoveEvent event = moveEventService.create(project, 'Test Event')
-        and: 'the above bundle is assigned to it'
-           moveBundleService.assignMoveEvent(event, [bundle.id])
-        and: 'some assets are created and assigned to the bundle'
+        and: 'a new Event is created'
+            MoveEvent event = moveEventService.create(project, 'Test Event')
+        and: 'the above Bundle is assigned to the Event'
+            moveBundleService.assignMoveEvent(event, [bundle.id])
+        and: 'some assets are created and assigned to the Bundle'
             AssetEntity asset1 = assetHelper.createDevice(project, AssetType.VM, [moveBundle: bundle])
             AssetEntity asset2 = assetHelper.createDevice(project, AssetType.SERVER, [moveBundle: bundle])
-            Long assetId1 = asset1.id
-            Long assetId2 = asset2.id
-        and: 'an asset that should be associated to the default project'
+        and: 'an asset not assigned to the Bundle (associated with the Default Bundle by default) is created'
             AssetEntity asset3 = assetHelper.createDevice(project, AssetType.SERVER)
-            Long assetId3 = asset3.id
-        and: 'some tasks for the event are generated'
-            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK)
-            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK)
+        and: 'some tasks are generated for the Event'
+            def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
+            def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
         and: 'the deleteBundleAndAssets method is called'
             moveBundleService.deleteBundleAndAssets(bundle)
-        and: 'the hibernate session is flushed and cleared so the data is deleted as expected'
-            sessionFactory.currentSession.flush()
-            sessionFactory.currentSession.clear()
-        then: 'the bundle should be deleted'
+        then: 'the Bundle should be deleted'
             MoveBundle.get(bundle.id) == null
         and: 'the assigned assets should be deleted'
-            AssetEntity.get(assetId1) == null
-            AssetEntity.get(assetId2) == null
-        and: 'the asset assigned to the default project should still exist'
-            AssetEntity.get(assetId3) != null
-        and: 'the event should still exist'
+            AssetEntity.withNewSession {
+                AssetEntity.get(asset1.id) == null
+                AssetEntity.get(asset2.id) == null
+            }
+        and: 'the asset not assigned to the deleted Bundle should still exist'
+            AssetEntity.get(asset3.id) != null
+        and: 'the Event should still exist'
             MoveEvent.get(event.id) != null
         and: 'the tasks should still exist '
             def task1Test = AssetComment.get(task1.id)

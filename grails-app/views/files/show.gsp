@@ -98,7 +98,7 @@
 	$("#assetMenuId a").css('background-color','#003366')
 
 	$(document).ready(function() {
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	})
 </script>
 

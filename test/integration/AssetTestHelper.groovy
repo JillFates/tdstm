@@ -88,7 +88,7 @@ class AssetTestHelper {
 		 		assetName: RandomStringUtils.randomAlphabetic(15),
 				currentAssetType: assetType,
 				moveBundle: project.projectDefaultBundle,
-				"moveBundle.id": project.projectDefaultBundle.id.toString(),
+				"moveBundle.id": params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
 				roomSourceId: "-1",
 				sourceLocation: "",
 				sourceRoom: "",

@@ -2772,7 +2772,7 @@ class ImportService implements ServiceMethods {
 			colNamesOrdinalMap[cellContent] = c
 		}
 
-		List<Map<String, ?>> domainPropertyNameList = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
+		List<Map<String, ?>> domainPropertyNameList = customDomainService.allFieldSpecs(project, assetClass.toString(), true)[assetClass.toString()]["fields"]
 
 		// Make sure that the required columns are in the spreadsheet
 		checkSheetForMissingColumns(sheetName, domainPropertyNameList, colNamesOrdinalMap)
