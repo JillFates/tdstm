@@ -4,11 +4,11 @@ import com.tdsops.tm.asset.WorkbookSheetName
 import groovy.transform.CompileStatic
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.streaming.SXSSFSheet
-import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -121,7 +121,7 @@ class WorkbookUtil {
 		return addCell(row, colIdx, value, cellType, cellStyle)
 	}
 
-		/**
+	/**
 	 * Adds a cell to a Workbook with specific cell style
 	 * @param sheet
 	 * @param columnIdx
@@ -215,7 +215,7 @@ class WorkbookUtil {
 			String value
 			def c = row.getLastCellNum()
 			while (c >= 0) {
-			value = getStringCellValue(sheet, c, 0)
+				value = getStringCellValue(sheet, c, 0)
 				if (!StringUtil.isBlank(value)) {
 					result = c + 1
 					break
@@ -237,7 +237,7 @@ class WorkbookUtil {
 
 	/**
 	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will use the 
-	* user's currently configured timezone to read the values as string.
+	 * user's currently configured timezone to read the values as string.
 	 *
 	 * @param sheet - the sheet to extract the value
 	 * @param columnIdx - the column to reference (offset starts at zero)
@@ -248,7 +248,7 @@ class WorkbookUtil {
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
 	 * @throws java.text.ParseException - if the field contains an invalid formatted String value
 	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
-	*/
+	 */
 	static Date getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, HttpSession session, Collection formatterTypes=null) {
 		Date result = null
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
@@ -269,7 +269,7 @@ class WorkbookUtil {
 						try {
 							if(formatterType == TimeUtil.FORMAT_DATE){ //Parse to DATE only
 								result = TimeUtil.parseDate(TimeUtil.getUserDateFormat(session), cellVal, formatterType.toString())
-						}else{
+							}else{
 								result = TimeUtil.parseDateTime(cellVal, formatterType.toString())
 							}
 							if (result) {
@@ -297,7 +297,7 @@ class WorkbookUtil {
 	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will make an assumption
 	 * that the date in the spreadsheet is in GMT.
 	 *
-	* The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
+	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
 	 * if the cell type is wrong or there was a parser error.
 	 *
 	 * @param sheet - the sheet to extract the value
@@ -320,8 +320,8 @@ class WorkbookUtil {
 	/**
 	 * Used to read a datetime value from a cell in a spreadsheet using a DateFormat formatter. The formatter will be set to the
 	 * timezone that was passed. This will attempt to read the numeric value which will have a datetime that was generated into
-	* the timezone of the user's Timezone so it will read it in and convert the date back to GMT appropriately.
-	*
+	 * the timezone of the user's Timezone so it will read it in and convert the date back to GMT appropriately.
+	 *
 	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
 	 * if the cell type is wrong or there was a parser error.
 	 *
@@ -463,14 +463,14 @@ class WorkbookUtil {
 	}
 
 	/**
-	  Used to clean up String values by escaping quotes and other things
+	 * Used to clean up String values by escaping quotes and other things
 	 */
 	static String sanitize(String value) {
 		return value?.replace("\\", "\\\\").replace("'","\\'")
 	}
 
 	/**
-	  Used to get the column code (AA, BF) from the column index
+	 * Used to get the column code (AA, BF) from the column index
 	 * @param colIdx - the offset start at zero for column A
 	 * @return The spreadsheet column code
 	 */
@@ -496,9 +496,9 @@ class WorkbookUtil {
 		def createFormulaString = {
 			String validationColumnCode = columnCode(validationColumn)
 			String formula = new StringBuffer("'${validationSheet.getSheetName()}'!")
-					.append("\$$validationColumnCode\$$firstValidationRow:")
-					.append("\$$validationColumnCode\$$lastValidationRow")
-					.toString()
+					  .append("\$$validationColumnCode\$$firstValidationRow:")
+					  .append("\$$validationColumnCode\$$lastValidationRow")
+					  .toString()
 			return formula
 		}
 
@@ -507,23 +507,23 @@ class WorkbookUtil {
 		if(lastTargetRow < firstTargetRow){
 			lastTargetRow = firstTargetRow
 		}
-  		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
+		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
 
-  		Name namedRange = validationSheet.getWorkbook().createName()
-  		String name = "list_${targetSheet.getSheetName()}_${validationColumn}"
-  		namedRange.setNameName(name)
-  		namedRange.setRefersToFormula(createFormulaString())
-  		def dvConstraint = dvHelper.createFormulaListConstraint(name)
+		Name namedRange = validationSheet.getWorkbook().createName()
+		String name = "list_${targetSheet.getSheetName()}_${validationColumn}"
+		namedRange.setNameName(name)
+		namedRange.setRefersToFormula(createFormulaString())
+		def dvConstraint = dvHelper.createFormulaListConstraint(name)
 
-  		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
-  		if(dvConstraint instanceof XSSFDataValidationConstraint){
-  			dataValidation.setSuppressDropDownArrow(false)
+		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+		if(dvConstraint instanceof XSSFDataValidationConstraint){
+			dataValidation.setSuppressDropDownArrow(false)
 			dataValidation.setShowErrorBox(true)
-  		}else{
-  			dataValidation.setSuppressDropDownArrow(true)
-  		}
+		}else{
+			dataValidation.setSuppressDropDownArrow(true)
+		}
 
-  		targetSheet.addValidationData(dataValidation)
+		targetSheet.addValidationData(dataValidation)
 	}
 
 
@@ -589,28 +589,39 @@ class WorkbookUtil {
 	}
 
 	/**
-	 * Get a SXSSFWorkbook from XSSFWorkbook
+	 * Clone a Workbook from the original one
 	 * @param workbook
-	 * @return SXSSFWorkbook
+	 * @return cloned workbook
 	 */
-	static SXSSFWorkbook getStreamableWorkbookInstanceFromXSSFWorkbook(Workbook workbook) {
-		// Save XSSFWorkbook
-		File tempXSSFWorkbook = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null)
-		FileOutputStream fileOutputStream =  new FileOutputStream(tempXSSFWorkbook)
-		workbook.write(fileOutputStream)
+	static Workbook cloneWorkbookInstance(Workbook originalWorkbook) {
+		File tempWorkbook = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null)
+		FileOutputStream fileOutputStream =  new FileOutputStream(tempWorkbook)
+		originalWorkbook.write(fileOutputStream)
 		fileOutputStream.close()
 
-		// Open a new XSSFWorkbook from the one saved previously
-		FileInputStream fileInputStream = new FileInputStream(tempXSSFWorkbook)
-		XSSFWorkbook wb_template = new XSSFWorkbook(fileInputStream)
-		fileInputStream.close()
-		workbook.close()
-		tempXSSFWorkbook.delete()
+		// Open a new Workbook from the one saved previously
+		FileInputStream fileInputStream = new FileInputStream(tempWorkbook)
 
-		// Create an SXSSFWorkbook
-		SXSSFWorkbook streamableWorkbook = new SXSSFWorkbook(wb_template)
-		//streamableWorkbook.setCompressTempFiles(true)
-		return streamableWorkbook
+		Workbook wb_template
+		if ( originalWorkbook instanceof XSSFWorkbook ) {
+			XSSFWorkbook xssfWorkbook = new XSSFWorkbook( fileInputStream )
+			wb_template = xssfWorkbook
+
+			// wb_template = new SXSSFWorkbook( xssfWorkbook )
+
+		} else if ( originalWorkbook instanceof  HSSFWorkbook ) {
+			wb_template = new HSSFWorkbook( fileInputStream )
+
+		} else {
+			throw new RuntimeException ( "Unsupported format Exception , Kill me please!" )
+
+		}
+
+		fileInputStream.close()
+		originalWorkbook.close()
+		tempWorkbook.delete()
+
+		return wb_template
 	}
 
 	/**

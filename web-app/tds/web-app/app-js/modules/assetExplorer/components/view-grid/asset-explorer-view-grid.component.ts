@@ -7,6 +7,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { Observable } from 'rxjs/Rx';
 
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
+import { SEARCH_QUITE_PERIOD } from '../../../../shared/model/constants';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 
 declare var jQuery: any;
@@ -53,6 +54,7 @@ export class AssetExplorerViewGridComponent {
 	VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
+	typingTimeout: any;
 
 	state: State = {
 		skip: 0,
@@ -95,6 +97,7 @@ export class AssetExplorerViewGridComponent {
 		this.model.columns.forEach((c: ViewColumn) => {
 			c.filter = '';
 		});
+		this.onFilter();
 	}
 
 	hasFilterApplied(): boolean {
@@ -116,6 +119,17 @@ export class AssetExplorerViewGridComponent {
 	onFilter(): void {
 		this.state.skip = 0;
 		this.onReload();
+	}
+
+	onFilterKeyUp(): void {
+		clearTimeout(this.typingTimeout);
+		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
+	}
+
+	onFilterKeyDown(e: KeyboardEvent): void {
+		if (e.code !== 'Tab') {
+			clearTimeout(this.typingTimeout);
+		}
 	}
 
 	apply(data: any): void {

@@ -146,7 +146,7 @@
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
 							<div class="">
-								<button type="submit" class="btn btn-primary">Export Excel (.xlsx)&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
+								<button type="submit" class="btn btn-primary">Export Excel&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
 							</div>
 						</div><!-- /.box-body -->
 					</g:form>

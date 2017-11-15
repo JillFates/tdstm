@@ -149,7 +149,7 @@ class AssetEntityService implements ServiceMethods {
 	].asImmutable()
 
 	private static final Map<String, String> TITLE_BY_FILTER = [
-			all: 'All Devices', other: 'Other Devices', physical: 'Physical Device', physicalServer: 'Physical Server',
+			all: 'Devices', other: 'Other Devices', physical: 'Physical Device', physicalServer: 'Physical Server',
 			server: 'Server', storage: 'Storage Device', virtualServer: 'Virtual Server'].asImmutable()
 
 	private static final Map<String, String> RACK_MAP = [

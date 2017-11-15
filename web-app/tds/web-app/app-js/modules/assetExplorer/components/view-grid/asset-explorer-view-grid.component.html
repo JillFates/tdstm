@@ -31,7 +31,7 @@
 		<ng-template kendoGridFilterCellTemplate>
 			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" (keyup.enter)="onFilter()" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter"
-				 placeholder="Filter" value="">
+				 placeholder="Filter" (keyup)="onFilterKeyUp()" (keydown)="onFilterKeyDown($event)" value="">
 				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
 				 aria-hidden="true"></span>
 			</div>

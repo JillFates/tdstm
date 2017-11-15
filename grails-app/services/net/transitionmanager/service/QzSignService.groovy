@@ -13,6 +13,9 @@ import java.security.Signature
 
 @Transactional
 class QzSignService {
+	static final DEFAULT_KEYPATH = 'bin/certs/qztray.transitionmanager.net.key'
+	static final DEFAULT_CERTPATH = 'bin/certs/qztray.digital-certificate'
+
 	def grailsApplication
 
 	/**
@@ -21,24 +24,44 @@ class QzSignService {
 	 * If it can't be found there, fallback to the Application's Home directory
 	 * @return File object representing the configuration File (use exists() to check if its there)
 	 */
-	File findPrivateKeyFile(){
+	File findPrivateKeyFile() {
 		if(!grailsApplication.config.tdstm.qztray.keypath){
 			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.keyPath')")
-			grailsApplication.config.tdstm.qztray.keypath = "tdstm/qztray.transitionmanager.net.key"
+			grailsApplication.config.tdstm.qztray.keypath = DEFAULT_KEYPATH
 		}
 
-		def keyPath = grailsApplication.config.tdstm.qztray.keypath
-		def keyFileRes = grailsApplication.parentContext.getResource("/WEB-INF/${keyPath}")
+		findFileInternal( grailsApplication.config.tdstm.qztray.keypath )
+	}
+
+	/**
+	 * Gets the Certificate file of the QZTray
+	 * @return Certificate File
+	 */
+	File findCertificateFile() {
+		if(!grailsApplication.config.tdstm.qztray.cert){
+			log.warn("Application configuration file is missing for the QZ Tray key file property ('qztray.cert')")
+			grailsApplication.config.tdstm.qztray.cert = DEFAULT_CERTPATH
+		}
+
+		findFileInternal( grailsApplication.config.tdstm.qztray.cert )
+	}
+
+	/**
+	 * Search for a file in the resource path or the application path (Tomcat)
+	 * @return the File
+	 */
+	private File findFileInternal(String path) {
+		def keyFileRes = grailsApplication.parentContext.getResource("/WEB-INF/${path}")
 
 		def file
 		if(keyFileRes.exists()){
 			file = keyFileRes.file
 		}else{
-			file = new File(keyPath)
+			file = new File(path)
 		}
 
 		if(!file.exists()){
-			log.warn("QZ Tray key file '${file}' was not found")
+			log.warn("QZ Tray file '${file}' was not found")
 		}
 
 		return file
