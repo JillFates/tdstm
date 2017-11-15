@@ -330,13 +330,16 @@ class DataviewService implements ServiceMethods {
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
         String hqlJoins = hqlJoins(dataviewSpec)
+		String hqlHaving = hqlHaving(dataviewSpec)
+		Map hqlParams = hqlParams(project, dataviewSpec)
 
         String hql = """
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $hqlWhere  
-          order by $hqlOrder  
+			$hqlHaving
+	   order by $hqlOrder
         """
 
 		String countHql = """
@@ -348,8 +351,8 @@ class DataviewService implements ServiceMethods {
 
         log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
-        def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
-        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec))
+        def assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
+        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams)
 
         previewQueryResults(assets, totalAssets[0], dataviewSpec)
     }
@@ -551,16 +554,42 @@ class DataviewService implements ServiceMethods {
         }
 
         dataviewSpec.filterColumns.each { Map column ->
-            if (hasMultipleFilter(column)){
-				where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
-            } else {
-				where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
-            }
+			if(isWhereMode(column)) {
+				if (hasMultipleFilter(column)){
+					where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
+				} else {
+					where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
+				}
+			}
         }
 
         where.join(" and ")
     }
-    /**
+
+	/**
+	 *
+	 * Creates a String with all the columns correctly set for having clause
+	 *
+	 * @param dataviewSpec
+	 * @return
+	 */
+	private String hqlHaving(DataviewSpec dataviewSpec){
+
+		List having = []
+
+		dataviewSpec.filterColumns.each { Map column ->
+			if(isHavingMode(column)) {
+				if (hasMultipleFilter(column)){
+					having << "${transformations[column.property].alias} in (:${namedParameterFor(column)}) \n"
+				} else {
+					having <<  "${transformations[column.property].alias} like :${namedParameterFor(column)} \n"
+				}
+			}
+		}
+		(having ? 'group by sme ' + 'having ' + having.join(" and ") : '')
+	}
+
+	/**
      *
      * Checks if column.filter has values to be used in filter.
      *
@@ -603,7 +632,7 @@ class DataviewService implements ServiceMethods {
     }
 
 	private String hqlOrder(DataviewSpec dataviewSpec){
-        "${propertyFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
+        "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
     private static String namedParameterFor(Map column) {
@@ -618,24 +647,48 @@ class DataviewService implements ServiceMethods {
         transformations[column.property].join
     }
 
+	private static String orderFor(Map column) {
+		transformations[column.property].alias ?: propertyFor(column)
+	}
+
+	private static boolean isHavingMode(Map column) {
+		transformations[column.property].mode == 'having'
+	}
+
+	private static boolean isWhereMode(Map column) {
+		transformations[column.property].mode == 'where'
+	}
+
+	private static String dynamicPersonColumns(String propertyName) {
+		"""
+			CONCAT( 
+				AE.${propertyName}.firstName,
+				CASE WHEN COALESCE(AE.${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
+			 	AE.${propertyName}.middleName,
+ 				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
+				AE.${propertyName}.lastName
+			) AS ${propertyName}
+		"""
+	}
+
     private static final Map<String, Map> transformations = [
-            "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: ""],
-			"assetClass"  : [property: "str(AE.assetClass)", type: String, namedParameter: "assetClass", join: ''],
-            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle"],
-            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project"],
-            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer"],
-            "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme"],
-            "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2"],
-            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model"],
-            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner"],
-			"sourceLocation" : [property: "AE.roomSource.location", type: String, namedParameter: "sourceLocation", join: "left outer join AE.roomSource"],
-			"sourceRack" : [property: "AE.rackSource.tag", type: String, namedParameter: "sourceRack", join: "left outer join AE.rackSource"],
-			"sourceRoom" : [property: "AE.roomSource.roomName", type: String, namedParameter: "sourceRack", join: "left outer join AE.roomSource"],
-			"targetLocation" : [property: "AE.roomTarget.location", type: String, namedParameter: "targetLocation", join: "left outer join AE.roomTarget"],
-			"targetRack" : [property: "AE.rackTarget.tag", type: String, namedParameter: "targetRack", join: "left outer join AE.rackTarget"],
-			"targetRoom" : [property: "AE.roomTarget.roomName", type: String, namedParameter: "targetRack", join: "left outer join AE.roomTarget"]
+            "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: "", mode:"where"],
+			"assetClass"  : [property: "str(AE.assetClass)", type: String, namedParameter: "assetClass", join: '', mode:"where"],
+            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle", mode:"where"],
+            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project", mode:"where"],
+            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer", mode:"where"],
+            "sme"         : [property: dynamicPersonColumns('sme'), type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme", alias:'sme', mode:"having"],
+            "sme2"        : [property: dynamicPersonColumns('sme2'), type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2", alias:'sme2', mode:"having"],
+            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model", mode:"where"],
+            "appOwner"    : [property: dynamicPersonColumns('appOwner'), type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner", alias:'appOwner', mode:"having"],
+			"sourceLocation" : [property: "AE.roomSource.location", type: String, namedParameter: "sourceLocation", join: "left outer join AE.roomSource", mode:"where"],
+			"sourceRack" : [property: "AE.rackSource.tag", type: String, namedParameter: "sourceRack", join: "left outer join AE.rackSource", mode:"where"],
+			"sourceRoom" : [property: "AE.roomSource.roomName", type: String, namedParameter: "sourceRack", join: "left outer join AE.roomSource", mode:"where"],
+			"targetLocation" : [property: "AE.roomTarget.location", type: String, namedParameter: "targetLocation", join: "left outer join AE.roomTarget", mode:"where"],
+			"targetRack" : [property: "AE.rackTarget.tag", type: String, namedParameter: "targetRack", join: "left outer join AE.rackTarget", mode:"where"],
+			"targetRoom" : [property: "AE.roomTarget.roomName", type: String, namedParameter: "targetRack", join: "left outer join AE.roomTarget", mode:"where"]
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
     }
 
 	/**
