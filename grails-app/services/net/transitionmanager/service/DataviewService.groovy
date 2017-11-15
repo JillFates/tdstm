@@ -347,6 +347,7 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $hqlWhere
+			$hqlHaving
         """
 
         log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
@@ -586,7 +587,7 @@ class DataviewService implements ServiceMethods {
 				}
 			}
 		}
-		(having ? 'group by sme ' + 'having ' + having.join(" and ") : '')
+		(having ? 'group by sme ' + '\n having ' + having.join(" and ") : '')
 	}
 
 	/**
