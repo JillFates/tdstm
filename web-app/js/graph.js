@@ -828,6 +828,9 @@ var GraphUtil = (function ($) {
 			} else if (o.highlighted == 'n'){
 				lineShadow.css('opacity', 0.3);
 				lineShadow.css('stroke-width', 1);
+			} else {
+				lineShadow.css('opacity', 1);
+				lineShadow.css('stroke-width', 1);
 			}
 		});
 		public.reorderDOM();
@@ -1223,7 +1226,11 @@ var GraphUtil = (function ($) {
 			var dependencyStatus = link.dependencyStatus;
 			var dependencyType = link.dependencyType;
 			link.hide = ((showTypeItems.indexOf(dependencyType) === -1) || (showStatusItems.indexOf(dependencyStatus) === -1))? 'y' : 'n';
-			link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : 'n';
+			if(highlightTypeItems.length > 0 || highlightStatusItems.length > 0) {
+				link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : (highlightStatusItems.indexOf(dependencyStatus) !== -1)? 'y' : 'n';
+			} else if(highlightTypeItems.length == 0 && highlightStatusItems.length == 0) {
+				link.highlighted = null;
+			}
 		}
 
 		public.dependencyPanelConfig.dependencyType.show = showTypeItems;
