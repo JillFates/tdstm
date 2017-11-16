@@ -138,6 +138,8 @@ databaseChangeLog = {
 	include file: '20170925-create-favorite-dataview-table.groovy'
 	include file: '20160920-create-license-table.groovy'
 	include file: '20160920-create-licensed_client-table.groovy'
+	include file: '20161010-notice-support.groovy'
+	include file: '20161010-notice-support-change-noticetype-column.groovy'
 	include file: '20170220-create-license-activity-track-table.groovy'
 	// The Delete Orphans using the PersonService.deletePerson can be temperamental with changes to the service
 	// like adding new references.
@@ -150,8 +152,6 @@ databaseChangeLog = {
 	include file: '20160817-delete-source-target-team-eav-attributes.groovy'
 	include file: '20160909-add-duration-locked-to-tasks.groovy'
 	include file: '20161006-update-user-preference-code-legendTwistieState.groovy'
-	include file: '20161010-notice-support.groovy'
-	include file: '20161010-notice-support-change-noticetype-column.groovy'
 	include file: '20161111-delete-asset-dependency-orphans.groovy'
 	include file: '20161129-fix-license-columns.groovy'
 	include file: '20161207-add-owner-to-license-table.groovy'
