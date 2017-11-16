@@ -6,4 +6,4 @@ export enum Keystroke {
 	TAB = 'Tab',
 	SHIFT_RIGHT = 'ShiftRight',
 	SHIFT_LEFT = 'ShiftLeft'
-}
+};
