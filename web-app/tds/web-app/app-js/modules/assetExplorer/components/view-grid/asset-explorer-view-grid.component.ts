@@ -4,7 +4,7 @@ import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-sp
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import { SEARCH_QUITE_PERIOD } from '../../../../shared/model/constants';
+import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 @Component({
@@ -103,9 +103,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onFilterKeyUp(e: KeyboardEvent): void {
-		if (e.code === 'Enter') {
+		if (e.code === Keystroke.ENTER) {
 			this.onFilter();
-		} else if (e.code !== 'Tab' && e.code !== 'ShiftRight' && e.code !== 'ShiftLeft') {
+		} else if (e.code !== Keystroke.TAB && e.code !== Keystroke.SHIFT_RIGHT && e.code !== Keystroke.SHIFT_LEFT) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}
