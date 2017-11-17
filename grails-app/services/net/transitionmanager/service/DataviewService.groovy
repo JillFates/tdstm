@@ -330,7 +330,6 @@ class DataviewService implements ServiceMethods {
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
         String hqlJoins = hqlJoins(dataviewSpec)
-		String hqlHaving = hqlHaving(dataviewSpec)
 		Map hqlParams = hqlParams(project, dataviewSpec)
 
         String hql = """
@@ -338,7 +337,6 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $hqlWhere  
-			$hqlHaving
 	   order by $hqlOrder
         """
 
@@ -347,7 +345,6 @@ class DataviewService implements ServiceMethods {
               from AssetEntity AE
                 $hqlJoins
              where AE.project = :project and $hqlWhere
-			$hqlHaving
         """
 
         log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
@@ -355,7 +352,7 @@ class DataviewService implements ServiceMethods {
         def assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
         def totalAssets = AssetEntity.executeQuery(countHql, hqlParams)
 
-        previewQueryResults(assets, totalAssets[0], dataviewSpec)
+        previewQueryResults(assets, assets.size(), dataviewSpec)
     }
 
 	/**
@@ -530,11 +527,20 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-	private String hqlColumns(DataviewSpec dataviewSpec){
+	private String hqlColumns(DataviewSpec dataviewSpec) {
 		dataviewSpec.columns.collect { Map column ->
-			"${propertyFor(column)}"
+			boolean isSubquery = transformations[column.property].mode == 'subquery'
+			boolean hasFilter = dataviewSpec.filterColumns.find { Map filter ->
+				filter.property == column.property
+			}
+			if (isSubquery && hasFilter) {
+				"${propertyWithFilter(column)}"
+			} else {
+				"${propertyFor(column)}"
+			}
 		}.join(", ")
-    }
+	}
+
     /**
      *
      * Creates a String with all the columns correctly set for where clause
@@ -542,52 +548,27 @@ class DataviewService implements ServiceMethods {
      * @param dataviewSpec
      * @return
      */
-	private String hqlWhere(DataviewSpec dataviewSpec){
+	private String hqlWhere(DataviewSpec dataviewSpec) {
 
-        List where = []
+		List where = []
 
-        if(!dataviewSpec.domains.isEmpty()){
-            where << "AE.assetClass in (:assetClasses)"
-        }
-
-        if (dataviewSpec.justPlanning != null) {
-            where << "AE.moveBundle in (:moveBundles)"
-        }
-
-        dataviewSpec.filterColumns.each { Map column ->
-			if(isWhereMode(column)) {
-				if (hasMultipleFilter(column)){
+		if (!dataviewSpec.domains.isEmpty()) {
+			where << "AE.assetClass in (:assetClasses)"
+		}
+		if (dataviewSpec.justPlanning != null) {
+			where << "AE.moveBundle in (:moveBundles)"
+		}
+		dataviewSpec.filterColumns.each { Map column ->
+			if (isWhereMode(column)) {
+				if (hasMultipleFilter(column)) {
 					where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
 				} else {
-					where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
-				}
-			}
-        }
-
-        where.join(" and ")
-    }
-
-	/**
-	 *
-	 * Creates a String with all the columns correctly set for having clause
-	 *
-	 * @param dataviewSpec
-	 * @return
-	 */
-	private String hqlHaving(DataviewSpec dataviewSpec){
-
-		List having = []
-
-		dataviewSpec.filterColumns.each { Map column ->
-			if(isHavingMode(column)) {
-				if (hasMultipleFilter(column)){
-					having << "${transformations[column.property].alias} in (:${namedParameterFor(column)}) \n"
-				} else {
-					having <<  "${transformations[column.property].alias} like :${namedParameterFor(column)} \n"
+					where << "${propertyFor(column)} like :${namedParameterFor(column)} \n"
 				}
 			}
 		}
-		(having ? 'group by sme ' + '\n having ' + having.join(" and ") : '')
+
+		where.join(" and ")
 	}
 
 	/**
@@ -644,30 +625,37 @@ class DataviewService implements ServiceMethods {
 		transformations[column.property].property
     }
 
+	private static String propertyWithFilter(Map column) {
+		transformations[column.property].propertyWithFilter
+	}
+
     private static String joinFor(Map column) {
-        transformations[column.property].join
+        transformations[column.property].join?:''
     }
 
 	private static String orderFor(Map column) {
 		transformations[column.property].alias ?: propertyFor(column)
 	}
 
-	private static boolean isHavingMode(Map column) {
-		transformations[column.property].mode == 'having'
-	}
-
 	private static boolean isWhereMode(Map column) {
 		transformations[column.property].mode == 'where'
 	}
 
-	private static String dynamicPersonColumns(String propertyName) {
+	/*
+	*
+	* */
+	private static String personColumns(String propertyName, boolean filter = false) {
+		String hqlFilter = filter ? "and (p.firstName = 'Andy')":''
 		"""
-			CONCAT( 
-				AE.${propertyName}.firstName,
-				CASE WHEN COALESCE(AE.${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
-			 	AE.${propertyName}.middleName,
- 				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
-				AE.${propertyName}.lastName
+			( SELECT
+				CONCAT( 
+					p.firstName,
+					CASE WHEN COALESCE(p.middleName, '') = '' THEN '' ELSE ' ' END,
+					p.middleName,
+					CASE WHEN COALESCE(p.lastName, '') = '' THEN '' ELSE ' ' END,
+					p.lastName
+				) from Person p where p.id = AE.${propertyName}
+				$hqlFilter
 			) AS ${propertyName}
 		"""
 	}
@@ -678,10 +666,10 @@ class DataviewService implements ServiceMethods {
             "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle", mode:"where"],
             "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project", mode:"where"],
             "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer", mode:"where"],
-            "sme"         : [property: dynamicPersonColumns('sme'), type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme", alias:'sme', mode:"having"],
-            "sme2"        : [property: dynamicPersonColumns('sme2'), type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2", alias:'sme2', mode:"having"],
+            "sme"         : [property: personColumns('sme'), propertyWithFilter: personColumns('sme', true), type: String, namedParameter: "smeName", alias:'sme', mode:"subquery"],
+            "sme2"        : [property: personColumns('sme2'), propertyWithFilter: personColumns('sme2', true), type: String, namedParameter: "sme2FirstName", alias:'sme2', mode:"subquery"],
             "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model", mode:"where"],
-            "appOwner"    : [property: dynamicPersonColumns('appOwner'), type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner", alias:'appOwner', mode:"having"],
+            "appOwner"    : [property: personColumns('appOwner'), propertyWithFilter: personColumns('appOwner', true), type: String, namedParameter: "appOwnerFirstName", alias:'appOwner', mode:"subquery"],
 			"sourceLocation" : [property: "AE.roomSource.location", type: String, namedParameter: "sourceLocation", join: "left outer join AE.roomSource", mode:"where"],
 			"sourceRack" : [property: "AE.rackSource.tag", type: String, namedParameter: "sourceRack", join: "left outer join AE.rackSource", mode:"where"],
 			"sourceRoom" : [property: "AE.roomSource.roomName", type: String, namedParameter: "sourceRack", join: "left outer join AE.roomSource", mode:"where"],
