@@ -670,6 +670,7 @@ class AccountImportExportService implements ServiceMethods {
 				} else {
 					throw new RuntimeException("Can not create a UserLogin until Person is saved for $person")
 				}
+				person.userLogin = userLogin
 
 				(error, userChanged) = applyUserLoginChanges(userLogin, accounts[i], sheetInfoOpts, formOptions)
 				if (error) {
