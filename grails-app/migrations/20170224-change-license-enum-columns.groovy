@@ -19,7 +19,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'license' and 
 							COLUMN_NAME = 'environment'
 					""")
@@ -66,7 +66,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'license' and 
 							COLUMN_NAME = 'status'
 					""")
@@ -114,7 +114,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'license' and 
 							COLUMN_NAME = 'type'
 					""")
@@ -158,7 +158,7 @@ databaseChangeLog = {
 
 				enumList.eachWithIndex{ enu, i ->
 					def id = i+1 //the old id is offset+1
-					sql.executeUpdate("UPDATE license set `method`='${enu.name()}' WHERE `method`='${id}'")
+					sql.executeUpdate("UPDATE license set `method`=${enu.name()} WHERE `method`=${id}")
 				}
 			}
 		}

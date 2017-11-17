@@ -19,7 +19,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'licensed_client' and 
 							COLUMN_NAME = 'environment'
 					""")
@@ -66,7 +66,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'licensed_client' and 
 							COLUMN_NAME = 'status'
 					""")
@@ -114,7 +114,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'licensed_client' and 
 							COLUMN_NAME = 'type'
 					""")
@@ -161,7 +161,7 @@ databaseChangeLog = {
 						SELECT COLUMN_TYPE
 						FROM information_schema.COLUMNS
 						WHERE 
-							TABLE_SCHEMA = '${schemaName}' and 
+							TABLE_SCHEMA = ${schemaName} and 
 							TABLE_NAME = 'licensed_client' and 
 							COLUMN_NAME = 'method'
 					""")
