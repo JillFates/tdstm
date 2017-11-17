@@ -149,6 +149,7 @@ var cancelCut = false
 
 // Build the layout model
 function buildMap () {
+
 	// get the default graph configuration
 	var config = getForceConfig()
 	widthCurrent = config.width
@@ -248,7 +249,7 @@ function createForceLayout (config) {
 
 // creates the graph SVG and sets up the bindings and behaviors for it
 function createGraph (config) {
-	
+
 	// updates the current fillMode
 	fillMode = GraphUtil.getFillMode()
 	
@@ -308,7 +309,7 @@ function createGraph (config) {
 	// bind the "color by" radio buttons
 	$('#colorBySelectId').unbind('change').on('change', setColorBy)
 	setColorBy()
-	GraphUtil.correctBothPanelSizes()
+	GraphUtil.correctPanelSizes()
 	
 	// bind the show budle conflicts checkbox
 	$('#bundleConflictsId').unbind('change').on('change', function (e) {
@@ -606,6 +607,7 @@ function toggleNodeSelection (id) {
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height) {
+
 	// handle resizing when not in fullscreen mode
 	if (!GraphUtil.isFullscreen() && (width && height))
 		resizeGraph(width, height)
@@ -781,6 +783,7 @@ function reoptimizeGraph () {
 function drawContextMenu() {
 	// Trigger action when the contexmenu is about to be shown
 	$(document).bind("contextmenu", function (event) {
+
 		if (event.shiftKey)
 			return;
 		var validTags = ['use', 'svg', 'g', 'line'];
@@ -789,7 +792,7 @@ function drawContextMenu() {
 
 		if (validTags.indexOf(tag) != -1) {
 			event.preventDefault();
-			//debugger;
+
 			// remove old items
 			$(".customMenu").children(".tempItem").remove();
 
@@ -823,7 +826,6 @@ function drawContextMenu() {
 			if (tag == 'line') {
 
 				var data = target.__data__;
-				//console.log(data);
 
 				$("#consoleOutputItemId").on('click', function (a, b) {
 					closeMenu();
@@ -867,6 +869,10 @@ function drawContextMenu() {
 	function closeMenu () {
 		$(".customMenu").css('display', "none").children(".tempItem").remove();
 	}
+
+	GraphUtil.restoreDependencyPanel('Type');
+	GraphUtil.restoreDependencyPanel('Status');
+	GraphUtil.applyShowHideDependencies();
 }
 
 function getDimensionsForOptimizing () {

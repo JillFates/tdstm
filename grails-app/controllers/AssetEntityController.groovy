@@ -22,6 +22,7 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -2068,7 +2069,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					depGroups = -1
 
 				def assetDependencies = AssetDependency.executeQuery('''
-					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
+					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.type as type, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
 					                (CASE WHEN ad.asset.moveBundle != ad.dependent.moveBundle
 					                       AND ad.status in (:statuses)
@@ -2110,6 +2111,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						notApplicable = true
 					}
 
+					def dependencyStatus = it.status
+					def dependencyType = it.type
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if (sourceIndex != -1 && targetIndex != -1) {
@@ -2121,9 +2124,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						linkTable[sourceIndex][targetIndex] = true
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 
-						graphLinks << [id: i, source: sourceIndex, target: targetIndex, value: 2, statusColor: statusColor,
-						               opacity: opacity, unresolved: !it.resolved, notApplicable: notApplicable,
-						               future: future, bundleConflict: it.bundleConflict, duplicate: duplicate]
+						graphLinks << [
+								id: i, 
+								source: sourceIndex, 
+								target: targetIndex, 
+								value: 2, 
+								statusColor: statusColor,
+								bundleConflict: it.bundleConflict, 
+								dependencyStatus: dependencyStatus, 
+								dependencyType: dependencyType,
+								duplicate: duplicate,
+								future: future, 
+								opacity: opacity, 
+								unresolved: !it.resolved, 
+								notApplicable: notApplicable,
+							]
 						i++
 					}
 				}
@@ -2133,6 +2148,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					graphNodes[it.source].dependsOn.add(it.id)
 					graphNodes[it.target].supports.add(it.id)
 				}
+
+				def entities = assetEntityService.entityInfo(project)
 
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
@@ -2153,6 +2170,19 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.moveBundleMap = moveBundleIndexMap as JSON
 				model.moveEventMap = moveEventIndexMap as JSON
 				model.depGroup = params.dependencyBundle
+				model.dependencyType = entities.dependencyType
+				model.dependencyStatus = entities.dependencyStatus
+				model.connectionTypes = '{}'
+				model.statusTypes = '{}'
+				if (project.depConsoleCriteria) {
+					def depConsoleCriteria = JsonUtil.parseJson(project.depConsoleCriteria)
+					if (depConsoleCriteria.connectionTypes) {
+						model.connectionTypes = JsonUtil.toJson(depConsoleCriteria.connectionTypes)
+					}
+					if (depConsoleCriteria.statusTypes) {
+						model.statusTypes = JsonUtil.toJson(depConsoleCriteria.statusTypes)
+					}
+				}
 
 				// Render dependency graph
 				render(template:'dependencyGraph', model:model)

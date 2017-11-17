@@ -43,6 +43,21 @@ var GraphUtil = (function ($) {
 	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.defaultDimensions = {'width': 28, 'height': 28};
 	public.lastHighlightSearch = null;
+	// Stored only on the current page session
+	public.dependencyPanelConfig = {
+		dependencyStatus: {
+			status: 'true',
+			show: [],
+			highlight: [],
+			groupingControl: []
+		},
+		dependencyType: {
+			status: 'true',
+			show: [],
+			highlight: [],
+			groupingControl: []
+		}
+	};
 
 	// ############################################################## graph UI functions ##############################################################
 
@@ -85,7 +100,7 @@ var GraphUtil = (function ($) {
 		if (public.graphExists()) {
 			var dimensions = public.getProperGraphDimensions();
 			resizeGraph(dimensions.width, dimensions.height);
-			public.correctBothPanelSizes();
+			public.correctPanelSizes();
 		}
 	}
 
@@ -104,6 +119,8 @@ var GraphUtil = (function ($) {
 			else
 				public.enableFullscreen();
 		}
+
+		public.correctActionButtons();
 	}
 
 	// changes the graph to fullscreen mode
@@ -136,10 +153,16 @@ var GraphUtil = (function ($) {
 		public.correctPanelSize('controlPanelId');
 	}
 
+	// sets the size of the Dependency Panel so that it can scroll when longer than the user's window
+	public.correctDependenciesPanelSize = function () {
+		public.correctPanelSize('dependenciesPanelId');
+	}
+
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
-	public.correctBothPanelSizes = function () {
+	public.correctPanelSizes = function () {
 		public.correctLegendSize();
 		public.correctControlPanelSize();
+		public.correctDependenciesPanelSize();
 	}
 
 	// sets the size of a panel so that it can scroll when longer than the user's window
@@ -162,8 +185,19 @@ var GraphUtil = (function ($) {
 			panel.css('height', '');
 			panel.css('overflow-y', '');
 		}
+
+		public.correctActionButtons();
 	}
 
+	public.correctActionButtons = function() {
+		if($('#dependenciesPanelId').has_scrollbar()) {
+			$('.dependency_panel_action_buttons').css('position', 'fixed');
+			$('.dependency_panel_action_buttons').css('bottom', '49px');
+		} else {
+			$('.dependency_panel_action_buttons').css('position', '');
+			$('.dependency_panel_action_buttons').css('bottom', '5px');
+		}
+	};
 
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
@@ -194,6 +228,24 @@ var GraphUtil = (function ($) {
                 } else {
                     public.correctControlPanelSize();
                 }
+			});
+		}
+	}
+
+
+	public.toggleDependencyPanel = function(dependencyPanel, event) {
+		var panelStatusOpen = $('.'+dependencyPanel).hasClass('open');
+		if(panelStatusOpen){
+			$(event).find('i.fa-fw').removeClass('fa-caret-down').addClass('fa-caret-right');
+			$('.'+dependencyPanel).removeClass('open').addClass('closed');
+			$('.'+dependencyPanel).slideUp(300, function(){
+				public.correctDependenciesPanelSize();
+			});
+		} else {
+			$(event).find('i.fa-fw').removeClass('fa-caret-right').addClass('fa-caret-down');
+			$('.'+dependencyPanel).removeClass('closed').addClass('open');
+			$('.'+dependencyPanel).slideDown(300, function(){
+				public.correctDependenciesPanelSize();
 			});
 		}
 	}
@@ -258,6 +310,9 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').removeClass('openPanel');
 			$('#controlPanelTabId').removeClass('activeTab');
+		} else if (panel == 'dependencies') {
+			$('#dependenciesPanelId').removeClass('openPanel');
+			$('#dependenciesPanelTabId').removeClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').removeClass('openPanel');
 			$('#legendTabId').removeClass('activeTab');
@@ -269,6 +324,9 @@ var GraphUtil = (function ($) {
 		if (panel == 'control') {
 			$('#controlPanelId').addClass('openPanel');
 			$('#controlPanelTabId').addClass('activeTab');
+		} else if (panel == 'dependencies') {
+			$('#dependenciesPanelId').addClass('openPanel');
+			$('#dependenciesPanelTabId').addClass('activeTab');
 		} else if (panel == 'legend') {
 			$('#legendDivId').addClass('openPanel');
 			$('#legendTabId').addClass('activeTab');
@@ -283,17 +341,28 @@ var GraphUtil = (function ($) {
 			else
 				public.openPanel('control');
 			public.hidePanel('legend');
+			public.hidePanel('dependencies');
+		} else if (panel == 'dependencies') {
+			if ($('#dependenciesPanelTabId.activeTab').size() > 0)
+				public.hidePanel('dependencies');
+			else {
+				public.openPanel('dependencies');
+			}
+			public.hidePanel('legend');
+			public.hidePanel('control');
 		} else if (panel == 'legend') {
 			if ($('#legendTabId.activeTab').size() > 0)
 				public.hidePanel('legend');
 			else
 				public.openPanel('legend');
 			public.hidePanel('control');
+			public.hidePanel('dependencies');
 		} else if (panel == 'hide') {
 			public.hidePanel('control');
 			public.hidePanel('legend');
+			public.hidePanel('dependencies');
 		}
-		public.correctBothPanelSizes();
+		public.correctPanelSizes();
 	}
 
 	// populates the team select
@@ -465,6 +534,7 @@ var GraphUtil = (function ($) {
 				+ ((d.future) ? ' future' : '')
 				+ ((d.cut) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
+				+ ((d.hide === 'y') ? ' hide_link' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
@@ -490,10 +560,13 @@ var GraphUtil = (function ($) {
 	}
 
 	// updates the class list for ever graph element
-	public.updateAllClasses = function () {
+	public.updateAllClasses = function (callback) {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
+		if(callback){
+			return callback();
+		}
 	}
 
 
@@ -737,6 +810,26 @@ var GraphUtil = (function ($) {
 
 			// apply the basic attributes
 			cutShadow.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
+		});
+		public.reorderDOM();
+	};
+
+	public.createLineShadows = function (color) {
+		public.force.links().each(function (o, i) {
+			// get the cut shadow object (create it if it doesn't exist)
+			var lineShadow = $(o.linkElement[0][0]);
+
+			lineShadow.css('opacity', null);
+			if (o.highlighted == 'y') {
+				lineShadow.css('opacity', 1);
+				lineShadow.css('stroke-width', 3);
+			} else if (o.highlighted == 'n'){
+				lineShadow.css('opacity', 0.3);
+				lineShadow.css('stroke-width', 1);
+			} else {
+				lineShadow.css('opacity', 1);
+				lineShadow.css('stroke-width', 1);
+			}
 		});
 		public.reorderDOM();
 	}
@@ -1057,7 +1150,115 @@ var GraphUtil = (function ($) {
 		}
 		public.updateAllClasses();
 		public.createCutShadows(fill);
-	}
+	};
+
+	public.restoreDependencyPanel = function(type) {
+		if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
+			$('#dependency' + type + 'Control_show_all').prop('checked', true);
+			$('#dependency' + type + 'Control_show_all').attr('state', 1);
+			$('.dependency' + type + 'ControlsShow').prop('checked', true);
+		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
+			$('#dependency' + type + 'Control_show_all').prop('checked', false);
+			$('#dependency' + type + 'Control_show_all').attr('state', 3);
+			$('.dependency' + type + 'ControlsShow').each(function () {
+				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
+			});
+		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'indeterminate'){
+			$('#dependency' + type + 'Control_show_all').prop('indeterminate', true);
+			$('#dependency' + type + 'Control_show_all').attr('state', 2);
+			$('.dependency' + type + 'ControlsShow').each(function(){
+				var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+				$(this).prop('checked', selected);
+			});
+		}
+
+		if(GraphUtil.dependencyPanelConfig['dependency' + type].highlight.length > 0) {
+			$('.dependency' + type + 'ControlsHighlight').each(function () {
+				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].highlight.indexOf($(this).val()) !== -1);
+			});
+		}
+
+		$('.dependency' + type + 'ControlsShow').each(function(){
+			var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+			if(selected) {
+				$(this).parent().addClass('groupingControl');
+			}
+		});
+	};
+
+	public.onSelectItemHighlightDependencyPanel = function(event){
+		if($(event).is(":checked")) {
+			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', true);
+		}
+	};
+
+	public.onSelectAllDependencyPanel = function(checkboxSelectorClass, config, event) {
+		var state = parseInt($(event).attr('state'));
+		if(state === 1) {
+			state = 3;
+			$('.' + checkboxSelectorClass + 'Show').prop('checked', false);
+			$('.' + checkboxSelectorClass + 'Highlight').prop('checked', false);
+			GraphUtil.dependencyPanelConfig[config].status = 'false';
+		} else if(state === 2) {
+			state = 1;
+			$('.' + checkboxSelectorClass + 'Show').prop('checked', true);
+			$(event).prop("checked", true);
+			GraphUtil.dependencyPanelConfig[config].status = 'true';
+		} else if(state === 3) {
+			state = 2;
+			$(event).prop("indeterminate", true);
+			$('.' + checkboxSelectorClass + 'Show').each(function(){
+				var showCheckbox = $(this);
+				var selected = GraphUtil.dependencyPanelConfig[config].groupingControl.indexOf(showCheckbox.val()) !== -1;
+				$(this).prop('checked', selected);
+			});
+			$('.' + checkboxSelectorClass + 'Highlight').each(function(){
+				if($(this).is(":checked")){
+					var sibling = $(this).parent().siblings()[1];
+					if(!$(sibling).find('input:checkbox').is(":checked")) {
+						$(this).prop('checked', false);
+					}
+				}
+			});
+			GraphUtil.dependencyPanelConfig[config].status = 'indeterminate';
+		}
+		$(event).attr('state', state);
+	};
+
+	public.applyShowHideDependencies = function () {
+		var links = public.force.links();
+		var showTypeItems = $('.dependencyTypeControlsShow:checked').map(function() { return this.value; }).get();
+		var highlightTypeItems = $('.dependencyTypeControlsHighlight:checked').map(function() { return this.value; }).get();
+		var showStatusItems = $('.dependencyStatusControlsShow:checked').map(function() { return this.value; }).get();
+		var highlightStatusItems = $('.dependencyStatusControlsHighlight:checked').map(function() { return this.value; }).get();
+
+		var hideList = [];
+		var highlightList = [];
+		for (var i = 0; i < links.length; ++i) {
+			var link = links[i];
+			var dependencyStatus = link.dependencyStatus;
+			var dependencyType = link.dependencyType;
+			link.hide = ((showTypeItems.indexOf(dependencyType) === -1) || (showStatusItems.indexOf(dependencyStatus) === -1))? 'y' : 'n';
+			if(highlightTypeItems.length > 0 || highlightStatusItems.length > 0) {
+				link.highlighted = (highlightTypeItems.indexOf(dependencyType) !== -1)? 'y' : (highlightStatusItems.indexOf(dependencyStatus) !== -1)? 'y' : 'n';
+			} else if(highlightTypeItems.length == 0 && highlightStatusItems.length == 0) {
+				link.highlighted = null;
+			}
+		}
+
+		public.dependencyPanelConfig.dependencyType.show = showTypeItems;
+		public.dependencyPanelConfig.dependencyType.highlight = highlightTypeItems;
+
+		public.dependencyPanelConfig.dependencyStatus.show = showStatusItems;
+		public.dependencyPanelConfig.dependencyStatus.highlight = highlightStatusItems;
+
+		public.updateAllClasses(function(){
+			$('.link').show();
+			$('.hide_link').hide();
+			public.createCutShadows(fill);
+			public.createLineShadows(fill)
+		});
+	};
 
 	// removes the value in the source filter field and performs a new search
 	public.clearFilter = function (source) {

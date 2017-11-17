@@ -6,8 +6,13 @@ $(document).ready(function() {
 
 	// handle detecting whether this graph is being opened in the fullscreen state
 	var fullscreen = ${fullscreen};
-	if (fullscreen)
+	if (fullscreen) {
 		GraphUtil.enableFullscreen();
+	}
+
+	// List of the dependency types and statuses used for the dependency group generation
+	GraphUtil.dependencyPanelConfig.dependencyStatus.groupingControl = ${raw(statusTypes)};
+	GraphUtil.dependencyPanelConfig.dependencyType.groupingControl = ${raw(connectionTypes)};
 
 	// figure out which panel should be opened initially
 	var showControls = '${showControls ?: ''}';
@@ -130,6 +135,16 @@ function listCheck () {
 	});
 	return labelsList
 }
+
+// --------  DEPENDENCY PANEL
+(function($) {
+	$.fn.has_scrollbar = function() {
+		var divnode = this.get(0);
+		if(divnode.scrollHeight > divnode.clientHeight)
+			return true;
+	}
+})(jQuery);
+// --------  DEPENDENCY PANEL
 
 $('#tabTypeId').val('graph')
 
