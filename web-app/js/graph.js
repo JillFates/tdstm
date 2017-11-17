@@ -347,8 +347,6 @@ var GraphUtil = (function ($) {
 				public.hidePanel('dependencies');
 			else {
 				public.openPanel('dependencies');
-				public.restoreDependencyPanel('Type');
-				public.restoreDependencyPanel('Status');
 			}
 			public.hidePanel('legend');
 			public.hidePanel('control');
@@ -824,7 +822,7 @@ var GraphUtil = (function ($) {
 			lineShadow.css('opacity', null);
 			if (o.highlighted == 'y') {
 				lineShadow.css('opacity', 1);
-				lineShadow.css('stroke-width', 2);
+				lineShadow.css('stroke-width', 3);
 			} else if (o.highlighted == 'n'){
 				lineShadow.css('opacity', 0.3);
 				lineShadow.css('stroke-width', 1);
@@ -1158,7 +1156,6 @@ var GraphUtil = (function ($) {
 		if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
 			$('#dependency' + type + 'Control_show_all').prop('checked', true);
 			$('#dependency' + type + 'Control_show_all').attr('state', 1);
-			$('.dependency' + type + 'ControlsShow').parent().removeClass('groupingControl');
 			$('.dependency' + type + 'ControlsShow').prop('checked', true);
 		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
 			$('#dependency' + type + 'Control_show_all').prop('checked', false);
@@ -1172,11 +1169,21 @@ var GraphUtil = (function ($) {
 			$('.dependency' + type + 'ControlsShow').each(function(){
 				var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
 				$(this).prop('checked', selected);
-				if(selected) {
-					$(this).parent().addClass('groupingControl');
-				}
 			});
 		}
+
+		if(GraphUtil.dependencyPanelConfig['dependency' + type].highlight.length > 0) {
+			$('.dependency' + type + 'ControlsHighlight').each(function () {
+				$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].highlight.indexOf($(this).val()) !== -1);
+			});
+		}
+
+		$('.dependency' + type + 'ControlsShow').each(function(){
+			var selected = GraphUtil.dependencyPanelConfig['dependency' + type].groupingControl.indexOf($(this).val()) !== -1;
+			if(selected) {
+				$(this).parent().addClass('groupingControl');
+			}
+		});
 	};
 
 	public.onSelectItemHighlightDependencyPanel = function(event){
@@ -1187,24 +1194,30 @@ var GraphUtil = (function ($) {
 
 	public.onSelectAllDependencyPanel = function(checkboxSelectorClass, config, event) {
 		var state = parseInt($(event).attr('state'));
-		$('.' + checkboxSelectorClass).parent().removeClass('groupingControl');
 		if(state === 1) {
 			state = 3;
-			$('.' + checkboxSelectorClass).prop('checked', false);
+			$('.' + checkboxSelectorClass + 'Show').prop('checked', false);
+			$('.' + checkboxSelectorClass + 'Highlight').prop('checked', false);
 			GraphUtil.dependencyPanelConfig[config].status = 'false';
 		} else if(state === 2) {
 			state = 1;
-			$('.' + checkboxSelectorClass).prop('checked', true);
+			$('.' + checkboxSelectorClass + 'Show').prop('checked', true);
 			$(event).prop("checked", true);
 			GraphUtil.dependencyPanelConfig[config].status = 'true';
 		} else if(state === 3) {
 			state = 2;
 			$(event).prop("indeterminate", true);
-			$('.' + checkboxSelectorClass).each(function(){
-				var selected = GraphUtil.dependencyPanelConfig[config].groupingControl.indexOf($(this).val()) !== -1;
+			$('.' + checkboxSelectorClass + 'Show').each(function(){
+				var showCheckbox = $(this);
+				var selected = GraphUtil.dependencyPanelConfig[config].groupingControl.indexOf(showCheckbox.val()) !== -1;
 				$(this).prop('checked', selected);
-				if(selected) {
-					$(this).parent().addClass('groupingControl');
+			});
+			$('.' + checkboxSelectorClass + 'Highlight').each(function(){
+				if($(this).is(":checked")){
+					var sibling = $(this).parent().siblings()[1];
+					if(!$(sibling).find('input:checkbox').is(":checked")) {
+						$(this).prop('checked', false);
+					}
 				}
 			});
 			GraphUtil.dependencyPanelConfig[config].status = 'indeterminate';

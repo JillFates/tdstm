@@ -870,6 +870,10 @@ function drawContextMenu() {
 	function closeMenu () {
 		$(".customMenu").css('display', "none").children(".tempItem").remove();
 	}
+
+	GraphUtil.restoreDependencyPanel('Type');
+	GraphUtil.restoreDependencyPanel('Status');
+	GraphUtil.applyShowHideDependencies();
 }
 
 function getDimensionsForOptimizing () {

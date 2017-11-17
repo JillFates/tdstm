@@ -259,7 +259,7 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyTypeControlsShow', 'dependencyType', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyTypeControls', 'dependencyType', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyType}" var="dependency">
@@ -283,7 +283,7 @@
 				</tr>
 				<tr>
 					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyStatusControlsShow', 'dependencyStatus', this);"/></td>
+					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyStatusControls', 'dependencyStatus', this);"/></td>
 					<td></td>
 				</tr>
 				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
