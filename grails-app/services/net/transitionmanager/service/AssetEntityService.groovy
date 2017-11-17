@@ -1801,7 +1801,11 @@ class AssetEntityService implements ServiceMethods {
 	 * @return a count of the number of records that are deleted
 	 */
 	String deleteBulkAssets(Project project, String type, List<String> assetIdList) {
-		def resp
+
+        // if no ids given don't process anything.
+		if (assetIdList.isEmpty()) {
+            return "0 $type records were deleted"
+        }
 
 		List<Long> assetIds = []
 		assetIdList.each { v ->
