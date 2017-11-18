@@ -193,6 +193,10 @@ databaseChangeLog = {
 	include file: '20170830-Assign-a-company-as-the-owner-for-the-default-project.groovy'
 	include file: '20170807-add-new-permission-to-asset-explorer-feature.groovy'
 	include file: '20170830-remove-staff-prefix-for-team-descriptions-v2.groovy'
+	
+	include file: '20171002-create-provider-and-datascript-tables.groovy'
+	include file: '20171010-remove-legacy-field-settings.groovy'
+	include file: '20171011-create-credential-table.groovy'
 	include file: '20171025-create-default-bundle-for-projects.groovy'
 	include file: '20171026-add-assetclass-to-common-fields.groovy'
 	include file: '20171108-all-asset-system-view.groovy'
