@@ -553,6 +553,12 @@ class UrlMappings {
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
 
+		// Angular Single Page App Named mappings
+		name assetViewShow: "/module/asset/views/$id/show" {
+			controller = 'singleApp'
+			action = 'index'
+		}
+
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")
 

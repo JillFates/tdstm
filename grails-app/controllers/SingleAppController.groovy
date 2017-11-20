@@ -12,8 +12,6 @@ class SingleAppController {
     EnvironmentService environmentService
 
     def index() {
-        log.info("Single App Controller - Running under Angular JS")
-
         [buildHash: environmentService.buildHash]
     }
 }
