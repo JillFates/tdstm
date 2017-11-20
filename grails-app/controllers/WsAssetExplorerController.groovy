@@ -36,6 +36,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
+	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
+	// TODO: JPM 11/2017 - Methods do NOT need try/catches
+
 	/**
 	 * Returns the list of available dataviews as a map(json) result.
 	 * All Dataviews returned belong to current user project in session.
@@ -43,15 +46,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * @return
 	 */
     def listDataviews() {
-		try {
-			Person currentPerson = securityService.loadCurrentPerson()
-			Project currentProject = securityService.userCurrentProject
-
-			List<Map> listMap = dataviewService.list(currentPerson, currentProject)*.toMap(securityService.currentPersonId)
-			renderSuccessJson(listMap)
-		} catch (Exception e) {
-			handleException e, log
-		}
+		Person currentPerson = securityService.loadCurrentPerson()
+		Project currentProject = securityService.userCurrentProject
+		List<Dataview> dataviews = dataviewService.list(currentPerson, currentProject)
+		println "** dataviews = $dataviews"
+		List<Map> listMap = dataviews*.toMap(currentPerson.id)
+		renderSuccessJson(listMap)
 	}
 
 	/**
@@ -259,13 +259,13 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured("isAuthenticated()")
 	def favoriteDataviews() {
-		try{
+		//try{
             Person person = securityService.getUserLoginPerson()
 			def favorites = dataviewService.getFavorites(person)
 			renderSuccessJson(favorites)
-		} catch (Exception e) {
-			renderErrorJson(e.getMessage())
-		}
+		//} catch (Exception e) {
+		//	renderErrorJson(e.getMessage())
+		//}
 
 	}
 

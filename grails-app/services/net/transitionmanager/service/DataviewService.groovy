@@ -23,6 +23,9 @@ class DataviewService implements ServiceMethods {
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
+	static final InvalidParamException MISSING_ID_EXCEPTION = new InvalidParamException('Missing required id')
+	static final EmptyResultException VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
+
 	// Limit the number of favorites that should be returned in queries.
 	static final int FAVORITES_MAX_SIZE = 10
 
@@ -35,36 +38,32 @@ class DataviewService implements ServiceMethods {
 	 * @param project
 	 * @return
 	 */
-    List<Dataview> list (Person person, Project project) {
-
+    List<Dataview> list(Person userPerson, Project userProject) {
         def query
+		List<Long> favoriteSystemViewIds
 
-        boolean canSeeSystemViews = securityService.hasPermission(person, Permission.AssetExplorerSystemList)
-
+        boolean canSeeSystemViews = securityService.hasPermission(userPerson, Permission.AssetExplorerSystemList)
         if (canSeeSystemViews) {
-
             query = Dataview.where {
-                (project == project && (isShared == true || person == person)) ||
-                        (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
+                (project == userProject && (isShared == true || person == userPerson)) \
+				|| \
+				(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
             }
-
         } else {
-
-            List<Long> favoriteSystemViewIds = FavoriteDataview.where {
-                person == person
-            }.projections {
-                property('id')
-            }.list()
+			// Get list of user's list favorite View Ids
+            favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
+        		.projections { property('dataview.id') }
+				.list()
 
             if (favoriteSystemViewIds) {
                 query = Dataview.where {
-                    (project == project && (isShared == true || person == person)) ||
-                            (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
+                    (project == userProject  && (isShared == true || person == userPerson)) \
+					|| \
+                    (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
                 }
             } else {
                 query = Dataview.where {
-                    (project == project && (isShared == true || person == person)) ||
-                            (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
+                    (project == userProject  && (isShared == true || person == userPerson))
                 }
             }
         }
@@ -73,13 +72,21 @@ class DataviewService implements ServiceMethods {
     }
 
     /**
-	 * Gets a Dataview by id.
+	 * Returns a Dataview by id after validating that the user has proper access
 	 * @param id
 	 * @return
 	 */
-	Dataview fetch(Integer id) {
+	Dataview fetch(Long id) throws InvalidParamException, EmptyResultException {
+		if (! id || id < 1) {
+			throw MISSING_ID_EXCEPTION
+		}
+
 		Dataview dataview = Dataview.get(id)
-		validateDataviewViewAccessOrException(id, dataview);
+		if (!dataview) {
+			throw VIEW_NOT_FOUND_EXCEPTION
+		} else {
+			validateDataviewViewAccessOrException(id, dataview);
+		}
 
 		return dataview
 	}
@@ -91,7 +98,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Dataview update(Person person, Project project, Integer id, JSONObject dataviewJson) {
+	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
 
@@ -160,10 +167,9 @@ class DataviewService implements ServiceMethods {
 	 * @param id Dataview id to delete
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	void delete(Integer id) {
-		Dataview dataview = Dataview.get(id)
+	void delete(Long id) {
+		Dataview dataview = fetch(id)
 		validateDataviewDeleteAccessOrException(id, dataview)
-
 		dataview.delete()
 	}
 
@@ -174,22 +180,21 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview
 	 * @throws InvalidRequestException
 	 */
-	void validateDataviewViewAccessOrException(Integer id, Dataview dataview) {
+	void validateDataviewViewAccessOrException(Long id, Dataview dataview) {
 		boolean throwNotFound = false
 		if (!dataview) {
 			throwNotFound = true
 		}
 
-        boolean canAccess = (dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) ||
-                (dataview.project.id == securityService.userCurrentProject.id)
+        boolean canAccess = 
+			(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) \
+			|| (dataview.project.id == securityService.userCurrentProject.id)
 
 		// Validate Dataview belongs to the project
 		if (!throwNotFound && !canAccess) {
 			securityService.reportViolation("attempted to access Dataview $dataview.id unrelated to project")
 			throwNotFound = true
 		}
-
-
 
 		if (!throwNotFound) {
 			// Make sure the user has proper access to the Dataview
@@ -212,7 +217,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(Integer id, JSONObject dataviewJson, Dataview dataview) {
+	void validateDataviewUpdateAccessOrException(Long id, JSONObject dataviewJson, Dataview dataview) {
 		validateDataviewViewAccessOrException(id, dataview)
 		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
 
@@ -244,7 +249,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewDeleteAccessOrException(Integer id, Dataview dataview) {
+	void validateDataviewDeleteAccessOrException(Long id, Dataview dataview) {
 		validateDataviewViewAccessOrException(id, dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
@@ -382,23 +387,7 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
-		// Error message
-		String cannotDeleteErrorMsg = "Cannot delete favorite dataview for ${person.toString()}"
-
-		// If no dataviewId given, throw an exception
-		if (!dataviewId) {
-			throw new DomainUpdateException("${cannotDeleteErrorMsg}. No dataview id given.")
-		}
-
-		// Retrieve the given dataview.
-		Dataview dataview = Dataview.where{
-			id == dataviewId && project == currentProject
-		}.find()
-
-		// If no dataview was found, throw an exception
-		if (!dataview) {
-			throw new EmptyResultException("${cannotDeleteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
-		}
+		Dataview dataview = fetch(dataviewId)
 
 		// Delete the corresponding favorite
 		int deletedFavs = FavoriteDataview.where{
@@ -407,9 +396,8 @@ class DataviewService implements ServiceMethods {
 
 		// If no favs were deleted, throw an exception.
 		if (deletedFavs == 0) {
-			throw new DomainUpdateException("${cannotDeleteErrorMsg}. '${dataview.name}' isn't a favorited dataview.")
+			throw new DomainUpdateException('Favorite was not found')
 		}
-
 	}
 
 	/**
@@ -417,36 +405,22 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewId
 	 */
 	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
-
-		// Error message
-		String cannotFavoriteErrorMsg = "Cannot favorite dataview for ${person.toString()}"
-
-		// If no dataviewId given, throw an exception
-		if (!dataviewId) {
-			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. No dataview id given.")
-		}
-
-		// Retrieve the given dataview.
-		Dataview dataview = Dataview.where{
-			id == dataviewId && project == currentProject
-		}.find()
-
-		// If no dataview was found, throw an exception
-		if (!dataview) {
-			throw new EmptyResultException("${cannotFavoriteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
-		}
+		Dataview dataview = fetch(dataviewId)
 
 		// Check if the favorite already exists.
-		FavoriteDataview favoriteDataview = FavoriteDataview.where{
+		FavoriteDataview favoriteDataview = FavoriteDataview.where {
 			person == person && dataview == dataview
 		}.find()
 
 		// If a favorite was found, throw an exception
 		if (favoriteDataview) {
-			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. ${dataview.name} is already a favorite for this person.")
+			throw new DomainUpdateException('View is already a favorite')
 		}
 
-		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview).save()
+		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
+		if (!favoriteDataview.save()) {
+			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
+		}
 	}
 
     /**
@@ -465,38 +439,36 @@ class DataviewService implements ServiceMethods {
      */
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
-                pagination: [
-                        offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
-                ],
-                assets    : assets.collect { columns ->
-                    Map row = [:]
-                    columns = [columns].flatten()
-                    columns.eachWithIndex { cell, index ->
-                        if (dataviewSpec.columns[index]) {
-                            row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
-                        }
-                    }
+			pagination: [
+				offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
+			],
+			assets: assets.collect { columns ->
+				Map row = [:]
+				columns = [columns].flatten()
+				columns.eachWithIndex { cell, index ->
+					if (dataviewSpec.columns[index]) {
+						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+					}
+				}
 
-                    row
-                }
+				row
+			}
         ]
     }
+
     /**
-     *
-     *
-     *
+     * Used to join the column names together for the HQL query of a dataview Spec
      * @param dataviewSpec
-     * @return
+     * @return the fields of the spec as HQL columns
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
         dataviewSpec.columns.collect { Map column ->
             "${joinFor(column)}"
         }.join(" ")
     }
+
     /**
-     *
      * Calculates HQL params from DataviewSpec for HQL query
-     *
      * @param project a Project instance to be added in Parameters
      * @param dataviewSpec
      * @return
@@ -505,9 +477,9 @@ class DataviewService implements ServiceMethods {
         Map params = [project: project]
         if (dataviewSpec.justPlanning != null) {
             params << [
-                    moveBundles: MoveBundle.where {
-                        project == project && useForPlanning == dataviewSpec.justPlanning
-                    }.list()
+				moveBundles: MoveBundle.where {
+					project == project && useForPlanning == dataviewSpec.justPlanning
+				}.list()
             ]
         }
         dataviewSpec.filterColumns.each { Map column ->
@@ -520,6 +492,7 @@ class DataviewService implements ServiceMethods {
 
         params
     }
+
     /**
      *
      * Creates a String with all the columns correctly set for select clause
@@ -582,6 +555,7 @@ class DataviewService implements ServiceMethods {
 	private Boolean hasMultipleFilter(Map column) {
         splitColumnFilter(column).size() > 1
     }
+
     /**
      *
      * Calculate Map with params splitting column.filter content
@@ -594,20 +568,19 @@ class DataviewService implements ServiceMethods {
 	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
 
-        if(values.size() == 1){
+        if(values.size() == 1) {
 			"%${values[0].trim()}%".toString()
         } else {
 			values.collect { "${it.trim()}".toString()}
         }
     }
+
     /**
-     *
      * Columnn filters value could be split by '|' separator
-     *
+	 * @param column - a set of column attributes
+	 * @return one or more strings based on filter being spilt
      * For example:
-     *
-     * { "domain": "common", "property": "environment", "filter": "production|development" }
-     *
+     * 		{ "domain": "common", "property": "environment", "filter": "production|development" }
      */
 	private String[] splitColumnFilter(Map column) {
         column.filter.split("\\|")
