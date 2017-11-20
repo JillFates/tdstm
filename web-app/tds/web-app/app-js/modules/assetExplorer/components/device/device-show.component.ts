@@ -20,7 +20,14 @@ export function DeviceShowComponent(template) {
 		}
 
 		cancelCloseDialog(): void {
-			this.activeDialog.close();
+			this.activeDialog.dismiss();
+		}
+
+		showAssetDetailView(assetClass: string, id: number) {
+			this.activeDialog.close({
+				assetClass: assetClass,
+				id: id
+			});
 		}
 
 	}

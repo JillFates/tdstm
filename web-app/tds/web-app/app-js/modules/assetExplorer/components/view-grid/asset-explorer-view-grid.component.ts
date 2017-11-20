@@ -153,12 +153,25 @@ export class AssetExplorerViewGridComponent {
 		this.modelChange.emit();
 	}
 
+	protected createDependencyPromise(assetClass: string, id: number) {
+		setTimeout(() => {
+			this.dialog.open(AssetShowComponent, [
+				{ provide: 'ID', useValue: id },
+				{ provide: 'ASSET', useValue: assetClass }],
+				'lg').then(x => {
+					this.createDependencyPromise(x.assetClass, x.id);
+				}).catch(x => {
+					console.log(x);
+				});
+		});
+	}
+
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
 			'lg').then(x => {
-				console.log(x);
+				this.createDependencyPromise(x.assetClass, x.id);
 			}).catch(x => {
 				console.log(x);
 			});

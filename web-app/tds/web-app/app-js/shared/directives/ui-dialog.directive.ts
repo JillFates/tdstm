@@ -70,9 +70,9 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	private registerListeners(): void {
 		this.openNotifier = this.notifierService.on('dialog.open', event => {
 			// make sure UI has no other open dialog
+			this.tdsUiDialog.modal('hide');
 			if (this.cmpRef) {
 				this.cmpRef.destroy();
-				this.tdsUiDialog.modal('hide');
 				this.reject('OTHER_DIALOG_OPENED');
 			}
 			this.size = event.size;
@@ -81,21 +81,25 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 
 			this.activeDialog.componentInstance = this.cmpRef;
-
+			jQuery('.modal-backdrop.fade.in').remove();
 			this.tdsUiDialog.modal('show');
 		});
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {
+			jQuery('.modal-backdrop.fade.in').remove();
+			jQuery('body').css('padding-right', '0px');
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
-				jQuery('#tdsUiDialog').modal('hide');
+				this.tdsUiDialog.modal('hide');
 				this.resolve(event.result);
 				this.cmpRef.destroy();
 			}
 		});
 
 		this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {
+			jQuery('.modal-backdrop.fade.in').remove();
+			jQuery('body').css('padding-right', '0px');
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
