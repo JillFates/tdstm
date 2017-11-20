@@ -457,9 +457,10 @@ class DataviewService implements ServiceMethods {
     }
 
     /**
-     * Used to join the column names together for the HQL query of a dataview Spec
+	 * Used to prepare the left outer join sentence based on
+	 * columns of a dataview Spec and transformations for HQL query
      * @param dataviewSpec
-     * @return the fields of the spec as HQL columns
+     * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
         dataviewSpec.columns.collect { Map column ->
@@ -471,7 +472,7 @@ class DataviewService implements ServiceMethods {
      * Calculates HQL params from DataviewSpec for HQL query
      * @param project a Project instance to be added in Parameters
      * @param dataviewSpec
-     * @return
+     * @return a Map with params to be used in a executeQuery with an HQL query.
      */
 	private Map hqlParams(Project project, DataviewSpec dataviewSpec) {
         Map params = [project: project]
@@ -494,9 +495,7 @@ class DataviewService implements ServiceMethods {
     }
 
     /**
-     *
      * Creates a String with all the columns correctly set for select clause
-     *
      * @param dataviewSpec
      * @return
      */
@@ -515,9 +514,7 @@ class DataviewService implements ServiceMethods {
 	}
 
     /**
-     *
      * Creates a String with all the columns correctly set for where clause
-     *
      * @param dataviewSpec
      * @return
      */
@@ -547,8 +544,6 @@ class DataviewService implements ServiceMethods {
 	/**
      *
      * Checks if column.filter has values to be used in filter.
-     *
-     *
      * @param column a Column with filter value
      * @return
      */
@@ -557,11 +552,9 @@ class DataviewService implements ServiceMethods {
     }
 
     /**
-     *
      * Calculate Map with params splitting column.filter content
      * if column.flter has only one value It's prepared with %${column.filter}%
      * in order to use like filter in HQL query.
-     *
      * @param column
      * @return
      */
@@ -585,7 +578,11 @@ class DataviewService implements ServiceMethods {
 	private String[] splitColumnFilter(Map column) {
         column.filter.split("\\|")
     }
-
+    /**
+     * Calculates the order from DataviewSpec for HQL query
+     * @param dataviewSpec
+     * @return a String HQL order sentence
+     */
 	private String hqlOrder(DataviewSpec dataviewSpec){
         "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
