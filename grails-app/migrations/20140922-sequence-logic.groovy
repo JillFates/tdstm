@@ -29,8 +29,7 @@ databaseChangeLog = {
 	 * if it's not it's created.
 	 */
 	changeSet(author: "eluna", id: "20140922 TM-2899-2", runAlways:'true') {
-		comment('Add the SP')
-		print("Check that the SP tdstm_secuencer is available...")
+		comment('Add the tdstm_sequencer Procedure to the database')
 		
 		preConditions(onFail:'MARK_RAN') {
 			sqlCheck(expectedResult:'0', """SELECT count(*) 
@@ -54,6 +53,5 @@ databaseChangeLog = {
 				SET sequence_number = IF(ISNULL(@prevs), 1, @prevs + 1);
 				END;
 			"""
-		println('OK')
 	}
 }
