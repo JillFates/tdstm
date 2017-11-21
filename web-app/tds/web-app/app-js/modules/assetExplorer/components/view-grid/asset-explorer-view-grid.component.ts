@@ -28,10 +28,10 @@ declare var jQuery: any;
 	.grid-message label{
 		font-weight: normal;
 	}
-	.application .dev, .application .dat, .application .sto,
-	.device .app, .device .dat, .device .sto,
-	.database .dev, .database .app, .database .sto,
-	.storage .dev, .storage .dat, .storage .app {
+	.application .device, .application .database, .application .storage,
+	.device .application, .device .database, .device .storage,
+	.database .device, .database .application, .database .storage,
+	.storage .device, .storage .database, .storage .application {
 		background-color:#f4f4f4;
 	}
 	.k-grid-content-locked,
@@ -68,12 +68,6 @@ export class AssetExplorerViewGridComponent {
 	rowCallbackClass(context: RowClassArgs) {
 		let obj = {};
 		obj[context.dataItem.common_assetClass.toLowerCase()] = true;
-		return obj;
-	}
-
-	cellCallbackClass(domain: string) {
-		let obj = {};
-		obj[domain.toLowerCase().substr(0, 3)] = true;
 		return obj;
 	}
 
