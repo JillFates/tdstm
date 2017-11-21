@@ -352,7 +352,7 @@ class DataviewService implements ServiceMethods {
              where AE.project = :project and $hqlWhere
         """
 
-        // log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
         def assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
         def totalAssets = AssetEntity.executeQuery(countHql, hqlParams)
@@ -624,11 +624,11 @@ class DataviewService implements ServiceMethods {
 	private static String personColumns(String propertyName, boolean filter = false) {
 		"""
 			CONCAT( 
-				AE.${propertyName}.firstName,
+				COALESCE(AE.${propertyName}.firstName, ''),
 				CASE WHEN COALESCE(AE.${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
-				AE.${propertyName}.middleName,
+				COALESCE(AE.${propertyName}.middleName,''),
 				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
-				AE.${propertyName}.lastName
+				COALESCE(AE.${propertyName}.lastName,'')
 			) AS ${propertyName}
 		"""
 	}
@@ -641,9 +641,9 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String customFilterLike(String propertyName, String namedParameter) {
 		"""
-			( (${propertyName}.firstName like :${namedParameter})
-			or (${propertyName}.middleName like :${namedParameter})
-			or (${propertyName}.lastName like :${namedParameter}) )
+			( (AE.${propertyName}.firstName like :${namedParameter})
+			or (AE.${propertyName}.middleName like :${namedParameter})
+			or (AE.${propertyName}.lastName like :${namedParameter}) )
 		"""
 	}
 
@@ -667,10 +667,10 @@ class DataviewService implements ServiceMethods {
 		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
-		'sme'            : [property: personColumns('sme'), type: String, namedParameter: 'smeName', join: '', customFilterLike: customFilterLike('sme','smeName'), customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
-		'sme2'           : [property: personColumns('sme2'), type: String, namedParameter: 'sme2Name', join: '', customFilterLike: customFilterLike('sme2','sme2Name'), customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
+		'sme'            : [property: personColumns('sme'), type: String, namedParameter: 'smeName', join: 'left outer join AE.sme', customFilterLike: customFilterLike('sme','smeName'), customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
+		'sme2'           : [property: personColumns('sme2'), type: String, namedParameter: 'sme2Name', join: 'left outer join AE.sme2', customFilterLike: customFilterLike('sme2','sme2Name'), customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
-		'appOwner'       : [property: personColumns('appOwner'), type: String, namedParameter: 'appOwnerName', join: '', customFilterLike: customFilterLike('appOwner','appOwnerName'), customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
+		'appOwner'       : [property: personColumns('appOwner'), type: String, namedParameter: 'appOwnerName', join: 'left outer join AE.appOwner', customFilterLike: customFilterLike('appOwner','appOwnerName'), customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
 		'sourceLocation' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
 		'sourceRack'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
 		'sourceRoom'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
