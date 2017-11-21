@@ -337,12 +337,12 @@ class DataviewService implements ServiceMethods {
         String hqlJoins = hqlJoins(dataviewSpec)
 		Map hqlParams = hqlParams(project, dataviewSpec)
 
-       String hql = """
-		select $hqlColumns
-              from AssetEntity AE
-                $hqlJoins
-             where AE.project = :project and $hqlWhere  
-	   order by $hqlOrder
+        String hql = """
+			select $hqlColumns
+				from AssetEntity AE
+				$hqlJoins
+				where AE.project = :project and $hqlWhere  
+			order by $hqlOrder
         """
 
 		String countHql = """
@@ -352,7 +352,7 @@ class DataviewService implements ServiceMethods {
              where AE.project = :project and $hqlWhere
         """
 
-        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+        // log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
         def assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
         def totalAssets = AssetEntity.executeQuery(countHql, hqlParams)
@@ -541,8 +541,7 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
-     *
-     * Checks if column.filter has values to be used in filter.
+     * Checks if column.filter has values to be used in filter
      * @param column a Column with filter value
      * @return
      */
@@ -551,20 +550,19 @@ class DataviewService implements ServiceMethods {
     }
 
 	/**
-	 *
-	 * Checks if the column has a custom filter defined.
-	 *
+	 * Checks if the column has a custom filter defined
 	 * @param column a Column to be checked
 	 * @return
 	 */
 	private Boolean hasCustomFilterFor(Map column) {
-		transformations[column.property].customFilterIn != null ||
-				transformations[column.property].customFilterLike != null
+		transformations[column.property].customFilterIn != null \
+		|| \
+		transformations[column.property].customFilterLike != null
 	}
 
     /**
      * Calculate Map with params splitting column.filter content
-     * if column.flter has only one value It's prepared with %${column.filter}%
+     * if column.filter has only one value It's prepared with %${column.filter}%
      * in order to use like filter in HQL query.
      * @param column
      * @return
@@ -572,7 +570,7 @@ class DataviewService implements ServiceMethods {
 	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
 
-        if(values.size() == 1) {
+        if (values.size() == 1) {
 			"%${values[0].trim()}%".toString()
         } else {
 			values.collect { "${it.trim()}".toString()}
@@ -589,6 +587,7 @@ class DataviewService implements ServiceMethods {
 	private String[] splitColumnFilter(Map column) {
         column.filter.split("\\|")
     }
+
     /**
      * Calculates the order from DataviewSpec for HQL query
      * @param dataviewSpec
@@ -634,19 +633,31 @@ class DataviewService implements ServiceMethods {
 		"""
 	}
 
+	/**
+	 * Used to render the WHERE logic to filter on a person with LIKE statement
+	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
+	 * @param namedParameter - the name to use as the parameter fed into the query
+	 * @return the SQL to append to the WHERE clause
+	 */
 	private static String customFilterLike(String propertyName, String namedParameter) {
 		"""
-			(${propertyName}.firstName like :${namedParameter})
+			( (${propertyName}.firstName like :${namedParameter})
 			or (${propertyName}.middleName like :${namedParameter})
-			or (${propertyName}.lastName like :${namedParameter})
+			or (${propertyName}.lastName like :${namedParameter}) )
 		"""
 	}
 
+	/**
+	 * Used to render the WHERE logic to filter on a person with IN statement
+	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
+	 * @param namedParameter - the name to use as the parameter fed into the query
+	 * @return the SQL to append to the WHERE clause
+	 */
 	private static String customFilterIn(String propertyName, String namedParameter) {
 		"""
-			(${propertyName}.firstName in (:${namedParameter}))
+			( (${propertyName}.firstName in (:${namedParameter}))
 			or (${propertyName}.middleName in (:${namedParameter}))
-			or (${propertyName}.lastName in (:${namedParameter}))
+			or (${propertyName}.lastName in (:${namedParameter})) )
 		"""
 	}
 
