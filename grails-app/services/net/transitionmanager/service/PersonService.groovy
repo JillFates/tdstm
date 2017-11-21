@@ -84,11 +84,11 @@ class PersonService implements ServiceMethods {
 		'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
 	]
 
-/* ***************************
+	/* ***************************
 	private static final List<String> notToUpdate = [
 		'beforeDelete', 'beforeInsert', 'beforeUpdate',
 		'blackOutDates', 'firstName', 'id']
-*/
+	*/
 
 	/**
 	 * Returns a properly format person's last name with its suffix
@@ -163,6 +163,11 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException("Invalid nameMap object $nameMap")
 		}
 
+		// TM-7169 Added test to prevent searching if missing the required first name at a minimum
+		if (! nameMap.first) {
+			throw new InvalidParamException('User has no first name associated with account')
+		}
+
 		List persons = []
 		Map queryParams = [companyId: company.id]
 		def (first, middle, last) = [false, false, false]
@@ -201,9 +206,11 @@ class PersonService implements ServiceMethods {
 			query.append(select)
 			query.append(" AND p.first_name=:first AND COALESCE(p.last_name,'') = '' AND COALESCE(p.middle_name,'') = '' ")
 		}
+		// log.debug "findByCompanyAndName() Query = ${query.toString()}"
+		
 		List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		if (pIds) {
-			persons = Person.getAll(pIds*.id).findAll()
+			persons = Person.where { id in pIds }
 		}
 
 		return persons
