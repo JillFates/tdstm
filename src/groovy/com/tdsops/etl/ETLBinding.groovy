@@ -11,12 +11,14 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 class ETLBinding extends Binding {
 
+    Set dynamicVariables = [] as Set
+
     ETLBinding (ETLProcessor etlProcessor, Map vars = [:]) {
         this.variables.putAll([
-                *      : etlProcessor.metaClass.methods.collectEntries {
+                *: etlProcessor.metaClass.methods.collectEntries {
                     [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
                 },
-                *      : vars
+                *: vars
         ])
     }
 
@@ -42,4 +44,22 @@ class ETLBinding extends Binding {
 
         result
     }
+
+    /**
+     *
+     * @param name
+     * @param value
+     */
+    void addDynamicVariable (String name, Element value) {
+        dynamicVariables.add(name)
+        this.variables[name] = value
+    }
+
+    /**
+     *
+     */
+    void cleanDynamicVariables() {
+        dynamicVariables.each {variables.remove(it)}
+    }
+
 }

@@ -116,28 +116,28 @@ class ETLProcessorSpec extends Specification {
         applicationFieldsValidator = new ETLAssetClassFieldsValidator()
         applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                 [constraints: [required: 0],
-                 "control"  : "Number",
-                 "default"  : "",
-                 "field"    : "id",
-                 "imp"      : "U",
-                 "label"    : "Id",
-                 "order"    : 0,
-                 "shared"   : 0,
-                 "show"     : 0,
-                 "tip"      : "",
-                 "udf"      : 0
+                 control    : 'Number',
+                 default    : '',
+                 field      : 'id',
+                 imp        : 'U',
+                 label      : 'Id',
+                 order      : 0,
+                 shared     : 0,
+                 show       : 0,
+                 tip        : "",
+                 udf        : 0
                 ],
                 [constraints: [required: 0],
-                 "control"  : "String",
-                 "default"  : "",
-                 "field"    : "appVendor",
-                 "imp"      : "N",
+                 control    : 'String',
+                 default    : '',
+                 field      : 'appVendor',
+                 imp        : 'N',
                  "label"    : "Vendor",
-                 "order"    : 0,
-                 "shared"   : 0,
-                 "show"     : 0,
-                 "tip"      : "",
-                 "udf"      : 0
+                 order      : 0,
+                 shared     : 0,
+                 show       : 0,
+                 tip        : "",
+                 udf        : 0
                 ]
         ])
 
@@ -158,11 +158,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         
@@ -178,11 +175,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         // Script supports one line comments
                         domain Application
@@ -202,11 +196,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
 
                         domain Unknown
@@ -224,11 +215,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
 
                         domain Application
@@ -247,11 +235,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("skip 20", ETLProcessor.class.name)
 
         then: 'An ETLProcessorException is thrown'
@@ -264,11 +249,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("invalid command", ETLProcessor.class.name)
 
         then: 'An MissingMethodException exception is thrown'
@@ -281,11 +263,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -314,11 +293,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -337,11 +313,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), jsonDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -364,11 +337,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -387,11 +357,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -414,11 +381,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
 
                         domain Device
@@ -447,11 +411,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                     
                         domain Device
@@ -476,11 +437,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                     
                         domain Device
@@ -503,11 +461,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                     
                         domain Device
@@ -529,11 +484,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -554,11 +506,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -581,11 +530,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -606,11 +552,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -633,11 +576,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -658,11 +598,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -685,11 +622,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -710,11 +644,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -735,11 +666,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -760,11 +688,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -785,11 +710,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -810,11 +732,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -835,11 +754,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -860,11 +776,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(etlProcessor.class.classLoader, binding)
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -886,7 +799,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -911,7 +824,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -935,11 +848,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -960,11 +870,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Device
                         read labels
@@ -983,11 +890,8 @@ class ETLProcessorSpec extends Specification {
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""domain Device
                         read labels
                         iterate 
@@ -1004,9 +908,6 @@ class ETLProcessorSpec extends Specification {
 
         given:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
-
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
 
         and:
             ImportCustomizer customizer = new ImportCustomizer()
@@ -1027,7 +928,7 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration)
                     .evaluate("""
                         domain Device
                         read labels
@@ -1047,9 +948,6 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
             ImportCustomizer customizer = new ImportCustomizer()
             customizer.addStaticStars ETLDomain.class.name
 
@@ -1064,7 +962,7 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).
+            new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
                     evaluate("""
             domain Device
             read labels
@@ -1085,9 +983,6 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
             ImportCustomizer customizer = new ImportCustomizer()
             customizer.addStaticStars ETLDomain.class.name
 
@@ -1103,7 +998,7 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).
+            new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
                     evaluate("""
             
             import java.lang.Math
@@ -1125,9 +1020,6 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
             ImportCustomizer customizer = new ImportCustomizer()
             customizer.addStaticStars ETLDomain.class.name
 
@@ -1144,7 +1036,7 @@ class ETLProcessorSpec extends Specification {
 
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration).
+            new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
                     evaluate("""
             
             import java.lang.Math.*
@@ -1166,9 +1058,6 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
 
         and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-        and:
             ImportCustomizer customizer = new ImportCustomizer()
             customizer.addStaticStars Math.class.name
             customizer.addStaticStars DebugConsole.ConsoleStatus.class.name
@@ -1185,7 +1074,7 @@ class ETLProcessorSpec extends Specification {
             configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding, configuration)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration)
                     .evaluate("""
                         read labels
                         max 10, 100
@@ -1204,11 +1093,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                             console on
                             domain Device
@@ -1232,11 +1118,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(simpleDataSet, debugConsole)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                             console
                             domain Device
@@ -1259,11 +1142,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                             console on
                             read labels
@@ -1298,11 +1178,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                             console open
                             domain Device
@@ -1322,11 +1199,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), environmentDataSet, console, GroovyMock(ETLFieldsValidator))
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""domain Device
                             def final dictionary = [prod: 'Production', dev: 'Development']
                             read labels
@@ -1347,28 +1221,28 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1378,11 +1252,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                                 read labels
                                 domain Application
@@ -1409,46 +1280,130 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
     }
 
-    void 'test can load field many times with the same extracted value' () {
+    void 'test can use if else groovy clause to load a field with an extracted element value' () {
 
         given:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "description",
-                     "imp"      : "N",
-                     "label"    : "Description",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
+                     "label"    : "Environment",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ]
+
+            ])
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'vendor name' 
+                                    
+                                    if ( CE == 'Microsoft'){
+                                        load appVendor
+                                    } else {
+                                        load environment
+                                    }
+                                }""".stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == 'Microsoft'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == 'Microsoft'
+
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == 'appVendor'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == 'Vendor'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == 'String'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
+
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == 'Mozilla'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == 'Mozilla'
+
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == 'environment'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == 'Environment'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == 'String'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+    }
+
+    void 'test can store a an extracted element in a variable' () {
+
+        given:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
+                     "label"    : "Vendor",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
+                     "label"    : "Environment",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1458,11 +1413,91 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'vendor name' store myVar
+                                    
+                                    if ( myVar == 'Microsoft'){
+                                        load appVendor
+                                    } else {
+                                        load environment
+                                    }
+                                }""".stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == 'Microsoft'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == 'Microsoft'
+
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == 'appVendor'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == 'Vendor'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == 'String'
+            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
+
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == 'Mozilla'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == 'Mozilla'
+
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == 'environment'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == 'Environment'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == 'String'
+            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+    }
+
+    void 'test can load field many times with the same extracted value' () {
+
+        given:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
+                     "label"    : "Vendor",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     "field"    : "description",
+                     imp        : 'N',
+                     "label"    : "Description",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ]
+            ])
+
         and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                                 read labels
                                 domain Application
@@ -1500,11 +1535,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                                 domain Application
                                 read labels
@@ -1519,34 +1551,34 @@ class ETLProcessorSpec extends Specification {
 
     }
 
-    void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification ' () {
+    void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification' () {
 
         given:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1556,11 +1588,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                                 read labels
                                 domain Application
@@ -1585,28 +1614,28 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1616,11 +1645,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -1645,28 +1671,28 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1676,11 +1702,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -1725,54 +1748,54 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
             validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
+                     control    : 'String',
+                     default    : '',
                      "field"    : "location",
-                     "imp"      : "N",
+                     imp        : 'N',
                      "label"    : "Location",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -1782,11 +1805,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         read labels
                         iterate {
@@ -1816,66 +1836,66 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "environment",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
                      "label"    : "Environment",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
             validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
+                     control    : 'String',
+                     default    : '',
                      "field"    : "location",
-                     "imp"      : "N",
+                     imp        : 'N',
                      "label"    : "Location",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
         and:
@@ -1884,14 +1904,10 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         read labels
-                        
                         iterate {
                         
                             domain Application
@@ -1960,66 +1976,66 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "environment",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
                      "label"    : "Environment",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
             validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
+                     control    : 'String',
+                     default    : '',
                      "field"    : "location",
-                     "imp"      : "N",
+                     imp        : 'N',
                      "label"    : "Location",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -2055,11 +2071,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         console on
                         read labels
@@ -2115,66 +2128,66 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "environment",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
                      "label"    : "Environment",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
             validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
+                     control    : 'String',
+                     default    : '',
                      "field"    : "location",
-                     "imp"      : "N",
+                     imp        : 'N',
                      "label"    : "Location",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -2210,11 +2223,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         console on
                         read labels
@@ -2239,40 +2249,40 @@ class ETLProcessorSpec extends Specification {
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
             validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
                     [constraints: [required: 0],
-                     "control"  : "Number",
-                     "default"  : "",
-                     "field"    : "id",
-                     "imp"      : "U",
-                     "label"    : "Id",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "appVendor",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
                      "label"    : "Vendor",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ],
                     [constraints: [required: 0],
-                     "control"  : "String",
-                     "default"  : "",
-                     "field"    : "environment",
-                     "imp"      : "N",
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
                      "label"    : "Environment",
-                     "order"    : 0,
-                     "shared"   : 0,
-                     "show"     : 0,
-                     "tip"      : "",
-                     "udf"      : 0
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
                     ]
             ])
 
@@ -2308,11 +2318,8 @@ class ETLProcessorSpec extends Specification {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
 
-        and:
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, binding)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         console on
                         read labels
@@ -2370,7 +2377,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -2395,7 +2402,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         domain Application
                         read labels
@@ -2420,7 +2427,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         trim on
                         domain Application
@@ -2446,7 +2453,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         trim on
                         domain Application
@@ -2472,7 +2479,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         sanitize on
                         domain Application
@@ -2498,7 +2505,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         trim on
                         replace Inc, Incorporated
@@ -2524,7 +2531,7 @@ class ETLProcessorSpec extends Specification {
             ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
         when: 'The ETL script is evaluated'
-            new GroovyShell(this.class.classLoader, new ETLBinding(etlProcessor))
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
                     .evaluate("""
                         trim on
                         replace ControlCharacters with '~'
@@ -2540,4 +2547,6 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
             etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
     }
+
+
 }

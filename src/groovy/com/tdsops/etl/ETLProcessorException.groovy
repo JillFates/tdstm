@@ -71,4 +71,7 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('Project not defined.')
     }
 
+    static ETLProcessorException currentElementNotDefined () {
+        new ETLProcessorException('CE (current element) is not defined.')
+    }
 }

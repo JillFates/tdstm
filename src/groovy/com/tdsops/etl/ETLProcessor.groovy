@@ -14,9 +14,14 @@ class ETLProcessor {
     Dataset dataSet
     List<getl.data.Field> fields
     ETLFieldsValidator fieldsValidator
+    ETLBinding binding
 
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
+    /**
+     * Current Element. Assigned and exposed in dsl scripts using 'CE' number
+     */
+    Element currentElement
 
     DebugConsole debugConsole
 
@@ -44,17 +49,20 @@ class ETLProcessor {
             element.replace(regex, replacement)
         }
     }
+
     /**
      *
      *  https://en.wikipedia.org/wiki/Control_character
      */
     static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
+
     /**
      *
      * Creates an instance of ETL processor with a source of data,
      * a domain mapper validator and an instance of fieldsValidator
      * with a map of available transformations
      *
+     * @param binding
      * @param project
      * @param dataSet
      * @param console
@@ -65,7 +73,9 @@ class ETLProcessor {
         this.dataSet = dataSet
         this.debugConsole = console
         this.fieldsValidator = fieldsValidator
+        this.binding = new ETLBinding(this)
     }
+
     /**
      *
      * Selects a domain or throws an ETLProcessorException in case of an invalid domain
@@ -82,10 +92,9 @@ class ETLProcessor {
         debugConsole.info("Selected Domain: $domain")
         this
     }
+
     /**
-     *
      * Read Labels from source of data
-     *
      * @param dataPart
      * @return
      */
@@ -104,9 +113,9 @@ class ETLProcessor {
         }
         this
     }
+
     /**
-     *
-     *
+     * Iterates a chunk of rows from a number to another number.
      * @param from
      * @return
      */
@@ -119,11 +128,10 @@ class ETLProcessor {
             }]
         }]
     }
+
     /**
-     *
-     *
-     *
-     * @param numbers
+     * Iterates a given number of rows based on its ordinal position
+     * @param numbers an arrays of ordinal row numbers
      * @return
      */
     def using (int[] numbers) {
@@ -135,9 +143,9 @@ class ETLProcessor {
             doIterate(subList, closure)
         }]
     }
+
     /**
-     *
-     *
+     * Iterates a list of rows applying a closure
      * @param rows
      * @param closure
      * @return
@@ -154,28 +162,26 @@ class ETLProcessor {
                 }
                 results[key].add(value)
             }
-
             currentRowResult = [:]
             currentRowIndex++
+            binding.cleanDynamicVariables()
         }
 
         currentRowIndex--
         this
     }
+
     /**
-     *
      * Iterates and applies closure to every row in the dataSource
-     *
      * @param closure
      * @return
      */
     ETLProcessor iterate (Closure closure) {
         doIterate(this.dataSet.rows(), closure)
     }
+
     /**
-     *
      * Sets Status console to on/off for allow/disallow log messages.
-     *
      * @param status
      * @return
      */
@@ -190,10 +196,9 @@ class ETLProcessor {
         debugConsole.info "Console status changed: $consoleStatus"
         this
     }
+
     /**
-     *
      * Removes leading and trailing whitespace from a string.
-     *
      * @param status
      * @return the instance of ETLProcessor who received this message
      */
@@ -208,9 +213,9 @@ class ETLProcessor {
         debugConsole.info "Global trim status changed: $status"
         this
     }
+
     /**
-     *
-     *
+     * Global sanitize global function
      * @param status
      * @return the instance of ETLProcessor who received this message
      */
@@ -226,6 +231,12 @@ class ETLProcessor {
         this
     }
 
+    /**
+     * Global replace method given a regex and a replacement content
+     * @param regex
+     * @param replacement
+     * @return
+     */
     ETLProcessor replace (String regex, String replacement) {
 
         globalTransformers.add(Replacer(regex, replacement))
@@ -234,8 +245,7 @@ class ETLProcessor {
     }
 
     /**
-     *
-     *
+     * Global Replace function
      * @param control
      * @return
      */
@@ -243,16 +253,19 @@ class ETLProcessor {
 
         debugConsole.info "Global trm status changed: $control"
         if (control == 'ControlCharacters') {
-            [with: { y ->
-                globalTransformers.add(Replacer(ControlCharactersRegex, y))
-            },
-             off : { ->
-
-             }]
+            [
+                    with: { y ->
+                        globalTransformers.add(Replacer(ControlCharactersRegex, y))
+                    }
+            ]
         }
-
     }
 
+    /**
+     * Skip a fixed amount of row for the iterate process
+     * @param amount
+     * @return
+     */
     ETLProcessor skip (Integer amount) {
         if (amount + currentRowIndex <= this.dataSet.readRows) {
             currentRowIndex += amount
@@ -261,10 +274,9 @@ class ETLProcessor {
         }
         this
     }
+
     /**
-     *
      * Extracts an element from dataSource by its index in the row
-     *
      * @param index
      * @return
      */
@@ -277,10 +289,9 @@ class ETLProcessor {
         currentColumnIndex = index
         doExtract()
     }
+
     /**
-     *
      * Extracts an element from dataSource by its column name
-     *
      * @param columnName
      * @return
      */
@@ -293,48 +304,53 @@ class ETLProcessor {
 
         doExtract()
     }
+
     /**
-     *
      * Loads field values in results. From an extracted value or just as a fixed new Element
-     *
      * @param field
      * @return
      */
     def load (final String field) {
 
-        [
-                with: { value ->
+        if (currentElement) {
+            currentElement.load(field)
 
-                    Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+        } else {
 
-                    Element newElement = currentRow.addNewElement(value, this)
-                    newElement.field.name = field
-                    newElement.domain = selectedDomain
+            [
+                    with: { value ->
 
-                    if (fieldSpec) {
-                        newElement.field.label = fieldSpec.label
-                        newElement.field.control = fieldSpec.control
-                        newElement.field.constraints = fieldSpec.constraints
+                        Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+
+                        Element newElement = currentRow.addNewElement(value, this)
+                        newElement.field.name = field
+                        newElement.domain = selectedDomain
+
+                        if (fieldSpec) {
+
+                            newElement.field.label = fieldSpec.label
+                            newElement.field.control = fieldSpec.control
+                            newElement.field.constraints = fieldSpec.constraints
+                        }
+
+                        addElementLoaded(selectedDomain, newElement)
+                        newElement
                     }
-
-                    addElementLoaded(selectedDomain, newElement)
-                    newElement
-                }
-        ]
+            ]
+        }
     }
+
     /**
-     *
-     *
+     * Create a Reference object for a list of field names
      * @param method
      * @return
      */
     def reference (String... fields) {
         new ETLReferenceElement(this, fields as List)
     }
+
     /**
-     *
      * Add a message in console for an element from dataSource by its index in the row
-     *
      * @param index
      * @return
      */
@@ -347,10 +363,9 @@ class ETLProcessor {
             throw ETLProcessorException.missingColumn(index)
         }
     }
+
     /**
-     *
      * Add a message in console for an element from dataSource by its column name
-     *
      * @param columnName
      * @return
      */
@@ -363,10 +378,9 @@ class ETLProcessor {
             throw ETLProcessorException.missingColumn(columnName)
         }
     }
+
     /**
-     *
      * It looks up the field Spec for Domain by fieldName
-     *
      * @param domain
      * @param fieldName
      * @return
@@ -388,10 +402,9 @@ class ETLProcessor {
         }
         fieldSpec
     }
+
     /**
-     *
      * Adds a message debug with element content in console
-     *
      * @param element
      */
     private def doDebug (Element element) {
@@ -399,26 +412,45 @@ class ETLProcessor {
         element
     }
 
+    /**
+     * Defines a variable within the script
+     * @param variableName
+     * @param element
+     */
+    void storeVariable (String variableName, Element element) {
+        binding.addDynamicVariable(variableName, element)
+    }
+
+    /**
+     * Adds a new row in the list of rows
+     * @param rowIndex
+     * @param row
+     */
     private void addCrudRowData (Integer rowIndex, Map row) {
         currentRow = new Row(rowIndex, fields.collect { row[it.name] }, this)
         rows.add(currentRow)
         currentRow
     }
+
     /**
-     *
      * Private method that executes extract method command internally.
      * @return
      */
     private def doExtract () {
-        Element selectedElement = currentRow.getElement(currentColumnIndex)
-        debugConsole.info "Extract element: ${selectedElement.value} by column index: ${currentColumnIndex}"
-        applyGlobalTransformations(selectedElement)
-        selectedElement
+        Element element = currentRow.getElement(currentColumnIndex)
+
+        addCurrentElementToBinding(element)
+
+        debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
+        applyGlobalTransformations(element)
+        element
     }
+
     /**
-     *
-     * Adds a loaded element with the current domain in results
-     *
+     * Adds a loaded element with the current domain in results.
+     * It also removes CE (currentElement) from script context.
+     * @param domain
+     * @param element
      */
     void addElementLoaded (ETLDomain domain, Element element) {
 
@@ -437,12 +469,12 @@ class ETLProcessor {
                 ]
         ])
 
+        removeCurrentElementFromBinding()
         debugConsole.info "Adding element ${element} in results for domain ${domain}"
     }
+
     /**
-     *
      * Adds an asset entity instance referenced from a datasource field
-     *
      * @param assetEntity
      * @param row
      */
@@ -458,6 +490,10 @@ class ETLProcessor {
         }
     }
 
+    /**
+     * Applies a global transformation for a given element
+     * @param element
+     */
     void applyGlobalTransformations (Element element) {
 
         globalTransformers.each { transformer ->
@@ -465,6 +501,30 @@ class ETLProcessor {
         }
     }
 
+    /**
+     * Add an Element as 'CE' variable within the binding script context.
+     * @param element a selected Element
+     * @return the curent element selected in ETLProcessor
+     */
+    private void addCurrentElementToBinding (Element element) {
+        currentElement = element
+        binding.setVariable('CE', currentElement)
+        currentElement
+    }
+
+    /**
+     * Removes 'CE' variable from binding script content
+     */
+    private void removeCurrentElementFromBinding () {
+        binding.variables.remove('CE')
+        currentElement = null
+    }
+
+    /**
+     * Validates calls within the DSL script that can not be managed
+     * @param methodName
+     * @param args
+     */
     def methodMissing (String methodName, args) {
         debugConsole.info "Method missing: ${methodName}, args: ${args}"
         throw ETLProcessorException.methodMissing(methodName, args)
@@ -494,6 +554,10 @@ class ETLProcessor {
         rows[index]
     }
 
+    Element getCurrentElement () {
+        currentElement
+    }
+
     List<String> getAvailableMethods () {
         ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
          'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
@@ -504,4 +568,5 @@ class ETLProcessor {
     List<String> getAssetFields () {
         ['id', 'assetName', 'moveBundle']
     }
+
 }
