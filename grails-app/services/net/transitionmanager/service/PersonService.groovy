@@ -208,9 +208,9 @@ class PersonService implements ServiceMethods {
 		}
 		// log.debug "findByCompanyAndName() Query = ${query.toString()}"
 		
-		List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		List<Long> pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)*.id
 		if (pIds) {
-			persons = Person.where { id in pIds }
+			persons = Person.where { id in pIds }.list()
 		}
 
 		return persons
