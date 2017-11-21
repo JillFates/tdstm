@@ -51,14 +51,16 @@ class ProjectTestHelper {
 		return moveEvent
 	}
 
-	Project createProjectWithDefaultBundle(PartyGroup company=null) {
-		Project project = createProject(company)
-        MoveBundle bundle = bundleHelper.createBundle(project)
-        project.defaultBundle = bundle
-        project.save(flush:true, failOnError:true)
+	/**
+	 * Used to create a project and the default project
+	 * @param owningCompany - an optional compnay to create the project for. If no supplied a company will be created as well
+	 * @return the project that was created
+	 */
+	Project createProjectWithDefaultBundle(PartyGroup owningCompany=null) {
+		Project project = createProject(owningCompany)
+		projectService.createDefaultBundle(project)
 
         return project
-
 	}
 
 	/**
@@ -69,7 +71,6 @@ class ProjectTestHelper {
 		if (!company) {
 			company = createCompany('Owner')
 		}
-		// println "company=$company, partyType=${company?.partyType}(${company?.partyType?.id}"
 
 		Project project = new Project()
 		project.with {

@@ -14,19 +14,6 @@ class Project extends PartyGroup {
 	// a constant and non-persistent marker instance used to indicate that all projects should be used
 	static final Project ALL = new Project()
 
-	/**
-	 * Used to determine if the parameter references the Default project
-	 * @param p - the project being checked. This can be the Project object or Project id (String or Long)
-	 * @return true if the parameter is or references the Default project otherwise false
-	 */
-	static boolean isDefaultProject(def p) {
-		if (p instanceof Project) {
-			p.id == DEFAULT_PROJECT_ID
-		} else {
-			p == DEFAULT_PROJECT_ID
-		}
-	}
-
 	transient ProjectService projectService
 	transient PartyRelationshipService partyRelationshipService
 
@@ -213,6 +200,19 @@ class Project extends PartyGroup {
 	 */
 	boolean isDefaultProject() {
 		id == DEFAULT_PROJECT_ID
+	}
+
+	/**
+	 * Used to determine if the parameter references is the Default project
+	 * @param p - the project being checked. This can be the Project object or Project id (String or Long)
+	 * @return true if the parameter is or references the Default project otherwise false
+	 */
+	static boolean isDefaultProject(def p) {
+		if (p instanceof Project) {
+			p.id == DEFAULT_PROJECT_ID
+		} else {
+			p == DEFAULT_PROJECT_ID
+		}
 	}
 
 	/**
