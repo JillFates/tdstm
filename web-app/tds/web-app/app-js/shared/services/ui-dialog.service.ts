@@ -29,6 +29,15 @@ export class UIDialogService {
 			});
 		});
 	}
+
+	replace(component: any, params: Array<any>, size: 'sm' | 'md' | 'xlg' | 'lg' = 'md'): void {
+		this.notifier.broadcast({
+			name: 'dialog.replace',
+			component: component,
+			size: size,
+			params: params
+		});
+	}
 }
 
 @Injectable()

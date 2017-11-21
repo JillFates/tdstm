@@ -39,6 +39,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	openNotifier: any;
 	closeNotifier: any;
 	dismissNotifier: any;
+	replaceNotifier: any;
 
 	constructor(private notifierService: NotifierService, private activeDialog: UIActiveDialogService, private compCreator: ComponentCreatorService) {
 		this.registerListeners();
@@ -62,6 +63,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		this.openNotifier();
 		this.closeNotifier();
 		this.dismissNotifier();
+		this.replaceNotifier();
 	}
 
 	/**
@@ -82,6 +84,14 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 
 			this.activeDialog.componentInstance = this.cmpRef;
 			this.tdsUiDialog.modal('show');
+		});
+
+		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
+			if (this.cmpRef) {
+				this.cmpRef.destroy();
+				this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
+				this.activeDialog.componentInstance = this.cmpRef;
+			}
 		});
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {

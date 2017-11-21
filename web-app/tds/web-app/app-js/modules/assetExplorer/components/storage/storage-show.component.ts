@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { AssetShowComponent } from '../asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -8,7 +9,7 @@ export function StorageShowComponent(template) {
 		selector: `storage-show`,
 		template: template
 	}) class StorageShowComponent implements OnInit {
-		constructor(private activeDialog: UIActiveDialogService) {
+		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService) {
 
 		}
 
@@ -24,10 +25,10 @@ export function StorageShowComponent(template) {
 		}
 
 		showAssetDetailView(assetClass: string, id: number) {
-			this.activeDialog.close({
-				assetClass: assetClass,
-				id: id
-			});
+			this.dialogService.replace(AssetShowComponent, [
+				{ provide: 'ID', useValue: id },
+				{ provide: 'ASSET', useValue: assetClass }],
+				'lg');
 		}
 
 	}

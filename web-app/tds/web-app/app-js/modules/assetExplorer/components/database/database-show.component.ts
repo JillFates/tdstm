@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { AssetShowComponent } from '../asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -8,7 +9,7 @@ export function DatabaseShowComponent(template) {
 		selector: `database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
-		constructor(private activeDialog: UIActiveDialogService) {
+		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService) {
 			jQuery('[data-toggle="popover"]').popover();
 		}
 
@@ -24,10 +25,10 @@ export function DatabaseShowComponent(template) {
 		}
 
 		showAssetDetailView(assetClass: string, id: number) {
-			this.activeDialog.close({
-				assetClass: assetClass,
-				id: id
-			});
+			this.dialogService.replace(AssetShowComponent, [
+				{ provide: 'ID', useValue: id },
+				{ provide: 'ASSET', useValue: assetClass }],
+				'lg');
 		}
 
 	}
