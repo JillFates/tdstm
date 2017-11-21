@@ -163,7 +163,7 @@ export class AssetExplorerViewGridComponent {
 				}).catch(x => {
 					console.log(x);
 				});
-		});
+		}, 500);
 	}
 
 	protected onShow(data: any) {

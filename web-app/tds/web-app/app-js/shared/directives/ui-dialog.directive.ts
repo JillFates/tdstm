@@ -16,7 +16,7 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-ui-dialog',
 	template: `
-    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
             <div class="modal-content">
                 <div #view></div>
@@ -81,13 +81,10 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 
 			this.activeDialog.componentInstance = this.cmpRef;
-			jQuery('.modal-backdrop.fade.in').remove();
 			this.tdsUiDialog.modal('show');
 		});
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {
-			jQuery('.modal-backdrop.fade.in').remove();
-			jQuery('body').css('padding-right', '0px');
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
@@ -98,8 +95,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		});
 
 		this.dismissNotifier = this.notifierService.on('dialog.dismiss', event => {
-			jQuery('.modal-backdrop.fade.in').remove();
-			jQuery('body').css('padding-right', '0px');
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
