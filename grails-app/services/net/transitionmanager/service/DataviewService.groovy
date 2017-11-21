@@ -655,9 +655,9 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String customFilterIn(String propertyName, String namedParameter) {
 		"""
-			( (${propertyName}.firstName in (:${namedParameter}))
-			or (${propertyName}.middleName in (:${namedParameter}))
-			or (${propertyName}.lastName in (:${namedParameter})) )
+			( (AE.${propertyName}.firstName in (:${namedParameter}))
+			or (AE.${propertyName}.middleName in (:${namedParameter}))
+			or (AE.${propertyName}.lastName in (:${namedParameter})) )
 		"""
 	}
 
