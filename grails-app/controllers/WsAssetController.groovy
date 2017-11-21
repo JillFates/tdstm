@@ -267,8 +267,20 @@ class WsAssetController implements ControllerMethods {
 				break
 		}
 
-		// log.debug "\n\n***\n domainName=$domainName\nmodel:$model"
-		render groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+		domainName=domainName.toLowerCase()
+
+		try {
+			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+			if (pageHtml) {
+				render pageHtml
+			} else {
+				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
+				sendNotFound()
+			}
+		} catch (e) {
+			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
+			sendNotFound()
+		}
 	}
 
 	/**
