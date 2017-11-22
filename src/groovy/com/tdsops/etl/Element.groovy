@@ -251,8 +251,27 @@ class Element {
      * @param variableName
      * @return
      */
-    Element store(String variableName) {
+    Element store (String variableName) {
         processor.storeVariable(variableName, this)
+    }
+
+    /**
+     * Appends Element and String values from a ETL Script and assign result String value
+     *
+     * @param objects
+     * @return
+     */
+    Element append (Object... objects) {
+
+        String newValue = objects.sum { object ->
+            if (object.class == Element.class) {
+                object.value
+            } else {
+                object ? object.toString() : ''
+            }
+        }
+        this.value = newValue
+        this
     }
 
     /**
@@ -263,7 +282,7 @@ class Element {
     boolean equals (otherObject) {
         if (this.is(otherObject)) return true
 
-        if(otherObject.class == String) return value.equals(otherObject)
+        if (otherObject.class == String) return value.equals(otherObject)
 
         if (getClass() != otherObject.class) return false
 

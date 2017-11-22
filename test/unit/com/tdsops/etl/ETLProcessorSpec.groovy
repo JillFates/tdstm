@@ -1430,21 +1430,136 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == 'Microsoft'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == 'Microsoft'
 
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == 'appVendor'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == 'Vendor'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == 'String'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == 'Mozilla'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == 'Mozilla'
+                with(elements[0]) {
+                    originalValue == 'Microsoft'
+                    value == 'Microsoft'
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == 'environment'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == 'Environment'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == 'String'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+                    field.name == 'appVendor'
+                    field.label == 'Vendor'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == 'Mozilla'
+                    value == 'Mozilla'
+
+                    field.name == 'environment'
+                    field.label == 'Environment'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+    }
+
+    void 'test can use a stored element in a transformation' () {
+
+        given:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
+                     "label"    : "Vendor",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
+                     "label"    : "Environment",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    ,
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'description',
+                     imp        : 'N',
+                     "label"    : "Description",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ]
+            ])
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'vendor name' transform with lowercase() store myVar
+                                    
+                                    extract 'location' transform with append('-', myVar) load description
+                                  
+                                }""".stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+                with(elements[0]) {
+                    originalValue == 'Microsoft'
+                    value == '-microsoft'
+
+                    field.name == 'appVendor'
+                    field.label == 'Vendor'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == 'Mozilla'
+                    value == '-mozilla'
+
+                    field.name == 'environment'
+                    field.label == 'Environment'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
     }
 
     void 'test can load field many times with the same extracted value' () {
