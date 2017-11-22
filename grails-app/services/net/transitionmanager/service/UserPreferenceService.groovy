@@ -190,100 +190,91 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return true if the set was successful
 	 */
 	@Transactional
-	boolean setPreference(UserLogin userLogin = null, String preferenceCode, value) {
+	boolean setPreference(UserLogin userLogin = null, String preferenceCode, Object value) {
+		// If is session only preference just store in the Session and we are done
+		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
+			session?.setAttribute(preferenceCode, value)
+			return true
+		}
+
 		userLogin = resolve(userLogin)
-		if (!userLogin) return
-
-		boolean saved = false
-		value = value?.toString()
-
-		log.debug 'setPreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
-
-		// Date start = new Date()
-
-		if (value && value != "null" && userLogin) {
-
-			//If is session only preference just store in the Session and we are done
-			if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
-				session?.setAttribute(preferenceCode, value)
-
-				/*
-				I always wonder if I should break here or assign to the saver variable and
-				add the else block in the next code section, but in other hand I think is cleaner
-				*/
-				return true
-			}
-
+		UserPreferenceEnum userPreferenceEnum = UserPreferenceEnum.valueOfNameOrValue(preferenceCode)
+		if (storePreference(userLogin, userPreferenceEnum, value)) {
 			// Note that session does not exist for Quartz jobs
 			if (session) {
-				//remove from the session cache so that getUserPreference won't find the previous value.
-				session.removeAttribute(preferenceCode)
+				getPreference(userLogin, userPreferenceEnum, null)
 			}
-
-			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
-			String prefValue = userPreference?.value
-
-			//log.debug 'setPreference() phase 1 took {}', TimeUtil.elapsed(start)
-			//start = new Date()
-
-			//	remove the movebundle and event preferences if user switched to different project
-			if (preferenceCode == CURR_PROJ.value() && prefValue && prefValue != value) {
-				removeProjectAssociatedPreferences(userLogin)
-			}
-
-			//log.debug 'setPreference() phase 2 took {}', TimeUtil.elapsed(start)
-			//start = new Date()
-
-			if (userPreference == null) {
-				userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode)
-			}
-			userPreference.value = value
-			save userPreference, true
-			saved = !userPreference.hasErrors()
-
-			// log.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
-			// start = new Date()
-
-			// Call getPreference() to load the preference into session
-			getPreference(userLogin, preferenceCode)
-
-			// log.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
+			return true
 		}
 
-		return saved
+		return false
 	}
 
-	/* Saves a user preference after making sure that it passes validation using the constraints map */
+	/**
+	 *
+	 * @param userLogin
+	 * @param preferenceCode
+	 * @param value
+	 */
 	@Transactional
-	void savePreference(String code, value) {
+	UserPreference storePreference(UserLogin userLogin, UserPreferenceEnum preferenceCode, Object value) {
+		if (!userLogin) return null
 
-		if (!(code in prefCodeConstraints)) {
-			throw new InvalidRequestException()
+		value = value?.toString()
+
+		if (!value || value == "null") {
+			return null
 		}
 
-		if (!ConstraintsValidator.validate(value, prefCodeConstraints[code])) {
+		if (!ConstraintsValidator.validate(value, prefCodeConstraints[preferenceCode.value()])) {
 			throw new InvalidParamException()
 		}
 
-		setPreference(code, value)
+		log.info 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
+
+		UserPreference userPreference = UserPreference.where {
+			userLogin == userLogin && preferenceCode == preferenceCode.value()
+		}.get()
+
+		if (userPreference) {
+			//	remove the movebundle and event preferences if user switched to different project
+			if (preferenceCode == CURR_PROJ && userPreference.value != value) {
+				removeProjectAssociatedPreferences(userLogin)
+			}
+		} else {
+			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
+		}
+
+		userPreference.value = value
+		save(userPreference, true)
+		return userPreference
 	}
 
+	/**
+	 *
+	 * @param userLogin
+	 * @param preference
+	 * @return
+	 */
 	@Transactional
 	boolean removePreference(UserLogin userLogin = null, UserPreferenceEnum preference) {
 		removePreference(userLogin, preference.value())
 	}
 
 	/**
-	 * @deprecated
+	 *
+	 * @param user
+	 * @param prefCode
+	 * @return
 	 */
 	@Transactional
 	boolean removePreference(UserLogin user = null, String prefCode) {
 		user = resolve(user)
-		if (!user) return
+		if (!user) return false
 
 		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
 		if (updateCount) {
-			log.debug 'Removed {} preference', prefCode
+			log.info 'Removed {} preference', prefCode
 
 			//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
 			if (prefCode == CURR_PROJ.value()) {
@@ -292,6 +283,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		session?.removeAttribute(prefCode)
+		return true
 	}
 
 	/**
@@ -316,6 +308,7 @@ class UserPreferenceService implements ServiceMethods {
 	String getCurrentProjectId(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_PROJ
 	}
+
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
 		// Session doesn't exist for Quartz jobs
 		if (session) {
@@ -336,6 +329,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 		return tzId
 	}
+
 	void setTimeZone(UserLogin userLogin = null, String timeZoneId) {
 		setPreference userLogin, CURR_TZ, timeZoneId
 	}
@@ -343,6 +337,7 @@ class UserPreferenceService implements ServiceMethods {
 	String getDateFormat(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_DT_FORMAT, TimeUtil.getDefaultFormatType()
 	}
+
 	void setDateFormat(UserLogin userLogin = null, String value) {
 		setPreference userLogin, CURR_DT_FORMAT, value
 	}
@@ -350,6 +345,7 @@ class UserPreferenceService implements ServiceMethods {
 	String getMoveEventId(UserLogin userLogin = null) {
 		getPreference userLogin, MOVE_EVENT
 	}
+
 	void setMoveEventId(UserLogin userLogin = null, value) {
 		setPreference userLogin, MOVE_EVENT, value
 	}
@@ -357,6 +353,7 @@ class UserPreferenceService implements ServiceMethods {
 	String getMoveBundleId() {
 		getPreference CURR_BUNDLE
 	}
+
 	void setMoveBundleId(UserLogin userLogin = null, value) {
 		setPreference userLogin, CURR_BUNDLE, value
 	}

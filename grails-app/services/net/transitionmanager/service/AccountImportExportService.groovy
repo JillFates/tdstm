@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -683,6 +684,7 @@ class AccountImportExportService implements ServiceMethods {
 					} else {
 						updateUserAndOrSecurity = true
 					}
+					userPreferenceService.storePreference(userLogin, UserPreferenceEnum.CURR_PROJ, project.id)
 				}
 
 				(error, securityRolesChanged) = applySecurityRoleChanges(accounts[i])
