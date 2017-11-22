@@ -1643,8 +1643,15 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def assetSummary() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
-
-		Boolean justPlanning = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
+		String justPlanningPref = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)
+		Boolean justPlanning = false
+		// If the preference is set, parse it to boolean
+		if (justPlanningPref) {
+			justPlanning = BooleanUtils.toBoolean(justPlanningPref)
+		} else {
+			// If the user doesn't have a Just Planning pref, default it to false.
+			userPreferenceService.setPreference(PREF.ASSET_JUST_PLANNING, false)
+		}
 		int totalAsset = 0
 		int totalPhysical = 0
 		int totalApplication = 0
