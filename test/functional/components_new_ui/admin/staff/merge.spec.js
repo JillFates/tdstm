@@ -129,7 +129,7 @@ describe('Merge Staff', function(){
       compareMergeModal.clickMergeBtn();
       if(process.env.BROWSER_NAME !== 'phantomjs'){
         var alertDialog = browser.driver.switchTo().alert();
-        expect(alertDialog.getText()).toEqual('This will merge the selected Person');
+        expect(alertDialog.getText()).toEqual('This will merge the selected Person(s)');
         alertDialog.accept();        
       }
     });
