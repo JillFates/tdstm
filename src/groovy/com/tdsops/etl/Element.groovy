@@ -257,7 +257,6 @@ class Element {
 
     /**
      * Appends Element and String values from a ETL Script and assign result String value
-     *
      * @param objects
      * @return
      */
@@ -270,7 +269,7 @@ class Element {
                 object ? object.toString() : ''
             }
         }
-        this.value = newValue
+        this.value += newValue
         this
     }
 

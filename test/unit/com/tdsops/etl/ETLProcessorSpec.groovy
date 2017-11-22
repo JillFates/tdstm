@@ -1458,6 +1458,109 @@ class ETLProcessorSpec extends Specification {
             }
     }
 
+    void 'test can append strings and element in a transformation chain' () {
+
+        given:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
+                     "label"    : "Vendor",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
+                     "label"    : "Environment",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'description',
+                     imp        : 'N',
+                     "label"    : "Description",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ]
+            ])
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                iterate {
+                                    extract 'vendor name' transform with lowercase() store myVar
+                                    
+                                    extract 'location' transform with append(' - ', myVar) load description
+                                  
+                                }""".stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+                with(elements[0]) {
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Center - Microsoft'
+
+                    field.name == 'appVendor'
+                    field.label == 'Vendor'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Center - Mozilla'
+
+                    field.name == 'environment'
+                    field.label == 'Environment'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+    }
+
     void 'test can use a stored element in a transformation' () {
 
         given:
@@ -1499,7 +1602,6 @@ class ETLProcessorSpec extends Specification {
                      tip        : "",
                      udf        : 0
                     ],
-                    ,
                     [constraints: [required: 0],
                      control    : 'String',
                      default    : '',
@@ -1526,9 +1628,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 domain Application
                                 iterate {
-                                    extract 'vendor name' transform with lowercase() store myVar
-                                    
-                                    extract 'location' transform with append('-', myVar) load description
+                                    extract 'location' transform with lowercase() append(' - ') load description
                                   
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
@@ -1538,8 +1638,8 @@ class ETLProcessorSpec extends Specification {
             with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
                 with(elements[0]) {
-                    originalValue == 'Microsoft'
-                    value == '-microsoft'
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Center - microsoft'
 
                     field.name == 'appVendor'
                     field.label == 'Vendor'
@@ -1551,8 +1651,8 @@ class ETLProcessorSpec extends Specification {
             with(etlProcessor.results.get(ETLDomain.Application)[1]) {
 
                 with(elements[0]) {
-                    originalValue == 'Mozilla'
-                    value == '-mozilla'
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Center - mozilla'
 
                     field.name == 'environment'
                     field.label == 'Environment'
