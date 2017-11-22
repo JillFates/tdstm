@@ -22,7 +22,10 @@ declare var jQuery: any;
                 <div #view></div>
             </div>
         </div>
-    </div>`
+	</div>`,
+	styles: [`
+		.modal { background:none;}
+	`]
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
