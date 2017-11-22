@@ -246,7 +246,7 @@ var Person = function () {
 	
 	// performs the person merge
 	var mergePerson = function () {
-		var returnStatus =  confirm('This will merge the selected Person');
+		var returnStatus =  confirm('This will merge the selected Person(s)');
 		if(returnStatus ){
 			var targetModelId 
 			var modelToMerge = new Array()
