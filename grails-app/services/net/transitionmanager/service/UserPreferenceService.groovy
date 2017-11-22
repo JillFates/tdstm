@@ -211,7 +211,7 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
-	 *
+	 * Stores an user preference into database. It validates preference value is not null and constraints passes
 	 * @param userLogin
 	 * @param preferenceCode
 	 * @param value
@@ -251,7 +251,7 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
-	 *
+	 * Removes an user preference
 	 * @param userLogin
 	 * @param preference
 	 * @return
@@ -262,7 +262,7 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
-	 *
+	 * Removes an user preference from database and user http session if present
 	 * @param user
 	 * @param prefCode
 	 * @return
@@ -305,10 +305,20 @@ class UserPreferenceService implements ServiceMethods {
 		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
 	}
 
+	/**
+	 * Get current project id user preference.
+	 * @param userLogin
+	 * @return
+	 */
 	String getCurrentProjectId(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_PROJ
 	}
 
+	/**
+	 * Set current project id user preference
+	 * @param userLogin
+	 * @param projectId
+	 */
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
 		// Session doesn't exist for Quartz jobs
 		if (session) {
@@ -320,6 +330,12 @@ class UserPreferenceService implements ServiceMethods {
 		setPreference userLogin, CURR_PROJ, projectId
 	}
 
+	/**
+	 * Get current time zone user preference
+	 * @param userLogin
+	 * @param defaultTimeZoneId
+	 * @return
+	 */
 	String getTimeZone(UserLogin userLogin = null, String defaultTimeZoneId = null) {
 		String tzId = getPreference userLogin, CURR_TZ, defaultTimeZoneId
 		/* If there's no user preference and no default value's been specified
@@ -330,38 +346,80 @@ class UserPreferenceService implements ServiceMethods {
 		return tzId
 	}
 
+	/**
+	 * Set time zone user preference
+	 * @param userLogin
+	 * @param timeZoneId
+	 */
 	void setTimeZone(UserLogin userLogin = null, String timeZoneId) {
 		setPreference userLogin, CURR_TZ, timeZoneId
 	}
 
+	/**
+	 * Get current date format user preference
+	 * @param userLogin
+	 * @return
+	 */
 	String getDateFormat(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_DT_FORMAT, TimeUtil.getDefaultFormatType()
 	}
 
+	/**
+	 * Set date format user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setDateFormat(UserLogin userLogin = null, String value) {
 		setPreference userLogin, CURR_DT_FORMAT, value
 	}
 
+	/**
+	 * Get current move event id user preference
+	 * @param userLogin
+	 * @return
+	 */
 	String getMoveEventId(UserLogin userLogin = null) {
 		getPreference userLogin, MOVE_EVENT
 	}
 
+	/**
+	 * Set move event id user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setMoveEventId(UserLogin userLogin = null, value) {
 		setPreference userLogin, MOVE_EVENT, value
 	}
 
+	/**
+	 * Get current move bundle id user preference
+	 * @return
+	 */
 	String getMoveBundleId() {
 		getPreference CURR_BUNDLE
 	}
 
+	/**
+	 * Set move bundle id user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setMoveBundleId(UserLogin userLogin = null, value) {
 		setPreference userLogin, CURR_BUNDLE, value
 	}
 
+	/**
+	 * Get a map of import user preferences
+	 * @return
+	 */
 	Map<String, String> getImportPreferences() {
 		getPreferencesMap(UserPreferenceEnum.importPreferenceKeys)
 	}
 
+	/**
+	 * Get a map of export user preferences
+	 * @return
+	 */
 	Map<String, String> getExportPreferences() {
 		getPreferencesMap(UserPreferenceEnum.exportPreferenceKeys)
 	}
@@ -426,9 +484,14 @@ class UserPreferenceService implements ServiceMethods {
 		valuesByCode
 	}
 
+	/**
+	 * Remove all project related user preferences
+	 * @param userLogin
+	 * @param pref
+	 */
 	private void removeProjectAssociatedPreference(UserLogin userLogin, UserPreferenceEnum pref) {
 		if (removePreference(userLogin, pref)) {
-			log.debug 'Removed {} preference as user switched to other project', pref
+			log.info 'Removed {} preference as user switched to other project', pref
 			getPreference(userLogin, pref)
 		}
 	}
