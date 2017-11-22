@@ -143,9 +143,8 @@
 						<div class="col-md-12">
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
-								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="model.schema.columns" [navigatable]="true" [animation]="false"
-								 class="row" style="margin-right:0px;" itemClass="item col-sm-4 col-md-4 col-lg-2" activeItemClass="item col-sm-4 col-md-4 col-lg-2 active"
-								 disabledItemClass="item col-sm-4 col-md-4 col-lg-2 disabled" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
+								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="draggableColumns" [navigatable]="false" [animation]="false"
+								 class="row" style="margin-right:0px;" itemClass="item col-sm-4 col-md-4 col-lg-2"  (dragEnd)="onDragEnd()" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
 										<div class="row">
 											<div class="col-sm-8 drag-label">
