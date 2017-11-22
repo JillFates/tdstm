@@ -1538,10 +1538,10 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center - Microsoft'
+                    value == 'ACME Data Center - microsoft'
 
-                    field.name == 'appVendor'
-                    field.label == 'Vendor'
+                    field.name == 'description'
+                    field.label == 'Description'
                     field.control == 'String'
                     field.constraints.required == 0
                 }
@@ -1551,10 +1551,10 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center - Mozilla'
+                    value == 'ACME Data Center - mozilla'
 
-                    field.name == 'environment'
-                    field.label == 'Environment'
+                    field.name == 'description'
+                    field.label == 'Description'
                     field.control == 'String'
                     field.constraints.required == 0
                 }
@@ -1628,7 +1628,7 @@ class ETLProcessorSpec extends Specification {
                                 read labels
                                 domain Application
                                 iterate {
-                                    extract 'location' transform with lowercase() append(' - ') load description
+                                    extract 'location' transform with lowercase() append('**') load description
                                   
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
@@ -1639,10 +1639,10 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center - microsoft'
+                    value == 'acme data center**'
 
-                    field.name == 'appVendor'
-                    field.label == 'Vendor'
+                    field.name == 'description'
+                    field.label == 'Description'
                     field.control == 'String'
                     field.constraints.required == 0
                 }
@@ -1652,10 +1652,10 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center - mozilla'
+                    value == 'acme data center**'
 
-                    field.name == 'environment'
-                    field.label == 'Environment'
+                    field.name == 'description'
+                    field.label == 'Description'
                     field.control == 'String'
                     field.constraints.required == 0
                 }
@@ -1722,21 +1722,33 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
 
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
+            with(etlProcessor.results.get(ETLDomain.Application)[0]){
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+                with (elements[0]) {
+                    originalValue == "Microsoft"
+                    value == "Microsoft"
+
+                    field.name == "appVendor"
+                    field.label == "Vendor"
+                    field.control == "String"
+                    field.constraints.required == 0
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]){
+
+                with (elements[0]) {
+                    originalValue == "Mozilla"
+                    value == "Mozilla"
+
+                    field.name == "appVendor"
+                    field.label == "Vendor"
+                    field.control == "String"
+                    field.constraints.required == 0
+                }
+            }
     }
 
     void 'test can throw an ETLProcessorException when try to load without domain definition' () {
@@ -1872,12 +1884,20 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+            with (etlProcessor.getRow(0)) {
+                with (getElement(1)) {
+                    value == "Microsoft"
+                    field.name == "appVendor"
+                }
+            }
 
+            with (etlProcessor.getRow(1)) {
+                with (getElement(1)) {
+                    value == "Mozilla"
+                    field.name == "appVendor"
+                }
+            }
     }
 
     void 'test can process a selected domain rows' () {
