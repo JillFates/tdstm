@@ -4,10 +4,10 @@ import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-sp
 import { State } from '@progress/kendo-data-query';
 import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetEditComponent } from '../asset/asset-edit.component';
+import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 @Component({
@@ -156,7 +156,7 @@ export class AssetExplorerViewGridComponent {
 	protected onShow(data: any) {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
-			{ provide: 'ASSET', useValue:  data['common_assetClass'] }],
+			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
 			'lg').then(x => {
 				console.log(x);
 			}).catch(x => {

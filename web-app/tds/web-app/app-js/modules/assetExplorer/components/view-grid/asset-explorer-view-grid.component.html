@@ -17,6 +17,9 @@
 		</div>
 	</ng-template>
 	<kendo-grid-column title="Action" [locked]="true" [width]="65">
+		<ng-template kendoGridCellTemplate let-dataItem>
+			<div class="row">
+				<div class="col-xs-12">
 					<button class="btn btn-default" (click)="onShow(dataItem)">
 						<span class="fa fa-search"></span>
 					</button>
