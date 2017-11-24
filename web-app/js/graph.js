@@ -192,7 +192,7 @@ var GraphUtil = (function ($) {
 	public.correctActionButtons = function() {
 		if($('#dependenciesPanelId').has_scrollbar()) {
 			$('.dependency_panel_action_buttons').css('position', 'fixed');
-			$('.dependency_panel_action_buttons').css('bottom', '49px');
+			$('.dependency_panel_action_buttons').css('bottom', '45px');
 		} else {
 			$('.dependency_panel_action_buttons').css('position', '');
 			$('.dependency_panel_action_buttons').css('bottom', '5px');
@@ -1184,6 +1184,26 @@ var GraphUtil = (function ($) {
 				$(this).parent().addClass('groupingControl');
 			}
 		});
+	};
+
+	public.onSelectItemShowDependencyPanel = function(event){
+		if(!$(event).is(":checked")) {
+			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', false);
+		}
+
+		var currentShowClass = $($(event)[0]).attr('class');
+		var parentId = $($(event)[0]).attr('parentid');
+		var noneChecked = true;
+		$('.' + currentShowClass).each(function(){
+			if($(this).is(":checked")) {
+				noneChecked = false;
+			}
+		});
+
+		if(noneChecked) {
+			$('#' + parentId).prop('checked', false);
+			$('#' + parentId).attr('state', 3);
+		}
 	};
 
 	public.onSelectItemHighlightDependencyPanel = function(event){
