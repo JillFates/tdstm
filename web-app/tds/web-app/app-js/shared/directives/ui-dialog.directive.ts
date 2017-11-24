@@ -30,6 +30,7 @@ declare var jQuery: any;
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
 	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
+	@ViewChild('extraDialog', { read: ViewContainerRef }) extraDialog: ViewContainerRef;
 	@ViewChild('modalDialog') el: ElementRef;
 	size = 'md';
 	tdsUiDialog: any;

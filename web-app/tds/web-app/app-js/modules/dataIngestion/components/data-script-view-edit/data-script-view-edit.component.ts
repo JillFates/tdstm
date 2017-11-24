@@ -1,11 +1,12 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DataScriptModel, ActionType, DataScriptMode} from '../../model/data-script.model';
-import {ProviderModel} from '../../model/provider.model';
-import {DataIngestionService} from '../../service/data-ingestion.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
+import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
+import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
+import { ProviderModel } from '../../model/provider.model';
+import { DataIngestionService } from '../../service/data-ingestion.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';
 
 @Component({
 	selector: 'data-script-view-edit',
@@ -18,7 +19,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 })
 export class DataScriptViewEditComponent implements OnInit {
 
-	@ViewChild('dataScriptProvider', {read: DropDownListComponent}) dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
@@ -34,11 +35,12 @@ export class DataScriptViewEditComponent implements OnInit {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService) {
+		private dataIngestionService: DataIngestionService,
+		private dialogService: UIDialogService) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail' );
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
 		this.dataSignature = JSON.stringify(this.dataScriptModel);
 		this.datasourceName.next(this.dataScriptModel.name);
 	}
@@ -50,7 +52,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.providerList.push({id: 0, name: 'Select...'});
+					this.providerList.push({ id: 0, name: 'Select...' });
 					this.dataScriptModel.provider = this.providerList[0];
 				}
 				this.providerList.push(...result);
@@ -112,10 +114,10 @@ export class DataScriptViewEditComponent implements OnInit {
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
 				'Confirm', 'Cancel').then(result => {
-				if (result) {
-					this.activeDialog.dismiss();
-				}
-			});
+					if (result) {
+						this.activeDialog.dismiss();
+					}
+				});
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -144,4 +146,9 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			});
 	}
+
+	protected onDataScriptDesigner(): void {
+		this.dialogService.extra(DataScriptEtlBuilderComponent, []).then(() => console.log('ok'), () => console.log('not ok'));
+	}
+
 }

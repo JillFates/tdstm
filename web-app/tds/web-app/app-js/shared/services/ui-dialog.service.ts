@@ -31,6 +31,7 @@ export class UIDialogService {
 	}
 
 	replace(component: any, params: Array<any>, size: 'sm' | 'md' | 'xlg' | 'lg' = 'md'): void {
+		return new Promise((resolve, reject) => {
 		this.notifier.broadcast({
 			name: 'dialog.replace',
 			component: component,
@@ -80,4 +81,35 @@ export class UIActiveDialogService {
 			});
 		}
 	}
+}
+
+declare var jQuery: any;
+export class UIExtraDialog {
+	modalIntance: any;
+	resolve: any;
+	reject: any;
+	cmpRef: ComponentRef<{}>;
+
+	constructor(private modalSelector: string) { }
+
+	open(resolve, reject, comp: ComponentRef<{}>) {
+		this.resolve = resolve;
+		this.reject = reject;
+		this.cmpRef = comp;
+		this.modalIntance = jQuery(this.modalSelector);
+		this.modalIntance.modal('show');
+	}
+
+	close(value?: any) {
+		this.modalIntance.modal('hide');
+		this.resolve(value);
+		this.cmpRef.destroy();
+	}
+
+	dismiss(value?: any) {
+		this.modalIntance.modal('hide');
+		this.reject(value);
+		this.cmpRef.destroy();
+	}
+
 }
