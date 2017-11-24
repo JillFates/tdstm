@@ -28,6 +28,9 @@ export const en_DICTIONARY: Object = {
 		'PROVIDERS': 'Providers',
 		'CREATE_DATA_SCRIPT': 'Create Data Script',
 		'CREATE_PROVIDER': 'Create Provider',
+		'SAMPLE_DATA_TITLE': 'Sample Data',
+		'ETL_BUILDER_TITLE': 'ETL Designer',
+		'CONSOLE_TITLE': 'ETL Console'
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
