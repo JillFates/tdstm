@@ -52,9 +52,8 @@ class AuditService implements InitializingBean, ServiceMethods {
 			String paramsMsg = params.size() ? params.toString() + ' :' : ''
 			String user = securityService.currentUsername ?: 'ANONYMOUS_USER'
 			String remoteIp = HtmlUtil.getRemoteIp(request)
-			//       'USER_ACTIVITY: $user invoked $request.method $auditUri $paramsMsg$remoteIp'
-			logger.info 'USER_ACTIVITY: {} invoked {} {} {}{}', user, request.method, auditUri,
-					request.method, remoteIp
+			logger.info 'USER_ACTIVITY: {} invoked {} {} {}', 
+				user, request.method, auditUri, remoteIp
 		}
 	}
 
