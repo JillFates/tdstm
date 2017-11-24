@@ -10,6 +10,9 @@ import { DataScriptListComponent } from './components/data-script-list/data-scri
 import { DataScriptViewEditComponent } from './components/data-script-view-edit/data-script-view-edit.component';
 import { ProviderListComponent } from './components/provider-list/provider-list.component';
 import { ProviderViewEditComponent } from './components/provider-view-edit/provider-view-edit.component';
+import { DataScriptConsoleComponent } from './components/data-script-console/data-script-console.component';
+import { DataScriptEtlBuilderComponent } from './components/data-script-etl-builder/data-script-etl-builder.component';
+import { DataScriptSampleDataComponent } from './components/data-script-sample-data/data-script-sample-data.component';
 import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 import { Permission } from '../../shared/model/permission.model';
@@ -20,9 +23,6 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
-import { DataScriptConsoleComponent } from './components/data-script-console/data-script-console.component';
-import { DataScriptEtlBuilderComponent } from './components/data-script-etl-builder/data-script-etl-builder.component';
-import { DataScriptSampleDataComponent } from './components/data-script-sample-data/data-script-sample-data.component';
 
 @NgModule({
 	imports: [
