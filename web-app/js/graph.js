@@ -1190,6 +1190,20 @@ var GraphUtil = (function ($) {
 		if(!$(event).is(":checked")) {
 			$($(event).parent().siblings()[1]).find('input:checkbox').prop('checked', false);
 		}
+
+		var currentShowClass = $($(event)[0]).attr('class');
+		var parentId = $($(event)[0]).attr('parentid');
+		var noneChecked = true;
+		$('.' + currentShowClass).each(function(){
+			if($(this).is(":checked")) {
+				noneChecked = false;
+			}
+		});
+
+		if(noneChecked) {
+			$('#' + parentId).prop('checked', false);
+			$('#' + parentId).attr('state', 3);
+		}
 	};
 
 	public.onSelectItemHighlightDependencyPanel = function(event){
