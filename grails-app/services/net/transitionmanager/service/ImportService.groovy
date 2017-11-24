@@ -25,6 +25,7 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -71,6 +72,7 @@ class ImportService implements ServiceMethods {
 	DeviceService deviceService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
+	ProjectService projectService
 	ProgressService progressService
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
@@ -173,8 +175,8 @@ class ImportService implements ServiceMethods {
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
 
 		// TODO : JPM 1/2017 : The staffList is getting ONLY the staff of the client but should be getting all staff on the project
-		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
-
+		List <Party> companies = [project.client, PartyGroup.get(18)] + projectService.getPartners(project)
+		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
 		return data
 	}
 
