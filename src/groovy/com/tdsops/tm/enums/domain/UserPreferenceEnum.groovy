@@ -1,6 +1,7 @@
 package com.tdsops.tm.enums.domain
 
 import groovy.transform.CompileStatic
+import net.transitionmanager.service.InvalidParamException
 
 @CompileStatic
 enum UserPreferenceEnum {
@@ -82,14 +83,39 @@ enum UserPreferenceEnum {
 		this.value = value
 	}
 
+	/**
+	 * Get preference value or name if no values is present or null
+	 * @return
+	 */
 	String value() {
 		value ?: name()
 	}
 
-	String toString() { value() }
+	String toString() {
+		value()
+	}
 
-	static
-	boolean isSessionOnlyPreference(String preferenceString){
+	/**
+	 * Get preference instance from name or value
+	 * @param str - preference name or value
+	 * @return
+	 */
+	static UserPreferenceEnum valueOfNameOrValue(String str) {
+		UserPreferenceEnum userPreferenceEnum = values().find {
+			it.name() == str || it.value() == str
+		}
+		if (userPreferenceEnum == null) {
+			throw new InvalidParamException('UserPreferenceEnum name or value invalid: ' + str)
+		}
+		return userPreferenceEnum
+	}
+
+	/**
+	 * Determine if a preference is session attachable only
+	 * @param preferenceString
+	 * @return
+	 */
+	static boolean isSessionOnlyPreference(String preferenceString){
 		sessionOnlyPreferences.find {
 			preferenceString == it.toString()
 		}

@@ -68,9 +68,8 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 			prefValue == result
 		and: 'the http session should also contain the preference'
 			prefValue == userPreferenceService.session.getAttribute(prefCode)
-		and: 'the perference should be in the database table'
-			userPreferenceService.getUserPreference(userLogin, prefCode)
-
+		and: 'the preference should be in the database table'
+			userPreferenceService.getPreference(userLogin, prefCode)
 		when: 'getting a persisted preference while providing a default value'
 			result = userPreferenceService.getPreference(userLogin, pref, 'bogus value')
 		then: 'the result should match the previously persisted value'
@@ -102,7 +101,7 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 		and: 'the http session should contain the same value'
 			prefValue == userPreferenceService.session.getAttribute(soPrefCode)
 		and: 'there should be NO database preference record'
-			userPreferenceService.getUserPreference(userLogin, prefCode) == null
+			userPreferenceService.getPreference(userLogin, prefCode) == null
 	}
 
 	def '4. Validate that clearSessionOnlyPreferences removes SessionOnly set preferences'() {
