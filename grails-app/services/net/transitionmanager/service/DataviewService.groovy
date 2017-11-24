@@ -352,12 +352,12 @@ class DataviewService implements ServiceMethods {
              where AE.project = :project and $hqlWhere
         """
 
-        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+        // log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
-        def assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
-        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams)
+        List assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
+        Long totalAssets = AssetEntity.executeQuery(countHql, hqlParams)[0]
 
-        previewQueryResults(assets, totalAssets[0], dataviewSpec)
+        previewQueryResults(assets, totalAssets, dataviewSpec)
     }
 
 	/**
@@ -537,7 +537,7 @@ class DataviewService implements ServiceMethods {
 				}
 			}
 		}
-		where.join(" and ")
+		where.join(' and ')
 	}
 
 	/**
@@ -621,7 +621,12 @@ class DataviewService implements ServiceMethods {
 		transformations[column.property].customFilterLike
 	}
 
-	private static String personColumns(String propertyName, boolean filter = false) {
+	/** 
+	 * Used to generate HQL that will properly concatenate a person's full name
+	 * @param propertyName - the particular property to construct the HQL for
+	 * @return the HQL for the computated fullName 
+	 */
+	private static String personFullName(String propertyName) {
 		"""
 			CONCAT( 
 				COALESCE(AE.${propertyName}.firstName, ''),
@@ -629,7 +634,7 @@ class DataviewService implements ServiceMethods {
 				COALESCE(AE.${propertyName}.middleName,''),
 				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
 				COALESCE(AE.${propertyName}.lastName,'')
-			) AS ${propertyName}
+			)
 		"""
 	}
 
@@ -640,11 +645,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the SQL to append to the WHERE clause
 	 */
 	private static String customFilterLike(String propertyName, String namedParameter) {
-		"""
-			( (AE.${propertyName}.firstName like :${namedParameter})
-			or (AE.${propertyName}.middleName like :${namedParameter})
-			or (AE.${propertyName}.lastName like :${namedParameter}) )
-		"""
+		"( ${personFullName(propertyName)} like :${namedParameter} )"
 	}
 
 	/**
@@ -654,11 +655,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the SQL to append to the WHERE clause
 	 */
 	private static String customFilterIn(String propertyName, String namedParameter) {
-		"""
-			( (AE.${propertyName}.firstName in (:${namedParameter}))
-			or (AE.${propertyName}.middleName in (:${namedParameter}))
-			or (AE.${propertyName}.lastName in (:${namedParameter})) )
-		"""
+		"( ${personFullName(propertyName)} in (:${namedParameter}) )"
 	}
 
     private static final Map<String, Map> transformations = [
@@ -667,10 +664,24 @@ class DataviewService implements ServiceMethods {
 		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
-		'sme'            : [property: personColumns('sme'), type: String, namedParameter: 'smeName', join: 'left outer join AE.sme', customFilterLike: customFilterLike('sme','smeName'), customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
-		'sme2'           : [property: personColumns('sme2'), type: String, namedParameter: 'sme2Name', join: 'left outer join AE.sme2', customFilterLike: customFilterLike('sme2','sme2Name'), customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
+		'appOwner'       : [property: "${personFullName('appOwner')} as appOwner", 
+							type: String, namedParameter: 'appOwnerName', 
+							join: 'left outer join AE.appOwner', 
+							customFilterLike: customFilterLike('appOwner','appOwnerName'), 
+							customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
+		'sme'            : [property: "${personFullName('sme')} as sme", 
+							type: String, 
+							namedParameter: 'smeName', 
+							join: 'left outer join AE.sme', 
+							customFilterLike: customFilterLike('sme','smeName'), 
+							customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
+		'sme2'           : [property: "${personFullName('sme2')} as sme2", 
+							type: String, 
+							namedParameter: 'sme2Name', 
+							join: 'left outer join AE.sme2', 
+							customFilterLike: customFilterLike('sme2','sme2Name'), 
+							customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
-		'appOwner'       : [property: personColumns('appOwner'), type: String, namedParameter: 'appOwnerName', join: 'left outer join AE.appOwner', customFilterLike: customFilterLike('appOwner','appOwnerName'), customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
 		'sourceLocation' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
 		'sourceRack'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
 		'sourceRoom'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
