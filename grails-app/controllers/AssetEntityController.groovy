@@ -991,9 +991,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		licenseAdminService.isLicenseCompliant(project)
 
 		try {
-			// Flag if the request contained any params that should enable the "Clear Filters" button.
-			boolean filteredRequest = false
-
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
 			}
@@ -1056,12 +1053,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
 			def status = params.status ?: filters?.status ?: ''
-
-			// If there's a status or filters set, then the Clear Filters button should be enabled.
-			if (status || params.filter) {
-				filteredRequest = true
-			}
-
 			return [
 					timeToUpdate: timeToRefresh ?: 60,
 					servers: entities.servers,
@@ -1097,8 +1088,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			        sizePref: userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
 			        partyGroupList: companiesList,
 					company: project.client,
-					step: params.step,
-					filteredRequest: filteredRequest]
+					step: params.step]
 		} catch (RuntimeException e) {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")

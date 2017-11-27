@@ -55,7 +55,7 @@
 							</td>
 							<td id="span_onePlus" class="pointer" 
 								onclick="getList( $('#tabTypeId').val(), 'onePlus')" 
-								title="All Groups:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
+								title="All Grouped Assets:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
 								<span class="depGroup">Grouped</span>
 							</td>
 						</g:if>
