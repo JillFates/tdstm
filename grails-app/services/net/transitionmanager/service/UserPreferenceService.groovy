@@ -24,6 +24,14 @@ class UserPreferenceService implements ServiceMethods {
 
 	def securityService
 
+	/**
+	 * This map contains those preferences that require the session to be updated.
+	 * Key: User Preference Code
+	 * Value: Session attribute
+	 */
+	private Map<String, String> SESSION_PREFERENCES = [
+	        CURR_PROJ: CURR_PROJ.value()
+	]
 	// defaults holds global defaults for certain values
 	// TODO - load these from application settings
 	protected static final Map<String, Object> defaults = [
@@ -245,8 +253,14 @@ class UserPreferenceService implements ServiceMethods {
 			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
 		}
 
+		// Check if the session needs updating
+		if (SESSION_PREFERENCES.containsKey(preferenceCode.value())) {
+			session.setAttribute(SESSION_PREFERENCES[preferenceCode.value()], value)
+		}
+
 		userPreference.value = value
 		save(userPreference, true)
+
 		return userPreference
 	}
 
@@ -327,7 +341,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		// Set the preference
-		setPreference userLogin, CURR_PROJ, projectId
+		setPreference(userLogin, CURR_PROJ, projectId)
 	}
 
 	/**
