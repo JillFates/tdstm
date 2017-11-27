@@ -248,7 +248,11 @@ class Element {
 
     /**
      * Saves a new variable in the binding context in order to use it later
-     * @param variableName
+     * It's used in this ETL script command
+     * <code>
+     *     extract 3 transform with lowercase() store myVar
+     * </code>
+     * * @param variableName
      * @return
      */
     Element store (String variableName) {
@@ -256,15 +260,19 @@ class Element {
     }
 
     /**
-     * Appends Element and String values from a ETL Script and assign result String value
+     * Appends Element and String values from a ETL Script and assign result String value.
+     * It's used in this ETL script command
+     * <code>
+     *     extract 4 transform append('-', myVar) load description
+     * </code>
      * @param objects
      * @return
      */
     Element append (Object... objects) {
 
         String newValue = objects.sum { object ->
-            if (object.class == Element.class) {
-                object.value
+            if (Element.class.isInstance(object)) {
+                ((Element)object).value
             } else {
                 object ? object.toString() : ''
             }
@@ -274,7 +282,13 @@ class Element {
     }
 
     /**
-     *
+     * Overiding Equals method for this command in an ETL script.
+     * <code>
+     *     .....
+     *     if (myVar == 'Cool Stuff') {
+     *          .....
+     *     }
+     * </code>
      * @param otherObject
      * @return
      */
