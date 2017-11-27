@@ -1,17 +1,19 @@
 import { Component } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'data-script-sample-data',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-sample-data/data-script-sample-data.component.html',
 })
-export class DataScriptSampleDataComponent {
+export class DataScriptSampleDataComponent extends UIExtraDialog {
 
-	constructor(private activeDialog: UIActiveDialogService) {
+	uploadOption = 'csv';
 
+	constructor() {
+		super('#loadSampleData');
 	}
 
 	protected cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		this.dismiss();
 	}
 }

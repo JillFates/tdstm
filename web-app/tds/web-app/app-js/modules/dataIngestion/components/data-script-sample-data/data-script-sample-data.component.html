@@ -1,15 +1,64 @@
-<div class="modal-content">
-	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-			<span aria-hidden="true">×</span>
-		</button>
-		<h4 class="modal-title">{{'DATA_INGESTION.SAMPLE_DATA_TITLE'|translate}}</h4>
-	</div>
-	<div class="modal-body">
+<div class="modal fade in" id="loadSampleData" data-backdrop="static" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{'DATA_INGESTION.SAMPLE_DATA_TITLE'|translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="radio">
+							<label>
+								<input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste CSV</label>
+						</div>
+						<textarea name="" class="form-control" id="" cols="30" rows="8"></textarea>
+					</div>
+					<div class="col-md-12">
+						<div class="radio">
+							<label>
+								<input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)</label>
 
-	</div>
-	<div class="modal-footer form-group-center">
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
+						</div>
+						<input type="file">
+					</div>
+					<div class="col-md-12">
+						<div class="radio">
+							<label>
+								<input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
+						</div>
+						<select name="" id=""></select>
+					</div>
+				</div>
+				<hr>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" value="">Data include header</label>
+						</div>
+						<div class="form-group form-inline">
+							<label for="" style="margin-right:60px;">Limit # of Rows</label>
+							<input type="number" style="width:80px;" class="form-control">
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" value="">Auto Generate ETL</label>
+						</div>
+						<select name="" id=""></select>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+				<button type="button" class="btn btn-primary pull-left">
+					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.LOAD' | translate }}</button>
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
+			</div>
+		</div>
 	</div>
 </div>
