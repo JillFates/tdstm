@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
@@ -7,13 +7,15 @@ import { DataScriptConsoleComponent } from '../data-script-console/data-script-c
 	selector: 'data-script-etl-builder',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-etl-builder/data-script-etl-builder.component.html'
 })
-export class DataScriptEtlBuilderComponent extends UIExtraDialog {
+export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 
 	collapsed = {
-		code: false,
+		code: true,
 		sample: false,
 		transformed: false
 	};
+
+	code = '';
 
 	constructor(private dialogService: UIDialogService) {
 		super('#etlBuilder');
@@ -21,6 +23,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog {
 
 	protected cancelCloseDialog(): void {
 		this.dismiss();
+	}
+
+	onCodeChange(event: { newValue: string, oldValue: string }) {
+		console.log(event);
 	}
 
 	protected toggleSection(section: string) {
@@ -37,6 +43,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog {
 		this.dialogService.extra(DataScriptConsoleComponent, [])
 			.then(() => console.log('ok'))
 			.catch(() => console.log('still ok'));
+	}
+
+	ngAfterViewInit(): void {
+		setTimeout(() => {
+			this.collapsed.code = false;
+		}, 300);
 	}
 
 }

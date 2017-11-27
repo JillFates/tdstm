@@ -18,13 +18,14 @@ import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 // Shared Pipes
-import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
+import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
+import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -59,6 +60,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
 		DynamicComponent
+		CodeMirrorComponent
 	],
 	providers: [
 		AuthService,
@@ -86,6 +88,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		DynamicComponent
+		CodeMirrorComponent
 	],
 	entryComponents: [DynamicComponent]
 })
