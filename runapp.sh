@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 
+#
 # Usage
 # ./runapp.sh
 # ./runapp.sh test-app -unit RunbookService
@@ -9,15 +9,15 @@
 
 # Configuration Settings
 SDK_INIT=~/.sdkman/bin/sdkman-init.sh
-GRAILS_VERSION=2.3.11
+GRAILS_VERSION=2.5.4
 JVM_MEMORY=1526m
 JVM_PERMGEN=512m
 
 if [ ! -f $SDK_INIT ]; then
    echo "Please install the SDKMan! before trying to use this script (see http://sdkman.io/)"
    exit 1
-fi 
- 
+fi
+
 source $SDK_INIT
 if [ $? -ne 0 ]; then
    echo Failed to initialize GVM
@@ -44,7 +44,7 @@ GRAILS_OPTS="$GRAILS_OPTS -Xmx$JVM_MEMORY -Xms$JVM_MEMORY -XX:PermSize=$JVM_PERM
 #    see https://blogs.oracle.com/buck/entry/inflation_system_properties
 GRAILS_OPTS="$GRAILS_OPTS -Dsun.reflect.inflationThreshold=100000"
 
-# Configuration to allow to attach to JVM for debugger/profiler  
+# Configuration to allow to attach to JVM for debugger/profiler
 #GRAILS_OPTS="$GRAILS_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
 
 export GRAILS_OPTS
@@ -54,7 +54,7 @@ export GRAILS_OPTS
 # -------------------
 
 # Configuration to point to our own tdstm-config.groovy file
-OPT="-reloading -Dtdstm.config.location=/etc/tdstm-config.trunk.groovy"
+OPT="-reloading -Dtdstm.config.location=/etc/tdstm-config.groovy"
 
 # Set Grails to disable recompile and reloading to improve performance (QA Only)
 #OPTS="$OPTS -Ddisable.auto.recompile=true -Dgrails.gsp.enable.reload=false -noreloading"
@@ -65,6 +65,11 @@ if [ "$1" == "" ]; then
 else
    CMD="$1 $2 $3 $4 $5 $6 $7 $8"
 fi
-
+npm install
+npm run build-prod
+cd web-app/tds/
+npm install
+npm run build-prod
+cd ../../
 grails $OPT $CMD
 
