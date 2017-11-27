@@ -14,9 +14,12 @@
 						<button type="button" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}</button>
 						<button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
 						<button type="button" (click)="onViewConsole()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.VIEW_CONSOLE' | translate}}</button>
+						<button class="pull-right btn btn-default" (click)="toggleSection('code')">
+							<i class="fa " [ngClass]="{'fa-angle-double-down':!collapsed.code,'fa-angle-double-up':collapsed.code}" style="padding-right:0px"></i>
+						</button>
 					</div>
 				</div>
-				<div class="row">
+				<div class="row" *ngIf="!collapsed.code">
 
 				</div>
 				<div class="row">
@@ -30,19 +33,25 @@
 				<hr>
 				<div class="row">
 					<div class="col-md-12">
-						<h4>Sample Data Preview</h4>
-						<kendo-grid>
-
-						</kendo-grid>
+						<h4 class="pull-left">Sample Data Preview</h4>
+						<button class="pull-right btn btn-default" (click)="toggleSection('sample')">
+							<i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-up':collapsed.sample}" style="padding-right:0px"></i>
+						</button>
+					</div>
+					<div class="col-md-12" *ngIf="!collapsed.sample">
+						<kendo-grid></kendo-grid>
 					</div>
 				</div>
 				<hr>
 				<div class="row">
 					<div class="col-md-12">
-						<h4>Transformed Data Review</h4>
-						<kendo-grid>
-
-						</kendo-grid>
+						<h4 class="pull-left">Transformed Data Review</h4>
+						<button class="pull-right btn btn-default" (click)="toggleSection('transformed')">
+							<i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.transformed,'fa-angle-double-up':collapsed.transformed}" style="padding-right:0px"></i>
+						</button>
+					</div>
+					<div class="col-md-12" *ngIf="!collapsed.transformed">
+						<kendo-grid></kendo-grid>
 					</div>
 				</div>
 			</div>
