@@ -30,7 +30,13 @@ export const en_DICTIONARY: Object = {
 		'CREATE_PROVIDER': 'Create Provider',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
 		'ETL_BUILDER_TITLE': 'ETL Designer',
-		'CONSOLE_TITLE': 'ETL Console'
+		'CONSOLE_TITLE': 'ETL Console',
+		'ETL_BUILDER': {
+			'TEST': 'Test',
+			'CHECK_SYNTAX': 'Check Syntax',
+			'LOAD_SAMPLE_DATA': 'Load Sample Data',
+			'VIEW_CONSOLE': 'View Console'
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
@@ -55,6 +61,7 @@ export const en_DICTIONARY: Object = {
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
+		'LOAD': 'Load',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',

@@ -1,18 +1,28 @@
 import { Component } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'data-script-console',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-console/data-script-console.component.html',
+	styles: [`
+	textarea.console {
+		color:#39d854;
+		background-color: #000;
+	}
+	textarea.console[disabled] {
+		cursor: auto;
+	}`]
 })
-export class DataScriptConsoleComponent {
+export class DataScriptConsoleComponent extends UIExtraDialog {
 
-	constructor(private activeDialog: UIActiveDialogService) {
+	message: string;
 
+	constructor() {
+		super('#viewConsole');
 	}
 
 	protected cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		this.dismiss();
 	}
 
 }

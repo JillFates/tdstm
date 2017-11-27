@@ -1,15 +1,25 @@
-<div class="modal-content">
-	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-			<span aria-hidden="true">×</span>
-		</button>
-		<h4 class="modal-title">{{'DATA_INGESTION.CONSOLE_TITLE'|translate}}</h4>
-	</div>
-	<div class="modal-body">
+<div class="modal fade in" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-md" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{'DATA_INGESTION.CONSOLE_TITLE'|translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<textarea class="form-control console" [(ngModel)]="message" disabled name="message" id="" cols="30" rows="10">
 
-	</div>
-	<div class="modal-footer form-group-center">
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
+						</textarea>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+			</div>
+		</div>
 	</div>
 </div>
