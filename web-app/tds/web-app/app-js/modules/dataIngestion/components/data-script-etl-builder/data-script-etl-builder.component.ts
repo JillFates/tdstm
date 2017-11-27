@@ -9,12 +9,22 @@ import { DataScriptConsoleComponent } from '../data-script-console/data-script-c
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog {
 
+	collapsed = {
+		code: false,
+		sample: false,
+		transformed: false
+	};
+
 	constructor(private dialogService: UIDialogService) {
 		super('#etlBuilder');
 	}
 
 	protected cancelCloseDialog(): void {
 		this.dismiss();
+	}
+
+	protected toggleSection(section: string) {
+		this.collapsed[section] = !this.collapsed[section];
 	}
 
 	protected onLoadSampleData(): void {
