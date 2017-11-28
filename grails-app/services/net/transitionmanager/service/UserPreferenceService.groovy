@@ -202,6 +202,9 @@ class UserPreferenceService implements ServiceMethods {
 		if (storePreference(userLogin, userPreferenceEnum, value)) {
 			// Note that session does not exist for Quartz jobs
 			if (session) {
+				/* Removing the preference from the session cache will make the getPreference method
+				to set it by retrieving the corresponding value from the database. */
+				session.removeAttribute(preferenceCode)
 				getPreference(userLogin, userPreferenceEnum, null)
 			}
 			return true
