@@ -123,17 +123,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		}
 	}
 
-	/**
-	 * Overrided handleExcpetion super class method in ControllerMethods class
-	 * to send just json reponse errors if exception is thrown.
-	 * @see ControllerMethods#handleException(java.lang.Exception, java.lang.Object)
-	 * @param e
-	 * @param log
-	 */
-	void handleException(Exception e, log) {
-		log.error(e)
-		renderErrorJson(e.message)
-	}
+
     /**
      * Performs a query for the Asset Explorer data grid using a saved View Specification plus
      * filter parameters that the user may have entered plus their preferences for the view.

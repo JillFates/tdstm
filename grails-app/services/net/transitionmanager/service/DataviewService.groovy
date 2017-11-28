@@ -90,8 +90,7 @@ class DataviewService implements ServiceMethods {
 
 		return dataview
 	}
-
-	/**
+	
 	 * Updates a database dataview object.
 	 * At this point just schema and isShared properties are accessible to be updated.
 	 * @param dataviewJson JSONObject to take changes from.
@@ -351,8 +350,7 @@ class DataviewService implements ServiceMethods {
                 $hqlJoins
              where AE.project = :project and $hqlWhere
         """
-
-        // log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+		
 
         List assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
         Long totalAssets = AssetEntity.executeQuery(countHql, hqlParams)[0]
@@ -525,7 +523,7 @@ class DataviewService implements ServiceMethods {
 		dataviewSpec.filterColumns.each { Map column ->
 			if (hasCustomFilterFor(column)){
 				if (hasMultipleFilter(column)){
-					where << "${getCustomFilterIn(column)}) \n"
+					where << "${getCustomFilterIn(column)} \n"
 				} else {
 					where <<  "${getCustomFilterLike(column)} \n"
 				}
