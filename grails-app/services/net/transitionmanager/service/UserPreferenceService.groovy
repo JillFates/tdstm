@@ -244,12 +244,11 @@ class UserPreferenceService implements ServiceMethods {
 			throw new InvalidParamException()
 		}
 
-		log.debug 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
-
 		UserPreference userPreference = UserPreference.where {
 			userLogin == userLogin && preferenceCode == preferenceCode.value()
 		}.get()
 
+		boolean isNew = false
 		if (userPreference) {
 			//	remove the movebundle and event preferences if user switched to different project
 			if (preferenceCode == CURR_PROJ && userPreference.value != value) {
@@ -257,10 +256,14 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		} else {
 			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
+			isNew = true
 		}
 
-		userPreference.value = value
-		save(userPreference, true)
+		if (isNew || userPreference.value != value) {
+			log.debug 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
+			userPreference.value = value
+			save(userPreference, true)
+		}
 		return userPreference
 	}
 
