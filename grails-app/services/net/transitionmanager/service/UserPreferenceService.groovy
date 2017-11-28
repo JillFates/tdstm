@@ -181,7 +181,7 @@ class UserPreferenceService implements ServiceMethods {
 
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
-	 * Note that if it is setting CURR_PROJ to a new value it will automatically call
+	 * Note that if it is setting CURR_PROJ to a new value it will automatically call ??? JPM 11/2017 -- Not sure that this is true
 	 * removeProjectAssociatedPreferences to clear out project specific settings.
 	 *
 	 * @param userLogin - the user to set the preference for
@@ -193,16 +193,28 @@ class UserPreferenceService implements ServiceMethods {
 	boolean setPreference(UserLogin userLogin = null, String preferenceCode, Object value) {
 		// If is session only preference just store in the Session and we are done
 		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
-			session?.setAttribute(preferenceCode, value)
+			if (session) {
+				def previousValue = session.getAttribute(preferenceCode)
+				if (previousValue == null || previousValue != value) {
+					session.setAttribute(preferenceCode, value)
+				}
+			}
 			return true
 		}
 
 		userLogin = resolve(userLogin)
 		UserPreferenceEnum userPreferenceEnum = UserPreferenceEnum.valueOfNameOrValue(preferenceCode)
-		if (storePreference(userLogin, userPreferenceEnum, value)) {
-			// Note that session does not exist for Quartz jobs
+		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
+
+		if (userPreference) {
+			// Note that session does not exist for Quartz jobs so we should check for a session object
 			if (session) {
-				getPreference(userLogin, userPreferenceEnum, null)
+				// Set or update the session with the new value 
+				def previousValue = session.getAttribute(preferenceCode)
+				if (previousValue == null || previousValue != userPreference.value) {
+					session.setAttribute(preferenceCode, userPreference.value)
+					session.setAttribute(preferenceCode, userPreference.value)
+				}
 			}
 			return true
 		}
@@ -211,7 +223,8 @@ class UserPreferenceService implements ServiceMethods {
 	}
 
 	/**
-	 * Stores an user preference into database. It validates preference value is not null and constraints passes
+	 * Used to store a user preference into database only and will NOT set the value in to the session.  It will validate preference value 
+	 * is not null and constraints passes before persisting.
 	 * @param userLogin
 	 * @param preferenceCode
 	 * @param value
@@ -222,7 +235,8 @@ class UserPreferenceService implements ServiceMethods {
 
 		value = value?.toString()
 
-		if (!value || value == "null") {
+		// TODO : JPM 11/2017 : Testing the value to a string 'null' does not seem correct.
+		if (!value || value == 'null') {
 			return null
 		}
 
@@ -230,12 +244,11 @@ class UserPreferenceService implements ServiceMethods {
 			throw new InvalidParamException()
 		}
 
-		log.info 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
-
 		UserPreference userPreference = UserPreference.where {
 			userLogin == userLogin && preferenceCode == preferenceCode.value()
 		}.get()
 
+		boolean isNew = false
 		if (userPreference) {
 			//	remove the movebundle and event preferences if user switched to different project
 			if (preferenceCode == CURR_PROJ && userPreference.value != value) {
@@ -243,10 +256,14 @@ class UserPreferenceService implements ServiceMethods {
 			}
 		} else {
 			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
+			isNew = true
 		}
 
-		userPreference.value = value
-		save(userPreference, true)
+		if (isNew || userPreference.value != value) {
+			log.debug 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
+			userPreference.value = value
+			save(userPreference, true)
+		}
 		return userPreference
 	}
 
@@ -274,7 +291,7 @@ class UserPreferenceService implements ServiceMethods {
 
 		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
 		if (updateCount) {
-			log.info 'Removed {} preference', prefCode
+			log.debug 'Removed {} preference', prefCode
 
 			//	When removing CURR_PROJ then a number of other preferences should be removed at the same time
 			if (prefCode == CURR_PROJ.value()) {
@@ -491,7 +508,7 @@ class UserPreferenceService implements ServiceMethods {
 	 */
 	private void removeProjectAssociatedPreference(UserLogin userLogin, UserPreferenceEnum pref) {
 		if (removePreference(userLogin, pref)) {
-			log.info 'Removed {} preference as user switched to other project', pref
+			log.debug 'Removed {} preference as user switched to other project', pref
 			getPreference(userLogin, pref)
 		}
 	}

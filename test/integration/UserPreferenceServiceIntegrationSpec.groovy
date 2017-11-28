@@ -134,4 +134,26 @@ class UserPreferenceServiceIntegrationSpec extends Specification {
 			userPreferenceService.session.getAttribute(soPrefCode) == null
 	}
 
+	def '6. Validate that updating preferences also updates the session so getPreference returns the correct value'() {
+		setup: 'Some values required.'
+		String preferenceValue = "100"
+		String anotherValue = "200"
+		UserPreferenceEnum preferenceCode = UserPreferenceEnum.ASSET_LIST_SIZE
+
+		when: 'setting the preference for the first time'
+			userPreferenceService.setPreference(userLogin, preferenceCode, preferenceValue)
+		then: 'the session has the correct value'
+			userPreferenceService.session.getAttribute(preferenceCode.value()) == preferenceValue
+		and: 'getPreference returns the correct value'
+			userPreferenceService.getPreference(userLogin, preferenceCode) == preferenceValue
+
+		when: 'updating an existing preference'
+			userPreferenceService.setPreference(userLogin, preferenceCode, anotherValue)
+		then: 'the session is updated correctly'
+			userPreferenceService.session.getAttribute(preferenceCode.value()) == anotherValue
+		and: 'the new value is retrieved when getting the preference'
+			userPreferenceService.getPreference(userLogin, preferenceCode) == anotherValue
+
+	}
+
 }
