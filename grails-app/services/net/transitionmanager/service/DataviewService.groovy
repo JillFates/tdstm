@@ -90,7 +90,8 @@ class DataviewService implements ServiceMethods {
 
 		return dataview
 	}
-	
+
+	/**
 	 * Updates a database dataview object.
 	 * At this point just schema and isShared properties are accessible to be updated.
 	 * @param dataviewJson JSONObject to take changes from.
