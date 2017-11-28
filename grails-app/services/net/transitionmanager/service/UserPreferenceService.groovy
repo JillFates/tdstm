@@ -205,7 +205,6 @@ class UserPreferenceService implements ServiceMethods {
 			if (session) {
 				// Update the session with the new value.
 				session.setAttribute(preferenceCode, userPreference.value)
-				//getPreference(userLogin, userPreferenceEnum, null)
 			}
 			return true
 		}
