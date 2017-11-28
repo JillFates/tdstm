@@ -392,6 +392,7 @@ line-height:28px;
 	background-repeat:no-repeat;
 	margin-right:5px;
 	font-weight:bold;
+    min-height: 30px;
 }
 
 #btmarrow{
