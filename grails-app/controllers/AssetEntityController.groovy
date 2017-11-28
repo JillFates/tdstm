@@ -1008,7 +1008,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def filters = session.TASK?.JQ_FILTERS
 
 			// Deal with the parameters
-			def taskPref = assetEntityService.getExistingPref('Task_Columns')
+			def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
@@ -1443,7 +1443,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def estStartClass
 		def estFinishClass
 		def nowGMT = TimeUtil.nowGMT()
-		def taskPref = assetEntityService.getExistingPref('Task_Columns')
+		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
 
 		def results = tasks?.collect {
@@ -2599,7 +2599,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def entities = assetEntityService.entityInfo(project)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		def depPref = assetEntityService.getExistingPref('Dep_Columns')
+		def depPref = assetEntityService.getExistingPref(PREF.Dep_Columns)
 		def attributes = ['c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
 		def columnLabelpref = [:]
 		depPref.each { key, value ->
@@ -2640,7 +2640,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		                    dependentBundle: params.dependentBundle, status: params.status,frequency: params.frequency,
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
-		def depPref= assetEntityService.getExistingPref('Dep_Columns')
+		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
 		StringBuffer query = new StringBuffer("""
 			SELECT * FROM (
 				SELECT asset_dependency_id AS id,

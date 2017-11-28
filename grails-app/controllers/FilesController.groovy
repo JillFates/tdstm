@@ -53,7 +53,7 @@ class FilesController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def fieldPrefs = assetEntityService.getExistingPref('Storage_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.Storage_Columns)
 
 		[fileFormat: filters?.fileFormatFilter, fileName: filters?.assetNameFilter ?:'',
 		 filesPref: fieldPrefs, size: filters?.sizeFilter] +
@@ -94,7 +94,7 @@ class FilesController implements ControllerMethods {
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.STORAGE.toString(), true)
 
-		Map filePref= assetEntityService.getExistingPref('Storage_Columns')
+		Map filePref= assetEntityService.getExistingPref(PREF.Storage_Columns)
 		List prefColumns = filePref*.value
 		for (String fieldName in prefColumns) {
 			if (fieldNameMap.containsKey(fieldName)) {
