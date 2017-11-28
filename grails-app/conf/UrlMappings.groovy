@@ -538,6 +538,66 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/datascript/list" {
+			controller = "wsDataScript"
+			action = [
+			        GET: "getDataScripts"
+			]
+		}
+
+		"/ws/dataingestion/datascript/" {
+			controller = "wsDataScript"
+			action = [
+					POST: "createDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/$id?" {
+			controller = "wsDataScript"
+			action = [
+					GET: "getDataScript",
+			        PUT: "updateDataScript",
+					DELETE: "deleteDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/validateunique/$name" {
+			controller = "wsDataScript"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
+		"/ws/dataingestion/provider/list" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProviders"
+			]
+		}
+
+		"/ws/dataingestion/provider/" {
+			controller = "wsProvider"
+			action = [
+					POST: "createProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/$id?" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProvider",
+					PUT: "updateProvider",
+					DELETE: "deleteProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/validateunique/$name" {
+			controller = "wsProvider"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

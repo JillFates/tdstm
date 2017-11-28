@@ -109,7 +109,7 @@ databaseChangeLog = {
 	include file: '20150616-timezones.groovy'
 	include file: '20150626-add-column-timezone-to-project.groovy'
 	include file: '20150827-set-timezone-and-datetime-user-preferences.groovy'
-	// TM-8152 - This property was removed 
+	// TM-8152 - This property was removed
 	// include file: '20151020-set-custom-fields-to-hidden.groovy'  //  TM-6622 - has been removed because FieldImportance table and domain class no longer exists.
 	include file: '20151214-fix-invalid-status-and-type-values-in-assetdep.groovy'
 	include file: '20151214-remove-new-or-old-column-from-asset-entity.groovy'
@@ -198,6 +198,8 @@ databaseChangeLog = {
 	include file: '20171011-create-credential-table.groovy'
 	include file: '20171025-create-default-bundle-for-projects.groovy'
 	include file: '20171026-add-assetclass-to-common-fields.groovy'
+	include file: '20171030-add-permissions-for-datascript.groovy'
+	include file: '20171102-add-permissions-for-provider.groovy'
 	include file: '20171108-all-asset-system-view.groovy'
 	include file: '20171110-create-new-permission-asset-explorer-system-list.groovy'
 }

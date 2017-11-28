@@ -22,6 +22,22 @@ export const en_DICTIONARY: Object = {
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		}
 	},
+	'DATA_INGESTION': {
+		'DATA_INGESTION': 'Data Ingestion',
+		'DATA_SCRIPTS': 'Data Scripts',
+		'PROVIDERS': 'Providers',
+		'CREATE_DATA_SCRIPT': 'Create Data Script',
+		'CREATE_PROVIDER': 'Create Provider',
+		'SAMPLE_DATA_TITLE': 'Sample Data',
+		'ETL_BUILDER_TITLE': 'ETL Designer',
+		'CONSOLE_TITLE': 'ETL Console',
+		'ETL_BUILDER': {
+			'TEST': 'Test',
+			'CHECK_SYNTAX': 'Check Syntax',
+			'LOAD_SAMPLE_DATA': 'Load Sample Data',
+			'VIEW_CONSOLE': 'View Console'
+		}
+	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
@@ -45,6 +61,7 @@ export const en_DICTIONARY: Object = {
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
+		'LOAD': 'Load',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',

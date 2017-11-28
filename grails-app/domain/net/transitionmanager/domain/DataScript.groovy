@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.TimeUtil
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 enum IngestionOperation {
@@ -38,6 +39,10 @@ enum DataScriptMode {
     String getKey() {
         return name()
     }
+
+    static DataScriptMode forLabel(String label) {
+        return DataScriptMode.values().find { it.toString() == label }
+    }
 }
 
 class DataScript {
@@ -66,10 +71,11 @@ class DataScript {
 
     static constraints = {
         name size: 1..255, unique: 'provider'
-        description size: 0..255
-        target size: 0..255
+        description size: 0..255, nullable: true
+        target size: 0..255, nullable: true
         lastModifiedBy nullable: true
         lastUpdated nullable: true
+        etlSourceCode nullable: true
     }
 
     static mapping = {
@@ -80,6 +86,33 @@ class DataScript {
         etlSourceCode 	sqlType: 'MEDIUMTEXT'
         createdBy column: 'created_by'
         lastModifiedBy column: 'last_modified_by'
+    }
+
+    def beforeInsert = {
+       dateCreated = TimeUtil.nowGMT()
+    }
+    def beforeUpdate = {
+        lastUpdated = TimeUtil.nowGMT()
+    }
+
+    /**
+     * Return a map representation of the DataScript instance.
+     * @return
+     */
+    Map toMap() {
+        Map dataMap = [
+                id: id,
+                name: name,
+                description: description,
+                target: target,
+                mode: mode.toString(),
+                etlSourceCode: etlSourceCode,
+                provider: [id: provider.id, name: provider.name],
+                dateCreated: dateCreated,
+                lastUpdated: lastUpdated
+        ]
+
+        return dataMap
     }
 
 }

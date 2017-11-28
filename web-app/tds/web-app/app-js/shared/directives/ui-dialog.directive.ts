@@ -8,9 +8,9 @@ import {
 	OnDestroy, AfterViewInit
 } from '@angular/core';
 
-import {NotifierService} from '../services/notifier.service';
-import {UIActiveDialogService} from '../services/ui-dialog.service';
-import {ComponentCreatorService} from '../services/component-creator.service';
+import { NotifierService } from '../services/notifier.service';
+import { UIActiveDialogService } from '../services/ui-dialog.service';
+import { ComponentCreatorService } from '../services/component-creator.service';
 declare var jQuery: any;
 
 @Component({
@@ -22,11 +22,13 @@ declare var jQuery: any;
                 <div #view></div>
             </div>
         </div>
-    </div>`
+	</div>
+	<div #extraDialog>`
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
-	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
+	@ViewChild('extraDialog', { read: ViewContainerRef }) extraDialog: ViewContainerRef;
 	@ViewChild('modalDialog') el: ElementRef;
 
 	tdsUiDialog: any;
@@ -39,6 +41,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	openNotifier: any;
 	closeNotifier: any;
 	dismissNotifier: any;
+	extraNotifier: any;
 
 	constructor(private notifierService: NotifierService, private activeDialog: UIActiveDialogService, private compCreator: ComponentCreatorService) {
 		this.registerListeners();
@@ -62,6 +65,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		this.openNotifier();
 		this.closeNotifier();
 		this.dismissNotifier();
+		this.extraNotifier();
 	}
 
 	/**
@@ -83,6 +87,12 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.activeDialog.componentInstance = this.cmpRef;
 
 			this.tdsUiDialog.modal('show');
+		});
+
+		this.extraNotifier = this.notifierService.on('dialog.extra', event => {
+			const cmpRef = this.compCreator.insert(event.component, event.params, this.extraDialog);
+			const instance = cmpRef.instance as any;
+			instance.open(event.resolve, event.reject, cmpRef);
 		});
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {
