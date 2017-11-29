@@ -23,6 +23,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.acls.model.NotFoundException
 import org.springframework.validation.Errors
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -117,6 +118,13 @@ trait ControllerMethods {
 
 	void sendNotFound() {
 		sendError NOT_FOUND // 404
+	}
+
+	/** 
+	 * Used to respond with a 400 Bad Request
+	 */
+	void sendBadRequest() {
+		response.sendError(400, 'Bad Request')
 	}
 
 	void setContentTypeJson() {
