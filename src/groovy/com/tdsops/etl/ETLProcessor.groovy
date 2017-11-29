@@ -314,30 +314,36 @@ class ETLProcessor {
 
         if (currentElement) {
             currentElement.load(field)
-
-        } else {
-
-            [
-                    with: { value ->
-
-                        Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
-
-                        Element newElement = currentRow.addNewElement(value, this)
-                        newElement.field.name = field
-                        newElement.domain = selectedDomain
-
-                        if (fieldSpec) {
-
-                            newElement.field.label = fieldSpec.label
-                            newElement.field.control = fieldSpec.control
-                            newElement.field.constraints = fieldSpec.constraints
-                        }
-
-                        addElementLoaded(selectedDomain, newElement)
-                        newElement
-                    }
-            ]
         }
+    }
+
+    /**
+     * Set field values in results. From an extracted value or just as a fixed new Element
+     * @param field
+     * @return
+     */
+    def set (final String field) {
+
+        [
+                with: { value ->
+
+                    Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+
+                    Element newElement = currentRow.addNewElement(value, this)
+                    newElement.field.name = field
+                    newElement.domain = selectedDomain
+
+                    if (fieldSpec) {
+
+                        newElement.field.label = fieldSpec.label
+                        newElement.field.control = fieldSpec.control
+                        newElement.field.constraints = fieldSpec.constraints
+                    }
+
+                    addElementLoaded(selectedDomain, newElement)
+                    newElement
+                }
+        ]
     }
 
     /**
@@ -469,7 +475,6 @@ class ETLProcessor {
                 ]
         ])
 
-        removeCurrentElementFromBinding()
         debugConsole.info "Adding element ${element} in results for domain ${domain}"
     }
 
@@ -513,14 +518,6 @@ class ETLProcessor {
     }
 
     /**
-     * Removes 'CE' variable from binding script content
-     */
-    private void removeCurrentElementFromBinding () {
-        binding.variables.remove('CE')
-        currentElement = null
-    }
-
-    /**
      * Validates calls within the DSL script that can not be managed
      * @param methodName
      * @param args
@@ -557,6 +554,11 @@ class ETLProcessor {
     Element getCurrentElement () {
         currentElement
     }
+
+    Element getElement (Integer rowIndex, Integer columnIndex) {
+        rows[rowIndex].getElement(columnIndex)
+    }
+
 
     List<String> getAvailableMethods () {
         ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',

@@ -400,8 +400,10 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.currentColumnIndex == 1
 
         and: 'The last column and row is selected'
-            etlProcessor.currentRow.getElement(1).value == "Slideaway"
-            etlProcessor.currentRow.getElement(1).originalValue == "Slideaway"
+            with(etlProcessor.currentRow.getElement(1)) {
+                value == "Slideaway"
+                originalValue == "Slideaway"
+            }
     }
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
@@ -430,8 +432,10 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.currentColumnIndex == 1
 
         and: 'The last column and row is selected'
-            etlProcessor.currentRow.getElement(1).value == "Slideaway"
-            etlProcessor.currentRow.getElement(1).originalValue == "Slideaway"
+            with(etlProcessor.currentRow.getElement(1)) {
+                value == "Slideaway"
+                originalValue == "Slideaway"
+            }
     }
 
     void 'test can throw an Exception if a column name is invalid' () {
@@ -498,9 +502,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == 'SRW24G1'
-            etlProcessor.getRow(1).getElement(1).value == 'ZPHA MODULE'
-            etlProcessor.getRow(2).getElement(1).value == 'SLIDEAWAY'
+            etlProcessor.getElement(0, 1).value == 'SRW24G1'
+            etlProcessor.getElement(1, 1).value == 'ZPHA MODULE'
+            etlProcessor.getElement(2, 1).value == 'SLIDEAWAY'
     }
 
     void 'test can transform a field value with uppercase transformation inside a closure' () {
@@ -522,9 +526,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == 'SRW24G1'
-            etlProcessor.getRow(1).getElement(1).value == 'ZPHA MODULE'
-            etlProcessor.getRow(2).getElement(1).value == 'SLIDEAWAY'
+            etlProcessor.getElement(0, 1).value == 'SRW24G1'
+            etlProcessor.getElement(1, 1).value == 'ZPHA MODULE'
+            etlProcessor.getElement(2, 1).value == 'SLIDEAWAY'
     }
 
     void 'test can transform a field value to lowercase transformation' () {
@@ -544,9 +548,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == 'srw24g1'
-            etlProcessor.getRow(1).getElement(1).value == 'zpha module'
-            etlProcessor.getRow(2).getElement(1).value == 'slideaway'
+            etlProcessor.getElement(0, 1).value == 'srw24g1'
+            etlProcessor.getElement(1, 1).value == 'zpha module'
+            etlProcessor.getElement(2, 1).value == 'slideaway'
     }
 
     void 'test can transform a field value to lowercase transformation inside a closure' () {
@@ -568,9 +572,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == 'srw24g1'
-            etlProcessor.getRow(1).getElement(1).value == 'zpha module'
-            etlProcessor.getRow(2).getElement(1).value == 'slideaway'
+            etlProcessor.getElement(0, 1).value == 'srw24g1'
+            etlProcessor.getElement(1, 1).value == 'zpha module'
+            etlProcessor.getElement(2, 1).value == 'slideaway'
     }
 
     void 'test can transform a field value with taking left 4 characters' () {
@@ -590,9 +594,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to left 4 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "SRW2"
-            etlProcessor.getRow(1).getElement(1).value == "ZPHA"
-            etlProcessor.getRow(2).getElement(1).value == "Slid"
+            etlProcessor.getElement(0, 1).value == "SRW2"
+            etlProcessor.getElement(1, 1).value == "ZPHA"
+            etlProcessor.getElement(2, 1).value == "Slid"
     }
 
     void 'test can transform a field value with taking left 4 characters inside a closure' () {
@@ -614,9 +618,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to left 4 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "SRW2"
-            etlProcessor.getRow(1).getElement(1).value == "ZPHA"
-            etlProcessor.getRow(2).getElement(1).value == "Slid"
+            etlProcessor.getElement(0, 1).value == "SRW2"
+            etlProcessor.getElement(1, 1).value == "ZPHA"
+            etlProcessor.getElement(2, 1).value == "Slid"
     }
 
     void 'test can transform a field value with taking middle 2 characters' () {
@@ -636,9 +640,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed with middle 2 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "w2"
-            etlProcessor.getRow(1).getElement(1).value == "ha"
-            etlProcessor.getRow(2).getElement(1).value == "id"
+            etlProcessor.getElement(0, 1).value == "w2"
+            etlProcessor.getElement(1, 1).value == "ha"
+            etlProcessor.getElement(2, 1).value == "id"
     }
 
     void 'test can transform a field value with taking middle 2 characters inside a closure' () {
@@ -658,9 +662,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed with middle 2 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "w2"
-            etlProcessor.getRow(1).getElement(1).value == "ha"
-            etlProcessor.getRow(2).getElement(1).value == "id"
+            etlProcessor.getElement(0, 1).value == "w2"
+            etlProcessor.getElement(1, 1).value == "ha"
+            etlProcessor.getElement(2, 1).value == "id"
     }
 
     void 'test can transform a field value striping first A characters' () {
@@ -680,9 +684,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping first "A" character'
-            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
-            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEWAY"
+            etlProcessor.getElement(0, 1).value == "SRW24G1"
+            etlProcessor.getElement(1, 1).value == "ZPH MODULE"
+            etlProcessor.getElement(2, 1).value == "SLIDEWAY"
     }
 
     void 'test can transform a field value striping last A characters' () {
@@ -702,9 +706,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping last "A" character'
-            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
-            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEAWY"
+            etlProcessor.getElement(0, 1).value == "SRW24G1"
+            etlProcessor.getElement(1, 1).value == "ZPH MODULE"
+            etlProcessor.getElement(2, 1).value == "SLIDEAWY"
     }
 
     void 'test can transform a field value striping all A characters' () {
@@ -724,9 +728,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping all "A" characters'
-            etlProcessor.getRow(0).getElement(1).value == "SRW24G1"
-            etlProcessor.getRow(1).getElement(1).value == "ZPH MODULE"
-            etlProcessor.getRow(2).getElement(1).value == "SLIDEWY"
+            etlProcessor.getElement(0, 1).value == "SRW24G1"
+            etlProcessor.getElement(1, 1).value == "ZPH MODULE"
+            etlProcessor.getElement(2, 1).value == "SLIDEWY"
     }
 
     void 'test can apply another transformation for a field value after striping all A characters' () {
@@ -746,9 +750,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row striping all "A" characters'
-            etlProcessor.getRow(0).getElement(1).value == "srw24g1"
-            etlProcessor.getRow(1).getElement(1).value == "zph module"
-            etlProcessor.getRow(2).getElement(1).value == "slidewy"
+            etlProcessor.getElement(0, 1).value == "srw24g1"
+            etlProcessor.getElement(2, 1).value == "slidewy"
+            etlProcessor.getElement(1, 1).value == "zph module"
     }
 
     void 'test can transform a field value with taking right 4 characters' () {
@@ -768,9 +772,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed with right 4 transformation'
-            etlProcessor.getRow(0).getElement(1).value == "24G1"
-            etlProcessor.getRow(1).getElement(1).value == "DULE"
-            etlProcessor.getRow(2).getElement(1).value == "away"
+            etlProcessor.getElement(0, 1).value == "24G1"
+            etlProcessor.getElement(1, 1).value == "DULE"
+            etlProcessor.getElement(2, 1).value == "away"
     }
 
     void 'test can transform a use left 4 transformation in a chain of transformations' () {
@@ -790,9 +794,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "srw2"
-            etlProcessor.getRow(1).getElement(1).value == "zpha"
-            etlProcessor.getRow(2).getElement(1).value == "slid"
+            etlProcessor.getElement(0, 1).value == "srw2"
+            etlProcessor.getElement(1, 1).value == "zpha"
+            etlProcessor.getElement(2, 1).value == "slid"
     }
 
     void 'test can transform a field value using replace command with a String value' () {
@@ -812,12 +816,15 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nIncorporated"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            with(etlProcessor.getElement(0, 1)) {
+                value == "Microsoft\b\nIncorporated"
+                field.name == "appVendor"
+            }
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Incorporated"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
-
+            with(etlProcessor.getElement(1, 1)) {
+                value == "Mozilla\t\t\0Incorporated"
+                field.name == "appVendor"
+            }
     }
 
     void 'test can transform a field value using replace command with a Regular expression value' () {
@@ -837,12 +844,15 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Mirosoft\b\nIn"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            with(etlProcessor.getElement(0, 1)) {
+                value == "Mirosoft\b\nIn"
+                field.name == "appVendor"
+            }
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozill\t\t\0In"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
-
+            with(etlProcessor.getElement(1, 1)) {
+                value == "Mozill\t\t\0In"
+                field.name == "appVendor"
+            }
     }
 
     void 'test can apply transformations on a field value many times' () {
@@ -862,9 +872,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every column for every row is transformed to uppercase'
-            etlProcessor.getRow(0).getElement(1).value == "srw24g1"
-            etlProcessor.getRow(1).getElement(1).value == "zpha module"
-            etlProcessor.getRow(2).getElement(1).value == "slideaway"
+            etlProcessor.getElement(0, 1).value == "srw24g1"
+            etlProcessor.getElement(1, 1).value == "zpha module"
+            etlProcessor.getElement(2, 1).value == "slideaway"
     }
 
     void 'test can check syntax errors at parsing time' () {
@@ -1212,9 +1222,9 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'The column is trsanlated for every row'
-            etlProcessor.getRow(0).getElement(3).value == "Production"
-            etlProcessor.getRow(1).getElement(3).value == "Production"
-            etlProcessor.getRow(2).getElement(3).value == "Development"
+            etlProcessor.getElement(0, 3).value == "Production"
+            etlProcessor.getElement(1, 3).value == "Production"
+            etlProcessor.getElement(2, 3).value == "Development"
     }
 
     void 'test can load field with an extracted element value after validate fields specs' () {
@@ -1265,21 +1275,35 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
 
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
+                with(elements[0]) {
+                    originalValue == "Microsoft"
+                    value == "Microsoft"
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == "Vendor"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == "String"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+                    field.name == "appVendor"
+                    field.label == "Vendor"
+                    field.control == "String"
+                    field.constraints.required == 0
+                }
+
+            }
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == "Mozilla"
+                    value == "Mozilla"
+
+                    field.name == "appVendor"
+                    field.label == "Vendor"
+                    field.control == "String"
+                    field.constraints.required == 0
+                }
+
+            }
+
+
     }
 
     void 'test can use if else groovy clause to load a field with an extracted element value' () {
@@ -1349,21 +1373,30 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].originalValue == 'Microsoft'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == 'Microsoft'
 
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == 'appVendor'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.label == 'Vendor'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.control == 'String'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.constraints.required == 0
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+                with(elements[0]) {
+                    originalValue == 'Microsoft'
+                    value == 'Microsoft'
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].originalValue == 'Mozilla'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == 'Mozilla'
+                    field.name == 'appVendor'
+                    field.label == 'Vendor'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
 
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == 'environment'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.label == 'Environment'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.control == 'String'
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.constraints.required == 0
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+                with(elements[0]) {
+                    originalValue == 'Mozilla'
+                    value == 'Mozilla'
+
+                    field.name == 'environment'
+                    field.label == 'Environment'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
     }
 
     void 'test can store a an extracted element in a variable' () {
@@ -2038,9 +2071,9 @@ class ETLProcessorSpec extends Specification {
         then: 'Results should contain domain results associated'
 
 
-            with(etlProcessor.results.get(ETLDomain.Application)[0]){
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
-                with (elements[0]) {
+                with(elements[0]) {
                     originalValue == "Microsoft"
                     value == "Microsoft"
 
@@ -2051,9 +2084,9 @@ class ETLProcessorSpec extends Specification {
                 }
             }
 
-            with(etlProcessor.results.get(ETLDomain.Application)[1]){
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
 
-                with (elements[0]) {
+                with(elements[0]) {
                     originalValue == "Mozilla"
                     value == "Mozilla"
 
@@ -2199,15 +2232,15 @@ class ETLProcessorSpec extends Specification {
 
         then: 'Every field property is assigned to the correct element'
 
-            with (etlProcessor.getRow(0)) {
-                with (getElement(1)) {
+            with(etlProcessor.getRow(0)) {
+                with(getElement(1)) {
                     value == "Microsoft"
                     field.name == "appVendor"
                 }
             }
 
-            with (etlProcessor.getRow(1)) {
-                with (getElement(1)) {
+            with(etlProcessor.getRow(1)) {
+                with(getElement(1)) {
                     value == "Mozilla"
                     field.name == "appVendor"
                 }
@@ -2263,15 +2296,33 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].value == "Mozilla"
-            etlProcessor.results.get(ETLDomain.Application)[1].elements[0].field.name == "appVendor"
+            with(etlProcessor.getElement(0, 1)) {
+                value == "Microsoft"
+                field.name == "appVendor"
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+                with(elements[0]) {
+                    value == "Microsoft"
+                    field.name == "appVendor"
+                }
+            }
+
+            with(etlProcessor.getElement(1, 1)) {
+                value == "Mozilla"
+                field.name == "appVendor"
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    value == "Mozilla"
+                    field.name == "appVendor"
+                }
+            }
+
     }
 
     void 'test can process multiple domains in same row' () {
@@ -2370,16 +2421,30 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Results should contain domain results associated'
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].value == "152254"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[0].field.name == "id"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].value == "Microsoft"
-            etlProcessor.results.get(ETLDomain.Application)[0].elements[1].field.name == "appVendor"
 
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].value == "ACME Data Center"
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].field.name == "location"
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+                with(elements[0]) {
+                    value == "152254"
+                    field.name == "id"
+                }
+
+                with(elements[1]) {
+                    value == "Microsoft"
+                    field.name == "appVendor"
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Device)[0]) {
+
+                with(elements[0]) {
+                    value == "ACME Data Center"
+                    field.name == "location"
+                }
+            }
     }
 
-    void 'test can load values without extract previously' () {
+    void 'test can create new results loading values without extract previously' () {
 
         given:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -2460,13 +2525,13 @@ class ETLProcessorSpec extends Specification {
                         iterate {
                         
                             domain Application
-                            load environment with Production
+                            set environment with Production
                             extract 0 load id
                             extract 'vendor name' load appVendor
                             
                             domain Device
                             extract 0 load id 
-                            load location with 'Development'        
+                            set location with 'Development'        
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
@@ -2627,7 +2692,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         iterate {
                             domain Application
-                            load environment with Production
+                            set environment with Production
                             extract 'application id' load id
                             reference id with id
                         }
@@ -2779,7 +2844,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         iterate {
                             domain Application
-                            load environment with Production
+                            set environment with Production
                             extract 'application id' load id
                             reference id with id
                         }
@@ -2874,7 +2939,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         iterate {
                             domain Application
-                            load environment with Production
+                            set environment with Production
                             extract 'location' load Vendor
                             reference assetName with Vendor
                         }
@@ -2988,11 +3053,11 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+            etlProcessor.getElement(0, 1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
+            etlProcessor.getElement(1, 1).field.name == "appVendor"
 
     }
 
@@ -3014,11 +3079,11 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+            etlProcessor.getElement(0, 1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
+            etlProcessor.getElement(1, 1).field.name == "appVendor"
 
     }
 
@@ -3040,11 +3105,11 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
+            etlProcessor.getElement(0, 1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
+            etlProcessor.getElement(1, 1).field.name == "appVendor"
 
     }
 
@@ -3067,11 +3132,11 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nIncorporated"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
+            etlProcessor.getElement(0, 1).field.name == "appVendor"
 
-            etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Incorporated"
-            etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
+            etlProcessor.getElement(1, 1).field.name == "appVendor"
     }
 
     void 'test can transform globally a field value using replace command using a range in the iteration' () {
@@ -3093,8 +3158,8 @@ class ETLProcessorSpec extends Specification {
                     ETLProcessor.class.name)
 
         then: 'Every field property is assigned to the correct element'
-            etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-            etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+            etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
+            etlProcessor.getElement(0, 1).field.name == "appVendor"
     }
 
 
