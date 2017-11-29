@@ -309,4 +309,14 @@ class Element {
     int hashCode () {
         return value.hashCode()
     }
+
+    Element plus (Element anotherElement) {
+        this.value += anotherElement?.value
+        this
+    }
+
+    Element plus (String value) {
+        this.value += value
+        this
+    }
 }

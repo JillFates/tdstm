@@ -44,6 +44,7 @@ class ETLProcessorSpec extends Specification {
         csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
         jsonConnection = new JSONConnection(config: 'json')
         FileUtils.ValidPath(conParams.path)
+        String.mixin StringAppendElement
     }
 
     def cleanupSpec () {
@@ -1585,6 +1586,110 @@ class ETLProcessorSpec extends Specification {
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
                     value == 'ACME Data Center - mozilla'
+
+                    field.name == 'description'
+                    field.label == 'Description'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+    }
+
+    void 'test can plus strings, current element and a defined variable in a transformation' () {
+
+        given:
+            ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+            validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+                    [constraints: [required: 0],
+                     control    : 'Number',
+                     default    : '',
+                     field      : 'id',
+                     imp        : 'U',
+                     label      : 'Id',
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'appVendor',
+                     imp        : 'N',
+                     "label"    : "Vendor",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'environment',
+                     imp        : 'N',
+                     "label"    : "Environment",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ],
+                    [constraints: [required: 0],
+                     control    : 'String',
+                     default    : '',
+                     field      : 'description',
+                     imp        : 'N',
+                     "label"    : "Description",
+                     order      : 0,
+                     shared     : 0,
+                     show       : 0,
+                     tip        : "",
+                     udf        : 0
+                    ]
+            ])
+
+        and:
+            DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                                read labels
+                                domain Application
+                                
+                                iterate {
+                                    extract 'vendor name' transform with lowercase() store myVar
+                                    
+                                    extract 'location' transform with append(myVar + ' - ' + CE) load description
+                                  
+                                }""".stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'Results should contain domain results associated'
+
+            with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+                with(elements[0]) {
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Centermicrosoft - ACME Data Center'
+
+                    field.name == 'description'
+                    field.label == 'Description'
+                    field.control == 'String'
+                    field.constraints.required == 0
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+                with(elements[0]) {
+                    originalValue == 'ACME Data Center'
+                    value == 'ACME Data Centermozilla - ACME Data Center'
 
                     field.name == 'description'
                     field.label == 'Description'
