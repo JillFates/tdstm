@@ -63,6 +63,10 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
+		}
+
 		"/ws/asset/showTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}
