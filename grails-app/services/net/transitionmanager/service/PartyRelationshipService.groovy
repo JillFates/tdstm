@@ -565,12 +565,11 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return a list the PartyRelationship records where the partyIdTo and the roleTypeCodeTo indicate the company and relationship
 	 */
 	List<PartyRelationship> getProjectCompanies(long projectId) {
-		PartyRelationship.executeQuery('''
-			from PartyRelationship
-			where partyRelationshipType in (:types)
-			  and partyIdFrom = :projectId
-			  and roleTypeCodeFrom = 'PROJECT'
-			''', [projectId: projectId, types: ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR']])
+		return PartyRelationship.where {
+			partyIdFrom.id == projectId
+			roleTypeCodeFrom.id == RoleType.PROJECT
+			partyRelationshipType.id in ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR']
+		}.list()
 	}
 
 	void createBundleTeamMembers(ProjectTeam projectTeam, teamMemberIds) {

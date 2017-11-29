@@ -174,8 +174,9 @@ class ImportService implements ServiceMethods {
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
 
-		// TODO : JPM 1/2017 : The staffList is getting ONLY the staff of the client but should be getting all staff on the project
-		List <Party> companies = [project.client, PartyGroup.get(18)] + projectService.getPartners(project)
+		List<Party> projectCompanies = partyRelationshipService.getProjectCompanies(project.id)*.partyIdTo
+		List<Party> partnerCompanies = projectService.getPartners(project)
+		List <Party> companies = projectCompanies + partnerCompanies
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
 		return data
 	}
