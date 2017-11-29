@@ -6,7 +6,6 @@
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -26,8 +25,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  * @see UrlMappings
  */
 @Secured('isAuthenticated()')
-// TODO: John. Can we remove this logger since we aren't using in this class? Also we have an implementation in ControllerMethods.handleException
-@Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods, PaginationMethods {
 
 	private final static DELETE_OK_STATUS = "Dataview deleted successfully";
@@ -123,17 +120,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		}
 	}
 
-	/**
-	 * Overrided handleExcpetion super class method in ControllerMethods class
-	 * to send just json reponse errors if exception is thrown.
-	 * @see ControllerMethods#handleException(java.lang.Exception, java.lang.Object)
-	 * @param e
-	 * @param log
-	 */
-	void handleException(Exception e, log) {
-		log.error(e)
-		renderErrorJson(e.message)
-	}
+
     /**
      * Performs a query for the Asset Explorer data grid using a saved View Specification plus
      * filter parameters that the user may have entered plus their preferences for the view.
