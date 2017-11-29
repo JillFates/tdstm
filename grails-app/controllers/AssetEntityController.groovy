@@ -1643,7 +1643,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def assetSummary() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
-		String justPlanningPref = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING)
+		String justPlanningPref = userPreferenceService.getPreference(null, PREF.ASSET_JUST_PLANNING, "false")
 		Boolean justPlanning = false
 		// If the preference is set, parse it to boolean
 		if (justPlanningPref) {
