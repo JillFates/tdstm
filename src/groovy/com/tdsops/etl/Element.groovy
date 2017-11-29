@@ -30,7 +30,6 @@ class Element {
      * <code>
      *     extract .. transform with uppercase() lowercase()
      * </code>
-     *
      * @param command
      * @return the element instance that received this command
      */
@@ -40,6 +39,10 @@ class Element {
 
     /**
      * Loads a field using fields spec based on domain validation
+     * It's used in this ETL script command
+     * <code>
+     *     extract 3 transform with lowercase() load description
+     * </code>
      * @param field
      * @return the element instance that received this command
      */
@@ -282,7 +285,35 @@ class Element {
     }
 
     /**
-     * Overiding Equals method for this command in an ETL script.
+     * Appends element.value content with anotherElement.value
+     * It's used in this ETL script command
+     * <code>
+     *     extract 4 transform append(myVar + CE) load description
+     * </code>
+     * @param anotherElement an ETL Element
+     * @return
+     */
+    Element plus (Element anotherElement) {
+        this.value += anotherElement?.value
+        this
+    }
+
+    /**
+     * Appends element.value content with a String value
+     * It's used in this ETL script command
+     * <code>
+     *     extract 4 transform append(myVar + '******') load description
+     * </code>
+     * @param anotherElement an ETL Element
+     * @return
+     */
+    Element plus (String value) {
+        this.value += value
+        this
+    }
+
+    /**
+     * Overriding Equals method for this command in an ETL script.
      * <code>
      *     .....
      *     if (myVar == 'Cool Stuff') {
@@ -295,7 +326,7 @@ class Element {
     boolean equals (otherObject) {
         if (this.is(otherObject)) return true
 
-        if (otherObject.class == String) return value.equals(otherObject)
+        if (String.isInstance(otherObject)) return value.equals(otherObject)
 
         if (getClass() != otherObject.class) return false
 
@@ -308,15 +339,5 @@ class Element {
 
     int hashCode () {
         return value.hashCode()
-    }
-
-    Element plus (Element anotherElement) {
-        this.value += anotherElement?.value
-        this
-    }
-
-    Element plus (String value) {
-        this.value += value
-        this
     }
 }
