@@ -2538,48 +2538,63 @@ class ETLProcessorSpec extends Specification {
             with(etlProcessor.results.get(ETLDomain.Application)[0]) {
 
                 with(elements[0]) {
-                    originalValue == "Production"
-                    value == "Production"
-                    field.name == "environment"
+                    originalValue == 'Production'
+                    value == 'Production'
+                    field.name == 'environment'
                 }
 
                 with(elements[1]) {
-                    originalValue == "152254"
-                    value == "152254"
-                    field.name == "id"
+                    originalValue == '152254'
+                    value == '152254'
+                    field.name == 'id'
                 }
             }
 
             with(etlProcessor.results.get(ETLDomain.Application)[1]) {
                 with(elements[0]) {
-                    originalValue == "Production"
-                    value == "Production"
-                    field.name == "environment"
+                    originalValue == 'Production'
+                    value == 'Production'
+                    field.name == 'environment'
                 }
 
                 with(elements[1]) {
-                    originalValue == "152255"
-                    value == "152255"
-                    field.name == "id"
+                    originalValue == '152255'
+                    value == '152255'
+                    field.name == 'id'
                 }
             }
 
         and: 'Results should contain Device domain results associated'
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[1].field.name == "location"
 
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].originalValue == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].value == "Development"
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[1].field.name == "location"
+            with(etlProcessor.results.get(ETLDomain.Device)[0]) {
 
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].originalValue == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].value == "152254"
-            etlProcessor.results.get(ETLDomain.Device)[0].elements[0].field.name == "id"
+                with (elements[0]) {
+                    originalValue == '152254'
+                    value == '152254'
+                    field.name == 'id'
+                }
 
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].originalValue == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].value == "152255"
-            etlProcessor.results.get(ETLDomain.Device)[1].elements[0].field.name == "id"
+                with (elements[1]) {
+                    originalValue == 'Development'
+                    value == 'Development'
+                    field.name == 'location'
+                }
+            }
+
+            with(etlProcessor.results.get(ETLDomain.Device)[1]) {
+
+                with (elements[0]) {
+                    originalValue == '152255'
+                    value == '152255'
+                    field.name == 'id'
+                }
+
+                with (elements[1]) {
+                    originalValue == 'Development'
+                    value == 'Development'
+                    field.name == 'location'
+                }
+            }
     }
 
     void 'test can reference a domain Property Name with loaded Data Value' () {
