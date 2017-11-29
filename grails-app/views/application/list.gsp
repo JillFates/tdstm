@@ -192,9 +192,13 @@
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
 						%{--<g:each var="attribute" in="${attributesList}">--}%
 						<g:each var="attribute" in="${fieldSpecs}">
-							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}"
+							<label>
+								<input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}"
 								${appPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','App_Columns')"/> ${attribute.frontendLabel}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.App_Columns}')"
+								/> ${attribute.frontendLabel}
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>

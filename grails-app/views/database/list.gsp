@@ -165,7 +165,11 @@
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}"
 								${dbPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Database_Columns')"/> ${attribute.frontendLabel}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Database_Columns}')"
+								/> 
+								${attribute.frontendLabel}
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>

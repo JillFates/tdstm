@@ -106,7 +106,11 @@
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${modelPref[key]}" id="coloumnSelector_${modelPref[key]}" value="${attribute}" 
 								${modelPref[key]== attribute? 'checked' :'' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Model_Columns')"/> ${attribute}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Model_Columns}')"
+								/> 
+								${attribute}
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>

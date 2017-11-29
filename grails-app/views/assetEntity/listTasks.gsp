@@ -336,7 +336,11 @@
 					<g:each var="attribute" in="${assetCommentFields}">
 						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute.key}"
 							${taskPref[key]==attribute.key ? 'checked' : '' }
-							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute.value}</label><br>
+							onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Task_Columns}')"
+							/> 
+							${attribute.value}
+						</label>
+						<br>
 					</g:each>
 				</div>
 			</div>

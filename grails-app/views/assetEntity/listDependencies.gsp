@@ -91,7 +91,11 @@
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${depPref[key]}" id="coloumnSelector_${depPref[key]}" value="${attribute}" 
 								${depPref[key]==attribute?'checked':'' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Dep_Columns')"/> ${attribute}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Dep_Columns}')"
+								/> 
+								${attribute}	
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>

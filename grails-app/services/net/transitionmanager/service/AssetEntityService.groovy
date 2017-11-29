@@ -2013,7 +2013,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return appPref
 	 */
 	// TODO : JPM 9/2014 : Rename getExistingPref method to getColumnPreferences
-	Map getExistingPref(String prefName) {
+	Map getExistingPref(com.tdsops.tm.enums.domain.UserPreferenceEnum prefName) {
 		def colPref
 		def existingPref = userPreferenceService.getPreference(prefName)
 
@@ -2024,28 +2024,28 @@ class AssetEntityService implements ServiceMethods {
 
 		if (!colPref) {
 			switch (prefName) {
-				case 'App_Columns':
+				case PREF.App_Columns:
 					colPref = ['1': 'sme', '2': 'environment', '3': 'validation', '4': 'planStatus', '5': 'moveBundle']
 					break
-				case 'Asset_Columns':
+				case PREF.Asset_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
-				case 'Physical_Columns':
+				case PREF.Physical_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
-				case 'Database_Columns':
+				case PREF.Database_Columns:
 					colPref = ['1': 'dbFormat','2': 'size','3': 'validation','4': 'planStatus','5': 'moveBundle']
 					break
-				case 'Storage_Columns':
+				case PREF.Storage_Columns:
 					colPref = ['1': 'fileFormat','2': 'size','3': 'validation','4': 'planStatus','5': 'moveBundle']
 					break
-				case 'Task_Columns':
+				case PREF.Task_Columns:
 					colPref = ['1': 'assetName','2': 'assetType','3': 'assignedTo','4': 'role', '5': 'category']
 					break
-				case 'Model_Columns':
+				case PREF.Model_Columns:
 					colPref = ['1': 'description','2': 'assetType','3': 'powerUse','4': 'modelConnectors']
 					break
-				case 'Dep_Columns':
+				case PREF.Dep_Columns:
 					colPref = ['1': 'frequency','2': 'comment']
 					break
 			}
@@ -2330,8 +2330,7 @@ class AssetEntityService implements ServiceMethods {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 
-		// def prefType = (listType == 'server') ? 'Asset_Columns' : 'Physical_Columns'
-		def prefType = 'Asset_Columns'
+		def prefType = PREF.Asset_Columns
 		def fieldPrefs = getExistingPref(prefType)
 
 		// The hack for the dot notation
@@ -2418,7 +2417,7 @@ class AssetEntityService implements ServiceMethods {
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
-		String prefType = 'Asset_Columns'
+		def prefType = PREF.Asset_Columns
 		def assetPref= getExistingPref(prefType)
 
 		List assetPrefColumns = assetPref*.value

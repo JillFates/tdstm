@@ -5,6 +5,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
@@ -115,7 +116,7 @@ class ModelService implements ServiceMethods {
 		Map<String, String> aliasValuesBase = [
 			modelName: 'm.name', manufacturer: 'man.name',  sourceTDSVersion: 'm.sourcetdsversion',
 			sourceTDS: 'm.sourcetds', modelStatus:'m.model_status', modelId: 'm.model_id']
-		Map modelPref = assetEntityService.getExistingPref('Model_Columns')
+		Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
 		def modelPrefVal = modelPref.collect { it.value }
 
 		modelPrefVal.each {
