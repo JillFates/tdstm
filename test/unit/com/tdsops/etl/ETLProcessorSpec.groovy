@@ -44,8 +44,6 @@ class ETLProcessorSpec extends Specification {
         csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
         jsonConnection = new JSONConnection(config: 'json')
         FileUtils.ValidPath(conParams.path)
-
-        String.mixin StringAppendElement
     }
 
     def cleanupSpec () {
@@ -1596,7 +1594,7 @@ class ETLProcessorSpec extends Specification {
             }
     }
 
-    void 'test can plus strings in a transformation using StringAppendElement' () {
+    void 'test can append strings, current element and a defined variable in a transformation' () {
 
         given:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -1666,7 +1664,7 @@ class ETLProcessorSpec extends Specification {
                                 iterate {
                                     extract 'vendor name' transform with lowercase() store myVar
                                     
-                                    extract 'location' transform with append('-' + '*' + '-' ) load description
+                                    extract 'location' transform with append('-', myVar, '-' , CE ) load description
                                   
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
@@ -1677,7 +1675,7 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center-*-'
+                    value == 'ACME Data Center-microsoft-ACME Data Center'
 
                     field.name == 'description'
                     field.label == 'Description'
@@ -1690,7 +1688,7 @@ class ETLProcessorSpec extends Specification {
 
                 with(elements[0]) {
                     originalValue == 'ACME Data Center'
-                    value == 'ACME Data Center-*-'
+                    value == 'ACME Data Center-mozilla-ACME Data Center'
 
                     field.name == 'description'
                     field.label == 'Description'
@@ -1700,7 +1698,7 @@ class ETLProcessorSpec extends Specification {
             }
     }
 
-    void 'test can plus strings and elements in a transformation using StringAppendElement' () {
+    void 'test can append strings and elements in a transformation' () {
 
         given:
             ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -1769,7 +1767,7 @@ class ETLProcessorSpec extends Specification {
                                 iterate {
                                     extract 'vendor name' transform with lowercase() store myVar
                                     
-                                    extract 'location' transform with append(' - ' + myVar + ' - ') load description
+                                    extract 'location' transform with append(' - ', myVar, ' - ') load description
                                   
                                 }""".stripIndent(),
                     ETLProcessor.class.name)
