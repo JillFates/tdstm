@@ -5,10 +5,13 @@
 			<div class="box-body box-with-empty-header">
 				<kendo-grid
 						[data]="gridData"
-						[filter]="filter"
+						[filter]="state.filter"
 						[filterable]="true"
 						(filterChange)="filterChange($event)"
+						[sort]="state.sort"
+						[sortable]="{mode:'single'}"
 						[pageSize]="10"
+						(sortChange)="sortChange($event)"
 						[pageable]="{ pageSizes: true, info: true}"
 						(cellClick)="cellClick($event)"
 						[selectable]="true"

@@ -23,6 +23,10 @@ export class DataScriptColumnModel {
 				property: 'description',
 				type: 'text'
 			}, {
+				label: 'Mode',
+				property: 'modeFormat',
+				type: 'text'
+			}, {
 				label: 'Date Create',
 				property: 'dateCreated',
 				type: 'date',
