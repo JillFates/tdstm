@@ -1,5 +1,6 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
@@ -80,7 +81,8 @@ export class AssetExplorerViewConfigComponent {
 		private permissionService: PermissionService,
 		private state: StateService,
 		private notifier: NotifierService,
-		@Inject('fields') fields: Observable<DomainModel[]>) {
+		@Inject('fields') fields: Observable<DomainModel[]>,
+		private prompt: UIPromptService) {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = { ...result[1] };
@@ -294,6 +296,15 @@ export class AssetExplorerViewConfigComponent {
 		if (this.isSaveAsAvailable()) {
 			this.openSaveDialog();
 		}
+	}
+
+	protected onCancel() {
+		this.prompt.open('Confirmation Required', 'Are you sure you want to cancel?', 'Yes', 'No')
+			.then(res => {
+				if (res) {
+					this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
+				}
+			});
 	}
 
 	protected onSave() {
