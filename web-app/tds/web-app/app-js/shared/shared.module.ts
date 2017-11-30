@@ -17,6 +17,7 @@ import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
+import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -55,6 +56,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		FormlyInputHorizontal,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		ErrorPageComponent,
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
@@ -73,6 +75,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		UIActiveDialogService,
 		UIPromptService,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
 	exports: [UILoaderDirective,
@@ -80,6 +83,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		UIDialogDirective,
 		UIBooleanPipe,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		TranslatePipe,
 		FilterPipe,
 		HeaderComponent,
