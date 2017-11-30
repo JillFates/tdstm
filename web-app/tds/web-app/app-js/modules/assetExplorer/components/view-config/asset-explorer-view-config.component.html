@@ -146,15 +146,15 @@
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="draggableColumns" [navigatable]="false" [animation]="false"
 								 class="row" style="margin-right:0px;" itemClass="item col-sm-4 col-md-4 col-lg-2"  (dragEnd)="onDragEnd()" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
 									<ng-template let-item="item" let-index="index">
-										<div class="row">
-											<div class="col-sm-8 drag-label">
+										<div class="row" style="height: 35px;">
+											<div class="col-sm-8 drag-label" style="height: 35px;">
 												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
 												{{item.label}}
 											</div>
 											<div class="col-sm-4" style="padding:0">
-												<div class="checkbox">
-													<label for="">
-														<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
+												<div class="checkbox" style="margin-top: 6px; margin-bottom: 6px;">
+													<label for="locked_{{item.domain+'.'+item.property}}">
+														<input id="locked_{{item.domain+'.'+item.property}}" type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
 													</label>
 												</div>
 											</div>
