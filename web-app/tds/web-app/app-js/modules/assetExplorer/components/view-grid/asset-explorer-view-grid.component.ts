@@ -8,6 +8,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 @Component({
@@ -61,7 +62,7 @@ export class AssetExplorerViewGridComponent {
 	};
 	gridData: GridDataResult;
 
-	constructor(private userPref: PreferenceService, private dialog: UIDialogService) {
+	constructor(private userPref: PreferenceService, private dialog: UIDialogService, private notifier: NotifierService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
 	}
 
@@ -122,6 +123,9 @@ export class AssetExplorerViewGridComponent {
 			total: data.pagination.total
 		};
 		this.showMessage = data.pagination.total === 0;
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
 	}
 
 	clear(): void {
