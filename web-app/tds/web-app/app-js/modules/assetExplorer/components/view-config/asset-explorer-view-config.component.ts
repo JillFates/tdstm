@@ -437,6 +437,11 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
+		setTimeout(() => {
+			this.notifier.broadcast({
+				name: 'grid.header.position.change'
+			});
+		}, 1200);
 	}
 
 	protected onToggleSelectedColumnsPreview(): void {

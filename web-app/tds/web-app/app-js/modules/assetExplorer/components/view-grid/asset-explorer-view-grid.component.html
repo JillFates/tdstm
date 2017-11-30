@@ -1,3 +1,4 @@
+<tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
