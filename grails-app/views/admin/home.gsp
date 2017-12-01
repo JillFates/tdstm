@@ -44,6 +44,7 @@ a:hover {
 					</g:each>
 				</tbody>
 			</table>
+
 			</div>
 		</td>
 		<td style="vertical-align:top">
@@ -138,6 +139,17 @@ a:hover {
 								<tds:hasPermission permission="${Permission.ModelEdit}">
 									<g:link controller="admin" action="modelConflicts" style="color:black">Model / Alias Conflicts</g:link>
 								</tds:hasPermission>
+							</td>
+						</tr>
+						<tr class="even">
+							<td>
+								<tds:hasPermission permission="${Permission.ApplicationRestart}">
+									<g:link controller="admin" action="restartAppServiceForm" style="color:black">Restart Application Service</g:link>
+								</tds:hasPermission>
+							</td>
+
+							<td>
+
 							</td>
 						</tr>
 
