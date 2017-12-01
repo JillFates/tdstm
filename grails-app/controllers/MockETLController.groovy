@@ -1,5 +1,6 @@
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.StringAppendElement
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -39,7 +40,7 @@ iterate {
     extract 'model name' transform with lowercase() load Name
     extract 2 transform with uppercase() load description
     
-    load environment with 'Production'
+    set environment with 'Production'
     //reference id with id
     reference assetName, id with Name, id
 
@@ -64,6 +65,8 @@ iterate {
         String script
 
         try {
+
+            String.mixin StringAppendElement
 
             if (params.fetch && params.file) {
 

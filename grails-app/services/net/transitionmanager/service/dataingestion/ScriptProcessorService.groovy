@@ -55,9 +55,7 @@ class ScriptProcessorService {
 
         ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator)
 
-        ETLBinding binding = new ETLBinding(etlProcessor)
-
-        new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
         etlProcessor
     }
