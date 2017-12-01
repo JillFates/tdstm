@@ -14,6 +14,7 @@ import 'rxjs/add/operator/catch';
 export class AssetExplorerService {
 
 	private assetExplorerUrl = '../ws/assetExplorer';
+	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
@@ -141,6 +142,15 @@ export class AssetExplorerService {
 	hasMaximumFavorites(length: number): boolean {
 		console.log(length);
 		return this.FAVORITES_MAX_SIZE < length;
+	}
+
+	deleteAssets(ids: string[]): Observable<any> {
+		return this.http.post(`${this.assetUrl}/deleteAssets`, JSON.stringify({ ids: ids }))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 }

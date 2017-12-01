@@ -6,9 +6,15 @@ import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/ke
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { Observable } from 'rxjs/Rx';
 
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { SEARCH_QUITE_PERIOD } from '../../../../shared/model/constants';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
+import { AssetExplorerService } from '../../service/asset-explorer.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { AlertType } from '../../../../shared/model/alert.model';
 
 declare var jQuery: any;
 @Component({
@@ -18,6 +24,9 @@ declare var jQuery: any;
 	styles: [`
 	.btnClear {
 		margin-right: 20px !important;
+	}
+	.btnDelete{
+		margin: 5px 0px 0px 15px;
 	}
 	.btnReload{
 		padding-top:7px;
@@ -62,8 +71,17 @@ export class AssetExplorerViewGridComponent {
 		sort: []
 	};
 	gridData: GridDataResult;
+	selectAll = false;
+	bulkItems = {};
+	bulkSelectedItems: string[] = [];
 
-	constructor(private userPref: PreferenceService, @Inject('fields') fields: Observable<DomainModel[]>) {
+	constructor(
+		private userPref: PreferenceService,
+		@Inject('fields') fields: Observable<DomainModel[]>,
+		private prompt: UIPromptService,
+		private permissionService: PermissionService,
+		private assetService: AssetExplorerService,
+		private notifier: NotifierService) {
 		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
 		fields.subscribe((result: DomainModel[]) => {
 			this.fields = result.reduce((p, c) => {
@@ -104,6 +122,14 @@ export class AssetExplorerViewGridComponent {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0;
 	}
 
+	hasItensSelected(): boolean {
+		return this.bulkSelectedItems.length > 0;
+	}
+
+	hasAssetDeletePermission(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetDelete);
+	}
+
 	clearText(column: ViewColumn): void {
 		if (column.filter) {
 			column.filter = '';
@@ -135,6 +161,11 @@ export class AssetExplorerViewGridComponent {
 	apply(data: any): void {
 		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
+		this.bulkItems = {};
+		data.assets.map(c => c.common_id).forEach(id => {
+			this.bulkItems[id] = false;
+		});
+		console.log(this.bulkItems);
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total
@@ -171,5 +202,36 @@ export class AssetExplorerViewGridComponent {
 		).forEach((c: ViewColumn) => {
 			c.width = data[0].newWidth;
 		});
+	}
+
+	onSelectAll(): void {
+		Object.keys(this.bulkItems).forEach(key => {
+			this.bulkItems[key] = this.selectAll;
+		});
+		this.setSelectedItems();
+	}
+
+	setSelectedItems(): void {
+		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+	}
+
+	onBulkDelete(): void {
+		if (this.hasAssetDeletePermission()) {
+			const message = this.bulkSelectedItems.length === 1 ? 'asset' : 'assets';
+			this.prompt.open('Confirmation Required', `You are about to delete ${this.bulkSelectedItems.length} ${message}. Click Confirm to delete the ${message} otherwise click Cancel`, 'Confirm', 'Cancel')
+				.then((res) => {
+					if (res) {
+						this.assetService.deleteAssets(this.bulkSelectedItems)
+							.subscribe(result => {
+								this.notifier.broadcast({
+									name: AlertType.SUCCESS,
+									message: result.message
+								});
+								this.bulkSelectedItems = [];
+								this.onReload();
+							}, err => console.log(err));
+					}
+				});
+		}
 	}
 }
