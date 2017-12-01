@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
@@ -41,7 +41,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 		}
 	`]
 })
-export class AssetExplorerViewConfigComponent {
+export class AssetExplorerViewConfigComponent implements OnInit {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
@@ -93,6 +93,13 @@ export class AssetExplorerViewConfigComponent {
 				this.draggableColumns = this.model.schema.columns.slice();
 			}
 		}, (err) => console.log(err));
+	}
+
+	ngOnInit(): void {
+		if (this.model.id) {
+			this.previewButtonClicked = true;
+			this.onPreview();
+		}
 	}
 
 	protected updateFilterbyModel() {
