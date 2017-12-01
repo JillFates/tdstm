@@ -68,6 +68,11 @@
 				message.html('<br />' + response.responseText);
 				$('#spinnerId').css('display', 'none');
 				$('#exitNeighborhoodId').removeAttr('disabled');
+				debugger;
+                for(i = 0; i < response.automatedTasks; i++) {
+					var autoTask = response.automatedTasks[i];
+					$("#" + autoTask).css('font-style','italic');
+				}
 				return;
 			}
 
