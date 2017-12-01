@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta charset="UTF-8">
 	<meta name="layout" content="topNav" />
-	<title>Document</title>
+	<title>Restart Application Service</title>
 	<style type="text/css">
 		.padded {
 			padding: 2em;
@@ -54,9 +54,10 @@
 				Clicking the Restart button is going to force the application to restart which will cause a brief disruption of service.
 				<br>
 				<br>
-				Please note that this action will be reported to administration.
+				The restart process typically takes 2-3 minutes to complete.
+				Please contact the Operations team to let them know the reboot has being initiated.
 			</p>
-			<button id="btnRestart" type="button" class="big">RESTART</button>
+			<button id="btnRestart" type="button" class="big">Initiate the Restart</button>
 			</h2>
 		</div>
 
@@ -77,7 +78,7 @@
 		<script type="text/javascript">
 			$(function(){
 				$('#btnRestart').on("click", function(e){
-					var proceed = confirm("Are you sure you want to restart the application? Click Okay to restart otherwise press Cancel.");
+					var proceed = confirm("Are you sure you want to restart the application? Click Ok to restart otherwise press Cancel.");
 					if(proceed){
 						$.post("restartAppService")
 						.done(function(data) {
