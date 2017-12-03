@@ -78,7 +78,7 @@
             {{dataItem.shared | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="imp" title="Importance" [width]="100">
+    <kendo-grid-column field="imp" title="Importance" [width]="125">
         <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
             Importance
             <popup-legends></popup-legends>
@@ -93,7 +93,7 @@
             </div>
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="constraints.required" title="Required" [width]="75" [class]="{'text-center':!isEditing}">
+    <kendo-grid-column field="constraints.required" title="Required" [width]="100" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" (change)="onRequired(dataItem)" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.constraints.required" name="required"></label>
@@ -103,7 +103,7 @@
             {{(dataItem.constraints? dataItem.constraints.required:false) | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display" [width]="65" [class]="{'text-center':!isEditing}">
+    <kendo-grid-column field="show" title="Display" [width]="90" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.show" name="required"></label>
