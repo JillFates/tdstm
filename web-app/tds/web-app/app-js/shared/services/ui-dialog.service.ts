@@ -30,6 +30,18 @@ export class UIDialogService {
 		});
 	}
 
+    extra(component: any, params: Array<any>): Promise<any> {
+		return new Promise((resolve, reject) => {
+			this.notifier.broadcast({
+				name: 'dialog.extra',
+				component: component,
+				params: params,
+				resolve: resolve,
+				reject: reject
+			});
+		});
+	}
+
 	replace(component: any, params: Array<any>, size: 'sm' | 'md' | 'xlg' | 'lg' = 'md'): void {
 		return new Promise((resolve, reject) => {
 		this.notifier.broadcast({
@@ -37,6 +49,7 @@ export class UIDialogService {
 			component: component,
 			size: size,
 			params: params
+			});
 		});
 	}
 }

@@ -259,6 +259,13 @@ class ProjectServiceIntegrationSpec extends Specification {
 		then: 'the project should have 4 Asset Field Settings'
 			4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
 
+		// The new project service for creating a project now prepopulates the project from the default so this test
+		// no longer makes sense.
+		//when: 'the cloneDefaultSettings method is called for the new project'
+		//	projectService.cloneDefaultSettings(p)
+		//then: 'the project should have 4 Asset Field Settings'
+		//	4 == Setting.findAllByProjectAndType(p, SettingType.CUSTOM_DOMAIN_FIELD_SPEC).size()
+
 		when: 'the cloneDefaultSettings method is called a second time'
 			projectService.cloneDefaultSettings(p)
 		then: 'an InvalidRequestException exception should be thrown'
@@ -282,7 +289,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 	}
 
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
-		when: 'creating a new person'
+        when: 'creating a new person'
 			Person userPerson = personHelper.createStaff(project.owner)
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
@@ -307,8 +314,8 @@ class ProjectServiceIntegrationSpec extends Specification {
 			projectService.addTeamMember(project, userPerson, ['PROJ_MGR'])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
-
 		and: 'Dataview is created for the project'
+
 			DataviewTestHelper dataviewTestHelper = new DataviewTestHelper()
 			Dataview dataview = dataviewTestHelper.createDataview(project)
 

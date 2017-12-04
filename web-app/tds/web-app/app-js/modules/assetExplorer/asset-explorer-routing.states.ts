@@ -36,13 +36,6 @@ const fieldsResolve = {
 	})
 };
 
-const reportsResolve = {
-	token: 'reports',
-	policy: { async: 'RXWAIT' },
-	deps: [AssetExplorerService],
-	resolveFn: (service: AssetExplorerService) => service.getReports()
-};
-
 export class AssetExplorerStates {
 	public static readonly REPORT_SELECTOR = {
 		name: 'tds.assetexplorer',
@@ -111,7 +104,6 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
-		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{
@@ -152,7 +144,6 @@ export const assetExplorerReportEditState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewConfigComponent }
 	},
 	resolve: [
-		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{
@@ -186,7 +177,6 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 		'containerView@tds': { component: AssetExplorerViewShowComponent }
 	},
 	resolve: [
-		reportsResolve,
 		assetsListSizeResolve,
 		fieldsResolve,
 		{

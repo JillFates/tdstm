@@ -22,7 +22,8 @@ declare var jQuery: any;
                 <div #view></div>
             </div>
         </div>
-	</div>`,
+	</div>
+    <div #extraDialog></div>`,
 	styles: [`
 		.modal { background:none;}
 	`]
@@ -44,6 +45,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	closeNotifier: any;
 	dismissNotifier: any;
 	replaceNotifier: any;
+	extraNotifier: any;
 
 	constructor(private notifierService: NotifierService, private activeDialog: UIActiveDialogService, private compCreator: ComponentCreatorService) {
 		this.registerListeners();
@@ -68,6 +70,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		this.closeNotifier();
 		this.dismissNotifier();
 		this.replaceNotifier();
+		this.extraNotifier();
 	}
 
 	/**
@@ -90,6 +93,13 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.tdsUiDialog.modal('show');
 		});
 
+		this.extraNotifier = this.notifierService.on('dialog.extra', event => {
+			const cmpRef = this.compCreator.insert(event.component, event.params, this.extraDialog);
+			const instance = cmpRef.instance as any;
+			instance.open(event.resolve, event.reject, cmpRef);
+		});
+
+
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
 			if (this.cmpRef) {
 				this.cmpRef.destroy();
@@ -97,6 +107,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.activeDialog.componentInstance = this.cmpRef;
 			}
 		});
+
+
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {
 			if (this.cmpRef) {
