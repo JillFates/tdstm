@@ -35,6 +35,7 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
+import { DictionaryService } from './services/dictionary.service';
 
 @NgModule({
 	imports: [
@@ -72,6 +73,7 @@ import { SHARED_STATES } from './shared-routing.states';
 		UIActiveDialogService,
 		UIPromptService,
 		UISVGIconDirectiveDirective,
+		DictionaryService,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
 	exports: [UILoaderDirective,

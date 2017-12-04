@@ -20,6 +20,8 @@ import { AssetQueryParams } from '../../model/asset-query-params';
 import { AssetExportModel } from '../../model/asset-export-model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import { DictionaryService } from '../../../../shared/services/dictionary.service';
+import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'asset-explorer-View-config',
@@ -82,7 +84,8 @@ export class AssetExplorerViewConfigComponent {
 		private state: StateService,
 		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
-		private prompt: UIPromptService) {
+		private prompt: UIPromptService,
+		private dictionary: DictionaryService) {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = { ...result[1] };
@@ -299,12 +302,12 @@ export class AssetExplorerViewConfigComponent {
 	}
 
 	protected onCancel() {
-		this.prompt.open('Confirmation Required', 'Are you sure you want to cancel?', 'Yes', 'No')
-			.then(res => {
-				if (res) {
-					this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
-				}
-			});
+		const routeState = this.dictionary.get(LAST_VISITED_PAGE);
+		if (routeState && routeState === AssetExplorerStates.REPORT_SHOW.name && this.model.id) {
+			this.state.go(routeState, { id: this.model.id });
+		} else {
+			this.state.go(AssetExplorerStates.REPORT_SELECTOR.name);
+		}
 	}
 
 	protected onSave() {

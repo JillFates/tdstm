@@ -11,6 +11,8 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { Permission } from '../../../../shared/model/permission.model';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import { DictionaryService } from '../../../../shared/services/dictionary.service';
+import { LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'asset-explorer-index',
@@ -29,16 +31,19 @@ export class AssetExplorerIndexComponent {
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
-		private notifier: NotifierService) {
+		private notifier: NotifierService,
+		private dictionary: DictionaryService) {
 		report.subscribe(
 			(result) => {
 				this.reportGroupModels = result;
-				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
+				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
+				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 			},
 			(err) => console.log(err));
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel): void {
+		this.dictionary.set(LAST_SELECTED_FOLDER, folderOpen);
 		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
 		if (this.selectedFolder) {

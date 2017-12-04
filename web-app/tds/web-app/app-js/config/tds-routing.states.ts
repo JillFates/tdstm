@@ -12,6 +12,8 @@ import { UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { SharedStates } from '../shared/shared-routing.states';
 // Services
 import { TaskService } from '../modules/taskManager/service/task.service';
+import { DictionaryService } from '../shared/services/dictionary.service';
+import { LAST_VISITED_PAGE } from '../shared/model/constants';
 
 export const tdsRoot = {
 	name: 'tds',
@@ -98,6 +100,8 @@ export function MiscConfig(router: UIRouter) {
 		exiting: (state) => state.data && !state.data.hasPendingChanges
 	}, (transition) => {
 		const loaderService = transition.injector().get(UILoaderService) as UILoaderService;
+		const dictionaryService = transition.injector().get(DictionaryService) as DictionaryService;
+		dictionaryService.set(LAST_VISITED_PAGE, transition.from().name);
 		loaderService.show();
 	}, { priority: 10 });
 	transitionService.onFinish({
@@ -112,6 +116,7 @@ export function MiscConfig(router: UIRouter) {
 	}, (transition) => {
 		const promptService = transition.injector().get(UIPromptService) as UIPromptService;
 		let target = transition.to();
+		const params = transition['_targetState']['_params'];
 		const $state = transition.router.stateService;
 		promptService.open(
 			'Confirmation Required',
@@ -119,7 +124,7 @@ export function MiscConfig(router: UIRouter) {
 			'Confirm', 'Cancel').then(result => {
 				if (result) {
 					$state.$current.data.hasPendingChanges = false;
-					$state.go(target.name);
+					$state.go(target.name, params);
 				}
 			});
 		return false;
