@@ -673,6 +673,7 @@ digraph runbook {
 			def fillcolor
 			def attribs
 			def color
+			def automatedTasks = []
 
 			style = styleDef
 
@@ -691,6 +692,7 @@ digraph runbook {
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
+					automatedTasks << it.id
 				} else {
 					fontcolor = taskStatusColorMap[colorKey][0]
 					fontsize = '10'
@@ -735,7 +737,7 @@ digraph runbook {
 //				return false
 
 				String svgText = graphvizService.generateSVGFromDOT("runbook-${moveEventId}", dotText.toString())
-				def data = [svgText:svgText, roles:roles, tasks:tasks]
+				def data = [svgText:svgText, roles:roles, tasks:tasks, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
 				return false
 

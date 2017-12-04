@@ -68,13 +68,9 @@
 				message.html('<br />' + response.responseText);
 				$('#spinnerId').css('display', 'none');
 				$('#exitNeighborhoodId').removeAttr('disabled');
-				debugger;
-                for(i = 0; i < response.automatedTasks; i++) {
-					var autoTask = response.automatedTasks[i];
-					$("#" + autoTask).css('font-style','italic');
-				}
 				return;
 			}
+
 
 			// parse the data from the server
 			var data = $.parseJSON(response.responseText);
@@ -144,6 +140,13 @@
 			// finish initialization and exit
 			performSearch();
 			$('#exitNeighborhoodId').removeAttr('disabled');
+
+			// Adding bold and italic styles to automated tasks (TM-7458)
+            for(i = 0; i < data.automatedTasks.length; i++) {
+                var autoTask = "#" + data.automatedTasks[i];
+                $(autoTask).css('font-weight','bold');
+                $(autoTask).css('font-style','italic');
+            }
 		}
 
 		// sets the proper width and height for the graph
