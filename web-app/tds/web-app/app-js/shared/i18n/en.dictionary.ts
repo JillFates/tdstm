@@ -20,6 +20,30 @@ export const en_DICTIONARY: Object = {
 			'NO_RECORDS': 'No records available',
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
+		},
+		'INDEX': {
+			'SAVED_VIEWS': 'Saved Views',
+			'ACTION': 'Action',
+			'FAVORITE': 'Favorite',
+			'NAME': 'Name',
+			'CREATED_BY': 'Created By',
+			'SHARED': 'Shared',
+		}
+	},
+	'DATA_INGESTION': {
+		'DATA_INGESTION': 'Data Ingestion',
+		'DATA_SCRIPTS': 'Data Scripts',
+		'PROVIDERS': 'Providers',
+		'CREATE_DATA_SCRIPT': 'Create Data Script',
+		'CREATE_PROVIDER': 'Create Provider',
+		'SAMPLE_DATA_TITLE': 'Sample Data',
+		'ETL_BUILDER_TITLE': 'ETL Designer',
+		'CONSOLE_TITLE': 'ETL Console',
+		'ETL_BUILDER': {
+			'TEST': 'Test',
+			'CHECK_SYNTAX': 'Check Syntax',
+			'LOAD_SAMPLE_DATA': 'Load Sample Data',
+			'VIEW_CONSOLE': 'View Console'
 		}
 	},
 	'FIELD_SETTINGS': {
@@ -45,6 +69,7 @@ export const en_DICTIONARY: Object = {
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
+		'LOAD': 'Load',
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
