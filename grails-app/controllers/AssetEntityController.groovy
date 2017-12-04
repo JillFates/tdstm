@@ -993,6 +993,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		licenseAdminService.isLicenseCompliant(project)
 
 		try {
+			// Flag if the request contained any params that should enable the "Clear Filters" button.
+			boolean filteredRequest = false
+
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
 			}
@@ -1007,7 +1010,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def filters = session.TASK?.JQ_FILTERS
 
 			// Deal with the parameters
-			def taskPref = assetEntityService.getExistingPref('Task_Columns')
+			def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
@@ -1055,6 +1058,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
 			def status = params.status ?: filters?.status ?: ''
+
+			// If there's a status or filters set, then the Clear Filters button should be enabled.
+			if (status || params.filter) {
+				filteredRequest = true
+			}
+
 			return [
 					timeToUpdate: timeToRefresh ?: 60,
 					servers: entities.servers,
@@ -1090,7 +1099,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			        sizePref: userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
 			        partyGroupList: companiesList,
 					company: project.client,
-					step: params.step]
+					step: params.step,
+					filteredRequest: filteredRequest]
 		} catch (RuntimeException e) {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")
@@ -1435,7 +1445,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def estStartClass
 		def estFinishClass
 		def nowGMT = TimeUtil.nowGMT()
-		def taskPref = assetEntityService.getExistingPref('Task_Columns')
+		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
 
 		def results = tasks?.collect {
@@ -2638,7 +2648,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def entities = assetEntityService.entityInfo(project)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		def depPref = assetEntityService.getExistingPref('Dep_Columns')
+		def depPref = assetEntityService.getExistingPref(PREF.Dep_Columns)
 		def attributes = ['c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
 		def columnLabelpref = [:]
 		depPref.each { key, value ->
@@ -2679,7 +2689,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		                    dependentBundle: params.dependentBundle, status: params.status,frequency: params.frequency,
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
-		def depPref= assetEntityService.getExistingPref('Dep_Columns')
+		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
 		StringBuffer query = new StringBuffer("""
 			SELECT * FROM (
 				SELECT asset_dependency_id AS id,

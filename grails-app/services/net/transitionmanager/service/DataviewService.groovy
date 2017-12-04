@@ -5,13 +5,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.FavoriteDataview
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -28,34 +23,70 @@ class DataviewService implements ServiceMethods {
 	static final List<String> UPDATE_PROPERTIES = ['name', 'schema', 'isShared']
 	static final List<String> CREATE_PROPERTIES = UPDATE_PROPERTIES + 'isSystem'
 
+	static final InvalidParamException MISSING_ID_EXCEPTION = new InvalidParamException('Missing required id')
+	static final EmptyResultException VIEW_NOT_FOUND_EXCEPTION = new EmptyResultException('View was not found')
+
 	// Limit the number of favorites that should be returned in queries.
 	static final int FAVORITES_MAX_SIZE = 10
 
 	/**
+	 *
 	 * Query for getting all projects where: belong to current project and either shared, system or are owned by
 	 * current person in session
+	 *
+	 * @param person
+	 * @param project
 	 * @return
 	 */
-	List<Dataview> list() {
-		Person currentPerson = securityService.loadCurrentPerson()
-		Project currentProject = securityService.userCurrentProject
+    List<Dataview> list(Person userPerson, Project userProject) {
+        def query
+		List<Long> favoriteSystemViewIds
 
-		def query = Dataview.where {
-			project == currentProject
-			(isSystem == true || isShared == true || person == currentPerson)
-		}
+        boolean canSeeSystemViews = securityService.hasPermission(userPerson, Permission.AssetExplorerSystemList)
+        if (canSeeSystemViews) {
+            query = Dataview.where {
+                (project == userProject && (isShared == true || person == userPerson)) \
+				|| \
+				(project.id == Project.DEFAULT_PROJECT_ID && isSystem == true)
+            }
+        } else {
+			// Get list of user's list favorite View Ids
+            favoriteSystemViewIds = FavoriteDataview.where { person == userPerson }
+        		.projections { property('dataview.id') }
+				.list()
 
-		return query.list()
-	}
+            if (favoriteSystemViewIds) {
+                query = Dataview.where {
+                    (project == userProject  && (isShared == true || person == userPerson)) \
+					|| \
+                    (project.id == Project.DEFAULT_PROJECT_ID && isSystem == true && id in favoriteSystemViewIds)
+                }
+            } else {
+                query = Dataview.where {
+                    (project == userProject  && (isShared == true || person == userPerson))
+                }
+            }
+        }
 
-	/**
-	 * Gets a Dataview by id.
+        return query.list()
+    }
+
+    /**
+	 * Returns a Dataview by id after validating that the user has proper access
 	 * @param id
 	 * @return
 	 */
-	Dataview fetch(Integer id) {
+	Dataview fetch(Long id) throws InvalidParamException, EmptyResultException {
+		if (! id || id < 1) {
+			throw MISSING_ID_EXCEPTION
+		}
+
 		Dataview dataview = Dataview.get(id)
-		validateDataviewViewAccessOrException(id, dataview);
+		if (!dataview) {
+			throw VIEW_NOT_FOUND_EXCEPTION
+		} else {
+			validateDataviewViewAccessOrException(id, dataview);
+		}
 
 		return dataview
 	}
@@ -67,7 +98,7 @@ class DataviewService implements ServiceMethods {
 	 * @return the Dataview object that was updated
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Dataview update(Integer id, JSONObject dataviewJson) {
+	Dataview update(Person person, Project project, Long id, JSONObject dataviewJson) {
 		Dataview dataview = Dataview.get(id)
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
 
@@ -80,15 +111,15 @@ class DataviewService implements ServiceMethods {
 			throw new DomainUpdateException('Error on update', dataview)
 		}
 
-		Long currentPersonId = securityService.currentPersonId
+		Long currentPersonId = person.id
 
 		// Check if the view is favorite and must be unfavorited.
 		if (dataview.isFavorite(currentPersonId) && !dataviewJson.isFavorite) {
-			deleteFavoriteDataview(dataview.id)
+			deleteFavoriteDataview(person, project, dataview.id)
 		} else {
 			// Check if the view must be favorited
 			if (!dataview.isFavorite(currentPersonId) && dataviewJson.isFavorite) {
-				addFavoriteDataview(dataview.id)
+				addFavoriteDataview(person, project, dataview.id)
 			}
 		}
 
@@ -96,19 +127,23 @@ class DataviewService implements ServiceMethods {
 	}
 
 	/**
+	 *
 	 * Create a Dataview object and add it to the person's favorite if needed.
-	 * Dataview person and project are taken from current session.
-	 * @param json JSONObject to take changes from.
+	 * Dataview person and project should be passed as a parameter
+	 *
+	 * @param currentPerson
+	 * @param currentProject
+	 * @param dataviewJson - JSONObject to take changes from.
 	 * @return the Dataview object that was created
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	Dataview create(JSONObject dataviewJson) {
+	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
 		validateDataviewCreateAccessOrException(dataviewJson)
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			person = securityService.loadCurrentPerson()
-			project = securityService.userCurrentProject
+			person = currentPerson
+            project = currentProject
 			name = dataviewJson.name
 			isSystem = dataviewJson.isSystem
 			isShared = dataviewJson.isShared
@@ -120,7 +155,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		if (dataviewJson.isFavorite) {
-			addFavoriteDataview(dataview.id)
+			addFavoriteDataview(currentPerson, currentProject, dataview.id)
 		}
 
 		return dataview
@@ -132,10 +167,9 @@ class DataviewService implements ServiceMethods {
 	 * @param id Dataview id to delete
 	 * @throws DomainUpdateException, UnauthorizedException
 	 */
-	void delete(Integer id) {
-		Dataview dataview = Dataview.get(id)
+	void delete(Long id) {
+		Dataview dataview = fetch(id)
 		validateDataviewDeleteAccessOrException(id, dataview)
-
 		dataview.delete()
 	}
 
@@ -146,14 +180,18 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview
 	 * @throws InvalidRequestException
 	 */
-	void validateDataviewViewAccessOrException(Integer id, Dataview dataview) {
+	void validateDataviewViewAccessOrException(Long id, Dataview dataview) {
 		boolean throwNotFound = false
 		if (!dataview) {
 			throwNotFound = true
 		}
 
+        boolean canAccess = 
+			(dataview.project.id == Project.DEFAULT_PROJECT_ID && dataview.isSystem) \
+			|| (dataview.project.id == securityService.userCurrentProject.id)
+
 		// Validate Dataview belongs to the project
-		if (!throwNotFound && dataview.project.id != securityService.userCurrentProject.id) {
+		if (!throwNotFound && !canAccess) {
 			securityService.reportViolation("attempted to access Dataview $dataview.id unrelated to project")
 			throwNotFound = true
 		}
@@ -179,7 +217,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewUpdateAccessOrException(Integer id, JSONObject dataviewJson, Dataview dataview) {
+	void validateDataviewUpdateAccessOrException(Long id, JSONObject dataviewJson, Dataview dataview) {
 		validateDataviewViewAccessOrException(id, dataview)
 		validateDataviewJson(dataviewJson, UPDATE_PROPERTIES)
 
@@ -211,7 +249,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataview - original object from database
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewDeleteAccessOrException(Integer id, Dataview dataview) {
+	void validateDataviewDeleteAccessOrException(Long id, Dataview dataview) {
 		validateDataviewViewAccessOrException(id, dataview)
 
 		String requiredPerm = dataview.isSystem ? Permission.AssetExplorerSystemDelete : Permission.AssetExplorerDelete
@@ -297,13 +335,14 @@ class DataviewService implements ServiceMethods {
         String hqlWhere = hqlWhere(dataviewSpec)
         String hqlOrder = hqlOrder(dataviewSpec)
         String hqlJoins = hqlJoins(dataviewSpec)
+		Map hqlParams = hqlParams(project, dataviewSpec)
 
         String hql = """
-            select $hqlColumns
-              from AssetEntity AE
-                $hqlJoins
-             where AE.project = :project and $hqlWhere  
-          order by $hqlOrder  
+			select $hqlColumns
+				from AssetEntity AE
+				$hqlJoins
+				where AE.project = :project and $hqlWhere  
+			order by $hqlOrder
         """
 
 		String countHql = """
@@ -312,22 +351,19 @@ class DataviewService implements ServiceMethods {
                 $hqlJoins
              where AE.project = :project and $hqlWhere
         """
+		
 
-        log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
+        List assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
+        Long totalAssets = AssetEntity.executeQuery(countHql, hqlParams)[0]
 
-        def assets = AssetEntity.executeQuery(hql, hqlParams(project, dataviewSpec), dataviewSpec.args)
-        def totalAssets = AssetEntity.executeQuery(countHql, hqlParams(project, dataviewSpec))
-
-        previewQueryResults(assets, totalAssets[0], dataviewSpec)
+        previewQueryResults(assets, totalAssets, dataviewSpec)
     }
 
 	/**
 	 * Retrieve the list of favorite data views for the current person,
 	 * @return List of dataviews (DataView instances) the user has favorited.
 	 */
-	List<Dataview> getFavorites(Long personId) {
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
+	List<Dataview> getFavorites(Person person) {
 		// Retrieve all the favorited views for the person.
 		/* Using createCriteria instead of where because there's no way of limiting the number
 		  of results using DetachedCriteria */
@@ -349,29 +385,8 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewId
 	 * @return
 	 */
-	void deleteFavoriteDataview(Long dataviewId) throws EmptyResultException, DomainUpdateException{
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
-		// Retrieve the current project
-		Project currentProject = securityService.getUserCurrentProject()
-
-		// Error message
-		String cannotDeleteErrorMsg = "Cannot delete favorite dataview for ${person.toString()}"
-
-		// If no dataviewId given, throw an exception
-		if (!dataviewId) {
-			throw new DomainUpdateException("${cannotDeleteErrorMsg}. No dataview id given.")
-		}
-
-		// Retrieve the given dataview.
-		Dataview dataview = Dataview.where{
-			id == dataviewId && project == currentProject
-		}.find()
-
-		// If no dataview was found, throw an exception
-		if (!dataview) {
-			throw new EmptyResultException("${cannotDeleteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
-		}
+	void deleteFavoriteDataview(Person person, Project currentProject, Long dataviewId) throws EmptyResultException, DomainUpdateException{
+		Dataview dataview = fetch(dataviewId)
 
 		// Delete the corresponding favorite
 		int deletedFavs = FavoriteDataview.where{
@@ -380,50 +395,31 @@ class DataviewService implements ServiceMethods {
 
 		// If no favs were deleted, throw an exception.
 		if (deletedFavs == 0) {
-			throw new DomainUpdateException("${cannotDeleteErrorMsg}. '${dataview.name}' isn't a favorited dataview.")
+			throw new DomainUpdateException('Favorite was not found')
 		}
-
 	}
 
 	/**
 	 * Add the given dataview to the current person's favorites.
 	 * @param dataviewId
 	 */
-	void addFavoriteDataview(Long dataviewId) {
-		// Retrieve the current person.
-		Person person = securityService.getUserLoginPerson()
-		// Retrieve the current project
-		Project currentProject = securityService.getUserCurrentProject()
-
-		// Error message
-		String cannotFavoriteErrorMsg = "Cannot favorite dataview for ${person.toString()}"
-
-		// If no dataviewId given, throw an exception
-		if (!dataviewId) {
-			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. No dataview id given.")
-		}
-
-		// Retrieve the given dataview.
-		Dataview dataview = Dataview.where{
-			id == dataviewId && project == currentProject
-		}.find()
-
-		// If no dataview was found, throw an exception
-		if (!dataview) {
-			throw new EmptyResultException("${cannotFavoriteErrorMsg}. No dataview with the id '${dataviewId}' exists for this project.")
-		}
+	void addFavoriteDataview(Person person, Project currentProject, Long dataviewId) {
+		Dataview dataview = fetch(dataviewId)
 
 		// Check if the favorite already exists.
-		FavoriteDataview favoriteDataview = FavoriteDataview.where{
+		FavoriteDataview favoriteDataview = FavoriteDataview.where {
 			person == person && dataview == dataview
 		}.find()
 
 		// If a favorite was found, throw an exception
 		if (favoriteDataview) {
-			throw new DomainUpdateException("${cannotFavoriteErrorMsg}. ${dataview.name} is already a favorite for this person.")
+			throw new DomainUpdateException('View is already a favorite')
 		}
 
-		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview).save()
+		favoriteDataview = new FavoriteDataview(person: person, dataview: dataview)
+		if (!favoriteDataview.save()) {
+			throw new DomainUpdateException('Unable to create favorite', favoriteDataview)
+		}
 	}
 
     /**
@@ -442,49 +438,48 @@ class DataviewService implements ServiceMethods {
      */
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
         [
-                pagination: [
-                        offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
-                ],
-                assets    : assets.collect { columns ->
-                    Map row = [:]
-                    columns = [columns].flatten()
-                    columns.eachWithIndex { cell, index ->
-                        if (dataviewSpec.columns[index]) {
-                            row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
-                        }
-                    }
+			pagination: [
+				offset: dataviewSpec.offset, max: dataviewSpec.max?:total, total: total
+			],
+			assets: assets.collect { columns ->
+				Map row = [:]
+				columns = [columns].flatten()
+				columns.eachWithIndex { cell, index ->
+					if (dataviewSpec.columns[index]) {
+						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+					}
+				}
 
-                    row
-                }
+				row
+			}
         ]
     }
+
     /**
-     *
-     *
-     *
+	 * Used to prepare the left outer join sentence based on
+	 * columns of a dataview Spec and transformations for HQL query
      * @param dataviewSpec
-     * @return
+     * @return the left outer join HQL sentence from the a Dataview spec
      */
 	private String hqlJoins(DataviewSpec dataviewSpec) {
         dataviewSpec.columns.collect { Map column ->
             "${joinFor(column)}"
         }.join(" ")
     }
+
     /**
-     *
      * Calculates HQL params from DataviewSpec for HQL query
-     *
      * @param project a Project instance to be added in Parameters
      * @param dataviewSpec
-     * @return
-     */
+     * @return a Map with params to be used in a executeQuery with an HQL query.
+	 */
 	private Map hqlParams(Project project, DataviewSpec dataviewSpec) {
         Map params = [project: project]
         if (dataviewSpec.justPlanning != null) {
             params << [
-                    moveBundles: MoveBundle.where {
-                        project == project && useForPlanning == dataviewSpec.justPlanning
-                    }.list()
+				moveBundles: MoveBundle.where {
+					project == project && useForPlanning == dataviewSpec.justPlanning
+				}.list()
             ]
         }
         dataviewSpec.filterColumns.each { Map column ->
@@ -497,28 +492,26 @@ class DataviewService implements ServiceMethods {
 
         params
     }
-    /**
-     *
-     * Creates a String with all the columns correctly set for select clause
-     *
-     * @param dataviewSpec
-     * @return
-     */
+
+	/**
+	 * Creates a String with all the columns correctly set for select clause
+	 * @param dataviewSpec
+	 * @return
+	 */
 	private String hqlColumns(DataviewSpec dataviewSpec){
 		dataviewSpec.columns.collect { Map column ->
 			"${propertyFor(column)}"
 		}.join(", ")
-    }
+	}
+
     /**
-     *
      * Creates a String with all the columns correctly set for where clause
-     *
      * @param dataviewSpec
      * @return
      */
-	private String hqlWhere(DataviewSpec dataviewSpec){
+	private String hqlWhere(DataviewSpec dataviewSpec) {
 
-        List where = []
+		List where = []
 
         if(!dataviewSpec.domains.isEmpty()){
             where << "AE.assetClass in (:assetClasses)"
@@ -528,60 +521,79 @@ class DataviewService implements ServiceMethods {
             where << "AE.moveBundle in (:moveBundles)"
         }
 
-        dataviewSpec.filterColumns.each { Map column ->
-            if (hasMultipleFilter(column)){
-				where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
-            } else {
-				where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
-            }
-        }
+		dataviewSpec.filterColumns.each { Map column ->
+			if (hasCustomFilterFor(column)){
+				if (hasMultipleFilter(column)){
+					where << "${getCustomFilterIn(column)} \n"
+				} else {
+					where <<  "${getCustomFilterLike(column)} \n"
+				}
+			} else {
+				if (hasMultipleFilter(column)){
+					where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
+				} else {
+					where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
+				}
+			}
+		}
+		where.join(' and ')
+	}
 
-        where.join(" and ")
-    }
-    /**
-     *
-     * Checks if column.filter has values to be used in filter.
-     *
-     *
+	/**
+     * Checks if column.filter has values to be used in filter
      * @param column a Column with filter value
      * @return
      */
 	private Boolean hasMultipleFilter(Map column) {
         splitColumnFilter(column).size() > 1
     }
+
+	/**
+	 * Checks if the column has a custom filter defined
+	 * @param column a Column to be checked
+	 * @return
+	 */
+	private Boolean hasCustomFilterFor(Map column) {
+		transformations[column.property].customFilterIn != null \
+		|| \
+		transformations[column.property].customFilterLike != null
+	}
+
     /**
-     *
      * Calculate Map with params splitting column.filter content
-     * if column.flter has only one value It's prepared with %${column.filter}%
+     * if column.filter has only one value It's prepared with %${column.filter}%
      * in order to use like filter in HQL query.
-     *
      * @param column
      * @return
      */
 	private def calculateParamsFor(Map column){
         String[] values = splitColumnFilter(column)
 
-        if(values.size() == 1){
+        if (values.size() == 1) {
 			"%${values[0].trim()}%".toString()
         } else {
 			values.collect { "${it.trim()}".toString()}
         }
     }
+
     /**
-     *
      * Columnn filters value could be split by '|' separator
-     *
+	 * @param column - a set of column attributes
+	 * @return one or more strings based on filter being spilt
      * For example:
-     *
-     * { "domain": "common", "property": "environment", "filter": "production|development" }
-     *
+     * 		{ "domain": "common", "property": "environment", "filter": "production|development" }
      */
 	private String[] splitColumnFilter(Map column) {
         column.filter.split("\\|")
     }
 
+    /**
+     * Calculates the order from DataviewSpec for HQL query
+     * @param dataviewSpec
+     * @return a String HQL order sentence
+     */
 	private String hqlOrder(DataviewSpec dataviewSpec){
-        "${propertyFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
+        "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
     private static String namedParameterFor(Map column) {
@@ -596,24 +608,87 @@ class DataviewService implements ServiceMethods {
         transformations[column.property].join
     }
 
+	private static String orderFor(Map column) {
+		transformations[column.property].alias ?: propertyFor(column)
+	}
+
+	private static String getCustomFilterIn(Map column) {
+		transformations[column.property].customFilterIn
+	}
+
+	private static String getCustomFilterLike(Map column) {
+		transformations[column.property].customFilterLike
+	}
+
+	/** 
+	 * Used to generate HQL that will properly concatenate a person's full name
+	 * @param propertyName - the particular property to construct the HQL for
+	 * @return the HQL for the computated fullName 
+	 */
+	private static String personFullName(String propertyName) {
+		"""
+			CONCAT( 
+				COALESCE(AE.${propertyName}.firstName, ''),
+				CASE WHEN COALESCE(AE.${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
+				COALESCE(AE.${propertyName}.middleName,''),
+				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
+				COALESCE(AE.${propertyName}.lastName,'')
+			)
+		"""
+	}
+
+	/**
+	 * Used to render the WHERE logic to filter on a person with LIKE statement
+	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
+	 * @param namedParameter - the name to use as the parameter fed into the query
+	 * @return the SQL to append to the WHERE clause
+	 */
+	private static String customFilterLike(String propertyName, String namedParameter) {
+		"( ${personFullName(propertyName)} like :${namedParameter} )"
+	}
+
+	/**
+	 * Used to render the WHERE logic to filter on a person with IN statement
+	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
+	 * @param namedParameter - the name to use as the parameter fed into the query
+	 * @return the SQL to append to the WHERE clause
+	 */
+	private static String customFilterIn(String propertyName, String namedParameter) {
+		"( ${personFullName(propertyName)} in (:${namedParameter}) )"
+	}
+
     private static final Map<String, Map> transformations = [
-            "id"          : [property: "str(AE.id)", type: String, namedParameter: "id", join: ""],
-			"assetClass"  : [property: "str(AE.assetClass)", type: String, namedParameter: "assetClass", join: ''],
-            "moveBundle"  : [property: "AE.moveBundle.name", type: String, namedParameter: "moveBundleName", join: "left outer join AE.moveBundle"],
-            "project"     : [property: "AE.project.description", type: String, namedParameter: "projectDescription", join: "left outer join AE.project"],
-            "manufacturer": [property: "AE.manufacturer.name", type: String, namedParameter: "manufacturerName", join: "left outer join AE.manufacturer"],
-            "sme"         : [property: "AE.sme.firstName", type: String, namedParameter: "smeFirstName", join: "left outer join AE.sme"],
-            "sme2"        : [property: "AE.sme2.firstName", type: String, namedParameter: "sme2FirstName", join: "left outer join AE.sme2"],
-            "model"       : [property: "AE.model.modelName", type: String, namedParameter: "modelModelName", join: "left outer join AE.model"],
-            "appOwner"    : [property: "AE.appOwner.firstName", type: String, namedParameter: "appOwnerFirstName", join: "left outer join AE.appOwner"],
-			"sourceLocation" : [property: "AE.roomSource.location", type: String, namedParameter: "sourceLocation", join: "left outer join AE.roomSource"],
-			"sourceRack" : [property: "AE.rackSource.tag", type: String, namedParameter: "sourceRack", join: "left outer join AE.rackSource"],
-			"sourceRoom" : [property: "AE.roomSource.roomName", type: String, namedParameter: "sourceRack", join: "left outer join AE.roomSource"],
-			"targetLocation" : [property: "AE.roomTarget.location", type: String, namedParameter: "targetLocation", join: "left outer join AE.roomTarget"],
-			"targetRack" : [property: "AE.rackTarget.tag", type: String, namedParameter: "targetRack", join: "left outer join AE.rackTarget"],
-			"targetRoom" : [property: "AE.roomTarget.roomName", type: String, namedParameter: "targetRack", join: "left outer join AE.roomTarget"]
+		'id'             : [property: 'str(AE.id)', type: String, namedParameter: 'id', join: ''],
+		'assetClass'     : [property: 'str(AE.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
+		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
+		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
+		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
+		'appOwner'       : [property: "${personFullName('appOwner')} as appOwner", 
+							type: String, namedParameter: 'appOwnerName', 
+							join: 'left outer join AE.appOwner', 
+							customFilterLike: customFilterLike('appOwner','appOwnerName'), 
+							customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
+		'sme'            : [property: "${personFullName('sme')} as sme", 
+							type: String, 
+							namedParameter: 'smeName', 
+							join: 'left outer join AE.sme', 
+							customFilterLike: customFilterLike('sme','smeName'), 
+							customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
+		'sme2'           : [property: "${personFullName('sme2')} as sme2", 
+							type: String, 
+							namedParameter: 'sme2Name', 
+							join: 'left outer join AE.sme2', 
+							customFilterLike: customFilterLike('sme2','sme2Name'), 
+							customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
+		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
+		'sourceLocation' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
+		'sourceRack'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
+		'sourceRoom'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
+		'targetLocation' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
+		'targetRack'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
+		'targetRoom'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget']
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: ""]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
     }
 
 	/**

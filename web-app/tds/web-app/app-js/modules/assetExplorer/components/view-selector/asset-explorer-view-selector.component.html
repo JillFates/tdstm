@@ -1,11 +1,26 @@
-<kendo-dropdownlist #kendoDropDown="kendoDropDownList" [defaultItem]="{name:'Saved Views',default:true}" [data]="data" (close)="onAction($event)"
- (open)="onAction($event)" [valueField]="'name'" [textField]="'name'" style="width: 266px;">
+<kendo-dropdownlist #kendoDropDown="kendoDropDownList"
+					[defaultItem]="defaultItem"
+					[data]="data"
+					[disabled]="isDisabled"
+					(close)="onAction($event)"
+					(open)="onAction($event)"
+					[valueField]="'name'"
+					[textField]="'name'"
+					class="asset-explorer-view-selector-component"
+					style="width: 266px;">
 	<ng-template kendoDropDownListValueTemplate let-dataItem>
-		<span style="cursor:pointer;width:100%;" (click)="onToggle()">{{dataItem.name}}</span>
+		<span style="cursor:pointer;width:100%;" (click)="onToggle()">
+			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
+				{{selectedItem}}
+			</div>
+			<ng-template #noneSelectedItem>
+				{{dataItem.name}}
+			</ng-template>
+		</span>
 	</ng-template>
 	<ng-template kendoDropDownListHeaderTemplate>
 		<div class="has-feedback" style="margin-top:-20px;">
-			<input type="text" class="form-control" (keyup)="onSearch()" [(ngModel)]='search' id="search" placeholder="Search" aria-describedby="search">
+			<input type="text" class="form-control" (keyup)="onSearch()" name="searchFilterSelector" id="searchFilterSelector" [(ngModel)]='searchFilterSelector' placeholder="Search" aria-describedby="search">
 			<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
 		</div>
 	</ng-template>

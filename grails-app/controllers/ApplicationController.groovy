@@ -59,7 +59,7 @@ class ApplicationController implements ControllerMethods {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 
-		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.App_Columns)
 
 		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
@@ -92,7 +92,7 @@ class ApplicationController implements ControllerMethods {
 		]
 
 		// Get the list of the user's column preferences
-		Map appPref = assetEntityService.getExistingPref('App_Columns')
+		Map appPref = assetEntityService.getExistingPref(PREF.App_Columns)
 		List<String> prefColumns = appPref*.value
 
 		// Get the list of fields for the domain
@@ -320,15 +320,17 @@ class ApplicationController implements ControllerMethods {
 	def columnAssetPref() {
 		def column = params.columnValue
 		String fromKey = params.from
-		def existingColsMap = assetEntityService.getExistingPref(params.type)
+		def prefCode = params.type as PREF
+		assert prefCode
+		def existingColsMap = assetEntityService.getExistingPref(prefCode)
 		String key = existingColsMap.find { it.value == column }?.key
 		if (key) {
 			existingColsMap[key] = params.previousValue
 		}
 
 		existingColsMap[fromKey] = column
-		userPreferenceService.setPreference(params.type, existingColsMap as JSON)
-		render true
+		userPreferenceService.setPreference(prefCode, existingColsMap as JSON)
+		render 'ok'
 	}
 
 	@HasPermission(Permission.AssetCreate)

@@ -5,19 +5,18 @@
 
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.Dataview
-import net.transitionmanager.domain.FavoriteDataview
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.dataview.DataviewSpec
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  *
@@ -26,8 +25,6 @@ import net.transitionmanager.service.dataview.DataviewSpec
  * @see UrlMappings
  */
 @Secured('isAuthenticated()')
-// TODO: John. Can we remove this logger since we aren't using in this class? Also we have an implementation in ControllerMethods.handleException
-@Slf4j(value='logger', category='grails.app.controllers.WsAssetExplorerController')
 class WsAssetExplorerController implements ControllerMethods, PaginationMethods {
 
 	private final static DELETE_OK_STATUS = "Dataview deleted successfully";
@@ -36,18 +33,21 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
+	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
+	// TODO: JPM 11/2017 - Methods do NOT need try/catches
+
 	/**
 	 * Returns the list of available dataviews as a map(json) result.
 	 * All Dataviews returned belong to current user project in session.
+     *
 	 * @return
 	 */
     def listDataviews() {
-		try {
-			List<Map> listMap = dataviewService.list()*.toMap(securityService.currentPersonId)
-			renderSuccessJson(listMap)
-		} catch (Exception e) {
-			handleException e, log
-		}
+		Person currentPerson = securityService.loadCurrentPerson()
+		Project currentProject = securityService.userCurrentProject
+		List<Dataview> dataviews = dataviewService.list(currentPerson, currentProject)
+		List<Map> listMap = dataviews*.toMap(currentPerson.id)
+		renderSuccessJson(listMap)
 	}
 
 	/**
@@ -73,7 +73,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured('isAuthenticated()')
 	def updateDataview(Integer id) {
 		try {
-			Map dataviewMap = dataviewService.update(id, request.JSON).toMap(securityService.currentPersonId)
+            Person currentPerson = securityService.loadCurrentPerson()
+            Project currentProject = securityService.userCurrentProject
+
+			Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
 			renderSuccessJson([dataView: dataviewMap])
 		} catch (Exception e) {
 			handleException e, log
@@ -89,7 +92,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured('isAuthenticated()')
 	def createDataview() {
 		try {
-			Map dataviewMap = dataviewService.create(request.JSON).toMap(securityService.currentPersonId)
+
+            JSONObject dataviewJson = request.JSON
+			Person person = securityService.loadCurrentPerson()
+			Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
+
+			Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
 			renderSuccessJson([dataView: dataviewMap])
 		} catch (Exception e) {
 			handleException e, log
@@ -112,17 +120,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		}
 	}
 
-	/**
-	 * Overrided handleExcpetion super class method in ControllerMethods class
-	 * to send just json reponse errors if exception is thrown.
-	 * @see ControllerMethods#handleException(java.lang.Exception, java.lang.Object)
-	 * @param e
-	 * @param log
-	 */
-	void handleException(Exception e, log) {
-		log.error(e)
-		renderErrorJson(e.message)
-	}
+
     /**
      * Performs a query for the Asset Explorer data grid using a saved View Specification plus
      * filter parameters that the user may have entered plus their preferences for the view.
@@ -230,7 +228,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
     @Secured('isAuthenticated()')
     def previewQuery(DataviewUserParamsCommand userParams) {
 
-        if(userParams.validate()){
+        if (userParams.validate()){
             Project project = securityService.userCurrentProject
 
             DataviewSpec dataviewSpec = new DataviewSpec(userParams)
@@ -247,12 +245,13 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured("isAuthenticated()")
 	def favoriteDataviews() {
-		try{
-			def favorites = dataviewService.getFavorites()
+		//try{
+            Person person = securityService.getUserLoginPerson()
+			def favorites = dataviewService.getFavorites(person)
 			renderSuccessJson(favorites)
-		} catch (Exception e) {
-			renderErrorJson(e.getMessage())
-		}
+		//} catch (Exception e) {
+		//	renderErrorJson(e.getMessage())
+		//}
 
 	}
 
@@ -262,7 +261,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured("isAuthenticated()")
 	def addFavoriteDataview(Long id) {
 		try{
-			dataviewService.addFavoriteDataview(id)
+            Person person = securityService.getUserLoginPerson()
+            Project currentProject = securityService.getUserCurrentProject()
+
+			dataviewService.addFavoriteDataview(person, currentProject, id)
 			renderSuccessJson("Dataview ${id} favorited")
 		} catch (Exception e) {
 			renderErrorJson(e.getMessage())
@@ -276,7 +278,10 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	@Secured("isAuthenticated()")
 	def deleteFavoriteDataview(Long id) {
 		try{
-			dataviewService.deleteFavoriteDataview(id)
+            Person person = securityService.getUserLoginPerson()
+            Project currentProject = securityService.getUserCurrentProject()
+
+			dataviewService.deleteFavoriteDataview(person, currentProject, id)
 			renderSuccessJson("Dataview ${id} removed from the person's favorites.")
 		} catch (Exception e) {
 			renderErrorJson(e.getMessage())

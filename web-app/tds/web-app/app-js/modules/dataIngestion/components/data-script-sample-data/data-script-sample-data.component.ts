@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
+import {Component} from '@angular/core';
+import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'data-script-sample-data',

@@ -1740,7 +1740,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		if (isDebugEnabled) {
 			log.debug '*************************************************************************************'
-			log.debug "**************** generateRunbook() by $whom for MoveEvent $moveEvent ****************"
+			log.debug '**************** generateRunbook() by {} for MoveEvent {} ****************', whom, moveEvent
 			log.debug '*************************************************************************************'
 			// log.debug "projectStaff is $projectStaff"
 		}

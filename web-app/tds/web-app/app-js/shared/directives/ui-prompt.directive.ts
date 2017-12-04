@@ -12,7 +12,10 @@ declare var jQuery: any;
 
 @Component({
 	selector: 'tds-ui-prompt',
-	templateUrl: '../tds/web-app/app-js/shared/directives/ui-prompt.directive.html'
+	templateUrl: '../tds/web-app/app-js/shared/directives/ui-prompt.directive.html',
+	styles: [`
+		.modal { background:none;}
+	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	title: string;

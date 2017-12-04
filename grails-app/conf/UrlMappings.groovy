@@ -63,13 +63,32 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/showTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/editTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'edit'
+		}
+
+		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'edit'
+		}
+
 		"/ws/asset/deleteAssets" {
 			controller = "wsAsset"
 			action = [
 			        POST: "deleteAssets"
 			]
-		}
-
+		}		
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -603,6 +622,12 @@ class UrlMappings {
 		// Angular 2 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
+
+		// Angular Single Page App Named mappings
+		name assetViewShow: "/module/asset/views/$id/show" {
+			controller = 'singleApp'
+			action = 'index'
+		}
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")

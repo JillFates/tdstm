@@ -710,15 +710,19 @@ class ProjectService implements ServiceMethods {
 		MoveBundle moveBundle
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
 		if (!project.defaultBundle) {
-			moveBundle = MoveBundle.findByNameAndProject(defaultBundleName, project)
+			
+			// TM-8319 - the name was being set to null
+			String bundleName = defaultBundleName ?: 'TBD'
+
+			moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
 			if (! moveBundle) {
 				moveBundle = new MoveBundle(
-						name: defaultBundleName,
-						project: project,
-						useForPlanning: true,
-						workflowCode: project.workflowCode,
-						startTime: project.startDate,
-						completionTime: project.completionDate
+					name: bundleName,
+					project: project,
+					useForPlanning: true,
+					workflowCode: project.workflowCode,
+					startTime: project.startDate,
+					completionTime: project.completionDate
 				)
 
 				if (!moveBundle.save(flush: true)) {

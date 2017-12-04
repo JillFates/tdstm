@@ -48,6 +48,11 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
         String distinguishedName = ctx.getStringAttribute('distinguishedname') ?: ''
         userInfo.guid = (objectGuid ? SecurityUtil.guidToString(objectGuid) : distinguishedName)
 
+        // TM-7169 - Use the name attribute if givename wasn't populated
+        if (!userInfo.firstName && !userInfo.fullName) {
+             userInfo.fullName = ctx.getStringAttribute('name') ?: ''
+        }
+
         List<String> ldapRoles = authorities.collect { it.authority }
         List<String> roles = []
         Map<String, String> roleMap = [:]

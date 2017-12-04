@@ -2354,6 +2354,8 @@ function clearFilter(gridId) {
 	$("[id^=gs_]").each(function () {
 		data[$(this).attr("name")] = '';//{assetName='',appOwner:'',environment:'',....}
 	});
+    // When clearing out the filters, also clear the filter param.
+    data["filter"] = ''
 	$("#" + gridId + "Grid").setGridParam({ postData: data });
 	$('.ui-icon-refresh').click();
 	$(".clearFilterId").attr("disabled", "disabled");

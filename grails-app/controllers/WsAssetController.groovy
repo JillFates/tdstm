@@ -10,9 +10,16 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.StorageService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
+import grails.gsp.PageRenderer
+
+import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 
 /**
  * Created by @oluna on 4/5/17.
@@ -23,6 +30,11 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
+	PageRenderer groovyPageRenderer
+	ControllerService controllerService
+	ApplicationService applicationService
+	DeviceService deviceService
+	StorageService storageService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -216,6 +228,89 @@ class WsAssetController implements ControllerMethods {
 		AssetEntity asset = AssetEntity.get(request.JSON.dependency.asset.id)
 		assetEntityService.updateAssetDependencyOrException(securityService.getUserCurrentProject(), asset, request.JSON.dependency.id, request.JSON.dependency)
 		renderSuccessJson()
+	}
+
+	/**
+	 * Used to retrieve the Angular HTML template used for the show or edit views of an asset
+	 * @param id - the id of the asset to generate the show view for
+	 * @param mode - the mode of the template to render [edit|show]
+	 * @return html template
+	 */
+	@HasPermission(Permission.AssetView)
+	def getTemplate(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode) || id == null ) {
+			sendBadRequest()
+			return
+		}
+
+		// Load the asset and validate that it is part of the project
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (! asset) {
+			sendNotFound()
+			return
+		}
+
+		Map model = [ asset: asset ]
+		String domainName = asset.assetClass.toString()
+		switch (domainName) {
+			case "APPLICATION":
+				model << applicationService.getModelForShow(asset.project, asset, params)
+				break
+			case "DEVICE":
+				model << deviceService.getModelForShow(asset.project, asset, params)
+				break
+			case "STORAGE":
+				model << storageService.getModelForShow(asset.project, asset, params)
+				break
+			default:
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+				break
+		}
+
+		domainName=domainName.toLowerCase()
+
+		try {
+			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+			if (pageHtml) {
+				render pageHtml
+			} else {
+				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
+				sendNotFound()
+			}
+		} catch (e) {
+			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
+			sendNotFound()
+		}
+	}
+
+	/**
+	 * Used to retrieve the model data for the show view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetView)
+	def getModel(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode) || id == null) {
+			sendBadRequest()
+			return
+		}
+
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (asset) {
+			Map model = [
+				asset: asset
+			]
+			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+			if (mode == 'show') {
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			} else {
+				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
+			}
+			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
+			renderAsJson(model)
+		}
 	}
 
 	/**

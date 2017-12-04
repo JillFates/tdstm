@@ -171,7 +171,7 @@
                                 </g:link>
                             </li>
                             <li>
-                                <g:link class="mmlink" base="/tdstm/module" controller="asset" action="views" id="1">
+                                <g:link class="mmlink" mapping="assetViewShow" id="1">
                                     <g:img uri="/icons/magnifier.png" width="16" height="16" /> All Assets
                                 </g:link>
                             </li>

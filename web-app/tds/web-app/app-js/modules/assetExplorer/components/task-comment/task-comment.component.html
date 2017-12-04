@@ -1,0 +1,29 @@
+<input type="checkbox" id="showAll" name="showAll" [(ngModel)]="showAll" />
+<label for="showAll">&nbsp;View All Tasks&nbsp;&nbsp;</label>
+<span id="viewUnpublishedContainerId" *ngIf="hasPublishPermission">
+	<input type="checkbox" id="viewUnpublishedCheckboxId" name="viewUnpublished" [(ngModel)]="viewUnpublishedValue" />
+	<label for="viewUnpublishedCheckboxId">&nbsp;View Unpublished Tasks</label>
+</span>
+<div class="list" style="position: relative; margin-top: 4px;">
+	<table id="listCommentsTables">
+		<thead>
+			<tr>
+				<!-- <th nowrap class="headerwidth3">Edit</th> -->
+				<th nowrap class="headerwidth3">Task&nbsp;#</th>
+				<th nowrap>Task/Comment</th>
+				<th nowrap class="headerwidth12">Status</th>
+				<th nowrap class="headerwidth6">Category</th>
+				<th nowrap class="headerwidth20">Assigned To</th>
+			</tr>
+		</thead>
+		<tbody id="listCommentsTbodyIds">
+			<tr *ngFor="let comment of getCommentsWithFilter()">
+				<td style="text-align: center;">{{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:''}}</td>
+				<td>{{comment.commentInstance.comment}}</td>
+				<td>{{(comment.commentInstance.commentType == 'issue')?comment.commentInstance.status:((comment.commentInstance.isResolved?'Archived':''))}}</td>
+				<td>{{comment.commentInstance.category}}</td>
+				<td>{{getAssignedTo(comment)}}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

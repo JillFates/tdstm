@@ -8,7 +8,7 @@ import { StateService } from '@uirouter/angular';
 import { Observable } from 'rxjs/Rx';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
-import { ViewColumn } from '../../model/view-spec.model';
+import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
@@ -68,6 +68,7 @@ export class AssetExplorerViewConfigComponent {
 	columnIndex = 0;
 	rowIndex = 0;
 
+	draggableColumns: QueryColumn[];
 	model: ViewModel;
 	domains: DomainModel[] = [];
 	filteredData: DomainModel[] = [];
@@ -94,6 +95,7 @@ export class AssetExplorerViewConfigComponent {
 				this.updateFilterbyModel();
 				this.currentTab = 1;
 				this.state.$current.data.page.title = this.model.name;
+				this.draggableColumns = this.model.schema.columns.slice();
 			}
 		}, (err) => console.log(err));
 	}
@@ -112,9 +114,11 @@ export class AssetExplorerViewConfigComponent {
 		if (!this.isAssetSelected()) {
 			this.model.schema.domains = [];
 			this.model.schema.columns = [];
+			this.draggableColumns = this.model.schema.columns.slice();
 		} else {
 			this.model.schema.columns = this.model.schema.columns
 				.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
+			this.draggableColumns = this.model.schema.columns.slice();
 		}
 		this.fields.filter(x => x['selected'] &&
 			this.model.schema.domains.indexOf(x['domain'].toLowerCase()) === -1)
@@ -373,6 +377,7 @@ export class AssetExplorerViewConfigComponent {
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
 		}
+		this.draggableColumns = this.model.schema.columns.slice();
 		this.grid.clear();
 		this.previewButtonClicked = false;
 	}
@@ -413,6 +418,7 @@ export class AssetExplorerViewConfigComponent {
 		this.model.schema.columns.splice(itemIndex, 1);
 		let lockeds = this.model.schema.columns.filter((x: ViewColumn) => x.locked).length;
 		this.model.schema.columns.splice(lockeds, 0, item);
+		this.draggableColumns = this.model.schema.columns.slice();
 	}
 
 	/**
@@ -449,5 +455,9 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onToggleSelectedColumnsPreview(): void {
 		this.collapsedColumnsPreview = !this.collapsedColumnsPreview;
+	}
+
+	protected onDragEnd(): void {
+		this.model.schema.columns = this.draggableColumns.slice();
 	}
 }

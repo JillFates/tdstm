@@ -52,7 +52,7 @@ class DatabaseController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def fieldPrefs = assetEntityService.getExistingPref('Database_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.Database_Columns)
 
 		[dbFormat: filters?.dbFormatFilter ?: '', dbName: filters?.assetNameFilter ?:'', dbPref: fieldPrefs] +
 		assetEntityService.getDefaultModelForLists(AssetClass.DATABASE, 'Database', project, fieldPrefs, params, filters)
@@ -91,7 +91,7 @@ class DatabaseController implements ControllerMethods {
 			depConflicts: params.depConflicts,
 			event: params.event
 		]
-		def dbPref = assetEntityService.getExistingPref('Database_Columns')
+		def dbPref = assetEntityService.getExistingPref(PREF.Database_Columns)
 
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DATABASE.toString(), true)
