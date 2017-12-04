@@ -1,4 +1,4 @@
-<div draggable class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 650px" tabindex="-1" data-keyboard="false">
+<div id="actionLookupModal" draggable class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">Action - ${apiAction.agent}</span>
 		<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
@@ -38,7 +38,7 @@
                         </tr>
                         <tr class="prop">
                             <td valign="top" colspan="2">
-                                <table>
+                                <table id="updateCommentTableInnerTable">
                                     <thead>
                                         <tr>
                                             <th>Parameter</th>
