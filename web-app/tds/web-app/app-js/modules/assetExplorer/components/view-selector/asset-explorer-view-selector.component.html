@@ -5,11 +5,12 @@
 					(close)="onAction($event)"
 					(open)="onAction($event)"
 					[valueField]="'name'"
+					(click)="onToggle()"
 					[textField]="'name'"
 					class="asset-explorer-view-selector-component"
 					style="width: 266px;">
 	<ng-template kendoDropDownListValueTemplate let-dataItem>
-		<span style="cursor:pointer;width:100%;" (click)="onToggle()">
+		<span style="cursor:pointer;width:100%;">
 			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
 				{{selectedItem}}
 			</div>
