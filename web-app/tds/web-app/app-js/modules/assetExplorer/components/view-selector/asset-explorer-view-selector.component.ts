@@ -32,15 +32,12 @@ export class AssetExplorerViewSelectorComponent implements AfterViewInit {
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];
 	public data: ViewGroupModel[];
-	private search = '';
+	private searchFilterSelector = '';
 	public defaultItem = {
 		name: 'Saved Views',
 		default: true
 	};
 	public selectedItem = '';
-
-	constructor(private service: AssetExplorerService, private stateService: StateService, private permissionService: PermissionService) {
-	}
 
 	constructor(
 		private service: AssetExplorerService,

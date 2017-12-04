@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Rx';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { SEARCH_QUITE_PERIOD } from '../../../../shared/model/constants';
+import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -17,7 +17,6 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
-import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
 import { AlertType } from '../../../../shared/model/alert.model';
 
 declare var jQuery: any;
@@ -168,7 +167,6 @@ export class AssetExplorerViewGridComponent {
 		data.assets.map(c => c.common_id).forEach(id => {
 			this.bulkItems[id] = false;
 		});
-		console.log(this.bulkItems);
 		this.gridData = {
 			data: data.assets,
 			total: data.pagination.total

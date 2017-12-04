@@ -9,7 +9,7 @@
 					class="asset-explorer-view-selector-component"
 					style="width: 266px;">
 	<ng-template kendoDropDownListValueTemplate let-dataItem>
-		<span style="cursor:pointer;width:100%;" (click)="onToggle()">{{dataItem.name}}</span>
+		<span style="cursor:pointer;width:100%;" (click)="onToggle()">
 			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
 				{{selectedItem}}
 			</div>

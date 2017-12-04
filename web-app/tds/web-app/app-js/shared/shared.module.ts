@@ -18,7 +18,7 @@ import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 // Shared Pipes
-import { UIBooleanPipe } from './pipes/types/ui-boolean.pipe';
+import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 // Shared Components
@@ -59,7 +59,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		ErrorPageComponent,
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
-		DynamicComponent
+		DynamicComponent,
 		CodeMirrorComponent
 	],
 	providers: [
@@ -87,7 +87,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
-		DynamicComponent
+		DynamicComponent,
 		CodeMirrorComponent
 	],
 	entryComponents: [DynamicComponent]

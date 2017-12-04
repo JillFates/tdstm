@@ -8,30 +8,34 @@ import {
 	OnDestroy, AfterViewInit
 } from '@angular/core';
 
-import { NotifierService } from '../services/notifier.service';
-import { UIActiveDialogService } from '../services/ui-dialog.service';
-import { ComponentCreatorService } from '../services/component-creator.service';
+import {NotifierService} from '../services/notifier.service';
+import {UIActiveDialogService} from '../services/ui-dialog.service';
+import {ComponentCreatorService} from '../services/component-creator.service';
+
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-ui-dialog',
 	template: `
-    <div class="modal fade" id="tdsUiDialog" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
-            <div class="modal-content">
-                <div #view></div>
+        <div class="modal fade" id="tdsUiDialog" data-backdrop="static" data-keyboard="false" tabindex="-1"
+             role="dialog">
+            <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
+                <div class="modal-content">
+                    <div #view></div>
+                </div>
             </div>
         </div>
-	</div>
-    <div #extraDialog></div>`,
+        <div #extraDialog></div>`,
 	styles: [`
-		.modal { background:none;}
+        .modal {
+            background: none;
+        }
 	`]
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
-	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
-	@ViewChild('extraDialog', { read: ViewContainerRef }) extraDialog: ViewContainerRef;
+	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+	@ViewChild('extraDialog', {read: ViewContainerRef}) extraDialog: ViewContainerRef;
 	@ViewChild('modalDialog') el: ElementRef;
 	size = 'md';
 	tdsUiDialog: any;
@@ -99,7 +103,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			instance.open(event.resolve, event.reject, cmpRef);
 		});
 
-
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
 			if (this.cmpRef) {
 				this.cmpRef.destroy();
@@ -107,8 +110,6 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.activeDialog.componentInstance = this.cmpRef;
 			}
 		});
-
-
 
 		this.closeNotifier = this.notifierService.on('dialog.close', event => {
 			if (this.cmpRef) {
