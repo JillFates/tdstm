@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild, OnInit} from '@angular/core';
+import {Component, Input, ViewChild, OnInit, Output, EventEmitter} from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
 
 @Component({
@@ -11,6 +11,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	@Input() domain: string;
 	@Input() field: FieldSettingsModel;
+	@Output('onShowPopup') onShowPopupEmitter = new EventEmitter<any>();
 
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
@@ -31,6 +32,11 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 
 	public onToggle(): void {
 		this.show = !this.show;
+		if (this.show) {
+			setTimeout( () => {
+				this.onShowPopupEmitter.emit();
+			}, 200);
+		}
 	}
 
 	public validateModel(): void {
