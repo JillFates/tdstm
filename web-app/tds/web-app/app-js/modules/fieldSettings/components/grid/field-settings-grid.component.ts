@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -34,6 +34,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
+	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	private state: State = {
@@ -55,6 +57,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
+	private gridDomElement: any;
 
 	private availableControls = [
 		{ text: 'List', value: 'List' },
@@ -63,7 +66,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor(private loaderService: UILoaderService, private prompt: UIPromptService) { }
+	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private el: ElementRef) {
+		this.gridDomElement = this.el.nativeElement;
+	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -238,10 +243,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
-	protected onControlChange(
-		dataItem: FieldSettingsModel,
-		selectList: SelectListConfigurationPopupComponent,
-		minMax: MinMaxConfigurationPopupComponent): void {
+	protected onControlChange(dataItem: FieldSettingsModel): void {
 		switch (dataItem.control) {
 			case 'List':
 
@@ -252,18 +254,18 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				if (!dataItem.constraints.values ||
 					dataItem.constraints.values.length === 0) {
-					selectList.onToggle();
+					this.selectList.onToggle();
 				} else {
-					selectList.show = false;
+					this.selectList.show = false;
 				}
 				break;
 			case 'String':
 				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
-					minMax.onToggle();
+					this.minMax.onToggle();
 				} else {
-					minMax.show = false;
+					this.minMax.show = false;
 				}
 				break;
 			case 'YesNo':
@@ -280,11 +282,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	}
 
-	protected onControlModelChange(
-		newValue: 'List' | 'String' | 'YesNo' | '',
-		dataItem: FieldSettingsModel,
-		selectList: SelectListConfigurationPopupComponent,
-		minMax: MinMaxConfigurationPopupComponent) {
+	protected onControlModelChange(newValue: 'List' | 'String' | 'YesNo' | '', dataItem: FieldSettingsModel) {
 		if (dataItem.control === 'List') {
 			this.prompt.open(
 				'Confirmation Required',
@@ -292,7 +290,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				'Ok', 'Cancel').then(result => {
 					if (result) {
 						dataItem.control = newValue;
-						this.onControlChange(dataItem, selectList, minMax);
+						this.onControlChange(dataItem);
 					} else {
 						setTimeout(() => {
 							jQuery('#control' + dataItem.field).val('List');
@@ -301,7 +299,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				});
 		} else {
 			dataItem.control = newValue;
-			this.onControlChange(dataItem, selectList, minMax);
+			this.onControlChange(dataItem);
 		}
 	}
 
@@ -317,6 +315,16 @@ export class FieldSettingsGridComponent implements OnInit {
 	 */
 	protected isFieldUsedAsPlanMethodology(field: FieldSettingsModel): boolean {
 		return this.data.planMethodology && this.data.planMethodology === field.field;
+	}
+
+	/**
+	 * Function called when any field control configuration popup is shown.
+	 * It grabs event emitter of control configuration component, and scrolls grid where the popup appears.
+	 */
+	private onControlConfigPopupShown(): void {
+		let gridContent: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
+		let gridContentHeight = gridContent.querySelector('div').offsetHeight;
+		gridContent.scrollTop = gridContentHeight / 2.3;
 	}
 
 }

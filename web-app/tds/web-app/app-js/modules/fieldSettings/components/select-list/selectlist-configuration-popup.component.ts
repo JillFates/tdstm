@@ -1,7 +1,7 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation} from '@angular/core';
 import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
@@ -35,6 +35,7 @@ export class SelectListConfigurationPopupComponent {
 	 */
 	@Input() field: FieldSettingsModel;
 	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
+	@Output('onShowPopup') onShowPopupEmitter = new EventEmitter<any>();
 
 	public items: any[] = [];
 	public newItem = '';
@@ -199,6 +200,9 @@ export class SelectListConfigurationPopupComponent {
 		this.show = !this.show;
 		if (this.show) {
 			this.load();
+			setTimeout( () => {
+				this.onShowPopupEmitter.emit();
+			}, 200);
 		} else {
 			this.items = [];
 		}

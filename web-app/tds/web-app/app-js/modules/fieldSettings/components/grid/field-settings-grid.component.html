@@ -128,12 +128,12 @@
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else controlTemp" let-dataItem>
             <div *ngIf="dataItem.udf">
                 <select class="form-control" style="float:left;width:100px" name="control" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}"
-                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem,selectList,minMax)" [ngModel]="dataItem.control">
+                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem)" [ngModel]="dataItem.control">
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <span *ngIf="!toBeDeleted(dataItem)">
-                    <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
-                    <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
+                    <selectlist-configuration-popup #selectList (onShowPopup)="onControlConfigPopupShown()" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
+                    <min-max-configuration-popup #minMax (onShowPopup)="onControlConfigPopupShown()" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
                 </span>
             </div>
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
