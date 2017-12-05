@@ -142,14 +142,10 @@ a:hover {
 							</td>
 						</tr>
 						<tr class="even">
-							<td>
+							<td colspan="2">
 								<tds:hasPermission permission="${Permission.ApplicationRestart}">
 									<g:link controller="admin" action="restartAppServiceForm" style="color:black">Restart Application Service</g:link>
 								</tds:hasPermission>
-							</td>
-
-							<td>
-
 							</td>
 						</tr>
 
