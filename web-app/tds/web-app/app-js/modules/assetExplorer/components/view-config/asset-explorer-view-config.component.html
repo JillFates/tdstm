@@ -32,6 +32,8 @@
 				 (click)="onSaveAs()">
 					<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}</button>
 			</ng-template>
+			<button type="button" class="btn btn-default" id="btnCancel" (click)="onCancel()">
+				<i class="fa fa-fw fa-times"></i> {{ 'GLOBAL.CANCEL' | translate }}</button>
 			<span class="btn" (click)="onFavorite()" style="margin:0 10px;padding:0 10px;">
 				<i style="font-size:20px;" class="fa fa-star-o text-yellow" [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
 			</span>

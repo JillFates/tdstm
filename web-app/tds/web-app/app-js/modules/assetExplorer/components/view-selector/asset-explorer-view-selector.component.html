@@ -28,20 +28,18 @@
 	<ng-template kendoDropDownListItemTemplate let-dataItem>
 		<div class="container" *ngIf="!dataItem.default; else default">
 			<div class="row" (click)="onFolderClick(dataItem)">
-				<i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}} <span class="label label-primary pull-right">{{dataItem.items.length}}</span>
+				<i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
+				<span class="label label-primary pull-right">{{dataItem.items.length}}</span>
 			</div>
 			<div class="row" style="margin-top:5px;" *ngIf="dataItem.open">
 				<li *ngIf="isCreateVisible(dataItem)">
-					<a (click)="onCreateNew(dataItem)" class="btn"><i class="fa fa-plus-square"></i> Create New</a>
+					<a (click)="onCreateNew(dataItem)" class="btn">
+						<i class="fa fa-plus-square"></i> Create New</a>
 				</li>
 				<li>
 					<ul style="padding-left:10px;margin-top:5px;" *ngFor="let value of dataItem.items">
-						<div *ngIf="!nameAsUrl; else as_url">
-							<a href="javascript:void(null);" (click)="onSelectItem(dataItem, value)"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
-						</div>
-						<ng-template #as_url>
-						<a href="./asset/views/{{value.id}}/show"><i class="fa fa-file-text-o"></i> {{value.name}}</a>
-						</ng-template>
+						<a uiSref="tds.assetexplorer_show" [uiParams]="{id:value.id}">
+							<i class="fa fa-file-text-o"></i> {{value.name}}</a>
 					</ul>
 				</li>
 			</div>
