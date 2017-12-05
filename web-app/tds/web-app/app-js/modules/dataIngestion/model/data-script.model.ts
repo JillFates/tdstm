@@ -9,15 +9,18 @@ export class DataScriptColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 120
+				width: 108,
+				locked: true
 			}, {
 				label: 'Name',
 				property: 'name',
-				type: 'text'
+				type: 'text',
+				locked: true
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
-				type: 'text'
+				type: 'text',
+				width: 220
 			}, {
 				label: 'Description',
 				property: 'description',
@@ -25,7 +28,8 @@ export class DataScriptColumnModel {
 			}, {
 				label: 'Mode',
 				property: 'modeFormat',
-				type: 'text'
+				type: 'text',
+				width: 200
 			}, {
 				label: 'Date Create',
 				property: 'dateCreated',

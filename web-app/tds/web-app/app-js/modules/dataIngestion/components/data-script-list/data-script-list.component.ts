@@ -14,7 +14,8 @@ import { DataScriptViewEditComponent } from '../data-script-view-edit/data-scrip
 	selector: 'data-script-list',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
 	styles: [`
-        #btnCreateDataScript { margin-left: 16px; }
+		#btnCreateDataScript { margin-left: 16px; }
+		.action-header { width:100%; text-align:center; }
 	`]
 })
 export class DataScriptListComponent {
