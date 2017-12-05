@@ -8,18 +8,18 @@ import {
 	OnDestroy, AfterViewInit
 } from '@angular/core';
 
-import {NotifierService} from '../services/notifier.service';
-import {UIActiveDialogService} from '../services/ui-dialog.service';
-import {ComponentCreatorService} from '../services/component-creator.service';
+import { NotifierService } from '../services/notifier.service';
+import { UIActiveDialogService } from '../services/ui-dialog.service';
+import { ComponentCreatorService } from '../services/component-creator.service';
 
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-ui-dialog',
 	template: `
-        <div class="modal fade" id="tdsUiDialog" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1"
              role="dialog">
-            <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
+            <div class="modal-dialog modal-{{size}}" role="document" tabindex="-1" #modalDialog>
                 <div class="modal-content">
                     <div #view></div>
                 </div>
@@ -34,9 +34,10 @@ declare var jQuery: any;
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
-	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
-	@ViewChild('extraDialog', {read: ViewContainerRef}) extraDialog: ViewContainerRef;
+	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
+	@ViewChild('extraDialog', { read: ViewContainerRef }) extraDialog: ViewContainerRef;
 	@ViewChild('modalDialog') el: ElementRef;
+	keyboard = false;
 	size = 'md';
 	tdsUiDialog: any;
 
@@ -57,6 +58,11 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		this.tdsUiDialog = jQuery('#tdsUiDialog');
+		this.tdsUiDialog.on('hide.bs.modal', () => {
+			if (this.reject) {
+				this.reject();
+			}
+		});
 		jQuery(this.el.nativeElement).draggable({
 			handle: '.modal-header'
 		});
@@ -92,9 +98,12 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.reject = event.reject;
 			this.resolve = event.resolve;
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
-
+			this.keyboard = event.escape;
 			this.activeDialog.componentInstance = this.cmpRef;
-			this.tdsUiDialog.modal('show');
+			this.tdsUiDialog.data('bs.modal').options.keyboard = this.keyboard;
+			this.tdsUiDialog.modal({
+				keyboard: this.keyboard
+			}).modal('show');
 		});
 
 		this.extraNotifier = this.notifierService.on('dialog.extra', event => {
