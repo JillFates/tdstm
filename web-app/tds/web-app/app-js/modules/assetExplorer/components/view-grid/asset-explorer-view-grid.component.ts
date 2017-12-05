@@ -214,7 +214,7 @@ export class AssetExplorerViewGridComponent {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			'lg').then(x => {
+			'lg', true).then(x => {
 				this.createDependencyPromise(x.assetClass, x.id);
 			}).catch(x => {
 				console.log(x);
