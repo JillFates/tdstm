@@ -1,29 +1,40 @@
-import {Component, Inject} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent, RowArgs} from '@progress/kendo-angular-grid';
+import { Component, Inject } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
+import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
 
-import {DataIngestionService} from '../../service/data-ingestion.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType} from '../../model/data-script.model';
-import {DataScriptViewEditComponent} from '../data-script-view-edit/data-script-view-edit.component';
+import { DataIngestionService } from '../../service/data-ingestion.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
+import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
 
 @Component({
 	selector: 'data-script-list',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-list/data-script-list.component.html',
 	styles: [`
-        #btnCreateDataScript { margin-left: 16px; }
+		#btnCreateDataScript { margin-left: 16px; }
+		.action-header { width:100%; text-align:center; }
 	`]
 })
 export class DataScriptListComponent {
 
-	public filter: CompositeFilterDescriptor;
+	private state: State = {
+		sort: [{
+			dir: 'asc',
+			field: 'name'
+		}],
+		filter: {
+			filters: [],
+			logic: 'and'
+		}
+	};
+
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
-	public gridData: any[];
+	public gridData: GridDataResult;
 	public resultSet: DataScriptModel[];
 	public selectedRows = [];
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
@@ -37,18 +48,27 @@ export class DataScriptListComponent {
 		dataScripts.subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.gridData = filterBy(this.resultSet, this.filter);
+				this.resultSet.forEach(x => {
+					x['modeFormat'] = (x.mode as any) ? 'Export' : 'Import';
+				});
+				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.filter = filter;
-		this.gridData = filterBy(this.resultSet, filter);
+		console.log(filter);
+		this.state.filter = filter;
+		this.gridData = process(this.resultSet, this.state);
+	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.gridData = process(this.resultSet, this.state);
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.filter || { logic: 'and', filters: []};
+		let root = this.state.filter || { logic: 'and', filters: [] };
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
@@ -92,10 +112,10 @@ export class DataScriptListComponent {
 
 	protected clearValue(column: any, value?: any): void {
 		column.filter = '';
-		if (this.filter && this.filter.filters.length > 0) {
-			const filterIndex = this.filter.filters.findIndex((r: any) => r.field === column.property);
-			this.filter.filters.splice(filterIndex, 1);
-			this.filterChange(this.filter);
+		if (this.state.filter && this.state.filter.filters.length > 0) {
+			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
+			this.state.filter.filters.splice(filterIndex, 1);
+			this.filterChange(this.state.filter);
 		}
 	}
 
@@ -104,7 +124,7 @@ export class DataScriptListComponent {
 			name: '',
 			description: '',
 			mode: DataScriptMode.IMPORT,
-			provider: { id: null, name: ''}
+			provider: { id: null, name: '' }
 		};
 		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
@@ -150,7 +170,7 @@ export class DataScriptListComponent {
 		this.dataIngestionService.getDataScripts().subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.gridData = filterBy(this.resultSet, this.filter);
+				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
 	}
@@ -162,8 +182,8 @@ export class DataScriptListComponent {
 	 */
 	private openDataScriptDialogViewEdit(dataScriptModel: DataScriptModel, actionType: number): void {
 		this.dialogService.open(DataScriptViewEditComponent, [
-			{provide: DataScriptModel, useValue: dataScriptModel},
-			{provide: Number, useValue: actionType}
+			{ provide: DataScriptModel, useValue: dataScriptModel },
+			{ provide: Number, useValue: actionType }
 		]).then(result => {
 			this.reloadDataScripts();
 			if (actionType === ActionType.CREATE) {
