@@ -568,7 +568,7 @@ class PartyRelationshipService implements ServiceMethods {
 		List<Party> companies
 		if (project) {
 			companies = PartyRelationship.where {
-				partyIdFrom.id == project.id
+				partyIdFrom == project
 				roleTypeCodeFrom.id == RoleType.PROJECT
 				partyRelationshipType.id in ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR', 'PROJ_PARTNER']
 			}.projections {property('partyIdTo')}.list()
