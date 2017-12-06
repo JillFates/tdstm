@@ -1884,8 +1884,8 @@ class ImportService implements ServiceMethods {
 	 * @return
 	 */
 	def validateAndProcessWorkbookSheets(Project project, CommonsMultipartFile file, Map<String, String> params) {
-		//def stopwatch = new StopWatch()
-		//stopwatch.start()
+		def stopwatch = new StopWatch()
+		stopwatch.start()
 
 		// ------
 		// Some variables that are referenced by the following closures
@@ -2055,7 +2055,7 @@ class ImportService implements ServiceMethods {
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DEVICE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
-				//log.info "upload() Devices took ${stopwatch.lap()}"
+				log.info "upload() Devices took ${stopwatch.lap()}"
 			}
 
 			// ----
@@ -2069,7 +2069,7 @@ class ImportService implements ServiceMethods {
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, APPLICATION)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
-				//log.info "upload() Applications took ${stopwatch.lap()}"
+				log.info "upload() Applications took ${stopwatch.lap()}"
 			}
 
 			// ----
@@ -2083,7 +2083,7 @@ class ImportService implements ServiceMethods {
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DATABASE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
-			//	log.info "upload() Databases took ${stopwatch.lap()}"
+				log.info "upload() Databases took ${stopwatch.lap()}"
 			}
 
 			// ----
@@ -2097,7 +2097,7 @@ class ImportService implements ServiceMethods {
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, STORAGE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
-				//log.info "upload() Logical Storage took ${stopwatch.lap()}"
+				log.info "upload() Logical Storage took ${stopwatch.lap()}"
 			}
 
 			// Process Dependencies
@@ -2365,7 +2365,7 @@ class ImportService implements ServiceMethods {
 
 				importResults.summary = "$dependencySheetRow Rows read, $dependencyAdded Added, $dependencyUpdated Updated, $dependencyUnchanged Unchanged, $dependencyErrored Errored, $dependencySkipped Skipped"
 				processResults('Dependencies', importResults)
-				//log.info "upload() Dependencies took ${stopwatch.lap()}"
+				log.info "upload() Dependencies took ${stopwatch.lap()}"
 
 			} // Process Dependencies
 
@@ -2386,7 +2386,7 @@ class ImportService implements ServiceMethods {
 				importResults.summary = "$importResults.rowsProcessed Rows read, $resultMap.cablingUpdated Updated, $resultMap.cablingSkipped Skipped, ${importResults.errors.size()} Errored"
 				processResults('Cabling', importResults)
 
-			//	log.info "upload() Cabling took ${stopwatch.lap()}"
+				log.info "upload() Cabling took ${stopwatch.lap()}"
 			}
 
 			// ----
@@ -2542,7 +2542,7 @@ class ImportService implements ServiceMethods {
 				}
 				importResults.summary = "$importResults.rowsProcessed Rows read, $commentAdded Added, $commentUpdated Updated, $commentUnchanged Unchanged, ${importResults.errors.size()} Errors"
 				processResults('Comments', importResults)
-				//log.info "upload() Comments took ${stopwatch.lap()}"
+				log.info "upload() Comments took ${stopwatch.lap()}"
 
 			} // Process Comment Imports
 
