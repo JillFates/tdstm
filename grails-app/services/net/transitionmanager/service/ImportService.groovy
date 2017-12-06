@@ -72,7 +72,6 @@ class ImportService implements ServiceMethods {
 	DeviceService deviceService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
-	ProjectService projectService
 	ProgressService progressService
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
