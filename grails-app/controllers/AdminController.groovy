@@ -89,7 +89,7 @@ class AdminController implements ControllerMethods {
 				args: [securityService.currentUsername, cmd])
 		Shell.systemLog(logStr)
 
-		auditService.saveUserAudit(UserAuditBuilder.initiatedAppRestart())
+		auditService.saveUserAudit(UserAuditBuilder.restartedApplication())
 
 		log.warn(logStr)
 
