@@ -9,7 +9,8 @@ declare var jQuery: any;
 @Component({
 	selector: 'header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
-	providers: [TranslatePipe]
+	providers: [TranslatePipe],
+	styles: [`.font-weight-bold { font-weight:bold; }`]
 })
 
 export class HeaderComponent implements AfterViewInit {
