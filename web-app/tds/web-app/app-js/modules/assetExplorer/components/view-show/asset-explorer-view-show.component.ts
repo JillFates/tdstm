@@ -42,6 +42,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 			this.domains = result[0];
 			this.model = result[1];
 			this.stateService.$current.data.page.title = this.model.name;
+			document.title = this.model.name;
 		}, (err) => console.log(err));
 	}
 
