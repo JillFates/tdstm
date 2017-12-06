@@ -197,7 +197,7 @@ class WsTaskController implements ControllerMethods {
 	 * @param id - task id
 	 * @return
 	 */
-	@HasPermission(Permission.ActionEdit)
+	@HasPermission(Permission.ActionReset)
 	def resetAction() {
 		AssetComment assetComment = AssetComment.get(params.id)
 		if (assetComment) {

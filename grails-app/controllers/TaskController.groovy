@@ -330,9 +330,9 @@ class TaskController implements ControllerMethods {
 				}
 			}
 
-			if (securityService.hasPermission(Permission.ActionEdit)) {
+			if (securityService.hasPermission(Permission.ActionReset)) {
 				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
-					actionBar << [label   : 'Reset Action', icon: 'ui-icon-power', actionType: 'resetAction', newStatus: READY,
+					actionBar << [label: 'Action Reset', icon: 'ui-icon-power', actionType: 'resetAction', newStatus: READY,
 								  redirect: 'taskManager', disabled: false]
 				}
 			}

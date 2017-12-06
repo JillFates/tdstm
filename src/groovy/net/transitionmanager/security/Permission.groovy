@@ -19,6 +19,7 @@ interface Permission {
 			ActionDelete				  = 'ActionDelete',
 			ActionEdit				  	  = 'ActionEdit',
 			ActionInvoke			  	  = 'ActionInvoke',
+			ActionReset				  	  = 'ActionReset',
 			ApplicationRestart            = 'ApplicationRestart',
 			ArchitectureView              = 'ArchitectureView',
 			AssetCreate                   = 'AssetCreate',
