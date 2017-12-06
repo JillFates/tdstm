@@ -1972,7 +1972,12 @@ class ImportService implements ServiceMethods {
 
 		// Contains map of the custom fields name values to match with the spreadsheet
 		Map projectCustomLabels = [:]
-
+		for (int i = 1; i<= Project.CUSTOM_FIELD_COUNT; i++) {
+			String pcKey = 'custom' + i
+			if (project[pcKey]) {
+				projectCustomLabels[project[pcKey]] = 'Custom' + i
+			}
+		}
 
 		// create workbook
 		def workbook
@@ -2042,7 +2047,7 @@ class ImportService implements ServiceMethods {
 			Map importResults
 			String sheetName, domainClassName
 
-			//log.info "upload() Initializtion loading took ${stopwatch.lap()}"
+			log.info "upload() Initializtion loading took ${stopwatch.lap()}"
 
 			// ----
 			// Devices Sheet
