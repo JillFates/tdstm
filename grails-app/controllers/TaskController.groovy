@@ -333,7 +333,7 @@ class TaskController implements ControllerMethods {
 			if (securityService.hasPermission(Permission.ActionReset)) {
 				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
 					actionBar << [label: 'Action Reset', icon: 'ui-icon-power', actionType: 'resetAction', newStatus: READY,
-								  redirect: 'taskManager', disabled: false]
+								  redirect: 'taskManager', tooltipText: 'Reset Task Status', disabled: false]
 				}
 			}
 
