@@ -878,6 +878,7 @@ class ReportsController implements ControllerMethods {
 			def startupById = startupBy instanceof Person ? startupBy.id : -1
 			def testingById = testingBy instanceof Person ? testingBy.id : -1
 
+
 			// TODO: we'd like to flush the session
 			// GormUtil.flushAndClearSession(idx)
 			appList.add([
