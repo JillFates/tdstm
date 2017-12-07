@@ -16,7 +16,8 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-selector/asset-explorer-view-selector.component.html',
 	encapsulation: ViewEncapsulation.None,
 	styles: [
-		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}`
+		`ul.k-list .k-item.k-state-selected,ul.k-list .k-item.k-state-selected:hover { color: #656565;  background-color: #ededed;}
+		 ul.k-list .k-item span.label { font-size:90% }`
 	]
 })
 export class AssetExplorerViewSelectorComponent implements AfterViewInit {
