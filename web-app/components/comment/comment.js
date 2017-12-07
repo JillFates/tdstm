@@ -2544,6 +2544,9 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
 						}
 						scope.loading = false;
                     }
+                    setTimeout(function(){
+                        $('[data-toggle="popover"]').popover();
+                    }, 600);
                 });
 
 			}
