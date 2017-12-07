@@ -55,7 +55,10 @@
 							<td colspan="2">
 								<g:render template="../application/show"
 										  model="[applicationInstance:application.app, customs: customs,
-												  project:project, standardFieldSpecs: standardFieldSpecs]" >
+												  project:project, standardFieldSpecs: standardFieldSpecs,
+												  shutdownBy: application.shutdownBy, shutdownById: application.shutdownById,
+												  startupBy: application.startupBy, startupById: application.startupById,
+												  testingBy: application.testingBy, testingById: application.testingById]" >
 								</g:render>
 							</td>
 						</tr>
