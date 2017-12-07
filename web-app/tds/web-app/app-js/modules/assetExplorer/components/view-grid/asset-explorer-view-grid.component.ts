@@ -8,7 +8,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
-import {NotifierService} from '../../../../shared/services/notifier.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 @Component({
@@ -54,6 +54,7 @@ export class AssetExplorerViewGridComponent {
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
 	typingTimeout: any;
+	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 
 	state: State = {
 		skip: 0,
@@ -103,14 +104,14 @@ export class AssetExplorerViewGridComponent {
 	onFilterKeyUp(e: KeyboardEvent): void {
 		if (e.code === Keystroke.ENTER) {
 			this.onFilter();
-		} else if (e.code !== Keystroke.TAB && e.code !== Keystroke.SHIFT_RIGHT && e.code !== Keystroke.SHIFT_LEFT) {
+		} else if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
-		if (e.code !== 'Tab') {
+		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
 	}
