@@ -869,9 +869,15 @@ class ReportsController implements ControllerMethods {
 
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
+
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
+
+			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
+			def startupById = startupBy instanceof Person ? startupBy.id : -1
+			def testingById = testingBy instanceof Person ? testingBy.id : -1
+
 
 			// TODO: we'd like to flush the session.
 			// GormUtil.flushAndClearSession(idx)
@@ -879,7 +885,7 @@ class ReportsController implements ControllerMethods {
 				          redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
 				          appMoveEvent: appMoveEvent, moveEventList: moveEventList, appMoveEvent: appMoveEventlist,
 				          dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				          project: project, prefValue: prefValue,
+				          project: project, prefValue: prefValue, shutdownById: shutdownById, startupById: startupById, testingById: testingById,
 				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
 		}
 
