@@ -175,7 +175,8 @@
 				},
 			 	dataBound: onDataBound,
 				 pageable: {
-					 pageSize: 50,
+					 pageSize: ${raw(com.tdsops.common.ui.Pagination.MAX_DEFAULT)},
+					 pageSizes: [ ${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) } ]
 				 },
 			}).data("kendoGrid");
 

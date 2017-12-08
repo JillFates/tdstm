@@ -22,6 +22,7 @@
 					sortname="'name'"
 					caption="listCaption"
 					width="'100%'"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					gridComplete="function(){bindResize('moveEventListId')}"
 					showPager="true">
 					<jqgrid:navigation id="moveEventListId" add="false" edit="false" del="false" search="false" refresh="true" />

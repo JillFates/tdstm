@@ -89,6 +89,7 @@
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'lastname'"
 					caption="listCaption"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
 					gridComplete="function(){bindResize('personId')}"
 					showPager="true"

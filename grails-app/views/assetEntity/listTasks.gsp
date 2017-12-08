@@ -129,6 +129,7 @@
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
 				rowNum="sizePref"
+				rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 				scrollOffset="0"
 				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId'); gridLoadComplete(); }"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
