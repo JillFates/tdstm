@@ -88,7 +88,6 @@ export const en_DICTIONARY: Object = {
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
 		'FREEZE': 'Freeze',
-		'SORT': 'Sort',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..'
 	},
