@@ -35,6 +35,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unrecognized command $method with args $args".toString())
     }
 
+    static ETLProcessorException parameterMissing (String parameter) {
+        new ETLProcessorException("Unrecognized command $parameter".toString())
+    }
+
     static ETLProcessorException extractMissingColumn (String columnName) {
         new ETLProcessorException("Extracting a missing column name '$columnName'".toString())
     }
