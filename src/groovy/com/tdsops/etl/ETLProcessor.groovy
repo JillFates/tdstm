@@ -495,7 +495,10 @@ class ETLProcessor {
     }
 
     List<String> getAvailableMethods () {
-        ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference', 'with', 'on', 'labels', 'transform', 'translate', 'debug']
+        ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
+         'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
+         'uppercase()', 'lowercase()', 'first(content)', 'last(content)', 'all(content)',
+         'left(amount)', 'right(amount)', 'replace(regex, replacement)']
     }
 
     List<String> getAssetFields () {

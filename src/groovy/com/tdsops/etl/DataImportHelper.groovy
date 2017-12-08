@@ -190,7 +190,7 @@ class DataImportHelper {
             errorMsg = "Value ${newValue} for field ${fieldName} is not a number. Asset No. ${params.assetIdx} in class ${params.assetClass}."
             // Check if the original value was given but it's not a number
         } else if (!StringUtil.isBlank(originalValue) && transformedOriginalValue == null) {
-                errorMsg = "Value ${originalValue} for field ${fieldName} is not a number. Asset No. ${params.assetIdx} in class ${params.assetClass}."
+            errorMsg = "Value ${originalValue} for field ${fieldName} is not a number. Asset No. ${params.assetIdx} in class ${params.assetClass}."
         }
 
         results.errorMsg = errorMsg
@@ -232,7 +232,7 @@ class DataImportHelper {
             if (! field ) {
                 // Construct what looks like a field for the id
                 field = [
-                    field: [name: 'id', control: 'Number', label: 'ID'],
+                        field: [name: 'id', control: 'Number', label: 'ID'],
                 ]
             }
 
