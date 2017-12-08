@@ -1,5 +1,5 @@
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
- [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-6">
@@ -78,7 +78,7 @@
 	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
 		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 		<kendo-pager-next-buttons></kendo-pager-next-buttons>
-		<kendo-pager-page-sizes [pageSizes]="[25,50,100,500,1000]"></kendo-pager-page-sizes>
+		<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
 		<div *ngIf="showMessage" class="grid-message">
 			<label>{{ gridMessage | translate }}</label>
 		</div>

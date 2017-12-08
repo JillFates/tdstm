@@ -23,6 +23,7 @@
 					{name:'lastUpdated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
 				sortname="'companyName'"
 				caption="listCaption"
+				rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 				gridComplete="function(){bindResize('companyId')}"
 				showPager="true">
 				<jqgrid:navigation id="companyId" add="false" edit="false" del="false" search="false"/>

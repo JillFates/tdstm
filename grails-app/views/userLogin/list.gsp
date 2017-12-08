@@ -64,6 +64,7 @@
 						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'username'"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"
 					showPager="true">

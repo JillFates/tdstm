@@ -465,8 +465,8 @@ $('#reportsMenu').hide();
 								mode: "row"
 							},
 							pageable: {
-								pageSize: 25,
-								pageSizes: [25, 100, 500, 1000]
+								pageSize: ${raw(com.tdsops.common.ui.Pagination.MAX_DEFAULT)},
+								pageSizes: [ ${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) } ]
 							}
 						});
 					}

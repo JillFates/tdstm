@@ -83,6 +83,7 @@
 					sortname="'assetName'"
 					caption="listCaption"
 					rowNum="sizePref"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('storageId');recompileDOM('storageIdWrapper');}"

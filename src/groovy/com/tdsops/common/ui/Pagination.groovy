@@ -46,4 +46,11 @@ class Pagination {
         offset
     }
 
+    /**
+     * Returns the MAX_OPTIONS list as a comma separate list of the values as a string
+     */
+    static String optionsAsText(){
+        MAX_OPTIONS.join(',')
+    }
+
 }
