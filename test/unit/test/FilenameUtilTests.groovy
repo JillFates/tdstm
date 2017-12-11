@@ -1,7 +1,28 @@
 package test
 
+import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Project
+import spock.lang.See
+import spock.lang.Specification
+
 /**
  * Created by ecantu on 12/11/2017.
  */
-class FilenameUtilTests {
+class FilenameUtilTests extends Specification {
+
+    @See('TM8124')
+    def '01. Test file name format 1'() {
+        given: 'a Project and Move Event with the corresponding values'
+            String fileExtension = 'xlsx'
+            PartyGroup company = new PartyGroup(name:'ABC Company')
+            Project project = new Project(name:'Test Project', projectCode: 'Big Movie', client: company)
+            MoveEvent me = new MoveEvent([project:project, name: 'ERP Event'])
+            def date = new Date()
+        expect: 'the resulting file name for format 1 match the expected file naming scheme'
+            def filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:me], fileExtension)
+                filename == 'ABC_Company-Big_Movie-ERP_Event-' + TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, new Date(), TimeUtil.FORMAT_DATE_TIME_26) + '.xlsx'
+    }
 }
