@@ -38,4 +38,16 @@ class FilenameUtilTests extends Specification {
         def filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:me], fileExtension)
         filename == ''
     }
+
+    @See('TM-8124')
+    def '03. Test all events for file name format 1'() {
+        given: 'a Project with the corresponding values, with all events for Event_Name'
+        String fileExtension = 'xlsx'
+        PartyGroup company = new PartyGroup(name:'ABC Company')
+        Project project = new Project(name:'Test Project', projectCode: 'Big Movie', client: company)
+        def date = new Date()
+        expect: 'the resulting file name for format 1 match the expected file naming scheme, with ALL for Event_Name'
+        def filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, allEvents: true], fileExtension)
+        filename == 'ABC_Company-Big_Movie-ALL-' + TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, new Date(), TimeUtil.FORMAT_DATE_TIME_26) + '.xlsx'
+    }
 }
