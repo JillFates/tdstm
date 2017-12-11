@@ -12,6 +12,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -1013,21 +1014,19 @@ class ReportsController implements ControllerMethods {
 		File file = grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
 
 		def currDate = TimeUtil.nowGMT()
-		String eventsFileName = "ALL"
-		String eventsTitleSheet = eventsFileName
-		if(reqEvents.size() > 1 || reqEvents[0] != "all"){
-			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+		String eventsTitleSheet = "ALL"
+		boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
+		def moveEvents = []
+		if(!allEvents){
+			moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
 			def eventNames = moveEvents.collect{it.name}
-			eventsFileName = eventNames.join("-")
 			eventsTitleSheet = eventNames.join(", ")
 		}
-		def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
-		String filename = project.client.name + '-' + ( project.name ?: project.id ) + "-${eventsFileName}-${exportDate}"
-
+		String filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:(!allEvents ? moveEvents[0]: null), allEvents: allEvents], 'xls')
 
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
-		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename )
 
 
 		def book = new HSSFWorkbook(new FileInputStream( file ))
