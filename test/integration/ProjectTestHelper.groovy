@@ -64,13 +64,18 @@ class ProjectTestHelper {
 	}
 
 	/**
-	 * Create a project
+	 * Create a project.
+	 * @param owner - the owner of the project, null if one should be created.
+	 * @param addPartner - flag if a company should be created and add as
+	 * @return
 	 */
-	Project createProject(PartyGroup company=null) {
+	Project createProject(PartyGroup company = null, boolean addPartner = false ) {
 
 		if (!company) {
 			company = createCompany('Owner')
 		}
+
+		// println "company=$company, partyType=${company?.partyType}(${company?.partyType?.id}"
 
 		Project project = new Project()
 		project.with {
@@ -87,9 +92,17 @@ class ProjectTestHelper {
 
 		// Assigning the owner to a project is done through the PartyRelationship so the project must be saved first
 		project.owner = company
+
+		// Add partner if needed
+		if (addPartner) {
+			createPartner(company, project)
+		}
+
+
 		project.save(failOnError:true)
 
 		projectService.cloneDefaultSettings(project)
+
 		return project
 	}
 
@@ -125,9 +138,9 @@ class ProjectTestHelper {
 	}
 
 	/**
-	 * Create a company as a client and assign them as a client of the specified company.
+	 * Create a company as a partner and assign them as a partner of the specified company.
 	 * @param company  the client's owning company
-	 * @return the client
+	 * @return the partner
 	 */
 	PartyGroup createPartner(PartyGroup company, Project project=null) {
 		PartyType pt = PartyType.get('COMPANY')
