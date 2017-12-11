@@ -1969,15 +1969,6 @@ class ImportService implements ServiceMethods {
 			throw new InvalidParamException("Unable to locate Data Import definition for ${params.dataTransferSet}")
 		}
 
-		// Contains map of the custom fields name values to match with the spreadsheet
-		Map projectCustomLabels = [:]
-		for (int i = 1; i<= Project.CUSTOM_FIELD_COUNT; i++) {
-			String pcKey = 'custom' + i
-			if (project[pcKey]) {
-				projectCustomLabels[project[pcKey]] = 'Custom' + i
-			}
-		}
-
 		// create workbook
 		def workbook
 		def titleSheet
@@ -2055,7 +2046,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Devices"
 				sheetName='Devices'
 				domainClassName = 'AssetEntity'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DEVICE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2069,7 +2060,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Applications"
 				sheetName='Applications'
 				domainClassName = 'Application'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, APPLICATION)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2083,7 +2074,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Databases"
 				sheetName='Databases'
 				domainClassName = 'Database'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DATABASE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2097,7 +2088,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Logical Storage"
 				sheetName='Storage'
 				domainClassName = 'Files'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, STORAGE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2840,7 +2831,7 @@ class ImportService implements ServiceMethods {
 	}
 
 	// Method process one of the asset class sheets
-	private Map processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName, assetIdColName,
+	private Map processSheet(project, dataTransferSet, workbook, sheetName, assetIdColName,
 							 assetNameColName, headerRowNum, domainName, timeOfExport, sheetConf, AssetClass assetClass) {
 
 		Map results = initializeImportResultsMap()
@@ -2853,7 +2844,7 @@ class ImportService implements ServiceMethods {
 			}
 
 			sheetInfo << sheetConf
-			importSheetValues(results, dataTransferBatch, projectCustomLabels, sheetInfo)
+			importSheetValues(results, dataTransferBatch, sheetInfo)
 			results.dataTransferBatch = dataTransferBatch
 
 			log.debug "processSheet() sheet $sheetName results = $results"
@@ -2869,14 +2860,13 @@ class ImportService implements ServiceMethods {
 	 * Iterates over the spreadsheet rows and loads each of the cells into the DataTransferValue table
 	 * @param results - the map used to track errors, skipped rows and count of what was added
 	 * @param dataTransferBatch - the batch to insert the rows into
-	 * @param projectCustomLabels - the custom label values for the project
 	 * @param sheetInfo - the map of all of the sheet information
 	 * @return a Map containing the following elements
 	 *		List errors - a list of errors
 	 *		List skipped - a list of skipped rows
 	 *		Integer added - a count of rows added
 	 */
-	private Map importSheetValues(Map results, DataTransferBatch dataTransferBatch, Map projectCustomLabels, Map sheetInfo) {
+	private Map importSheetValues(Map results, DataTransferBatch dataTransferBatch, Map sheetInfo) {
 
 		Sheet sheetObject = sheetInfo.sheet
 		Map colNamesOrdinalMap = sheetInfo.colNamesOrdinalMap
