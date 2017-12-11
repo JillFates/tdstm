@@ -6,12 +6,12 @@ import { DependecyService } from '../../service/dependecy.service';
 
 declare var jQuery: any;
 
-export function ApplicationShowComponent(template, assetId: number) {
+export function ApplicationShowComponent(template, modelId: number) {
 	@Component({
 		selector: `application-show`,
 		template: template
 	}) class ApplicationShowComponent implements OnInit {
-		mainAsset = assetId;
+		mainAsset = modelId;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 
@@ -35,8 +35,8 @@ export function ApplicationShowComponent(template, assetId: number) {
 				'lg');
 		}
 
-		showDependencyView(dependencyAsset: number) {
-			this.assetService.getDependencies(this.mainAsset, dependencyAsset)
+		showDependencyView(assetId: number, dependencyAsset: number) {
+			this.assetService.getDependencies(assetId, dependencyAsset)
 				.subscribe((result) => {
 					this.dialogService.extra(AssetDependencyComponent, [
 						{ provide: 'ASSET_DEP_MODEL', useValue: result }])

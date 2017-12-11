@@ -15,15 +15,15 @@
 				</thead>
 				<tbody>
 					<g:each in="${supportAssets}" var="support" status="i">
-						<tr (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-							<td class="dep-${support.status}">
+						<tr class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+							<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 								${support?.asset?.assetType}
 							</td>
-							<td class="dep-${support.status}" style="min-width:80px">
+							<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})" style="min-width:80px">
 								${support?.asset?.assetName}
 							</td>
 							<g:if test="${support?.asset?.moveBundle!=asset.moveBundle && support.status == 'Validated' }">
-								<td style="background-color: lightpink;position:relative;">
+								<td style="background-color: lightpink;position:relative;" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 									<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 									<div class="text-center" style="position:absolute;right:5px;top:20%;">
 										<img src="${resource(dir:'icons', absolute:true ,file:'error.png')}" width="17" height="17" alt="..." data-toggle="popover"
@@ -32,7 +32,7 @@
 								</td>
 							</g:if>
 							<g:elseif test="${support?.asset?.moveBundle!=asset.moveBundle }">
-								<td class="dep-${support.status}" style="position:relative;">
+								<td class="dep-${support.status}" style="position:relative;" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 									<b>
 										<div style="padding: 5px 25px 5px 0px;">${support?.asset?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;">
@@ -43,15 +43,15 @@
 								</td>
 							</g:elseif>
 							<g:else>
-								<td class="dep-${support.status}">
+								<td class="dep-${support.status}" (click)="showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})">
 									${support?.asset?.moveBundle}
 								</td>
 							</g:else>
-							<td class="dep-${support.status}" nowrap="nowrap">
+							<td class="dep-${support.status}" nowrap="nowrap" (click)="showDependencyView(${support.asset.id},${support.dependent.id})">
 								${support.type} &nbsp;
 								<g:render template="/angular/common/dependentComment" model="[dependency:support, type:'support', forWhom:'show']"></g:render>
 							</td>
-							<td class="dep-${support.status}">
+							<td class="dep-${support.status}" (click)="showDependencyView(${support.asset.id},${support.dependent.id})">
 								${support.status}
 							</td>
 						</tr>
@@ -107,11 +107,11 @@
 									${dependent.dependent?.moveBundle}
 								</td>
 							</g:else>
-							<td class="dep-${dependent.status}" nowrap="nowrap" (click)="showDependencyView(${dependent.dependent?.id})">
+							<td class="dep-${dependent.status}" nowrap="nowrap" (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
 								${dependent.type}&nbsp;
 								<g:render template="/angular/common/dependentComment" model="[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
 							</td>
-							<td class="dep-${dependent.status}" (click)="showDependencyView(${dependent.dependent?.id})">
+							<td class="dep-${dependent.status}" (click)="showDependencyView(${assetEntity.id}, ${dependent.dependent.id})">
 								${dependent.status}
 							</td>
 						</tr>
