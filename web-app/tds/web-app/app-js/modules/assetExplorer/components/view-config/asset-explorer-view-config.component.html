@@ -150,7 +150,7 @@
 											<div class="drag-label" style="height: 35px;">
 												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
 												{{item.label}}
-												<i class="fa fa-thumb-tack pull-right" style="margin-left: 10px; margin-top: 9px;" [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}" (click)="freezeColumn(item)"></i>
+												<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column" [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}" (click)="freezeColumn(item)"></i>
 											</div>
 										</div>
 									</ng-template>
