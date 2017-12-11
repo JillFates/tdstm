@@ -1,4 +1,5 @@
 import com.tds.asset.AssetEntity
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.os.Shell
 import com.tdsops.common.security.AESCodec
 import com.tdsops.common.security.DESCodec
@@ -28,6 +29,7 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserService
+
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.lang.management.ManagementFactory
@@ -86,21 +88,25 @@ class AdminController implements ControllerMethods {
 		String logStr = message(code: 'tdstm.admin.serviceRestartCommand.log',
 				args: [securityService.currentUsername, cmd])
 		Shell.systemLog(logStr)
-		log.info(logStr)
 
+		auditService.saveUserAudit(UserAuditBuilder.restartedApplication())
+
+		log.warn(logStr)
 
 		Map results = Shell.executeCommand(cmd)
 
 		// Now log the results
 		logStr = message(code: 'tdstm.admin.serviceRestartCommand.results', args: [results.toString()])
 		Shell.systemLog(logStr)
-		log.info(logStr)
+		log.warn(logStr)
 
 		if (results.exitValue == 0) {
 			renderSuccessJson(results)
 		} else {
 			renderFailureJson(results)
 		}
+		println "restartAppServiceAction() 5"
+		
 	}
 
 	@HasPermission(Permission.AdminUtilitiesAccess)

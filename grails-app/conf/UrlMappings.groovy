@@ -292,7 +292,14 @@ class UrlMappings {
 			action = [PUT:"unlockAccount"]
 		}
 
-		"/admin/restartAppService" {
+		name adminPortal: "/admin/home" {
+			controller = 'admin'
+			action = [
+				GET: "home"
+			]
+		}
+		
+		"/admin/restart" {
 			controller = "admin"
 			action = [
 				GET: "restartAppServiceForm",
