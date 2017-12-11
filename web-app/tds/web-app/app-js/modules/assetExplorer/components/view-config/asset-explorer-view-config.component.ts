@@ -432,6 +432,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		}
 	}
 
+	private freezeColumn(item: ViewColumn): void {
+		item.locked = !item.locked;
+		this.onLockedColumn(item);
+	}
+
 	protected onLockedColumn(item: ViewColumn): void {
 		let itemIndex = this.model.schema.columns.findIndex(x => x.domain === item.domain && x.property === item.property);
 		this.model.schema.columns.splice(itemIndex, 1);
