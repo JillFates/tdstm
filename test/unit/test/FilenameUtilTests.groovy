@@ -13,7 +13,7 @@ import spock.lang.Specification
  */
 class FilenameUtilTests extends Specification {
 
-    @See('TM8124')
+    @See('TM-8124')
     def '01. Test file name format 1'() {
         given: 'a Project and Move Event with the corresponding values'
             String fileExtension = 'xlsx'
@@ -24,5 +24,18 @@ class FilenameUtilTests extends Specification {
         expect: 'the resulting file name for format 1 match the expected file naming scheme'
             def filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:me], fileExtension)
                 filename == 'ABC_Company-Big_Movie-ERP_Event-' + TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, new Date(), TimeUtil.FORMAT_DATE_TIME_26) + '.xlsx'
+    }
+
+    @See('TM-8124')
+    def '02. Test bad or incomplete properties for file name format 1'() {
+        given: 'a Project and Move Event with incomplete values (projectCode is missing)'
+        String fileExtension = 'xlsx'
+        PartyGroup company = new PartyGroup(name:'ABC Company')
+        Project project = new Project(name:'Test Project', client: company)
+        MoveEvent me = new MoveEvent([project:project, name: 'ERP Event'])
+        def date = new Date()
+        expect: 'the resulting file name for format 1 is empty, and not a corrupted filename'
+        def filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:me], fileExtension)
+        filename == ''
     }
 }
