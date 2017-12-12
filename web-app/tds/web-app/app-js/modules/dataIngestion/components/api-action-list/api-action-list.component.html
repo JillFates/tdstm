@@ -27,7 +27,7 @@
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 							<button class="btn btn-default" (click)="onEdit(dataItem)"><span class="glyphicon glyphicon-pencil"></span></button>
-							<button class="btn btn-default" (click)="onDeleteDataScript(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+							<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>

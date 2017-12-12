@@ -15,7 +15,7 @@ import { DataScriptViewEditComponent } from '../data-script-view-edit/data-scrip
 	selector: 'api-action-list',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/api-action-list/api-action-list.component.html',
 	styles: [`
-		#btnCreateDataScript { margin-left: 16px; }
+		#btnCreate { margin-left: 16px; }
 		.action-header { width:100%; text-align:center; }
 	`]
 })
@@ -51,9 +51,6 @@ export class APIActionListComponent {
 		apiActions.subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.resultSet.forEach(x => {
-					x['modeFormat'] = (x.mode as any) ? 'Export' : 'Import';
-				});
 				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
@@ -148,7 +145,7 @@ export class APIActionListComponent {
 			mode: DataScriptMode.IMPORT,
 			provider: { id: null, name: '' }
 		};
-		this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
+		// this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
 
 	/**
@@ -157,18 +154,18 @@ export class APIActionListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
+		// this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected API Action
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
+		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+					this.dataIngestionService.deleteAPIAction(dataItem.id).subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -184,7 +181,7 @@ export class APIActionListComponent {
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
 			this.selectRow(event['dataItem'].id);
-			this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			// this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
 		}
 	}
 

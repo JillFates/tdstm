@@ -155,4 +155,13 @@ export class DataIngestionService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	deleteAPIAction(id: number): Observable<string> {
+		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
 }
