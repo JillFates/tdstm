@@ -191,11 +191,12 @@ class ApiActionService {
 	 * Delete the given ApiAction.
 	 * @param id
 	 * @param project
+	 * @param flush
 	 */
-	void delete(Long id, Project project) {
+	void delete(Long id, Project project, boolean flush = false) {
 		ApiAction apiAction = find(id, project)
 		if (apiAction) {
-			apiAction.delete()
+			apiAction.delete(flush: flush)
 		} else {
 			throw new DomainUpdateException("No such ApiAction for this project.")
 		}
