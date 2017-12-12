@@ -63,6 +63,21 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/$id" {
+			controller = "wsApiAction"
+			action = [
+			        DELETE: "delete",
+					GET: "fetch"
+			]
+		}
+
+		"/ws/apiAction/list" {
+			controller = "wsApiAction"
+			action = [
+					GET: "list"
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}

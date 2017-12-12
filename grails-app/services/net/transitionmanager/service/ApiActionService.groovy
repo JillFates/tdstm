@@ -8,6 +8,7 @@ import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
+import org.hibernate.criterion.CriteriaSpecification
 
 @Slf4j
 @Transactional
@@ -32,14 +33,13 @@ class ApiActionService {
 		}.get()
 	}
 
-	List<Map> list(Project project) {
-		List actions = ApiAction.createCriteria().list() {
-			eq('project', project)
-			order('name', 'asc')
-		}
-		List<Map> list = actions.collect { [ id: it.id, name: it.name ] }
-
-		return list
+	List<Map> list(Project project, boolean minimalInfo = true) {
+		List apiActions = ApiAction.where {
+			project == project
+		}.order("name", "asc").list()
+		List<Map> results = []
+		apiActions.each {results << it.toMap(minimalInfo)}
+		return results
 	}
 
 	/**
@@ -185,6 +185,20 @@ class ApiActionService {
 	private AbstractAgent agentInstanceForAction(ApiAction action) {
 		Class clazz = agentClassForAction(action)
 		clazz.instance
+	}
+
+	/**
+	 * Delete the given ApiAction.
+	 * @param id
+	 * @param project
+	 */
+	void delete(Long id, Project project) {
+		ApiAction apiAction = find(id, project)
+		if (apiAction) {
+			apiAction.delete()
+		} else {
+			throw new DomainUpdateException("No such ApiAction for this project.")
+		}
 	}
 
 }

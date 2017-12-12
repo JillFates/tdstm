@@ -130,4 +130,26 @@ class ApiAction {
 		}
 		return list
 	}
+
+	/**
+	 * Create a map with the data for this ApiAction
+	 * @param minimalInfo - flag that signals if only the m
+	 * @return
+	 */
+	Map toMap(boolean minimalInfo = true) {
+		Map basicFields = [id: id, name: name]
+		Map extendedFields = [:]
+		if (!minimalInfo) {
+			extendedFields = [
+					description: description,
+					agentMethod: agentMethod,
+					providerName : provider.name,
+					defaultDataScriptName: defaultDataScript,
+					producesData: producesData,
+					lastModified: lastModified
+
+			]
+		}
+		return basicFields + extendedFields
+	}
 }
