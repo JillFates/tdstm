@@ -6,6 +6,7 @@ import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@
 import { DataIngestionService } from '../../service/data-ingestion.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { APIActionColumnModel, DataScriptModel, DataScriptMode} from '../../model/api-action.model';
 import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
@@ -219,5 +220,18 @@ export class APIActionListComponent {
 	private selectRow(dataItemId: number): void {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
+	}
+
+	// Permissions
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ActionCreate);
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ActionEdit);
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ActionDelete);
 	}
 }
