@@ -88,7 +88,7 @@ grails.project.dependency.resolution = {
 		compile ":rest-client-builder:2.1.0"
 
 		runtime ':database-migration:1.4.0'
-		runtime ':grails-melody:1.59.0'
+		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'
 		runtime ':jmesa:2.0.4-SNAPSHOT-0.1'
 		runtime ':jqgrid:3.8.0.1'
