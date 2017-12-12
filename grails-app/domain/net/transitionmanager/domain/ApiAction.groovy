@@ -143,10 +143,14 @@ class ApiAction {
 			extendedFields = [
 					description: description,
 					agentMethod: agentMethod,
-					providerName : provider.name,
+					provider: [
+					        id: provider.id,
+							name: provider.name
+					],
 					defaultDataScriptName: defaultDataScript,
 					producesData: producesData,
-					lastModified: lastModified
+					lastModified: lastModified,
+					dateCreated: dateCreated
 
 			]
 		}
