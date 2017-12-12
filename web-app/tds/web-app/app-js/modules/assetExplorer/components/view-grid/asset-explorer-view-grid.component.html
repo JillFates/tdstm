@@ -1,8 +1,11 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
+
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
-	<ng-template kendoGridToolbarTemplate [position]="'top'">
+
+    <!-- Header Toolbar -->
+    <ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-2">
 			<div class="checkbox">
 				<label>
@@ -17,6 +20,8 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
+
+    <!-- Action Column-->
 	<kendo-grid-column title="Action" [locked]="true" [width]="65">
 		<ng-template kendoGridCellTemplate let-dataItem>
 			<div class="row">
@@ -28,7 +33,9 @@
 			</div>
 		</ng-template>
 	</kendo-grid-column>
-	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
+
+    <!-- Configured View Columns (*ngFor) -->
+	<kendo-grid-column *ngFor="let column of model.columns; let i = index" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
@@ -40,17 +47,21 @@
 		</ng-template>
 		<ng-template kendoGridFilterCellTemplate>
 			<div class=" has-feedback" style="margin-bottom:0px;">
-				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter"
-				 (keyup)="onFilterKeyUp($event)" (keydown)="onFilterKeyDown($event)" value="">
+				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
+                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event)" (keydown)="onFilterKeyDown($event)">
 				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
 				 aria-hidden="true"></span>
 			</div>
 		</ng-template>
 	</kendo-grid-column>
+
+    <!-- No Records -->
 	<ng-template kendoGridNoRecordsTemplate>
 
 	</ng-template>
-	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+
+    <!-- Pagination Footer -->
+    <ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
 		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 		<kendo-pager-next-buttons></kendo-pager-next-buttons>
 		<kendo-pager-page-sizes [pageSizes]="[25,50,100,500,1000]"></kendo-pager-page-sizes>
