@@ -327,5 +327,10 @@ trait ControllerMethods {
 			return null
 		}
 	}
+
+	void setHeaderContentDisposition(String filename) {
+		response.addHeader("Content-Disposition", "attachment; filename=\""+filename)
+	}
+
 	
 }

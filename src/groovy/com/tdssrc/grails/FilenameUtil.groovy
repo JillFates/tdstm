@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
-import com.tdssrc.grails.TimeUtil
+import com.tdsops.tm.enums.FilenameFormat
+import groovy.util.logging.Slf4j
 
 /**
  * The FilenameUtil class contains a set of file name formats that can be used to simplify the creation
@@ -8,10 +9,8 @@ import com.tdssrc.grails.TimeUtil
  * throughout the app. It can also be easily extended with new formats.
  * Created by ecantu on 12/11/2017.
  */
+@Slf4j(value='logger')
 class FilenameUtil {
-
-    public static final FILENAME_DEFAULT_FORMAT = 'Filename Default Format'
-    public static final String FILENAME_FORMAT_1 = "Project_Client-Project_Code-Event_Name-yyyymmdd_hhmm"
 
     /*
      * Main method for creating a file name.
@@ -21,14 +20,20 @@ class FilenameUtil {
      *      The properties/values to construct the file name. This will vary depending on the nameFormat chosen.
      * @param fileExtension
      *      The extension of the resulting file name
+     * @param date
+     *      The date to be used in the file name. This parameter is optional, if no date is provided one will be created.
      * @return
      *      The resulting file name for the given format.
      */
-    static String buildFilename(String nameFormat=FilenameUtil.FILENAME_DEFAULT_FORMAT, Map nameValues, String fileExtension) {
+    static String buildFilename(FilenameFormat nameFormat=FilenameFormat.DEFAULT, Map nameValues, String fileExtension, Date date = new Date()) {
         String filename =''
         switch (nameFormat) {
-            case FILENAME_FORMAT_1: filename = filenameFormat1(nameValues); break
-            default: filename = filenameDefaultFormat(nameValues); break
+            case FilenameFormat.CLIENT_PROJECT_EVENT_DATE:
+                filename = clientProjectEventDateFormatter(nameValues, date)
+                break
+            default:
+                filename = filenameDefaultFormat(nameValues, date)
+                break
         }
         return filename? filename << '.' + fileExtension: filename
     }
@@ -48,17 +53,22 @@ class FilenameUtil {
      *      If is not present, the event name will be used in the normal form,
      *      replacing with (_) any spaces found if the event name has any (eg: 'Test Event' will be 'Test_Event').
      *      If any values or properties are missing, an empty String is returned.
+     * @param date
+     *      The date to be used in the file name.
      * @return
      *      The resulting file name.
      */
-    private static String filenameFormat1(Map nameValues) {
+    private static String clientProjectEventDateFormatter(Map nameValues, Date date) {
 
         String projectClient = nameValues.project?.client?.name?.replaceAll("\\s","_")
         String projectCode = nameValues.project?.projectCode?.replaceAll("\\s","_")
         String eventName = nameValues.allEvents ?  'ALL' :  nameValues.moveEvent?.name?.replaceAll("\\s","_")
-        String date = TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, new Date(), TimeUtil.FORMAT_DATE_TIME_26)
-        if(projectClient == null || projectCode == null || eventName == null) return ''
-        return projectClient + '-' + projectCode + '-' + eventName + '-' + date
+        String formattedDate = TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, date, TimeUtil.FORMAT_DATE_TIME_26)
+        if(projectClient == null || projectCode == null || eventName == null) {
+            logger.error 'FilenameUtil: Error while creating file name - Some required properties are missing'
+            return ''
+        }
+        return projectClient + '-' + projectCode + '-' + eventName + '-' + formattedDate
     }
 
     /*
@@ -68,7 +78,7 @@ class FilenameUtil {
      * @return
      *      The resulting file name.
      */
-    private static String filenameDefaultFormat(Map nameValues) {
-        return filenameFormat1(nameValues)
+    private static String filenameDefaultFormat(Map nameValues, Date date) {
+        return clientProjectEventDateFormatter(nameValues, date)
     }
 }

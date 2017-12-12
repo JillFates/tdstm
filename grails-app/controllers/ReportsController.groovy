@@ -6,6 +6,7 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -1022,11 +1023,14 @@ class ReportsController implements ControllerMethods {
 			def eventNames = moveEvents.collect{it.name}
 			eventsTitleSheet = eventNames.join(", ")
 		}
-		String filename = FilenameUtil.buildFilename(FilenameUtil.FILENAME_FORMAT_1, [project:project, moveEvent:(!allEvents ? moveEvents[0]: null), allEvents: allEvents], 'xls')
+		def nameParams = [project:project,
+						  moveEvent:(!allEvents ? moveEvents[0]: null),
+						  allEvents: allEvents]
+		String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams, 'xls')
 
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
-		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename )
+		setHeaderContentDisposition(filename)
 
 
 		def book = new HSSFWorkbook(new FileInputStream( file ))
