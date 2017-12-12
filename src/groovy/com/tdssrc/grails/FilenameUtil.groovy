@@ -25,7 +25,7 @@ class FilenameUtil {
      * @return
      *      The resulting file name for the given format.
      */
-    static String buildFilename(FilenameFormat nameFormat=FilenameFormat.DEFAULT, Map nameValues, String fileExtension, Date date = new Date()) {
+    static String buildFilename(FilenameFormat nameFormat=FilenameFormat.DEFAULT, Map nameValues, String fileExtension=null, Date date = new Date()) {
         String filename =''
         switch (nameFormat) {
             case FilenameFormat.CLIENT_PROJECT_EVENT_DATE:
@@ -35,7 +35,7 @@ class FilenameUtil {
                 filename = filenameDefaultFormat(nameValues, date)
                 break
         }
-        return filename? filename << '.' + fileExtension: filename
+        return fileExtension? filename << '.' + fileExtension: filename
     }
 
     /*

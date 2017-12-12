@@ -988,7 +988,7 @@ class ReportsController implements ControllerMethods {
 					  break
 
 				case "Generate Pdf" :
-					  exportTaskReportPdf(taskList, tzId, project)
+					  exportTaskReportPdf(taskList, tzId, project, reqEvents)
 					  break
 
 				default :
@@ -1077,9 +1077,10 @@ class ReportsController implements ControllerMethods {
 	 * @param taskList : list of tasks
 	 * @param tzId : timezone
 	 * @param project : project instance
+	 * @param reqEvents : list of requested events.
 	 * @return : will generate a pdf file having task task list
 	 */
-	def exportTaskReportPdf(taskList, tzId, project){
+	def exportTaskReportPdf(taskList, tzId, project, reqEvents){
 		def currDate = new Date()
 		def reportFields = []
 
@@ -1117,7 +1118,12 @@ class ReportsController implements ControllerMethods {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		} else {
-			String filename = project.name + '-TaskReport'
+			boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
+			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			def nameParams = [project:project,
+							  moveEvent:(!allEvents ? moveEvents[0]: null),
+							  allEvents: allEvents]
+			String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams)
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":filename,"_file":"taskReport"])
 		}
