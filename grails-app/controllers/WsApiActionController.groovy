@@ -25,7 +25,7 @@ class WsApiActionController implements ControllerMethods{
     def list(){
         Project project = securityService.getUserCurrentProjectOrException()
         List<Map> apiActions = apiActionService.list(project, false)
-        renderSuccessJson([apiActions: apiActions])
+        renderSuccessJson([data: apiActions])
     }
 
     /**
