@@ -47,7 +47,7 @@ export class DataIngestionService {
 	}
 
 	getAPIActions(): Observable<DataScriptModel[]> {
-		return this.http.get(`${this.dataDefaultUrl}/apiAction/list`)
+		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
 			.map((res: Response) => {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
