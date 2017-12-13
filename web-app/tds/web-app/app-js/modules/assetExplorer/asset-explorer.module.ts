@@ -18,7 +18,7 @@ import { AssetEditComponent } from './components/asset/asset-edit.component';
 import { SharedModule } from '../../shared/shared.module';
 import { Permission } from '../../shared/model/permission.model';
 import { TaskCommentComponent } from './components/task-comment/task-comment.component';
-
+import { AssetDependencyComponent } from './components/asset-dependency/asset-dependency.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -29,6 +29,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 // Services
 import { AssetExplorerService } from './service/asset-explorer.service';
 import { TaskCommentService } from './service/task-comment.service';
+import { DependecyService } from './service/dependecy.service';
 
 @NgModule({
 	imports: [
@@ -53,15 +54,17 @@ import { TaskCommentService } from './service/task-comment.service';
 		AssetExplorerViewShowComponent,
 		AssetShowComponent,
 		AssetEditComponent,
-		TaskCommentComponent
+		TaskCommentComponent,
+		AssetDependencyComponent
 	],
-	providers: [AssetExplorerService, TaskCommentService],
+	providers: [AssetExplorerService, TaskCommentService, DependecyService],
 	exports: [AssetExplorerIndexComponent, TaskCommentComponent],
 	entryComponents: [
 		AssetExplorerViewSaveComponent,
 		AssetExplorerViewExportComponent,
 		AssetShowComponent,
-		AssetEditComponent
+		AssetEditComponent,
+		AssetDependencyComponent
 	],
 })
 
