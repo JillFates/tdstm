@@ -34,7 +34,7 @@ class WsApiActionController implements ControllerMethods{
     def fetch(Long id){
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.findOrException(id, project)
-        renderSuccessJson([apiAction: apiAction.toMap(false)])
+        renderSuccessJson(apiAction.toMap(false))
     }
 
     /**
