@@ -13,9 +13,9 @@ import { ProviderViewEditComponent } from './components/provider-view-edit/provi
 import { DataScriptConsoleComponent } from './components/data-script-console/data-script-console.component';
 import { DataScriptEtlBuilderComponent } from './components/data-script-etl-builder/data-script-etl-builder.component';
 import { DataScriptSampleDataComponent } from './components/data-script-sample-data/data-script-sample-data.component';
+import { APIActionListComponent } from './components/api-action-list/api-action-list.component';
 import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
-import { Permission } from '../../shared/model/permission.model';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -43,7 +43,8 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		ProviderViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
-		DataScriptSampleDataComponent
+		DataScriptSampleDataComponent,
+		APIActionListComponent
 	],
 	providers: [DataIngestionService],
 	exports: [

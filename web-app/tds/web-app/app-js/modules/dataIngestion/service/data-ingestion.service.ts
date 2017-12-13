@@ -11,6 +11,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class DataIngestionService {
 
+	private dataDefaultUrl = '../ws';
 	private dataIngestionUrl = '../ws/dataingestion';
 
 	constructor(private http: HttpInterceptor) {
@@ -41,6 +42,21 @@ export class DataIngestionService {
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAPIActions(): Observable<DataScriptModel[]> {
+		return this.http.get(`${this.dataDefaultUrl}/apiAction/list`)
+			.map((res: Response) => {
+				let result = res.json();
+				let dataScriptModels = result && result.status === 'success' && result.data;
+				dataScriptModels.forEach((r) => {
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
+					r.producesData = (r.producesData === 1);
+				});
+				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -133,6 +149,15 @@ export class DataIngestionService {
 
 	deleteProvider(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteAPIAction(id: number): Observable<string> {
+		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
