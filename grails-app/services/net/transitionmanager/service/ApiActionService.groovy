@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
+import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import grails.transaction.Transactional
 
@@ -8,6 +9,8 @@ import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
+import net.transitionmanager.domain.Provider
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.hibernate.criterion.CriteriaSpecification
 
 @Slf4j
@@ -33,9 +36,22 @@ class ApiActionService {
 		}.get()
 	}
 
-	List<Map> list(Project project, boolean minimalInfo = true) {
+	/**
+	 * List all the API Action for the given project.
+	 * @param project
+	 * @param minimalInfo - if true, only the id and name for each API Action will be returned.
+	 * @param filterParams - filters for narrowing down the search.
+	 * @return
+	 */
+	List<Map> list(Project project, Boolean minimalInfo = true, Map filterParams = [:]) {
+
+		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
+
 		List apiActions = ApiAction.where {
 			project == project
+			if (producesDataFilter != null) {
+				producesData == producesDataFilter
+			}
 		}.order("name", "asc").list()
 		List<Map> results = []
 		apiActions.each {results << it.toMap(minimalInfo)}
@@ -194,12 +210,22 @@ class ApiActionService {
 	 * @param flush
 	 */
 	void delete(Long id, Project project, boolean flush = false) {
-		ApiAction apiAction = find(id, project)
-		if (apiAction) {
-			apiAction.delete(flush: flush)
-		} else {
-			throw new DomainUpdateException("No such ApiAction for this project.")
+		ApiAction apiAction = findOrException(id, project)
+		apiAction.delete(flush: flush)
+	}
+
+	/**
+	 * Find a given API Action or throw an exception.
+	 * @param apiActionId
+	 * @param project
+	 * @return
+	 */
+	ApiAction findOrException(Long apiActionId, Project project) {
+		ApiAction apiAction = find(apiActionId, project)
+		if (!apiAction) {
+			throw EmptyResultException("Cannot find an API Action with the given id.")
 		}
+		return apiAction
 	}
 
 }

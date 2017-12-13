@@ -71,7 +71,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/apiAction/" {
+		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
 					GET: "list"

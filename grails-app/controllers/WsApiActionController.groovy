@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -7,7 +6,6 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.SecurityService
 
 @Secured("isAuthenticated()")
@@ -24,7 +22,7 @@ class WsApiActionController implements ControllerMethods{
     @HasPermission(Permission.ActionEdit)
     def list(){
         Project project = securityService.getUserCurrentProjectOrException()
-        List<Map> apiActions = apiActionService.list(project, false)
+        List<Map> apiActions = apiActionService.list(project, false, params)
         renderSuccessJson(apiActions)
     }
 
@@ -35,12 +33,8 @@ class WsApiActionController implements ControllerMethods{
     @HasPermission(Permission.ActionEdit)
     def fetch(Long id){
         Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.find(id, project)
-        Map apiActionMap = null
-        if (apiAction) {
-            apiActionMap = apiAction.toMap(false)
-        }
-        renderSuccessJson([apiAction: apiActionMap])
+        ApiAction apiAction = apiActionService.findOrException(id, project)
+        renderSuccessJson([apiAction: apiAction.toMap(false)])
     }
 
     /**

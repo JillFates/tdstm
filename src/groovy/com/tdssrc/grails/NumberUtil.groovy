@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import org.apache.commons.lang3.BooleanUtils
+
 /**
  * The NumberUtil class contains a collection of useful number manipulation methods
  */
@@ -164,5 +166,19 @@ class NumberUtil {
 	static Collection<Integer> mapToPositiveInteger(Collection values, Integer defValue = null){
 		values = mapToPositiveLong(values, defValue)
 		values*.toInteger()
+	}
+
+	/**
+	 * Convert a value to 0 (false) or 1 (true).
+	 * @param value
+	 * @return 0, 1 or null (if original value is null).
+	 */
+	static Integer toZeroOrOne(Object value) {
+		Integer result
+		if (value) {
+			boolean boolValue = BooleanUtils.toBoolean(value)
+			result = boolValue? 1 : 0
+		}
+		return result
 	}
 }
