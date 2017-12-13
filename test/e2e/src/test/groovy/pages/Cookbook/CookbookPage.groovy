@@ -24,12 +24,13 @@ class CookbookPage extends Page {
         contextSelectorDefault      { $("select#contextSelector").find("option", selected:"selected") }
         createRecipeButton          { $("a#generateRecipe") }
 
+        createRecipeModal(required: false, wait:true) {$ ("div", class:"modal fade in")}
+        taskDetailsModal(required: false, wait:true)  { $("div", "window-class":"modal-task")}
  // TODO following item have the checkbox inside the label
  //     viewArchivedCBoxLabel       { $("label", for:"viewArchived").text() }
         viewArchivedCBox            { $("input#viewArchived") }
 
         deleteRecipeButtons         { $("a.actions.remove" ) }
-        gebRecipes(required: false) { $("span.ng-binding", text: "Geb Recipe Test") }
         taskGenerationTab           { $("li", heading: "Task Generation").find("a") }
         historyTab                  { $("li", heading: "History").find("a") }
         editorTab                   { $("li", heading: "Editor").find("a") }
@@ -42,5 +43,7 @@ class CookbookPage extends Page {
         recipeGridRowsActions       { recipeGridRows.find("a", class:"actions")}
         gridSize                    { recipeGridRows.size()}
         rowSize                     { recipeGridHeaderCols.size()}
+        gebRecipes(required: false) { recipeGridRows.find("span.ng-binding", text: "Geb Recipe Test") }
+        gebRecipesWithTasks(required: false) { recipeGridRows.find("span.ng-binding", text: "Geb Recipe With Tasks Test") }
     }
 }
