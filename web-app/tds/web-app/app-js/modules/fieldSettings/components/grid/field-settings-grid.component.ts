@@ -318,13 +318,21 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * Function called when any field control configuration popup is shown.
+	 * Fix for config popup shown inside kendo grid:
+	 * This is called when any field control configuration popup is shown.
 	 * It grabs event emitter of control configuration component, and scrolls grid where the popup appears.
 	 */
 	private onControlConfigPopupShown(): void {
-		let gridContent: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
-		let gridContentHeight = gridContent.querySelector('div').offsetHeight;
-		gridContent.scrollTop = gridContentHeight / 2.3;
+		let gridVirtualSection: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
+		let dialogWrapper: any = gridVirtualSection.querySelector('kendo-dialog.k-dialog-wrapper');
+		let dialogBackgroundWrapper: any = gridVirtualSection.querySelector('div.k-overlay');
+		if (dialogWrapper && dialogBackgroundWrapper) {
+			dialogWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
+			if (dialogBackgroundWrapper.offsetHeight < gridVirtualSection.offsetHeight) {
+				dialogBackgroundWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
+			}
+			gridVirtualSection.scrollTop = 0;
+		}
 	}
 
 }
