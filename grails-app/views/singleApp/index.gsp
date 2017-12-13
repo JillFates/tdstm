@@ -13,6 +13,9 @@
 
         <style>
         /*TODO: REMOVE ON COMPLETE MIGRATION */
+        body {
+            background-color: #ecf0f5 !important;
+        }
         .content-wrapper {
             background-color: #ecf0f5 !important;
         }

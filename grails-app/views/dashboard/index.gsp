@@ -471,7 +471,8 @@
 		getMoveEventNewsDetails($('#moveEvent').val());
 		moveDataSteps();
 
-
+        // standard fix to add a close icon on popup dialogs
+        $('.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 	});
 
     var numCols = $('div.show_bundle_step').children().length;
