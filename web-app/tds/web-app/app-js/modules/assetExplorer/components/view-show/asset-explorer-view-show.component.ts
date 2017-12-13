@@ -24,6 +24,7 @@ import { AssetExportModel } from '../../model/asset-export-model';
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
 })
 export class AssetExplorerViewShowComponent implements OnInit {
+	private dataSignature: string;
 	model: ViewModel;
 	domains: DomainModel[] = [];
 
@@ -41,6 +42,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		Observable.zip(fields, report).subscribe((result: [DomainModel[], ViewModel]) => {
 			this.domains = result[0];
 			this.model = result[1];
+			this.dataSignature = JSON.stringify(this.model);
 			this.stateService.$current.data.page.title = this.model.name;
 			document.title = this.model.name;
 		}, (err) => console.log(err));
@@ -82,6 +84,15 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		}
 	}
 
+	protected onSave() {
+		if (this.isSaveAvailable()) {
+			this.assetService.saveReport(this.model)
+				.subscribe(result => {
+					this.dataSignature = JSON.stringify(this.model);
+				});
+		}
+	}
+
 	protected onSaveAs(): void {
 		if (this.isSaveAsAvailable()) {
 			this.dialogService.open(AssetExplorerViewSaveComponent, [
@@ -89,6 +100,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				{ provide: 'favorites', useValue: this.select.data.filter(x => x.name === 'Favorites')[0] }
 			]).then(result => {
 				this.model = result;
+				this.dataSignature = JSON.stringify(this.model);
 				setTimeout(() => {
 					this.stateService.go(AssetExplorerStates.REPORT_EDIT.name, { id: this.model.id });
 				});
@@ -96,6 +108,14 @@ export class AssetExplorerViewShowComponent implements OnInit {
 				console.log('error');
 			});
 		}
+	}
+
+	protected isDirty(): boolean {
+		let result = this.dataSignature !== JSON.stringify(this.model);
+		if (this.stateService && this.stateService.$current && this.stateService.$current.data) {
+			this.stateService.$current.data.hasPendingChanges = result;
+		}
+		return result;
 	}
 
 	protected onExport(): void {
@@ -161,10 +181,26 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		return assetQueryParams;
 	}
 
+	protected isSaveAvailable(): boolean {
+		return this.model.id ?
+			this.model.isSystem ?
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
+				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit) :
+			this.model.isSystem ?
+				this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
+				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+	}
+
 	protected isSaveAsAvailable(): boolean {
 		return this.model.isSystem ?
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
 			this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
+	}
+
+	protected isSystemSaveAvailable(edit): boolean {
+		return edit ?
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
+			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
 	}
 
 	protected isEditAvailable(): boolean {

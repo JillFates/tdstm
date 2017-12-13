@@ -124,8 +124,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
-				this.tdsUiDialog.modal('hide');
 				this.resolve(event.result);
+				this.tdsUiDialog.modal('hide');
 				this.cmpRef.destroy();
 			}
 		});
@@ -134,8 +134,8 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			if (this.cmpRef) {
 				this.el.nativeElement.style.top = 'initial';
 				this.el.nativeElement.style.left = 'initial';
-				this.tdsUiDialog.modal('hide');
 				this.reject(event.result);
+				this.tdsUiDialog.modal('hide');
 				this.cmpRef.destroy();
 			}
 		});
