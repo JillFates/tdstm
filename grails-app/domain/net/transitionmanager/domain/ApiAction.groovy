@@ -141,17 +141,24 @@ class ApiAction {
 		Map extendedFields = [:]
 		if (!minimalInfo) {
 			extendedFields = [
-					description: description,
+					agentClass: agentClass.name(),
 					agentMethod: agentMethod,
+					asyncQueue: asyncQueue,
+					callbackMethod: callbackMethod,
+					callbackMode: callbackMode.name(),
+					dateCreated: dateCreated,
+					defaultDataScriptName: defaultDataScript,
+					description: description,
+					lastModified: lastModified,
+					methodParams: methodParams,
+					pollingInterval: pollingInterval,
+					producesData: producesData,
 					provider: [
 					        id: provider.id,
 							name: provider.name
 					],
-					defaultDataScriptName: defaultDataScript,
-					producesData: producesData,
-					lastModified: lastModified,
-					dateCreated: dateCreated
 
+					timeout: timeout,
 			]
 		}
 		return basicFields + extendedFields

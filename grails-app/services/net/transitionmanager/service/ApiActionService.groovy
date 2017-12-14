@@ -223,9 +223,36 @@ class ApiActionService {
 	ApiAction findOrException(Long apiActionId, Project project) {
 		ApiAction apiAction = find(apiActionId, project)
 		if (!apiAction) {
-			throw EmptyResultException("Cannot find an API Action with the given id.")
+			throw new EmptyResultException("Cannot find an API Action with the given id.")
 		}
 		return apiAction
+	}
+
+	/**
+	 * Validate that no other API Action with the same name exists for this project.
+	 * @param project
+	 * @param name
+	 * @param apiActionId - if null, it's a create operation, otherwise an update.
+	 * @return
+	 */
+	boolean validateApiActionName(Project project, String name, Long apiActionId = null){
+		boolean isValid = false
+
+		// Both name and project are required for validating.
+		if (name && project) {
+			// Find an API Action for this project with the given name.
+			ApiAction apiAction = ApiAction.where {
+				project == project
+				name == name
+			}.find()
+
+			// If no API Action was found or the IDs match, the name it's okay.
+			if (!apiAction || apiAction.id == apiActionId) {
+				isValid = true
+			}
+		}
+		return isValid
+
 	}
 
 }
