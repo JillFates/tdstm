@@ -7,6 +7,7 @@ import com.tdssrc.grails.GormUtil
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.ApiActionService
@@ -276,19 +277,40 @@ class ApiActionServiceIntegrationTests extends Specification {
 		when: "Trying to delete an API Action that belongs to some other project"
 			apiActionService.delete(apiAction2.id, project)
 		then: "A DomainUpdateException is thrown"
-			thrown DomainUpdateException
+			thrown EmptyResultException
 
 		when: "trying to delete an API Action that doesn't exist"
 			apiActionService.delete(0, project)
 		then: "A DomainUpdateException is thrown"
-			thrown DomainUpdateException
+			thrown EmptyResultException
 
 		when: "trying to delete an API Action without passing a project"
 			apiActionService.delete(apiAction2.id, null)
-		then: "A DomainUpdateException is thrown"
-			thrown DomainUpdateException
+		then: "An EmptyResultException is thrown"
+			thrown EmptyResultException
 
 
+
+	}
+
+	def "11. Test validateApiActionName with different values"() {
+		given: "Two projects with an API Action each."
+			Project project1 = projectHelper.createProject()
+			Project project2 = projectHelper.createProject()
+			ApiAction apiAction1 = apiActionHelper.createApiAction(project1)
+			ApiAction apiAction2 = apiActionHelper.createApiAction(project2)
+		expect: "True when querying with no id and a valid name (a create operation.)"
+			apiActionService.validateApiActionName(project1, apiAction2.name)
+		and: "False when entering a duplicate name and no id (a create operation)."
+			!apiActionService.validateApiActionName(project1, apiAction1.name)
+		and: "True when the name and the id match (an update operation)"
+			apiActionService.validateApiActionName(project1, apiAction1.name, apiAction1.id)
+		and: "True when changing the name for an existing Action with a valid input (an update operation)"
+			apiActionService.validateApiActionName(project1, apiAction2.name, apiAction1.id)
+		and: "False when no project is given."
+			!apiActionService.validateApiActionName(null, apiAction1.name)
+		and: "False when no name is given."
+			!apiActionService.validateApiActionName(project1, null)
 
 	}
 
