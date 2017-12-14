@@ -48,4 +48,25 @@ class WsApiActionController implements ControllerMethods{
         renderSuccessJson([deleted: true])
     }
 
+
+    /**
+     * Create a new ApiAction.
+     */
+    @HasPermission(Permission.ActionCreate)
+    def create() {
+        Project project = securityService.userCurrentProject
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
+        renderSuccessJson(apiAction.toMap(false))
+    }
+
+
+    /**
+     * Update the corresponding ApiAction.
+     */
+    @HasPermission(Permission.ActionEdit)
+    def update(Long id) {
+        Project project = securityService.userCurrentProject
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON, id)
+        renderSuccessJson(apiAction.toMap(false))
+    }
 }

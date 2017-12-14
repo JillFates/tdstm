@@ -67,14 +67,16 @@ class UrlMappings {
 			controller = "wsApiAction"
 			action = [
 			        DELETE: "delete",
-					GET: "fetch"
+					GET: "fetch",
+					PUT: "update"
 			]
 		}
 
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
-					GET: "list"
+					GET: "list",
+					POST: "create"
 			]
 		}
 

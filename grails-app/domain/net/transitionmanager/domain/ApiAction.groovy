@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
@@ -162,5 +163,12 @@ class ApiAction {
 			]
 		}
 		return basicFields + extendedFields
+	}
+
+	def beforeInsert = {
+		dateCreated = TimeUtil.nowGMT()
+	}
+	def beforeUpdate = {
+		lastModified = TimeUtil.nowGMT()
 	}
 }

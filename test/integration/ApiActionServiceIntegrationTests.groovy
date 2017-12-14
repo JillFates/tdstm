@@ -1,3 +1,5 @@
+import com.tdssrc.grails.JsonUtil
+import grails.validation.ValidationException
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -6,8 +8,8 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 
 import net.transitionmanager.agent.*
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.ApiActionService
@@ -16,6 +18,8 @@ import net.transitionmanager.service.AwsService
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 
+import org.apache.commons.lang.RandomStringUtils as RSU
+import org.codehaus.groovy.grails.web.json.JSONObject
 //import spock.lang.Specification
 import spock.lang.*
 
@@ -24,6 +28,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	ApiActionService apiActionService
 	ApiActionTestHelper apiActionHelper = new ApiActionTestHelper()
+	ProviderTestHelper providerHelper = new ProviderTestHelper()
 
 	private ApiAction action
 	private AssetComment task
@@ -277,17 +282,17 @@ class ApiActionServiceIntegrationTests extends Specification {
 		when: "Trying to delete an API Action that belongs to some other project"
 			apiActionService.delete(apiAction2.id, project)
 		then: "A DomainUpdateException is thrown"
-			thrown EmptyResultException
+			thrown InvalidParamException
 
 		when: "trying to delete an API Action that doesn't exist"
 			apiActionService.delete(0, project)
 		then: "A DomainUpdateException is thrown"
-			thrown EmptyResultException
+			thrown InvalidParamException
 
 		when: "trying to delete an API Action without passing a project"
 			apiActionService.delete(apiAction2.id, null)
 		then: "An EmptyResultException is thrown"
-			thrown EmptyResultException
+			thrown InvalidParamException
 
 
 
@@ -312,6 +317,130 @@ class ApiActionServiceIntegrationTests extends Specification {
 		and: "False when no name is given."
 			!apiActionService.validateApiActionName(project1, null)
 
+	}
+
+	def "12. Test Create ApiActions with valid and invalid data"() {
+		setup: "some useful values"
+			Provider provider = providerHelper.createProvider(project)
+			String apiName = RSU.randomAlphabetic(10)
+			String json = """
+							{
+								"name": "Api Action 2",
+								"description": "some description",
+								"providerId": ${provider.id},
+								"agentClass": "AWS",
+								"agentMethod": "X",
+								"callbackMode": "NA",
+								"callbackMethod": "Y",
+								"asyncQueue": "AQ",
+								"producesData": 0,
+								"pollingInterval": 0,
+								"timeout": 0
+							}
+							"""
+			JSONObject apiActionJson = JsonUtil.parseJson(json)
+		when: "Creating an API Action"
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "The operation succeeded"
+			apiAction != null
+		when: "Trying to create a second API Action with the same name"
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "An Error is thrown"
+			thrown InvalidParamException
+		when: "Trying to create an ApiAction with missing params"
+			apiActionJson.remove("agentMethod")
+			apiActionJson.name = RSU.randomAlphabetic(10)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "A ValidationException is thrown"
+			thrown ValidationException
+		when: "Trying to create with invalid enum"
+			apiActionJson.agentMethod = "X"
+			apiActionJson.agentClass = "BOGUS"
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+		when: "Trying to assign a provider of another project"
+			Project project2 = projectHelper.createProject()
+			Provider provider2 = providerHelper.createProvider(project2)
+			apiActionJson.providerId = provider2.id
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "A DomainUpdateException is thrown"
+			thrown DomainUpdateException
+
+
+	}
+
+	def "13. Test Update ApiActions with valid and invalid data"() {
+		setup: "some useful values"
+			Provider provider = providerHelper.createProvider(project)
+			String apiName = RSU.randomAlphabetic(10)
+			String json = """
+								{
+									"name": "Api Action 2",
+									"description": "some description",
+									"providerId": ${provider.id},
+									"agentClass": "AWS",
+									"agentMethod": "X",
+									"callbackMode": "NA",
+									"callbackMethod": "Y",
+									"asyncQueue": "AQ",
+									"producesData": 0,
+									"pollingInterval": 0,
+									"timeout": 0
+								}
+								"""
+			JSONObject apiActionJson = JsonUtil.parseJson(json)
+		when: "Creating an API Action"
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+		then: "The operation succeeded"
+			apiAction != null
+		when: "Trying to update the API Action with a different name"
+			String newName =  RSU.randomAlphabetic(10)
+			apiActionJson.name = newName
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
+		then: "the name was updated"
+			apiAction2.name == newName
+		and: "the id didn't change (the action was updated)"
+			apiAction.id == apiAction2.id
+		when: "we try to set the name to that of an existing Action"
+			apiActionJson.name = RSU.randomAlphabetic(10)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+			apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+		when: "Trying to update with a provider of another project"
+			Project project2 = projectHelper.createProject()
+			Provider provider2 = providerHelper.createProvider(project2)
+			apiActionJson.name = RSU.randomAlphabetic(10)
+			apiActionJson.providerId = provider2.id
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
+		then: "A DomainUpdateException is thrown"
+			thrown DomainUpdateException
+
+
+	}
+
+	def "14. Test parseEnum with different valid and invalid inputs"(){
+		when: "Trying to parse a valid value"
+			AgentClass agentClass = apiActionService.parseEnum(AgentClass, "someField", "AWS")
+		then: "The correct value was parsed"
+			agentClass == AgentClass.AWS
+		when: "Trying with an invalid value"
+			agentClass = apiActionService.parseEnum(AgentClass, "someField", RSU.randomAlphabetic(10))
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+		when: "Trying with an invalid value"
+			agentClass = apiActionService.parseEnum(AgentClass, "someField", null)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+		when: "Trying with a class that is not an Enum"
+			agentClass = apiActionService.parseEnum(Integer, "someField", "AWS")
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+		when: "Trying with a null class.	"
+			agentClass = apiActionService.parseEnum(null, "someField", "AWS")
+		then: "An NullPointerException is thrown"
+			thrown NullPointerException
 	}
 
 	/*

@@ -7,16 +7,18 @@ import grails.transaction.Transactional
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
 import net.transitionmanager.domain.Provider
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.hibernate.criterion.CriteriaSpecification
 
 @Slf4j
 @Transactional
 class ApiActionService {
 	CamelHostnameIdentifier camelHostnameIdentifier
+	DataScriptService dataScriptService
+	ProviderService providerService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -223,7 +225,7 @@ class ApiActionService {
 	ApiAction findOrException(Long apiActionId, Project project) {
 		ApiAction apiAction = find(apiActionId, project)
 		if (!apiAction) {
-			throw new EmptyResultException("Cannot find an API Action with the given id.")
+			throw new InvalidParamException("Cannot find an API Action with the given id.")
 		}
 		return apiAction
 	}
@@ -252,6 +254,72 @@ class ApiActionService {
 			}
 		}
 		return isValid
+
+	}
+
+	/**
+	 * Convert a string into the corresponding enum.
+	 * @param enumClass
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	def parseEnum(Class enumClass, String field, String value) {
+		String baseErrorMsg = "Error trying to create or update an API Action."
+		if (!value) {
+			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
+		}
+		try {
+			return enumClass.valueOf(value)
+		}catch (IllegalArgumentException e){
+			throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+		}
+	}
+
+	ApiAction saveOrUpdateApiAction(Project project, JSONObject apiActionJson, Long apiActionId = null) {
+
+		ApiAction apiAction
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = findOrException(apiActionId, project)
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+
+		String actionName = apiActionJson.name
+
+		if (!validateApiActionName(project, apiActionJson.name)) {
+			throw new InvalidParamException("Invalid name for API Action.")
+		}
+
+		DataScript dataScript = null
+		if (apiActionJson.defaultDataScriptId) {
+			dataScript = dataScriptService.getDataScript(NumberUtil.toLong(apiActionJson.defaultDataScriptId), project)
+		}
+
+		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
+
+		apiAction.with {
+			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
+			agentMethod = apiActionJson.agentMethod
+			asyncQueue = apiActionJson.asyncQueue
+			callbackMethod = apiActionJson.callbackMethod
+			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
+			description = apiActionJson.description
+			defaultDataScript = dataScript
+			description =  apiActionJson.description
+			methodParams =  apiActionJson.methodParams
+			name = actionName
+			pollingInterval = NumberUtil.toInteger(apiActionJson.pollingInterval)
+			producesData =  NumberUtil.toZeroOrOne(apiActionJson.producesData)
+			provider = prov
+			timeout = NumberUtil.toInteger(apiActionJson.timeout)
+		}
+
+		apiAction.save(failOnError: true)
+		return apiAction
 
 	}
 
