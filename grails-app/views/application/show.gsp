@@ -14,10 +14,9 @@
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
-				<g:render template="show" model="[applicationInstance:applicationInstance, shutdownBy: application.shutdownBy,
-												  shutdownById: application.shutdownById,
-												  startupBy: application.startupBy, startupById: application.startupById,
-												  testingBy: application.testingBy, testingById: application.testingById]" >
+				<g:render template="show" model="[applicationInstance:applicationInstance, shutdownBy: shutdownBy,
+								shutdownById: shutdownById, startupBy: startupBy, startupById: startupById,
+								testingBy: testingBy, testingById: testingById]" >
 
 				</g:render>
 			</div>
