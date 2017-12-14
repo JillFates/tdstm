@@ -1,8 +1,10 @@
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SecurityRole
 import net.transitionmanager.domain.Dataview
 import com.tdsops.tm.enums.domain.SettingType
 import net.transitionmanager.domain.*
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
 import spock.lang.Specification
 import test.helper.DataScriptTestHelper
