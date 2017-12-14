@@ -359,9 +359,6 @@
  <g:render template="initAssetEntityData"/>
  <script type="text/javascript">
 
-    $(document).ready(function() {
-        $('[data-toggle="popover"]').popover();
-    });
 
 	function toggleCheckbox (chkbox, field) {
 		$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
