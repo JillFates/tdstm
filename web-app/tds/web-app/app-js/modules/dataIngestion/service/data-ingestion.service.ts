@@ -4,6 +4,7 @@ import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
+import {APIActionModel} from '../model/api-action.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -110,6 +111,31 @@ export class DataIngestionService {
 		}
 	}
 
+	saveAPIAction(model: APIActionModel): Observable<DataScriptModel> {
+		let postRequest = {
+			name: model.name,
+			description: model.description,
+			providerId: model.provider.id
+		};
+		if (!model.id) {
+			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					let dataItem = (result && result.status === 'success' && result.data);
+					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
+					return dataItem;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
+	}
+
 	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
 		let postRequest = {
 			providerId: model.provider.id
@@ -131,6 +157,21 @@ export class DataIngestionService {
 			postRequest['providerId'] = model.id;
 		}
 		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
+		let postRequest = {
+			providerId: model.provider.id
+		};
+		if (model.id) {
+			postRequest['dataScriptId'] = model.id;
+		}
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

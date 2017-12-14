@@ -14,6 +14,7 @@ import { DataScriptConsoleComponent } from './components/data-script-console/dat
 import { DataScriptEtlBuilderComponent } from './components/data-script-etl-builder/data-script-etl-builder.component';
 import { DataScriptSampleDataComponent } from './components/data-script-sample-data/data-script-sample-data.component';
 import { APIActionListComponent } from './components/api-action-list/api-action-list.component';
+import { APIActionViewEditComponent } from './components/api-action-view-edit/api-action-view-edit.component';
 import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 // Import Kendo Modules
@@ -44,7 +45,8 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,
-		APIActionListComponent
+		APIActionListComponent,
+		APIActionViewEditComponent
 	],
 	providers: [DataIngestionService],
 	exports: [
@@ -58,7 +60,8 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		ProviderViewEditComponent,
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
-		DataScriptSampleDataComponent
+		DataScriptSampleDataComponent,
+		APIActionViewEditComponent
 	]
 })
 

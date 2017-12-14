@@ -54,21 +54,17 @@ export class APIActionColumnModel {
 	}
 }
 
-export class DataScriptModel {
+export class APIActionModel {
 	id?: number;
 	name: string;
 	description: string;
-	mode: DataScriptMode;
-	etlSourceCode?: string;
+	agentMethod?: string;
 	provider?: {
 		id?: number,
 		name: string
 	};
+	defaultDataScriptName?: string;
+	producesData?: number;
 	dateCreated?: Date;
-	lastUpdated?: Date;
-}
-
-export enum DataScriptMode {
-	IMPORT,
-	EXPORT
+	lastModified?: Date;
 }

@@ -8,9 +8,9 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { APIActionColumnModel, DataScriptModel, DataScriptMode} from '../../model/api-action.model';
+import { APIActionColumnModel, APIActionModel } from '../../model/api-action.model';
 import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
-import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
+import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
 
 @Component({
 	selector: 'api-action-list',
@@ -37,7 +37,7 @@ export class APIActionListComponent {
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
-	public resultSet: DataScriptModel[];
+	public resultSet: APIActionModel[];
 	public selectedRows = [];
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
@@ -45,7 +45,7 @@ export class APIActionListComponent {
 
 	constructor(
 		private dialogService: UIDialogService,
-		@Inject('apiActions') apiActions: Observable<DataScriptModel[]>,
+		@Inject('apiActions') apiActions: Observable<APIActionModel[]>,
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
@@ -140,13 +140,12 @@ export class APIActionListComponent {
 	}
 
 	protected onCreate(): void {
-		let dataScriptModel: DataScriptModel = {
+		let dataScriptModel: APIActionModel = {
 			name: '',
 			description: '',
-			mode: DataScriptMode.IMPORT,
 			provider: { id: null, name: '' }
 		};
-		// this.openDataScriptDialogViewEdit(dataScriptModel, ActionType.CREATE);
+		this.openAPIActionDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
 
 	/**
@@ -155,7 +154,7 @@ export class APIActionListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		// this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
+		this.openAPIActionDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
 	/**
@@ -182,7 +181,7 @@ export class APIActionListComponent {
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
 			this.selectRow(event['dataItem'].id);
-			// this.openDataScriptDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			this.openAPIActionDialogViewEdit(event['dataItem'], ActionType.VIEW);
 		}
 	}
 
@@ -200,16 +199,16 @@ export class APIActionListComponent {
 	 * @param {DataScriptModel} dataScriptModel
 	 * @param {number} actionType
 	 */
-	private openDataScriptDialogViewEdit(dataScriptModel: DataScriptModel, actionType: number): void {
-		this.dialogService.open(DataScriptViewEditComponent, [
-			{ provide: DataScriptModel, useValue: dataScriptModel },
+	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number): void {
+		this.dialogService.open(APIActionViewEditComponent, [
+			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
 		]).then(result => {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
 				setTimeout(() => {
-					this.selectRow(result.dataScript.id);
-					this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
+					this.selectRow(result.apiAction.id);
+					this.openAPIActionDialogViewEdit(result.apiAction, ActionType.VIEW);
 				}, 500);
 			}
 		}).catch(result => {
