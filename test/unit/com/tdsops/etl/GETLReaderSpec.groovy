@@ -104,9 +104,6 @@ class GETLReaderSpec extends Specification {
             fields[3].type == Field.Type.STRING
             fields[4].type == Field.Type.STRING
 
-        and:
-            csvFile.columnsNames == ['id', 'name']
-
         and: 'First row results contains fields values'
             Map row = dataset.rows()[0]
             row.id == "114054"
