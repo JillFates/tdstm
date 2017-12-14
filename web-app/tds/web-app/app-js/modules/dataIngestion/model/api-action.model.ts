@@ -59,6 +59,13 @@ export class APIActionModel {
 	name: string;
 	description: string;
 	agentMethod?: string;
+	agentClass?: string;
+	asyncQueue?: string;
+	callbackMethod?: string;
+	callbackMode?: string;
+	methodParams?: string;
+	pollingInterval?: number;
+	timeout?: number;
 	provider?: {
 		id?: number,
 		name: string

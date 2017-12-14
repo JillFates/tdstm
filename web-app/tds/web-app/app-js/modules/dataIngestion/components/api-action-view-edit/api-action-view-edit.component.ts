@@ -41,7 +41,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 		this.apiActionModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 		this.datasourceName.next(this.apiActionModel.name);
 	}

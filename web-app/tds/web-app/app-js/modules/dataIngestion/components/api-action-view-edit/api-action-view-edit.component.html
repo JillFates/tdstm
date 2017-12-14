@@ -7,7 +7,7 @@
 	</div>
 	<div class="modal-body">
 		<form name="dataScriptForm" role="form" data-toggle="validator" #dataScriptForm='ngForm' class="form-horizontal left-alignment">
-			<div class="box-body">
+			<div class="box-body"> <!--
 				<div class="row">
 					<div class="col-md-12">
 						<div class="form-group">
@@ -69,11 +69,11 @@
 							<textarea id="dataScriptDescription" name="dataScriptDescription" class="form-control" [(ngModel)]="dataScriptModel.description"></textarea>
 						</div>
 					</div>
-				</div>
+				</div> -->
 			</div>
 		</form>
 	</div>
-	<div class="modal-footer form-group-center">
+	<!-- <div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveDataScript()"
 		 class="btn btn-primary pull-left" [disabled]="!dataScriptForm.form.valid || !isUnique">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
@@ -85,5 +85,5 @@
 			<span class="fa fa-fw fa-trash"></span> Delete</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 			<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
-	</div>
+	</div> -->
 </div>
