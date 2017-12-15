@@ -674,7 +674,7 @@ class UrlMappings {
 		"/ws/apiAction/agent/$id" {
 			controller = "wsApiAction"
 			action = [
-			        GET: "agentDetails"
+			        GET: "agentDictionary"
 			]
 		}
 
