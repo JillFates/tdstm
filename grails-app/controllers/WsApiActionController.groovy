@@ -22,8 +22,8 @@ class WsApiActionController implements ControllerMethods {
      * @param id
      * @return
      */
-    def agentDetails(String id) {
-        renderAsJson(apiActionService.agentDetails(id))
+    def agentDictionary(String id) {
+        renderAsJson(apiActionService.agentDictionary(id))
     }
 
 }

@@ -16,9 +16,9 @@ class ApiActionService {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-			(AgentClass.AWS): AwsAgent,
-			(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-			(AgentClass.SERVICE_NOW): ServiceNowAgent
+		(AgentClass.AWS): AwsAgent,
+		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
+		(AgentClass.SERVICE_NOW): ServiceNowAgent
 	].asImmutable()
 
 	/**
@@ -26,32 +26,44 @@ class ApiActionService {
 	 * @return
 	 */
 	List<String> agentNamesList() {
-		List<String> agentNames = new ArrayList<>()
+		List<Map> agents = new ArrayList<>()
+
 		agentClassMap.each { entry ->
 			Class clazz = entry.value
 			AbstractAgent agent = clazz.newInstance()
-			agentNames.add(agent.name)
+			Map info = [
+				id: agent.agentClass.toString(),
+				name: agent.name
+			]
+			agents << info
 		}
 
-		return agentNames
+		return agents
 	}
 
 	/**
 	 * Get an agent details by agent name
-	 * @param agentName
-	 * @return
+	 * @param agentCode
+	 * @return the method dictionary for a specified agent
 	 */
-	Map agentDetails(String agentName) {
-		Map agentDetails = [:]
+	Map agentDictionary(String id) {
+		Map dictionary = [:]
+		List<String> agentIds  = []
 		agentClassMap.each { entry ->
 			Class clazz = entry.value
 			AbstractAgent agent = clazz.newInstance()
-			if (agent.name == agentName) {
-				agentDetails = agent.dictionary()
+			String agentId = agent.agentClass.toString()
+			agentIds << agentId
+			if (agentId == id) {
+				dictionary = agent.dictionary()
 			}
 		}
 
-		return agentDetails
+		if (!dictionary) {
+			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
+		}
+
+		return dictionary
 	}
 
 	/**

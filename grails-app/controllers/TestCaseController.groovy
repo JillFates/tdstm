@@ -13,6 +13,7 @@ import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AwsService
 import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.PartyRelationshipService
@@ -45,9 +46,14 @@ class TestCaseController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
+	ApiActionService apiActionService
 
 	AwsService awsService
 
+	def agents() {
+		renderAsJson(apiActionService.agentNamesList())
+	}
+		
 	def api() {
 
 		log.debug "=====================\nAbout to save ApiAction\n====================="
