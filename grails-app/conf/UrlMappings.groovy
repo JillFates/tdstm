@@ -664,6 +664,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/agent" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentNames"
+			]
+		}
+
+		"/ws/apiAction/agent/$id" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentDetails"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

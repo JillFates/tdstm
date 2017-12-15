@@ -21,10 +21,54 @@ class ApiActionService {
 			(AgentClass.SERVICE_NOW): ServiceNowAgent
 	].asImmutable()
 
+	/**
+	 * Get a list of agent names
+	 * @return
+	 */
+	List<String> agentNamesList() {
+		List<String> agentNames = new ArrayList<>()
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			agentNames.add(agent.name)
+		}
+
+		return agentNames
+	}
+
+	/**
+	 * Get an agent details by agent name
+	 * @param agentName
+	 * @return
+	 */
+	Map agentDetails(String agentName) {
+		Map agentDetails = [:]
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			if (agent.name == agentName) {
+				agentDetails = agent.dictionary()
+			}
+		}
+
+		return agentDetails
+	}
+
+	/**
+	 * Find an ApiAction by id
+	 * @param id
+	 * @return
+	 */
 	ApiAction find(Long id){
 		return ApiAction.get(id)
 	}
 
+	/**
+	 * Find and ApiAction by id and project it belongs to
+	 * @param id
+	 * @param project
+	 * @return
+	 */
 	ApiAction find(Long id, Project project) {
 		return ApiAction.where {
 			id == id
@@ -32,6 +76,11 @@ class ApiActionService {
 		}.get()
 	}
 
+	/**
+	 * Get a list of ApiActions names that belongs to a project
+	 * @param project
+	 * @return
+	 */
 	List<Map> list(Project project) {
 		List actions = ApiAction.createCriteria().list() {
 			eq('project', project)
