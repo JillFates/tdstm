@@ -138,31 +138,28 @@ class ApiAction {
 	 * @return
 	 */
 	Map toMap(boolean minimalInfo = true) {
-		Map basicFields = [id: id, name: name]
-		Map extendedFields = [:]
+		Map fields = [id: id, name: name]
 		if (!minimalInfo) {
-			extendedFields = [
-					agentClass: agentClass.name(),
-					agentMethod: agentMethod,
-					asyncQueue: asyncQueue,
-					callbackMethod: callbackMethod,
-					callbackMode: callbackMode.name(),
-					dateCreated: dateCreated,
-					defaultDataScriptName: defaultDataScript,
-					description: description,
-					lastModified: lastModified,
-					methodParams: methodParams,
-					pollingInterval: pollingInterval,
-					producesData: producesData,
-					provider: [
-					        id: provider.id,
-							name: provider.name
-					],
-
-					timeout: timeout,
+			fields.agentClass  = agentClass.name()
+			fields.agentMethod = agentMethod
+			fields.asyncQueue = asyncQueue
+			fields.callbackMethod = callbackMethod
+			fields.callbackMode = callbackMode.name()
+			fields.dateCreated = dateCreated
+			fields.defaultDataScriptName = defaultDataScript
+			fields.description = description
+			fields.lastModified = lastModified
+			fields.methodParams = methodParams
+			fields.pollingInterval = pollingInterval
+			fields.producesData = producesData
+			fields.provider = [
+					id  : provider.id,
+					name: provider.name
 			]
+			fields.timeout = timeout
+
 		}
-		return basicFields + extendedFields
+		return fields
 	}
 
 	def beforeInsert = {

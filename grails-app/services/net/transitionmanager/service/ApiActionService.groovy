@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import grails.transaction.Transactional
@@ -212,7 +213,7 @@ class ApiActionService {
 	 * @param flush
 	 */
 	void delete(Long id, Project project, boolean flush = false) {
-		ApiAction apiAction = findOrException(id, project)
+		ApiAction apiAction = ormUtil.findInProject(project, ApiAction, id, true)
 		apiAction.delete(flush: flush)
 	}
 
@@ -243,13 +244,13 @@ class ApiActionService {
 		// Both name and project are required for validating.
 		if (name && project) {
 			// Find an API Action for this project with the given name.
-			ApiAction apiAction = ApiAction.where {
+			Long id = ApiAction.where {
 				project == project
 				name == name
-			}.find()
+			}.projections{property('id')}.find()
 
 			// If no API Action was found or the IDs match, the name it's okay.
-			if (!apiAction || apiAction.id == apiActionId) {
+			if (!id || id == apiActionId) {
 				isValid = true
 			}
 		}
@@ -283,7 +284,7 @@ class ApiActionService {
 		// If there's an apiActionId then it's an update operation.
 		if (apiActionId) {
 			// Retrieve the corresponding API Action instance
-			apiAction = findOrException(apiActionId, project)
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
 		} else {
 			apiAction = new ApiAction(project: project)
 		}

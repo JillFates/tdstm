@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -9,7 +10,7 @@ import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.SecurityService
 
 @Secured("isAuthenticated()")
-@Slf4j(value='logger', category='grails.app.controllers.WsApiActionController')
+@Slf4j
 class WsApiActionController implements ControllerMethods{
 
     ApiActionService apiActionService
@@ -33,7 +34,7 @@ class WsApiActionController implements ControllerMethods{
     @HasPermission(Permission.ActionEdit)
     def fetch(Long id){
         Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.findOrException(id, project)
+        ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
         renderSuccessJson(apiAction.toMap(false))
     }
 
