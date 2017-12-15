@@ -11,6 +11,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { APIActionColumnModel, APIActionModel } from '../../model/api-action.model';
 import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
 import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
+import { DIALOG_SIZE } from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'api-action-list',
@@ -203,7 +204,7 @@ export class APIActionListComponent {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
-		]).then(result => {
+		], DIALOG_SIZE.XLG).then(result => {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
 				setTimeout(() => {

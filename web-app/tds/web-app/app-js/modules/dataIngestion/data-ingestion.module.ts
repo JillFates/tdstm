@@ -17,11 +17,13 @@ import { APIActionListComponent } from './components/api-action-list/api-action-
 import { APIActionViewEditComponent } from './components/api-action-view-edit/api-action-view-edit.component';
 import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
+import { PopupPollingComponent } from './components/popups/popup-polling.component';
 // Import Kendo Modules
 import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
+import { PopupModule } from '@progress/kendo-angular-popup';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
 
@@ -34,6 +36,7 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		GridModule,
 		DateInputsModule,
 		SortableModule,
+		PopupModule,
 		AssetExplorerModule, // So we can use Shared components that belongs to this module
 		UIRouterModule.forChild({ states: DATA_INGESTION_STATES })
 	],
@@ -46,7 +49,8 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,
 		APIActionListComponent,
-		APIActionViewEditComponent
+		APIActionViewEditComponent,
+		PopupPollingComponent
 	],
 	providers: [DataIngestionService],
 	exports: [
