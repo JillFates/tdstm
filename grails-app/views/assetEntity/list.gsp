@@ -127,6 +127,7 @@
 					caption="listCaption"
 					width="windowWidth"
 					rowNum="sizePref"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('assetListId');recompileDOM('assetListIdWrapper');}"

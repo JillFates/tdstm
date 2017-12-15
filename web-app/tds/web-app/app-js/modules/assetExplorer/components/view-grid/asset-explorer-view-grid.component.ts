@@ -9,12 +9,11 @@ import { Observable } from 'rxjs/Rx';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { SEARCH_QUITE_PERIOD, Keystroke } from '../../../../shared/model/constants';
+import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, Keystroke } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
-import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
@@ -67,10 +66,13 @@ export class AssetExplorerViewGridComponent {
 	gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	showMessage = true;
 	typingTimeout: any;
+	// Pagination Configuration
+	private maxDefault = MAX_DEFAULT;
+	private maxOptions = MAX_OPTIONS;
 
 	state: State = {
 		skip: 0,
-		take: 25,
+		take: this.maxDefault,
 		sort: []
 	};
 	gridData: GridDataResult;

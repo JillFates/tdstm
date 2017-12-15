@@ -32,6 +32,7 @@
 					sortname="'projectCode'"
 					caption="listCaption"
 					height="'100%'"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					postData="{isActive:isActive}"
 					gridComplete="function(){bindResize('projectGridId')}"
 					showPager="true">
