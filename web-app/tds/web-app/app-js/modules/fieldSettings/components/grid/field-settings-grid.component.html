@@ -144,7 +144,7 @@
     </kendo-grid-column>
     <kendo-grid-column field="tip" title="Tooltip Help">
         <ng-template kendoGridCellTemplate *ngIf="isEditing" let-dataItem>
-            <textarea class="form-control" [(ngModel)]="dataItem.tip" name="tip" rows="2" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}" [disabled]="toBeDeleted(dataItem)">
+            <textarea style="resize: vertical;" class="form-control" [(ngModel)]="dataItem.tip" name="tip" rows="2" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}" [disabled]="toBeDeleted(dataItem)">
             </textarea>
         </ng-template>
     </kendo-grid-column>
