@@ -23,15 +23,71 @@ class ApiActionService {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-			(AgentClass.AWS): AwsAgent,
-			(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-			(AgentClass.SERVICE_NOW): ServiceNowAgent
+		(AgentClass.AWS): AwsAgent,
+		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
+		(AgentClass.SERVICE_NOW): ServiceNowAgent
 	].asImmutable()
 
+	/**
+	 * Get a list of agent names
+	 * @return
+	 */
+	List<String> agentNamesList() {
+		List<Map> agents = new ArrayList<>()
+
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			Map info = [
+				id: agent.agentClass.toString(),
+				name: agent.name
+			]
+			agents << info
+		}
+
+		return agents
+	}
+
+	/**
+	 * Get an agent details by agent name
+	 * @param agentCode
+	 * @return the method dictionary for a specified agent
+	 */
+	Map agentDictionary(String id) {
+		Map dictionary = [:]
+		List<String> agentIds  = []
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			String agentId = agent.agentClass.toString()
+			agentIds << agentId
+			if (agentId == id) {
+				dictionary = agent.dictionary()
+			}
+		}
+
+		if (!dictionary) {
+			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
+		}
+
+		return dictionary
+	}
+
+	/**
+	 * Find an ApiAction by id
+	 * @param id
+	 * @return
+	 */
 	ApiAction find(Long id){
 		return ApiAction.get(id)
 	}
 
+	/**
+	 * Find and ApiAction by id and project it belongs to
+	 * @param id
+	 * @param project
+	 * @return
+	 */
 	ApiAction find(Long id, Project project) {
 		return ApiAction.where {
 			id == id
@@ -215,20 +271,6 @@ class ApiActionService {
 	void delete(Long id, Project project, boolean flush = false) {
 		ApiAction apiAction = ormUtil.findInProject(project, ApiAction, id, true)
 		apiAction.delete(flush: flush)
-	}
-
-	/**
-	 * Find a given API Action or throw an exception.
-	 * @param apiActionId
-	 * @param project
-	 * @return
-	 */
-	ApiAction findOrException(Long apiActionId, Project project) {
-		ApiAction apiAction = find(apiActionId, project)
-		if (!apiAction) {
-			throw new InvalidParamException("Cannot find an API Action with the given id.")
-		}
-		return apiAction
 	}
 
 	/**

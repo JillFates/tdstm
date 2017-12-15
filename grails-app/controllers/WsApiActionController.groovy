@@ -9,12 +9,29 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.SecurityService
 
-@Secured("isAuthenticated()")
+@Secured('isAuthenticated()')
 @Slf4j
-class WsApiActionController implements ControllerMethods{
+class WsApiActionController implements ControllerMethods {
 
     ApiActionService apiActionService
     SecurityService securityService
+
+    /**
+     * Get a list of agent names
+     * @return
+     */
+    def agentNames() {
+        renderAsJson(apiActionService.agentNamesList())
+    }
+
+    /**
+     * Get agent details by agent name
+     * @param id
+     * @return
+     */
+    def agentDictionary(String id) {
+        renderAsJson(apiActionService.agentDictionary(id))
+    }
 
     /**
      * List all available ApiActions for the user's project.
