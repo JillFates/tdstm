@@ -933,14 +933,14 @@ public class GormUtil {
 	static <T> T findInProject(Project project, Class<T> type, id, boolean throwException = false) {
 		T instance = null
 		String errorMsg
-		// Both, type and id are mandatory
+		// Project, type and id are mandatory
 		if (type && id && project) {
 			// Check if the class is a domain class.
 			if (isDomainClass(type)) {
 				// fetch the instance
 				instance = type.get(id)
 				// Make sure the domain class has a 'project' field.
-				if (isDomainProperty(instance, 'project')) {
+				if (instance && isDomainProperty(instance, 'project')) {
 					// Validate the projects' id match.
 					if (project.id != instance.project.id) {
 						errorMsg = "The domain object with type $type and id $id doesn't belong to project ${project.name}."
