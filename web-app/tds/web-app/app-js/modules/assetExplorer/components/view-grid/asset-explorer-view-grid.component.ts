@@ -240,6 +240,7 @@ export class AssetExplorerViewGridComponent {
 
 	setSelectedItems(): void {
 		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 
 	onBulkDelete(): void {
