@@ -261,4 +261,10 @@ export class AssetExplorerViewGridComponent {
 				});
 		}
 	}
+
+	cellClick(e): void {
+		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
+			this.onShow(e.dataItem);
+		}
+	}
 }
