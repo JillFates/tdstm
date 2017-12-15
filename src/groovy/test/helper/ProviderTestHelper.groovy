@@ -1,3 +1,5 @@
+package test.helper
+
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 

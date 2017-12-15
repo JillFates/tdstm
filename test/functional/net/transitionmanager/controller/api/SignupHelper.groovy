@@ -12,6 +12,7 @@ package net.transitionmanager.controller.api
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.time.TimeCategory
 import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRole
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
@@ -180,8 +181,12 @@ class SignupHelper {
     void deleteUserLoginByUsername(String username) {
         def userLogin = UserLogin.findByUsername(username)
         def person = userLogin.person
+        def partyRoles = PartyRole.findAllByParty(person)
+        partyRoles*.delete()
+        def users = UserLogin.findAllByPerson(person)
+        users*.delete()
         person.delete(flush: true, failOnError: true)
-        userLogin.delete(flush: true, failOnError: true)
+        //userLogin.delete(flush: true, failOnError: true)
     }
 
     void disablePasswordExpirationByUsername(String username) {

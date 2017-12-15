@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import groovy.json.JsonException
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.InvalidParamException
+import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @CompileStatic
@@ -71,6 +73,25 @@ class JsonUtil {
     }
 
     /**
+     * Convert a JSONElement to map
+     * @param json
+     * @return
+     */
+    static Map<String, ?> convertJsonToMap(JSONElement json) {
+        if (json == null) return null
+        return convertJsonToMap(json.toString())
+    }
+
+    /**
+     * Convert a map to json string
+     * @param map
+     * @return
+     */
+    static String convertMapToJsonString(Map<String, ?> map) {
+        return JsonOutput.toJson(map)
+    }
+
+    /**
      * Converts an object into a String in the JSON format
      * @param object - the object to be converted
      * @return the object as JSON String
@@ -81,7 +102,7 @@ class JsonUtil {
     }
 
     /**
-     * Converts an object into a String in the JSON pretty format 
+     * Converts an object into a String in the JSON pretty format
      * @param object - the object to be converted
      * @return the object as JSON String
      */
