@@ -15,7 +15,7 @@ class RiverMeadowAgent extends AbstractAgent {
 	 * Constructor
 	 */
 	RiverMeadowAgent() {
-		setInfo(AgentClass.RiverMeadow, 'River Meadow APIs')
+		setInfo(AgentClass.RIVER_MEADOW, 'River Meadow APIs')
 
 		setDictionary( [
 			initiateTransport: new DictionaryItem([
@@ -33,7 +33,7 @@ class RiverMeadowAgent extends AbstractAgent {
 					groupId: groupIdParam(),
 					serverGuid: [type:String, description: 'The unique server reference']
 				],
-				results: invokeResults() + [progress:progressResult()]
+				results: invokeResults() + [progress:'progressResult()']
 			]),
 			preflightCheck: new DictionaryItem([
 				name: 'preflightCheck',
