@@ -20,9 +20,11 @@ import { ActionType } from '../../../../shared/model/data-list-grid.model';
 })
 export class APIActionViewEditComponent implements OnInit {
 
-	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
+	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
+	@ViewChild('apiActionAgent', { read: DropDownListComponent }) apiActionAgent: DropDownListComponent;
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
+	public agentList = new Array<ProviderModel>();
 	public modalTitle: string;
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
@@ -58,11 +60,6 @@ export class APIActionViewEditComponent implements OnInit {
 				}
 				this.providerList.push(...result);
 				this.dataSignature = JSON.stringify(this.apiActionModel);
-				setTimeout(() => { // Delay issues on Auto Focus
-					if (this.dataScriptProvider) {
-						this.dataScriptProvider.focus();
-					}
-				}, 500);
 
 			},
 			(err) => console.log(err));
@@ -71,7 +68,7 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Create a new DataScript
 	 */
-	protected onSaveDataScript(): void {
+	protected onSaveApiAction(): void {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
@@ -127,7 +124,7 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Change the View Mode to Edit Mode
 	 */
-	protected changeToEditDataScript(): void {
+	protected changeToEditApiAction(): void {
 		this.modalType = this.actionTypes.EDIT;
 	}
 
@@ -135,7 +132,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Delete the selected Data Script
 	 * @param dataItem
 	 */
-	protected onDeleteDataScript(): void {
+	protected onDeleteApiAction(): void {
 		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
