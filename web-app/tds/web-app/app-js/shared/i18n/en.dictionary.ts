@@ -24,11 +24,13 @@ export const en_DICTIONARY: Object = {
 		'DEPENDENCY_DETAIL': 'Dependency Detail'
 	},
 	'DATA_INGESTION': {
+		'API_ACTIONS': 'Api Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'Data Scripts',
 		'PROVIDERS': 'Providers',
 		'CREATE_DATA_SCRIPT': 'Create Data Script',
 		'CREATE_PROVIDER': 'Create Provider',
+		'CREATE_ACTION': 'Create Action',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
 		'ETL_BUILDER_TITLE': 'ETL Designer',
 		'CONSOLE_TITLE': 'ETL Console',

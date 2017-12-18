@@ -42,7 +42,7 @@ class AssetTestHelper {
 	 * @param person - the person to be referenced
 	 * @return the newly created Application
 	 */
-	private Application createApplication(Person person, Project project) {
+	 Application createApplication(Person person, Project project) {
 		String pRef = person.id.toString()
 		Application app = new Application(
 			assetName: RandomStringUtils.randomAlphabetic(15),

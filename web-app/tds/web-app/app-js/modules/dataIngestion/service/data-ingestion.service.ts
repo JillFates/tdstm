@@ -4,6 +4,7 @@ import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
+import {APIActionModel} from '../model/api-action.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -11,6 +12,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class DataIngestionService {
 
+	private dataDefaultUrl = '../ws';
 	private dataIngestionUrl = '../ws/dataingestion';
 
 	constructor(private http: HttpInterceptor) {
@@ -41,6 +43,21 @@ export class DataIngestionService {
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 				});
 				return providerModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAPIActions(): Observable<DataScriptModel[]> {
+		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
+			.map((res: Response) => {
+				let result = res.json();
+				let dataScriptModels = result && result.status === 'success' && result.data;
+				dataScriptModels.forEach((r) => {
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
+					r.producesData = (r.producesData === 1);
+				});
+				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -94,6 +111,31 @@ export class DataIngestionService {
 		}
 	}
 
+	saveAPIAction(model: APIActionModel): Observable<DataScriptModel> {
+		let postRequest = {
+			name: model.name,
+			description: model.description,
+			providerId: model.provider.id
+		};
+		if (!model.id) {
+			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					let dataItem = (result && result.status === 'success' && result.data);
+					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
+					return dataItem;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
+	}
+
 	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
 		let postRequest = {
 			providerId: model.provider.id
@@ -122,6 +164,21 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
+	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
+		let postRequest = {
+			providerId: model.provider.id
+		};
+		if (model.id) {
+			postRequest['dataScriptId'] = model.id;
+		}
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	deleteDataScript(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
 			.map((res: Response) => {
@@ -133,6 +190,15 @@ export class DataIngestionService {
 
 	deleteProvider(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/provider/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteAPIAction(id: number): Observable<string> {
+		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
