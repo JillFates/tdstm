@@ -5,6 +5,7 @@ import { ViewModel, ViewGroupModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -45,6 +46,14 @@ export class AssetExplorerViewSaveComponent {
 
 	protected isValid(): boolean {
 		return this.model.name && this.model.name.trim() !== '';
+	}
+
+	/**
+	 * Disable the System View checkbox if the user does not have the proper permission
+	 * @returns {boolean}
+	 */
+	private isSystemCreatePermitted(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
 	}
 
 	protected onFavorite() {

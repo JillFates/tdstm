@@ -17,9 +17,16 @@
 					</div>
 				</div>
 				<div class="form-group">
+                    <div class="checkbox" style="padding-left:160px;">
+                        <label>
+                            {{isSystemCreatePermitted()}}<br>
+                            <input type="checkbox" name="isSystem" [(ngModel)]="model.isSystem"> {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}
+                        </label>
+                    </div>
 					<div class="checkbox" style="padding-left:160px;">
 						<label>
-							<input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared"> {{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</label>
+							<input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared"> {{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
+                        </label>
 					</div>
 				</div>
 				<div class="form-group">

@@ -21,7 +21,8 @@ export const en_DICTIONARY: Object = {
 			'SCHEMA_CHANGE': 'New results, click Preview button to see them',
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		},
-		'DEPENDENCY_DETAIL': 'Dependency Detail'
+		'DEPENDENCY_DETAIL': 'Dependency Detail',
+		'SYSTEM_VIEW': 'System View'
 	},
 	'DATA_INGESTION': {
 		'DATA_INGESTION': 'Data Ingestion',
@@ -56,6 +57,7 @@ export const en_DICTIONARY: Object = {
 		'OK': 'Ok',
 		'ADD': 'Add',
 		'CANCEL': 'Cancel',
+		'CREATE': 'Create',
 		'CLOSE': 'Close',
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
