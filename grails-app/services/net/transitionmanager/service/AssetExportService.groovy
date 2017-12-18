@@ -5,6 +5,8 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.asset.WorkbookSheetName
 import com.tdsops.tm.asset.export.SpreadsheetColumnMapper
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.FilenameUtil
+import com.tdsops.tm.enums.FilenameFormat
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -1251,17 +1253,21 @@ class AssetExportService {
 			progressService.updateData(key, 'filename', savedWorkbookAbosolutePath)
 			profiler.endInfo("Create temporary export file")
 
-			// The filename will consiste of the following:
-			//    - Owner of the Project
-			//    - Name of the Project or ID
-			//    - Bundle name(s) selected or ALL
-			//    - Letters symbolizing each of the tabs that were exported
-			//    - The date that the spreadsheet was exported
-			//    - The file extension to use
-			project = Project.get(projectId)
-			String filename = project.client.name + '-' +
-					  ( project.name ?: project.id ) +
-					  "-${bundleNameList}-${exportedEntity}-${exportDate}.${fileExtension}"
+       // @See TM-7958
+       // The filename will consist of the following:
+       //    - Project Client
+       //    - Project Code
+       //    - Bundle name(s) selected or ALL_BUNDLES
+       //    - Letters symbolizing each of the tabs that were exported
+       //    - The date that the spreadsheet was exported in yyyyMMdd_HHmm format
+       //    - The file extension to use
+       MoveBundle mb = MoveBundle.read(bundle[0])
+       def nameParams = [project:project,
+                         moveBundle:(!allBundles ? mb: null),
+                         exportedEntity: exportedEntity,
+                         allBundles: allBundles,
+                         useForPlanning: useForPlanning]
+       String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, nameParams, fileExtension)
 
 			filename = StringUtil.sanitizeAndStripSpaces(filename)
 
