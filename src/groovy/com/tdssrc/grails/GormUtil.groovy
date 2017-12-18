@@ -937,8 +937,14 @@ public class GormUtil {
 		if (type && id && project) {
 			// Check if the class is a domain class.
 			if (isDomainClass(type)) {
-				// fetch the instance
-				instance = type.get(id)
+				try{
+					// fetch the instance
+					instance = type.get(id)
+				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
+				} catch(Exception e) {
+					errorMsg = "The domain object with type $type couldn't be found using the id $id"
+				}
+
 				// Make sure the domain class has a 'project' field.
 				if (instance && isDomainProperty(instance, 'project')) {
 					// Validate the projects' id match.
