@@ -32,7 +32,7 @@ environments {
 		atCheckWaiting = 10
 
         if (browserLocation == 'local') {  // use local browser (not grid)
-            println "browser.location: Using local chrome browser."
+            println "browser.location: Using local chrome browser : ${browserLocation}"
             driver = { new ChromeDriver() }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
@@ -52,7 +52,7 @@ environments {
 		atCheckWaiting = 10
 
         if (browserLocation == 'local') {  // use local browser (not grid)
-            println "browser.location: Using local firefox browser."
+            println "browser.location: Using local firefox browser : ${browserLocation}"
             driver = { new FirefoxDriver() }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid browser location: ${browserLocation}"

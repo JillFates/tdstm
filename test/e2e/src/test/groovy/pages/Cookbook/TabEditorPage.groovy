@@ -24,7 +24,7 @@ class TabEditorPage extends Page {
         edTabRecipeName                 { $("span", class: "headingTitle col-xs-6").find("p") }
         edTabRecipeLabel                { $("label", "ng-show": "editor.selectedRVersion.name") }
         edTabTextArea                   { $("div", class:"CodeMirror-lines").find("div", class: "CodeMirror-code") }
-        edTabEditorBtn                  { $("button", "ng-click": "showEditPopup()") }
+        edTabEditorBtn(wait:true)       { $("button", "ng-click": "showEditPopup()") }
         edTabSaveWipBtn(wait:true)      { $("button", "ng-click": "saveWIP()") }
         edTabUndoBtn                    { $("button", "ng-click": "cancelChanges()") }
         edTabReleaseBtn                 { $("button", "ng-click": "releaseVersion()") }
