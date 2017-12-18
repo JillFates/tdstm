@@ -12,15 +12,14 @@ class TaskEditionPage extends Page{
 
     static content = {
 
-        etModalWindow(wait:true)    { $("div#editTaskPopup")}
-        etModalTitle                { $("span#ui-id-5", class:"ui-dialog-title ng-binding") }
-        etModalSaveBtn              { $("button#saveAndCloseBId")}
-        etModalCancelBtn            { $("button",class:"btn btn-default tablesave cancel")}
-        etModalNameTA(wait:true)    { $("#commentEditId")}
-        etModalEdited(wait:true)    { $("#commentTdId")}
-        etModalCloseBtn             { $("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
-        etModalEventSelector        { $("select#moveEvent")}
-
+        etModalWindow(wait:true)        { $("div#editTaskPopup")}
+        etModalTitle                    { etModalWindow.find("span#ui-id-5", class:"ui-dialog-title ng-binding") }
+        etModalTaskName(wait:true)      { etModalWindow.find("#commentEditId")}
+        etModalEventSelector            { etModalWindow.find("select#moveEvent")}
+        etModalStatusSelector(wait:true){ etModalWindow.find("select#status")}
+        etModalSaveBtn                  { etModalWindow.find("button#saveAndCloseBId")}
+        etModalCancelBtn                { etModalWindow.find("button",class:"btn btn-default tablesave cancel")}
+        etModalCloseBtn                 { etModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
     }
 
 
