@@ -30,7 +30,7 @@ export class AssetExplorerViewSaveComponent {
 			this.model.isFavorite = false;
 		}
 		if (this.model.isSystem) {
-			this.model.isShared = true;
+			this.model.isShared = false;
 		}
 	}
 
@@ -54,6 +54,15 @@ export class AssetExplorerViewSaveComponent {
 	 */
 	private isSystemCreatePermitted(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
+	}
+
+	/**
+	 * Should turn isShared to false when isSystem is selected as true.
+	 */
+	private onIsSystemChange(): void {
+		if (this.model.isSystem && this.model.isShared) {
+			this.model.isShared = false;
+		}
 	}
 
 	protected onFavorite() {

@@ -59,8 +59,8 @@ export class AssetExplorerIndexComponent {
 		if (this.isCreateAvailable()) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
 				{
-					system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
-					shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
+					// system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
+					// shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
 				});
 		}
 	}
