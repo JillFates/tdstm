@@ -35,6 +35,10 @@ class UserAuditBuilder {
 		create LOGIN, 'User logout'
 	}
 
+	static UserAudit restartedApplication() {
+		create ADMIN, 'Initiated an application restart'
+	}
+	
 	/**
 	 * Creates an UserAudit to indicate that a new user was created
 	 */
@@ -70,16 +74,18 @@ class UserAuditBuilder {
 		create USER_MGMT, 'User\'s account was unlocked by (' + unlockedBy + ')', null, userLogin
 	}
 
-	private static UserAudit create(UserAuditClassification classification, String message,
-	                                Project project = null, UserLogin userLogin = null) {
+	private static UserAudit create(UserAuditClassification classification, 
+			String message,
+	        Project project = null, UserLogin userLogin = null) {
+		
 		new UserAudit(
-				userLogin: userLogin ?: loadCurrentUserLogin(),
-				project: project,
-				ipAddress: RequestContextHolder.currentRequestAttributes().request.remoteAddr,
-				severity: UserAuditSeverity.INFO,
-				securityRelevant: false,
-				classification: classification,
-				message: message)
+			userLogin: userLogin ?: loadCurrentUserLogin(),
+			project: project,
+			ipAddress: RequestContextHolder.currentRequestAttributes().request.remoteAddr,
+			severity: UserAuditSeverity.INFO,
+			securityRelevant: false,
+			classification: classification,
+			message: message)
 	}
 
 	private static UserLogin loadCurrentUserLogin() {

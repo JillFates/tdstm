@@ -1,6 +1,6 @@
 <kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
- (columnResize)="onWidthChange($event)" [rowClass]="rowCallbackClass">
+ (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-6">
 			<div class="checkbox pull-left">
@@ -18,7 +18,7 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
-    <kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
+	<kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
 		<ng-template kendoGridHeaderTemplate>
 			<div class="row">
 				<div class="col-md-12 text-center">
@@ -34,7 +34,7 @@
 			<div class="row">
 				<div class="col-md-12 text-center">
 					<div class="checkbox checkbox-grid">
-						<label>
+						<label style="min-height: 15px;">
 							<input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
 						</label>
 					</div>
@@ -42,17 +42,15 @@
 			</div>
 		</ng-template>
 	</kendo-grid-column>
-	<kendo-grid-column title="Action" [locked]="true" [width]="65">
+	<!-- <kendo-grid-column title="Action" [locked]="true" [width]="60">
 		<ng-template kendoGridCellTemplate let-dataItem>
 			<div class="row">
-				<div class="col-xs-12">
-					<button class="btn btn-default" (click)="onShow(dataItem)">
-						<span class="fa fa-search"></span>
-					</button>
+				<div class="col-xs-12 text-center">
+					<span class="fa fa-search" style="cursor:pointer;" (click)="onShow(dataItem)"></span>
 				</div>
 			</div>
 		</ng-template>
-	</kendo-grid-column>
+	</kendo-grid-column> -->
 	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>

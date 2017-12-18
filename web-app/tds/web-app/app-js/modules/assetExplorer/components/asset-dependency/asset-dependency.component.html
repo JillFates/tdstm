@@ -1,0 +1,55 @@
+<div class="modal fade in" id="assetDependency" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">{{'ASSET_EXPLORER.DEPENDENCY_DETAIL'|translate}}</h4>
+            </div>
+            <div class="modal-body comment-dialog-content">
+                <table class="table table-striped" style="border: 0px; margin-bottom: 0px;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Environment</th>
+                            <th>Bundle</th>
+                            <th>Plan Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{assetDependency?.assetA?.name}}</td>
+                            <td>{{assetDependency?.assetA?.assetClass}}</td>
+                            <td>{{assetDependency?.assetA?.environment}}</td>
+                            <td>{{assetDependency?.assetA?.bundle}}</td>
+                            <td>{{assetDependency?.assetA?.planStatus}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="lbl-asset-dependency-direction">
+                                <span *ngIf="assetDependency?.assetA?.dependency?.id && !assetDependency?.assetB?.dependency?.id">
+                                    <i class="fa fa-fw fa-long-arrow-down"></i> Depends On</span>
+                                <span *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id">
+                                    <i class="fa fa-fw fa-arrows-v"></i> Bi-Directional Dependencies</span>
+                                <span *ngIf="!assetDependency?.assetA?.dependency?.id && !assetDependency?.assetB?.dependency?.id" style="color: darkred;">
+                                    <span class="glyphicon glyphicon-remove"></span> Dependency was not found.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{assetDependency?.assetB?.name}}</td>
+                            <td>{{assetDependency?.assetB?.assetClass}}</td>
+                            <td>{{assetDependency?.assetB?.environment}}</td>
+                            <td>{{assetDependency?.assetB?.bundle}}</td>
+                            <td>{{assetDependency?.assetB?.planStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer form-group-center">
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+            </div>
+        </div>
+    </div>
+</div>

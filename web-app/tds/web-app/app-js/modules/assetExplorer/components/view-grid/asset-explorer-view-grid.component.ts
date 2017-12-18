@@ -240,6 +240,7 @@ export class AssetExplorerViewGridComponent {
 
 	setSelectedItems(): void {
 		this.bulkSelectedItems = Object.keys(this.bulkItems).filter(key => this.bulkItems[key]);
+		this.selectAll = this.bulkSelectedItems.length === this.gridData.data.length;
 	}
 
 	onBulkDelete(): void {
@@ -259,6 +260,12 @@ export class AssetExplorerViewGridComponent {
 							}, err => console.log(err));
 					}
 				});
+		}
+	}
+
+	cellClick(e): void {
+		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
+			this.onShow(e.dataItem);
 		}
 	}
 }
