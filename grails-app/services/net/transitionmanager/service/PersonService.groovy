@@ -325,8 +325,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		if (!clientStaffOnly) {
-			companies << projectService.getOwner(project)
-			companies.addAll(projectService.getPartners(project))
+			companies = partyRelationshipService.getProjectCompanies(project)
 		}
 
 		// Try finding the person with an exact match
