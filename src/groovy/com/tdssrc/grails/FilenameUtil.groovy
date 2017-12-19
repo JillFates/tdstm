@@ -105,11 +105,11 @@ class FilenameUtil {
       String useForPlanning = nameValues.useForPlanning ? 'PLANNING' : ''
       String exportedEntity = nameValues.exportedEntity
       String formattedDate = TimeUtil.formatDate(TimeUtil.MIDDLE_ENDIAN, date, TimeUtil.FORMAT_DATE_TIME_26)
-      if(projectClient == null || projectCode == null ) {
+      if(projectClient == null || projectCode == null || !(useForPlanning || bundleName)) {     // either useForPlanning or bundleName has to have a value
          logger.error 'FilenameUtil: Error while creating file name - Some required properties are missing'
          return ''
       }
-      return projectClient + '-' + projectCode + '-' + (useForPlanning ?: bundleName) + '-' + exportedEntity + (exportedEntity ? '-' : '' ) + formattedDate
+      return projectClient + '-' + projectCode + '-' + (useForPlanning ?: bundleName) + '-' + (exportedEntity ? exportedEntity + '-' : '' ) + formattedDate
    }
 
     /*
