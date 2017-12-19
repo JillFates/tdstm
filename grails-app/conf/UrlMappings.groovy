@@ -695,6 +695,27 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataScript/testScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "testScript"
+			]
+		}
+
+		"/ws/dataScript/checkSyntax" {
+			controller = "wsDataScript"
+			action = [
+					POST: "checkSyntax"
+			]
+		}
+
+		"/ws/dataScript/saveScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "saveScript"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

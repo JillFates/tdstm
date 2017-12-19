@@ -1,11 +1,16 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.etl.DataScriptParamsCommand
+import com.tdsops.etl.SaveDataScriptParamsCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.dataingestion.ScriptProcessorService
 
 /**
  * Provide the endpoints for working with DataScripts.
@@ -17,6 +22,8 @@ class WsDataScriptController implements ControllerMethods{
     private final static DELETE_OK_MESSAGE = "DataScript deleted successfully.";
 
     DataScriptService dataScriptService
+    ScriptProcessorService scriptProcessorService
+    SecurityService securityService
 
     /**
      * Endpoint for creating a new DataScript.
@@ -116,5 +123,66 @@ class WsDataScriptController implements ControllerMethods{
             handleException(e, logger)
         }
     }
+
+    /**
+     * Runs the script against the data provided and returns resulting transformed data
+     * @return
+     */
+    def testScript (DataScriptParamsCommand command) {
+
+        if (!command.validate()) {
+            renderErrorJson('Invalid parameters')
+            return
+        }
+
+        Project project = securityService.userCurrentProject
+
+        Map<String, ?> result = scriptProcessorService.testScript(project, command.script, command.fileName)
+
+        renderSuccessJson(result)
+    }
+
+    /**
+     * Compiles the script and returns any syntax errors
+     * @return
+     */
+    def checkSyntax (DataScriptParamsCommand command) {
+
+        if (!command.validate()) {
+            renderErrorJson('Invalid parameters')
+            return
+        }
+
+        Project project = securityService.userCurrentProject
+
+        Map<String, ?> result = scriptProcessorService.checkSyntax(project, command.script, command.fileName)
+
+        renderSuccessJson(result)
+    }
+
+    /**
+     * Saves the script to the datascript domain record
+     * @return
+     */
+    def saveScript (SaveDataScriptParamsCommand command) {
+
+        if (!command.validate()) {
+            renderErrorJson('Invalid parameters')
+            return
+        }
+
+        Project project = securityService.userCurrentProject
+
+        DataScript dataScript = DataScript.get(command.id)
+
+        if (dataScript.project != project) {
+            securityService.reportViolation("attempted to ACTION dataview ($command.id) not assoc with project")
+        }
+
+        DataScript saveScript = scriptProcessorService.saveScript(dataScript, command.script)
+
+        renderSuccessJson()
+    }
+
 
 }
