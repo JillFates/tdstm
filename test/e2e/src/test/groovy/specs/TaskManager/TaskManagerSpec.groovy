@@ -16,6 +16,8 @@ class TaskManagerSpec extends GebReportingSpec{
     //Define the names of the tasks you will Create and Edit
     static taskName = "ZZ Task For E2E Automation"
     static taskNameEdit = "ZZ Task For E2E Edited"
+    static taskStatus = "Hold"
+    static taskEvent = "Buildout"
 
     def setupSpec() {
         testCount = 0
@@ -94,6 +96,8 @@ class TaskManagerSpec extends GebReportingSpec{
         when:
         waitFor {etModalTaskName == taskName}
         etModalTaskName = taskNameEdit
+        etModalEventSelector = taskEvent
+        etModalStatusSelector = taskStatus
         waitFor { etModalSaveBtn.click() }
         then:
         at TaskDetailsPage
@@ -105,7 +109,11 @@ class TaskManagerSpec extends GebReportingSpec{
         when:
         at TaskDetailsPage
         then:
-        waitFor{tdModalTaskName == taskNameEdit}
+        waitFor{tdModalTaskName.text().trim() == taskNameEdit}
+        waitFor{tdModalTaskEvent.text().trim() == taskEvent}
+        waitFor{tdModalTaskStatus.text().trim() == taskStatus}
+
+
     }
 
     def "Delete Task"() {
