@@ -9,7 +9,7 @@ class TabTaskGenTabSummaryPage extends Page {
     }
 
     static content = {
-        tskGTabSummaryTab             { $("li", heading: "Summary").find("a") }
+        tskGTabSummaryTab(wait:true)  { $("li", heading: "Summary").find("a") }
         tskGTabSummaryList            { $("div", "ui-view": "taskBatchCompleted").find("ul", class:"summaryList ng-scope")}
     }
 }

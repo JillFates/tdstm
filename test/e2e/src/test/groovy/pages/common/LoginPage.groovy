@@ -1,9 +1,8 @@
 package pages.common
 
 import geb.Page
+import modules.LoginModule
 import pages.Dashboards.UserDashboardPage
-
-//import modules.ManualsMenuModule
 
 class LoginPage extends Page {
     static url = "/tdstm/auth/login"
@@ -13,9 +12,6 @@ class LoginPage extends Page {
     }
 
     static content = {
-        username { $("#usernameid") }
-        password { $("input", name:"password") }
-        submitButton(to: UserDashboardPage) { $("#submitButton") }
-        //manualsMenu { module(ManualsMenuModule) }
+        loginModule { module LoginModule }
     }
 }

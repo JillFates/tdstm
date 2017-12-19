@@ -1,0 +1,281 @@
+package specs.Cookbook
+
+import geb.spock.GebReportingSpec
+import pages.Cookbook.CookbookPage
+import pages.Cookbook.EditRecipePage
+import pages.Cookbook.TabEditorPage
+import pages.Cookbook.TabEditorTabSyntaxErrorsPage
+import pages.Cookbook.TabHistoryPage
+import pages.Cookbook.TabHistoryTabActionsPage
+import pages.Cookbook.TabHistoryTabGenLogPage
+import pages.Cookbook.TabHistoryTabTasksPage
+import pages.Cookbook.TaskDetailsPage
+import pages.Dashboards.UserDashboardPage
+import pages.common.LoginPage
+import spock.lang.Stepwise
+
+@Stepwise
+class RecipeHistorySpec extends GebReportingSpec {
+    def testKey
+    static testCount
+    static recipeText
+
+    def setupSpec() {
+        testCount = 0
+        def username = "e2e_test_user"
+        def password = "e2e_password"
+        to LoginPage
+        loginModule.login(username,password)
+        at UserDashboardPage
+        waitFor { taskMenu.click() }
+        cookbookMenuItem.click()
+        at CookbookPage
+        waitFor { recipeGridRows.size() > 0 }
+    }
+
+    def setup() {
+        testCount++
+    }
+
+    def cleanup() {
+        String sCount = String.format("%03d", testCount)
+        println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
+    }
+
+    def "Select the Empty Recipe to verify History"() {
+        testKey = "TM-XXXX"
+        given:
+        at CookbookPage
+        when:
+        waitFor { gebRecipes.getAt(0).click()}
+        then:
+        gebRecipes.getAt(0).text().trim() == "Geb Recipe Test"
+    }
+
+    // History Tab (empty)
+
+    def "Go to empty 'History' tab"() {
+        testKey = "TM-XXXX"
+        given:
+        at CookbookPage
+        when:
+        historyTab.click()
+        then:
+        at TabHistoryPage
+        waitFor { historyTab.parent(".active") }
+    }
+
+    def "Check 'History' tab empty elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryPage
+        then:
+        historyTab.parent(".active")
+        hisTabBatchGridHeadCols.getAt(0).find("div",class:"ngHeaderText").text().trim() == "Message"
+        hisTabBatchGridRowsCols.getAt(0).find("div",class:"ngCellText").text().trim() == "No results found"
+    }
+
+    def "Check Cookbook page title changed"(){
+        testKey = "TM-XXXX"
+        when:
+        at CookbookPage
+        then:
+        pageTitle.text().trim() == "Generation History"
+    }
+
+    def "Go to empty 'Actions' tab"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryPage
+        when:
+        hisTabActTab.click()
+        then:
+        at TabHistoryTabActionsPage
+        waitFor { hisTabActTab.parent(".active") }
+    }
+
+    def "Check 'Actions' tab blocked elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryTabActionsPage
+        then:
+        hisTabActTab.parent(".active")
+        hisTabActTabPublishBtn.text() == "Publish"
+        hisTabActTabPublishBtn.@disabled == "true"
+        hisTabActTabResetBtn.@disabled == "true"
+        hisTabActTabRefreshBtn.@disabled == "true"
+        hisTabActTabDeleteBtn.@disabled == "true"
+    }
+
+    def "Go to empty 'Generation Log' tab"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryPage
+        when:
+        hisTabGenLogTab.click()
+        then:
+        at TabHistoryTabGenLogPage
+        waitFor { hisTabGenLogTab.parent(".active") }
+    }
+
+    def "Check 'Generation Log' tab 'Exception' empty text"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryTabGenLogPage
+        then:
+        hisTabGenLogTabExcpRadio == "exceptionLog"
+        hisTabGenLogTabTxt.text().trim() == ""
+    }
+
+    def "Check 'Generation Log' tab 'Info/Warning' empty text"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryTabGenLogPage
+        when:
+        hisTabGenLogTabInfoRadio.click()
+        then:
+        hisTabGenLogTabInfoRadio == "infoLog"
+        hisTabGenLogTabTxt.text().trim() == ""
+    }
+
+    def "Select the Recipe with generated tasks to verify History"() {
+        testKey = "TM-XXXX"
+        given:
+        at CookbookPage
+        when:
+        waitFor { gebRecipesWithTasks[0].click()}
+        then:
+        gebRecipesWithTasks[0].text().trim() == "Geb Recipe With Tasks Test"
+    }
+
+    def "Go to populated 'History' tab"() {
+        testKey = "TM-XXXX"
+        given:
+        at CookbookPage
+        when:
+        historyTab.click()
+        then:
+        at TabHistoryPage
+        waitFor { historyTab.parent(".active") }
+    }
+
+    def "Check History tab active elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryPage
+        then:
+        hisTabBatchGridHeadCols.getAt(0).text().trim() == "Context Target"
+        hisTabBatchGridHeadCols.getAt(1).text().trim() == "Tasks"
+        hisTabBatchGridHeadCols.getAt(2).text().trim() == "Exceptions"
+        hisTabBatchGridHeadCols.getAt(3).text().trim() == "Generated By"
+        hisTabBatchGridHeadCols.getAt(4).text().trim() == "Generated At"
+        hisTabBatchGridHeadCols.getAt(5).text().trim() == "Status"
+        hisTabBatchGridHeadCols.getAt(6).text().trim() == "Version"
+        hisTabBatchGridHeadCols.getAt(7).text().trim() == "Published"
+        hisTabBatchGridHeadCols.getAt(8).text().trim() == "Actions"
+    }
+
+    def "Go to Actions tab with actived buttons"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryPage
+        when:
+        hisTabActTab.click()
+        then:
+        at TabHistoryTabActionsPage
+    }
+
+    def "Check Actions tab active elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryTabActionsPage
+        then:
+        hisTabActTabPublishBtn.text() == "Publish"
+        hisTabActTabPublishBtn.@disabled == ""
+        hisTabActTabResetBtn.@disabled == ""
+        hisTabActTabRefreshBtn.@disabled == ""
+        hisTabActTabDeleteBtn.@disabled == ""
+    }
+
+    def "Go to Tasks tab with recipe tasks values "() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryPage
+        when:
+        hisTabTasksTab.click()
+        then:
+        at TabHistoryTabTasksPage
+        waitFor {hisTabTasksTabTasksList.size() > 0 }
+    }
+
+    def "Check Tasks tab active elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryTabTasksPage
+        then:
+        waitFor {hisTabTasksTabTasksList.size() > 1 }
+        hisTabTasksTabTasksGridHeadCols.getAt(0).text() == "Task #"
+        hisTabTasksTabTasksGridHeadCols.getAt(1).text() == "Description"
+        hisTabTasksTabTasksGridHeadCols.getAt(2).text() == "Asset"
+        hisTabTasksTabTasksGridHeadCols.getAt(3).text() == "Team"
+        hisTabTasksTabTasksGridHeadCols.getAt(4).text() == "Person"
+        hisTabTasksTabTasksGridHeadCols.getAt(5).text() == "Due date"
+        hisTabTasksTabTasksGridHeadCols.getAt(6).text() == "Status"
+    }
+
+    def "Select the first task for get its details"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryTabTasksPage
+        when:
+        waitFor {hisTabTasksTabTasksList[0].click()}
+        then:
+        at TaskDetailsPage
+    }
+    def "Close 'Tasks Details' modal window"() {
+        testKey = "TM-XXXX"
+        given:
+        at TaskDetailsPage
+        when:
+        taskDetailsModalCloseBtn.click()
+        then:
+        at CookbookPage
+        waitFor {!taskDetailsModal.present}
+        // TODO check window modal closed
+    }
+
+    def "Go to Generation Log tab"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryPage
+        when:
+        hisTabGenLogTab.click()
+        then:
+        at TabHistoryTabGenLogPage
+    }
+
+    def "Check Generation Log tab active elements"() {
+        testKey = "TM-XXXX"
+        when:
+        at TabHistoryTabGenLogPage
+        then:
+        hisTabGenLogTabExcpRadio == "exceptionLog"
+        hisTabGenLogTabTxt.text().contains("has no predecessor tasks")
+    }
+
+    def "Click on Info/Warning radio"() {
+        testKey = "TM-XXXX"
+        given:
+        at TabHistoryTabGenLogPage
+        when:
+        hisTabGenLogTabInfoRadio.click()
+        then:
+        hisTabGenLogTabInfoRadio == "infoLog"
+        hisTabGenLogTabTxt.text().contains("A total of")
+        hisTabGenLogTabTxt.text().contains("Tasks and")
+        hisTabGenLogTabTxt.text().contains("Dependencies created in")
+    }
+
+}
+
+
