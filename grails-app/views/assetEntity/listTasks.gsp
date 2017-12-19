@@ -60,7 +60,7 @@
 
 		$(document).ready(function() {
 
-			progressTimer = new ProgressTimer(0, 'RefreshTaskMgr', function () {
+            progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.TASKMGR_REFRESH}', function () {
                 reloadGrid();
 				progressTimer.resetTimer();
 			});
