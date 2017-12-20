@@ -1,6 +1,6 @@
 <%@page defaultCodec="none" %>
 <%@page import="net.transitionmanager.security.Permission"%>
-<div style="margin-top: 10px; float: left;">
+<div style="margin-top: 10px;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 0px; margin-bottom: 10px;">
