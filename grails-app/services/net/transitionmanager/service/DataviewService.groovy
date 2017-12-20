@@ -565,10 +565,21 @@ class DataviewService implements ServiceMethods {
 		transformations[column.property].alias ?: propertyFor(column)
 	}
 
+	/**
+	 * Return the alias for the given column.
+	 * @param column
+	 * @return
+	 */
 	private static String aliasFor(Map column) {
 		return transformations[column.property].alias
 	}
 
+	/**
+	 * Build the projection for the given column.
+	 *
+	 * @param column
+	 * @return
+	 */
 	private static String projectionPropertyFor(Map column) {
 		String projection
 		String property = propertyFor(column)
