@@ -35,7 +35,7 @@
         <div class="modal-body">
             <form>
                 <div class="box-body">
-                    <p >The Asset Name you want to create already exist, do you want to proceed?</p>
+                    <p >The Asset Name you want to create already exists, do you want to proceed?</p>
                 </div><!-- /.box-body -->
             </form>
         </div>
@@ -82,7 +82,7 @@
         if(assetExist) {
             var confirmationDialogOnClone = $('#confirmationDialogOnClone');
             confirmationDialogOnClone.html($('.confirmationDialogOnCloneContent').html());
-            confirmationDialogOnClone.dialog("option", "title", 'Asset already exist');
+            confirmationDialogOnClone.dialog("option", "title", 'Asset already exists');
             confirmationDialogOnClone.dialog('option', 'width', 'auto');
             confirmationDialogOnClone.dialog('option', 'modal', 'true');
             confirmationDialogOnClone.dialog('option', 'position', ['center', 'top']);
