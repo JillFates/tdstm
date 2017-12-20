@@ -124,7 +124,7 @@ function changePersonDetails () {
 			data: parameters,
             success: function(response) {
             	tdsCommon.prepareJQueryAjaxResponse(response);
-                updateWelcomeAndErrorMsg(response);
+                updateWelcome(response);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log("/person/updateAccount - " + errorThrown);
@@ -144,22 +144,6 @@ function updateWelcome( e ) {
 	}
 }
 
-function updateWelcomeAndErrorMsg( e ) {
-	var errorMsg
-	if (e.data != null) {
-		errorMsg = e.data
-	} else {
-		errorMsg = "An unexpected error occurred while attempting to perform the update."
-	}
-    var data = tdsCommon.isJQueryAjaxResponse(e) ? tdsCommon.isValidWsJQueryAjaxResponse(e, errorMsg, false)
-        : tdsCommon.isValidWsResponse(e, errorMsg, false);
-    if (data !== false) {
-        $("#loginUserId").html(data.name)
-        $("#tzId").html(data.tz)
-        $("#personDialog").dialog('close')
-        window.location.reload()
-    }
-}
 function setUserTimeZone( tz ){
 	new Ajax.Request('/tdstm/project/setUserTimeZone',{asynchronous:true,evalScripts:true,onComplete:function(e){updateTimeZone(e)},parameters:'tz=' + tz });
 }

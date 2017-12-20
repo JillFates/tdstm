@@ -619,7 +619,7 @@ class PersonController implements ControllerMethods {
 		}
 
 		if (errMsg) {
-			renderFailureJson(errMsg)
+			renderErrorJson(errMsg)
 		} else {
 			renderSuccessJson(results)
 		}
