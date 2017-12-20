@@ -183,8 +183,7 @@ class WsDataScriptController implements ControllerMethods {
     def saveScript (DataScriptSaveScriptCommand command) {
 
         if (!command.validate()) {
-            renderErrorJson('Invalid parameters')
-            return
+            throw new InvalidParamException('Invalid parameters')
         }
 
         Project project = securityService.getUserCurrentProjectOrException()
