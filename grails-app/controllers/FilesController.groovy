@@ -118,6 +118,9 @@ class FilesController implements ControllerMethods {
 			case 'fileFormat':
 				temp+="f.file_format AS fileFormat,"
 			break
+			case "LUN":
+				temp +="f.lun AS LUN,"
+			break
 			case 'lastUpdated':
 				temp +="ee.last_updated AS $value,"
 				joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
