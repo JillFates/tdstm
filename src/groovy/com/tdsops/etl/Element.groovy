@@ -259,7 +259,7 @@ class Element {
      * @return
      */
     Element store (String variableName) {
-        processor.storeVariable(variableName, this)
+        processor.addDynamicVariable(variableName, this)
     }
 
     /**

@@ -46,9 +46,11 @@ class ETLBinding extends Binding {
     }
 
     /**
+     * Adds a new Dynamic variable from an ETL script.
+     * It uses name parameter to define it in an internal map definition.
      *
-     * @param name
-     * @param value
+     * @param name the name of the variable to be added dynamically within the binding context.
+     * @param value the ETL Element define for the name variable
      */
     void addDynamicVariable (String name, Element value) {
         dynamicVariables.add(name)
@@ -56,9 +58,9 @@ class ETLBinding extends Binding {
     }
 
     /**
-     *
+     * Removes all the dynamic variables added by an ETL script.
      */
-    void cleanDynamicVariables() {
+    void removeAllDynamicVariables () {
         dynamicVariables.each {variables.remove(it)}
     }
 

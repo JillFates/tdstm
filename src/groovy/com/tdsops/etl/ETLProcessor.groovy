@@ -10,16 +10,17 @@ import net.transitionmanager.domain.Project
  */
 class ETLProcessor {
 
+    static final String CURR_ELEMENT_VARNAME = 'CE'
+
     Project project
     Dataset dataSet
     List<getl.data.Field> fields
     ETLFieldsValidator fieldsValidator
     ETLBinding binding
-
     Integer currentRowIndex = 0
     Integer currentColumnIndex = 0
     /**
-     * Current Element. Assigned and exposed in dsl scripts using 'CE' number
+     * Current Element. Assigned and exposed in dsl scripts using 'CURR_ELEMENT_VARNAME' number
      */
     Element currentElement
 
@@ -164,7 +165,7 @@ class ETLProcessor {
             }
             currentRowResult = [:]
             currentRowIndex++
-            binding.cleanDynamicVariables()
+            binding.removeAllDynamicVariables()
         }
 
         currentRowIndex--
@@ -419,11 +420,12 @@ class ETLProcessor {
     }
 
     /**
-     * Defines a variable within the script
+     * Add a variable within the script as a dynamic variable.
+     *
      * @param variableName
      * @param element
      */
-    void storeVariable (String variableName, Element element) {
+    void addDynamicVariable (String variableName, Element element) {
         binding.addDynamicVariable(variableName, element)
     }
 
@@ -507,13 +509,13 @@ class ETLProcessor {
     }
 
     /**
-     * Add an Element as 'CE' variable within the binding script context.
+     * Add an Element as CURR_ELEMENT_VARNAME value as variable within the binding script context.
      * @param element a selected Element
      * @return the curent element selected in ETLProcessor
      */
     private void addCurrentElementToBinding (Element element) {
         currentElement = element
-        binding.setVariable('CE', currentElement)
+        binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
         currentElement
     }
 
