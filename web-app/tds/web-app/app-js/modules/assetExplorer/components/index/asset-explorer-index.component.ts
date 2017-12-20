@@ -118,9 +118,7 @@ export class AssetExplorerIndexComponent {
 	 * @returns {boolean}
 	 */
 	protected isCreateAvailable(): boolean {
-		return this.selectedFolder.type === this.viewType.SYSTEM_VIEWS ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
-			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	protected isEditAvailable(report: ViewModel): boolean {
