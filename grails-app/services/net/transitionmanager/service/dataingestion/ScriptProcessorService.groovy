@@ -49,9 +49,7 @@ class ScriptProcessorService {
 
         ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator)
 
-        ETLBinding binding = new ETLBinding(etlProcessor)
-
-        new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+        new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
         etlProcessor
     }
@@ -98,9 +96,7 @@ class ScriptProcessorService {
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
-            ETLBinding binding = new ETLBinding(etlProcessor)
-
-            new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
             result.isValid = true
         } catch (all) {
@@ -142,13 +138,11 @@ class ScriptProcessorService {
 
         ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, new ETLAssetClassFieldsValidator())
 
-        ETLBinding binding = new ETLBinding(etlProcessor)
-
         List<Map<String, ?>> errors = []
 
         try {
 
-            new GroovyShell(this.class.classLoader, binding).parse(scriptContent?.trim(), ETLProcessor.class.name)
+            new GroovyShell(this.class.classLoader, etlProcessor.binding).parse(scriptContent?.trim(), ETLProcessor.class.name)
 
         } catch (MultipleCompilationErrorsException cfe) {
             ErrorCollector errorCollector = cfe.getErrorCollector()

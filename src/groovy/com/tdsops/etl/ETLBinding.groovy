@@ -11,12 +11,14 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 class ETLBinding extends Binding {
 
+    Set dynamicVariables = [] as Set
+
     ETLBinding (ETLProcessor etlProcessor, Map vars = [:]) {
         this.variables.putAll([
-                *      : etlProcessor.metaClass.methods.collectEntries {
+                *: etlProcessor.metaClass.methods.collectEntries {
                     [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
                 },
-                *      : vars
+                *: vars
         ])
     }
 
@@ -42,4 +44,24 @@ class ETLBinding extends Binding {
 
         result
     }
+
+    /**
+     * Adds a new Dynamic variable from an ETL script.
+     * It uses name parameter to define it in an internal map definition.
+     *
+     * @param name the name of the variable to be added dynamically within the binding context.
+     * @param value the ETL Element define for the name variable
+     */
+    void addDynamicVariable (String name, Element value) {
+        dynamicVariables.add(name)
+        this.variables[name] = value
+    }
+
+    /**
+     * Removes all the dynamic variables added by an ETL script.
+     */
+    void removeAllDynamicVariables () {
+        dynamicVariables.each {variables.remove(it)}
+    }
+
 }

@@ -151,7 +151,7 @@ class ScriptProcessorServiceSpec extends Specification {
                 read labels
                 iterate {
                     domain Application
-                    load environment with Production
+                    set environment with Production
                     extract 'location' load Vendor
                     reference assetName with Vendor
                 }
