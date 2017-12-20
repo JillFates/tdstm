@@ -2531,9 +2531,9 @@ class AssetEntityService implements ServiceMethods {
 					altColumns.append(", aeSourceChassis.asset_name AS sourceChassis")
 					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeSourceChassis ON aeSourceChassis.asset_entity_id=ae.source_chassis_id ")
 					break
-				case 'targerChassis':
+				case 'targetChassis':
 					altColumns.append(", aeTargetChassis.asset_name AS targetChassis")
-					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.targer_chassis_id ")
+					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.target_chassis_id ")
 					break
 
 				case 'validation':
