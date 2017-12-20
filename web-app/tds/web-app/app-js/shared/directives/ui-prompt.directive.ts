@@ -23,7 +23,6 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	confirmLabel: string;
 	cancelLabel: string;
 	tdsUiPrompt: any;
-
 	resolve: any;
 	reject: any;
 
@@ -68,18 +67,18 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	protected cancel(): void {
-		this.tdsUiPrompt.modal('hide');
 		this.resolve(false);
+		this.tdsUiPrompt.modal('hide');
 	}
 
 	protected dismiss(): void {
-		this.tdsUiPrompt.modal('hide');
 		this.reject();
+		this.tdsUiPrompt.modal('hide');
 	}
 
 	protected confirm(): void {
-		this.tdsUiPrompt.modal('hide');
 		this.resolve(true);
+		this.tdsUiPrompt.modal('hide');
 	}
 }
 

@@ -2,8 +2,10 @@ package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -916,5 +918,53 @@ public class GormUtil {
 	 */
 	static Class getDomainPropertyType(Class clazz, String property) {
 		return GrailsClassUtils.getPropertyType(clazz, property)
+	}
+
+	/**
+	 * Find an instance of the given type using the id provided for the
+	 * project specified.
+	 *
+	 * @param project
+	 * @param type
+	 * @param id
+	 * @param throwException
+	 * @return
+	 */
+	static <T> T findInProject(Project project, Class<T> type, id, boolean throwException = false) {
+		T instance = null
+		String errorMsg
+		// Project, type and id are mandatory
+		if (type && id && project) {
+			// Check if the class is a domain class.
+			if (isDomainClass(type)) {
+				try{
+					// fetch the instance
+					instance = type.get(id)
+				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
+				} catch(Exception e) {
+					errorMsg = "The domain object with type $type couldn't be found using the id $id"
+				}
+
+				// Make sure the domain class has a 'project' field.
+				if (instance && isDomainProperty(instance, 'project')) {
+					// Validate the projects' id match.
+					if (project.id != instance.project.id) {
+						errorMsg = "The domain object with type $type and id $id doesn't belong to project ${project.name}."
+					}
+				}
+			} else {
+				errorMsg = "$type is not a domain class."
+			}
+		} else {
+			errorMsg = "findInProject requires a project, a domain class and an id."
+		}
+
+		if (errorMsg) {
+			logger.error(errorMsg)
+			if (throwException) {
+				throw new InvalidParamException(errorMsg)
+			}
+		}
+		return instance
 	}
 }

@@ -1,3 +1,4 @@
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.MoveEvent
@@ -5,6 +6,7 @@ import net.transitionmanager.domain.MoveEventStaff
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 
 import spock.lang.Specification
@@ -13,6 +15,7 @@ class PartyRelationshipServiceTests extends Specification {
 
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
+	ProjectService projectService
 	SecurityService securityService
 
 	private Person byWhom
@@ -21,6 +24,8 @@ class PartyRelationshipServiceTests extends Specification {
 	private Project project
 	private MoveEvent moveEvent
 	private Person person
+
+	static ProjectTestHelper projectHelper = new ProjectTestHelper()
 
 	void setup() {
 		def projectHelper = new ProjectTestHelper()
@@ -173,5 +178,51 @@ class PartyRelationshipServiceTests extends Specification {
 			partyRelationshipService.getCompanyStaff(company).size() == (staffSize - 1)
 			// Include the disabled accounts
 			partyRelationshipService.getCompanyStaff(company, true)
+	}
+
+	void "Test getProjectCompanies with a client, owner and partner" () {
+		setup: "Create a project with different owner, client and partner"
+			Project project = projectHelper.createProject(null, true)
+		when: "Asking for the companies for the project "
+			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
+		then: "The List has three objects"
+			companies.size() == 3
+		and: "There are no duplicated companies"
+			companies.unique {it.id}.size() == 3
+		and: "It contains the owner"
+			companies.find {it.id == project.owner.id}
+		and: "It contains the client"
+			companies.find {it.id == project.client.id}
+
+		when: "Retrieving the partners"
+			List<Party> partners = projectService.getPartners(project)
+		then: "There's only one partner"
+			partners.size() == 1
+		and: "The partner is in the list of companies"
+			Party partner = partners.get(0)
+			companies.find {it.id == partner.id}
+	}
+
+	void "Test getProjectCompanies for a project with no partner" () {
+		setup: "Create a project with different owner, client"
+			Project project = projectHelper.createProject()
+		when: "Asking for the companies for the project "
+			List<Party> companies = partyRelationshipService.getProjectCompanies(project)
+		then: "The List has three objects"
+			companies.size() == 2
+		and: "There are no duplicated companies"
+			companies.unique {it.id}.size() == 2
+		and: "It contains the owner"
+			companies.find {it.id == project.owner.id}
+		and: "It contains the client"
+			companies.find {it.id == project.client.id}
+	}
+
+	void "Test getProjectCompanies with a null project" () {
+
+		when: "Asking for the companies with a null project "
+			List<Party> companies = partyRelationshipService.getProjectCompanies(null)
+		then: "The result is null."
+			companies == null
 	}
 }

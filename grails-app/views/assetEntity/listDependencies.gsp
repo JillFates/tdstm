@@ -44,6 +44,7 @@
 					caption="listCaption"
 					multiselect="true"
 					loadComplete="initCheck"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					gridComplete="function(){bindResize('dependencyGridId')}"
 					onSelectRow="validateMergeCount"
 					showPager="true">

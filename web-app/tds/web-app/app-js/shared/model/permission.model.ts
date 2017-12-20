@@ -1,4 +1,8 @@
 export class Permission {
+	static ActionAssignment = 'ActionAssignment';
+	static ActionCreate = 'ActionCreate';
+	static ActionDelete = 'ActionDelete';
+	static ActionEdit = 'ActionEdit';
 	static AdminMenuView = 'AdminMenuView';
 	static AdminUtilitiesAccess = 'AdminUtilitiesAccess';
 	static ApplicationRestart = 'ApplicationRestart';

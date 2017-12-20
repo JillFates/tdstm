@@ -55,6 +55,7 @@
 						{name:'category',width:'80',formatter: myLinkFormatter}"
 					sortname="'lastUpdated'"
 					sortorder="'desc'"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					caption="'Asset Comment:'"
 					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
 					showPager="true">

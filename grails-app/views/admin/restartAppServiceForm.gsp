@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta charset="UTF-8">
 	<meta name="layout" content="topNav" />
-	<title>Document</title>
+	<title>Restart Application Service</title>
 	<style type="text/css">
 		.padded {
 			padding: 2em;
@@ -46,17 +46,18 @@
 <body>
 	<g:if test="${restartable}">
 		<div class="padded center red">
-			<h2>
+			
 			<p class="padded">
-				Restart Application Service
+				<h2>Restart Application Service</h2>
+				<h3>Clicking the Restart button will cause a brief disruption of service while the application is stopped and then restarted. 
+				The process typically takes 2-3 minutes to complete.
 				<br>
-				<br>
-				Clicking the Restart button is going to force the application to restart which will cause a brief disruption of service.
-				<br>
-				<br>
-				Please note that this action will be reported to administration.
+				<br>				
+				Please notify the Support/Operations team that an application restart will be performed before continuing.
+				</h3>
 			</p>
-			<button id="btnRestart" type="button" class="big">RESTART</button>
+			<br>				
+			<button id="btnRestart" type="button" class="big">Initiate Application Restart</button>
 			</h2>
 		</div>
 
@@ -77,21 +78,21 @@
 		<script type="text/javascript">
 			$(function(){
 				$('#btnRestart').on("click", function(e){
-					var proceed = confirm("Are you sure you want to restart the application? Click Okay to restart otherwise press Cancel.");
+					var proceed = confirm("Are you sure you want to restart the application? Click Ok to restart otherwise press Cancel.");
 					if(proceed){
-						$.post("restartAppService")
+						$.post("restart")
 						.done(function(data) {
 						  	if(data.status == "fail"){
 						  	  	alert("ERROR: " + data.data.message);
 
 						  	}else {
-						  	  	var message = "The application is restarting that will take approximately 1 to 2 minutes...";
+						  	  	var message = "The application is being restarted. This may take 2 to 3 minutes to complete...";
 						  	  	var timeOutSecs = 60;
 						  		$("body").append("<div class='modal'><div class='center'><h2><strong>" + message + "</strong></h2></div></div>");
 								$(".modal").show();
 
 								setTimeout(function(){
-									window.location.replace("${createLink(uri: '/')}");
+									window.location.replace("${createLink(mapping:'adminPortal')}");
 								}, timeOutSecs * 1000);
 						  	}
 
@@ -100,7 +101,8 @@
 				});
 			});
 		</script>
-	</g:if><g:else>
+	</g:if>
+	<g:else>
 		<div class="padded center red">
 			<h2>
 			Restart Application Service

@@ -38,6 +38,7 @@
 					caption="listCaption"
 					multiselect="true"
 					showPager="true"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					loadComplete="initModelCheck"
 					gridComplete="function(){bindResize('modelId')}"
 					onSelectRow="validateModelCount">

@@ -63,6 +63,23 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/$id" {
+			controller = "wsApiAction"
+			action = [
+			        DELETE: "delete",
+					GET: "fetch",
+					PUT: "update"
+			]
+		}
+
+		"/ws/apiAction" {
+			controller = "wsApiAction"
+			action = [
+					GET: "list",
+					POST: "create"
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}
@@ -332,7 +349,14 @@ class UrlMappings {
 			action = [PUT:"unlockAccount"]
 		}
 
-		"/admin/restartAppService" {
+		name adminPortal: "/admin/home" {
+			controller = 'admin'
+			action = [
+				GET: "home"
+			]
+		}
+		
+		"/admin/restart" {
 			controller = "admin"
 			action = [
 				GET: "restartAppServiceForm",
@@ -654,6 +678,41 @@ class UrlMappings {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
+			]
+		}
+
+		"/ws/apiAction/agent" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentNames"
+			]
+		}
+
+		"/ws/apiAction/agent/$id" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentDictionary"
+			]
+		}
+
+		"/ws/dataScript/testScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "testScript"
+			]
+		}
+
+		"/ws/dataScript/checkSyntax" {
+			controller = "wsDataScript"
+			action = [
+					POST: "checkSyntax"
+			]
+		}
+
+		"/ws/dataScript/saveScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "saveScript"
 			]
 		}
 

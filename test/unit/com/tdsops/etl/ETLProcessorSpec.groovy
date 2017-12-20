@@ -21,7 +21,6 @@ import spock.lang.Specification
 
 class ETLProcessorSpec extends Specification {
 
-
     @Shared
     Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
 

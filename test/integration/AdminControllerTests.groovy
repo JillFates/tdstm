@@ -1,38 +1,76 @@
-import grails.test.mixin.TestFor
-import spock.lang.Specification
+import com.tdsops.tm.enums.domain.SecurityRole
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.SecurityService
+import spock.lang.See
 import net.transitionmanager.domain.Project
+import grails.test.spock.IntegrationSpec
 
 /**
  * Unit test cases for the TimeUtil class
  * Note that in order to test with the HttpSession that this test spec is using the AdminController not for any thing in particular
  * but it allows the tests to access the session and manipulate it appropriately.
-*/
-@TestFor(AdminController)
-class AdminControllerTests extends Specification {
+ */
+class AdminControllerTests extends IntegrationSpec {
 
-	def personHelper
-	def projectHelper
-	Project project
-	def privPerson, privUser
-	def unPrivPerson, unPrivUser
+    def controller = new AdminController()
+    SecurityService securityService
+    def personHelper
+    def projectHelper
+    Project project
+    def privPerson, adminPerson
+    def unPrivPerson, unPrivUser
+    CoreService coreService
 
+    def setup() {
+        personHelper = new PersonTestHelper()
+        projectHelper = new ProjectTestHelper()
+        adminPerson = personHelper.getAdminPerson()
 
-	def setup() {
-		personHelper = new PersonTestHelper()
-		projectHelper = new ProjectTestHelper()
-		privUser = personHelper.getAdminPerson()
-	}
+        UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ADMIN}"])
+        securityService.assumeUserIdentity(adminUser.username, false)
+        assert securityService.isLoggedIn()
+    }
 
-	def 'Test the AccountImportExport controller methods for permissions'() {
-		setup:
-			project = projectHelper.createProject(privUser.company)
-			unPrivPerson = personHelper.createPerson(privUser, project.company, project, null, null, 'USER')
+    def 'Test the AccountImportExport controller methods for permissions'() {
+        setup:
+        project = projectHelper.createProject(adminPerson.company)
+        unPrivPerson = personHelper.createPerson(adminPerson, project.company, project, null, null, 'USER')
 
-		when:
-			def x=1
-			// Need to mock the session to return the user appropriately
-			//controller.importAccountsTemplate()
-		then:
-			x == 1
-	}
+        when:
+        def x = 1
+        // Need to mock the session to return the user appropriately
+        //controller.importAccountsTemplate()
+        then:
+        x == 1
+    }
+
+    /**
+     * The property <code>serviceRestartCommand</code> is defined in the tdstm-config.groovy file.
+     * Basically is a OS command for creating an empty file that it will be checked later by a cron process,
+     * and if the file exists then it will restart the app service.
+     * The command is 'touch' and is an OS dependent command, as it is intended to be run on UNIX systems.
+     * If you want to run this test on Windows, there is a workaround that consists of installing a touch command
+     * for Windows. This can be done with http://www.binarez.com/touch_dot_exe/
+     */
+    @See('TM-7670')
+    def 'Test the correct creation of the restart file in restartAppServiceAction()'() {
+        setup: 'Check that the command that will be used internally to create the file is ok'
+            String command = coreService.getAppConfigSetting(AdminController.APP_RESTART_CMD_PROPERTY)
+            assert command
+            def touchCmd = command.split()[0]   /* get the command name */
+            assert touchCmd == 'touch'
+        and: 'make sure the file does not exist before running the test.'
+            def filePath = command.split()[1]   /*  get the file path */
+            def file = new File(filePath)       /*  if the file exists, delete it */
+            if (file.exists()) {
+                file.delete()
+            }
+            !file.exists()
+        when:'the restartAppServiceAction() method is called'
+            def returned = controller.restartAppServiceAction()
+        then:'the method executes successfully and the file gets created.'
+            controller.response.status == 200
+            file.exists()
+    }
 }

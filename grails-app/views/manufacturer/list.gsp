@@ -35,6 +35,7 @@
 					{name:'assetCount',width:'50',search:false,sortable:false}"
 				sortname="'name'"
 				caption="listCaption"
+				rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 				gridComplete="function(){bindResize('manufacturerId')}"
 				showPager="true">
 				<jqgrid:navigation id="manufacturerId" add="false" edit="false" del="false" search="false" refresh="true" />

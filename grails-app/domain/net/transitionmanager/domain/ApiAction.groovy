@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
@@ -129,5 +130,42 @@ class ApiAction {
 			}
 		}
 		return list
+	}
+
+	/**
+	 * Create a map with the data for this ApiAction
+	 * @param minimalInfo - flag that signals if only the m
+	 * @return
+	 */
+	Map toMap(boolean minimalInfo = true) {
+		Map fields = [id: id, name: name]
+		if (!minimalInfo) {
+			fields.agentClass  = agentClass.name()
+			fields.agentMethod = agentMethod
+			fields.asyncQueue = asyncQueue
+			fields.callbackMethod = callbackMethod
+			fields.callbackMode = callbackMode.name()
+			fields.dateCreated = dateCreated
+			fields.defaultDataScriptName = defaultDataScript
+			fields.description = description
+			fields.lastModified = lastModified
+			fields.methodParams = methodParams
+			fields.pollingInterval = pollingInterval
+			fields.producesData = producesData
+			fields.provider = [
+					id  : provider.id,
+					name: provider.name
+			]
+			fields.timeout = timeout
+
+		}
+		return fields
+	}
+
+	def beforeInsert = {
+		dateCreated = TimeUtil.nowGMT()
+	}
+	def beforeUpdate = {
+		lastModified = TimeUtil.nowGMT()
 	}
 }

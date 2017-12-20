@@ -1,30 +1,93 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import grails.transaction.Transactional
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
+import net.transitionmanager.domain.Provider
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
 @Transactional
 class ApiActionService {
 	CamelHostnameIdentifier camelHostnameIdentifier
+	DataScriptService dataScriptService
+	ProviderService providerService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-			(AgentClass.AWS): AwsAgent,
-			(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-			(AgentClass.SERVICE_NOW): ServiceNowAgent
+		(AgentClass.AWS): AwsAgent,
+		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
+		(AgentClass.SERVICE_NOW): ServiceNowAgent
 	].asImmutable()
 
+	/**
+	 * Get a list of agent names
+	 * @return
+	 */
+	List<String> agentNamesList() {
+		List<Map> agents = new ArrayList<>()
+
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			Map info = [
+				id: agent.agentClass.toString(),
+				name: agent.name
+			]
+			agents << info
+		}
+
+		return agents
+	}
+
+	/**
+	 * Get an agent details by agent name
+	 * @param agentCode
+	 * @return the method dictionary for a specified agent
+	 */
+	Map agentDictionary(String id) {
+		Map dictionary = [:]
+		List<String> agentIds  = []
+		agentClassMap.each { entry ->
+			Class clazz = entry.value
+			AbstractAgent agent = clazz.newInstance()
+			String agentId = agent.agentClass.toString()
+			agentIds << agentId
+			if (agentId == id) {
+				dictionary = agent.dictionary()
+			}
+		}
+
+		if (!dictionary) {
+			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
+		}
+
+		return dictionary
+	}
+
+	/**
+	 * Find an ApiAction by id
+	 * @param id
+	 * @return
+	 */
 	ApiAction find(Long id){
 		return ApiAction.get(id)
 	}
 
+	/**
+	 * Find and ApiAction by id and project it belongs to
+	 * @param id
+	 * @param project
+	 * @return
+	 */
 	ApiAction find(Long id, Project project) {
 		return ApiAction.where {
 			id == id
@@ -32,14 +95,26 @@ class ApiActionService {
 		}.get()
 	}
 
-	List<Map> list(Project project) {
-		List actions = ApiAction.createCriteria().list() {
-			eq('project', project)
-			order('name', 'asc')
-		}
-		List<Map> list = actions.collect { [ id: it.id, name: it.name ] }
+	/**
+	 * List all the API Action for the given project.
+	 * @param project
+	 * @param minimalInfo - if true, only the id and name for each API Action will be returned.
+	 * @param filterParams - filters for narrowing down the search.
+	 * @return
+	 */
+	List<Map> list(Project project, Boolean minimalInfo = true, Map filterParams = [:]) {
 
-		return list
+		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
+
+		List apiActions = ApiAction.where {
+			project == project
+			if (producesDataFilter != null) {
+				producesData == producesDataFilter
+			}
+		}.order("name", "asc").list()
+		List<Map> results = []
+		apiActions.each {results << it.toMap(minimalInfo)}
+		return results
 	}
 
 	/**
@@ -185,6 +260,110 @@ class ApiActionService {
 	private AbstractAgent agentInstanceForAction(ApiAction action) {
 		Class clazz = agentClassForAction(action)
 		clazz.instance
+	}
+
+	/**
+	 * Delete the given ApiAction.
+	 * @param id
+	 * @param project
+	 * @param flush
+	 */
+	void delete(Long id, Project project, boolean flush = false) {
+		ApiAction apiAction = ormUtil.findInProject(project, ApiAction, id, true)
+		apiAction.delete(flush: flush)
+	}
+
+	/**
+	 * Validate that no other API Action with the same name exists for this project.
+	 * @param project
+	 * @param name
+	 * @param apiActionId - if null, it's a create operation, otherwise an update.
+	 * @return
+	 */
+	boolean validateApiActionName(Project project, String name, Long apiActionId = null){
+		boolean isValid = false
+
+		// Both name and project are required for validating.
+		if (name && project) {
+			// Find an API Action for this project with the given name.
+			Long id = ApiAction.where {
+				project == project
+				name == name
+			}.projections{property('id')}.find()
+
+			// If no API Action was found or the IDs match, the name it's okay.
+			if (!id || id == apiActionId) {
+				isValid = true
+			}
+		}
+		return isValid
+
+	}
+
+	/**
+	 * Convert a string into the corresponding enum.
+	 * @param enumClass
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	def parseEnum(Class enumClass, String field, String value) {
+		String baseErrorMsg = "Error trying to create or update an API Action."
+		if (!value) {
+			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
+		}
+		try {
+			return enumClass.valueOf(value)
+		}catch (IllegalArgumentException e){
+			throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+		}
+	}
+
+	ApiAction saveOrUpdateApiAction(Project project, JSONObject apiActionJson, Long apiActionId = null) {
+
+		ApiAction apiAction
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+
+		String actionName = apiActionJson.name
+
+		if (!validateApiActionName(project, apiActionJson.name)) {
+			throw new InvalidParamException("Invalid name for API Action.")
+		}
+
+		DataScript dataScript = null
+		if (apiActionJson.defaultDataScriptId) {
+			dataScript = dataScriptService.getDataScript(NumberUtil.toLong(apiActionJson.defaultDataScriptId), project)
+		}
+
+		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
+
+		apiAction.with {
+			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
+			agentMethod = apiActionJson.agentMethod
+			asyncQueue = apiActionJson.asyncQueue
+			callbackMethod = apiActionJson.callbackMethod
+			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
+			description = apiActionJson.description
+			defaultDataScript = dataScript
+			description =  apiActionJson.description
+			methodParams =  apiActionJson.methodParams
+			name = actionName
+			pollingInterval = NumberUtil.toInteger(apiActionJson.pollingInterval)
+			producesData =  NumberUtil.toZeroOrOne(apiActionJson.producesData)
+			provider = prov
+			timeout = NumberUtil.toInteger(apiActionJson.timeout)
+		}
+
+		apiAction.save(failOnError: true)
+		return apiAction
+
 	}
 
 }
