@@ -4,7 +4,9 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.search.FieldSearchData
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
@@ -331,32 +333,34 @@ class DataviewService implements ServiceMethods {
 
 		dataviewSpec = addRequieredColumns(dataviewSpec)
 
-        String hqlColumns = hqlColumns(dataviewSpec)
-        String hqlWhere = hqlWhere(dataviewSpec)
-        String hqlOrder = hqlOrder(dataviewSpec)
-        String hqlJoins = hqlJoins(dataviewSpec)
-		Map hqlParams = hqlParams(project, dataviewSpec)
+		String hqlColumns = hqlColumns(dataviewSpec)
+		Map whereInfo = hqlWhere(dataviewSpec, project)
+		String conditions = whereInfo.conditions
+		Map whereParams = whereInfo.params
+		String hqlOrder = hqlOrder(dataviewSpec)
+		String hqlJoins = hqlJoins(dataviewSpec)
 
-        String hql = """
-			select $hqlColumns
-				from AssetEntity AE
-				$hqlJoins
-				where AE.project = :project and $hqlWhere  
-			order by $hqlOrder
+		String hql = """
+            select $hqlColumns
+              from AssetEntity AE
+                $hqlJoins
+             where AE.project = :project and $conditions  
+          order by $hqlOrder  
         """
 
 		String countHql = """
             select count(*)
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $hqlWhere
+             where AE.project = :project and $conditions
         """
-		
 
-        List assets = AssetEntity.executeQuery(hql, hqlParams, dataviewSpec.args)
-        Long totalAssets = AssetEntity.executeQuery(countHql, hqlParams)[0]
+		log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
-        previewQueryResults(assets, totalAssets, dataviewSpec)
+		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
+		def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
+
+		previewQueryResults(assets, totalAssets[0], dataviewSpec)
     }
 
 	/**
@@ -467,31 +471,6 @@ class DataviewService implements ServiceMethods {
         }.join(" ")
     }
 
-    /**
-     * Calculates HQL params from DataviewSpec for HQL query
-     * @param project a Project instance to be added in Parameters
-     * @param dataviewSpec
-     * @return a Map with params to be used in a executeQuery with an HQL query.
-	 */
-	private Map hqlParams(Project project, DataviewSpec dataviewSpec) {
-        Map params = [project: project]
-        if (dataviewSpec.justPlanning != null) {
-            params << [
-				moveBundles: MoveBundle.where {
-					project == project && useForPlanning == dataviewSpec.justPlanning
-				}.list()
-            ]
-        }
-        dataviewSpec.filterColumns.each { Map column ->
-            params << [("${namedParameterFor(column)}".toString()): calculateParamsFor(column)]
-        }
-
-        if(!dataviewSpec.domains.isEmpty()) {
-            params << ["assetClasses" : dataviewSpec.domains.findResults { AssetClass.safeValueOf(it.toUpperCase())}]
-        }
-
-        params
-    }
 
 	/**
 	 * Creates a String with all the columns correctly set for select clause
@@ -500,81 +479,55 @@ class DataviewService implements ServiceMethods {
 	 */
 	private String hqlColumns(DataviewSpec dataviewSpec){
 		dataviewSpec.columns.collect { Map column ->
-			"${propertyFor(column)}"
+			"${projectionPropertyFor(column)}"
 		}.join(", ")
 	}
 
     /**
      * Creates a String with all the columns correctly set for where clause
      * @param dataviewSpec
+	 * @param project
      * @return
      */
-	private String hqlWhere(DataviewSpec dataviewSpec) {
+	private Map hqlWhere(DataviewSpec dataviewSpec, Project project) {
 
-		List where = []
+		// List of conditions for the WHERE clause.
+		List whereConditions = []
+		// Params for the WHERE
+		Map whereParams = [project: project]
 
-        if(!dataviewSpec.domains.isEmpty()){
-            where << "AE.assetClass in (:assetClasses)"
-        }
+		if(!dataviewSpec.domains.isEmpty()){
+			whereConditions << "AE.assetClass in (:assetClasses)"
+			whereParams << ["assetClasses" : dataviewSpec.domains.findResults { AssetClass.safeValueOf(it.toUpperCase())}]
+		}
 
-        if (dataviewSpec.justPlanning != null) {
-            where << "AE.moveBundle in (:moveBundles)"
-        }
+		if (dataviewSpec.justPlanning != null) {
+			whereConditions << "AE.moveBundle in (:moveBundles)"
+			whereParams << [
+					moveBundles: MoveBundle.where {
+						project == project && useForPlanning == dataviewSpec.justPlanning
+					}.list()
+			]
+		}
 
 		dataviewSpec.filterColumns.each { Map column ->
-			if (hasCustomFilterFor(column)){
-				if (hasMultipleFilter(column)){
-					where << "${getCustomFilterIn(column)} \n"
-				} else {
-					where <<  "${getCustomFilterLike(column)} \n"
-				}
-			} else {
-				if (hasMultipleFilter(column)){
-					where << "${propertyFor(column)} in (:${namedParameterFor(column)}) \n"
-				} else {
-					where <<  "${propertyFor(column)} like :${namedParameterFor(column)} \n"
-				}
-			}
+
+			FieldSearchData fieldSearchData = new FieldSearchData([
+					column: propertyFor(column),
+					columnAlias: namedParameterFor(column),
+					domain: domainFor(column),
+					filter: filterFor(column)
+			])
+
+			SqlUtil.parseParameter(fieldSearchData)
+
+			whereConditions << fieldSearchData.sqlSearchExpression
+			whereParams += fieldSearchData.sqlSearchParameters
 		}
-		where.join(' and ')
+
+		return [conditions: whereConditions.join(" AND \n"), params: whereParams]
 	}
 
-	/**
-     * Checks if column.filter has values to be used in filter
-     * @param column a Column with filter value
-     * @return
-     */
-	private Boolean hasMultipleFilter(Map column) {
-        splitColumnFilter(column).size() > 1
-    }
-
-	/**
-	 * Checks if the column has a custom filter defined
-	 * @param column a Column to be checked
-	 * @return
-	 */
-	private Boolean hasCustomFilterFor(Map column) {
-		transformations[column.property].customFilterIn != null \
-		|| \
-		transformations[column.property].customFilterLike != null
-	}
-
-    /**
-     * Calculate Map with params splitting column.filter content
-     * if column.filter has only one value It's prepared with %${column.filter}%
-     * in order to use like filter in HQL query.
-     * @param column
-     * @return
-     */
-	private def calculateParamsFor(Map column){
-        String[] values = splitColumnFilter(column)
-
-        if (values.size() == 1) {
-			"%${values[0].trim()}%".toString()
-        } else {
-			values.collect { "${it.trim()}".toString()}
-        }
-    }
 
     /**
      * Columnn filters value could be split by '|' separator
@@ -612,74 +565,65 @@ class DataviewService implements ServiceMethods {
 		transformations[column.property].alias ?: propertyFor(column)
 	}
 
-	private static String getCustomFilterIn(Map column) {
-		transformations[column.property].customFilterIn
+	private static String aliasFor(Map column) {
+		return transformations[column.property].alias
 	}
 
-	private static String getCustomFilterLike(Map column) {
-		transformations[column.property].customFilterLike
+	private static String projectionPropertyFor(Map column) {
+		String projection
+		String property = propertyFor(column)
+		String alias = aliasFor(column)
+		if (alias) {
+			projection = "$property AS alias"
+		} else {
+			projection = property
+		}
+
+		return projection
 	}
 
-	/** 
-	 * Used to generate HQL that will properly concatenate a person's full name
-	 * @param propertyName - the particular property to construct the HQL for
-	 * @return the HQL for the computated fullName 
+
+	/**
+	 * Return the Domain class this column belongs to.
+	 *
+	 * @param column
+	 * @return
 	 */
-	private static String personFullName(String propertyName) {
-		"""
-			CONCAT( 
-				COALESCE(AE.${propertyName}.firstName, ''),
-				CASE WHEN COALESCE(AE.${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
-				COALESCE(AE.${propertyName}.middleName,''),
-				CASE WHEN COALESCE(AE.${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
-				COALESCE(AE.${propertyName}.lastName,'')
-			)
-		"""
+	private static Class domainFor(Map column) {
+		String domain = column.domain == "common" ? "DEVICE" : column.domain.toUpperCase()
+		AssetClass assetClass = AssetClass.safeValueOf(domain)
+		return AssetClass.domainClassFor(assetClass)
 	}
 
 	/**
-	 * Used to render the WHERE logic to filter on a person with LIKE statement
-	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
-	 * @param namedParameter - the name to use as the parameter fed into the query
-	 * @return the SQL to append to the WHERE clause
+	 * Retrieve the filter the user provided for this column.
+	 * @param column
+	 * @return
 	 */
-	private static String customFilterLike(String propertyName, String namedParameter) {
-		"( ${personFullName(propertyName)} like :${namedParameter} )"
-	}
-
-	/**
-	 * Used to render the WHERE logic to filter on a person with IN statement
-	 * @param propertyName - the name of the property to query (e.g. sme, sme2 or appOwner)
-	 * @param namedParameter - the name to use as the parameter fed into the query
-	 * @return the SQL to append to the WHERE clause
-	 */
-	private static String customFilterIn(String propertyName, String namedParameter) {
-		"( ${personFullName(propertyName)} in (:${namedParameter}) )"
+	private static String filterFor(Map column) {
+		return column.filter
 	}
 
     private static final Map<String, Map> transformations = [
-		'id'             : [property: 'str(AE.id)', type: String, namedParameter: 'id', join: ''],
+		'id'             : [property: 'AE.id', type: Long, namedParameter: 'id', join: ''],
 		'assetClass'     : [property: 'str(AE.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
 		'moveBundle'     : [property: 'AE.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join AE.moveBundle'],
 		'project'        : [property: 'AE.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join AE.project'],
 		'manufacturer'   : [property: 'AE.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join AE.manufacturer'],
-		'appOwner'       : [property: "${personFullName('appOwner')} as appOwner", 
+		'appOwner'       : [property: SqlUtil.personFullName('appOwner', 'AE'),
 							type: String, namedParameter: 'appOwnerName', 
-							join: 'left outer join AE.appOwner', 
-							customFilterLike: customFilterLike('appOwner','appOwnerName'), 
-							customFilterIn: customFilterIn('appOwner','appOwnerName'), alias:'appOwner'],
-		'sme'            : [property: "${personFullName('sme')} as sme", 
+							join: 'left outer join AE.appOwner',
+							alias:'appOwner'],
+		'sme'            : [property: SqlUtil.personFullName('sme', 'AE'),
 							type: String, 
 							namedParameter: 'smeName', 
-							join: 'left outer join AE.sme', 
-							customFilterLike: customFilterLike('sme','smeName'), 
-							customFilterIn: customFilterIn('sme','smeName'), alias:'sme'],
-		'sme2'           : [property: "${personFullName('sme2')} as sme2", 
+							join: 'left outer join AE.sme',
+							alias:'sme'],
+		'sme2'           : [property: SqlUtil.personFullName('sme2', 'AE'),
 							type: String, 
 							namedParameter: 'sme2Name', 
-							join: 'left outer join AE.sme2', 
-							customFilterLike: customFilterLike('sme2','sme2Name'), 
-							customFilterIn: customFilterIn('sme2','sme2Name'), alias:'sme2'],
+							join: 'left outer join AE.sme2',
+							alias:'sme2'],
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
 		'sourceLocation' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
 		'sourceRack'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
