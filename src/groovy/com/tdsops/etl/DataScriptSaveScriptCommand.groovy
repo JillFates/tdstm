@@ -4,16 +4,16 @@ import grails.validation.Validateable
 import net.transitionmanager.command.CommandObject
 
 /**
- * The DataScriptParamsCommand represents the parameters that are necessary to test an ETL script
+ * The DataScriptSaveScriptCommand represents the parameters that are necessary to test an ETL script
  */
 @Validateable
-class DataScriptParamsCommand implements CommandObject {
+class DataScriptSaveScriptCommand implements CommandObject {
 
+    Long id
     String script
-    String fileName
 
     static constraints = {
+        id nullable: false
         script blank: false
-        fileName blank: false
     }
 }

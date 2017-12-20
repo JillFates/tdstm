@@ -83,15 +83,35 @@ class ScriptProcessorService {
      * @param project
      * @param scriptContent
      * @param fileName
-     * @return a map with the console output log and ETLProcessor data results
+     * @return a map with isValid boolean result, the console output log and ETLProcessor data results
      */
     Map<String, ?> testScript (Project project, String scriptContent, String fileName) {
 
-        ETLProcessor etlProcessor = process(project, scriptContent, fileName)
-        [
-                consoleLog: etlProcessor.debugConsole.content(),
-                data      : etlProcessor.results
-        ]
+        ETLProcessor etlProcessor
+        Map<String, ?> result = [isValid: false]
+
+        try {
+            CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+
+            etlProcessor = new ETLProcessor(project,
+                    new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true),
+                    new DebugConsole(buffer: new StringBuffer()),
+                    createFieldsSpecValidator(project))
+
+            ETLBinding binding = new ETLBinding(etlProcessor)
+
+            new GroovyShell(this.class.classLoader, binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+
+            result.isValid = true
+        } catch (all) {
+            log.warn('Error testing script: ' + all.getMessage(), all)
+            result.error = all.getMessage()
+        }
+
+        result.consoleLog = etlProcessor?.debugConsole?.content()
+        result.data = etlProcessor?.results
+
+        result
     }
 
     /**

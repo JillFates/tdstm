@@ -332,7 +332,7 @@ trait ControllerMethods {
 	 *
 	 */
 	def <T> T fetchDomain(Class<T> clazz, Map params) {
-		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
+		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.id.toLong())
 		if (t) {
 			if (GormUtil.isDomainProperty(t, 'project')) {
 				SecurityService securityService = ApplicationContextHolder.getBean('securityService')
