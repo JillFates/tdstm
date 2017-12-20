@@ -753,17 +753,17 @@ class AssetExportService {
 							case 'Id':
 								colVal = app.id
 								break
-							case 'AppOwner':
+							case 'App Owner':
 								colVal = app.appOwner
 								break
 							case 'DepGroup':
 								// Find the Dependency Group that this app is bound to
 								colVal = assetDepBundleMap[app.id]
 								break
-							case ~/ShutdownBy|StartupBy|TestingBy/:
+							case ~/Shutdown By|Startup By|Testing By/:
 								colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
 								break
-							case ~/ShutdownFixed|StartupFixed|TestingFixed/:
+							case ~/Shutdown Fixed|Startup Fixed|Testing Fixed/:
 								colVal = app[field] ? 'Yes' : 'No'
 								break
 							case ~/Retire Date|Maint Expiration/:
