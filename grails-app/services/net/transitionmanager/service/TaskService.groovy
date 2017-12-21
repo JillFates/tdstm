@@ -455,10 +455,14 @@ class TaskService implements ServiceMethods {
 				}
 
 				if (errMsg) {
-					log.info "invokeAction() error $errMsg"
-					addNote(task, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
-					status = ACS.HOLD
-					task.status = status
+					log.warn "invokeAction() error $errMsg"
+					AssetComment.withNewTransaction {
+						AssetComment taskObj = AssetComment.get(task.id) 
+						addNote(taskObj, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
+						status = ACS.HOLD
+						taskObj.status = status
+						taskObj.save(failOnError:true)
+					}
 				}
 			}
 		}
