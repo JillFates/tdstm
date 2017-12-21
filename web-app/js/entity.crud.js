@@ -1589,19 +1589,23 @@ var EntityCrud = (function ($) {
 	 * @param iconLinkId - the DOM id of the A tag that contains the icon that is changed accordingly
 	 */
 	pub.onDepCommentDialogClose = function () {
-		var modal = $('#depCommentDialog');
-		var type = $('#depCommentType').val();
-		var rowNo = $('#depCommentRowNo').val();
 		var textarea = $('#depCommentTextarea');
 
-		var hiddenInput = $('input:hidden[name=comment_' + type + '_' + rowNo + ']')
+		if (textarea.val().length > 255) {
+			alert("The length of the comment exceeds the allowed maximum of 255 characters.")
+		} else {
+            var modal = $('#depCommentDialog');
+            var type = $('#depCommentType').val();
+            var rowNo = $('#depCommentRowNo').val();
+            var hiddenInput = $('input:hidden[name=comment_' + type + '_' + rowNo + ']')
+            hiddenInput.val(textarea.val());
+            modal.dialog('close');
+            // Update the icon based on if there is content
+            var iconMode = hiddenInput.val() ? 'edit' : 'add';
+            $('#commLink_' + type + '_' + rowNo).html('<img border="0px" src="' + tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">'));
+		}
 
-		hiddenInput.val(textarea.val());
-		modal.dialog('close');
 
-		// Update the icon based on if there is content
-		var iconMode = hiddenInput.val() ? 'edit' : 'add';
-		$('#commLink_' + type + '_' + rowNo).html('<img border="0px" src="' + tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">'));
 	};
 
 	/**
