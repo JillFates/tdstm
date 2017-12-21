@@ -348,15 +348,6 @@ tdsops.buildFile = "/build.txt"
 // activity:  will also include all user interactions with the application.
 //tdstm.security.auditLogging = "access"
 
-tdstm {
-	// TM-8654 - added the AWS credentials temporarily
-	credentials {
-		aws {
-			accessKey = 'AKIAJQVV5RZ45K6T5GRA'
-			secretKey = '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'
-		}
-	}
-}
 
 grails {
 	plugin {
