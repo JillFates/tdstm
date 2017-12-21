@@ -93,9 +93,13 @@
 									<tds:actionButton label="Invoke" icon="ui-icon-gear" id="${item?.id}" onclick="invokeAction('${item?.id}')"/>
 								</g:if>
 							</tds:hasPermission>
-							<tds:hasPermission permission="${Permission.ActionEdit}">
+							<tds:hasPermission permission="${Permission.ActionReset}">
 								<g:if test="${item?.apiActionId != null && item?.status in [AssetCommentStatus.HOLD]}">
-									<tds:actionButton label="Reset" icon="ui-icon-power" id="${item?.id}" onclick="resetAction('${item?.id}')"/>
+									<tds:actionButton 
+										label="${message(code:'task.button.resetAction.label')}" 
+										icon="ui-icon-power" id="${item?.id}" 
+										tooltipText="${message(code:'task.button.resetAction.tooltip')}" 
+										onclick="resetAction('${item?.id}')"/>
 								</g:if>
 							</tds:hasPermission>
 
@@ -149,6 +153,11 @@
 	</div>
 </div>
 <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
+    });
+
 	if('${tab}'=="todo"){
 		$("#toDOSpanId").html(${todoSize})
 		$("#toDOAllSpanId").html(${allSize})

@@ -12,7 +12,7 @@ import groovy.transform.ToString
  * invoked by the TransitionManager application in Tasks and other places.
  */
 @Slf4j(value='logger')
-@ToString(excludes='methodParams', includeNames=true, includeFields=true)
+@ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 	String name
 	String description

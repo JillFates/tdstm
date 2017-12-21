@@ -180,16 +180,10 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeAction() {
-		AssetComment assetComment = AssetComment.get(params.id)
-		if (assetComment) {
-			Person whom = securityService.loadCurrentPerson()
-			String status = taskService.invokeAction(assetComment, whom)
-			renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
-		} else {
-			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
-			log.error "invokeAction: $errorMsg"
-			renderErrorJson([errorMsg])
-		}
+		AssetComment assetComment = fetchDomain(AssetComment, params)
+		Person whom = securityService.loadCurrentPerson()
+		String status = taskService.invokeAction(assetComment, whom)
+		renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
 	}
 
 	/**
@@ -197,9 +191,9 @@ class WsTaskController implements ControllerMethods {
 	 * @param id - task id
 	 * @return
 	 */
-	@HasPermission(Permission.ActionEdit)
+	@HasPermission(Permission.ActionReset)
 	def resetAction() {
-		AssetComment assetComment = AssetComment.get(params.id)
+		AssetComment assetComment = fetchDomain(AssetComment, params)
 		if (assetComment) {
 			Person whom = securityService.loadCurrentPerson()
 			String status = taskService.resetAction(assetComment, whom)
