@@ -326,8 +326,9 @@ export class FieldSettingsGridComponent implements OnInit {
 		let gridVirtualSection: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
 		let dialogWrapper: any = gridVirtualSection.querySelector('kendo-dialog.k-dialog-wrapper');
 		let dialogBackgroundWrapper: any = gridVirtualSection.querySelector('div.k-overlay');
+		let dialogDiv: any = gridVirtualSection.querySelector('div.k-widget.k-window.k-dialog');
 		if (dialogWrapper && dialogBackgroundWrapper) {
-			dialogWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
+			dialogWrapper.style.height = (dialogDiv.offsetHeight + 20).toString() + 'px';
 			if (dialogBackgroundWrapper.offsetHeight < gridVirtualSection.offsetHeight) {
 				dialogBackgroundWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
 			}
