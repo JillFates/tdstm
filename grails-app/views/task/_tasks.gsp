@@ -95,7 +95,11 @@
 							</tds:hasPermission>
 							<tds:hasPermission permission="${Permission.ActionReset}">
 								<g:if test="${item?.apiActionId != null && item?.status in [AssetCommentStatus.HOLD]}">
-									<tds:actionButton label="Action Reset" icon="ui-icon-power" id="${item?.id}" tooltipText="Reset Task Status" onclick="resetAction('${item?.id}')"/>
+									<tds:actionButton 
+										label="${message(code:'task.button.resetAction.label')}" 
+										icon="ui-icon-power" id="${item?.id}" 
+										tooltipText="${message(code:'task.button.resetAction.tooltip')}" 
+										onclick="resetAction('${item?.id}')"/>
 								</g:if>
 							</tds:hasPermission>
 

@@ -51,6 +51,7 @@ import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.context.MessageSource
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -82,6 +83,7 @@ class TaskController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
+	MessageSource messageSource
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
@@ -251,7 +253,8 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskView)
 	def genActionBarForShowView() {
-		AssetComment comment = AssetComment.get(params.id)
+		AssetComment comment = fetchDomain(AssetComment, params)
+
 		StringBuilder actionBar = new StringBuilder("""<span class="slide" style=" margin-top: 4px;">""")
 		int cols = 12
 
@@ -304,7 +307,8 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskView)
 	def genActionBarForShowViewJson() {
-		def comment = AssetComment.get(params.id)
+		AssetComment comment = fetchDomain(AssetComment, params)
+
 		Project project = securityService.userCurrentProject
 		def actionBar = []
 		def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
@@ -332,11 +336,15 @@ class TaskController implements ControllerMethods {
 
 			if (securityService.hasPermission(Permission.ActionReset)) {
 				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
-					actionBar << [label: 'Action Reset', icon: 'ui-icon-power', actionType: 'resetAction', newStatus: READY,
-								  redirect: 'taskManager', tooltipText: 'Reset Task Status', disabled: false]
+					actionBar << [
+						label: message(code:'task.button.resetAction.label'), 
+						icon: 'ui-icon-power', 
+						actionType: 'resetAction', newStatus: READY,
+						redirect:'taskManager', 
+						tooltipText: message(code:'task.button.resetAction.tooltip'), 
+						disabled: false]
 				}
 			}
-
 
 			if (includeDetails) {
 				actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
@@ -373,7 +381,7 @@ class TaskController implements ControllerMethods {
 			renderSuccessJson(actionBar)
 		}
 		else {
-			renderFailureJson(error: "Task was not found.")
+			renderFailureJson(error: "Task was not found")
 		}
 	}
 
@@ -1091,8 +1099,8 @@ digraph runbook {
 	def editTask() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
-
 		def apiActionList = apiActionService.list(project)
+	
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
