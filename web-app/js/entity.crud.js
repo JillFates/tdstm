@@ -1591,8 +1591,8 @@ var EntityCrud = (function ($) {
 	pub.onDepCommentDialogClose = function () {
 		var textarea = $('#depCommentTextarea');
 
-		if (textarea.val().length > 255) {
-			alert("The length of the comment exceeds the allowed maximum of 255 characters.")
+		if (textarea.val().length > 65535) {
+			alert("The length of the comment exceeds the allowed maximum of 65535 characters.")
 		} else {
             var modal = $('#depCommentDialog');
             var type = $('#depCommentType').val();
