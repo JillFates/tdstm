@@ -126,8 +126,8 @@ class ETLProcessor implements RangeChecker {
     def from (int from) {
         [to: { int to ->
             [iterate: { Closure closure ->
-                from = from - 1
-                to = to - 1
+                from--
+                to--
                 List<Map> rows = this.dataSet.rows()
                 subListRangeCheck(from, to, rows.size())
                 List subList = rows.subList(from, to)
@@ -150,7 +150,7 @@ class ETLProcessor implements RangeChecker {
             List rowNumbers = numbers as List
             List rows = this.dataSet.rows()
             List subList = rowNumbers.collect { int number ->
-                number = number - 1
+                number--
                 rangeCheck(number, rows.size())
                 rows.get(number)
             }
@@ -303,7 +303,7 @@ class ETLProcessor implements RangeChecker {
      */
     def extract (Integer index) {
 
-        index = index - 1
+        index--
         rangeCheck(index, currentRow.size())
 
         currentColumnIndex = index
