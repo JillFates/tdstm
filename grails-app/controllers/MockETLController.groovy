@@ -36,9 +36,9 @@ read labels
 iterate {
     domain Application
     
-    extract 0 load id
+    extract 1 load id
     extract 'model name' transform with lowercase() load Name
-    extract 2 transform with uppercase() load description
+    extract 3 transform with uppercase() load description
     
     set environment with 'Production'
     //reference id with id
@@ -46,7 +46,7 @@ iterate {
 
     domain Device
     
-    extract 0 load id
+    extract 1 load id
     extract 'model name' transform with uppercase() load Name
 }
 """.stripIndent()
