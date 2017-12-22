@@ -328,10 +328,6 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.currentRowIndex == jsonDataSet.readRows
     }
 
-    /**
-     *
-     *
-     */
     void 'test can iterate over a range of data source rows' () {
 
         given:
@@ -352,6 +348,44 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.currentRowIndex == 2
     }
 
+    void 'test can throw an exception when iterates over an invalid range of data source rows' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+        when: 'The ETL script with iterate staring in zero is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        from 0 to 3 iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == 'Initial position starts with 1'
+
+
+        when: 'The ETL script with iterate with a bigger to parameter is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        from 1 to 8 iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
+            e = thrown ETLProcessorException
+            e.message == "Invalid to parameter = 8"
+
+    }
+
     void 'test can iterate over a list of data source rows' () {
 
         given:
@@ -362,7 +396,7 @@ class ETLProcessorSpec extends Specification {
                     .evaluate("""
                         domain Device
                         read labels
-                        using 0, 1, 2 iterate {
+                        from 1, 2, 3 iterate {
                             println it
                         }
                     """.stripIndent(),
@@ -370,6 +404,27 @@ class ETLProcessorSpec extends Specification {
 
         then: 'The current row index is the last row in data source'
             etlProcessor.currentRowIndex == 3
+    }
+
+    void 'test can throw an exception with a message when iterates over a invalid list of data source rows' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        from 0, 2, 4 iterate {
+                            println it
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == 'Initial position starts with 1'
     }
     /**
      * 	The 'extract' command takes a parameter that can be the ordinal position or the label identified in the 'read labels'.
@@ -388,7 +443,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 1
+                            extract 2
                         }
                         
                     """.stripIndent(),
@@ -460,6 +515,27 @@ class ETLProcessorSpec extends Specification {
 
     }
 
+    void 'test can throw an Exception if a column position is zero' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(this.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 0
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == 'Initial position starts with 1'
+    }
+
     void 'test can throw an Exception if a column index is not between row elements range' () {
 
         given:
@@ -480,7 +556,7 @@ class ETLProcessorSpec extends Specification {
 
         then: 'An ETLProcessorException is thrown'
             ETLProcessorException e = thrown ETLProcessorException
-            e.message == "Invalid column index: 10000"
+            e.message == "Invalid index = 10000"
     }
 
     void 'test can transform a field value with uppercase transformation' () {
@@ -632,7 +708,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform with middle(2, 3) lowercase()
+                            extract 'model name' transform with middle(3, 2) lowercase()
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -641,6 +717,27 @@ class ETLProcessorSpec extends Specification {
             etlProcessor.getElement(0, 1).value == "w2"
             etlProcessor.getElement(1, 1).value == "ha"
             etlProcessor.getElement(2, 1).value == "id"
+    }
+
+    void 'test can throw an exception when a middle transformation is staring in zero' () {
+
+        given:
+            ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+        when: 'The ETL script is evaluated'
+            new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
+                    .evaluate("""
+                        domain Device
+                        read labels
+                        iterate {
+                            extract 'model name' transform with middle(0, 2) lowercase()
+                        }
+                    """.stripIndent(),
+                    ETLProcessor.class.name)
+
+        then: 'An ETLProcessorException is thrown'
+            ETLProcessorException e = thrown ETLProcessorException
+            e.message == 'Initial position starts with 1'
     }
 
     void 'test can transform a field value with taking middle 2 characters inside a closure' () {
@@ -654,7 +751,7 @@ class ETLProcessorSpec extends Specification {
                         domain Device
                         read labels
                         iterate {
-                            extract 'model name' transform with middle(2, 3) lowercase()  
+                            extract 'model name' transform with middle(3, 2) lowercase()  
                         }
                     """.stripIndent(),
                     ETLProcessor.class.name)
@@ -2513,7 +2610,7 @@ class ETLProcessorSpec extends Specification {
                         read labels
                         iterate {
                             domain Application
-                            extract 0 load id
+                            extract 1 load id
                             extract 'vendor name' load appVendor
                             
                             domain Device
@@ -2628,11 +2725,11 @@ class ETLProcessorSpec extends Specification {
                         
                             domain Application
                             set environment with Production
-                            extract 0 load id
+                            extract 1 load id
                             extract 'vendor name' load appVendor
                             
                             domain Device
-                            extract 0 load id 
+                            extract 1 load id 
                             set location with 'Development'        
                         }
                         """.stripIndent(),
@@ -3268,7 +3365,7 @@ class ETLProcessorSpec extends Specification {
                         replace ControlCharacters with '~'
                         domain Application
                         read labels
-                        from 0 to 1 iterate {
+                        from 1 to 2 iterate {
                             extract 'vendor name' load appVendor
                         }
                     """.stripIndent(),
