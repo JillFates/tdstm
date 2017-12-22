@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 import com.tdssrc.grails.StringUtil
 
-class Element {
+class Element implements RangeChecker {
 
     String originalValue
     String value
@@ -87,13 +87,16 @@ class Element {
      * <code>
      *      load ... transformation with take(n, m)
      * <code>
+     * This method also validate the range that is trying to be taken.
      * @param take
      * @param position
      * @return the element instance that received this command
      */
-    Element middle (int take, int position) {
+    Element middle (int position, int take) {
+
         int start = (position - 1)
         int to = (start + take - 1)
+        subListRangeCheck(start, start + to, value.size())
         value = value[start..to]
         this
     }
@@ -275,7 +278,7 @@ class Element {
 
         String newValue = objects.sum { object ->
             if (Element.class.isInstance(object)) {
-                ((Element)object).value
+                ((Element) object).value
             } else {
                 object ? object.toString() : ''
             }
@@ -316,10 +319,8 @@ class Element {
      * Overriding Equals method for this command in an ETL script.
      * <code>
      *     .....
-     *     if (myVar == 'Cool Stuff') {
-     *          .....
-     *     }
-     * </code>
+     *     if (myVar == 'Cool Stuff') {*          .....
+     *}* </code>
      * @param otherObject
      * @return
      */

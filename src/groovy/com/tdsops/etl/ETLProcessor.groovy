@@ -8,7 +8,7 @@ import net.transitionmanager.domain.Project
  *
  *
  */
-class ETLProcessor {
+class ETLProcessor implements RangeChecker {
 
     static final String CURR_ELEMENT_VARNAME = 'CE'
 
@@ -116,15 +116,21 @@ class ETLProcessor {
     }
 
     /**
-     * Iterates a chunk of rows from a number to another number.
+     * Iterate command from one row to another one using their position in the DataSet.
+     * <code>
+     *  from 1 to 3 iterate {*   ..........
+     *}*  <code>
      * @param from
-     * @return
+     * @return a Map with the next steps in this command.
      */
     def from (int from) {
-
         [to: { int to ->
             [iterate: { Closure closure ->
-                List subList = this.dataSet.rows().subList(from, to)
+                from = from - 1
+                to = to - 1
+                List<Map> rows = this.dataSet.rows()
+                subListRangeCheck(from, to, rows.size())
+                List subList = rows.subList(from, to)
                 doIterate(subList, closure)
             }]
         }]
@@ -132,15 +138,22 @@ class ETLProcessor {
 
     /**
      * Iterates a given number of rows based on its ordinal position
+     * <code>
+     * from 1, 3, 5 iterate {*       ......
+     *}* </code>
      * @param numbers an arrays of ordinal row numbers
      * @return
      */
-    def using (int[] numbers) {
+    def from (int[] numbers) {
 
         [iterate: { Closure closure ->
             List rowNumbers = numbers as List
             List rows = this.dataSet.rows()
-            List subList = rowNumbers.collect { rows.get(it) }
+            List subList = rowNumbers.collect { int number ->
+                number = number - 1
+                rangeCheck(number, rows.size())
+                rows.get(number)
+            }
             doIterate(subList, closure)
         }]
     }
@@ -278,14 +291,20 @@ class ETLProcessor {
 
     /**
      * Extracts an element from dataSource by its index in the row
+     * <code>
+     *     domain Application
+     *     iterate {
+     *          extract 1 load appName
+     *          extract 3 load description
+     *     }
+     * <code>
      * @param index
      * @return
      */
     def extract (Integer index) {
 
-        if (!(index in (0..currentRow.size()))) {
-            throw ETLProcessorException.extractInvalidColumn(index)
-        }
+        index = index - 1
+        rangeCheck(index, currentRow.size())
 
         currentColumnIndex = index
         doExtract()
@@ -293,6 +312,12 @@ class ETLProcessor {
 
     /**
      * Extracts an element from dataSource by its column name
+     * <code>
+     *      domain Application
+     *      iterate {
+     *          extract 'column name' load appName
+     *      }
+     * <code>
      * @param columnName
      * @return
      */
