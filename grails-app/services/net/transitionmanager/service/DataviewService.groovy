@@ -585,7 +585,7 @@ class DataviewService implements ServiceMethods {
 		String property = propertyFor(column)
 		String alias = aliasFor(column)
 		if (alias) {
-			projection = "$property AS alias"
+			projection = "$property AS $alias"
 		} else {
 			projection = property
 		}
