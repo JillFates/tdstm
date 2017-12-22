@@ -1,5 +1,7 @@
 package com.tdsops.common.sql
 
+import com.tdsops.tm.search.FieldSearchData
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
@@ -210,169 +212,371 @@ class SqlUtil {
 	assert e=='NOT like'
 	*/
 
-	static String parseParameter(String prop, String expr, Map params, Class clazz) {
+	/**
+	 * Used for filtering a domain class with a filter on a field.
+	 *
+	 * Possible Expressions:
+	 *
+	 *	Scenario 1:
+	 * 		"=something" => prop = "something"
+	 * 		"=50"		=> prop = 50 or prop = "50" (depending on field's data type).
+	 * 	Scenario 2 (also applicable to Strings):
+	 * 		"<=40"	=>	prop <= 40
+	 * 		">=40"	=>	prop >= 40
+	 * 	Scenario 3:
+	 * 		"<>50"			=> prop <> 50
+	 * 		"<>something"	=>	prop NOT LIKE "%something%"
+	 * 	Scenario 4 (also applicable to Strings):
+	 * 		"<50"	=>	prop < 50
+	 * 		">50"	=>	prop > 50
+	 * 	Scenario 5:
+	 * 		!ab:bc	=> prop NOT LIKE "%ab%" AND prop NOT LIKE "%bc%"
+	 * 		-ab:bc	=> prop NOT LIKE "%ab%" AND prop NOT LIKE "%bc%"
+	 * 	Scenario 6:
+	 * 		!ab|bc	=>	prop NOT IN ('ab', 'bc')
+	 * 		-ab|bc	=>	prop NOT IN ('ab', 'bc')
+	 * 	Scenario 7:
+	 * 		-ab		=> prop NOT LIKE "%ab%"
+	 * 		-50		=> prop <> 50
+	 * 	Scenario 8:
+	 * 		!ab		=> prop <> "ab"
+	 * 	Scenario 9:
+	 * 		ab & bc	=> prop LIKE "ab" AND prop LIKE "bc"
+	 * 	Scenario 10:
+	 * 		ab | bc	=> prop IN ("ab", "bc")
+	 * 	Scenario 11:
+	 * 		ab : bc	=> prop LIKE "%ab%" OR prop LIKE "%bc%"
+	 * 	Scenario 12:
+	 * 		"ab"	=> prop = "ab"
+	 * 	Scenario 13:
+	 * 		ab		=> prop LIKE "%ab%"
+	 * 		ab*		=> prop LIKE "ab%"
+	 * 		*ab		=> prop LIKE "%ab"
+	 * 		*ab*	=> prop LIKE "%ab%"
+	 *
+	 *
+	 *
+	 *
+	 * @param fieldSearchData
+	 */
+	static void parseParameter(FieldSearchData fieldSearchData) {
 
-		expr = expr.trim()
+		String errMsg = fieldSearchData.validate()
+		if (errMsg) {
+			throw new RuntimeException(errMsg)
+		}
 
-		String firstChar = expr[0]
-		String rest = expr.substring(1).trim()
+		String originalFilter = fieldSearchData.filter
 
-		String queryString
+		int filterSize = originalFilter.size()
 
-		switch (firstChar) {
-			/* Starts with '=' */
+		/* We're handling 1-char long filters individually because the
+		* switch below has cases where it asks for the second char, which
+		* would break the app. */
+		if (filterSize == 1) {
+			fieldSearchData.useWildcards = true
+			buildSingleValueParameter(fieldSearchData, 'LIKE')
+			return
+		}
+
+		// At this point we know that the filter is at least 2-char long.
+
+		switch (originalFilter[0]) {
+		/* Scenario 1: Starts with '=' */
 			case '=':
-				queryString = buildSingleValueParameter(prop, rest, '=', params)
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildSingleValueParameter(fieldSearchData, '=')
 				break
 
-			/* Starts with '<' or '>' */
+		/* Starts with '<' or '>' */
 			case ['<', '>']:
-				/* Starts with '<=' or '>=' */
-				if (rest[0] == '=') {
-					queryString = buildSingleValueParameter(prop, rest.substring(1), firstChar + '=', params)
-				/* Starts with '<>' */
-				}else if (expr ==~ /^<>.*/) {
-					queryString = buildDistinctParameter(prop, rest.substring(1), params, clazz)
-				/* Starts with '<' or '>' */
+
+				/* Scenario 2: Starts with '<=' or '>=' */
+				if (originalFilter[1] == '=') {
+					String operator = originalFilter.substring(0, 2)
+					fieldSearchData.filter = originalFilter.substring(2)
+					buildSingleValueParameter(fieldSearchData, operator)
+
+					/* Scenario 3: Starts with '<>' */
+				}else if (originalFilter ==~ /^<>.*/) {
+					fieldSearchData.filter = originalFilter.substring(2)
+					buildDistinctParameter(fieldSearchData)
+
+					/* Scenario 4: Starts with '<' or '>' and any literal follows. */
 				}else{
-					queryString = buildSingleValueParameter(prop, rest, firstChar, params)
+					fieldSearchData.filter = originalFilter.substring(1)
+					String operator = originalFilter[0]
+					buildSingleValueParameter(fieldSearchData, operator)
 				}
 
 				break
 
-			/* Starts with '-' or '!' */
+		/* Starts with '-' or '!' */
 			case ['-', '!']:
+
+				String rest = originalFilter.substring(1)
+				fieldSearchData.filter = rest
+
 				switch(rest) {
-					/* Start with '-' or '!' and it's a list of ':' separated values. */
+
+				/* Scenario 5: Start with '-' or '!', and it's a list of ':' separated values. */
 					case ~ /.*:.*/:
-						queryString = buildLikeList(prop, rest, 'NOT LIKE', 'AND', ':', params)
+						buildLikeList(fieldSearchData, 'NOT LIKE', 'AND', ':')
 						break
-					/* Start with '-' or '!' and it's a list of '|' separated values. */
+
+				/* Scenario 6: Start with '-' or '!' and it's a list of '|' separated values. */
 					case ~ /.*\|.*/:
-						queryString = buildInList(prop, 'NOT IN', rest, params)
+						buildInList(fieldSearchData, 'NOT IN')
 						break
-					/* Starts with '-' or '!' and it isn't a list. */
+
+				/* Starts with '-' or '!' and it isn't a list. */
 					default:
-						/* If there are wildcards it must be handled as a LIKE operation. */
-						if (isOverriding(rest)) {
-							// Parses de parameter accordingly.
-							queryString = buildDistinctParameter(prop, rest.replaceAll('\\*', '%'), params, clazz, true)
-						/* Starts with '-' and no overriding required. */
-						} else if (firstChar == '-') {
-							queryString = buildDistinctParameter(prop, rest, params, clazz)
-						/* Starts with '!' and it's not a list of values and no overriding required. */
-						}else{
-							queryString = buildSingleValueParameter(prop, rest, '<>', params)
+						fieldSearchData.filter = rest
+						/* Scenario 7: Starts with '-' and it isn't a list. */
+						if (originalFilter[0] == '-') {
+							buildDistinctParameter(fieldSearchData)
+
+							/* Scenario8 : Starts with '!' and it's not a list of values. */
+						} else {
+							buildSingleValueParameter(fieldSearchData, '<>')
 						}
 
 						break
 				}
 				break
+
 			default:
-					switch(expr) {
-						/* It's a list of '&' separated values. */
-						case ~ /.*&.*/:
-							queryString = buildLikeList(prop, expr, 'LIKE', 'AND', '&', params)
-							break
-						/* It's a list of '|' separated values. */
-						case ~ /.*\|.*/:
-							queryString = buildInList(prop, 'IN', expr, params)
-							break
-						/* It's a list of ':' separated values. */
-						case ~ /.*:.*/:
-							queryString = buildLikeList(prop, expr, 'LIKE', 'OR', ':', params)
-							break
-						/* It starts and ends with double quotation marks. */
-						case ~ /^\'.*\'/:
-							queryString = buildSingleValueParameter(prop, expr.substring(1, expr.length() - 1), '=', params)
-							break
-						/* Default scenario (overriding may be required). */
-						default:
-							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, true), 'LIKE', params)
-							break
-					}
-					break
+				switch(originalFilter) {
+
+				/* Scenario 9: It's a list of '&' separated values. */
+					case ~ /.*&.*/:
+						buildLikeList(fieldSearchData, 'LIKE', 'AND', '&')
+						break
+
+				/* Scenario 10: It's a list of '|' separated values. */
+					case ~ /.*\|.*/:
+						buildInList(fieldSearchData, 'IN')
+						break
+
+				/* Scenario 11: It's a list of ':' separated values. */
+					case ~ /.*:.*/:
+						buildLikeList(fieldSearchData, 'LIKE', 'OR', ':')
+						break
+
+				/* Scenario 12: It starts and ends with double quotation marks. */
+					case ~ /^\".*\"/:
+						fieldSearchData.filter = originalFilter.substring(1, filterSize - 1)
+						buildSingleValueParameter(fieldSearchData, '=')
+						break
+
+				/* Scenario 13: Default scenario (overriding may be required). */
+					default:
+						fieldSearchData.useWildcards = true
+						buildSingleValueParameter(fieldSearchData, 'LIKE')
+						break
+				}
+				break
 		}
 
-		return queryString
 	}
 
 	/**
-	 * Determines whether the user is overriding the default filter logic.
+	 * Constructs simple not like/not equal expressions for number and string parameters.
+	 *
+	 * - When handling numbers the resulting expression will be column <> aNumber.
+	 * - When handling strings, the expression is column NOT LIKE "%aString%"
 	 */
-	 private static boolean isOverriding(String expr) {
-	 	expr ==~ /.*[\*%].*/
-	 }
+	private static void buildDistinctParameter(FieldSearchData fieldSearchData) {
 
-	/**
-	 * Constructs simple not-like expressions for number and string parameters.
-	 */
-	private static String buildDistinctParameter(String prop, String value, Map params, Class clazz, boolean checkOverriding = false) {
-		// TODO Analyze column type
-		boolean fieldTypeIsNumber = isSubclassOf(fieldType(clazz, prop), Number)
-		if (value.isNumber() && fieldTypeIsNumber) {
-			buildSingleValueParameter(prop, parseNumberParameter(value), '<>', params)
-		}
+		// At this point the filter is just the value to lookup.
+		String value = fieldSearchData.filter
+
+		// If the column is a number and also the value, handle this and a numeric expression.
+		if (value.isNumber() && isNumericField(fieldSearchData)) {
+			buildSingleValueParameter(fieldSearchData, '<>')
+		} // If not a numeric expression, handle it as a NOT LIKE expression.
 		else {
-			buildSingleValueParameter(prop, parseStringParameter(value, checkOverriding), 'NOT LIKE', params)
+			fieldSearchData.useWildcards = true
+			buildSingleValueParameter(fieldSearchData, 'NOT LIKE')
 		}
 	}
 
-	private static String buildInList(String prop, String inOp, String expr, Map params) {
-
+	/**
+	 * Build a SQL IN or NOT IN expression.
+	 *
+	 * @param fieldSearchData
+	 * @param inOp
+	 */
+	private static void buildInList(FieldSearchData fieldSearchData, String inOp) {
 		def values = []
-		expr.split('\\|').eachWithIndex{ String value, int index ->
-			String paramKey = prop + index
-			values << ':' + paramKey
-			params[paramKey] = escapeStringParameter(value)
+		fieldSearchData.filter.split('\\|').eachWithIndex{ String value, int index ->
+			// Use underscores to avoid issues when handling sme, potentially conflicting with sme2
+			String namedParameter = "${fieldSearchData.columnAlias}__" + index
+			values << ':' + namedParameter
+			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
-		return prop + ' ' + inOp + '(' + values.join(',') + ')'
+
+		fieldSearchData.sqlSearchExpression = fieldSearchData.column + ' ' + inOp + ' (' + values.join(', ') + ')'
 	}
 
-	private static String buildLikeList(String prop, String expr, String likeOp, String logicalOp, String separator, Map params) {
-		List<String> conditions = []
-		expr.split(separator).eachWithIndex{ String value, int index ->
-			conditions << buildSingleValueParameter(prop + index, parseStringParameter(value, false), likeOp, params, prop)
+	/**
+	 * Construct a list of LIKE or NOT LIKE expressions concatenated by a logical operator (AND/OR).
+	 * @param fieldSearchData
+	 * @param likeOp
+	 * @param logicalOp
+	 * @param separator
+	 */
+	private static void buildLikeList(FieldSearchData fieldSearchData, String likeOp, String logicalOp, String separator) {
+		List<String> expressions = []
+		fieldSearchData.useWildcards = true
+
+		fieldSearchData.filter.split(separator).eachWithIndex{ String value, int index ->
+			// Use underscores to avoid issues when handling sme, potentially conflicting with sme2
+			String namedParameter = "${fieldSearchData.columnAlias}__" + index
+			// Parse the string parameter considering user wildcards.
+			String parsedParameter = parseStringParameter(value, fieldSearchData.useWildcards)
+			String sqlExpression = getSingleValueExpression(fieldSearchData.column, namedParameter, likeOp )
+			fieldSearchData.addSqlSearchParameter(namedParameter, parsedParameter)
+			expressions << sqlExpression
 		}
-		conditions.join(" $logicalOp ")
+		// Surround with () to avoid issues when mixing ANDs and ORs
+		fieldSearchData.sqlSearchExpression = "(${expressions.join(" $logicalOp ")})"
+	}
+
+	/**
+	 * Build a simple "column + operator + parameter" used in different places.
+	 *
+	 * @param column
+	 * @param namedParameter
+	 * @param operator
+	 * @return
+	 */
+	private static String getSingleValueExpression(String column, String namedParameter, String operator) {
+		return column + ' ' + operator + ' :' + namedParameter
 	}
 
 	/**
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
-	private static String buildSingleValueParameter(String prop, value, String operator, Map params, String propName = prop) {
-		params[prop] = value
-		propName + ' ' + operator + ' :' + prop
+	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
+
+		Object paramValue
+
+		if (fieldSearchData.filter.isNumber() && isNumericField(fieldSearchData)) {
+			paramValue = parseNumberParameter(fieldSearchData.filter)
+		} else {
+			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
+		}
+
+		String expression = getSingleValueExpression(fieldSearchData.column, fieldSearchData.columnAlias, operator)
+		fieldSearchData.sqlSearchExpression = expression
+
+		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+
 	}
 
+	/**
+	 * Escape the parameter to avoid SQL Injection attacks.
+	 * @param parameter
+	 * @return
+	 */
 	private static String escapeStringParameter(String parameter) {
 		return StringEscapeUtils.escapeJava(parameter.toString().trim())
 	}
 
 	/**
-	 * Escapes the parameter accordingly and determines whether or not
-	 * it should include whildcards.
+	 * Parses the string parameter and replaces wildcards accordingly.
+	 * @param value - the parameter
+	 * @param useWildcards - flag if wildcards should be used.
+	 * @return
 	 */
-	private static String parseStringParameter(String parameter, boolean checkOverride) {
-		String before = '%'
-		String after = '%'
-		if (checkOverride && isOverriding(parameter)) {
-			before = after = ''
-			parameter = parameter.replaceAll('\\*', '%')
+	private static String parseStringParameter(String value, boolean useWildcards) {
+		String before = ''
+		String after = ''
+		value = value.trim()
+		if (useWildcards) {
+			switch (value) {
+			// Ends with the wildcard and starts with anything else.
+				case ~ /[^*|%].*[*|%]/:
+					value = value.substring(0, value.size() - 1)
+					after = "%"
+					break
+			// Starts with the wildcard and ends with anything else.
+				case ~ /[*|%].*[^*|%]/:
+					value = value.substring(1)
+					before = "%"
+					break
+			// Starts and ends with the wildcard
+				case ~ /[*|%].*[*|%]/:
+					value = value.substring(1, value.size() - 1)
+				default:
+					before = after = "%"
+					break
+			}
+
 		}
-		return before + escapeStringParameter(parameter) + after
+
+		return before + escapeStringParameter(value) + after
 	}
 
+	/**
+	 * Return the numeric representation for a String (Long or Double).
+	 *
+	 * @param parameter
+	 * @return numeric representation or null if the parameter is not a number.
+	 */
 	private static Number parseNumberParameter(String parameter) {
-		parameter.isInteger() ? parameter.toInteger() : parameter.toDouble()
+		if (parameter.isNumber()) {
+			return parameter.isLong() ? parameter.toLong() : parameter.toDouble()
+		} else {
+			return null
+		}
+
 	}
 
-	private static Class fieldType(Class clazz, String field) {
-		return clazz.metaClass.properties.find { it.name == field }.type
+	/**
+	 * Determine if the field being used for filtering is numeric.
+	 * @param fsd
+	 * @return
+	 */
+	private static boolean isNumericField(FieldSearchData fsd) {
+		boolean isNumeric = false
+		def properties = fsd.domain.metaClass.properties
+		// Look up the field type using the column.
+		Class fieldType = properties.find { it.name == fsd.column }?.type
+		// If it couldn't be found, try with the columnAlias
+		if (!fieldType) {
+			fieldType = properties.find { it.name == fsd.columnAlias }?.type
+		}
+
+		// If we could determine the class, check if it is a subclass of Number
+		if(fieldType) {
+			isNumeric = Number.isAssignableFrom(fieldType)
+		}
+
+		return isNumeric
+
 	}
 
-	private static boolean isSubclassOf(Class clazz, Class superClazz) {
-		return superClazz.isAssignableFrom(clazz)
+	/**
+	 * Used to generate HQL that will properly concatenate a person's full name
+	 * @param propertyName - the particular property to construct the HQL for
+	 * @return the HQL for the computated fullName
+	 */
+	static String personFullName(String propertyName, String table = null) {
+		if (table != null) {
+			propertyName = "${table}.${propertyName}"
+		}
+		return """
+				CONCAT( 
+					COALESCE(${propertyName}.firstName, ''),
+					CASE WHEN COALESCE(${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
+					COALESCE(${propertyName}.middleName,''),
+					CASE WHEN COALESCE(${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
+					COALESCE(${propertyName}.lastName,'')
+				)
+				"""
 	}
+
 }
 

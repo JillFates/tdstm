@@ -3,6 +3,7 @@ import com.tds.asset.Database
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
@@ -185,7 +186,18 @@ class DatabaseController implements ControllerMethods {
 		def whereConditions = []
 		filterParams.each { key, val ->
 			if (val && val.trim().size()){
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Database)
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: Database,
+						column: key,
+						filter: val,
+						columnAlias: "dbs.${key}"
+
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
