@@ -163,6 +163,11 @@ class ApiAction {
 				credentialMap = [id: credential.id, name: credential.name]
 			}
 
+			Map defaultDataScriptMap = null
+			if (defaultDataScript) {
+				defaultDataScriptMap = [id: defaultDataScript.id, name: defaultDataScript.name]
+			}
+
 			fields.agentClass  = [
 			        id: agent.agentClass.name(),
 					name: agent.name
@@ -173,7 +178,7 @@ class ApiAction {
 			fields.callbackMode = callbackMode.name()
 			fields.credential = credentialMap
 			fields.dateCreated = dateCreated
-			fields.defaultDataScriptName = defaultDataScript
+			fields.defaultDataScript = defaultDataScriptMap
 			fields.description = description
 			fields.lastModified = lastModified
 			fields.methodParams = methodParams
