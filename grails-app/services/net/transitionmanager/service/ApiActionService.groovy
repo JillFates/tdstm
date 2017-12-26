@@ -8,6 +8,7 @@ import grails.transaction.Transactional
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
@@ -86,13 +87,11 @@ class ApiActionService {
 	 * Find and ApiAction by id and project it belongs to
 	 * @param id
 	 * @param project
+	 * @parm throwException
 	 * @return
 	 */
-	ApiAction find(Long id, Project project) {
-		return ApiAction.where {
-			id == id
-			project == project
-		}.get()
+	ApiAction find(Long id, Project project, boolean throwException = false) {
+		return GormUtil.findInProject(project, ApiAction, id, throwException)
 	}
 
 	/**
@@ -257,7 +256,7 @@ class ApiActionService {
 	 * @return the Agent class instance to invoke the method on
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
-	private AbstractAgent agentInstanceForAction(ApiAction action) {
+	AbstractAgent agentInstanceForAction(ApiAction action) {
 		Class clazz = agentClassForAction(action)
 		clazz.instance
 	}
@@ -269,7 +268,7 @@ class ApiActionService {
 	 * @param flush
 	 */
 	void delete(Long id, Project project, boolean flush = false) {
-		ApiAction apiAction = ormUtil.findInProject(project, ApiAction, id, true)
+		ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
 		apiAction.delete(flush: flush)
 	}
 
@@ -319,6 +318,29 @@ class ApiActionService {
 		}
 	}
 
+	/**
+	 *
+	 * @param project
+	 * @param provider
+	 * @param credentialId
+	 * @return
+	 */
+	Credential findCredential(Project project, Provider provider, Long credentialId) {
+		return Credential.where {
+			id == credentialId
+			project == project
+			provider == provider
+		}
+
+	}
+
+	/**
+	 * Create or Update an API Action based on a JSON Object.
+	 * @param project
+	 * @param apiActionJson
+	 * @param apiActionId
+	 * @return
+	 */
 	ApiAction saveOrUpdateApiAction(Project project, JSONObject apiActionJson, Long apiActionId = null) {
 
 		ApiAction apiAction
@@ -344,12 +366,15 @@ class ApiActionService {
 
 		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
 
+		Credential credential = GormUtil.findInProject(project, Credential, NumberUtil.toLong(apiActionJson.credentialId))
+
 		apiAction.with {
 			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
 			agentMethod = apiActionJson.agentMethod
 			asyncQueue = apiActionJson.asyncQueue
 			callbackMethod = apiActionJson.callbackMethod
 			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
+			credential = credentials
 			description = apiActionJson.description
 			defaultDataScript = dataScript
 			description =  apiActionJson.description

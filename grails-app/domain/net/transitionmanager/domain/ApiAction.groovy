@@ -2,10 +2,12 @@ package net.transitionmanager.domain
 
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
+import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
 import groovy.transform.ToString
+import net.transitionmanager.service.ApiActionService
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -14,6 +16,9 @@ import groovy.transform.ToString
 @Slf4j(value='logger')
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
+	// Transient reference to retrieve the agent for this action.
+	ApiActionService apiActionService
+
 	String name
 	String description
 
@@ -62,6 +67,9 @@ class ApiAction {
 	// The method that the async response should call to return response
 	String callbackMethod = ''
 
+	// Optional credentials required by the agent.
+	Credential credential
+
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
@@ -78,6 +86,7 @@ class ApiAction {
 		agentMethod nullable: false, size: 1..64
 		asyncQueue nullable: false, size: 0..64
 		callbackMode nullable: false
+		credential nullable: true
 		defaultDataScript nullable: true
 		name nullable: false, size: 1..64
 		methodParams nullable: true
@@ -97,7 +106,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsList']
+	static transients = ['methodParamsList', 'apiActionService', 'agent']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -133,18 +142,36 @@ class ApiAction {
 	}
 
 	/**
+	 * Return the AbstractAgent instance for this API Action.
+	 * @return
+	 */
+	AbstractAgent getAgent() {
+		return apiActionService.agentInstanceForAction(this)
+	}
+
+	/**
 	 * Create a map with the data for this ApiAction
 	 * @param minimalInfo - flag that signals if only the m
 	 * @return
 	 */
 	Map toMap(boolean minimalInfo = true) {
 		Map fields = [id: id, name: name]
+		AbstractAgent agent = getAgent()
 		if (!minimalInfo) {
-			fields.agentClass  = agentClass.name()
+			Map credentialMap = null
+			if (credential) {
+				credentialMap = [id: credential.id, name: credential.name]
+			}
+
+			fields.agentClass  = [
+			        id: agent.agentClass.name(),
+					name: agent.name
+			]
 			fields.agentMethod = agentMethod
 			fields.asyncQueue = asyncQueue
 			fields.callbackMethod = callbackMethod
 			fields.callbackMode = callbackMode.name()
+			fields.credential = credentialMap
 			fields.dateCreated = dateCreated
 			fields.defaultDataScriptName = defaultDataScript
 			fields.description = description

@@ -940,6 +940,9 @@ public class GormUtil {
 				try{
 					// fetch the instance
 					instance = type.get(id)
+					if (!instance) {
+						errorMsg = "The domain object with type $type couldn't be found using the id $id"
+					}
 				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
 				} catch(Exception e) {
 					errorMsg = "The domain object with type $type couldn't be found using the id $id"
