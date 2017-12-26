@@ -12,6 +12,7 @@ import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.SecurityService
@@ -29,6 +30,8 @@ import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
+  AssetService assetService
+	PageRenderer groovyPageRenderer
 	ControllerService controllerService
 	ApplicationService applicationService
 	DeviceService deviceService
@@ -216,6 +219,16 @@ class WsAssetController implements ControllerMethods {
 		assetEntityService.deleteAssetEntityDependencyOrException(securityService.getUserCurrentProject(), assetEntity, request.JSON.dependencyId)
 		renderSuccessJson()
 	}
+
+   /**
+    * Delete multiple Asset Dependencies.
+    * @param : dependencyIds[]  : list of ids for which assets are requested to be deleted
+    */
+   @HasPermission(Permission.AssetEdit)
+   def bulkDeleteDependencies(){
+      Project project = projectForWs
+      renderAsJson(resp: assetService.bulkDeleteDependencies(project, params.list("dependencyIds[]")))
+   }
 
 	/**
 	 * Update Asset Dependency Fields
