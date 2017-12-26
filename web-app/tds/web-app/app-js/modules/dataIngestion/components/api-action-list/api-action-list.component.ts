@@ -154,11 +154,12 @@ export class APIActionListComponent {
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
-		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.BEFORE_API_CALL, false, ''));
-		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.AFTER_API_CALL, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
 		this.openAPIActionDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
 

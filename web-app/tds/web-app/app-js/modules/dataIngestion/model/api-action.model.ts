@@ -110,9 +110,10 @@ export enum EventReactionType {
 	SUCCESS = 'success',
 	DEFAULT = 'default',
 	ERROR = 'error',
+	FAILED = 'failed',
 	TIMEDOUT = 'timedout',
 	LAPSED = 'lapsed',
 	STALLED = 'stalled',
-	BEFORE_API_CALL = 'beforeApiCall',
-	AFTER_API_CALL = 'afterApiCall'
+	PRE_API_CALL = 'preApiCall',
+	FINALIZED_API_CALL = 'finalizedApiCall'
 };

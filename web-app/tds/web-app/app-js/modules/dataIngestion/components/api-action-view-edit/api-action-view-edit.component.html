@@ -215,14 +215,14 @@
 									<div class="col-md-12 event-wrapper">
 										<div class="row">
 											<div class="col-md-1"><label>Events:</label></div>
-											<div class="col-md-2">
+											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="true"> Status
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2">
+											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="apiActionModel.eventReactions[1].value.length > 0"> Success
@@ -236,31 +236,38 @@
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2">
+											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0"> Error
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2">
+											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionTimeout" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0"> Timeout
+														<input type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0"> Failed
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0"> Lapsed
+														<input type="checkbox" name="apiActionTimeout" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0"> Timeout
+													</label>
+												</div>
+											</div>
+											<div class="col-md-2" style="width: 70px !important;">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0"> Lapsed
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0"> Stalled
+														<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0"> Stalled
 													</label>
 												</div>
 											</div>
@@ -269,14 +276,14 @@
 												<div class="col-md-3">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0"> Before API Call
+															<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0"> Before API Call
 														</label>
 													</div>
 												</div>
 												<div class="col-md-3">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0"> After API Call
+															<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[9].selected" [disabled]="apiActionModel.eventReactions[9].value.length > 0"> After API Call
 														</label>
 													</div>
 												</div>
@@ -286,8 +293,11 @@
 									<div class="all-codemirrors">
 										<div class="col-md-12 codemirror-wrapper">
 											<div class="form-group">
-												<label for="apiActionStatusDetermination" class="col-sm-11 control-label">Status Determination - logic to determine the Success or other status based on API response.</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination - logic to determine the Success or other status based on API response.</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[0])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[0].open, 'fa-angle-double-left': !apiActionModel.eventReactions[0].open}" style="padding-right:0px;"></i>
 													</button>
@@ -305,8 +315,11 @@
 										<label class="col-md-12 reaction-section-event" *ngIf="showsEventLabel()">Events:</label>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[1].selected">
 											<div class="form-group">
-												<label for="apiActionSuccess" class="col-sm-11 control-label">Success - logic to be performed upon the API call being successful.</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionSuccess" class="col-sm-8 control-label">Success - logic to be performed upon the API call being successful.</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[1])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[1])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[1].open, 'fa-angle-double-left': !apiActionModel.eventReactions[1].open}" style="padding-right:0px;"></i>
 													</button>
@@ -323,8 +336,11 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[2].selected">
 											<div class="form-group">
-												<label for="apiActionDefault" class="col-sm-11 control-label">Default - logic to be performed for events not explicitly defined.</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionDefault" class="col-sm-8 control-label">Default - logic to be performed for events not explicitly defined.</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[2])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[2])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[2].open, 'fa-angle-double-left': !apiActionModel.eventReactions[2].open}" style="padding-right:0px;"></i>
 													</button>
@@ -341,8 +357,11 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[3].selected">
 											<div class="form-group">
-												<label for="apiActionError" class="col-sm-11 control-label">Error - logic to perform when the API call fails for any cause</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionError" class="col-sm-8 control-label">Error - logic to perform when the API call fails for any cause</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[3])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[3])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[3].open, 'fa-angle-double-left': !apiActionModel.eventReactions[3].open}" style="padding-right:0px;"></i>
 													</button>
@@ -359,8 +378,11 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[4].selected">
 											<div class="form-group">
-												<label for="apiActionTimeout" class="col-sm-11 control-label">Timed Out - logic to perform if an API call timed out before completing</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionFailed" class="col-sm-8 control-label">Failed - logic to perform when API call receives 400 or 500 series HTTP error code</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[4])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[4])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[4].open, 'fa-angle-double-left': !apiActionModel.eventReactions[4].open}" style="padding-right:0px;"></i>
 													</button>
@@ -368,7 +390,7 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[4].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionTimeout" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
+													<code-mirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
 													<label class="control-label label-detail">{{apiActionModel.eventReactions[4].value}}</label>
@@ -377,8 +399,11 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[5].selected">
 											<div class="form-group">
-												<label for="apiActionLapsed" class="col-sm-11 control-label">Lapsed - logic to perform if a polling action did not complete in anticipated time</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionTimeout" class="col-sm-8 control-label">Timed Out - logic to perform if an API call timed out before completing</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[5])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[5])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[5].open, 'fa-angle-double-left': !apiActionModel.eventReactions[5].open}" style="padding-right:0px;"></i>
 													</button>
@@ -386,7 +411,7 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[5].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
+													<code-mirror id="apiActionTimeout" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
 													<label class="control-label label-detail">{{apiActionModel.eventReactions[5].value}}</label>
@@ -395,8 +420,11 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[6].selected">
 											<div class="form-group">
-												<label for="apiActionStalled" class="col-sm-11 control-label">Stalled - logic to perform if a polling action has not detected any progress for a period of time</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed - logic to perform if a polling action did not complete in anticipated time</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[6])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[6])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[6].open, 'fa-angle-double-left': !apiActionModel.eventReactions[6].open}" style="padding-right:0px;"></i>
 													</button>
@@ -404,18 +432,20 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[6].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
+													<code-mirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
 													<label class="control-label label-detail">{{apiActionModel.eventReactions[6].value}}</label>
 												</div>
 											</div>
 										</div>
-										<label class="col-md-12 reaction-section-event" *ngIf="showsCusomizeLabel() && apiActionModel.pollingInterval">Customize:</label>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected && apiActionModel.pollingInterval">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected">
 											<div class="form-group">
-												<label for="apiActionBeforeCall" class="col-sm-11 control-label">Before API Call - logic to perform before the API call is invoked to customize the request</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled - logic to perform if a polling action has not detected any progress for a period of time</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[7])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[7].open, 'fa-angle-double-left': !apiActionModel.eventReactions[7].open}" style="padding-right:0px;"></i>
 													</button>
@@ -423,17 +453,21 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[7].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
+													<code-mirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
 													<label class="control-label label-detail">{{apiActionModel.eventReactions[7].value}}</label>
 												</div>
 											</div>
 										</div>
+										<label class="col-md-12 reaction-section-event" *ngIf="showsCusomizeLabel() && apiActionModel.pollingInterval">Customize:</label>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected && apiActionModel.pollingInterval">
 											<div class="form-group">
-												<label for="apiActionAfterCall" class="col-sm-11 control-label">After API Call - logic to perform after API call completes or erred and the appropriate event has been processed</label>
-												<div class="col-sm-1 collapse-icon-wrapper">
+												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Pre API Call - logic to perform before the API call is invoked to customize the request</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[8])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">
 														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[8].open, 'fa-angle-double-left': !apiActionModel.eventReactions[8].open}" style="padding-right:0px;"></i>
 													</button>
@@ -441,10 +475,31 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[8].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
+													<code-mirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[8].value</label>
+													<label class="control-label label-detail">{{apiActionModel.eventReactions[8].value}}</label>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[9].selected && apiActionModel.pollingInterval">
+											<div class="form-group">
+												<label for="apiActionAfterCall" class="col-sm-8 control-label">Finalized API Call - logic to perform after API call completes or erred and the appropriate event has been processed</label>
+												<div class="col-sm-4 collapse-icon-wrapper">
+													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[9])">
+														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
+													</button>
+													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[9])">
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[9].open, 'fa-angle-double-left': !apiActionModel.eventReactions[9].open}" style="padding-right:0px;"></i>
+													</button>
+												</div>
+											</div>
+											<div class="form-group" *ngIf="apiActionModel.eventReactions[9].open">
+												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
+													<code-mirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[9].value"></code-mirror>
+												</div>
+												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
+													<label class="control-label label-detail">{{apiActionModel.eventReactions[9].value</label>
 												</div>
 											</div>
 										</div>
