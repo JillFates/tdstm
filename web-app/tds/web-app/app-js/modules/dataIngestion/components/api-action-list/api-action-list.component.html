@@ -26,8 +26,10 @@
 							<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-							<button class="btn btn-default" (click)="onEdit(dataItem)" *ngIf="isEditAvailable()"><span class="glyphicon glyphicon-pencil"></span></button>
-							<button class="btn btn-default" (click)="onDelete(dataItem)" *ngIf="isDeleteAvailable()"><span class="fa fa-fw fa-trash"></span></button>
+							<div class="text-center">
+								<button class="btn btn-default" (click)="onEdit(dataItem)" *ngIf="isEditAvailable()"><span class="glyphicon glyphicon-pencil"></span></button>
+								<button class="btn btn-default" (click)="onDelete(dataItem)" *ngIf="isDeleteAvailable()"><span class="fa fa-fw fa-trash"></span></button>
+							</div>
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>

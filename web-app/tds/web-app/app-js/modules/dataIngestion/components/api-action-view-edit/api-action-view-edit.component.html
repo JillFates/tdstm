@@ -141,7 +141,7 @@
 									<div class="col-md-5">
 										<div class="form-check">
 											<label class="form-check-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" [(ngModel)]="apiActionModel.pollingInterval" name="apiActionPollingInterval" class="form-check-input">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.pollingInterval" class="form-check-input">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -183,8 +183,8 @@
 											</div>
 										</div>
 										<div class="form-check">
-											<label class="form-check-label">
-												<input type="checkbox" class="form-check-input">
+											<label for="apiActionProduceData" class="form-check-label">
+												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" class="form-check-input">
 												Provides Data
 											</label>
 											<popup-provides-data></popup-provides-data>
@@ -197,7 +197,7 @@
 																	[data]="agentDatascriptList"
 																	[textField]="'name'"
 																	[valueField]="'id'"
-																	[(ngModel)]="apiActionModel.dataScript"></kendo-dropdownlist>
+																	[(ngModel)]="apiActionModel.defaultDataScript"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
 

@@ -32,67 +32,6 @@ export class DataIngestionService {
 		}
 	];
 
-	mockDataAgentMethod: AgentMethodModel[] = [
-		{
-			'description': 'Used to generate Simple Notification Service (SNS) messages',
-			'method': 'sendSns',
-			'name': 'sendSnsNotification',
-			'params': {
-				'queueName': {
-					'type': 'java.lang.String',
-					'description': 'The name of the queue/topic to send message to'
-				},
-				'callbackMethod': {
-					'type': 'java.lang.String',
-					'description': 'The name of the callback method that the async response should trigger'
-				},
-				'message': {
-					'type': 'java.lang.Object',
-					'description': 'The data to pass to the message'
-				}
-			},
-			'results': {
-				'status': {
-					'type': 'java.lang.String',
-					'description': 'Status of process (success|error|failed|running)'
-				},
-				'cause': {
-					'type': 'java.lang.String',
-					'description': 'The cause of an error or failure'
-				}
-			}
-		},
-		{
-			'description': 'Used to generate Simple Queue Service (SQS) messages',
-			'method': 'sendSqs',
-			'name': 'sendSqsMessage',
-			'params': {
-				'queueName': {
-					'type': 'java.lang.String',
-					'description': 'The name of the queue/topic to send message to'
-				},
-				'callbackMethod': {
-					'type': 'java.lang.String',
-					'description': 'The name of the callback method that the async response should trigger'
-				},
-				'message': {
-					'type': 'java.lang.Object',
-					'description': 'The data to pass to the message'
-				}
-			},
-			'results': {
-				'status': {
-					'type': 'java.lang.String',
-					'description': 'Status of process (success|error|failed|running)'
-				},
-				'cause': {
-					'type': 'java.lang.String',
-					'description': 'The cause of an error or failure'
-				}
-			}
-		}
-	];
-
 	constructor(private http: HttpInterceptor) {
 	}
 
@@ -136,7 +75,6 @@ export class DataIngestionService {
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
 					r.pollingInterval = (r.pollingInterval === 1);
-					r.agentClass = { id: r.agentClass };
 				});
 				return dataScriptModels;
 			})
@@ -158,7 +96,23 @@ export class DataIngestionService {
 	}
 
 	getActionMethodById(agentId: string): Observable<AgentMethodModel[]> {
-		return Observable.from(this.mockDataAgentMethod).bufferCount(this.mockDataAgentMethod.length);
+		return this.http.get(`${this.dataApiActionUrl}/agent/${agentId}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let agentMethodModel = new Array<AgentMethodModel>();
+				for (let property in result) {
+					if (result.hasOwnProperty(property)) {
+						agentMethodModel.push({
+							id: result[property].name,
+							name: result[property].name,
+							description: result[property].description
+						});
+					}
+				}
+				result = agentMethodModel;
+				return result;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
@@ -214,19 +168,27 @@ export class DataIngestionService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			agentClass: model.agentClass.id,
+			agentMethod: model.agentMethod.id,
+			producesData: (model.producesData) ? 1 : 0,
+			pollingInterval: (model.pollingInterval) ? 1 : 0
 		};
+
+		if (postRequest.producesData === 1) {
+			postRequest['defaultDataScriptId'] = model.defaultDataScript.id;
+		}
+
 		if (!model.id) {
-			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
+			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
 					let dataItem = (result && result.status === 'success' && result.data);
-					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
 					return dataItem;
 				})
 				.catch((error: any) => error.json());
 		} else {
-			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
+			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data;

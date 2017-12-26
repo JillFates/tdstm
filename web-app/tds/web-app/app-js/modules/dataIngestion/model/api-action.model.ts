@@ -35,7 +35,7 @@ export class APIActionColumnModel {
 				width: 100
 			}, {
 				label: 'Default Data Script',
-				property: 'defaultDataScriptName',
+				property: 'defaultDataScript.name',
 				type: 'text'
 			}, {
 				label: 'Created',
@@ -76,8 +76,7 @@ export class APIActionModel {
 		id?: number,
 		name: string
 	};
-	defaultDataScriptName?: string;
-	dataScript?: {
+	defaultDataScript?: {
 		id?: string,
 		name?: string
 	};

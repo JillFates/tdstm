@@ -133,7 +133,7 @@ export class APIActionViewEditComponent {
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentDatascriptList.push({ id: null, name: 'Select...' });
-					this.apiActionModel.dataScript = this.agentCredentialList[0];
+					this.apiActionModel.defaultDataScript = this.agentCredentialList[0];
 				}
 				this.agentDatascriptList.push(...result);
 			},
