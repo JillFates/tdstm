@@ -12,3 +12,10 @@ export enum Keystroke {
 	SHIFT_RIGHT = 'ShiftRight',
 	SHIFT_LEFT = 'ShiftLeft'
 };
+
+export enum DIALOG_SIZE {
+	SM = 'sm',
+	MD = 'md',
+	LG = 'lg',
+	XLG = 'xlg'
+};

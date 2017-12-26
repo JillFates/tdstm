@@ -63,6 +63,23 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/$id" {
+			controller = "wsApiAction"
+			action = [
+			        DELETE: "delete",
+					GET: "fetch",
+					PUT: "update"
+			]
+		}
+
+		"/ws/apiAction" {
+			controller = "wsApiAction"
+			action = [
+					GET: "list",
+					POST: "create"
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}
@@ -171,6 +188,36 @@ class UrlMappings {
 			action = [GET:"listBundles"]
 		}
 
+
+		/***************************/
+
+		"/ws/assetImport/invokeFetchAction" {
+			controller = 'wsAssetImport'
+			action = [POST: 'invokeFetchAction']
+		}
+
+		"/ws/assetImport/loadData" {
+			controller = 'wsAssetImport'
+			action = [POST: 'loadData']
+		}
+
+		"/ws/assetImport/manualFormOptions" {
+			controller = 'wsAssetImport'
+			action = [GET: 'manualFormOptions']
+		}
+
+		"/ws/assetImport/transformData" {
+			controller = 'wsAssetImport'
+			action = [POST: 'transformData']
+		}
+
+		"/ws/assetImport/viewData" {
+			controller = 'wsAssetImport'
+			action = [GET: 'viewData']
+		}
+
+		/***************************/
+
 		"/ws/event/listEventsAndBundles" {
 			controller = "wsEvent"
 			action = [GET:"listEventsAndBundles"]
@@ -230,6 +277,16 @@ class UrlMappings {
 		"/ws/task/$id/tasks" {
 			controller = "wsTask"
 			action = [GET:"retrieveTasksOfTaskBatch"]
+		}
+
+		"/ws/task/$id/invokeAction" {
+			controller = "wsTask"
+			action = [POST:"invokeAction"]
+		}
+
+		"/ws/task/$id/resetAction" {
+			controller = "wsTask"
+			action = [POST:"resetAction"]
 		}
 
 		"/ws/progress/$id" {
@@ -621,6 +678,41 @@ class UrlMappings {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
+			]
+		}
+
+		"/ws/apiAction/agent" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentNames"
+			]
+		}
+
+		"/ws/apiAction/agent/$id" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentDictionary"
+			]
+		}
+
+		"/ws/dataScript/testScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "testScript"
+			]
+		}
+
+		"/ws/dataScript/checkSyntax" {
+			controller = "wsDataScript"
+			action = [
+					POST: "checkSyntax"
+			]
+		}
+
+		"/ws/dataScript/saveScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "saveScript"
 			]
 		}
 

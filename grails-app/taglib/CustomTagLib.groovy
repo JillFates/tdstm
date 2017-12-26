@@ -126,9 +126,10 @@ class CustomTagLib implements InitializingBean {
 	 * @param icon - CSS icon to display in button
 	 * @param id - CSS id to embed into IDs
 	 * @param onclick - Javascript to add to button
+	 * @param tooltipText - text for tooltip on hover to add to Button
 	 */
 	def actionButton = { Map attrs ->
-		out << HtmlUtil.actionButton(attrs.label, attrs.icon, attrs.id, attrs.onclick)
+		out << HtmlUtil.actionButton(attrs.label, attrs.icon, attrs.id, attrs.onclick, attrs.tooltipText)
 	}
 
 	/**

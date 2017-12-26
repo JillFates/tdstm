@@ -24,11 +24,13 @@ export const en_DICTIONARY: Object = {
 		'DEPENDENCY_DETAIL': 'Dependency Detail'
 	},
 	'DATA_INGESTION': {
+		'API_ACTIONS': 'Api Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'Data Scripts',
 		'PROVIDERS': 'Providers',
 		'CREATE_DATA_SCRIPT': 'Create Data Script',
 		'CREATE_PROVIDER': 'Create Provider',
+		'CREATE_ACTION': 'Create Action',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
 		'ETL_BUILDER_TITLE': 'ETL Designer',
 		'CONSOLE_TITLE': 'ETL Console',
@@ -52,6 +54,22 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		}
 	},
+	'IMPORT_ASSETS': {
+		'MANUAL_IMPORT': {
+			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
+			'FETCH_DATA_ACTION': 'Fetch with Data Action:',
+			'TRANSFORM_DATA_SCRIPT': 'Transform with Data Script:',
+			'LOAD_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
+			'GOTO_IMPORT_BATCHES': 'Go to Manage Import Batches',
+			'FETCH': 'Fetch',
+			'TRANSFORM': 'Transform',
+			'IMPORT': 'Import',
+			'VIEW_DATA': 'View Data'
+		}
+	},
+	'DEPENDENCY_INJECTION': {
+		'MANUAL_ASSET_IMPORT': 'Manual Asset Import'
+	},
 	'GLOBAL': {
 		'OK': 'Ok',
 		'ADD': 'Add',
@@ -71,7 +89,9 @@ export const en_DICTIONARY: Object = {
 		'ADD_FAVORITES': 'Add to Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
-		'FREEZE': 'Freeze'
+		'FREEZE': 'Freeze',
+		'CLEAR': 'Clear',
+		'PLEASE_SELECT': 'Please Select..'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

@@ -88,6 +88,22 @@ grails {
 	}
 	json.legacy.builder = false
 
+	// Configuration for Camel and the Routing Plugin
+	camel {
+		camelContextId = 'transitionManager'
+	}
+	routing {
+		trace = true
+		threadPoolProfileConfig {
+			// The following are the defaults based on the plugin documentation
+			defaultProfile = true
+			poolSize = 10
+			maxPoolSize = 20
+			maxQueueSize = 1000
+			rejectedPolicy = 'CallerRuns'
+		}
+	}
+
 	mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
 
 	mime {
@@ -332,6 +348,15 @@ tdsops.buildFile = "/build.txt"
 // activity:  will also include all user interactions with the application.
 //tdstm.security.auditLogging = "access"
 
+tdstm {
+	// TM-8654 - added the AWS credentials temporarily
+	credentials {
+		aws {
+			accessKey = 'AKIAJQVV5RZ45K6T5GRA'
+			secretKey = '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'
+		}
+	}
+}
 
 grails {
 	plugin {

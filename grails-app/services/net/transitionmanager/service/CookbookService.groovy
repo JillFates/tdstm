@@ -1,4 +1,6 @@
 package net.transitionmanager.service
+
+
 import com.tds.asset.Application
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.domain.RecipeHelper
@@ -12,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Recipe
@@ -81,7 +84,7 @@ class CookbookService implements ServiceMethods {
 	RecipeVersion createRecipe(String recipeName, String description, String recipeContext, cloneFrom) {
 		securityService.requirePermission Permission.RecipeCreate
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		//TODO check this checkAccess(project)
 
@@ -132,7 +135,7 @@ class CookbookService implements ServiceMethods {
 		securityService.requirePermission Permission.RecipeEdit
 
 		// TODO: 170822 oluna, have to lookup Projects that the user has access to.
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		if (!name) {
 			throw new EmptyResultException()
@@ -181,7 +184,7 @@ class CookbookService implements ServiceMethods {
 	def deleteRecipe(recipeId) {
 		securityService.requirePermission Permission.RecipeDelete
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -220,7 +223,7 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -254,7 +257,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	Recipe updateRecipe(long recipeId, recipeName, description) {
 		//TODO check this checkAccess(project)
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -328,7 +331,7 @@ class CookbookService implements ServiceMethods {
 	void releaseRecipe(long recipeId) {
 		// securityService.requirePermission Permission.RecipeRelease
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -360,7 +363,7 @@ class CookbookService implements ServiceMethods {
 	Recipe revertRecipe(long recipeVersionId) {
 		// securityService.requirePermission Permission.RecipeRevert ?
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 
 		RecipeVersion recipeVersion =  RecipeVersion.get(recipeVersionId)
 
@@ -392,7 +395,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	List<Map> validateSyntaxForUser(sourceCode) {
 		securityService.requirePermission Permission.RecipeEdit
-		securityService.userCurrentProjectOrException
+		securityService.getUserCurrentProjectOrException()
 
 		validateSyntax(sourceCode)
 	}
@@ -619,7 +622,7 @@ class CookbookService implements ServiceMethods {
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
 	List<Map> findRecipeVersions(recipeId) {
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -654,20 +657,18 @@ class CookbookService implements ServiceMethods {
 			throw new EmptyResultException()
 		}
 
-		def arguments = [
-				"recipeId" : recipeId
+		 def arguments = [
+		"recipeId" : recipeId
 		]
 
-		return namedParameterJdbcTemplate.query("""
-			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
-							recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,
-							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
-							if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
-			FROM recipe
-			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
-			WHERE recipe.recipe_id = :recipeId
-			ORDER BY version_number ASC
-			""", arguments, new RecipeVersionCompleteMapper())
+		return namedParameterJdbcTemplate.query("""SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
+			        recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,
+			        recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
+			        if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
+	        FROM recipe
+			 INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id
+			 WHERE recipe.recipe_id=:recipeId
+			 ORDER BY version_number ASC""", arguments, new RecipeVersionCompleteMapper())
 	}
 
 	/**
@@ -679,7 +680,7 @@ class CookbookService implements ServiceMethods {
 	Recipe archivedUnarchived(recipeId, archived) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -708,11 +709,11 @@ class CookbookService implements ServiceMethods {
 		}
 	}
 
-	List<Map> validateSyntax(String sourceCode) {
+	List<Map> validateSyntax(String sourceCode, Project project = null) {
 		try {
-			basicValidateSyntax(sourceCode)
+			basicValidateSyntax(sourceCode, project)
 		} catch (e) {
-			[[error: 1, reason: 'Invalid syntax', detail: e.message.replaceAll(/[\r]/, '<br/>')]]
+			[[error: 1, reason: 'Invalid syntax', detail: e.message?.replaceAll(/[\r]/, '<br/>')]]
 		}
 	}
 
@@ -768,11 +769,18 @@ class CookbookService implements ServiceMethods {
 	* 4) Invalid reference
 	* 5) Duplicate reference
 	*/
-	List<Map> basicValidateSyntax(sourceCode) {
+	List<Map> basicValidateSyntax(sourceCode, Project currentProject = null) {
 
 		def errorList = [] as HashSet
 		def recipe
 		def msg
+
+		if ( !currentProject ) {
+			// Reference to current project
+			currentProject = securityService.getUserCurrentProjectOrException()
+		}
+		// Keeps an in-memory list of all the possible Api Actions to querying multiple times.
+		List apiActions = ApiAction.findAllByProject(currentProject)
 
 		// TODO: ValidateSyntax - Add a check to make sure that any filters that specify a group, that the group is defined
 
@@ -820,6 +828,34 @@ class CookbookService implements ServiceMethods {
 				if (n=="category" && !(v in AssetCommentCategory.list)) {
 					errorList << [error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'"]
+				}
+
+				if ( n == "invoke" && type == "task") {
+					String method = v["method"]
+					if (method){
+						ApiAction apiAction = null
+						for (action in apiActions) {
+							if (action.name == method ) {
+								apiAction = action
+								break
+							}
+						}
+						if ( !apiAction) {
+							errorList << [error: 4, reason: "Invalid API Action Reference",
+							detail: "$label in element $i references an API action that doesn't exist."]
+						}
+					} else {
+						errorList << [error: 1, reason: "Invalid Syntax",
+							detail: "$label in element $i doesn't specify a method for '$n'"]
+					}
+					/*
+						TODO (arecordon)
+						As stated by jmartin in TM-5989. We aren't going to perform further
+						analysis on this field.
+						We need to break the execution to avoid a failure because of unexpected
+						properties.
+					*/
+					return
 				}
 
 				if (map.containsKey(n)) {
@@ -887,7 +923,7 @@ class CookbookService implements ServiceMethods {
 			]
 		]
 
-		// Definition of the properties supported by group
+		// Definition of the properties supported by task
 		def taskProps = [
 			id: 0,
 			title:0,
@@ -934,7 +970,8 @@ class CookbookService implements ServiceMethods {
 			constraintTime:0,
 			constraintType:0,
 			class:['device','database','application','storage'],
-			docLink:0,
+			invoke:[:],
+			docLink:0
 		]
 
 		def teamCodes = []
@@ -1393,7 +1430,7 @@ class CookbookService implements ServiceMethods {
 	void defineRecipeContext(recipeId, contextId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
@@ -1418,7 +1455,7 @@ class CookbookService implements ServiceMethods {
 	void deleteRecipeContext(recipeId) {
 		securityService.requirePermission Permission.RecipeEdit
 
-		Project project = securityService.userCurrentProjectOrException
+		Project project = securityService.getUserCurrentProjectOrException()
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 

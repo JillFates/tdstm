@@ -480,7 +480,7 @@ class SqlUtil {
 	 * @param parameter
 	 * @return
 	 */
-	private static String escapeStringParameter(String parameter) {
+	static String escapeStringParameter(String parameter) {
 		return StringEscapeUtils.escapeJava(parameter.toString().trim())
 	}
 

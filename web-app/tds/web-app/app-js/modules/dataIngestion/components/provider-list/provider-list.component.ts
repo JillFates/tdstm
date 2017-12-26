@@ -166,12 +166,6 @@ export class ProviderListComponent {
 		]).then(result => {
 			// update the list to reflect changes, it keeps the filter
 			this.reloadProviders();
-			if (actionType === ActionType.CREATE) {
-				setTimeout(() => {
-					this.selectRow(result.provider.id);
-					this.openProviderDialogViewEdit(result.provider, ActionType.VIEW);
-				}, 500);
-			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

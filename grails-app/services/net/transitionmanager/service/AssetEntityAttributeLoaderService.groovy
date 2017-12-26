@@ -1143,6 +1143,20 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					asset = null
 				}
 			}
+		} else {
+
+			// Look for the id property and see if there is an error on it
+			// Map idDtv = dtvList.find { it.fieldName == 'id' }
+//println "findAndValidateAsset() $idDtv"
+//def x=5/0
+			// if (idDtv && idDtv.hasError) {
+			if (dtvList[0].hasError) {
+				errorCount++
+				// ignoredAssets << "${idDtv.errorText} (row $rowNum)".toString()
+				ignoredAssets << "${dtvList[0].errorText} (row $rowNum)".toString()
+				// logger.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
+				asset = false
+			}
 		}
 
 		if (asset == null) {

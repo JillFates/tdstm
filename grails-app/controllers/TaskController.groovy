@@ -14,11 +14,13 @@ import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.CommentService
@@ -32,6 +34,7 @@ import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
+import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -48,6 +51,7 @@ import static net.transitionmanager.domain.Permissions.Roles.CLIENT_ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.context.MessageSource
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -67,6 +71,7 @@ class TaskController implements ControllerMethods {
 
 	AssetEntityService assetEntityService
 	AssetService assetService
+	ApiActionService apiActionService
 	CommentService commentService
 	ControllerService controllerService
 	CustomDomainService customDomainService
@@ -78,6 +83,7 @@ class TaskController implements ControllerMethods {
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
+	MessageSource messageSource
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
@@ -247,7 +253,8 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskView)
 	def genActionBarForShowView() {
-		AssetComment comment = AssetComment.get(params.id)
+		AssetComment comment = fetchDomain(AssetComment, params)
+
 		StringBuilder actionBar = new StringBuilder("""<span class="slide" style=" margin-top: 4px;">""")
 		int cols = 12
 
@@ -300,7 +307,8 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskView)
 	def genActionBarForShowViewJson() {
-		def comment = AssetComment.get(params.id)
+		AssetComment comment = fetchDomain(AssetComment, params)
+
 		Project project = securityService.userCurrentProject
 		def actionBar = []
 		def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
@@ -317,6 +325,25 @@ class TaskController implements ControllerMethods {
 
 				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: COMPLETED,
 				              redirect: 'taskManager', disabled: !(comment.status in [READY, STARTED])]
+			}
+
+			if (securityService.hasPermission(Permission.ActionInvoke)) {
+				if (comment.isActionInvocable() && !comment.isAutomatic()) {
+					actionBar << [label   : 'Invoke', icon: 'ui-icon-gear', actionType: 'invokeAction', newStatus: STARTED,
+								  redirect: 'taskManager', disabled: comment.status != READY]
+				}
+			}
+
+			if (securityService.hasPermission(Permission.ActionReset)) {
+				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
+					actionBar << [
+						label: message(code:'task.button.resetAction.label'), 
+						icon: 'ui-icon-power', 
+						actionType: 'resetAction', newStatus: READY,
+						redirect:'taskManager', 
+						tooltipText: message(code:'task.button.resetAction.tooltip'), 
+						disabled: false]
+				}
 			}
 
 			if (includeDetails) {
@@ -354,7 +381,7 @@ class TaskController implements ControllerMethods {
 			renderSuccessJson(actionBar)
 		}
 		else {
-			renderFailureJson(error: "Task was not found.")
+			renderFailureJson(error: "Task was not found")
 		}
 	}
 
@@ -1070,7 +1097,36 @@ digraph runbook {
 
 	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
-		render(view: "_editTask", model: [])
+		Project project = controllerService.getProjectForPage(this)
+		if (! project) return
+		def apiActionList = apiActionService.list(project)
+	
+		render(view: "_editTask", model: [apiActionList: apiActionList])
+	}
+
+    // TODO: <SL> Need @HasPermission annotation
+	def actionLookUp(Long apiActionId, Long commentId) {
+		Project project = securityService.userCurrentProject
+		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
+		if (!assetComment) {
+			sendNotFound()
+			return
+		}
+
+		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
+			ApiAction apiAction = assetComment.apiAction
+			Map apiActionPayload = [
+					agent       : apiAction.agentClass.toString(),
+					method      : apiAction.agentMethod,
+					description : apiAction.description,
+					methodParams: apiAction.methodParamsList,
+					methodParamsValues: apiActionService.getApiActionParametersAndValuesFromContext(apiAction, assetComment)
+			]
+
+			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
+		} else {
+			sendForbidden()
+		}
 	}
 
 	@HasPermission(Permission.TaskView)
