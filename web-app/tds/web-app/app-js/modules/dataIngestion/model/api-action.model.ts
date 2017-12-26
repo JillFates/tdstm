@@ -25,7 +25,7 @@ export class APIActionColumnModel {
 				type: 'text'
 			}, {
 				label: 'Method',
-				property: 'agentMethod',
+				property: 'agentMethod.name',
 				type: 'text',
 				width: 200
 			}, {
@@ -58,8 +58,14 @@ export class APIActionModel {
 	id?: number;
 	name: string;
 	description: string;
-	agentMethod?: string;
-	agentClass?: string;
+	agentMethod?: {
+		id?: string,
+		name?: string
+	};
+	agentClass?: {
+		id?: string,
+		name?: string
+	};
 	asyncQueue?: string;
 	callbackMethod?: string;
 	callbackMode?: string;
@@ -71,7 +77,42 @@ export class APIActionModel {
 		name: string
 	};
 	defaultDataScriptName?: string;
+	dataScript?: {
+		id?: string,
+		name?: string
+	};
 	producesData?: number;
 	dateCreated?: Date;
 	lastModified?: Date;
+	credential?: {
+		id?: string,
+		name?: string
+	};
+	eventReactions?: EventReaction[];
 }
+
+export class EventReaction {
+	type: EventReactionType;
+	selected?: boolean;
+	value?: string;
+	open?: boolean;
+
+	constructor(type: EventReactionType, selected: boolean, value: string) {
+		this.type = type;
+		this.selected = selected;
+		this.value = value;
+		this.open = true;
+	}
+}
+
+export enum EventReactionType {
+	STATUS = 'status',
+	SUCCESS = 'success',
+	DEFAULT = 'default',
+	ERROR = 'error',
+	TIMEDOUT = 'timedout',
+	LAPSED = 'lapsed',
+	STALLED = 'stalled',
+	BEFORE_API_CALL = 'beforeApiCall',
+	AFTER_API_CALL = 'afterApiCall'
+};

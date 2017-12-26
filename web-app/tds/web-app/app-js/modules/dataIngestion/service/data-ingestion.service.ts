@@ -5,6 +5,7 @@ import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provid
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel} from '../model/api-action.model';
+import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -13,7 +14,84 @@ import 'rxjs/add/operator/catch';
 export class DataIngestionService {
 
 	private dataDefaultUrl = '../ws';
+	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
+
+	mockData: CredentialModel[] = [
+		{
+			id: '1',
+			name: 'Credential 1'
+		},
+		{
+			id: '2',
+			name: 'Credential 2'
+		},
+		{
+			id: '3',
+			name: 'Credential 3'
+		}
+	];
+
+	mockDataAgentMethod: AgentMethodModel[] = [
+		{
+			'description': 'Used to generate Simple Notification Service (SNS) messages',
+			'method': 'sendSns',
+			'name': 'sendSnsNotification',
+			'params': {
+				'queueName': {
+					'type': 'java.lang.String',
+					'description': 'The name of the queue/topic to send message to'
+				},
+				'callbackMethod': {
+					'type': 'java.lang.String',
+					'description': 'The name of the callback method that the async response should trigger'
+				},
+				'message': {
+					'type': 'java.lang.Object',
+					'description': 'The data to pass to the message'
+				}
+			},
+			'results': {
+				'status': {
+					'type': 'java.lang.String',
+					'description': 'Status of process (success|error|failed|running)'
+				},
+				'cause': {
+					'type': 'java.lang.String',
+					'description': 'The cause of an error or failure'
+				}
+			}
+		},
+		{
+			'description': 'Used to generate Simple Queue Service (SQS) messages',
+			'method': 'sendSqs',
+			'name': 'sendSqsMessage',
+			'params': {
+				'queueName': {
+					'type': 'java.lang.String',
+					'description': 'The name of the queue/topic to send message to'
+				},
+				'callbackMethod': {
+					'type': 'java.lang.String',
+					'description': 'The name of the callback method that the async response should trigger'
+				},
+				'message': {
+					'type': 'java.lang.Object',
+					'description': 'The data to pass to the message'
+				}
+			},
+			'results': {
+				'status': {
+					'type': 'java.lang.String',
+					'description': 'Status of process (success|error|failed|running)'
+				},
+				'cause': {
+					'type': 'java.lang.String',
+					'description': 'The cause of an error or failure'
+				}
+			}
+		}
+	];
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -47,19 +125,40 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	getAPIActions(): Observable<DataScriptModel[]> {
+	getAPIActions(): Observable<APIActionModel[]> {
 		return this.http.get(`${this.dataDefaultUrl}/apiAction`)
 			.map((res: Response) => {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
 				dataScriptModels.forEach((r) => {
+					r.agentMethod = { name: r.agentMethod };
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
+					r.pollingInterval = (r.pollingInterval === 1);
+					r.agentClass = { id: r.agentClass };
 				});
 				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	getAgents(): Observable<AgentModel[]> {
+		return this.http.get(`${this.dataApiActionUrl}/agent`)
+			.map((res: Response) => {
+				let result = res.json();
+				let agentModels = result; // && result.status === 'success' && result.data;
+				return agentModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getCredentials(): Observable<AgentModel[]> {
+		return Observable.from(this.mockData).bufferCount(this.mockData.length);
+	}
+
+	getActionMethodById(agentId: string): Observable<AgentMethodModel[]> {
+		return Observable.from(this.mockDataAgentMethod).bufferCount(this.mockDataAgentMethod.length);
 	}
 
 	saveDataScript(model: DataScriptModel): Observable<DataScriptModel> {
