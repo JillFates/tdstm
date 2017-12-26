@@ -406,7 +406,7 @@ class ApiActionService {
 		Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
 		if (credentialId) {
 			credential = GormUtil.findInProject(project, Credential, credentialId, true)
-			if (credential.provider.id != prov.id) {
+			if (credential.provider.id != provider.id) {
 				throw new InvalidParamException("Error trying to create or update an API Action. The Credential's provider doesn't match the Action's provider.")
 			}
 		}
