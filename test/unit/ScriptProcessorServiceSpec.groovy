@@ -31,6 +31,10 @@ class ScriptProcessorServiceSpec extends Specification {
         settingService(SettingService)
     }
 
+    static doWithConfig(c) {
+        c.graph.tmpDir = '/tmp/'
+    }
+
     def setup () {
 
         fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
