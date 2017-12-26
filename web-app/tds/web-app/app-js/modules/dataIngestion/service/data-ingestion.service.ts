@@ -14,6 +14,7 @@ export class DataIngestionService {
 
 	private dataDefaultUrl = '../ws';
 	private dataIngestionUrl = '../ws/dataingestion';
+	private dataScriptUrl = '../ws/dataScript';
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -202,6 +203,19 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	saveScript(id: number, script: string): Observable<any> {
+		let postRequest = {
+			id: id,
+			script: script
+		};
+		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success';
 			})
 			.catch((error: any) => error.json());
 	}

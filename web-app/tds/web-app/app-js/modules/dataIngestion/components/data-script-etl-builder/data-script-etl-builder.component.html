@@ -21,13 +21,15 @@
 				</div>
 				<div class="row" *ngIf="!collapsed.code">
 					<div class="col-md-12">
-						<code-mirror [(model)]="code" (change)="onCodeChange($event)" ></code-mirror>
+						<code-mirror [(model)]="script" (change)="onCodeChange($event)" ></code-mirror>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<button type="button" class="btn btn-primary pull-left">
-							<span class="fa fa-fw fa-floppy-o"></span> {{'GLOBAL.SAVE' | translate }}</button>
+						<button [disabled]="!isScriptDirty()" (click)="onSave()"
+                                type="button" class="btn btn-primary pull-left">
+							<span class="fa fa-fw fa-floppy-o"></span> {{'GLOBAL.SAVE' | translate }}
+                        </button>
 						<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 							<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 					</div>
