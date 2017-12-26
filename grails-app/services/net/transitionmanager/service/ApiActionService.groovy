@@ -289,7 +289,7 @@ class ApiActionService {
 				project == project
 				name == name
 			}.projections{property('id')}.find()
-
+			
 			// If no API Action was found or the IDs match, the name it's okay.
 			if (!id || id == apiActionId) {
 				isValid = true
@@ -355,7 +355,7 @@ class ApiActionService {
 
 		String actionName = apiActionJson.name
 
-		if (!validateApiActionName(project, apiActionJson.name)) {
+		if (!validateApiActionName(project, apiActionJson.name, apiActionId)) {
 			throw new InvalidParamException("Invalid name for API Action.")
 		}
 
@@ -366,7 +366,7 @@ class ApiActionService {
 
 		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
 
-		Credential credential = GormUtil.findInProject(project, Credential, NumberUtil.toLong(apiActionJson.credentialId))
+		Credential credentials = getCredential(project, prov, apiActionJson)
 
 		apiAction.with {
 			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
@@ -391,4 +391,25 @@ class ApiActionService {
 
 	}
 
+	/**
+	 * Return the corresponding credential from this API Action JSON, validating that its provider matches
+	 * the one for the API Action.
+	 * The credential is not mandatory, so if none is provided, no exception will be thrown. However, if an
+	 * invalid value is passed, the application will detect and throw an error.
+	 * @param project
+	 * @param provider
+	 * @param credentialId
+	 * @return
+	 */
+	private Credential getCredential(Project project, Provider provider, JSONObject apiActionJson) {
+		Credential credential = null
+		Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
+		if (credentialId) {
+			credential = GormUtil.findInProject(project, Credential, credentialId, true)
+			if (credential.provider.id != prov.id) {
+				throw new InvalidParamException("Error trying to create or update an API Action. The Credential's provider doesn't match the Action's provider.")
+			}
+		}
+		return credential
+	}
 }
