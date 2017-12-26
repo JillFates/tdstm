@@ -256,8 +256,8 @@ export class APIActionViewEditComponent {
 	/**
 	 * Show only the Customize Label if one Custm is selected
 	 */
-	showsCusomizeLabel(): boolean {
-		let events = [EventReactionType.BEFORE_API_CALL, EventReactionType.AFTER_API_CALL];
+	showsCustomizeLabel(): boolean {
+		let events = [EventReactionType.PRE_API_CALL, EventReactionType.FINALIZED_API_CALL];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
@@ -274,5 +274,15 @@ export class APIActionViewEditComponent {
 	 */
 	openCloseCodeMirror(eventReaction: EventReaction): void {
 		eventReaction.open = !eventReaction.open;
+	}
+
+	/**
+	 *  Verify the current Event Reaction input is a valid code
+	 * @param {EventReaction} eventReaction
+	 */
+	verifyCode(eventReaction: EventReaction): void {
+		// to all validateCode on date ingestion service
+		eventReaction.valid = false;
+		eventReaction.error = 'Error at Line 3: Unknow variable burt!';
 	}
 }

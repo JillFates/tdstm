@@ -96,12 +96,16 @@ export class EventReaction {
 	selected?: boolean;
 	value?: string;
 	open?: boolean;
+	valid?: boolean;
+	error?: string;
 
 	constructor(type: EventReactionType, selected: boolean, value: string) {
 		this.type = type;
 		this.selected = selected;
 		this.value = value;
 		this.open = true;
+		this.valid = true;
+		this.error = '';
 	}
 }
 

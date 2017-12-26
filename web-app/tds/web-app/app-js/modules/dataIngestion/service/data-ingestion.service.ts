@@ -278,6 +278,15 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
+	validateCode(): Observable<any> {
+		return this.http.post(`${this.dataIngestionUrl}/`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	deleteDataScript(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
 			.map((res: Response) => {
