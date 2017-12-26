@@ -6,6 +6,15 @@ export const LOADER_IDLE_PERIOD = 150;
 export const MAX_OPTIONS = [25, 50, 100, 250, 500, 1000];
 export const MAX_DEFAULT = 25;
 
+// Intervals
+export enum INTERVAL {
+	SECONDS = 'Seconds',
+	MINUTES = 'Minutes',
+	HOURS = 'Hours'
+}
+
+export const INTERVALS = [INTERVAL.SECONDS, INTERVAL.MINUTES, INTERVAL.HOURS];
+
 export enum Keystroke {
 	ENTER = 'Enter',
 	TAB = 'Tab',

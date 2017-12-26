@@ -8,7 +8,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { APIActionColumnModel, APIActionModel } from '../../model/api-action.model';
+import { APIActionColumnModel, APIActionModel, EventReaction, EventReactionType } from '../../model/api-action.model';
 import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
 import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
 import { DIALOG_SIZE } from '../../../../shared/model/constants';
@@ -144,8 +144,22 @@ export class APIActionListComponent {
 		let dataScriptModel: APIActionModel = {
 			name: '',
 			description: '',
-			provider: { id: null, name: '' }
+			provider: { id: null, name: '' },
+			agentClass: { id: null, name: '' },
+			agentMethod: { id: null, name: ''},
+			eventReactions: []
 		};
+
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
+		dataScriptModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
 		this.openAPIActionDialogViewEdit(dataScriptModel, ActionType.CREATE);
 	}
 

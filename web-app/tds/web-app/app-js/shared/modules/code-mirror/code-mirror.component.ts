@@ -1,23 +1,25 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import * as CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/groovy/groovy';
+import 'codemirror/mode/javascript/javascript';
 
 declare var jQuery: any;
 @Component({
 	selector: 'code-mirror',
-	template: '<textarea name="" id="" cols="30" rows="10" #codeMirror></textarea>',
+	template: '<textarea  #codeMirror></textarea>',
 	exportAs: 'codeMirror'
 }) export class CodeMirrorComponent implements AfterViewInit {
 	@ViewChild('codeMirror') el: ElementRef;
 	@Output() change = new EventEmitter<{ newValue: string, oldValue: string }>();
 	@Input() model: string;
+	@Input() mode;
 	@Output() modelChange = new EventEmitter<string>();
 	instance;
 
 	ngAfterViewInit(): void {
 		console.log(this.el, CodeMirror);
 		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
-			mode: 'groovy',
+			mode: this.mode,
 			lineNumbers: true
 		});
 
