@@ -1832,14 +1832,8 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (validatedAssetIds.size() > 0) {
-			if (type == "dependencies") {
-				count = AssetDependency.where {
-					id in validatedAssetIds
-				}.deleteAll()
-			} else {
-				count = deleteAssets(validatedAssetIds)
-			}
-		} else {
+       count = deleteAssets(validatedAssetIds)
+    } else {
 			count = 0
 		}
 
