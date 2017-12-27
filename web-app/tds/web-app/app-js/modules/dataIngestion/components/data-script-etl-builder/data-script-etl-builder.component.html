@@ -1,3 +1,8 @@
+<style>
+    .btn-resize {
+        font-size: 14px;
+    }
+</style>
 <div class="modal fade in" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
@@ -27,10 +32,11 @@
 				<div class="row">
 					<div class="col-md-12">
 						<button [disabled]="!isScriptDirty()" (click)="onSave()"
-                                type="button" class="btn btn-primary pull-left">
+                                type="button" class="btn btn-primary btn-resize pull-left">
 							<span class="fa fa-fw fa-floppy-o"></span> {{'GLOBAL.SAVE' | translate }}
                         </button>
-						<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
+						<button (click)="cancelCloseDialog()"
+                                type="button" class="btn btn-default btn-resize pull-right">
 							<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 					</div>
 				</div>
@@ -50,7 +56,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<h4 class="pull-left">Transformed Data Review</h4>
-						<button class="pull-right btn btn-default" (click)="toggleSection('transformed')">
+						<button class="pull-right btn btn-defaulscriptt" (click)="toggleSection('transformed')">
 							<i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.transformed,'fa-angle-double-up':collapsed.transformed}" style="padding-right:0px"></i>
 						</button>
 					</div>

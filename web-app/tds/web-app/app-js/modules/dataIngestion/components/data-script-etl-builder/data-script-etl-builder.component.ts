@@ -6,6 +6,7 @@ import {DataScriptModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -27,13 +28,34 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}, 300);
 	}
 
-	constructor(private dialogService: UIDialogService, private dataScriptModel: DataScriptModel, private dataIngestionService: DataIngestionService, private notifier: NotifierService) {
+	constructor(
+		private dialogService: UIDialogService,
+		private dataScriptModel: DataScriptModel,
+		private dataIngestionService: DataIngestionService,
+		private notifierService: NotifierService,
+		private promptService: UIPromptService) {
 		super('#etlBuilder');
-		this.script = this.dataScriptModel.etlSourceCode.slice(0);
+		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
+	}
+
+	onEscKeyPressed(): void {
+		this.cancelCloseDialog();
 	}
 
 	protected cancelCloseDialog(): void {
-		this.dismiss();
+		if (this.isScriptDirty()) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel').then(result => {
+					if (result) {
+						this.dismiss();
+					}
+				});
+		} else {
+			this.dismiss();
+		}
+
 	}
 
 	private onSave(): void {
@@ -43,12 +65,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				this.saving = false;
 				if (result) {
 					this.dataScriptModel.etlSourceCode = this.script.slice(0);
-					this.notifier.broadcast({
+					this.notifierService.broadcast({
 						name: AlertType.SUCCESS,
 						message: 'Script saved successfully.'
 					});
 				} else {
-					this.notifier.broadcast({
+					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: 'Script not saved.'
 					});
@@ -58,6 +80,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	private isScriptDirty(): boolean {
+		if (!this.dataScriptModel.etlSourceCode) {
+			return this.script.length > 0;
+		}
 		if (this.dataScriptModel.etlSourceCode !== this.script) {
 			return true;
 		} else {
@@ -74,6 +99,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected onLoadSampleData(): void {
+		this.dismiss();
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
 			.then(() => console.log('ok'))
 			.catch(() => console.log('still ok'));

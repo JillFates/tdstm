@@ -150,7 +150,8 @@ export class DataScriptViewEditComponent implements OnInit {
 	protected onDataScriptDesigner(): void {
 		this.dialogService.extra(DataScriptEtlBuilderComponent,
 			[UIDialogService,
-				{provide: DataScriptModel, useValue: this.dataScriptModel} ])
+				{provide: DataScriptModel, useValue: this.dataScriptModel}],
+			true)
 			.then(() => console.log('ok'), () => console.log('not ok'));
 	}
 
