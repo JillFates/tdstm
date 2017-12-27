@@ -69,12 +69,19 @@ class DeviceService implements ServiceMethods {
 			return "Unable to create rack $location/$roomName/$rackName (${isSource ? 'Source' : 'Target'})"
 		}
 
-		if (isSource) {
-			asset.rackSource = rack
-		}
-		else {
-			asset.rackTarget = rack
-		}
+    /* @See TM-7806
+       If an asset is of type 'VM', 'Virtual' or 'Blade', this should not be tracked at the rack level,
+       since this are not physical devices. */
+    String assetType = asset.assetType.toUpperCase()
+    if (!(assetType == 'VM' || assetType == 'VIRTUAL' || assetType == 'BLADE')) {
+       if (isSource) {
+          asset.rackSource = rack
+       }
+       else {
+          asset.rackTarget = rack
+       }
+    }
+
 
 		logger.debug 'assignDeviceToLocationRoomRack() END {} {}/{}/{}', asset, asset.sourceLocation,
 				asset.sourceRoom, asset.sourceRack
