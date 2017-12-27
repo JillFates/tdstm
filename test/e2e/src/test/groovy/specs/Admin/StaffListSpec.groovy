@@ -7,22 +7,25 @@ import pages.Admin.UserCreationPage
 import pages.Admin.UserDetailsPage
 import pages.common.LoginPage
 import pages.common.MenuPage
+import specs.common.TestUtils
 import spock.lang.Stepwise
 
 @Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount
+    static randStr = TestUtils.randStr(4)
 
     //Define the names for the Staffq you will Create and Edit
-    static firstName = "QAE2EFirst"
-    static middleName = "QAE2EMiddle"
-    static lastName = "QAE2ELast"
-    static teamName = "Account Manager"
-    static userName = "QAE2ETest"
-    static userPass = "QAE2EPass*"
-    static userEmail = "QAE2Etestuser@transitionaldata.com"
+    static baseName = "QAE2E"
     static userProject = "TM-Demo"
+    static teamName = "Account Manager"
+    static firstName = baseName + randStr + "First"
+    static middleName = baseName + randStr + "Middle"
+    static lastName = baseName + randStr + "Last"
+    static userName = baseName + randStr + "Test"
+    static userPass = baseName + randStr + "Pass*"
+    static userEmail = baseName + randStr + "testuser@transitionaldata.com"
 
     def setupSpec() {
         testCount = 0
