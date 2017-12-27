@@ -54,6 +54,47 @@ export class APIActionColumnModel {
 	}
 }
 
+export class APIActionParameterColumnModel {
+	columns: any[];
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 68,
+				locked: true
+			}, {
+				label: 'Name',
+				property: 'name',
+				type: 'text',
+				width: 180
+			}, {
+				label: 'Data Type',
+				property: 'dataType',
+				type: 'text',
+				width: 110
+			}, {
+				label: 'Context',
+				property: 'context',
+				type: 'text',
+				width: 140
+			}, {
+				label: 'value',
+				property: 'value',
+				type: 'text',
+				width: 240
+			}, {
+				label: 'Description',
+				property: 'description',
+				type: 'text',
+				width: 277
+			}
+		];
+	}
+}
+
 export class APIActionModel {
 	id?: number;
 	name: string;
@@ -106,6 +147,15 @@ export class EventReaction {
 		this.valid = true;
 		this.error = '';
 	}
+}
+
+export class APIActionParameterModel {
+	id?: number;
+	name?: string;
+	description?: string;
+	dataType?: string;
+	context?: string;
+	value?: string;
 }
 
 export enum EventReactionType {

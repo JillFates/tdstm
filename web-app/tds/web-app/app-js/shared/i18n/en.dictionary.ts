@@ -24,6 +24,7 @@ export const en_DICTIONARY: Object = {
 		'DEPENDENCY_DETAIL': 'Dependency Detail'
 	},
 	'DATA_INGESTION': {
+		'ADD_ARGUMENT': 'Add Argument',
 		'API_ACTIONS': 'Api Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'Data Scripts',

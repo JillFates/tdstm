@@ -18,7 +18,6 @@ declare var jQuery: any;
 	exportAs: 'fieldSettingsGrid',
 	templateUrl: '../tds/web-app/app-js/modules/fieldSettings/components/grid/field-settings-grid.component.html',
 	styles: [`
-		.float-right { float: right;}
 		.k-grid { height:calc(100vh - 225px); }
 		tr .text-center { text-align: center; }
 		.has-error,.has-error:focus { border: 1px #f00 solid;}

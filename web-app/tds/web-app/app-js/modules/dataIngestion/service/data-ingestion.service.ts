@@ -4,7 +4,7 @@ import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
-import {APIActionModel} from '../model/api-action.model';
+import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 
 import 'rxjs/add/operator/map';
@@ -29,6 +29,17 @@ export class DataIngestionService {
 		{
 			id: '3',
 			name: 'Credential 3'
+		}
+	];
+
+	mockParametersData: APIActionParameterModel[] = [
+		{
+			id: 1,
+			name: 'sys_id',
+			description: 'The Unique ID used by ServiceNow (sysid)',
+			dataType: 'String',
+			context: 'Application',
+			value: 'externalRelId'
 		}
 	];
 
@@ -93,6 +104,10 @@ export class DataIngestionService {
 
 	getCredentials(): Observable<AgentModel[]> {
 		return Observable.from(this.mockData).bufferCount(this.mockData.length);
+	}
+
+	getParameters(): Observable<APIActionParameterModel[]> {
+		return Observable.from(this.mockParametersData).bufferCount(this.mockParametersData.length);
 	}
 
 	getActionMethodById(agentId: string): Observable<AgentMethodModel[]> {

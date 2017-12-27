@@ -1,17 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
-import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import {APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
-import { ProviderModel } from '../../model/provider.model';
-import { DataIngestionService } from '../../service/data-ingestion.service';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';
-import { ActionType } from '../../../../shared/model/data-list-grid.model';
-import { INTERVAL, INTERVALS} from '../../../../shared/model/constants';
+import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Subject} from 'rxjs/Subject';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {
+	APIActionModel,
+	APIActionParameterColumnModel,
+	APIActionParameterModel,
+	EventReaction,
+	EventReactionType
+} from '../../model/api-action.model';
+import {ProviderModel} from '../../model/provider.model';
+import {DataIngestionService} from '../../service/data-ingestion.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {INTERVAL, INTERVALS} from '../../../../shared/model/constants';
 import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
 import {DataScriptModel} from '../../model/data-script.model';
 import {NgForm} from '@angular/forms';
+import {process, State} from '@progress/kendo-data-query';
+import {GridDataResult} from '@progress/kendo-angular-grid';
 
 declare var jQuery: any;
 
@@ -40,18 +47,29 @@ export class APIActionViewEditComponent {
 	public agentMethodList = new Array<AgentMethodModel>();
 	public agentCredentialList = new Array<CredentialModel>();
 	public agentDatascriptList = new Array<DataScriptModel>();
+	public parameterList: GridDataResult;
+	public apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	public modalTitle: string;
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private intervals = INTERVALS;
+	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	private currentTab = 0;
+	public isEditing = false;
 	private codeMirror = {
 		mode: {
 			name: 'javascript'
 		},
 		rows: 10,
 		cols: 4
+	};
+
+	private state: State = {
+		sort: [{
+			dir: 'asc',
+			field: 'name'
+		}]
 	};
 
 	constructor(
@@ -68,6 +86,7 @@ export class APIActionViewEditComponent {
 		this.getAgents();
 		this.getCredentials();
 		this.getDataScripts();
+		this.getParameters();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 	}
@@ -136,6 +155,20 @@ export class APIActionViewEditComponent {
 					this.apiActionModel.defaultDataScript = this.agentCredentialList[0];
 				}
 				this.agentDatascriptList.push(...result);
+			},
+			(err) => console.log(err));
+	}
+
+	/**
+	 * Get the list of existing parameters for the API Action
+	 */
+	getParameters(): void {
+		this.dataIngestionService.getParameters().subscribe(
+			(result: any) => {
+				if (this.modalType === ActionType.CREATE) {
+					this.parameterList = process([], this.state);
+				}
+				this.parameterList = process(result, this.state);
 			},
 			(err) => console.log(err));
 	}
@@ -284,5 +317,25 @@ export class APIActionViewEditComponent {
 		// to all validateCode on date ingestion service
 		eventReaction.valid = false;
 		eventReaction.error = 'Error at Line 3: Unknow variable burt!';
+	}
+
+	onEditParameters(): void {
+		this.isEditing = true;
+	}
+
+	onAddParameter(): void {
+		this.parameterList.data.push({
+			id: 0,
+			name: '',
+			description: '',
+			dataType: '',
+			context: '',
+			value: ''
+		});
+		this.refreshParametersList();
+	}
+
+	public refreshParametersList(): void {
+		this.parameterList = process(this.parameterList.data, this.state);
 	}
 }
