@@ -966,6 +966,8 @@ public class GormUtil {
 			logger.error(errorMsg)
 			if (throwException) {
 				throw new InvalidParamException(errorMsg)
+			} else {
+				instance = null
 			}
 		}
 		return instance
