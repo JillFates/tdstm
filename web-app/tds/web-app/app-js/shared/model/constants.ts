@@ -28,3 +28,5 @@ export enum DIALOG_SIZE {
 	LG = 'lg',
 	XLG = 'xlg'
 };
+
+export const DATA_TYPES = ['String', 'No Idea'];

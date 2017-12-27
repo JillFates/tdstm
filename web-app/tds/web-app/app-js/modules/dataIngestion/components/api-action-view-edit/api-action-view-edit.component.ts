@@ -1,5 +1,4 @@
-import {Component, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
+import {Component, ViewChild} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -13,12 +12,13 @@ import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS} from '../../../../shared/model/constants';
+import {INTERVAL, INTERVALS, DATA_TYPES} from '../../../../shared/model/constants';
 import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
 import {DataScriptModel} from '../../model/data-script.model';
 import {NgForm} from '@angular/forms';
 import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
+import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 
 declare var jQuery: any;
 
@@ -54,7 +54,33 @@ export class APIActionViewEditComponent {
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private intervals = INTERVALS;
+	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public commonFieldSpecs;
+	public assetClassesForParameters = [
+		{
+			assetClass: 'COMMON',
+			value: 'Asset'
+		}, {
+			assetClass: 'APPLICATION',
+			value: 'Application'
+		}, {
+			assetClass: 'DATABASE',
+			value: 'Database'
+		}, {
+			assetClass: 'DEVICE',
+			value: 'Device'
+		}, {
+			assetClass: 'STORAGE',
+			value: 'Logical Storage'
+		}, {
+			assetClass: 'TASK',
+			value: 'Task'
+		}, {
+			assetClass: 'USER_DEFINED',
+			value: 'User Defined'
+		}
+	];
 	private currentTab = 0;
 	public isEditing = false;
 	private codeMirror = {
@@ -64,7 +90,6 @@ export class APIActionViewEditComponent {
 		rows: 10,
 		cols: 4
 	};
-
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -79,6 +104,7 @@ export class APIActionViewEditComponent {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
+		private customDomainService: CustomDomainService,
 		private dialogService: UIDialogService) {
 
 		this.apiActionModel = Object.assign({}, this.originalModel);
@@ -87,6 +113,7 @@ export class APIActionViewEditComponent {
 		this.getCredentials();
 		this.getDataScripts();
 		this.getParameters();
+		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 	}
@@ -169,6 +196,17 @@ export class APIActionViewEditComponent {
 					this.parameterList = process([], this.state);
 				}
 				this.parameterList = process(result, this.state);
+			},
+			(err) => console.log(err));
+	}
+
+	/**
+	 * Preload the list of Common Fields Specs
+	 */
+	getCommonFieldSpecs(): void {
+		this.customDomainService.getCommonFieldSpecs().subscribe(
+			(result: any) => {
+				this.commonFieldSpecs = result;
 			},
 			(err) => console.log(err));
 	}
@@ -323,18 +361,54 @@ export class APIActionViewEditComponent {
 		this.isEditing = true;
 	}
 
+	/**
+	 * Add a new argument to the list of parameters and refresh the list.
+	 */
 	onAddParameter(): void {
 		this.parameterList.data.push({
 			id: 0,
 			name: '',
 			description: '',
 			dataType: '',
-			context: '',
+			context: {
+				value: '',
+				assetClass: ''
+			},
+			field: '',
+			currentFieldList: [],
 			value: ''
 		});
 		this.refreshParametersList();
 	}
 
+	/**
+	 * When the Context has change, we should load the list of params associate with the Asset Class,
+	 * if the value is USER_DEFINED, the field will become a text input field
+	 */
+	onContextValueChange(dataItem: APIActionParameterModel): void {
+		let fieldSpecs = this.commonFieldSpecs.find((spec) => {
+			return spec.domain === dataItem.context.assetClass;
+		});
+		if (fieldSpecs) {
+			dataItem.currentFieldList = fieldSpecs.fields;
+		}
+	}
+
+	/**
+	 * Delete from the paramaters the argument passed.
+	 * @param dataItem
+	 */
+	onDelete(dataItem: APIActionParameterModel): void {
+		let parameterIndex = this.parameterList.data.indexOf(dataItem);
+		if (parameterIndex >= 0) {
+			this.parameterList.data.splice(parameterIndex, 1);
+			this.refreshParametersList();
+		}
+	}
+
+	/**
+	 * Refresh the list of elements after update, create or delete parameters / arguments
+	 */
 	public refreshParametersList(): void {
 		this.parameterList = process(this.parameterList.data, this.state);
 	}

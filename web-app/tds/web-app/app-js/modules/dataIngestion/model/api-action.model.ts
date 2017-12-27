@@ -77,7 +77,7 @@ export class APIActionParameterColumnModel {
 				width: 110
 			}, {
 				label: 'Context',
-				property: 'context',
+				property: 'context.value',
 				type: 'text',
 				width: 140
 			}, {
@@ -154,7 +154,14 @@ export class APIActionParameterModel {
 	name?: string;
 	description?: string;
 	dataType?: string;
-	context?: string;
+	context?: ParameterContextModel;
+	value?: string;
+	field?: string;
+	currentFieldList?: Array<any>;
+}
+
+export class ParameterContextModel {
+	assetClass?: string;
 	value?: string;
 }
 

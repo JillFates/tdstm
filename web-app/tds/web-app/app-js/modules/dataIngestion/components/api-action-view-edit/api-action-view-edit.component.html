@@ -222,7 +222,7 @@
 										<button class="btn btn-default mar-left-15" id="btnEditParameters" type="button" (click)="onEditParameters()"><i class="fa fa-fw fa-list-ul"></i> {{ 'GLOBAL.EDIT' | translate }}</button>
 										<button *ngIf="isEditing" class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_ARGUMENT' | translate }}</button>
 									</ng-template>
-									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns" field="{{column.property}}" [locked]="column.locked" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index" field="{{column.property}}" [locked]="column.locked" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 										<ng-template kendoGridHeaderTemplate>
 											<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
 										</ng-template>
@@ -231,21 +231,41 @@
 												<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf='isEditing' let-dataItem>
+										<ng-template kendoGridCellTemplate *ngIf='isEditing' let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'name'">
-												<input type="text" name="{{column.property}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'dataType'">
-												<input type="text" name="{{column.property}}" [(ngModel)]="dataItem.dataType" style="width: 100%;" />
+												<kendo-dropdownlist
+														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+														[data]="dataTypes"
+														[(ngModel)]="dataItem.dataType">
+												</kendo-dropdownlist>
 											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'context'">
-												<input type="text" name="{{column.property}}" [(ngModel)]="dataItem.context" style="width: 100%;" />
+											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
+												<kendo-dropdownlist
+														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+														[data]="assetClassesForParameters"
+														[textField]="'value'"
+														[valueField]="'value'"
+														(valueChange)="onContextValueChange(dataItem)"
+														[(ngModel)]="dataItem.context">
+												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input type="text" name="{{column.property}}" [(ngModel)]="dataItem.value" style="width: 100%;" />
+												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'" type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.value" style="width: 100%;" />
+												<kendo-combobox *ngIf="dataItem.context.assetClass !== 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'"
+																[data]="dataItem.currentFieldList"
+																[filterable]="true"
+																[textField]="'field'"
+																[valueField]="'field'"
+																name="{{column.property + columnIndex + rowIndex}}"
+																[(ngModel)]="dataItem.field">
+
+												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'description'">
-												<input type="text" name="{{column.property}}" [(ngModel)]="dataItem.description" style="width: 100%;" />
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.description" style="width: 100%;" />
 											</div>
 										</ng-template>
 									</kendo-grid-column>

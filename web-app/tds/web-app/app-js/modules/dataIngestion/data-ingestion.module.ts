@@ -20,9 +20,9 @@ import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 import { PopupPollingComponent } from './components/popups/popup-polling.component';
 import { PopupProvidesDataComponent } from './components/popups/popup-provides-data.component';
 // Import Kendo Modules
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { DateInputsModule,  } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { NumericTextBoxModule } from '@progress/kendo-angular-inputs';
@@ -34,7 +34,7 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		DropDownListModule,
+		DropDownsModule,
 		GridModule,
 		DateInputsModule,
 		SortableModule,
