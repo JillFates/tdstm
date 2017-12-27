@@ -157,4 +157,26 @@ class CredentialService {
         }
         return JsonUtil.convertJsonToMap(resp.json)
     }
+
+    /**
+     * Find a Credential instance with the given id, project and provider.
+     *
+     * @param id
+     * @param project
+     * @param provider
+     * @param throwException
+     * @return
+     */
+    private Credential findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
+        Credential credential = Credential.where {
+            id == id
+            project == project
+            provider == provider
+        }.find()
+
+        if (! credential && throwException) {
+            throw new InvalidParamException("No Credential exists with the ID $id for the Project $project and Provider $provider.")
+        }
+        return credential
+    }
 }

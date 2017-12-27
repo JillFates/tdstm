@@ -19,6 +19,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 @Transactional
 class ApiActionService {
 	CamelHostnameIdentifier camelHostnameIdentifier
+	CredentialService credentialService
 	DataScriptService dataScriptService
 	ProviderService providerService
 
@@ -355,18 +356,17 @@ class ApiActionService {
 
 		String actionName = apiActionJson.name
 
+		// Make sure the name is valid. Fail otherwise.
 		if (!validateApiActionName(project, apiActionJson.name, apiActionId)) {
 			throw new InvalidParamException("Invalid name for API Action.")
-		}
-
-		DataScript dataScript = null
-		if (apiActionJson.defaultDataScriptId) {
-			dataScript = dataScriptService.getDataScript(NumberUtil.toLong(apiActionJson.defaultDataScriptId), project)
 		}
 
 		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
 
 		Credential credentials = getCredential(project, prov, apiActionJson)
+
+		DataScript dataScript = getDataScript(project, prov, apiActionJson)
+
 
 		apiAction.with {
 			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
@@ -403,13 +403,27 @@ class ApiActionService {
 	 */
 	private Credential getCredential(Project project, Provider provider, JSONObject apiActionJson) {
 		Credential credential = null
-		Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
-		if (credentialId) {
-			credential = GormUtil.findInProject(project, Credential, credentialId, true)
-			if (credential.provider.id != provider.id) {
-				throw new InvalidParamException("Error trying to create or update an API Action. The Credential's provider doesn't match the Action's provider.")
-			}
+		if (apiActionJson.credentialId) {
+			Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
+			credential = credentialService.findByProjectAndProvider(credentialId, project, provider, true)
 		}
 		return credential
 	}
+
+	/**
+	 * Find and return a DataScript with the given id for the corresponding provider and project.
+	 * @param project
+	 * @param provider
+	 * @param apiActionJson
+	 * @return
+	 */
+	private DataScript getDataScript(Project project, Provider provider, JSONObject apiActionJson) {
+		DataScript dataScript = null
+		if (apiActionJson.defaultDataScriptId) {
+			Long dataScriptId = NumberUtil.toLong(apiActionJson.defaultDataScriptId)
+			dataScript = dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, true)
+		}
+		return dataScript
+	}
+
 }

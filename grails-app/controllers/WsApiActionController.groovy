@@ -51,7 +51,7 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def fetch(Long id){
         Project project = securityService.userCurrentProject
-        ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
+        ApiAction apiAction = apiActionService.find(id, project, true)
         renderSuccessJson(apiAction.toMap(false))
     }
 

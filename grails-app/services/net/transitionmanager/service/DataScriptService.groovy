@@ -152,4 +152,26 @@ class DataScriptService implements ServiceMethods{
             dataScript.delete()
         }
     }
+
+    /**
+     * Find a DataScript with the given id, project and provider.
+     *
+     * @param id
+     * @param project
+     * @param provider
+     * @param throwException
+     * @return
+     */
+    DataScript findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
+        DataScript dataScript = DataScript.where {
+            id == id
+            project == project
+            provider == provider
+        }.find()
+
+        if (! dataScript && throwException) {
+            throw new InvalidParamException("No DataScript exists with the ID $id for the Project $project and Provider $provider.")
+        }
+        return dataScript
+    }
 }
