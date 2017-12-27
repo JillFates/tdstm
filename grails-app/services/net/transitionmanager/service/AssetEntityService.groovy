@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
+import com.tdsops.tm.search.FieldSearchData
 import net.transitionmanager.domain.AppMoveEvent
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -2616,15 +2617,26 @@ class AssetEntityService implements ServiceMethods {
 		// Handle the filtering by each column's text field
 		def whereConditions = []
 		def queryParams = [:]
-		filterParams.each {key, val ->
-			if (val && val.trim().size()) {
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, AssetEntity)
+		filterParams.each { key, val ->
+			if (val?.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: AssetEntity,
+						column: key,
+						filter: val,
+						columnAlias: "assets.${key}"
+
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
 		if (whereConditions.size()) {
 			firstWhere = false
-			query.append(" WHERE assets.${whereConditions.join(" AND assets.")}")
+			query.append(" WHERE ${whereConditions.join(" AND ")}")
 		}
 		if (params.moveBundleId) {
 			// TODO : JPM 9/2014 : params.moveBundleId!='unAssigned' - is that even possible anymore? moveBundle can't be unassigned...

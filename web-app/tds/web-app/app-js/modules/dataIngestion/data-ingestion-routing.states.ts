@@ -2,6 +2,7 @@ import {Ng2StateDeclaration} from '@uirouter/angular';
 
 import {DataScriptListComponent} from './components/data-script-list/data-script-list.component';
 import {ProviderListComponent} from './components/provider-list/provider-list.component';
+import {APIActionListComponent} from './components/api-action-list/api-action-list.component';
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 
 import {DataIngestionService} from './service/data-ingestion.service';
@@ -14,6 +15,10 @@ export class DataIngestionStates {
 	public static readonly PROVIDER_LIST = {
 		name: 'tds.dataingestion_provider',
 		url: '/provider/list'
+	};
+	public static readonly API_ACTION_LIST = {
+		name: 'tds.dataingestion_apiaciton',
+		url: '/action/list'
 	};
 }
 
@@ -67,7 +72,33 @@ export const providerListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	]
 };
 
+export const apiActionListState: Ng2StateDeclaration = <Ng2StateDeclaration>{
+	name: DataIngestionStates.API_ACTION_LIST.name,
+	url: DataIngestionStates.API_ACTION_LIST.url,
+	data: {
+		page: {
+			title: 'DATA_INGESTION.API_ACTIONS',
+			instruction: '',
+			menu: ['DATA_INGESTION.DATA_INGESTION', 'DATA_INGESTION.API_ACTIONS']
+		},
+		requiresAuth: true,
+	},
+	views: {
+		'headerView@tds': {component: HeaderComponent},
+		'containerView@tds': {component: APIActionListComponent}
+	},
+	resolve: [
+		{
+			token: 'apiActions',
+			policy: {async: 'RXWAIT'},
+			deps: [DataIngestionService],
+			resolveFn: (service: DataIngestionService) => service.getAPIActions()
+		}
+	]
+};
+
 export const DATA_INGESTION_STATES = [
 	dataScriptListState,
-	providerListState
+	providerListState,
+	apiActionListState
 ];

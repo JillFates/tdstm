@@ -3,6 +3,8 @@ package test.helper
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 
+import org.apache.commons.lang.RandomStringUtils as RSU
+
 /**
  * Use this class to create provider domain objects in your tests
  */
@@ -15,7 +17,7 @@ class ProviderTestHelper {
      */
     Provider createProvider(Project project) {
         Provider provider = new Provider(
-                name: 'Test provider',
+                name: RSU.randomAlphabetic(10),
                 comment: 'Test comment',
                 description: 'Test description',
                 project: project

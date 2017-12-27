@@ -1,10 +1,11 @@
-import com.tds.asset.AssetDependency
+import com.tds.asset.Application
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import com.tds.asset.AssetDependency
@@ -18,11 +19,14 @@ class GormUtilTests extends Specification {
 	// IOC variables
 	def sessionFactory
 	def personService
-	def personHelper
-	def assetHelper
+	PersonTestHelper personHelper
+	AssetTestHelper assetHelper
+	ProjectTestHelper projectHelper
 
 	def setup() {
 		assetHelper = new AssetTestHelper()
+		projectHelper = new ProjectTestHelper()
+		personHelper = new PersonTestHelper()
 	}
 
 	def "Test isDomainClass"() {
@@ -465,4 +469,65 @@ class GormUtilTests extends Specification {
 	}
 	*/
 
+	def "Test findInProject on different scenarios" () {
+		setup: "Create some objects require for the tests"
+			Project project = projectHelper.createProject()
+			Project project2 = projectHelper.createProject()
+			Person person = personHelper.createPerson()
+			Application application = assetHelper.createApplication(person, project)
+
+		when: "Looking up the application using the Application class"
+			Application app = GormUtil.findInProject(project, Application, application.id)
+		then: "The application was found"
+			app != null
+			app instanceof Application
+			app.id == application.id
+
+		when: "Looking up the application using the AssetEntity class"
+			AssetEntity asset1 = GormUtil.findInProject(project, AssetEntity, application.id)
+		then: "The application was found"
+			app != null
+			app instanceof Application
+			app.id == application.id
+
+		when: "Trying to find an instance of something that isn't a domain object"
+			def bogus = GormUtil.findInProject(project, String, 123)
+		then: "Nothing was found"
+			bogus == null
+
+		when: "Trying to find an instance of something that isn't a domain object and setting the exception flag"
+			bogus = GormUtil.findInProject(project, String, 123, true)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+
+		when: "Trying to find the application and passing a different project"
+			app = GormUtil.findInProject(project2, Application, application.id, true)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+
+		when: "Trying to find the application and passing a null project"
+			app = GormUtil.findInProject(null, Application, application.id, true)
+		then: "An InvalidParamException is thrown"
+				thrown InvalidParamException
+
+		when: "Trying to find something with null class"
+			app = GormUtil.findInProject(project, null, application.id, true)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+
+		when: "Trying to find the application and passing a null id"
+			app = GormUtil.findInProject(project, Application, null, true)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+
+		when: "Trying to find the application and passing an id of the wrong type"
+			app = GormUtil.findInProject(project, Application, "bogus", true)
+		then: "An InvalidParamException is thrown"
+			thrown InvalidParamException
+
+		when: "Trying to find the application and passing an id that doesn't exist."
+			app = GormUtil.findInProject(project, Application, application.id + 1)
+		then: "Null is returned."
+			app == null
+	}
 }

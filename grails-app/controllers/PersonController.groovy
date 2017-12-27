@@ -943,7 +943,12 @@ class PersonController implements ControllerMethods {
 		Person person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def company = person.company
-		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+		def personFunctions = []
+		// <SL>: Find a better solution to determine if the person we are trying to load if not "Automated"
+		// TM-6780
+		if (company) {
+			personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+		}
 		def availabaleFunctions = partyRelationshipService.getStaffingRoles(false)
 		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.userLoginPerson)
 

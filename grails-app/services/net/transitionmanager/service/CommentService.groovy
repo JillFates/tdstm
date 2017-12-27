@@ -48,6 +48,7 @@ class CommentService implements ServiceMethods {
 
 	def mailService					// SendMail MailService class
 	AssetEntityService assetEntityService
+	ApiActionService apiActionService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	Scheduler quartzScheduler
@@ -277,7 +278,7 @@ class CommentService implements ServiceMethods {
 			if(params.durationLocked) assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.durationScale) {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
-				log.debug "saveUpdateCommentAndNotes - TimeScale=$assetComment.durationScale"
+				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
 			}
 
 			// Issues (aka tasks) have a number of additional properties to be managed
@@ -331,6 +332,12 @@ class CommentService implements ServiceMethods {
 					// log.info "saveUpdateCommentAndNotes: dueDate=[$params.dueDate]"
 					assetComment.dueDate = TimeUtil.parseDate(params.dueDate)
 				}
+			}
+
+			// Assign ApiAction to task
+			if(params.containsKey("apiActionId")){
+				long id = Long.parseLong(params.apiActionId)
+				assetComment.apiAction = apiActionService.find(id, assetComment.project)
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This

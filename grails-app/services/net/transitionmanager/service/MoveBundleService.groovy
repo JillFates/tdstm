@@ -331,6 +331,20 @@ class MoveBundleService implements ServiceMethods {
 			session.setAttribute('Dep_Groups', (groups as JSON).toString())
 		}
 
+		// TM-8535 Missing Remnants (Group 0)
+		if( dependList && dependList[0].dependencyBundle != 0 ) {
+			dependList.add(0, [
+					  dependencyBundle: 0,
+					  appCount: 0,
+					  serverCount: 0,
+					  vmCount: 0,
+					  dbCount: 0,
+					  storageCount: 0,
+					  statusAssigned: 0,
+					  statusMoved: 0
+			])
+		}
+
 		dependList.each { group ->
 			def depGroupsDone = group.statusAssigned + group.statusMoved
 			String statusClass = ''
@@ -744,7 +758,8 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleText : bundle ids to analyze
 	 */
 	private void addStragglerDepsToGroupZero(projectId, moveBundleText, sqlTime) {
-		jdbcTemplate.execute("""
+
+		def sql = """
 			INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
 			SELECT ae.asset_entity_id, 0, "Straggler", "$sqlTime", ae.project_id
 			FROM asset_entity ae
@@ -752,7 +767,10 @@ class MoveBundleService implements ServiceMethods {
 			WHERE ae.project_id = $projectId # AND ae.dependency_bundle IS NULL
 			AND adb.asset_id IS NULL
 			AND move_bundle_id in ($moveBundleText)
-			AND ae.asset_type in $dependecyBundlingAssetTypesJoined""")
+			AND ae.asset_type in $dependecyBundlingAssetTypesJoined
+		"""
+
+		jdbcTemplate.execute(sql)
 	}
 
 	private String listAsPipeSeparatedString(list) {

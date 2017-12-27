@@ -6,6 +6,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
@@ -41,6 +42,8 @@ trait ControllerMethods {
 	MessageSource messageSource
 	SecurityService securityService
 	LicenseAdminService licenseAdminService
+
+	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
 
 	void renderAsJson(data) {
 		render(data as JSON)
@@ -116,19 +119,43 @@ trait ControllerMethods {
 		sendError FORBIDDEN // 403
 	}
 
-	void sendNotFound() {
-		sendError NOT_FOUND // 404
+	void sendNotFound(String message='') {
+		render(status:NOT_FOUND, message)
+		//sendError NOT_FOUND // 404
 	}
 
-	/** 
+	/**
 	 * Used to respond with a 400 Bad Request
 	 */
 	void sendBadRequest() {
 		response.sendError(400, 'Bad Request')
 	}
 
+	/**
+	 * Used to indicate that the request input was missing or improperly formatted
+	 * @param message - an optional error message as to why the input was invalid, when included will appear in an X header
+	 */
+	void sendInvalidInput(String message = '') {
+		if (message) {
+			response.addHeader(ERROR_MESG_HEADER, message)
+		}
+		render(status:400, text: 'Invalid Input')
+	}
+
 	void setContentTypeJson() {
 		response.contentType = 'text/json'
+	}
+
+	void setContentTypeCsv() {
+		response.contentType = 'text/csv'
+	}
+
+	void setContentTypeXml() {
+		response.contentType = 'text/xml'
+	}
+
+	void setContentTypeExcel() {
+		response.contentType = 'application/vnd.ms-excel'
 	}
 
 	void sendError(HttpStatus status, String message = null) {
@@ -301,11 +328,11 @@ trait ControllerMethods {
 	}
 
 	/**
-	 * Used to retrieve an domain record using the 
-	 * 
+	 * Used to retrieve an domain record using the
+	 *
 	 */
 	def <T> T fetchDomain(Class<T> clazz, Map params) {
-		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
+		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.id.toLong())
 		if (t) {
 			if (GormUtil.isDomainProperty(t, 'project')) {
 				SecurityService securityService = ApplicationContextHolder.getBean('securityService')
@@ -332,5 +359,11 @@ trait ControllerMethods {
 		response.addHeader("Content-Disposition", "attachment; filename=\""+filename)
 	}
 
-	
+	/**
+	 * Used to load the currentPerson into the controller
+	 * @return
+	 */
+	Person currentPerson() {
+		securityService.loadCurrentPerson()
+	}
 }
