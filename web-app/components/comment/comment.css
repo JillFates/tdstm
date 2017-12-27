@@ -179,6 +179,18 @@ button.alert-close {
 .comment-dialog-content {
 	position: relative;
 }
+#actionLookupModal {
+    width: 1000px;
+    top: 40px;
+    left: -190px;
+}
+#updateCommentTable, #updateCommentTableInnerTable {
+    table-layout: fixed;
+}
+#updateCommentTableInnerTable td{
+    word-break: break-all;
+}
+
 .buttons input.edit-comment {
     background: transparent url(../../icons/comment_edit.png) 5px 50% no-repeat;
     padding-left: 28px;

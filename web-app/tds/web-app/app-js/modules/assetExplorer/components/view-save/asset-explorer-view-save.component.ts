@@ -5,6 +5,7 @@ import { ViewModel, ViewGroupModel } from '../../model/view.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -29,7 +30,7 @@ export class AssetExplorerViewSaveComponent {
 			this.model.isFavorite = false;
 		}
 		if (this.model.isSystem) {
-			this.model.isShared = true;
+			this.model.isShared = false;
 		}
 	}
 
@@ -45,6 +46,23 @@ export class AssetExplorerViewSaveComponent {
 
 	protected isValid(): boolean {
 		return this.model.name && this.model.name.trim() !== '';
+	}
+
+	/**
+	 * Disable the System View checkbox if the user does not have the proper permission
+	 * @returns {boolean}
+	 */
+	private isSystemCreatePermitted(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate);
+	}
+
+	/**
+	 * Should turn isShared to false when isSystem is selected as true.
+	 */
+	private onIsSystemChange(): void {
+		if (this.model.isSystem && this.model.isShared) {
+			this.model.isShared = false;
+		}
 	}
 
 	protected onFavorite() {

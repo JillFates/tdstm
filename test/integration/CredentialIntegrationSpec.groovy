@@ -3,8 +3,12 @@ import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.*
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
+import test.helper.CredentialTestHelper
+import test.helper.ProjectTestHelper
+import test.helper.ProviderTestHelper
+import test.helper.PersonTestHelper
 
-class CredentialTests extends IntegrationSpec {
+class CredentialIntegrationSpec extends IntegrationSpec {
 
     ProjectService projectService
     SecurityService securityService
@@ -24,7 +28,7 @@ class CredentialTests extends IntegrationSpec {
         securityService.assumeUserIdentity(adminUser.username, false)
 
         Provider provider = providerTestHelper.createProvider(project)
-        credentialTestHelper.createCredential(project, provider)
+        credentialTestHelper.createAndSaveCredential(project, provider)
 
         when: 'project is deleted'
         projectService.deleteProject(project.id, true)
@@ -40,7 +44,7 @@ class CredentialTests extends IntegrationSpec {
         given:
         Project project = projectHelper.createProjectWithDefaultBundle()
         Provider provider = providerTestHelper.createProvider(project)
-        credentialTestHelper.createCredential(project, provider)
+        credentialTestHelper.createAndSaveCredential(project, provider)
 
         when: 'provider is deleted'
         provider.delete(flush: true)

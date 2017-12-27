@@ -4,6 +4,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
+import com.tds.asset.CommentNote
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
@@ -32,8 +33,10 @@ import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
@@ -48,6 +51,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -566,11 +570,18 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def workflowTransition = assetComment?.workflowTransition
 			String workflow = workflowTransition?.name
 
-			def noteList = assetComment.notes.sort{it.dateCreated}
+			// Get a list of the Notes associated with the task/comment
 			def notes = []
-			noteList.each {
-				notes << [TimeUtil.formatDateTime(it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
-				          it.createdBy?.toString(), it.note, it.createdBy?.id]
+			def notesList = CommentNote.createCriteria().list(max: 50) {
+				eq('assetComment', assetComment)
+				order('dateCreated', 'desc')
+			}
+			for (note in notesList) {
+				notes << [
+					TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
+					note.createdBy?.toString(),
+					note.note,
+					note.createdBy?.id]
 			}
 
 			// Get the name of the User Role by Name to display
@@ -631,6 +642,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 			def canEdit = userCanEditComments(assetComment.commentType)
 
+			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
+
+			ApiAction apiAction = assetComment.apiAction
+			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
 			commentList << [
@@ -665,7 +681,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
+				apiAction:apiActionMap,
+				actionMode: actionMode,
+				actionInvocable: assetComment.isActionInvocable(),
+				actionMode: actionMode,
 				lastUpdated: lastUpdated,
+				apiActionId: assetComment.apiAction?.id,
+				action: assetComment.apiAction?.name
+				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
@@ -1199,9 +1222,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def listTaskJSON() {
 		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
 		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
-		
+
 		// Get the pagination and set the user preference appropriately
-		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true) 
+		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true)
 		Integer currentPage = paginationPage()
 		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
@@ -2136,18 +2159,18 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 
 						graphLinks << [
-								id: i, 
-								source: sourceIndex, 
-								target: targetIndex, 
-								value: 2, 
+								id: i,
+								source: sourceIndex,
+								target: targetIndex,
+								value: 2,
 								statusColor: statusColor,
-								bundleConflict: it.bundleConflict, 
-								dependencyStatus: dependencyStatus, 
+								bundleConflict: it.bundleConflict,
+								dependencyStatus: dependencyStatus,
 								dependencyType: dependencyType,
 								duplicate: duplicate,
-								future: future, 
-								opacity: opacity, 
-								unresolved: !it.resolved, 
+								future: future,
+								opacity: opacity,
+								unresolved: !it.resolved,
 								notApplicable: notApplicable,
 							]
 						i++
@@ -2238,7 +2261,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		//def workFlowTransitions = WorkflowTransition.findAllByWorkflow(workFlow) TODO : should be removed after completion of this new feature
 		if (assetEntity) {
-			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			def existingWorkflows
+			if (assetCommentId) {
+				existingWorkflows = AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId).workflowTransition
+			} else {
+				existingWorkflows = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			}
 			workFlowTransitions.removeAll(existingWorkflows)
 		}
 

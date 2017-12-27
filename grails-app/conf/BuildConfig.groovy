@@ -16,11 +16,19 @@ grails.project.dependency.resolution = {
 
 	repositories {
 		inherits true
-		mavenRepo('http://tmdevold.tdsops.com/grails-maven')
+		mavenRepo 'http://tmdevold.tdsops.com/grails-maven'
 		mavenLocal()
+
+		//mavenRepo 'http://repo.grails.org/grails/plugins'
+		//mavenRepo 'https://repo.grails.org/grails/core'
+		//grailsPlugins()
+
 		grailsCentral()
 		mavenCentral()
 	}
+
+//	String camelVersion = '2.15.0'
+	String camelVersion = '2.13.2'
 
 	dependencies {
 		compile 'com.google.guava:guava:16.0.1'
@@ -35,11 +43,24 @@ grails.project.dependency.resolution = {
 		runtime 'mysql:mysql-connector-java:5.1.40'
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
+		runtime "org.apache.camel:camel-aws:${camelVersion}"
+
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'
 
+		// GETL Groovy ETL - https://github.com/ascrus/getl/
+		runtime 'net.sourceforge.getl:getl:1.2.05'
+
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
+
+		/*
+		//testRuntime ("org.apache.camel:camel-test:${camelVersion}") {
+		test ("org.apache.camel:camel-test:${camelVersion}") {
+			excludes( [name: 'junit'] )//
+
+		*/
+
 	}
 
 	plugins {
@@ -48,6 +69,10 @@ grails.project.dependency.resolution = {
 //		compile ':filterpane:2.5.0', {
 //			excludes 'asset-pipeline'
 //		}
+
+//		compile 'org.grails.plugins:routing:1.4.1'
+		compile 'org.grails.plugins:routing:1.4.0'
+
 		compile ':jasper:1.11.0'
 		compile ':quartz:1.0.2'
 		compile ':plugin-config:0.2.0'
@@ -65,6 +90,7 @@ grails.project.dependency.resolution = {
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'
+		runtime ':jmesa:2.0.4-SNAPSHOT-0.1'
 		runtime ':jqgrid:3.8.0.1'
 		runtime ':jquery-ui:1.8.15'
 		runtime ':jquery:1.11.1'

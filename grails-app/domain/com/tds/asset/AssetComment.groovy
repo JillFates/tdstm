@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -13,9 +14,8 @@ import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.TimeScale.M
@@ -77,6 +77,18 @@ class AssetComment {
 	Integer taskSpec                  // The taskSpec id # within the recipe that caused this task to be created
 	String instructionsLink
 	Boolean durationLocked = false
+
+	// If present is an API Action that will be invoked when a task goes to Started or Completed or user presses the Invoke
+	ApiAction apiAction
+
+	// The time that the API Action was invoked. Invocation can only occur if this property is null.
+	Date apiActionInvokedAt
+
+	// The time that the API Action invocation completed
+	Date apiActionCompletedAt
+
+	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
+	String apiActionSettings
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
@@ -146,6 +158,10 @@ class AssetComment {
 		taskSpec nullable: true
 		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
 		workflowTransition nullable: true
+		apiAction nullable: true
+		apiActionInvokedAt nullable: true
+		apiActionCompletedAt nullable: true
+		apiActionSettings nullable: true
 	}
 
 	static mapping = {
@@ -153,6 +169,7 @@ class AssetComment {
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
 		resolvedBy column: 'resolved_by'
+		// child lazy: false
 		columns {
 			comment sqltype: 'text'
 			displayOption sqltype: 'char', length: 1
@@ -244,6 +261,39 @@ class AssetComment {
 		isResolved = date ? 1 : 0
 	}
 
+	/**
+	 * Determines if the task is Automatic processed
+	 * @return
+	 */
+	boolean isAutomatic(){
+		AUTOMATIC_ROLE == role
+	}
+
+	/**
+	 * Used to determine if the task has an action associated with it
+	 * @return true if the task has an associated action
+	 */
+	boolean hasAction() {
+		apiAction != null
+	}
+
+	/*
+	 * Used to determine if the task action can be invoked either manually or by the automatic mechanism
+	 *
+	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
+	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
+	 * will turn to STARTED otherwise marked DONE if successful.
+	 * With both manual/user or automatic tasks, if the invocation fails the status should change to HOLD
+	 *
+	 * @return true if action can be invoked
+	 */
+	boolean isActionInvocable() {
+		apiAction &&
+		! apiActionInvokedAt &&
+		! apiActionCompletedAt &&
+		status in [READY, STARTED]
+	}
+
 	/*
 	 * Returns the remaining duration until the tasks will be completed. This tasks into account the start time
 	 * if the task is in progress otherwise returns the total duration
@@ -277,7 +327,7 @@ class AssetComment {
     * isActionable - return indicator that the status of the task is Actionable
     */
 	boolean isActionable() {
-		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
+		!(status in [ COMPLETED, TERMINATED ])
 	}
 
 	// task Manager column header names and its labels
