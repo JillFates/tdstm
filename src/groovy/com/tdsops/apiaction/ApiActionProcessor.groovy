@@ -1,14 +1,16 @@
 package com.tdsops.apiaction
 
+import net.transitionmanager.integration.ActionRequest
+
 class ApiActionProcessor {
 
-    ApiActionRequest request
+    ActionRequest request
     ApiActionResponse response
     ReactionAssetFacade asset
     ReactionTaskFacade task
     ApiActionJob job
 
-    ApiActionProcessor (ApiActionRequest request,
+    ApiActionProcessor (ActionRequest request,
                         ApiActionResponse response,
                         ReactionAssetFacade asset,
                         ReactionTaskFacade task,
@@ -71,9 +73,6 @@ class ApiActionProcessor {
  * Mock classes
  *
  */
-class ApiActionRequest {
-}
-
 class ApiActionResponse {
 }
 

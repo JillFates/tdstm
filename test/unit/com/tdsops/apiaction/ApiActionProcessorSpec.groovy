@@ -1,5 +1,6 @@
 package com.tdsops.apiaction
 
+import net.transitionmanager.integration.ActionRequest
 import spock.lang.Specification
 
 import static com.tdsops.apiaction.ReactionHttpStatusCodes.NOT_FOUND
@@ -29,13 +30,7 @@ class ApiActionProcessorSpec extends Specification {
     void 'test can invoke a simple PRE Script to customize Http4 component with params and headers' () {
 
         given:
-            ApiActionRequest request = GroovyMock(ApiActionRequest) {
-                final Map<String, ?> params = [:]
-                final Map<String, ?> config = [:]
-
-                getParams() >> params
-                getConfig() >> new Expando()
-            }
+            ActionRequest request = new ActionRequest(['format': 'xml'])
 
             def apiActionProcessor = new ApiActionProcessor(
                     request,
@@ -49,7 +44,8 @@ class ApiActionProcessorSpec extends Specification {
         when:
             new GroovyShell(this.class.classLoader, actionBinding)
                     .evaluate("""
-                        request.params.format = 'json'
+                        request.param.format = 'json'
+                        request.headers.add('header1', 'value1')
                         
                         // Set the socket and connect to 5 seconds
                         request.config.setProperty('httpClient.socketTimeout', 5000)
@@ -76,6 +72,7 @@ class ApiActionProcessorSpec extends Specification {
             actionBinding.hasVariable('SC')
 
         and:
+            request.param.format == 'json'
             request.config.getProperty('httpClient.socketTimeout') == 5000
             request.config.getProperty('httpClient.connectionTimeout') == 5000
             request.config.getProperty('proxyAuthHost') == '123.88.23.42'
@@ -93,7 +90,7 @@ class ApiActionProcessorSpec extends Specification {
             }
 
             ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
-                    GroovyMock(ApiActionRequest),
+                    new ActionRequest(['property1': 'value1']),
                     response,
                     GroovyMock(ReactionAssetFacade),
                     GroovyMock(ReactionTaskFacade),
@@ -133,7 +130,7 @@ class ApiActionProcessorSpec extends Specification {
 
         given:
             ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
-                    GroovyMock(ApiActionRequest),
+                    new ActionRequest(['property1': 'value1']),
                     GroovyMock(ApiActionResponse),
                     GroovyMock(ReactionAssetFacade),
                     GroovyMock(ReactionTaskFacade),
@@ -159,7 +156,7 @@ class ApiActionProcessorSpec extends Specification {
 
         given:
             ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
-                    GroovyMock(ApiActionRequest),
+                    new ActionRequest(['property1': 'value1']),
                     GroovyMock(ApiActionResponse),
                     GroovyMock(ReactionAssetFacade),
                     GroovyMock(ReactionTaskFacade),
