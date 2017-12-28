@@ -30,8 +30,7 @@ class ApiActionProcessor {
                 request: request,
                 asset  : asset,
                 task   : task,
-                job    : job,
-                SC     : ReactionHttpStatusCodes
+                job    : job
         ])
     }
 
@@ -47,8 +46,7 @@ class ApiActionProcessor {
                 *       : ReactionScriptCode.values()
                         .collectEntries {
                     [(it.name()): it]
-                },
-                SC      : ReactionHttpStatusCodes
+                }
         ])
     }
 
@@ -63,9 +61,27 @@ class ApiActionProcessor {
                 response: response,
                 asset   : asset,
                 task    : task,
-                job     : job,
-                SC      : ReactionHttpStatusCodes
+                job     : job
         ])
     }
 
+}
+
+/**
+ * Mock classes
+ *
+ */
+class ApiActionRequest {
+}
+
+class ApiActionResponse {
+}
+
+class ReactionAssetFacade {
+}
+
+class ReactionTaskFacade {
+}
+
+class ApiActionJob {
 }

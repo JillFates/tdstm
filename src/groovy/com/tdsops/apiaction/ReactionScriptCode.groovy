@@ -1,6 +1,14 @@
 package com.tdsops.apiaction
-
 enum ReactionScriptCode {
 
-    SUCCESS, ERROR
+    EVALUATE,
+    SUCCESS,
+    ERROR,
+    DEFAULT,
+    FAILED,
+    TIMEDOUT,
+    LAPSED,
+    STALLED,
+    PRE,
+    FINAL
 }

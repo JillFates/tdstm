@@ -1,7 +1,4 @@
 package com.tdsops.apiaction
-
-import org.codehaus.groovy.runtime.InvokerHelper
-
 /**
  * This class is used for binding context in every Api Action script processed.
  */
@@ -9,10 +6,11 @@ class ApiActionBinding extends Binding {
 
     ApiActionBinding (ApiActionProcessor apiActionProcessor, Map vars = [:]) {
         this.variables.putAll([
-                *: apiActionProcessor.metaClass.methods.collectEntries {
-                    [(it.name): InvokerHelper.getMethodPointer(apiActionProcessor, it.name)]
-                },
-                *: vars
+                SC: ReactionHttpStatusCodes,
+//                *: apiActionProcessor.metaClass.methods.collectEntries {
+//                    [(it.name): InvokerHelper.getMethodPointer(apiActionProcessor, it.name)]
+//                },
+                * : vars
         ])
     }
 
