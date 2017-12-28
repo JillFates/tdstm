@@ -149,10 +149,10 @@
 										<div class="form-group intervals-content">
 											<label for="apiActionEndpointPath" class="col-sm-4 control-label">Frequency:</label>
 											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100"> </kendo-numerictextbox>
+												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100" [disabled]="!apiActionModel.pollingInterval"></kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist [data]="intervals"></kendo-dropdownlist>
+												<kendo-dropdownlist [data]="intervals" [disabled]="!apiActionModel.pollingInterval"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
 
@@ -161,10 +161,10 @@
 										<div class="form-group intervals-content">
 											<label for="apiActionEndpointPath" class="col-sm-4 control-label">Assume Lapsed After:</label>
 											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100"> </kendo-numerictextbox>
+												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100" [disabled]="!apiActionModel.pollingInterval"></kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist [data]="intervals"></kendo-dropdownlist>
+												<kendo-dropdownlist [data]="intervals" [disabled]="!apiActionModel.pollingInterval"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
 
@@ -173,10 +173,10 @@
 										<div class="form-group intervals-content">
 											<label for="apiActionEndpointPath" class="col-sm-4 control-label">Assume Stalled After:</label>
 											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100"> </kendo-numerictextbox>
+												<kendo-numerictextbox [format]="'n'" [value]="0" [min]="0" [max]="100" [disabled]="!apiActionModel.pollingInterval"></kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist [data]="intervals"></kendo-dropdownlist>
+												<kendo-dropdownlist [data]="intervals" [disabled]="!apiActionModel.pollingInterval"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
 
@@ -197,7 +197,8 @@
 																	[data]="agentDatascriptList"
 																	[textField]="'name'"
 																	[valueField]="'id'"
-																	[(ngModel)]="apiActionModel.defaultDataScript"></kendo-dropdownlist>
+																	[(ngModel)]="apiActionModel.defaultDataScript"
+																	[disabled]="!apiActionModel.producesData"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
 

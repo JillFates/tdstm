@@ -15,11 +15,12 @@ export enum INTERVAL {
 
 export const INTERVALS = [INTERVAL.SECONDS, INTERVAL.MINUTES, INTERVAL.HOURS];
 
-export enum Keystroke {
+export enum KEYSTROKE {
 	ENTER = 'Enter',
 	TAB = 'Tab',
 	SHIFT_RIGHT = 'ShiftRight',
-	SHIFT_LEFT = 'ShiftLeft'
+	SHIFT_LEFT = 'ShiftLeft',
+	ESCAPE = 'Escape'
 };
 
 export enum DIALOG_SIZE {

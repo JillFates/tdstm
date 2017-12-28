@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Rx';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, Keystroke } from '../../../../shared/model/constants';
+import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -148,9 +148,9 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	onFilterKeyUp(e: KeyboardEvent): void {
-		if (e.code === Keystroke.ENTER) {
+		if (e.code === KEYSTROKE.ENTER) {
 			this.onFilter();
-		} else if (e.code !== Keystroke.TAB && e.code !== Keystroke.SHIFT_RIGHT && e.code !== Keystroke.SHIFT_LEFT) {
+		} else if (e.code !== KEYSTROKE.TAB && e.code !== KEYSTROKE.SHIFT_RIGHT && e.code !== KEYSTROKE.SHIFT_LEFT) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}
