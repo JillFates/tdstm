@@ -207,4 +207,5 @@ databaseChangeLog = {
 	include file: '20171110-create-new-permission-asset-explorer-system-list.groovy'
 	include file: '20171205-add-action-reset-permission.groovy'
 	include file: '20171221-change-asset-dependency-comment-type.groovy'
+	include file: '20171227-rename-all-assets-view.groovy'
 }
