@@ -19,6 +19,7 @@ import {NgForm} from '@angular/forms';
 import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
 
 declare var jQuery: any;
 
@@ -109,6 +110,8 @@ export class APIActionViewEditComponent {
 		private dialogService: UIDialogService) {
 
 		this.apiActionModel = Object.assign({}, this.originalModel);
+		this.dataSignature = JSON.stringify(this.apiActionModel);
+
 		this.getProviders();
 		this.getAgents();
 		this.getCredentials();
@@ -116,7 +119,6 @@ export class APIActionViewEditComponent {
 		this.getParameters();
 		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
-		this.dataSignature = JSON.stringify(this.apiActionModel);
 	}
 
 	/**
@@ -128,10 +130,9 @@ export class APIActionViewEditComponent {
 				if (this.modalType === ActionType.CREATE) {
 					this.providerList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.provider = this.providerList[0];
+					this.modifySignatureByProperty('provider');
 				}
 				this.providerList.push(...result);
-				this.dataSignature = JSON.stringify(this.apiActionModel);
-
 			},
 			(err) => console.log(err));
 	}
@@ -145,6 +146,7 @@ export class APIActionViewEditComponent {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentList.push({ id: '', name: 'Select...' });
 					this.apiActionModel.agentClass = this.agentList[0];
+					this.modifySignatureByProperty('agentClass');
 				}
 				this.agentList.push(...result);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.name) {
@@ -152,6 +154,7 @@ export class APIActionViewEditComponent {
 				} else {
 					this.agentMethodList.push({ id: '', name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
+					this.modifySignatureByProperty('agentMethod');
 				}
 			},
 			(err) => console.log(err));
@@ -166,6 +169,7 @@ export class APIActionViewEditComponent {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentCredentialList.push({ id: '', name: 'Select...' });
 					this.apiActionModel.credential = this.agentCredentialList[0];
+					this.modifySignatureByProperty('credential');
 				}
 				this.agentCredentialList.push(...result);
 			},
@@ -181,6 +185,7 @@ export class APIActionViewEditComponent {
 				if (this.modalType === ActionType.CREATE) {
 					this.agentDatascriptList.push({ id: null, name: 'Select...' });
 					this.apiActionModel.defaultDataScript = this.agentCredentialList[0];
+					this.modifySignatureByProperty('defaultDataScript');
 				}
 				this.agentDatascriptList.push(...result);
 			},
@@ -306,7 +311,6 @@ export class APIActionViewEditComponent {
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 				}
 				this.agentMethodList = result;
-				this.dataSignature = JSON.stringify(this.apiActionModel);
 			},
 			(err) => console.log(err));
 	}
@@ -422,5 +426,14 @@ export class APIActionViewEditComponent {
 	 */
 	public refreshParametersList(): void {
 		this.parameterList = process(this.parameterList.data, this.state);
+	}
+
+	/**
+	 * Keep Data Signature Clean even when there are so many values incoming
+	 * @param property
+	 * @param value
+	 */
+	private modifySignatureByProperty(property: any): void {
+		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.apiActionModel[property]);
 	}
 }

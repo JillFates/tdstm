@@ -1,17 +1,23 @@
-import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
-import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
+import {Component, Inject} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import {process, CompositeFilterDescriptor, SortDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
-import { DataIngestionService } from '../../service/data-ingestion.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { APIActionColumnModel, APIActionModel, EventReaction, EventReactionType } from '../../model/api-action.model';
-import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
-import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
-import { DIALOG_SIZE, INTERVAL } from '../../../../shared/model/constants';
+import {DataIngestionService} from '../../service/data-ingestion.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
+import {
+	COLUMN_MIN_WIDTH,
+	Flatten,
+	ActionType,
+	BooleanFilterData,
+	DefaultBooleanFilterData
+} from '../../../../shared/model/data-list-grid.model';
+import {APIActionViewEditComponent} from '../api-action-view-edit/api-action-view-edit.component';
+import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'api-action-list',
@@ -149,6 +155,8 @@ export class APIActionListComponent {
 			agentClass: { id: null, name: '' },
 			agentMethod: { id: null, name: ''},
 			eventReactions: [],
+			pollingInterval: false,
+			producesData: false,
 			polling: {
 				frequency: {
 					value: 0,

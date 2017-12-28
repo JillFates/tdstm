@@ -111,7 +111,7 @@ export class APIActionModel {
 	callbackMethod?: string;
 	callbackMode?: string;
 	methodParams?: string;
-	pollingInterval?: number;
+	pollingInterval?: boolean;
 	polling?: {
 		frequency?: {
 			value?: number;
@@ -135,7 +135,7 @@ export class APIActionModel {
 		id?: string,
 		name?: string
 	};
-	producesData?: number;
+	producesData?: boolean;
 	dateCreated?: Date;
 	lastModified?: Date;
 	credential?: {
