@@ -20,6 +20,7 @@ import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
 
 declare var jQuery: any;
 
@@ -168,7 +169,7 @@ export class APIActionViewEditComponent {
 		this.dataIngestionService.getCredentials().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.agentCredentialList.push({ id: '', name: 'Select...' });
+					this.agentCredentialList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
 				}
@@ -183,6 +184,7 @@ export class APIActionViewEditComponent {
 	getDataScripts(): void {
 		this.dataIngestionService.getDataScripts().subscribe(
 			(result: any) => {
+				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
 				if (this.modalType === ActionType.CREATE) {
 					this.datascriptList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
@@ -309,7 +311,7 @@ export class APIActionViewEditComponent {
 					if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.id);
 					} else {
-						this.agentMethodList.push({id: '', name: 'Select...'});
+						this.agentMethodList.push({id: 0, name: 'Select...'});
 						this.apiActionModel.agentMethod = this.agentMethodList[0];
 					}
 					this.agentMethodList = result;
@@ -317,7 +319,7 @@ export class APIActionViewEditComponent {
 				(err) => console.log(err));
 		} else {
 			this.agentMethodList = new Array<AgentMethodModel>();
-			this.agentMethodList.push({id: '', name: 'Select...'});
+			this.agentMethodList.push({id: 0, name: 'Select...'});
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 		}
 	}

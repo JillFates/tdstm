@@ -1,10 +1,10 @@
 export class AgentModel {
-	id?: string;
+	id?: number;
 	name?: string;
 }
 
 export class CredentialModel {
-	id?: string;
+	id?: number;
 	name?: string;
 }
 

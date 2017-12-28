@@ -100,11 +100,11 @@ export class APIActionModel {
 	name: string;
 	description: string;
 	agentMethod?: {
-		id?: string,
+		id?: number,
 		name?: string
 	};
 	agentClass?: {
-		id?: string,
+		id?: number,
 		name?: string
 	};
 	asyncQueue?: string;
@@ -139,7 +139,7 @@ export class APIActionModel {
 	dateCreated?: Date;
 	lastModified?: Date;
 	credential?: {
-		id?: string,
+		id?: number,
 		name?: string
 	};
 	eventReactions?: EventReaction[];

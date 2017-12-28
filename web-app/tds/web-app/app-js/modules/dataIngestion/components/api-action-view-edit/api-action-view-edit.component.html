@@ -159,7 +159,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.frequency.value"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -167,7 +168,8 @@
 														name="apiActionFrequencyInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.frequency.interval"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
@@ -183,7 +185,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -191,7 +194,8 @@
 														name="apiActionAssumeLapsedAfterInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.lapsedAfter.interval"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
@@ -207,7 +211,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -215,7 +220,8 @@
 														name="apiActionAssmeStalledAfterInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.stalledAfter.interval"
-														[disabled]="!apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.pollingInterval"
+														[required]="apiActionModel.pollingInterval">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">

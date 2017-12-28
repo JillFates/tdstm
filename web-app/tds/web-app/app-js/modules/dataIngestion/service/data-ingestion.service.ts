@@ -20,15 +20,15 @@ export class DataIngestionService {
 
 	mockData: CredentialModel[] = [
 		{
-			id: '1',
+			id: 1,
 			name: 'Credential 1'
 		},
 		{
-			id: '2',
+			id: 2,
 			name: 'Credential 2'
 		},
 		{
-			id: '3',
+			id: 3,
 			name: 'Credential 3'
 		}
 	];
@@ -128,7 +128,7 @@ export class DataIngestionService {
 		return Observable.from(this.mockParametersData).bufferCount(this.mockParametersData.length);
 	}
 
-	getActionMethodById(agentId: string): Observable<AgentMethodModel[]> {
+	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
 		return this.http.get(`${this.dataApiActionUrl}/agent/${agentId}`)
 			.map((res: Response) => {
 				let result = res.json();
