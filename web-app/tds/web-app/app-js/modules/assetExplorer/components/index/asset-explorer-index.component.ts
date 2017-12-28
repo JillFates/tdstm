@@ -59,8 +59,8 @@ export class AssetExplorerIndexComponent {
 		if (this.isCreateAvailable()) {
 			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
 				{
-					system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
-					shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
+					// system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
+					// shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
 				});
 		}
 	}
@@ -118,9 +118,7 @@ export class AssetExplorerIndexComponent {
 	 * @returns {boolean}
 	 */
 	protected isCreateAvailable(): boolean {
-		return this.selectedFolder.type === this.viewType.SYSTEM_VIEWS ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
-			this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 	}
 
 	protected isEditAvailable(report: ViewModel): boolean {
