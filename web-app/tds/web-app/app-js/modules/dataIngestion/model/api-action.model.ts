@@ -112,6 +112,20 @@ export class APIActionModel {
 	callbackMode?: string;
 	methodParams?: string;
 	pollingInterval?: number;
+	polling?: {
+		frequency?: {
+			value?: number;
+			interval?: string;
+		};
+		lapsedAfter?: {
+			value?: number;
+			interval?: string;
+		};
+		stalledAfter?: {
+			value?: number;
+			interval?: string;
+		}
+	};
 	timeout?: number;
 	provider?: {
 		id?: number,

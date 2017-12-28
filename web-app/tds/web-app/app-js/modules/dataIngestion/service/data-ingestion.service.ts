@@ -6,6 +6,7 @@ import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
+import {INTERVAL} from '../../../shared/model/constants';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -89,6 +90,20 @@ export class DataIngestionService {
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
 					r.pollingInterval = (r.pollingInterval === 1);
+					r.polling = {
+						frequency: {
+							value: 0,
+								interval: INTERVAL.SECONDS
+						},
+						lapsedAfter: {
+							value: 0,
+								interval: INTERVAL.MINUTES
+						},
+						stalledAfter: {
+							value: 0,
+								interval: INTERVAL.MINUTES
+						}
+					};
 				});
 				return dataScriptModels;
 			})

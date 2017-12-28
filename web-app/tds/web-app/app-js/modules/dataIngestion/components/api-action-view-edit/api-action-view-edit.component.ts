@@ -54,6 +54,7 @@ export class APIActionViewEditComponent {
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private intervals = INTERVALS;
+	public interval = INTERVAL;
 	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;

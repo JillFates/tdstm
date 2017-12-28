@@ -11,7 +11,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { APIActionColumnModel, APIActionModel, EventReaction, EventReactionType } from '../../model/api-action.model';
 import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
 import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
+import { DIALOG_SIZE, INTERVAL } from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'api-action-list',
@@ -43,6 +43,7 @@ export class APIActionListComponent {
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	private interval = INTERVAL;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -147,7 +148,21 @@ export class APIActionListComponent {
 			provider: { id: null, name: '' },
 			agentClass: { id: null, name: '' },
 			agentMethod: { id: null, name: ''},
-			eventReactions: []
+			eventReactions: [],
+			polling: {
+				frequency: {
+					value: 0,
+					interval: this.interval.SECONDS
+				},
+				lapsedAfter: {
+					value: 0,
+					interval: this.interval.MINUTES
+				},
+				stalledAfter: {
+					value: 0,
+					interval: this.interval.MINUTES
+				}
+			}
 		};
 
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
