@@ -255,11 +255,11 @@
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
 												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'" type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.value" style="width: 100%;" />
 												<kendo-combobox *ngIf="dataItem.context.assetClass !== 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'"
+																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
 																[textField]="'field'"
 																[valueField]="'field'"
-																name="{{column.property + columnIndex + rowIndex}}"
 																[(ngModel)]="dataItem.field">
 
 												</kendo-combobox>
