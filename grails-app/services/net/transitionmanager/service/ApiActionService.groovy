@@ -307,16 +307,21 @@ class ApiActionService {
 	 * @param value
 	 * @return
 	 */
-	def parseEnum(Class enumClass, String field, String value) {
+	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false) {
 		String baseErrorMsg = "Error trying to create or update an API Action."
-		if (!value) {
+		if (!value && mandatory) {
 			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
 		}
-		try {
-			return enumClass.valueOf(value)
-		}catch (IllegalArgumentException e){
-			throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+		if (value) {
+			try {
+				return enumClass.valueOf(value)
+			}catch (IllegalArgumentException e){
+				throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+			}
+		} else {
+			return null
 		}
+
 	}
 
 	/**
@@ -369,7 +374,7 @@ class ApiActionService {
 
 
 		apiAction.with {
-			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
+			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass, true)
 			agentMethod = apiActionJson.agentMethod
 			asyncQueue = apiActionJson.asyncQueue
 			callbackMethod = apiActionJson.callbackMethod

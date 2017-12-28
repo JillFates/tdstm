@@ -85,7 +85,8 @@ class ApiAction {
 		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
 		asyncQueue nullable: false, size: 0..64
-		callbackMode nullable: false
+		callbackMethod nullable: true
+		callbackMode nullable: true
 		credential nullable: true
 		defaultDataScript nullable: true
 		name nullable: false, size: 1..64
@@ -175,7 +176,7 @@ class ApiAction {
 			fields.agentMethod = agentMethod
 			fields.asyncQueue = asyncQueue
 			fields.callbackMethod = callbackMethod
-			fields.callbackMode = callbackMode.name()
+			fields.callbackMode = callbackMode? callbackMode.name() : null
 			fields.credential = credentialMap
 			fields.dateCreated = dateCreated
 			fields.defaultDataScript = defaultDataScriptMap
