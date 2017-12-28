@@ -47,26 +47,20 @@ class AssetService {
       if (dependencyIds.isEmpty()) {
          return "0 $type records were deleted"
       }
+      List<Long> depIds = NumberUtil.toPositiveLongList(dependencyIds)
 
-      List<Long> depIds = []
-      dependencyIds.each { v ->
-         Long id = NumberUtil.toPositiveLong(v, -1)
-         if (id > 0) {
-            depIds << id
-         }
-      }
       log.debug "bulkDeleteDependencies: $depIds to be deleted"
       int count = depIds.size()
 
       // Now make sure that the ids are associated to the project
       List<Long> validatedDepIds =
-              AssetDependency.where {
-                 asset.project == project
-                 dependent.project == project
-                 id in depIds
-              }
-              .projections { property 'id' }
-                      .list()
+         AssetDependency.where {
+            asset.project == project
+            dependent.project == project
+             id in depIds
+         }
+         .projections { property 'id' }
+         .list()
 
       if (count != validatedDepIds.size()) {
          List<Long> idsNotInProject = depIds - validatedDepIds
