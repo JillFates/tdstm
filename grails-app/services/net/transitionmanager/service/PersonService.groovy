@@ -356,7 +356,7 @@ class PersonService implements ServiceMethods {
 			}
 
 			where = ''
-			queryParams = [companies: companies]
+			queryParams = [companies: queryParams.companies]
 			addQueryParam('firstName', nameMap.first)
 			addQueryParam('middleName', nameMap.middle)
 			addQueryParam('lastName', lastName)
