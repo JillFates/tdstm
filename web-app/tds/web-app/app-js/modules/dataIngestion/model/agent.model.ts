@@ -9,7 +9,7 @@ export class CredentialModel {
 }
 
 export class AgentMethodModel {
-	id?: string;
+	id?: number;
 	name?: string;
 	description?: string;
 	method?: string;

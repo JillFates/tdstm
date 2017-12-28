@@ -47,7 +47,8 @@ export class APIActionViewEditComponent {
 	public agentList = new Array<AgentModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
 	public agentCredentialList = new Array<CredentialModel>();
-	public agentDatascriptList = new Array<DataScriptModel>();
+	public datascriptList = new Array<DataScriptModel>();
+	public providerDatascriptList = new Array<DataScriptModel>();
 	public parameterList: GridDataResult;
 	public apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	public modalTitle: string;
@@ -144,7 +145,7 @@ export class APIActionViewEditComponent {
 		this.dataIngestionService.getAgents().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.agentList.push({ id: '', name: 'Select...' });
+					this.agentList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.agentClass = this.agentList[0];
 					this.modifySignatureByProperty('agentClass');
 				}
@@ -152,7 +153,7 @@ export class APIActionViewEditComponent {
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.name) {
 					this.onAgentValueChange(this.apiActionModel.agentMethod);
 				} else {
-					this.agentMethodList.push({ id: '', name: 'Select...' });
+					this.agentMethodList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
 				}
@@ -183,11 +184,11 @@ export class APIActionViewEditComponent {
 		this.dataIngestionService.getDataScripts().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
-					this.agentDatascriptList.push({ id: null, name: 'Select...' });
-					this.apiActionModel.defaultDataScript = this.agentCredentialList[0];
+					this.datascriptList.push({ id: 0, name: 'Select...' });
+					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
-				this.agentDatascriptList.push(...result);
+				this.datascriptList.push(...result);
 			},
 			(err) => console.log(err));
 	}
@@ -300,19 +301,41 @@ export class APIActionViewEditComponent {
 	 * On a new Agent change
 	 * @param value
 	 */
-	onAgentValueChange(agentModel: AgentModel): void {
-		this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
-			(result: any) => {
-				this.agentMethodList = new Array<AgentMethodModel>();
-				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
-					this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.id);
-				} else {
-					this.agentMethodList.push({ id: '', name: 'Select...' });
-					this.apiActionModel.agentMethod = this.agentMethodList[0];
-				}
-				this.agentMethodList = result;
-			},
-			(err) => console.log(err));
+	protected onAgentValueChange(agentModel: AgentModel): void {
+		if (agentModel.id !== 0) {
+			this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
+				(result: any) => {
+					this.agentMethodList = new Array<AgentMethodModel>();
+					if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
+						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.id);
+					} else {
+						this.agentMethodList.push({id: '', name: 'Select...'});
+						this.apiActionModel.agentMethod = this.agentMethodList[0];
+					}
+					this.agentMethodList = result;
+				},
+				(err) => console.log(err));
+		} else {
+			this.agentMethodList = new Array<AgentMethodModel>();
+			this.agentMethodList.push({id: '', name: 'Select...'});
+			this.apiActionModel.agentMethod = this.agentMethodList[0];
+		}
+	}
+
+	/**
+	 * On a new Provider Value change
+	 * @param value
+	 */
+	protected onProviderValueChange(providerModel: ProviderModel): void {
+		// Call Credential API that does not exist yet...
+
+		// Populate only the DataScripts that are related to the provider
+		this.providerDatascriptList = new Array<DataScriptModel>();
+		this.providerDatascriptList.push({ id: 0, name: 'Select...' });
+		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
+		this.apiActionModel.defaultDataScript = this.providerDatascriptList[0];
+		// Set Credential to default
+		this.apiActionModel.credential = this.agentCredentialList[0];
 	}
 
 	/**

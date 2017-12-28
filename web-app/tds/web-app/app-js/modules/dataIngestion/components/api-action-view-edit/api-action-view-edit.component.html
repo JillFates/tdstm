@@ -47,8 +47,10 @@
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
 																	id="apiActionProvider" name="apiActionProvider" class="form-control"
+                                                                    (valueChange)="onProviderValueChange($event)"
 																	[data]="providerList"
-																	[textField]="'name'" [valueField]="'id'"
+																	[textField]="'name'"
+                                                                    [valueField]="'id'"
 																	[(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.provider}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -94,9 +96,10 @@
 																	[valueField]="'id'"
 																	(open)="onOpenAgentMethod()"
 																	[(ngModel)]="apiActionModel.agentMethod"
+																	[disabled]="apiActionModel.agentClass.id === 0"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.agentMethod}">
 													<ng-template kendoDropDownListItemTemplate let-dataItem>
-														<span style="margin-right: 3px; min-width: 115px;">{{ dataItem?.name }}</span> | <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
+														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
 													</ng-template>
 												</kendo-dropdownlist>
 											</div>
@@ -113,6 +116,7 @@
 																	[data]="agentCredentialList"
 																	[textField]="'name'"
 																	[valueField]="'id'"
+                                                                    [disabled]="apiActionModel.provider.id === 0"
 																	[(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -230,11 +234,11 @@
 											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist
 																	id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"
-																	[data]="agentDatascriptList"
+																	[data]="providerDatascriptList"
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
-																	[disabled]="!apiActionModel.producesData"></kendo-dropdownlist>
+																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
 

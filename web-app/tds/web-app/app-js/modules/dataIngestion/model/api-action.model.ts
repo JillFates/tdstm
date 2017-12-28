@@ -132,7 +132,7 @@ export class APIActionModel {
 		name: string
 	};
 	defaultDataScript?: {
-		id?: string,
+		id?: number,
 		name?: string
 	};
 	producesData?: boolean;
