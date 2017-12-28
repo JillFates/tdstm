@@ -2671,7 +2671,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 					// Update the status of completion
 					percComplete += percIncrHalf
-					progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Creating dependencies for task spec $taskSpec.id")
+					progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Creating predecessors for task spec $taskSpec.id")
 
 
 					// ------------------------------------------------------------------------------------
