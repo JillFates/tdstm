@@ -19,7 +19,7 @@ class CommentNote {
 
 	static constraints = {
 		dateCreated nullable: true
-		note blank: false
+		note size: 0..65535
 	}
 
 	static mapping = {

@@ -7,7 +7,7 @@
 <div id="cablingDialogId" style="display: none;"></div>
 
 <div id="depCommentDialog" class="static-dialog" style="display:none">
-	<textarea name="" id="depCommentTextarea" rows="5" cols="150"></textarea>
+	<textarea name="" id="depCommentTextarea" rows="5" cols="150" maxlength="65535"></textarea>
 	<input type="hidden" id="depCommentRowNo" name="" />
 	<input type="hidden" id="depCommentType" name="" />
 
