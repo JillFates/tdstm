@@ -1,20 +1,20 @@
 package specs.Admin
 
 import geb.spock.GebReportingSpec
+import jodd.util.RandomString
 import pages.Admin.StaffListPage
 import pages.Admin.StaffCreationPage
 import pages.Admin.UserCreationPage
 import pages.Admin.UserDetailsPage
 import pages.common.LoginPage
 import pages.common.MenuPage
-import specs.common.TestUtils
 import spock.lang.Stepwise
 
 @Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
     static testCount
-    static randStr = TestUtils.randStr(4)
+    static randStr =  RandomString.getInstance().randomAlphaNumeric(4)
 
     //Define the names for the Staffq you will Create and Edit
     static baseName = "QAE2E"
@@ -45,13 +45,12 @@ class StaffListSpec extends GebReportingSpec {
     }
 
     // Enter on Staff page
-    def "Open List Staff"() {
+    def "Go to List Staff"() {
         testKey = "TM-XXXX"
         given:
         at MenuPage
         when:
-        waitFor { menuModule.adminMenu.click() }
-        waitFor { menuModule.adminStaffItem.click() }
+        menuModule.goToAdminListStaff()
         then:
         at StaffListPage
         waitFor { gridSize > 0 }

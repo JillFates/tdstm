@@ -2,10 +2,8 @@ package specs.Cookbook
 
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
-import pages.Cookbook.CreateRecipePage
-import pages.Cookbook.TabEditorPage
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
+import pages.common.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -20,9 +18,8 @@ class RecipeDeletionSpec extends GebReportingSpec {
         def password = "e2e_password"
         to LoginPage
         loginModule.login(username,password)
-        at UserDashboardPage
-        waitFor { taskMenu.click() }
-        cookbookMenuItem.click()
+        at MenuPage
+        menuModule.goToTasksCookbook()
     }
 
     def setup() {

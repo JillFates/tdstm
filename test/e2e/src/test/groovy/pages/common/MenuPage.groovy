@@ -6,10 +6,11 @@ import modules.MenuModule
 class MenuPage extends Page {
 
     static at = {
-        title.contains("User Dashboard For")
+        contextPath.value() == "/tdstm"
     }
 
     static content = {
+        contextPath { $("input",id:"contextPath") }
         menuModule { module MenuModule }
     }
 }

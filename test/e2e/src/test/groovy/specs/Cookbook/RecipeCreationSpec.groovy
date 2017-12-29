@@ -6,6 +6,7 @@ import pages.Cookbook.CreateRecipePage
 import pages.Cookbook.TabEditorPage
 import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
+import pages.common.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -20,9 +21,8 @@ class RecipeCreationSpec extends GebReportingSpec {
         def password = "e2e_password"
         to LoginPage
         loginModule.login(username,password)
-        at UserDashboardPage
-        waitFor { taskMenu.click() }
-        cookbookMenuItem.click()
+        at MenuPage
+        menuModule.goToTasksCookbook()
     }
 
     def setup() {

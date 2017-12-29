@@ -2,9 +2,8 @@ package specs.Cookbook
 
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
-import pages.Cookbook.TabHistoryPage
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
+import pages.common.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -34,10 +33,9 @@ class CookbookSpec extends GebReportingSpec {
     def "Go to Cookbook page"() {
         testKey = "TM-7179"
         given:
-        at UserDashboardPage
+        at MenuPage
         when:
-        waitFor { taskMenu.click() }
-        cookbookMenuItem.click()
+        menuModule.goToTasksCookbook()
         then:
         at CookbookPage
         waitFor { recipeGridRows.size() > 0 }

@@ -1,8 +1,8 @@
 package specs.common
 
 import geb.spock.GebReportingSpec
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
+import pages.common.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -22,7 +22,7 @@ class LoginSpec extends GebReportingSpec {
         when:
         loginModule.login(username,password)
         then:
-        at UserDashboardPage
+        at MenuPage
     }
 
 }
