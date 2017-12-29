@@ -355,6 +355,11 @@ trait ControllerMethods {
 		}
 	}
 
+  /**
+   * Sets the Content-Disposition response-header field to the given filename parameter
+   *
+   * @param filename  The filename to be set
+   */
 	void setHeaderContentDisposition(String filename) {
 		response.addHeader("Content-Disposition", "attachment; filename=\""+filename)
 	}

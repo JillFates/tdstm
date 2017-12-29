@@ -9,7 +9,7 @@ import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Project
 import spock.lang.See
-import spock.lang.Specification
+import spock.lang.Shared
 
 /**
  * Created by ecantu on 12/11/2017.
@@ -17,41 +17,53 @@ import spock.lang.Specification
 @TestMixin(ControllerUnitTestMixin)
 class FilenameUtilTests extends AbstractUnitSpec {
 
+   @Shared
+   String fileExtension = 'xlsx'
+   @Shared
+   Date aDate
+   @Shared
+   PartyGroup company
+   @Shared
+   Project completeProject
+   @Shared
+   Project missingPropertiesProject
+
+
+   def setupSpec() {
+      // a Company
+      company = new PartyGroup(name:'ABC Company')
+      // a Project with all the required properties for file naming
+      completeProject = new Project(name:'Test Project', projectCode: 'Big Move', client: company)
+      // a Project with some required properties missing (projectCode is not present)
+      missingPropertiesProject = new Project(name:'Test Project', client: company)
+   }
+
     @See('TM-8124')
-    def '01. Test file name format 1'() {
-        given: 'a Project and Move Event with the corresponding values'
-            String fileExtension = 'xlsx'
-            PartyGroup company = new PartyGroup(name:'ABC Company')
-            Project project = new Project(name:'Test Project', projectCode: 'Big Movie', client: company)
-            MoveEvent me = new MoveEvent([project:project, name: 'ERP Event'])
-            def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
-        expect: 'the resulting file name for format 1 match the expected file naming scheme'
-            def filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, [project:project, moveEvent:me], fileExtension, date)
-                filename == 'ABC_Company-Big_Movie-ERP_Event-20141020_2215.xlsx'
+    def '01. Test file name for CLIENT_PROJECT_EVENT_DATE format'() {
+       given: 'a Project, Move Event and date with the corresponding values'
+            MoveEvent me = new MoveEvent([project:completeProject, name: 'ERP Event'])
+            aDate = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+            def params = [project:completeProject, moveEvent:me]
+       expect: 'the resulting file name for CLIENT_PROJECT_EVENT_DATE format match the expected file naming scheme'
+            'ABC_Company-Big_Move-ERP_Event-20141020_2215.xlsx' == FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, aDate)
     }
 
     @See('TM-8124')
-    def '02. Test bad or incomplete properties for file name format 1'() {
+    def '02. Test bad or incomplete properties for CLIENT_PROJECT_EVENT_DATE format'() {
         given: 'a Project and Move Event with incomplete values (projectCode is missing)'
-            String fileExtension = 'xlsx'
-            PartyGroup company = new PartyGroup(name:'ABC Company')
-            Project project = new Project(name:'Test Project', client: company)
-            MoveEvent me = new MoveEvent([project:project, name: 'ERP Event'])
-            def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
-        expect: 'the resulting file name for format 1 is empty, and not a corrupted filename'
-            def filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, [project:project, moveEvent:me], fileExtension, date)
-            filename == ''
+            MoveEvent me = new MoveEvent([project:missingPropertiesProject, name: 'ERP Event'])
+            aDate = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+            def params = [project:missingPropertiesProject, moveEvent:me]
+        expect: 'the resulting file name for CLIENT_PROJECT_EVENT_DATE format is empty, and not a corrupted filename'
+            '' == FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, aDate)
     }
 
     @See('TM-8124')
-    def '03. Test all events for file name format 1'() {
+    def '03. Test ALL events for CLIENT_PROJECT_EVENT_DATE format'() {
         given: 'a Project with the corresponding values, with ALL events for Event_Name'
-            String fileExtension = 'xlsx'
-            PartyGroup company = new PartyGroup(name:'ABC Company')
-            Project project = new Project(name:'Test Project', projectCode: 'Big Movie', client: company)
-            def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
-        expect: 'the resulting file name for format 1 match the expected file naming scheme, with ALL for Event_Name'
-            def filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, [project:project, allEvents: true], fileExtension, date)
-            filename == 'ABC_Company-Big_Movie-ALL-20141020_2215.xlsx'
+            aDate = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+            def params = [project:completeProject, allEvents: true] // the allEvents param is flagged true
+        expect: 'the resulting file name for CLIENT_PROJECT_EVENT_DATE match the expected file naming scheme, with ALL for Event_Name'
+            'ABC_Company-Big_Move-ALL-20141020_2215.xlsx' == FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, aDate)
     }
 }
