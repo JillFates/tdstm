@@ -1805,15 +1805,9 @@ class AssetEntityService implements ServiceMethods {
         // if no ids given don't process anything.
 		if (assetIdList.isEmpty()) {
             return "0 $type records were deleted"
-        }
+    }
 
-		List<Long> assetIds = []
-		assetIdList.each { v ->
-			Long id = NumberUtil.toPositiveLong(v, -1)
-			if (id > 0) {
-				assetIds << id
-			}
-		}
+		List<Long> assetIds = NumberUtil.toPositiveLongList(assetIdList)
 		log.debug "deleteBulkAssets: $assetIds to be deleted"
 		int count = assetIds.size()
 
@@ -1832,14 +1826,8 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (validatedAssetIds.size() > 0) {
-			if (type == "dependencies") {
-				count = AssetDependency.where {
-					id in validatedAssetIds
-				}.deleteAll()
-			} else {
-				count = deleteAssets(validatedAssetIds)
-			}
-		} else {
+       count = deleteAssets(validatedAssetIds)
+    } else {
 			count = 0
 		}
 
