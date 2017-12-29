@@ -84,7 +84,7 @@ class ApiAction {
 	static constraints = {
 		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
-		asyncQueue nullable: false, size: 0..64
+		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
 		credential nullable: true
@@ -93,6 +93,7 @@ class ApiAction {
 		methodParams nullable: true
 		lastModified nullable: true
 		producesData nullable: false, range:0..1
+		timeout nullable: true
 	}
 
 	static mapping = {
