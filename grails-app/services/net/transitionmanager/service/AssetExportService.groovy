@@ -749,27 +749,27 @@ class AssetExportService {
 						def colNum = entry.value["order"] as int
 
 						def colVal = ''
-						switch(colName) {
+						switch(field) {
 							case 'Id':
 								colVal = app.id
 								break
-							case 'App Owner':
+							case 'appOwner':
 								colVal = app.appOwner
 								break
 							case 'DepGroup':
 								// Find the Dependency Group that this app is bound to
 								colVal = assetDepBundleMap[app.id]
 								break
-							case ~/Shutdown By|Startup By|Testing By/:
+							case ~/shutdownBy|startupBy|testingBy/:
 								colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
 								break
-							case ~/Shutdown Fixed|Startup Fixed|Testing Fixed/:
+							case ~/shutdownFixed|startupFixed|testingFixed/:
 								colVal = app[field] ? 'Yes' : 'No'
 								break
-							case ~/Retire Date|Maint Expiration/:
+							case ~/retireDate|maintExpDate/:
 								colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
 								break
-							case ~/Modified Date/:
+							case ~/modifiedDate/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
 							default:
