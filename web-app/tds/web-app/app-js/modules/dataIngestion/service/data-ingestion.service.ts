@@ -85,7 +85,7 @@ export class DataIngestionService {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
 				dataScriptModels.forEach((r) => {
-					r.agentMethod = { name: r.agentMethod };
+					r.agentMethod = {name: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
@@ -93,15 +93,15 @@ export class DataIngestionService {
 					r.polling = {
 						frequency: {
 							value: 0,
-								interval: INTERVAL.SECONDS
+							interval: INTERVAL.SECONDS
 						},
 						lapsedAfter: {
 							value: 0,
-								interval: INTERVAL.MINUTES
+							interval: INTERVAL.MINUTES
 						},
 						stalledAfter: {
 							value: 0,
-								interval: INTERVAL.MINUTES
+							interval: INTERVAL.MINUTES
 						}
 					};
 				});

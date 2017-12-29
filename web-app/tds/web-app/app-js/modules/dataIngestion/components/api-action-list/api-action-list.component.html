@@ -15,8 +15,7 @@
 						(sortChange)="sortChange($event)"
 						[pageable]="{ pageSizes:[25,50,100,250,500,1000], info: true}"
 						(cellClick)="cellClick($event)"
-						[selectable]="true"
-						[rowSelected]="isRowSelected">
+						[selectable]="true">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<button class="btn btn-default" id="btnCreate" type="button" (click)="onCreate()" *ngIf="isCreateAvailable()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'DATA_INGESTION.CREATE_ACTION' | translate }}</button>
 						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>

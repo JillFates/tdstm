@@ -10,7 +10,7 @@
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
-						<a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab">Info</a>
+                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': !apiActionForm?.form?.valid && !isCurrentTab(0)}">Info</span></a>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(1)}">
 						<a href="#tab_2" (click)="setCurrentTab(1)" data-toggle="tab">Parameters</a>
@@ -47,7 +47,7 @@
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
 																	id="apiActionProvider" name="apiActionProvider" class="form-control"
-                                                                    (valueChange)="onProviderValueChange($event)"
+                                                                    (valueChange)="onProviderValueChange($event, false)"
 																	[data]="providerList"
 																	[textField]="'name'"
                                                                     [valueField]="'id'"
@@ -81,7 +81,7 @@
 																	required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.agentClass}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.agentClass}}</label>
+												<label class="control-label label-detail">{{apiActionModel.agentClass.name}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -104,7 +104,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
+												<label class="control-label label-detail">{{apiActionModel.agentMethod.name}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -120,7 +120,7 @@
 																	[(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
+												<label class="control-label label-detail">{{apiActionModel.credential?.name}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -173,7 +173,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} | ({{apiActionModel.polling.frequency.interval}})</label>
+												<label class="control-label label-detail">{{apiActionModel.polling.frequency.value}} ({{apiActionModel.polling.frequency.interval}})</label>
 											</div>
 										</div>
 										<div class="form-group intervals-content">
@@ -199,7 +199,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} | ({{apiActionModel.polling.lapsedAfter.interval}})</label>
+												<label class="control-label label-detail">{{apiActionModel.polling.lapsedAfter.value}} ({{apiActionModel.polling.lapsedAfter.interval}})</label>
 											</div>
 										</div>
 										<div class="form-group intervals-content">
@@ -225,7 +225,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} | ({{apiActionModel.polling.stalledAfter.interval}})</label>
+												<label class="control-label label-detail">{{apiActionModel.polling.stalledAfter.value}} ({{apiActionModel.polling.stalledAfter.interval}})</label>
 											</div>
 										</div>
 										<div class="form-check">
@@ -247,7 +247,7 @@
 																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-
+                                                <label class="control-label label-detail">{{apiActionModel.defaultDataScript.name}}</label>
 											</div>
 										</div>
 									</div>

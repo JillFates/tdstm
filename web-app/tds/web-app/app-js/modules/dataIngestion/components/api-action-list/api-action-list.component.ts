@@ -245,8 +245,9 @@ export class APIActionListComponent {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
 				setTimeout(() => {
-					this.selectRow(result.apiAction.id);
-					this.openAPIActionDialogViewEdit(result.apiAction, ActionType.VIEW);
+					this.selectRow(result.id);
+					let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
+					this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
 				}, 500);
 			}
 		}).catch(result => {

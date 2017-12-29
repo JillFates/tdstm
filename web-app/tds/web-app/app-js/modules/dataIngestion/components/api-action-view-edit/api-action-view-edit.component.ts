@@ -31,6 +31,10 @@ declare var jQuery: any;
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
+		.invalid-form {
+			color: red;
+			font-weight: bold;
+		}
 	`]
 })
 export class APIActionViewEditComponent {
@@ -152,7 +156,7 @@ export class APIActionViewEditComponent {
 				}
 				this.agentList.push(...result);
 				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.name) {
-					this.onAgentValueChange(this.apiActionModel.agentMethod);
+					this.onAgentValueChange(this.apiActionModel.agentClass);
 				} else {
 					this.agentMethodList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
@@ -191,6 +195,9 @@ export class APIActionViewEditComponent {
 					this.modifySignatureByProperty('defaultDataScript');
 				}
 				this.datascriptList.push(...result);
+				if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
+					this.onProviderValueChange(this.apiActionModel.provider, true);
+				}
 			},
 			(err) => console.log(err));
 	}
@@ -308,12 +315,13 @@ export class APIActionViewEditComponent {
 			this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
 				(result: any) => {
 					this.agentMethodList = new Array<AgentMethodModel>();
-					if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
-						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.id);
+					if (this.apiActionModel.agentMethod) {
+						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
 					} else {
 						this.agentMethodList.push({id: 0, name: 'Select...'});
 						this.apiActionModel.agentMethod = this.agentMethodList[0];
 					}
+					this.modifySignatureByProperty('agentMethod');
 					this.agentMethodList = result;
 				},
 				(err) => console.log(err));
@@ -328,16 +336,21 @@ export class APIActionViewEditComponent {
 	 * On a new Provider Value change
 	 * @param value
 	 */
-	protected onProviderValueChange(providerModel: ProviderModel): void {
+	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Call Credential API that does not exist yet...
 
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({ id: 0, name: 'Select...' });
+		this.providerDatascriptList.push({id: 0, name: 'Select...'});
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
-		this.apiActionModel.defaultDataScript = this.providerDatascriptList[0];
-		// Set Credential to default
-		this.apiActionModel.credential = this.agentCredentialList[0];
+		if (previousValue) {
+			this.apiActionModel.defaultDataScript = this.providerDatascriptList.find((datascript) => datascript.id === this.apiActionModel.defaultDataScript.id);
+			this.modifySignatureByProperty('defaultDataScript');
+		} else {
+			this.apiActionModel.defaultDataScript = this.providerDatascriptList[0];
+			// Set Credential to default
+			this.apiActionModel.credential = this.agentCredentialList[0];
+		}
 	}
 
 	/**
