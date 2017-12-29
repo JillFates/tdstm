@@ -175,6 +175,7 @@ class ImportService implements ServiceMethods {
 
 		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
+
 		return data
 	}
 
@@ -1798,7 +1799,7 @@ class ImportService implements ServiceMethods {
 		PersonService personService = grailsApplication.mainContext.personService
 
 		// Search across the project staff list for person by name
-		Map map = personService.findPerson(name, project, projectStaff)
+		Map map = personService.findPerson(name, project, projectStaff, false)
 
 		if (map.person) {
 			if (map.isAmbiguous) {
