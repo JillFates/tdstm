@@ -15,17 +15,11 @@ class TaskDeletionSpec extends GebReportingSpec{
 
     def testKey
     static testCount
-    //Define the names of the tasks you will Create and Edit
+    //Define the names of the tasks you will Create and Delete
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "QAE2E"
     static taskName = baseName +" "+ randStr + " Task For E2E Automation for Delete"
-    static taskNameEdit = baseName +" "+ randStr + " Task For E2E Edited"
-    static taskStatus = "Started"
     static taskEvent = "Buildout"
-    static taskPerson = "AUTO" //TODO verify other staff id values
-    static taskTeam = "AUTO"  //TODO verify other team id values
-    static taskAssetType = "Applications"
-    static taskAssetName = "App 1"
 
     def setupSpec() {
         testCount = 0
@@ -41,9 +35,6 @@ class TaskDeletionSpec extends GebReportingSpec{
         waitFor {tcModalLoading.hasClass("ng-hide")}
         tcModalTaskName = taskName
         tcModalEventSelector = taskEvent
-        tcModalStatusSelector = taskStatus
-        tcModalPersonSelector = taskPerson
-        tcModalTeamSelector = taskTeam
         waitFor { tcModalSaveBtn.click() }
         at TaskManagerPage
     }
@@ -56,15 +47,26 @@ class TaskDeletionSpec extends GebReportingSpec{
         String sCount = String.format("%03d", testCount)
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
+    def "Filter Task on List"() {
+        testKey = "TM-XXXX"
+        given:
+        at TaskManagerPage
+        when:
+        waitFor {tmDescriptionTColFlt.click()}
+        tmDescriptionTColFlt = taskName
+        waitFor{tmFirstElementDesc.text() == taskName}
+        waitFor{tmFirstElementDesc.click()}
+        waitFor{tmTaskDetailBtn.click()}
+        then:
+        at TaskDetailsPage
+    }
 
-    def "Task Details"() {
+    def "Open Task Details"() {
         testKey = "TM-XXXX"
         when:
         at TaskDetailsPage
         then:
-        waitFor{tdModalTaskName.text().trim() == taskNameEdit}
-        waitFor{tdModalTaskEvent.text().trim() == taskEvent}
-        waitFor{tdModalTaskStatus.text().trim() == taskStatus}
+        waitFor{tdModalTaskName.text().trim() == taskName}
     }
 
     def "Delete Task"() {
