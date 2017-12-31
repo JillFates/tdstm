@@ -2,15 +2,11 @@ package specs.Cookbook
 
 import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
-import pages.Cookbook.EditRecipePage
-import pages.Cookbook.TabEditorPage
-import pages.Cookbook.TabEditorTabSyntaxErrorsPage
 import pages.Cookbook.TabHistoryPage
 import pages.Cookbook.TabHistoryTabActionsPage
 import pages.Cookbook.TabHistoryTabGenLogPage
 import pages.Cookbook.TabHistoryTabTasksPage
 import pages.Cookbook.TaskDetailsPage
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
 import pages.common.MenuPage
 import spock.lang.Stepwise

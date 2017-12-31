@@ -8,7 +8,6 @@ import pages.Cookbook.ErrorMessagePage
 import pages.Cookbook.TabEditorPage
 import pages.Cookbook.TabTaskGenPage
 import pages.Cookbook.TabTaskGenTabSummaryPage
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
 import pages.common.MenuPage
 import spock.lang.Stepwise

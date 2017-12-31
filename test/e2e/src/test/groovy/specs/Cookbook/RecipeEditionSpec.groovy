@@ -6,8 +6,6 @@ import pages.Cookbook.CreateRecipePage
 import pages.Cookbook.EditRecipePage
 import pages.Cookbook.TabEditorPage
 import pages.Cookbook.TabEditorTabSyntaxErrorsPage
-import pages.Cookbook.TabHistoryPage
-import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
 import pages.common.MenuPage
 import spock.lang.Stepwise

@@ -2,7 +2,6 @@ package pages.common
 
 import geb.Page
 import modules.LoginModule
-import pages.Dashboards.UserDashboardPage
 
 class LoginPage extends Page {
     static url = "/tdstm/auth/login"
