@@ -20,7 +20,16 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		transformed: false
 	};
 	private script: string;
+	private filename = 'applications.csv';
+	private consoleLog: string;
 	private saving = false;
+	private consoleSettings: any = {
+		top : '30px',
+		left : '30px',
+		height: '200px',
+		width: '500px',
+		log: null
+	};
 
 	ngAfterViewInit(): void {
 		setTimeout(() => {
@@ -38,6 +47,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
 	}
 
+	/**
+	 * On EscKey Pressed close the dialog.
+	 */
 	onEscKeyPressed(): void {
 		this.cancelCloseDialog();
 	}
@@ -101,14 +113,35 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	protected onLoadSampleData(): void {
 		this.dismiss();
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
-			.then(() => console.log('ok'))
-			.catch(() => console.log('still ok'));
+			.then(() => console.log('onLoadSampleData ok'))
+			.catch(() => console.log('onLoadSampleData close'));
 	}
 
+	/**
+	 * On View Console button open the console dialog.
+	 */
 	protected onViewConsole(): void {
-		this.dialogService.extra(DataScriptConsoleComponent, [])
-			.then(() => console.log('ok'))
-			.catch(() => console.log('still ok'));
+		this.dialogService.extra(DataScriptConsoleComponent, [{provide: 'consoleSettings', useValue: this.consoleSettings}], false, true)
+			.then((result) => {/* on ok */} )
+			.catch((result) => {/* on close/cancel */});
+	}
+
+	/**
+	 * On Test Script button.
+	 */
+	private testing = false;
+	private onTestScript(): void {
+		this.testing = true;
+		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
+			this.testing = false;
+			if (result.data.isValid) {
+				this.consoleSettings.log = result.data.consoleLog;
+				this.notifierService.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'Valid Script'
+				});
+			}
+		});
 	}
 
 }

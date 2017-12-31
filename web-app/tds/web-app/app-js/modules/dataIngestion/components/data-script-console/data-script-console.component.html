@@ -1,5 +1,8 @@
-<div class="modal fade in" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md" role="document">
+<div class="modal fade in no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog"
+     [style.top]="consoleSettings.top"
+     [style.left]="consoleSettings.left">
+	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document"
+         [style.width]="consoleSettings.width">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
@@ -10,8 +13,9 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-12">
-						<textarea class="form-control console" [(ngModel)]="message" disabled name="message" id="" cols="30" rows="10">
-
+						<textarea id="textAreaLog" class="form-control console" [(ngModel)]="consoleSettings.log" disabled cols="30" rows="10"
+                                  [style.width]="consoleSettings.width"
+                                  [style.height]="consoleSettings.height">
 						</textarea>
 					</div>
 				</div>
