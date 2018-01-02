@@ -23,6 +23,15 @@ class ApiActionProcessor {
     }
 
     /**
+     * Creates a ApiActionBinding base on the ReactionScriptCode params.
+     * @param code a instance of ReactionScriptCode
+     * @return an instance of ApiActionBinding
+     */
+    ApiActionBinding scriptBindingFor(ReactionScriptCode code) {
+
+    }
+
+    /**
      *
      * @return
      */

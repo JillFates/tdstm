@@ -1,4 +1,5 @@
 package com.tdsops.apiaction
+
 enum ReactionScriptCode {
 
     EVALUATE,

@@ -1,5 +1,9 @@
 package net.transitionmanager.service
 
+import com.tdsops.apiaction.ApiActionResponse
+import com.tdsops.apiaction.ReactionAssetFacade
+import com.tdsops.apiaction.ReactionScriptCode
+import com.tdsops.apiaction.ReactionTaskFacade
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -12,6 +16,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.integration.ActionRequest
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
@@ -363,6 +368,20 @@ class ApiActionService {
 
 		apiAction.save(failOnError: true)
 		return apiAction
+
+	}
+
+	/**
+	 *
+	 * @param code
+	 * @param script
+	 * @param request
+	 * @param response
+	 * @param task
+	 * @param asset
+	 * @return
+	 */
+	Object evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset) {
 
 	}
 
