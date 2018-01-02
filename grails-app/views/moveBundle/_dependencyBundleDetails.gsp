@@ -14,7 +14,7 @@
 			<div class="planBundleSel">
 				<g:form name="bundleForm" action="dependencyConsole">	
 					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
-					Move Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
+					Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
 					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>&nbsp;&nbsp;
 					<span class="checkboxContainer">
 						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
