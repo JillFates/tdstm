@@ -1,15 +1,22 @@
-package com.tdsops.apiaction
+package net.transitionmanager.integration
 
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptBinding
+import net.transitionmanager.integration.ApiActionScriptProcessor
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.integration.ReactionTaskFacade
 import spock.lang.Specification
 
-import static com.tdsops.apiaction.ReactionHttpStatusCodes.NOT_FOUND
-import static com.tdsops.apiaction.ReactionHttpStatusCodes.OK
-import static com.tdsops.apiaction.ReactionScriptCode.ERROR
-import static com.tdsops.apiaction.ReactionScriptCode.SUCCESS
+import static net.transitionmanager.integration.ReactionHttpStatusCodes.NOT_FOUND
+import static net.transitionmanager.integration.ReactionHttpStatusCodes.OK
+import static net.transitionmanager.integration.ReactionScriptCode.ERROR
+import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 
 
-class ApiActionProcessorSpec extends Specification {
+class ApiActionScriptProcessorSpec extends Specification {
 
     def setupSpec () {
 
@@ -23,25 +30,22 @@ class ApiActionProcessorSpec extends Specification {
 
     }
 
-    /**
-     * PRE Script section.
-     */
     void 'test can invoke a simple PRE Script to customize Http4 component with params and headers' () {
 
         given:
             ActionRequest request = new ActionRequest(['format': 'xml'])
 
-            ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
                     request,
-                    GroovyMock(ApiActionResponse),
+                    new ApiActionResponse(),
                     GroovyMock(ReactionAssetFacade),
                     GroovyMock(ReactionTaskFacade),
                     GroovyMock(ApiActionJob)
             )
-            ApiActionBinding actionBinding = apiActionProcessor.preScriptBinding()
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.PRE)
 
         when: 'The PRE script is evaluated'
-            new GroovyShell(this.class.classLoader, actionBinding)
+            new GroovyShell(this.class.classLoader, scriptBinding)
                     .evaluate("""
                         request.param.format = 'json'
                         request.headers.add('header1', 'value1')
@@ -60,15 +64,15 @@ class ApiActionProcessorSpec extends Specification {
                         // Set the content-type to JSON
                         request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
                         
-                    """.stripIndent(), ApiActionProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptProcessor.class.name)
 
-        then: 'All the correct varibales were bound'
-            actionBinding.hasVariable('request')
-            !actionBinding.hasVariable('response')
-            actionBinding.hasVariable('task')
-            actionBinding.hasVariable('asset')
-            actionBinding.hasVariable('job')
-            actionBinding.hasVariable('SC')
+        then: 'All the correct variables were bound'
+            scriptBinding.hasVariable('request')
+            !scriptBinding.hasVariable('response')
+            scriptBinding.hasVariable('task')
+            scriptBinding.hasVariable('asset')
+            scriptBinding.hasVariable('job')
+            scriptBinding.hasVariable('SC')
 
         and: 'the request object was modified correctly'
             request.param.format == 'json'
@@ -78,43 +82,40 @@ class ApiActionProcessorSpec extends Specification {
             request.config.getProperty('proxyAuthPort') == 8080
     }
 
-    /**
-     * EVALUATE Script section.
-     */
     void 'test can invoke a simple EVALUATE Script and return a ReactionScriptCode result' () {
 
         setup:
-            ApiActionResponse response = GroovyMock(ApiActionResponse) {
-                getStatus() >> status
-            }
+            ApiActionResponse response = new ApiActionResponse()
+            response.data = 'anything'
+            response.status = status
 
-            ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
                     new ActionRequest(['property1': 'value1']),
-                    response,
+                    response.asImmutable(),
                     GroovyMock(ReactionAssetFacade),
                     GroovyMock(ReactionTaskFacade),
                     GroovyMock(ApiActionJob)
             )
 
-            ApiActionBinding actionBinding = apiActionProcessor.evaluateScriptBinding()
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.EVALUATE)
 
         expect: 'The evaluation of the script returns a ReactionScriptCode'
-            new GroovyShell(this.class.classLoader, apiActionProcessor.evaluateScriptBinding())
+            new GroovyShell(this.class.classLoader, scriptBinding)
                     .evaluate("""
                         if (response.status == SC.OK) {
                            return SUCCESS
                         } else {
                            return ERROR
                         }
-                    """.stripIndent(), ApiActionProcessor.class.name) == reaction
+                    """.stripIndent(), ApiActionScriptProcessor.class.name) == reaction
 
         and: 'And all the variables were bound correctly'
-            actionBinding.hasVariable('request') == hasRequest
-            actionBinding.hasVariable('response') == hasResponse
-            actionBinding.hasVariable('task') == hasTask
-            actionBinding.hasVariable('asset') == hasAsset
-            actionBinding.hasVariable('job') == hasJob
-            actionBinding.hasVariable('SC') == hasSC
+            scriptBinding.hasVariable('request') == hasRequest
+            scriptBinding.hasVariable('response') == hasResponse
+            scriptBinding.hasVariable('task') == hasTask
+            scriptBinding.hasVariable('asset') == hasAsset
+            scriptBinding.hasVariable('job') == hasJob
+            scriptBinding.hasVariable('SC') == hasSC
 
         where:
             status    || hasRequest | hasResponse | hasTask | hasAsset | hasJob | hasSC | reaction
@@ -122,86 +123,80 @@ class ApiActionProcessorSpec extends Specification {
             NOT_FOUND || true       | true        | false   | false    | false  | true  | ERROR
     }
 
-    /**
-     * EVALUATE Script section.
-     */
     void 'test can invoke a simple SUCCESS Script to check Asset if asset is a Device or an Application and change a task to done' () {
 
         given:
             ReactionAssetFacade asset = GroovyMock()
             ReactionTaskFacade task = GroovyMock()
 
-            ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
                     new ActionRequest(['property1': 'value1']),
-                    GroovyMock(ApiActionResponse),
+                    new ApiActionResponse(),
                     asset,
                     task,
                     GroovyMock(ApiActionJob)
             )
-            ApiActionBinding actionBinding = apiActionProcessor.resultScriptBinding()
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.SUCCESS)
 
         when: 'The script is evaluated'
-            new GroovyShell(this.class.classLoader, actionBinding)
+            new GroovyShell(this.class.classLoader, scriptBinding)
                     .evaluate("""
                     // Check to see if the asset is a VM
                     if ( !asset.isaDevice() && !asset.isaDatabase() ) {
                        task.done()
                     } 
-                    """.stripIndent(), ApiActionProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptProcessor.class.name)
 
         then: 'The asset and task object received the correct messages'
             1 * task.done()
             1 * asset.isaDevice()
             1 * asset.isaDatabase()
 
-        and: 'All the correct varibales were bound'
-            actionBinding.hasVariable('request')
-            actionBinding.hasVariable('response')
-            actionBinding.hasVariable('task')
-            actionBinding.hasVariable('asset')
-            actionBinding.hasVariable('job')
-            actionBinding.hasVariable('SC')
+        and: 'All the correct variables were bound'
+            scriptBinding.hasVariable('request')
+            scriptBinding.hasVariable('response')
+            scriptBinding.hasVariable('task')
+            scriptBinding.hasVariable('asset')
+            scriptBinding.hasVariable('job')
+            scriptBinding.hasVariable('SC')
     }
 
-    /**
-     * FINALIZE Script section.
-     */
     void 'test can invoke a simple FINALIZE Script to evaluate what has been performed' () {
 
         given:
 
             ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
 
-            ApiActionProcessor apiActionProcessor = new ApiActionProcessor(
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
                     new ActionRequest(['property1': 'value1']),
-                    GroovyMock(ApiActionResponse),
+                    new ApiActionResponse(),
                     GroovyMock(ReactionAssetFacade),
                     task,
                     GroovyMock(ApiActionJob)
             )
-            ApiActionBinding actionBinding = apiActionProcessor.resultScriptBinding()
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.FINAL)
 
         when: 'The script is evaluated'
-            new GroovyShell(this.class.classLoader, actionBinding)
+            new GroovyShell(this.class.classLoader, scriptBinding)
                     .evaluate("""
                         // Complete the task 
                         task.done()
                         
                         // Add a note to the task
                         task.addNote('hickory dickery dock, a mouse ran up the clock')
-                    """.stripIndent(), ApiActionProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptProcessor.class.name)
 
         then: 'The asset and task object received the correct messages'
             1 * task.done()
             1 * task.addNote('hickory dickery dock, a mouse ran up the clock')
 
-        and: 'All the correct varibales were bound'
-            actionBinding.hasVariable('request')
-            actionBinding.hasVariable('response')
-            actionBinding.hasVariable('task')
-            actionBinding.hasVariable('asset')
-            actionBinding.hasVariable('job')
-            actionBinding.hasVariable('SC')
+        and: 'All the correct variables were bound'
+            scriptBinding.hasVariable('request')
+            scriptBinding.hasVariable('response')
+            scriptBinding.hasVariable('task')
+            scriptBinding.hasVariable('asset')
+            scriptBinding.hasVariable('job')
+            scriptBinding.hasVariable('SC')
     }
 }
 

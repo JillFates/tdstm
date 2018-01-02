@@ -1,7 +1,9 @@
 package net.transitionmanager.integration
-
 /**
- *
+ * The API Action Reaction logic is going to need the ability to inspect the response object
+ * for information that is returned from the API action invocation.
+ * This class will be exposed to the Reaction DSL scripting language
+ * to examine the results that came back from the call.
  */
 class ApiActionResponse {
     boolean readonly = false
@@ -12,41 +14,40 @@ class ApiActionResponse {
     List<Map> files
     String filename
     String originalFilename
-    Integer status
+    ReactionHttpStatusCodes status
     Boolean successful
 
-    void setReadonly(boolean value) {
+    void setReadonly (boolean value) {
         readonly = value
     }
 
-    boolean isReadonly() {
+    boolean isReadonly () {
         return readonly
     }
 
-    void setProperty(String name, Object value) {
+    void setProperty (String name, Object value) {
         if (name != 'readonly') {
             checkReadonly(name)
             this.@"$name" = value
         }
     }
 
-    boolean hasHeader(String key) {
+    boolean hasHeader (String key) {
         if (Objects.nonNull(headers)) {
             return headers.containsKey(key)
         }
         return false
     }
 
-    String getHeader(String key) {
+    String getHeader (String key) {
         if (hasHeader(key)) {
             return headers.get(key)
         }
         return null
     }
 
-    ApiActionResponse asImmutable() {
+    ApiActionResponse asImmutable () {
         ApiActionResponse immutable = new ApiActionResponse()
-        immutable.setReadonly(true)
         immutable.data = this.data
         immutable.elapsed = this.elapsed
         immutable.error = this.error
@@ -57,10 +58,11 @@ class ApiActionResponse {
         immutable.status = this.status
         immutable.successful = this.successful
 
+        immutable.setReadonly(true)
         return immutable
     }
 
-    private checkReadonly(String name) {
+    private checkReadonly (String name) {
         if (isReadonly()) {
             throw new ReadOnlyPropertyException(name, ApiActionResponse.class.name)
         }

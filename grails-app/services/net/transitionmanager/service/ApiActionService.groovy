@@ -1,9 +1,9 @@
 package net.transitionmanager.service
 
 import com.tdsops.apiaction.ApiActionResponse
-import com.tdsops.apiaction.ReactionAssetFacade
-import com.tdsops.apiaction.ReactionScriptCode
-import com.tdsops.apiaction.ReactionTaskFacade
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.integration.ReactionTaskFacade
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil

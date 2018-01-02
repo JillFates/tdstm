@@ -1,4 +1,4 @@
-package com.tdsops.apiaction
+package net.transitionmanager.integration
 
 import org.apache.commons.httpclient.HttpStatus
 

@@ -1,10 +1,10 @@
-package com.tdsops.apiaction
+package net.transitionmanager.integration
 /**
  * This class is used for binding context in every Api Action script processed.
  */
-class ApiActionBinding extends Binding {
+class ApiActionScriptBinding extends Binding {
 
-    ApiActionBinding (ApiActionProcessor apiActionProcessor, Map vars = [:]) {
+    ApiActionScriptBinding (ApiActionScriptProcessor apiActionProcessor, Map vars = [:]) {
         this.variables.putAll([
                 SC: ReactionHttpStatusCodes,
 //                *: apiActionProcessor.metaClass.methods.collectEntries {
