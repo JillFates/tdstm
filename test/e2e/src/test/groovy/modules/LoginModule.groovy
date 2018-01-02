@@ -3,6 +3,7 @@ package modules
 import geb.Module
 
 class LoginModule extends Module {
+
     static content = {
         username        { $("#usernameid") }
         password        { $("input", name:"password") }

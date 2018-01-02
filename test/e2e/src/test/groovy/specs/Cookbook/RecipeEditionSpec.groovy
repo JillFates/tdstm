@@ -9,6 +9,7 @@ import pages.Cookbook.TabEditorTabSyntaxErrorsPage
 import pages.Cookbook.TabHistoryPage
 import pages.Dashboards.UserDashboardPage
 import pages.common.LoginPage
+import pages.common.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -23,9 +24,8 @@ class RecipeEditionSpec extends GebReportingSpec {
         def password = "e2e_password"
         to LoginPage
         loginModule.login(username,password)
-        at UserDashboardPage
-        waitFor { taskMenu.click() }
-        cookbookMenuItem.click()
+        at MenuPage
+        menuModule.goToTasksCookbook()
         at CookbookPage
         waitFor { recipeGridRows.size() > 0 }
         waitFor { createRecipeButton.click()}
