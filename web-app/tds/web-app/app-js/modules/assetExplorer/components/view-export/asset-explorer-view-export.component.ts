@@ -1,10 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import { ExcelExportComponent } from '@progress/kendo-angular-excel-export';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { FieldImportance } from '../../../fieldSettings/model/field-settings.model';
-import { AssetExportModel } from '../../model/asset-export-model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
+import {Component, ViewChild} from '@angular/core';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ExcelExportComponent} from '@progress/kendo-angular-excel-export';
+import {DomainModel} from '../../../fieldSettings/model/domain.model';
+import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
+import {AssetExportModel} from '../../model/asset-export-model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -18,6 +18,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
+	protected exportFileName = this.fileName;
 	protected dataToExport: any[] = [];
 	private defaultLimitRows = 0;
 	private defaultOffset = 0;
@@ -27,7 +28,7 @@ export class AssetExplorerViewExportComponent {
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 
-		let configuredColumns = { ...this.assetExportModel.assetQueryParams.filters.columns };
+		let configuredColumns = {...this.assetExportModel.assetQueryParams.filters.columns};
 
 		this.columns = Object.keys(configuredColumns).map((key) => {
 			let definition = {
@@ -66,14 +67,23 @@ export class AssetExplorerViewExportComponent {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
-					this.onExportDataResponse(result['assets']);
+					this.prepareExportData(result);
 				}, err => console.log(err));
 		} else {
 			this.assetExpService.query(this.assetExportModel.queryId, this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
-					this.onExportDataResponse(result['assets']);
+					this.prepareExportData(result);
 				}, err => console.log(err));
 		}
+	}
+
+	private prepareExportData(resultAssets: any): void {
+		this.assetExpService.getFileName(this.fileName)
+			.subscribe(result => {
+				this.exportFileName = result;
+				this.onExportDataResponse(resultAssets['assets']);
+			}, err => console.log(err));
+
 	}
 
 	private getPropertyColumnField(domain: string, separator: string, property: string): string {

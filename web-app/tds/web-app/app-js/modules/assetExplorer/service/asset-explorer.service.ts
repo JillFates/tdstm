@@ -13,6 +13,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
+    private defaultUrl = '../ws';
 	private assetExplorerUrl = '../ws/assetExplorer';
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
@@ -153,4 +154,12 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
+    getFileName(viewName: string): Observable<any> {
+        return this.http.post(`${this.defaultUrl}/filename`, JSON.stringify({ viewName: viewName }))
+            .map((res: Response) => {
+                let result = res.json();
+                return result && result.status === 'success' && result.data;
+            })
+            .catch((error: any) => error.json());
+    }
 }
