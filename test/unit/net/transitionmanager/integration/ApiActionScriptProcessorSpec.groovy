@@ -27,15 +27,13 @@ class ApiActionScriptProcessorSpec extends Specification {
     void 'test can create a script binding context based on a ReactionScriptCode.#reactionScriptCode' () {
 
         setup:
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    new ActionRequest(['property1': 'value1']),
-                    new ApiActionResponse().asImmutable(),
-                    GroovyMock(ReactionAssetFacade),
-                    GroovyMock(ReactionTaskFacade),
-                    GroovyMock(ApiActionJob)
-            )
-
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(reactionScriptCode)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(new ActionRequest(['property1': 'value1']))
+                    .with(new ApiActionResponse().asImmutable())
+                    .with(GroovyMock(ReactionAssetFacade))
+                    .with(GroovyMock(ReactionTaskFacade))
+                    .with(GroovyMock(ApiActionJob))
+                    .build(reactionScriptCode)
 
         expect: 'All the bound variables were correctly set within the api action script binding'
             scriptBinding.hasVariable('request') == hasRequest
@@ -65,14 +63,13 @@ class ApiActionScriptProcessorSpec extends Specification {
         given:
             ActionRequest request = new ActionRequest(['format': 'xml'])
 
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    request,
-                    new ApiActionResponse(),
-                    GroovyMock(ReactionAssetFacade),
-                    GroovyMock(ReactionTaskFacade),
-                    GroovyMock(ApiActionJob)
-            )
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.PRE)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(request)
+                    .with(new ApiActionResponse())
+                    .with(GroovyMock(ReactionAssetFacade))
+                    .with(GroovyMock(ReactionTaskFacade))
+                    .with(GroovyMock(ApiActionJob))
+                    .build(ReactionScriptCode.PRE)
 
         when: 'The PRE script is evaluated'
             new GroovyShell(this.class.classLoader, scriptBinding)
@@ -95,7 +92,7 @@ class ApiActionScriptProcessorSpec extends Specification {
                         // Set the content-type to JSON
                         request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
                         
-                    """.stripIndent(), ApiActionScriptProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptBinding.class.name)
 
         then: 'All the correct variables were bound'
             scriptBinding.hasVariable('request')
@@ -118,14 +115,13 @@ class ApiActionScriptProcessorSpec extends Specification {
         given:
             ActionRequest request = new ActionRequest(['format': 'xml'])
 
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    request,
-                    new ApiActionResponse(),
-                    GroovyMock(ReactionAssetFacade),
-                    GroovyMock(ReactionTaskFacade),
-                    GroovyMock(ApiActionJob)
-            )
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.PRE)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(request)
+                    .with(new ApiActionResponse().asImmutable())
+                    .with(GroovyMock(ReactionAssetFacade))
+                    .with(GroovyMock(ReactionTaskFacade))
+                    .with(GroovyMock(ApiActionJob))
+                    .build(ReactionScriptCode.PRE)
 
         when: 'The PRE script is evaluated'
             new GroovyShell(this.class.classLoader, scriptBinding)
@@ -138,7 +134,7 @@ class ApiActionScriptProcessorSpec extends Specification {
                         } else {
                            return ERROR
                         }
-                    """.stripIndent(), ApiActionScriptProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptBinding.class.name)
 
         then: 'A MissingPropertyException is thrown'
             MissingPropertyException e = thrown(MissingPropertyException)
@@ -152,15 +148,13 @@ class ApiActionScriptProcessorSpec extends Specification {
             response.data = 'anything'
             response.status = status
 
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    new ActionRequest(['property1': 'value1']),
-                    response.asImmutable(),
-                    GroovyMock(ReactionAssetFacade),
-                    GroovyMock(ReactionTaskFacade),
-                    GroovyMock(ApiActionJob)
-            )
-
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.EVALUATE)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(new ActionRequest(['property1': 'value1']))
+                    .with(response.asImmutable())
+                    .with(GroovyMock(ReactionAssetFacade))
+                    .with(GroovyMock(ReactionTaskFacade))
+                    .with(GroovyMock(ApiActionJob))
+                    .build(ReactionScriptCode.EVALUATE)
 
         expect: 'The evaluation of the script returns a ReactionScriptCode'
             new GroovyShell(this.class.classLoader, scriptBinding)
@@ -170,7 +164,7 @@ class ApiActionScriptProcessorSpec extends Specification {
                         } else {
                            return ERROR
                         }
-                    """.stripIndent(), ApiActionScriptProcessor.class.name) == reaction
+                    """.stripIndent(), ApiActionScriptBinding.class.name) == reaction
 
         and: 'And all the variables were bound correctly'
             scriptBinding.hasVariable('request') == hasRequest
@@ -192,14 +186,13 @@ class ApiActionScriptProcessorSpec extends Specification {
             ReactionAssetFacade asset = GroovyMock()
             ReactionTaskFacade task = GroovyMock()
 
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    new ActionRequest(['property1': 'value1']),
-                    new ApiActionResponse(),
-                    asset,
-                    task,
-                    GroovyMock(ApiActionJob)
-            )
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.SUCCESS)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(new ActionRequest(['property1': 'value1']))
+                    .with(new ApiActionResponse().asImmutable())
+                    .with(asset)
+                    .with(task)
+                    .with(GroovyMock(ApiActionJob))
+                    .build(ReactionScriptCode.SUCCESS)
 
         when: 'The script is evaluated'
             new GroovyShell(this.class.classLoader, scriptBinding)
@@ -208,7 +201,7 @@ class ApiActionScriptProcessorSpec extends Specification {
                     if ( !asset.isaDevice() && !asset.isaDatabase() ) {
                        task.done()
                     } 
-                    """.stripIndent(), ApiActionScriptProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptBinding.class.name)
 
         then: 'The asset and task object received the correct messages'
             1 * task.done()
@@ -229,14 +222,13 @@ class ApiActionScriptProcessorSpec extends Specification {
         given:
             ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
 
-            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
-                    new ActionRequest(['property1': 'value1']),
-                    new ApiActionResponse(),
-                    GroovyMock(ReactionAssetFacade),
-                    task,
-                    GroovyMock(ApiActionJob)
-            )
-            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.FINAL)
+            ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                    .with(new ActionRequest(['property1': 'value1']))
+                    .with(new ApiActionResponse().asImmutable())
+                    .with(GroovyMock(ReactionAssetFacade))
+                    .with(task)
+                    .with(GroovyMock(ApiActionJob))
+                    .build(ReactionScriptCode.FINAL)
 
         when: 'The script is evaluated'
             new GroovyShell(this.class.classLoader, scriptBinding)
@@ -246,7 +238,7 @@ class ApiActionScriptProcessorSpec extends Specification {
                         
                         // Add a note to the task
                         task.addNote('hickory dickery dock, a mouse ran up the clock')
-                    """.stripIndent(), ApiActionScriptProcessor.class.name)
+                    """.stripIndent(), ApiActionScriptBinding.class.name)
 
         then: 'The asset and task object received the correct messages'
             1 * task.done()

@@ -269,7 +269,7 @@ class ApiActionService {
      * @param flush
      */
     void delete (Long id, Project project, boolean flush = false) {
-        ApiAction apiAction = ormUtil.findInProject(project, ApiAction, id, true)
+        ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
         apiAction.delete(flush: flush)
     }
 
@@ -378,15 +378,20 @@ class ApiActionService {
      * @param task ReactionTaskFacade instance to be bound in the ApiActionScriptBinding instance
      * @param asset ReactionAssetFacade instance to be bound in the ApiActionScriptBinding instance
      * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
-     * @return The result of execute the script param using an instance of GroovyShell
+     * @return a Map that contains the result of the execution script using an instance of GroovyShell
      */
-    Object evaluateReactionScript (ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
+    Map<String, ?> evaluateReactionScript (ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
 
-        ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(request, response, asset, task, job)
-        ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(code)
+        ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+                .with(request)
+                .with(response)
+                .with(asset)
+                .with(task)
+                .with(job)
+                .build(ReactionScriptCode.FINAL)
 
         def result = new GroovyShell(this.class.classLoader, scriptBinding)
-                .evaluate(script, ApiActionScriptProcessor.class.name)
+                .evaluate(script, ApiActionScriptBinding.class.name)
 
         checkEvaluationScriptResult(code, result)
 
