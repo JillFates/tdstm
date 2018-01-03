@@ -59,6 +59,7 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_23 = "MM/dd/yy"
 	static final String FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
 	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
+	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
 
 	static final String SHORT = 'S'
 	static final String FULL = 'F'
@@ -630,6 +631,9 @@ class TimeUtil {
 				break
 			case FORMAT_DATE_TIME_25:
 				format = isMiddleEndian ? FORMAT_DATE_TIME_25 : "dd/MM/yyyy hh:mm"
+				break
+			case FORMAT_DATE_TIME_26:
+				format = FORMAT_DATE_TIME_26
 				break
 		}
 
