@@ -753,9 +753,6 @@ class AssetExportService {
 							case 'Id':
 								colVal = app.id
 								break
-							case 'appOwner':
-								colVal = app.appOwner
-								break
 							case 'DepGroup':
 								// Find the Dependency Group that this app is bound to
 								colVal = assetDepBundleMap[app.id]
