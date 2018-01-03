@@ -314,7 +314,7 @@
                         </span>
                         <tds:hasPermission permission="${Permission.TaskPublish}">
                             <span class="checkboxContainer action-bar">
-                                <input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/>
+                                <input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onchange="toggleViewUnpublished(this);"/>
                                 <label for="viewUnpublishedCB" class="pointer"><b>View Unpublished</b></label>
                             </span>
                         </tds:hasPermission>
@@ -361,8 +361,8 @@
 		$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
 		submitForm()
 	}
-	function toggleViewUnpublished (e) {
-		var checkedValue = $(e.srcElement).is(':checked');
+	function toggleViewUnpublished (element) {
+		var checkedValue = $(element).is(':checked');
 		viewUnpublished = checkedValue;
 		setUserPreference('viewUnpublished', checkedValue, function () {
 			reloadGrid();
