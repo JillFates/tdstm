@@ -361,7 +361,7 @@ trait ControllerMethods {
    * @param filename  The filename to be set
    */
 	void setHeaderContentDisposition(String filename) {
-		response.addHeader("Content-Disposition", "attachment; filename=\""+filename)
+		response.addHeader("Content-Disposition", "attachment; filename=\""+filename+"\"")
 	}
 
 	/**
