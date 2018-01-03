@@ -77,7 +77,7 @@ class ErrorHandlerController implements ControllerMethods {
 	 * respond with what?
 	 */
 	def forbidden() {
-		log.debug "Hit forbidden() 2"
+		log.debug "Hit forbidden()"
 
 		def ex = errorHandlerService.getException(request)
 		if (ex) {
@@ -166,7 +166,7 @@ class ErrorHandlerController implements ControllerMethods {
 						forward action:'notFound'
 						return
 					}
-					break
+					// Drop into the default if it wasn't as suspected
 
 				default:
 					log.warn ExceptionUtil.stackTraceToString('Unhandled Exception', model.exception)

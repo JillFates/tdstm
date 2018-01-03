@@ -4,6 +4,7 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
 import net.transitionmanager.domain.Person
@@ -219,7 +220,7 @@ trait ControllerMethods {
 
 			default:
 				if (log) {
-					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
+					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 40)
 				}
 
 				renderErrorJson('An unresolved error has occurred')
@@ -234,6 +235,22 @@ trait ControllerMethods {
 		handleException(e, log)
 	}
 
+	/**
+	 * Exception handler for IllegalArgumentException
+	 */
+	def illegalArgumentException(IllegalArgumentException e) {
+		log.warn ExceptionUtil.stackTraceToString('IllegalArgumentException', e)
+		response.setHeader('X-Error-Msg', e.getMessage())
+		if (WebUtil.isAjax(request)) {
+			renderErrorJson('An invalid argument was received')
+		} else {
+			render(view:'/errorHandler/error')
+		}
+	}
+
+	/** 
+	 * Used to fetch a domain class by the id property in the params
+	 */
 	def <T> T getFromParams(Class<T> clazz, Map params) {
 		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.long('id'))
 		if (t) {
