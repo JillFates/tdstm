@@ -42,7 +42,7 @@ class ETLBinding extends Binding {
             result = name
         }
 
-        result
+        return result
     }
 
     /**

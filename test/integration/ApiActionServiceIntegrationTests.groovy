@@ -22,6 +22,7 @@ import org.apache.commons.lang.RandomStringUtils as RSU
 import org.codehaus.groovy.grails.web.json.JSONObject
 //import spock.lang.Specification
 import spock.lang.*
+import test.helper.ProviderTestHelper
 
 @Title('Tests for the ApiActionService class')
 class ApiActionServiceIntegrationTests extends Specification {
