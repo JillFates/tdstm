@@ -1,9 +1,4 @@
-<style>
-    .btn-resize {
-        font-size: 14px;
-    }
-</style>
-<div class="modal fade in no-background" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
+<div class="modal fade in no-background data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -16,7 +11,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<button type="button" [disabled]="!script || testing || !filename" (click)="onTestScript()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.TEST' | translate}}</button>
-						<button type="button" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}</button>
+						<button type="button" [disabled]="!script || checking || !filename" (click)="onCheckScriptSyntax()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}</button>
 						<button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
 						<button type="button" [disabled]="!consoleSettings.log" (click)="onViewConsole()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.VIEW_CONSOLE' | translate}}</button>
 						<button class="pull-right btn btn-default" (click)="toggleSection('code')">
@@ -40,6 +35,14 @@
 							<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 					</div>
 				</div>
+                <hr>
+                <div *ngIf="scriptErrorLog" class="row">
+                    <div class="col-md-12">
+                        <h4 class="pull-left">Errors</h4>
+                        <textarea class="form-control console" [(ngModel)]="scriptErrorLog" cols="30" rows="1" style="cursor: default; resize: vertical;">
+						</textarea>
+                    </div>
+                </div>
 				<hr>
 				<div class="row">
 					<div class="col-md-12">

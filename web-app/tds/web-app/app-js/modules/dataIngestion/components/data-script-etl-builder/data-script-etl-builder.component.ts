@@ -20,9 +20,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		transformed: false
 	};
 	private script: string;
-	private filename = 'applications.csv';
-	private consoleLog: string;
+	private filename: string;
+	private checking = false;
 	private saving = false;
+	private testing = false;
+	private scriptErrorLog: string;
 	private consoleSettings: any = {
 		top : '30px',
 		left : '30px',
@@ -111,9 +113,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected onLoadSampleData(): void {
-		this.dismiss();
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
-			.then(() => console.log('onLoadSampleData ok'))
+			.then(() => {
+				// by the moment is hardcoded, this will be retrieved by the load sample data process..
+				this.filename = 'service_now_applications.csv';
+			})
 			.catch(() => console.log('onLoadSampleData close'));
 	}
 
@@ -129,16 +133,50 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On Test Script button.
 	 */
-	private testing = false;
 	private onTestScript(): void {
 		this.testing = true;
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
 			this.testing = false;
+			this.consoleSettings.log = null;
+			this.scriptErrorLog = null;
+			this.consoleSettings.log = result.data.consoleLog;
 			if (result.data.isValid) {
-				this.consoleSettings.log = result.data.consoleLog;
 				this.notifierService.broadcast({
 					name: AlertType.SUCCESS,
 					message: 'Valid Script'
+				});
+			} else {
+				this.scriptErrorLog = result.data.error;
+				this.notifierService.broadcast({
+					name: AlertType.DANGER,
+					message: 'Invalid Script'
+				});
+			}
+		});
+	}
+
+	/**
+	 * On Check Script Syntax button.
+	 */
+	private onCheckScriptSyntax(): void {
+		this.checking = true;
+		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
+			this.checking = false;
+			this.consoleSettings.log = null;
+			this.scriptErrorLog = null;
+			if (result.data.validSyntax) {
+				this.notifierService.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'Valid Syntax'
+				});
+			} else {
+				let errors = result.data.errors.map( error => {
+					return `message: ${error.message} --> start line: ${error.startLine}, end line: ${error.endLine}, start column: ${error.startColumn}, endColumn: ${error.endColumn}, fatal: ${error.fatal}`;
+				});
+				this.scriptErrorLog = errors.join('\n');
+				this.notifierService.broadcast({
+					name: AlertType.DANGER,
+					message: 'Invalid Syntax'
 				});
 			}
 		});

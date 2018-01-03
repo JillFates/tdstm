@@ -41,7 +41,10 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
-		this.dataSignature = JSON.stringify(this.dataScriptModel);
+		// ignore etl script from this context
+		let copy = {...this.dataScriptModel};
+		delete copy.etlSourceCode;
+		this.dataSignature = JSON.stringify(copy);
 		this.datasourceName.next(this.dataScriptModel.name);
 	}
 
@@ -56,7 +59,9 @@ export class DataScriptViewEditComponent implements OnInit {
 					this.dataScriptModel.provider = this.providerList[0];
 				}
 				this.providerList.push(...result);
-				this.dataSignature = JSON.stringify(this.dataScriptModel);
+				let copy = {...this.dataScriptModel};
+				delete copy.etlSourceCode;
+				this.dataSignature = JSON.stringify(copy);
 				setTimeout(() => { // Delay issues on Auto Focus
 					if (this.dataScriptProvider) {
 						this.dataScriptProvider.focus();
@@ -102,7 +107,9 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.dataScriptModel);
+		let copy = {...this.dataScriptModel};
+		delete copy.etlSourceCode;
+		return this.dataSignature !== JSON.stringify(copy);
 	}
 
 	/**

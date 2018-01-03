@@ -223,16 +223,15 @@ export class DataIngestionService {
 	testScript(script: string, filename: string): Observable<any> {
 		let postRequest = {
 			script: script,
-			filename: filename
+			fileName: filename
 		};
-		/*
 		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				return res.json();
 			})
 			.catch((error: any) => error.json());
-			*/
-		let mockResponse = {
+
+		/*let mockResponse = {
 			status: 'success',
 			data: {
 				isValid: true,
@@ -241,6 +240,18 @@ export class DataIngestionService {
 				data: {}
 			}
 		};
-		return Observable.of(mockResponse);
+		return Observable.of(mockResponse);*/
+	}
+
+	checkSyntax(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
 	}
 }

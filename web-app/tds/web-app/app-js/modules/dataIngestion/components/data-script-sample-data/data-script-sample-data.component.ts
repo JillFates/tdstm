@@ -13,6 +13,10 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		super('#loadSampleData');
 	}
 
+	private onLoadData(): void {
+		this.close();
+	}
+
 	protected cancelCloseDialog(): void {
 		this.dismiss();
 	}
