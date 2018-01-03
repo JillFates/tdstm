@@ -33,7 +33,9 @@ class ControlTagLib {
 		String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
 		String cssClass = attrs["class"]
 		out << "<span "
-		out << tooltipAttribute
+		if (field.tip) {
+			out << tooltipAttribute
+		}
 		out << attribute("class", cssClass)
 		out << " >\n"
 		out << body()
@@ -80,7 +82,9 @@ class ControlTagLib {
 		sb.append('"')
 		sb.append(' >')
 		sb.append('<span ')
-		sb.append(tooltipAttrib(fieldSpec))
+		if (fieldSpec.tip) {
+			sb.append(tooltipAttrib(fieldSpec))
+		}
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		if (attrs.containsKey("labelSuffix")){
@@ -107,15 +111,17 @@ class ControlTagLib {
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
 		sb.append("<span ")
-        // Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
-        // This parameter is optional to modify default tooltip positioning
-        // Also checks that the value is one of the valid data-placement element values
-		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
-		if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
-			throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
-					'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+		if (fieldSpec.tip) {
+			// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
+			// This parameter is optional to modify default tooltip positioning
+			// Also checks that the value is one of the valid data-placement element values
+			String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+			if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+				throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+						'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+			}
+			sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
 		}
-		sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
 		sb.append(" >")
         sb.append(fieldValue)
         sb.append(suffixFieldValue)
