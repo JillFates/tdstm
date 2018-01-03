@@ -2,6 +2,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
@@ -52,7 +53,8 @@ class WsApiActionController implements ControllerMethods {
     def fetch(Long id){
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
-        renderSuccessJson(apiAction.toMap(false))
+        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+        renderSuccessJson(apiAction.toMap(agent,false))
     }
 
     /**
@@ -74,7 +76,8 @@ class WsApiActionController implements ControllerMethods {
     def create() {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
-        renderSuccessJson(apiAction.toMap(false))
+        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+        renderSuccessJson(apiAction.toMap(agent, false))
     }
 
 
@@ -85,6 +88,7 @@ class WsApiActionController implements ControllerMethods {
     def update(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON, id)
-        renderSuccessJson(apiAction.toMap(false))
+        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+        renderSuccessJson(apiAction.toMap(agent, false))
     }
 }

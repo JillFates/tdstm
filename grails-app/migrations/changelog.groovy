@@ -209,5 +209,5 @@ databaseChangeLog = {
 	include file: '20171221-change-asset-dependency-comment-type.groovy'
     include file: '20171221-add-credential-and-agentclass-to-apiaction.groovy'
 	include file: '20171227-rename-all-assets-view.groovy'
-    include file: '20171228-make-api-action-callbackmode-nullable.groovy'
+    include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
 }

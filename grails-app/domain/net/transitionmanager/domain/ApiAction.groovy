@@ -1,5 +1,6 @@
 package net.transitionmanager.domain
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AbstractAgent
@@ -7,7 +8,6 @@ import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
 import groovy.transform.ToString
-import net.transitionmanager.service.ApiActionService
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -16,8 +16,8 @@ import net.transitionmanager.service.ApiActionService
 @Slf4j(value='logger')
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
-	// Transient reference to retrieve the agent for this action.
-	ApiActionService apiActionService
+
+	static tmpcount = 0
 
 	String name
 	String description
@@ -108,7 +108,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsList', 'apiActionService', 'agent']
+	static transients = ['methodParamsList', 'agent']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -144,21 +144,16 @@ class ApiAction {
 	}
 
 	/**
-	 * Return the AbstractAgent instance for this API Action.
-	 * @return
-	 */
-	AbstractAgent getAgent() {
-		return apiActionService.agentInstanceForAction(this)
-	}
-
-	/**
 	 * Create a map with the data for this ApiAction
+	 * @param agent - agent instance for the corresponding agent class.
 	 * @param minimalInfo - flag that signals if only the m
 	 * @return
 	 */
-	Map toMap(boolean minimalInfo = true) {
+	Map toMap(AbstractAgent agent, boolean minimalInfo = true) {
+		if (agent == null) {
+			throw new RuntimeException("Agent cannot be null.")
+		}
 		Map fields = [id: id, name: name]
-		AbstractAgent agent = getAgent()
 		if (!minimalInfo) {
 			Map credentialMap = null
 			if (credential) {

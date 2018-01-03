@@ -113,7 +113,10 @@ class ApiActionService {
 			}
 		}.order("name", "asc").list()
 		List<Map> results = []
-		apiActions.each {results << it.toMap(minimalInfo)}
+		apiActions.each { apiAction ->
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			results << apiAction.toMap(agent, minimalInfo)
+		}
 		return results
 	}
 

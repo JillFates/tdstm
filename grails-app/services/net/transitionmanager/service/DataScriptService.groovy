@@ -170,7 +170,7 @@ class DataScriptService implements ServiceMethods{
         }.find()
 
         if (! dataScript && throwException) {
-            throw new InvalidParamException("No DataScript exists with the ID $id for the Project $project and Provider $provider.")
+            throw new EmptyResultException("No DataScript exists with the ID $id for the Project $project and Provider $provider.")
         }
         return dataScript
     }

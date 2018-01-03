@@ -5,7 +5,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.EmptyResultException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -965,7 +965,7 @@ public class GormUtil {
 		if (errorMsg) {
 			logger.error(errorMsg)
 			if (throwException) {
-				throw new InvalidParamException(errorMsg)
+				throw new EmptyResultException(errorMsg)
 			} else {
 				instance = null
 			}
