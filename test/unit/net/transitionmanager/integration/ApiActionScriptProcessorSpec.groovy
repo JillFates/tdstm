@@ -1,17 +1,10 @@
 package net.transitionmanager.integration
 
-import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.integration.ApiActionJob
-import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.integration.ApiActionScriptBinding
-import net.transitionmanager.integration.ApiActionScriptProcessor
-import net.transitionmanager.integration.ReactionAssetFacade
-import net.transitionmanager.integration.ReactionScriptCode
-import net.transitionmanager.integration.ReactionTaskFacade
 import spock.lang.Specification
+import spock.lang.Unroll
 
-import static net.transitionmanager.integration.ReactionHttpStatusCodes.NOT_FOUND
-import static net.transitionmanager.integration.ReactionHttpStatusCodes.OK
+import static ReactionHttpStatus.NOT_FOUND
+import static ReactionHttpStatus.OK
 import static net.transitionmanager.integration.ReactionScriptCode.ERROR
 import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 
@@ -27,6 +20,43 @@ class ApiActionScriptProcessorSpec extends Specification {
     }
 
     def setup () {
+
+    }
+
+    @Unroll
+    void 'test can create a script binding context based on a ReactionScriptCode.#reactionScriptCode' () {
+
+        setup:
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
+                    new ActionRequest(['property1': 'value1']),
+                    new ApiActionResponse().asImmutable(),
+                    GroovyMock(ReactionAssetFacade),
+                    GroovyMock(ReactionTaskFacade),
+                    GroovyMock(ApiActionJob)
+            )
+
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(reactionScriptCode)
+
+        expect: 'All the bound variables were correctly set within the api action script binding'
+            scriptBinding.hasVariable('request') == hasRequest
+            scriptBinding.hasVariable('response') == hasResponse
+            scriptBinding.hasVariable('task') == hasTask
+            scriptBinding.hasVariable('asset') == hasAsset
+            scriptBinding.hasVariable('job') == hasJob
+            scriptBinding.hasVariable('SC') == hasSC
+
+        where: 'The ReactionScriptCode instance is defined'
+            reactionScriptCode          || hasRequest | hasResponse | hasTask | hasAsset | hasJob | hasSC
+            ReactionScriptCode.EVALUATE || true       | true        | false   | false    | false  | true
+            ReactionScriptCode.SUCCESS  || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.ERROR    || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.DEFAULT  || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.FAILED   || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.TIMEDOUT || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.LAPSED   || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.STALLED  || true       | true        | true    | true     | true   | true
+            ReactionScriptCode.PRE      || true       | false       | true    | true     | true   | true
+            ReactionScriptCode.FINAL    || true       | true        | true    | true     | true   | true
 
     }
 
@@ -47,6 +77,7 @@ class ApiActionScriptProcessorSpec extends Specification {
         when: 'The PRE script is evaluated'
             new GroovyShell(this.class.classLoader, scriptBinding)
                     .evaluate("""
+                        
                         request.param.format = 'json'
                         request.headers.add('header1', 'value1')
                         
@@ -80,6 +111,38 @@ class ApiActionScriptProcessorSpec extends Specification {
             request.config.getProperty('httpClient.connectionTimeout') == 5000
             request.config.getProperty('proxyAuthHost') == '123.88.23.42'
             request.config.getProperty('proxyAuthPort') == 8080
+    }
+
+    void 'test can throw an MissingPropertyException if PRE try to use response object' () {
+
+        given:
+            ActionRequest request = new ActionRequest(['format': 'xml'])
+
+            ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(
+                    request,
+                    new ApiActionResponse(),
+                    GroovyMock(ReactionAssetFacade),
+                    GroovyMock(ReactionTaskFacade),
+                    GroovyMock(ApiActionJob)
+            )
+            ApiActionScriptBinding scriptBinding = apiActionProcessor.scriptBindingFor(ReactionScriptCode.PRE)
+
+        when: 'The PRE script is evaluated'
+            new GroovyShell(this.class.classLoader, scriptBinding)
+                    .evaluate("""
+                        request.param.format = 'json'
+                        request.headers.add('header1', 'value1')
+                        
+                        if (response.status == SC.OK) {
+                           return SUCCESS
+                        } else {
+                           return ERROR
+                        }
+                    """.stripIndent(), ApiActionScriptProcessor.class.name)
+
+        then: 'A MissingPropertyException is thrown'
+            MissingPropertyException e = thrown(MissingPropertyException)
+            e.message == 'No such property: response for class: net_transitionmanager_integration'
     }
 
     void 'test can invoke a simple EVALUATE Script and return a ReactionScriptCode result' () {
@@ -164,7 +227,6 @@ class ApiActionScriptProcessorSpec extends Specification {
     void 'test can invoke a simple FINALIZE Script to evaluate what has been performed' () {
 
         given:
-
             ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
 
             ApiActionScriptProcessor apiActionProcessor = new ApiActionScriptProcessor(

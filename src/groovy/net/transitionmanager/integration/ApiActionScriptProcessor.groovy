@@ -54,7 +54,11 @@ class ApiActionScriptProcessor {
                         response: response,
                         asset   : asset,
                         task    : task,
-                        job     : job
+                        job     : job,
+                        *       : ReactionScriptCode.values()
+                                .collectEntries {
+                            [(it.name()): it]
+                        }
                 ])
                 break
         }

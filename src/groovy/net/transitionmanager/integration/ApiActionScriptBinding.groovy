@@ -6,7 +6,7 @@ class ApiActionScriptBinding extends Binding {
 
     ApiActionScriptBinding (ApiActionScriptProcessor apiActionProcessor, Map vars = [:]) {
         this.variables.putAll([
-                SC: ReactionHttpStatusCodes,
+                SC: ReactionHttpStatus,
 //                *: apiActionProcessor.metaClass.methods.collectEntries {
 //                    [(it.name): InvokerHelper.getMethodPointer(apiActionProcessor, it.name)]
 //                },
@@ -15,7 +15,7 @@ class ApiActionScriptBinding extends Binding {
     }
 
     /**
-     * Custom lookup variable. If a variable isn't found
+     * Custom lookup variable. If a variable isn't found it throws an exception
      * @param name
      * @return
      */
@@ -23,16 +23,16 @@ class ApiActionScriptBinding extends Binding {
     Object getVariable (String name) {
 
         if (variables == null)
-            throw new MissingPropertyException(name, this.getClass())
+            throw new MissingPropertyException('There is not variables bound in this script context')
 
         Object result = variables.get(name)
 
         if (result == null && !variables.containsKey(name)) {
-            //throw new MissingPropertyException(name, this.getClass())
-            result = name
+            throw new MissingPropertyException('There is no property with name: ' + name + ' bound in this script context')
+//            result = name
         }
 
-        result
+        return result
     }
 
 }

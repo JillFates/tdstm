@@ -14,7 +14,7 @@ class ApiActionResponse {
     List<Map> files
     String filename
     String originalFilename
-    ReactionHttpStatusCodes status
+    int status
     Boolean successful
 
     void setReadonly (boolean value) {
