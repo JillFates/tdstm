@@ -51,7 +51,7 @@
 																	[data]="providerList"
 																	[textField]="'name'"
                                                                     [valueField]="'id'"
-																	[(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.provider}"></kendo-dropdownlist>
+																	[(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.provider?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.provider.name}}</label>
@@ -78,7 +78,7 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.agentClass"
-																	required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.agentClass}"></kendo-dropdownlist>
+																	required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentClass?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.agentClass.name}}</label>
@@ -97,7 +97,7 @@
 																	(open)="onOpenAgentMethod()"
 																	[(ngModel)]="apiActionModel.agentMethod"
 																	[disabled]="apiActionModel.agentClass.id === 0"
-																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && !apiActionModel.agentMethod}">
+																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == 0}">
 													<ng-template kendoDropDownListItemTemplate let-dataItem>
 														<span style="margin-right: 3px; min-width: 115px; font-weight: bold;">{{ dataItem?.name }}</span> <span style="margin-left: 3px;">{{ dataItem?.description }}</span>
 													</ng-template>
@@ -244,7 +244,9 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
-																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
+																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
+																	[required]="apiActionModel.producesData"
+																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.producesData?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
                                                 <label class="control-label label-detail">{{apiActionModel.defaultDataScript.name}}</label>
@@ -665,7 +667,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!apiActionForm?.form?.valid">
+		 class="btn btn-primary pull-left" [disabled]="!apiActionForm?.form?.valid || (apiActionModel.agentMethod?.id == 0 ||  apiActionModel.agentClass?.id == 0 || apiActionModel.provider?.id == 0) || (apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0)">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-code"></span> Check Syntax</button>
