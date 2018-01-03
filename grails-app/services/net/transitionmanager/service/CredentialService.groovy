@@ -175,7 +175,7 @@ class CredentialService {
         }.find()
 
         if (! credential && throwException) {
-            throw new InvalidParamException("No Credential exists with the ID $id for the Project $project and Provider $provider.")
+            throw new EmptyResultException("No Credential exists with the ID $id for the Project $project and Provider $provider.")
         }
         return credential
     }
