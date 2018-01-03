@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation, Inject } from '@angular/core';
+import {Component, Input, Output, EventEmitter, ViewEncapsulation, Inject, ViewChild} from '@angular/core';
 
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
-import { GridDataResult, DataStateChangeEvent, RowClassArgs } from '@progress/kendo-angular-grid';
+import {GridDataResult, DataStateChangeEvent, RowClassArgs} from '@progress/kendo-angular-grid';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { Observable } from 'rxjs/Rx';
 
@@ -263,9 +263,28 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
-	cellClick(e): void {
+	/**
+	 * On cell click event.
+	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
+	 * @param e
+	 */
+	private cellClick(e): void {
 		if (['common_assetName', 'common_id'].indexOf(e.column.field) !== -1) {
+			jQuery('tr.k-state-selected').removeClass('k-state-selected');
+			jQuery(`tr[data-kendo-grid-item-index=${e.rowIndex}]`).addClass('k-state-selected');
 			this.onShow(e.dataItem);
 		}
+	}
+
+	/**
+	 * Returns specific class name based on the cell property name.
+	 * @param {ViewColumn} column
+	 * @returns {string} asset-detail-link for assetName or assetId.
+	 */
+	private getCellClass(column: ViewColumn): string {
+		if (['common_assetName', 'common_id'].indexOf(column.domain + '_' + column.property) !== -1) {
+			return 'asset-detail-link';
+		}
+		return '';
 	}
 }
