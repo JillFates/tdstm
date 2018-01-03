@@ -1,6 +1,6 @@
 <%@page defaultCodec="none" %>
 <%@page import="net.transitionmanager.security.Permission"%>
-<div style="margin-top: 10px; float: left;">
+<div style="margin-top: 10px;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 0px; margin-bottom: 10px;">
@@ -14,17 +14,17 @@
 			<div class="planBundleSel">
 				<g:form name="bundleForm" action="dependencyConsole">	
 					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
-					Move Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
+					Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
 					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>&nbsp;&nbsp;
 					<span class="checkboxContainer">
 						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
 						<label for="assinedGroupCB" class="pointer">&nbsp;Show ONLY Work In Progress</label>
 					</span>
-					<div style="position: absolute; margin: -25px 409px 0;">
+					<span style="margin-left: 1em">
 						<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
 							<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
 						</g:link>
-					</div>
+					</span>
 				</g:form>
 			</div>
 			&nbsp;Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered

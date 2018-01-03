@@ -1,7 +1,14 @@
-<kendo-grid [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+<style>
+    .asset-detail-link {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<kendo-grid #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
-	<ng-template kendoGridToolbarTemplate [position]="'top'">
+	<!-- Toolbar -->
+    <ng-template kendoGridToolbarTemplate [position]="'top'">
 		<div class="col-sm-6">
 			<div class="checkbox pull-left">
 				<label>
@@ -18,7 +25,9 @@
 				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
 		</div>
 	</ng-template>
-	<kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
+
+    <!-- Select All column -->
+    <kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
 		<ng-template kendoGridHeaderTemplate>
 			<div class="row">
 				<div class="col-md-12 text-center">
@@ -42,7 +51,8 @@
 			</div>
 		</ng-template>
 	</kendo-grid-column>
-	<!-- <kendo-grid-column title="Action" [locked]="true" [width]="60">
+
+    <!-- <kendo-grid-column title="Action" [locked]="true" [width]="60">
 		<ng-template kendoGridCellTemplate let-dataItem>
 			<div class="row">
 				<div class="col-xs-12 text-center">
@@ -51,7 +61,9 @@
 			</div>
 		</ng-template>
 	</kendo-grid-column> -->
-	<kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
+
+    <!-- Configured Columns -->
+    <kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
@@ -62,17 +74,25 @@
 			</div>
 		</ng-template>
 		<ng-template kendoGridFilterCellTemplate>
-			<div class=" has-feedback" style="margin-bottom:0px;">
+			<div class="has-feedback" style="margin-bottom:0px;">
 				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter"
 				 (keyup)="onFilterKeyUp($event)" (keydown)="onFilterKeyDown($event)" value="">
 				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
 				 aria-hidden="true"></span>
 			</div>
 		</ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span [ngClass]="getCellClass(column)">
+                {{dataItem[column.domain+'_'+column.property]}}
+            </span>
+        </ng-template>
 	</kendo-grid-column>
-	<ng-template kendoGridNoRecordsTemplate>
 
+    <!-- No records -->
+    <ng-template kendoGridNoRecordsTemplate>
 	</ng-template>
+
+    <!-- Pagination footer -->
 	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
 		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
 		<kendo-pager-next-buttons></kendo-pager-next-buttons>
@@ -82,4 +102,5 @@
 		</div>
 		<kendo-pager-info></kendo-pager-info>
 	</ng-template>
+
 </kendo-grid>

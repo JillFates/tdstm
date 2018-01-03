@@ -88,6 +88,21 @@
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.COMPLETED}', '${item?.status}', 'taskManager')"/>
 							</g:if>
 
+							<tds:hasPermission permission="${Permission.ActionInvoke}">
+								<g:if test="${item?.apiActionId != null && item?.apiActionInvokedAt == null && item?.apiActionCompletedAt == null && item?.status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED]}">
+									<tds:actionButton label="Invoke" icon="ui-icon-gear" id="${item?.id}" onclick="invokeAction('${item?.id}')"/>
+								</g:if>
+							</tds:hasPermission>
+							<tds:hasPermission permission="${Permission.ActionReset}">
+								<g:if test="${item?.apiActionId != null && item?.status in [AssetCommentStatus.HOLD]}">
+									<tds:actionButton 
+										label="${message(code:'task.button.resetAction.label')}" 
+										icon="ui-icon-power" id="${item?.id}" 
+										tooltipText="${message(code:'task.button.resetAction.tooltip')}" 
+										onclick="resetAction('${item?.id}')"/>
+								</g:if>
+							</tds:hasPermission>
+
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
 							<g:if test="${item.successors > 0 || item.predecessors > 0}">
@@ -138,6 +153,11 @@
 	</div>
 </div>
 <script type="text/javascript">
+
+    $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
+    });
+
 	if('${tab}'=="todo"){
 		$("#toDOSpanId").html(${todoSize})
 		$("#toDOAllSpanId").html(${allSize})

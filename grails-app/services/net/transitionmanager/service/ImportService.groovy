@@ -175,6 +175,7 @@ class ImportService implements ServiceMethods {
 
 		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
+
 		return data
 	}
 
@@ -1374,8 +1375,11 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass,
-				assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(
+				project, userLogin, domainClass,
+				assetEntityId, dataTransferBatch, dtvList,
+				eavAttributeSet, errorCount, errorConflictCount,
+				ignoredAssets, rowNum, fieldSpecs)
 			if (!asset)
 				continue
 
@@ -1795,7 +1799,7 @@ class ImportService implements ServiceMethods {
 		PersonService personService = grailsApplication.mainContext.personService
 
 		// Search across the project staff list for person by name
-		Map map = personService.findPerson(name, project, projectStaff)
+		Map map = personService.findPerson(name, project, projectStaff, false)
 
 		if (map.person) {
 			if (map.isAmbiguous) {

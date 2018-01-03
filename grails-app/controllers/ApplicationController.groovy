@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
@@ -120,7 +121,7 @@ class ApplicationController implements ControllerMethods {
 		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		Map<String, String> customizeQuery = assetEntityService.getAppCustomQuery(appPref)
 
-		def queryParams = [:]
+		Map queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
 			                      if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
@@ -203,15 +204,26 @@ class ApplicationController implements ControllerMethods {
 
 		// Handle the filtering by each column's text field
 
-		def whereConditions = []
-		filterParams.each { key, val ->
-			if (val?.trim()) {
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Application)
+		List<String> whereConditions = []
+
+		filterParams.each { column, filter ->
+			if (filter?.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: Application,
+						column: column,
+						filter: filter,
+						columnAlias: "apps.${column}"
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
 		if (whereConditions) {
-			query.append(" WHERE apps.${whereConditions.join(" AND apps.")}")
+			query.append(" WHERE ${whereConditions.join(" AND ")}")
 			firstWhere = false
 		}
 

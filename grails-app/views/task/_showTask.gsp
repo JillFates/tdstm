@@ -35,6 +35,27 @@
 						<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Event:</label></td>
 						<td valign="top" class="value" id="eventName" colspan="3">{{acData.eventName}}</td>
 					</tr>
+					<tr id="actionShowId">
+						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<td valign="top" class="value" id="vmAction" colspan="2">{{acData.apiAction.name}}</td>
+						<td valign="top" class="value" >
+							<g:set var="canInvoke" value="${false}"/>
+							<tds:hasPermission permission="${Permission.ActionInvoke}">
+								<g:set var="canInvoke" value="${true}"/>
+							</tds:hasPermission>
+							%{--<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction();" ng-disabled="<%= !canInvoke %>"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;--}%
+							%{--<button class="btn btn-default" role="button" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction();" ng-disabled="<%= !canInvoke %>">Invoke</button>--}%
+							<span id="actionBarId2" class="slide">
+								<a class="task_action btn btn-default" ng-if="acData.apiAction.id" ng-click="lookUpAction();" ng-disabled="<%= !canInvoke %>">
+									<span class="fa fa-fw fa-search"></span>
+								</a>
+								<a style="margin-top: 8px;" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction();" ng-disabled="<%= !canInvoke %>">
+									<span class="ui-button-icon-primary ui-icon task_icon ui-icon-gear"></span>
+									<span id="start_text_205966" ng-class="{task_button_disabled: (button.disabled), task_button: (!button.disabled)}">Invoke</span>
+								</a>
+							</span>
+						</td>
+					</tr>
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
 						<td valign="top" class="value" id="categoryTdId" style="width:15%">{{ac.category}}</td>

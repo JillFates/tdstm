@@ -95,6 +95,7 @@ export class AssetExplorerViewConfigComponent {
 				this.updateFilterbyModel();
 				this.currentTab = 1;
 				this.state.$current.data.page.title = this.model.name;
+				document.title = this.model.name;
 				this.draggableColumns = this.model.schema.columns.slice();
 			}
 		}, (err) => console.log(err));

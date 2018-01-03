@@ -324,9 +324,9 @@ class PersonService implements ServiceMethods {
 			queryParams.middleName = nameMap.middle ?: ''
 		}
 
+		// If the flag is false, we also need to look for the partners and owner staff.
 		if (!clientStaffOnly) {
-			companies << projectService.getOwner(project)
-			companies.addAll(projectService.getPartners(project))
+			queryParams.companies = partyRelationshipService.getProjectCompanies(project)
 		}
 
 		// Try finding the person with an exact match
@@ -356,7 +356,7 @@ class PersonService implements ServiceMethods {
 			}
 
 			where = ''
-			queryParams = [companies: companies]
+			queryParams = [companies: queryParams.companies]
 			addQueryParam('firstName', nameMap.first)
 			addQueryParam('middleName', nameMap.middle)
 			addQueryParam('lastName', lastName)

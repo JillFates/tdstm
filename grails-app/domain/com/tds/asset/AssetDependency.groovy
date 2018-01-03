@@ -36,7 +36,7 @@ class AssetDependency {
 		c2 nullable: true
 		c3 nullable: true
 		c4 nullable: true
-		comment nullable: true
+		comment size: 0..65535
 		dataFlowDirection blank: false, size: 0..14, inList: ['Unknown', 'bi-directional', 'incoming', 'outgoing']
 		dataFlowFreq nullable: true, size: 0..8, inList: ['Unknown', 'constant', 'hourly', 'daily', 'weekly', 'monthly']
 		dependent nullable: true
@@ -46,14 +46,12 @@ class AssetDependency {
 
 	static mapping = {
 		autoTimestamp false
+		comment sqltype: 'text'
 		createdBy column: 'created_by'
 		id column: 'asset_dependency_id'
 		isFuture formula: "status = '$FUTURE'"
 		isStatusResolved formula: "status != '$QUESTIONED'"
 		updatedBy column: 'updated_by'
-		columns {
-			comment sqltype: 'text'
-		}
 	}
 
 	def beforeInsert = {

@@ -23,7 +23,7 @@ class TaskNonTranService implements ServiceMethods {
 	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
-	
+
 
 	/**
 	 * This is invoked by the AssetComment.beforeUpdate method in order to handle any status changes
@@ -58,8 +58,8 @@ class TaskNonTranService implements ServiceMethods {
 		String msg = ''
 
 		def predCountSQL = 'SELECT COUNT(*) FROM asset_comment ac ' +
-			'JOIN task_dependency td ON td.predecessor_id=ac.asset_comment_id AND ac.status<>"' + AssetCommentStatus.COMPLETED + '" ' +
-			'WHERE td.asset_comment_id='
+			'JOIN task_dependency td ON td.predecessor_id=ac.asset_comment_id AND ac.status<>"' + AssetCommentStatus.COMPLETED +
+			'" WHERE td.asset_comment_id='
 
 		AssetComment.withTransaction { TransactionStatus transactionStatus ->
 
@@ -72,16 +72,16 @@ class TaskNonTranService implements ServiceMethods {
 				def successorDeps = TaskDependency.findAllByPredecessor(task)
 				log.info "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
 				def i = 1
-				successorDeps?.each { succDepend ->
-					def successorTask = succDepend.assetComment
+				for (succDepend in successorDeps) {
+					AssetComment successorTask = succDepend.assetComment
 					log.info "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) Processing (#${i++}) successorTask(#:$successorTask.taskNumber Id:$successorTask.id) - $whom"
 
 					// If the Successor Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
 					if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
 
 						// See if there are any predecessor tasks dependencies for the successor that are not COMPLETED
-						def sql = "$predCountSQL $successorTask.id"
-						def predCount = jdbcTemplate.queryForObject(sql, Integer)
+						String sql = "$predCountSQL $successorTask.id"
+						int predCount = jdbcTemplate.queryForObject(sql, Integer)
 						//def predCount = jdbcTemplate.queryForInt(predCountSQL, [successorTask.id]) -- this was NOT working...
 						// log.info "updateTaskSuccessors: predCount=$predCount, $sql"
 						if (predCount > 0) {
@@ -89,7 +89,7 @@ class TaskNonTranService implements ServiceMethods {
 						} else {
 
 							def setStatusTo = AssetCommentStatus.READY
-							if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
+                            if (successorTask.isAutomatic() && ! successorTask.hasAction()) {
 								// If this is an automated task, we'll mark it COMPLETED instead of READY and indicate that it was completed by
 								// the Automated Task person.
 								setStatusTo = AssetCommentStatus.COMPLETED
@@ -99,14 +99,16 @@ class TaskNonTranService implements ServiceMethods {
 							log.info "updateTaskSuccessors: pred task(#:$task.taskNumber Id:$task.id) triggering successor task (#:$successorTask.taskNumber Id:$successorTask.id) to $setStatusTo by $whom"
 							taskService.setTaskStatus(successorTask, setStatusTo, whom, isPM)
 							// log.info "taskStatusChangeEvent: successorTask($successorTask.id) Making READY - Successful"
+							msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id)"
 							// Validates whether a notification should be issued. This should done before validate() because of the implementation of shouldSendNotification
 							boolean notificationRequired = commentService.shouldSendNotification(successorTask, whom, false, false)
+							msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id)"
 							if ( ! successorTask.validate() ) {
-								msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) failed READY of successor task(#:$successorTask.taskNumber Id:$successorTask.id) - $whom : ${GormUtil.allErrorsString(successorTask)}"
+								msg = "$msg failed READY of successor task(#:$successorTask.taskNumber Id:$successorTask.id) - $whom : ${GormUtil.allErrorsString(successorTask)}"
 								log.error msg
 							} else {
 								if ( successorTask.save(flush:true) ) {
-									msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) successor task(#:$successorTask.taskNumber Id:$successorTask.id) Saved - $whom"
+									msg = "$msg successor task(#:$successorTask.taskNumber Id:$successorTask.id) Saved - $whom"
 									success = true
 									if (notificationRequired) {
 										String tzId = userPreferenceService.timeZone
@@ -115,7 +117,7 @@ class TaskNonTranService implements ServiceMethods {
 										commentService.dispatchTaskEmail([taskId: successorTask.id, tzId: tzId, isNew: false, userDTFormat: userDTFormat])
 									}
 								} else {
-									msg = "updateTaskSuccessors: task(#:$task.taskNumber Id:$task.id) failed setting successor task(#:$successorTask.taskNumber Id:$successorTask.id) to READY - $whom : ${GormUtil.allErrorsString(successorTask)}"
+									msg = "$msg failed setting successor task(#:$successorTask.taskNumber Id:$successorTask.id) to READY - $whom : ${GormUtil.allErrorsString(successorTask)}"
 									log.error msg
 									success=false
 								}

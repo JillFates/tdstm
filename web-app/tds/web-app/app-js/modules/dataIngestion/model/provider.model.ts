@@ -7,15 +7,18 @@ export class ProviderColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 80
+				width: 108,
+				locked: true
 			}, {
 				label: 'Name',
 				property: 'name',
-				type: 'text'
+				type: 'text',
+				width: 208,
 			}, {
 				label: 'Description',
 				property: 'description',
-				type: 'text'
+				type: 'text',
+				width: 300,
 			}, {
 				label: 'Date Create',
 				property: 'dateCreated',
