@@ -388,13 +388,22 @@ class ApiActionService {
         def result = new GroovyShell(this.class.classLoader, scriptBinding)
                 .evaluate(script, ApiActionScriptProcessor.class.name)
 
-        if(code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-            throw new Exception('Script must return SUCCESS or ERROR')
-        }
+        checkEvaluationScriptResult(code, result)
 
         return [
                 result: result
         ]
+    }
+    /**
+     * It checks if the code is ReactionScriptCode.EVALUATE and the results is an instance of ReactionScriptCode.
+     * If results it is not an instance of ReactionScriptCode,  It throws an Exception.
+     * @param code
+     * @param result
+     */
+    private void checkEvaluationScriptResult (ReactionScriptCode code, result) {
+        if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
+            throw new Exception('Script must return SUCCESS or ERROR')
+        }
     }
 
 

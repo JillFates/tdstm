@@ -102,7 +102,7 @@ class ApiActionServiceSpec extends Specification {
 			""".stripIndent()
 
             def response = service.evaluateReactionScript(
-                    ReactionScriptCode.EVALUATE,
+                    ReactionScriptCode.SUCCESS,
                     script,
                     actionRequest,
                     actionResponse,
@@ -113,7 +113,7 @@ class ApiActionServiceSpec extends Specification {
 
         then: 'Service result has a ReactionScriptCode'
             with(response) {
-                result == task
+                !result
             }
 
         and: 'The asset and task object received the correct messages'
