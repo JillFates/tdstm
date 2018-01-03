@@ -1,8 +1,4 @@
 package net.transitionmanager.integration
-
-import groovy.transform.builder.Builder
-import groovy.transform.builder.ExternalStrategy
-
 /**
  * This class is used for binding context in every Api Action script processed.
  */
@@ -40,57 +36,17 @@ class ApiActionScriptBinding extends Binding {
     }
 
     /**
-     * Creates a ApiActionScriptBinding base on the ReactionScriptCode params.
-     * @param code a instance of ReactionScriptCode
-     * @return an instance of ApiActionScriptBinding
-     */
-    static ApiActionScriptBinding scriptBindingFor (ReactionScriptCode code, ActionRequest request,
-                                                    ApiActionResponse response,
-                                                    ReactionAssetFacade asset,
-                                                    ReactionTaskFacade task,
-                                                    ApiActionJob job) {
-
-        ApiActionScriptBinding binding
-
-        switch (code) {
-            case ReactionScriptCode.PRE:
-                binding = new ApiActionScriptBinding([
-                        request: request,
-                        asset  : asset,
-                        task   : task,
-                        job    : job
-                ])
-                break
-            case ReactionScriptCode.EVALUATE:
-                binding = new ApiActionScriptBinding([
-                        request : request,
-                        response: response,
-                        *       : ReactionScriptCode.values()
-                                .collectEntries {
-                            [(it.name()): it]
-                        }
-                ])
-                break
-            default:
-                binding = new ApiActionScriptBinding([
-                        request : request,
-                        response: response,
-                        asset   : asset,
-                        task    : task,
-                        job     : job,
-                        *       : ReactionScriptCode.values()
-                                .collectEntries {
-                            [(it.name()): it]
-                        }
-                ])
-                break
-        }
-
-        return binding
-    }
-
-    /**
      * Fluent API for Builder pattern.
+     * You must define all the necessary params to build an instance of ApiActionScriptBinding
+     * <code>
+     *      ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+     *              .with(new ActionRequest(['property1': 'value1']))
+     *              .with(new ApiActionResponse().asImmutable())
+     *              .with(new ReactionAssetFacade())
+     *              .with(new ReactionTaskFacade())
+     *              .with(new ApiActionJob())
+     *                  .build(ReactionScriptCode.FINAL)
+     * </code>
      */
     static class Builder {
 
@@ -99,7 +55,6 @@ class ApiActionScriptBinding extends Binding {
         ReactionAssetFacade asset
         ReactionTaskFacade task
         ApiActionJob job
-
 
         Builder with (ActionRequest request) {
             this.request = request
@@ -122,16 +77,35 @@ class ApiActionScriptBinding extends Binding {
         }
 
         Builder with (ApiActionJob job) {
-            this.job
+            this.job = job
             this
         }
-
+        /**
+         * Check if all the params where defined to build an instance of ApiActionScriptBinding
+         * to be used for ReactionScriptCode code Script
+         * @param code
+         * @param params
+         */
+        void checkParams (ReactionScriptCode code, List<String> params) {
+            params.each { String param ->
+                if (!this."${param}") {
+                    throw new Exception("Can not build a biding context for ${code} without ${param} object")
+                }
+            }
+        }
+        /**
+         * Build an instance of ApiActionScriptBinding using all the neccessary objects
+         * accordingly to the ReactionScriptCode code param.
+         * @param code an instance of ReactionScriptCode to define all the necessary object in the binding context
+         * @return an instance of ApiActionScriptBinding
+         */
         ApiActionScriptBinding build (ReactionScriptCode code) {
 
             ApiActionScriptBinding binding
 
             switch (code) {
                 case ReactionScriptCode.PRE:
+                    checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
                     binding = new ApiActionScriptBinding([
                             request: request,
                             asset  : asset,
@@ -140,6 +114,7 @@ class ApiActionScriptBinding extends Binding {
                     ])
                     break
                 case ReactionScriptCode.EVALUATE:
+                    checkParams(ReactionScriptCode.EVALUATE, ['request', 'response'])
                     binding = new ApiActionScriptBinding([
                             request : request,
                             response: response,
@@ -150,6 +125,7 @@ class ApiActionScriptBinding extends Binding {
                     ])
                     break
                 default:
+                    checkParams(ReactionScriptCode.DEFAULT, ['request', 'response', 'asset', 'task', 'job'])
                     binding = new ApiActionScriptBinding([
                             request : request,
                             response: response,
@@ -166,50 +142,5 @@ class ApiActionScriptBinding extends Binding {
 
             return binding
         }
-    }
-}
-
-@Builder(builderStrategy = ExternalStrategy, forClass = ApiActionScriptBinding)
-class ApiActionScriptBindingBuilder {
-
-    ApiActionScriptBinding build (ReactionScriptCode code) {
-
-        ApiActionScriptBinding binding
-
-        switch (code) {
-            case ReactionScriptCode.PRE:
-                binding = new ApiActionScriptBinding([
-                        request: request,
-                        asset  : asset,
-                        task   : task,
-                        job    : job
-                ])
-                break
-            case ReactionScriptCode.EVALUATE:
-                binding = new ApiActionScriptBinding([
-                        request : request,
-                        response: response,
-                        *       : ReactionScriptCode.values()
-                                .collectEntries {
-                            [(it.name()): it]
-                        }
-                ])
-                break
-            default:
-                binding = new ApiActionScriptBinding([
-                        request : request,
-                        response: response,
-                        asset   : asset,
-                        task    : task,
-                        job     : job,
-                        *       : ReactionScriptCode.values()
-                                .collectEntries {
-                            [(it.name()): it]
-                        }
-                ])
-                break
-        }
-
-        return binding
     }
 }

@@ -13,9 +13,9 @@ class ApiActionServiceSpec extends Specification {
 
             ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
             ApiActionResponse actionResponse = new ApiActionResponse()
-            ReactionAssetFacade asset = GroovyMock(ReactionAssetFacade)
-            ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
-            ApiActionJob job = GroovyMock(ApiActionJob)
+            ReactionAssetFacade asset = new ReactionAssetFacade()
+            ReactionTaskFacade task = new ReactionTaskFacade()
+            ApiActionJob job = new ApiActionJob()
 
         when: 'A PRE script is evaluated'
             String script = """
@@ -51,9 +51,9 @@ class ApiActionServiceSpec extends Specification {
             actionResponse.data = 'anything'
             actionResponse.status = ReactionHttpStatus.OK
 
-            ReactionAssetFacade asset = GroovyMock(ReactionAssetFacade)
-            ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
-            ApiActionJob job = GroovyMock(ApiActionJob)
+            ReactionAssetFacade asset = new ReactionAssetFacade()
+            ReactionTaskFacade task = new ReactionTaskFacade()
+            ApiActionJob job = new ApiActionJob()
 
         when: 'A EVALUATE script is evaluated'
             String script = """
@@ -89,14 +89,14 @@ class ApiActionServiceSpec extends Specification {
             actionResponse.data = 'anything'
             actionResponse.status = ReactionHttpStatus.OK
 
-            ReactionAssetFacade asset = GroovyMock(ReactionAssetFacade)
-            ReactionTaskFacade task = GroovyMock(ReactionTaskFacade)
-            ApiActionJob job = GroovyMock(ApiActionJob)
+            ReactionAssetFacade asset = new ReactionAssetFacade()
+            ReactionTaskFacade task = new ReactionTaskFacade()
+            ApiActionJob job = new ApiActionJob()
 
         when: 'A EVALUATE script is evaluated'
             String script = """
                 // Check to see if the asset is a VM
-                if ( !asset.isaDevice() && !asset.isaDatabase() ) {
+                if ( asset.isaDevice() && asset.isaDatabase() ) {
                     task.done()
                 }
 			""".stripIndent()
@@ -113,13 +113,11 @@ class ApiActionServiceSpec extends Specification {
 
         then: 'Service result has a ReactionScriptCode'
             with(response) {
-                !result
+                !!result
             }
 
         and: 'The asset and task object received the correct messages'
-            1 * task.done()
-            1 * asset.isaDevice()
-            1 * asset.isaDatabase()
+            task.isDone()
     }
 
     void 'test can throw an Exception if a reaction EVALUATE script does not return a ReactionScriptCode' () {
