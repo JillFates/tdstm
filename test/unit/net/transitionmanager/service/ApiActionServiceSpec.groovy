@@ -121,6 +121,36 @@ class ApiActionServiceSpec extends Specification {
     }
 
     void 'test can throw an Exception if a reaction EVALUATE script does not return a ReactionScriptCode' () {
+        setup:
+            ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
+            ApiActionResponse actionResponse = new ApiActionResponse()
+            actionResponse.data = 'anything'
+            actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
+            ReactionAssetFacade asset = new ReactionAssetFacade()
+            ReactionTaskFacade task = new ReactionTaskFacade()
+            ApiActionJob job = new ApiActionJob()
+
+
+        when: 'A EVALUATE script is evaluated that does not return a an instance of ReactionScriptCode'
+            String script = """
+                 if (response.status == SC.OK) {
+                    return SUCCESS
+                 } 
+			""".stripIndent()
+
+            service.evaluateReactionScript(
+                    ReactionScriptCode.EVALUATE,
+                    script,
+                    actionRequest,
+                    actionResponse.asImmutable(),
+                    task,
+                    asset,
+                    job
+            )
+
+        then: 'An Exception is thrown'
+            Exception e = thrown(Exception)
+            e.message == 'Script must return SUCCESS or ERROR'
     }
 }

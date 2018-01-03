@@ -7,9 +7,6 @@ class ApiActionScriptBinding extends Binding {
     ApiActionScriptBinding (Map vars = [:]) {
         this.variables.putAll([
                 SC: ReactionHttpStatus,
-//                *: apiActionProcessor.metaClass.methods.collectEntries {
-//                    [(it.name): InvokerHelper.getMethodPointer(apiActionProcessor, it.name)]
-//                },
                 * : vars
         ])
     }

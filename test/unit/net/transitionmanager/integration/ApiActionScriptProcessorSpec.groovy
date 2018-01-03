@@ -58,6 +58,20 @@ class ApiActionScriptProcessorSpec extends Specification {
 
     }
 
+    void 'test can throw an Exception if you try to create a script binding without the correct context objects'(){
+
+        when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
+            new ApiActionScriptBinding.Builder()
+                    .with(new ReactionAssetFacade())
+                    .with(new ReactionTaskFacade())
+                    .with(new ApiActionJob())
+                    .build(ReactionScriptCode.PRE)
+
+        then: 'An Exception is thrown'
+            Exception e = thrown(Exception)
+            e.message == 'Can not build a biding context for PRE without request object'
+    }
+
     void 'test can invoke a simple PRE Script to customize Http4 component with params and headers' () {
 
         given:
