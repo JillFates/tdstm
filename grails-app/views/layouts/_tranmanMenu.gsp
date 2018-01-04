@@ -130,6 +130,35 @@
                                 <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMProjectStaff?cover=print','help');">help</a>
                             </li>
                         </tds:hasPermission>
+                        <li class="divider"></li>
+                        <li class="menu-child-item">
+                            <a href="/tdstm/mockETL">Mock ETL</a>
+                        </li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="import" id="assets">
+                                Manual Asset Import
+                            </g:link>
+                        </li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="datascript" id="list">
+                                DataScripts
+                            </g:link>
+                        </li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="provider" id="list">
+                                Providers
+                            </g:link>
+                        </li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="action" id="list">
+                                API Actions
+                            </g:link>
+                        </li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="credential" id="list">
+                                Credentials
+                            </g:link>
+                        </li>
                     </ul>
                 </li>
                 <li class="dropdown menu-parent-data-centers">
