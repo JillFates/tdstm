@@ -17,6 +17,7 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
+import grails.gsp.PageRenderer
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
@@ -30,7 +31,7 @@ import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
-  AssetService assetService
+	AssetService assetService
 	PageRenderer groovyPageRenderer
 	ControllerService controllerService
 	ApplicationService applicationService
@@ -281,13 +282,13 @@ class WsAssetController implements ControllerMethods {
 
 		domainName=domainName.toLowerCase()
 		try {
-			render (view: "/angular/$domainName/$mode", model: model)
-			// There was code to check if the template output content using PageRenderer but that doesn't support
-			// rendering with Session. 
-			// if (no content rendered) {
-			//	log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
-			//	sendNotFound()	
-			//}
+			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+			if (pageHtml) {
+				render pageHtml
+			} else {
+				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
+				sendNotFound()
+			}
 		} catch (e) {
 			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
 			sendNotFound()
