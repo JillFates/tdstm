@@ -118,7 +118,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				// by the moment is hardcoded, this will be retrieved by the load sample data process..
 				this.filename = 'service_now_applications.csv';
 			})
-			.catch(() => console.log('onLoadSampleData close'));
+			.catch((err) => {
+			console.log('SampleDataDialog closed');
+			if (err) {
+				console.log(err);
+			}
+		});
 	}
 
 	/**

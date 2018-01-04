@@ -8,6 +8,7 @@ import {APIActionModel} from '../model/api-action.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -253,5 +254,14 @@ export class DataIngestionService {
 				return res.json();
 			})
 			.catch((error: any) => error.json());
+	}
+
+	uploadFile(ref: string): Observable<any> {
+		return Observable.of( new HttpResponse(
+			{
+				status: 200,
+				body: { data: { filename: 'service_now_applications.csv' } }
+			}
+		));
 	}
 }
