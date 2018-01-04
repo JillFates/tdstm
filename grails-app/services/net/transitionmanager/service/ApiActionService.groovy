@@ -380,18 +380,18 @@ class ApiActionService {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	Map<String, ?> evaluateReactionScript (ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
+	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
 
 		ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
-			.with(request)
-			.with(response)
-			.with(asset)
-			.with(task)
-			.with(job)
-			.build(ReactionScriptCode.FINAL)
+				.with(request)
+				.with(response)
+				.with(asset)
+				.with(task)
+				.with(job)
+				.build(ReactionScriptCode.FINAL)
 
 		def result = new GroovyShell(this.class.classLoader, scriptBinding)
-			.evaluate(script, ApiActionScriptBinding.class.name)
+				.evaluate(script, ApiActionScriptBinding.class.name)
 
 		checkEvaluationScriptResult(code, result)
 
@@ -405,7 +405,7 @@ class ApiActionService {
 	 * @param code
 	 * @param result
 	 */
-	private void checkEvaluationScriptResult (ReactionScriptCode code, result) {
+	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
 			throw new Exception('Script must return SUCCESS or ERROR')
 		}

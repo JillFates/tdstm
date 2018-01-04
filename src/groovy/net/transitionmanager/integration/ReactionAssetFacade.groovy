@@ -5,11 +5,11 @@ package net.transitionmanager.integration
  */
 class ReactionAssetFacade {
 
-    Boolean isaDevice(){
-        true
-    }
+	Boolean isaDevice(){
+		true
+	}
 
-    Boolean isaDatabase(){
-        true
-    }
+	Boolean isaDatabase(){
+		true
+	}
 }

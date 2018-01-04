@@ -5,23 +5,23 @@ package net.transitionmanager.integration
  */
 class ReactionTaskFacade {
 
-    Boolean done = false
+	Boolean done = false
 
-    String note = ''
+	String note = ''
 
-    Boolean done(){
-        this.done = true
-    }
+	Boolean done(){
+		this.done = true
+	}
 
-    Boolean isDone () {
-        return done
-    }
+	Boolean isDone () {
+		return done
+	}
 
-    String getNote () {
-        return note
-    }
+	String getNote () {
+		return note
+	}
 
-    void addNote (String note) {
-        this.note = note
-    }
+	void addNote (String note) {
+		this.note = note
+	}
 }
