@@ -17,6 +17,7 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
+import grails.gsp.PageRenderer
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import grails.gsp.PageRenderer
 
@@ -31,7 +32,7 @@ import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
-  AssetService assetService
+	AssetService assetService
 	PageRenderer groovyPageRenderer
 	ControllerService controllerService
 	ApplicationService applicationService
