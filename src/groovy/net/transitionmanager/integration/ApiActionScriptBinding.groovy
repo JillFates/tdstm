@@ -19,16 +19,11 @@ class ApiActionScriptBinding extends Binding {
 	@Override
 	Object getVariable(String name) {
 
-		if (variables == null)
-			throw new MissingPropertyException('There is not variables bound in this script context')
-
-		Object result = variables.get(name)
-
-		if (result == null && !variables.containsKey(name)) {
+		if (variables?.containsKey(name)) {
+			return variables.get(name)
+		} else {
 			throw new MissingPropertyException('There is no property with name: ' + name + ' bound in this script context')
 		}
-
-		return result
 	}
 
 	/**
