@@ -265,7 +265,11 @@ class ImportService implements ServiceMethods {
 		if (performance) log.debug 'Fetching DataTransferValue ROWS took {}', TimeUtil.elapsed(now)
 
 		if (performance) now = new Date()
-		def assetIds = AssetEntity.findAllByProject(project)*.id
+
+		List<Long> assetIds = AssetEntity.where {
+			project == project
+		}.projections {property("id")}.list()
+
 		if (performance) log.debug 'Fetching existing asset IDS took {}', TimeUtil.elapsed(now)
 
 		def eavAttributeSet = EavAttributeSet.get(1)
