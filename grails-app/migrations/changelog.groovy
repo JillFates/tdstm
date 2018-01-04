@@ -198,4 +198,5 @@ databaseChangeLog = {
 	include file: '20171108-all-asset-system-view.groovy'
 	include file: '20171110-create-new-permission-asset-explorer-system-list.groovy'
 	include file: '20171129-change-person-travel-ok-type-and-default.groovy'
+  include file: '20180104-drop-not-null-user-login-id-constraint-on-data-transfer-batch-table.groovy'
 }
