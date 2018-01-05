@@ -37,11 +37,7 @@ class ControlAngularTagLib {
 		Map field = attrs.field ?: [:]
 		String cssClass = attrs["class"]
 		out << "<span "
-		if (field.tip) {
-			String tooltipDataPlacement = attrs.tooltipDataPlacement
-			String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
-			out << tooltipAttribute
-		}
+		out << tooltipAttrib(field, attrs.tooltipDataPlacement)
 		out << attribute("class", cssClass)
 		out << " >\n"
 		out << body()
@@ -88,9 +84,7 @@ class ControlAngularTagLib {
 		sb.append('"')
 		sb.append(' >')
 		sb.append('<span ')
-		if (fieldSpec.tip) {
-			sb.append(tooltipAttrib(fieldSpec))
-		}
+		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')
 		sb.append(StringEscapeUtils.escapeHtml(fieldSpec.label))
 		sb.append('</span>')
@@ -113,17 +107,7 @@ class ControlAngularTagLib {
 		StringBuilder sb = new StringBuilder("\n")
 		sb.append("<td class='valueNW ${fieldSpec.imp}'>")
 		sb.append("<span ")
-		if (fieldSpec.tip) {
-			// Get bootstrap tooltip data-placement from attrib tooltipDataPlacement
-			// This parameter is optional to modify default tooltip positioning
-			// Also checks that the value is one of the valid data-placement element values
-			String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
-			if (tooltipDataPlacement != null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
-				throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
-						'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
-			}
-			sb.append(tooltipAttrib(fieldSpec, tooltipDataPlacement))
-		}
+		sb.append(tooltipAttrib(fieldSpec, attrs.tooltipDataPlacement))
 		sb.append(" >")
 		sb.append(fieldValue)
 		sb.append("</span>")
@@ -525,6 +509,7 @@ class ControlAngularTagLib {
 
 	/**
 	 * Returns the HTML tooltip attributes based on the field specification
+	 * Also checks that the tooltipDataPlacement is a valid data-placement element value on Bootstrap
 	 * @param field - the Field specification object
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return The tooltip attributes HTML for controls
@@ -532,13 +517,18 @@ class ControlAngularTagLib {
 	private String tooltipAttrib(Map field, String tooltipDataPlacement=null ) {
 
 		StringBuilder attrib = new StringBuilder('')
-		attrib.append( attribute('data-toggle', 'popover') )
-		attrib.append( attribute('data-trigger', 'hover') )
-		if (tooltipDataPlacement !=null) {
-			attrib.append( attribute('data-placement', tooltipDataPlacement) )
+		if(field.tip) {
+			if (tooltipDataPlacement && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
+				throw new InvalidParamException('<tds:inputControl> tag optional argument tooltipDataPlacement ' +
+						'requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
+			}
+			attrib.append(attribute('data-toggle', 'popover'))
+			attrib.append(attribute('data-trigger', 'hover'))
+			if (tooltipDataPlacement) {
+				attrib.append(attribute('data-placement', tooltipDataPlacement))
+			}
+			attrib.append(attribute('data-content', field?.tip, field?.label))
 		}
-		attrib.append( attribute('data-content', field?.tip, field?.label) )
-
 		return attrib.toString()
 	}
 
