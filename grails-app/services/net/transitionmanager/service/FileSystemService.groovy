@@ -99,6 +99,10 @@ class FileSystemService  implements InitializingBean {
      */
     String getUniqueFilename(String directory, String prefix='', String extension='tmp') {
         String filename
+        // Remove a possible '.' at the beginning of the file extension.
+        if (extension.startsWith(".")) {
+            extension = extension.substring(1)
+        }
         int tries = maxUniqueTries
         while(true) {
             filename = prefix + RandomStringUtils.randomAlphanumeric(32) + '.' + extension
@@ -110,6 +114,22 @@ class FileSystemService  implements InitializingBean {
                 throw new RuntimeErrorException('getUniqueFilename unable to determine unique filename')
             }
         }
+        return filename
+    }
+
+    /**
+     * Create a temporary file in the system named random + extension
+     * a write to it the input given.
+     * @param prefix
+     * @param extension
+     * @param rawInput
+     * @return file name for the temporary file.
+     */
+    String writeTemporaryFileFromRawInput(String prefix, String extension, String rawInput) {
+        // Create a temporary file, retrieving its name and output stream.
+        def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
+        os << rawInput
+        os.close()
         return filename
     }
 
