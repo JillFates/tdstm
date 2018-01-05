@@ -35,11 +35,11 @@ class ControlAngularTagLib {
 	 */
 	def tooltipSpan = {attrs, body ->
 		Map field = attrs.field ?: [:]
-		String tooltipDataPlacement = attrs.tooltipDataPlacement
-		String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
 		String cssClass = attrs["class"]
 		out << "<span "
 		if (field.tip) {
+			String tooltipDataPlacement = attrs.tooltipDataPlacement
+			String tooltipAttribute = tooltipAttrib(field, tooltipDataPlacement)
 			out << tooltipAttribute
 		}
 		out << attribute("class", cssClass)
