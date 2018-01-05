@@ -24,11 +24,13 @@ class TaskEditionPage extends Page{
         teModalAssetNameSelector        { teModalWindow.find("div#s2id_currentAsset")}
         teModalAssetNameSelValues(wait:true, required:false) { $("div#select2-drop").find("li",class:"select2-results-dept-0 select2-result select2-result-selectable")}
         teModalAssetNameMoreResults (wait:true, required:false) { teModalAssetNameSelValues.find("li.select2-more-results")}
+        teModalInstructionsLink         {teModalWindow.find("input#instructionsLinkId")}
         teModalStatusSelector(wait:true) { teModalWindow.find("select#status")}
         teModalAddPredecessorBtn(wait:true) { teModalWindow.find("a","ng-click":"\$broadcast('addDependency','predecessor')")}
         teModalPredecessorDD (wait:true, required:false){ teModalWindow.find("task-dependencies","ng-model":"dependencies.predecessors").find("span",class:"k-icon k-i-arrow-s")}
         teModalAddSuccessorBtn(wait:true) { teModalWindow.find("a","ng-click":"\$broadcast('addDependency','successor')")}
         teModalSuccessorDD  (wait:true, required:false) { teModalWindow.find("task-dependencies","ng-model":"dependencies.successors").find("span",class:"k-icon k-i-arrow-s")}
+        teModalNote                     { teModalWindow.find("textarea#noteEditId")}
         teModalSaveBtn                  { teModalWindow.find("button#saveAndCloseBId")}
         teModalCancelBtn                { teModalWindow.find("button",class:"btn btn-default tablesave cancel")}
         teModalCloseBtn                 { teModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}

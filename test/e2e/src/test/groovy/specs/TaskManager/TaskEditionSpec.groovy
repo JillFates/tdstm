@@ -27,8 +27,10 @@ class TaskEditionSpec extends GebReportingSpec{
     static taskTeam = "Unassigned"  //TODO verify other team id values
     static taskAssetType = "Applications"
     static taskAssetName = "App 1"
+    static taskInsLink = "https://www.transitionaldata.com"
     static taskPredecessor = "11747: ZZ Test Task 2"
     static taskSuccessor = "11749: ZZ Test Task 3"
+    static taskNote = "This is a Note for "+ baseName +" "+ randStr + " Task For E2E Edited"
 
     def setupSpec() {
         testCount = 0
@@ -71,7 +73,7 @@ class TaskEditionSpec extends GebReportingSpec{
         at TaskEditionPage
     }
 
-    def "Edit Task - Change Name, Assigned to and Team"() {
+    def "Edit Task - Change Fields and static Dropdowns"() {
         testKey = "TM-XXXX"
         given:
         at TaskEditionPage
@@ -82,7 +84,9 @@ class TaskEditionSpec extends GebReportingSpec{
         teModalPersonSelector = taskPerson
         teModalTeamSelector = taskTeam
         teModalEventSelector = taskEvent
+        teModalInstructionsLink = taskInsLink
         teModalStatusSelector = taskStatus
+        teModalNote = taskNote
         then:
         at TaskEditionPage
 
@@ -137,7 +141,9 @@ class TaskEditionSpec extends GebReportingSpec{
         tdModalTaskTeam.text().trim() == taskTeam
         tdModalTaskEvent.text().trim() == taskEvent
         tdModalTaskAssetName.text().trim() == taskAssetName
+        tdModalInstructionsLink.text().trim() == taskInsLink
         tdModalTaskStatus.text().trim() == taskStatus
+        tdModalNoteLast.text().trim() == taskNote
         waitFor { tdModalCloseBtn.click() }
         at TaskManagerPage
     }
