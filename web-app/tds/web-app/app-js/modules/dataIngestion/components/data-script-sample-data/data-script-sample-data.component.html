@@ -12,26 +12,33 @@
 					<div class="col-md-12">
 						<div class="radio">
 							<label>
-								<input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste CSV</label>
+								<input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste CSV
+                            </label>
+                            <label style="margin-left: 10px;">
+                                <input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)
+                            </label>
+                            <label style="margin-left: 10px;">
+                                <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
 						</div>
-						<textarea name="" class="form-control" id="" cols="30" rows="8"></textarea>
-					</div>
-					<div class="col-md-12">
-						<div class="radio">
-							<label>
-								<input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)</label>
-
-						</div>
-						<input type="file">
-					</div>
-					<div class="col-md-12">
-						<div class="radio">
-							<label>
-								<input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
-						</div>
-						<select name="" id=""></select>
 					</div>
 				</div>
+                <div class="row">
+                    <div *ngIf="uploadOption === 'csv'" class="col-md-12">
+                        <textarea name="" class="form-control" id="" cols="30" rows="8"></textarea>
+                    </div>
+                    <div *ngIf="uploadOption === 'file'" class="col-md-12">
+                        <kendo-upload
+                                [autoUpload]="false"
+                                [saveUrl]="uploadSaveUrl"
+                                [restrictions]="uploadRestrictions"
+                                [multiple]="false"
+                                (success)="completeEventHandler($event)">
+                        </kendo-upload><!---->
+                    </div>
+                    <div *ngIf="uploadOption === 'service'" class="col-md-12">
+                        <select name="" id=""></select>
+                    </div>
+                </div>
 				<hr>
 				<div class="row">
 					<div class="col-md-6">
@@ -54,7 +61,7 @@
 				</div>
 			</div>
 			<div class="modal-footer form-group-center">
-				<button type="button" class="btn btn-primary pull-left">
+                <button [disabled]="!fileLoadReference" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
 					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.LOAD' | translate }}</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
