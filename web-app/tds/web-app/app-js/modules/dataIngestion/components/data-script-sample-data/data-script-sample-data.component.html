@@ -8,60 +8,86 @@
 				<h4 class="modal-title">{{'DATA_INGESTION.SAMPLE_DATA_TITLE'|translate}}</h4>
 			</div>
 			<div class="modal-body">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="radio">
-							<label>
-								<input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste CSV
-                            </label>
-                            <label style="margin-left: 10px;">
-                                <input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)
-                            </label>
-                            <label style="margin-left: 10px;">
-                                <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
-						</div>
-					</div>
-				</div>
-                <div class="row">
-                    <div *ngIf="uploadOption === 'csv'" class="col-md-12">
-                        <textarea name="" class="form-control" id="" cols="30" rows="8"></textarea>
+
+                <form name="dataScriptForm" role="form" #dataScriptForm='ngForm' class="form-horizontal left-alignment">
+                    <!-- top radio buttons options -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste content (CSV, JSON, XML)
+                                </label>
+                                <label style="margin-left: 10px;">
+                                    <input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)
+                                </label>
+                                <label style="margin-left: 10px;">
+                                    <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
+                            </div>
+                        </div>
                     </div>
-                    <div *ngIf="uploadOption === 'file'" class="col-md-12">
-                        <kendo-upload
-                                [autoUpload]="false"
-                                [saveUrl]="uploadSaveUrl"
-                                [restrictions]="uploadRestrictions"
-                                [multiple]="false"
-                                (success)="completeEventHandler($event)">
-                        </kendo-upload><!---->
+
+                    <div class="row" style="margin-top: 10px;">
+                        <!-- csv -->
+                        <div *ngIf="uploadOption === 'csv'" class="col-md-12">
+                            <div class="form-group">
+                                <label for="fileExtension" class="col-sm-12 control-label">File extension:</label>
+                                <div class="col-sm-12">
+                                    <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
+                                                        [(ngModel)]="csv.selected"
+                                                        [data]="csv.options.slice(1)"></kendo-dropdownlist>
+                                </div>
+                                <div class="col-sm-12">
+                                    <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; margin-top: 5px; padding-left: 0px; padding-right: 0px;"
+                                          [(ngModel)]="csv.fileContent"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- file -->
+                        <div *ngIf="uploadOption === 'file'" class="col-md-12">
+                            <kendo-upload
+                                    [autoUpload]="false"
+                                    [saveUrl]="uploadSaveUrl"
+                                    [restrictions]="uploadRestrictions"
+                                    [multiple]="false"
+                                    (success)="completeEventHandler($event)">
+                            </kendo-upload><!---->
+                        </div>
+                        <!-- web service -->
+                        <div *ngIf="uploadOption === 'service'" class="col-md-12">
+                            <select name="" id=""></select>
+                        </div>
                     </div>
-                    <div *ngIf="uploadOption === 'service'" class="col-md-12">
-                        <select name="" id=""></select>
+
+                    <div *ngIf="uploadOption === 'service'">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="">Data include header</label>
+                                </div>
+                                <div class="form-group form-inline">
+                                    <label for="" style="margin-right:60px;">Limit # of Rows</label>
+                                    <input type="number" style="width:80px;" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="">Auto Generate ETL</label>
+                                </div>
+                                <select name="" id=""></select>
+                            </div>
+                        </div>
                     </div>
-                </div>
-				<hr>
-				<div class="row">
-					<div class="col-md-6">
-						<div class="checkbox">
-							<label>
-								<input type="checkbox" value="">Data include header</label>
-						</div>
-						<div class="form-group form-inline">
-							<label for="" style="margin-right:60px;">Limit # of Rows</label>
-							<input type="number" style="width:80px;" class="form-control">
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="checkbox">
-							<label>
-								<input type="checkbox" value="">Auto Generate ETL</label>
-						</div>
-						<select name="" id=""></select>
-					</div>
-				</div>
+
+                </form>
+
+
+
 			</div>
 			<div class="modal-footer form-group-center">
-                <button [disabled]="!fileLoadReference" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
+                <button [disabled]="!validForm()" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
 					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.LOAD' | translate }}</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>

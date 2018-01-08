@@ -40,7 +40,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private promptService: UIPromptService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
-		this.filename = 'service_now_applications.csv';
 	}
 
 	/**
@@ -108,15 +107,14 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected onLoadSampleData(): void {
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
-			.then(() => {
-				// by the moment is hardcoded, this will be retrieved by the load sample data process..
-				this.filename = 'service_now_applications.csv';
+			.then((filename) => {
+				this.filename = filename;
 			})
 			.catch((err) => {
-			console.log('SampleDataDialog closed');
-			if (err) {
-				console.log(err);
-			}
+				console.log('SampleDataDialog error occurred..');
+				if (err) {
+					console.log(err);
+				}
 		});
 	}
 

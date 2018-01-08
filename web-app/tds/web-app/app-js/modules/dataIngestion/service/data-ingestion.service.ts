@@ -16,6 +16,7 @@ export class DataIngestionService {
 	private dataDefaultUrl = '../ws';
 	private dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
+	private fileSystemUrl = '../ws/fileSystem';
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -244,6 +245,18 @@ export class DataIngestionService {
 			fileName: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadText(content: string, extension: string): Observable<any> {
+		let postRequest = {
+			content: content,
+			extension: extension
+		};
+		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				return res.json();
 			})
