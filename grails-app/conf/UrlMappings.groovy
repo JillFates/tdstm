@@ -452,6 +452,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/fileSystem/delete" {
+			controller = "wsFileSystem"
+			action = [
+					DELETE: "deleteFile"
+			]
+		}
+
 		///// LICENSES Manager API (BackOffice) /////////
 
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
