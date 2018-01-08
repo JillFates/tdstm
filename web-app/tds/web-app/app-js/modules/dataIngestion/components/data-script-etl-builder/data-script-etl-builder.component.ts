@@ -7,6 +7,7 @@ import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -24,14 +25,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private checking = false;
 	private saving = false;
 	private testing = false;
-	private scriptErrorLog: string;
-	private consoleSettings: any = {
-		top : '30px',
-		left : '30px',
-		height: '200px',
-		width: '500px',
-		log: null
-	};
+	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 
 	ngAfterViewInit(): void {
 		setTimeout(() => {
@@ -47,6 +41,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private promptService: UIPromptService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
+		this.filename = 'service_now_applications.csv';
 	}
 
 	/**
@@ -130,7 +125,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * On View Console button open the console dialog.
 	 */
 	protected onViewConsole(): void {
-		this.dialogService.extra(DataScriptConsoleComponent, [{provide: 'consoleSettings', useValue: this.consoleSettings}], false, true)
+		this.dialogService.extra(DataScriptConsoleComponent, [{provide: ScriptConsoleSettingsModel, useValue: this.consoleSettings}], false, true)
 			.then((result) => {/* on ok */} )
 			.catch((result) => {/* on close/cancel */});
 	}
@@ -138,20 +133,20 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On Test Script button.
 	 */
+	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
 	private onTestScript(): void {
 		this.testing = true;
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
 			this.testing = false;
-			this.consoleSettings.log = null;
-			this.scriptErrorLog = null;
-			this.consoleSettings.log = result.data.consoleLog;
-			if (result.data.isValid) {
+			this.clearLogVariables();
+			this.scriptTestResult = result.data;
+			this.consoleSettings.scriptTestResult = this.scriptTestResult;
+			if (this.scriptTestResult.isValid) {
 				this.notifierService.broadcast({
 					name: AlertType.SUCCESS,
 					message: 'Valid Script'
 				});
 			} else {
-				this.scriptErrorLog = result.data.error;
 				this.notifierService.broadcast({
 					name: AlertType.DANGER,
 					message: 'Invalid Script'
@@ -163,28 +158,46 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	/**
 	 * On Check Script Syntax button.
 	 */
+	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
 	private onCheckScriptSyntax(): void {
 		this.checking = true;
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
 			this.checking = false;
-			this.consoleSettings.log = null;
-			this.scriptErrorLog = null;
-			if (result.data.validSyntax) {
+			this.clearLogVariables();
+			this.scriptValidSyntaxResult = result.data;
+			if (this.scriptValidSyntaxResult.validSyntax) {
 				this.notifierService.broadcast({
 					name: AlertType.SUCCESS,
 					message: 'Valid Syntax'
 				});
 			} else {
-				let errors = result.data.errors.map( error => {
-					return `message: ${error.message} --> start line: ${error.startLine}, end line: ${error.endLine}, start column: ${error.startColumn}, endColumn: ${error.endColumn}, fatal: ${error.fatal}`;
-				});
-				this.scriptErrorLog = errors.join('\n');
 				this.notifierService.broadcast({
 					name: AlertType.DANGER,
 					message: 'Invalid Syntax'
 				});
 			}
 		});
+	}
+
+	private testHasErrors(): boolean {
+		return !this.scriptTestResult.isValid && this.scriptTestResult.error && this.scriptTestResult.error.length > 0;
+	}
+
+	private syntaxHasErrors(): boolean {
+		return !this.scriptValidSyntaxResult.validSyntax && this.scriptValidSyntaxResult.errors && this.scriptValidSyntaxResult.errors.length > 0;
+	};
+
+	private getSyntaxErrors(): string {
+		let errors = this.scriptValidSyntaxResult.errors.map( error => {
+			return `message: ${error.message} --> start line: ${error.startLine}, end line: ${error.endLine}, start column: ${error.startColumn}, endColumn: ${error.endColumn}, fatal: ${error.fatal}`;
+		});
+		return errors.join('\n');
+	};
+
+	private clearLogVariables(): void {
+		this.scriptTestResult = new ScriptTestResultModel();
+		this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
+		this.consoleSettings.scriptTestResult = new ScriptTestResultModel();
 	}
 
 }

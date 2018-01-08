@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, Inject} from '@angular/core';
 import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
+import {ScriptConsoleSettingsModel} from '../../model/script-result.models';
 
 declare var jQuery: any;
 const DIALOG_ID = '#viewConsole';
@@ -14,7 +15,7 @@ export class DataScriptConsoleComponent extends UIExtraDialog implements AfterVi
 	private dialogInstance: any;
 	private textAreaInstance: any;
 
-	constructor(@Inject('consoleSettings') private consoleSettings: any) {
+	constructor(private consoleSettings: ScriptConsoleSettingsModel) {
 		super(DIALOG_ID);
 	}
 
