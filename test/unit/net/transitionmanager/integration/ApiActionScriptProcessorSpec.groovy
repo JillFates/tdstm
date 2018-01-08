@@ -1,33 +1,41 @@
 package net.transitionmanager.integration
 
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.text.MessageFormat
 
 import static ReactionHttpStatus.NOT_FOUND
 import static ReactionHttpStatus.OK
 import static net.transitionmanager.integration.ReactionScriptCode.ERROR
 import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 
-
+@TestMixin(GrailsUnitTestMixin)
 class ApiActionScriptProcessorSpec extends Specification {
 
-	def setupSpec() {
+	StaticMessageSource messageSource
 
+	def setupSpec() {
 	}
 
 	def cleanupSpec() {
-
 	}
 
 	def setup() {
-
+		messageSource = applicationContext.getBean(MessageSource)
+		assertNotNull messageSource
 	}
 
 	@Unroll
 	void 'test can create a script binding context based on a ReactionScriptCode.#reactionScriptCode'() {
 
 		setup:
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
@@ -61,15 +69,39 @@ class ApiActionScriptProcessorSpec extends Specification {
 	void 'test can throw an Exception if you try to create a script binding without the correct context objects'() {
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
-			new ApiActionScriptBinding.Builder()
+			new ApiActionScriptBindingBuilder(messageSource)
 					.with(new ReactionAssetFacade())
 					.with(new ReactionTaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
 		then: 'An Exception is thrown'
-			Exception e = thrown(Exception)
+			ApiActionException e = thrown(ApiActionException)
 			e.message == 'Can not build a biding context for PRE without request object'
+	}
+
+	void 'test can throw an Exception if you try to create a script binding without the correct context objects with i18n message'() {
+
+		setup:
+			LocaleContextHolder.setLocale(Locale.FRENCH)
+			messageSource.addMessage(
+					'apiAction.invalid.params.exception',
+					Locale.FRENCH,
+					'Impossible de créer un contexte de liaison pour {0} sans objet de {1}')
+
+		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
+			new ApiActionScriptBindingBuilder(messageSource)
+					.with(new ReactionAssetFacade())
+					.with(new ReactionTaskFacade())
+					.with(new ApiActionJob())
+					.build(ReactionScriptCode.PRE)
+
+		then: 'An Exception is thrown'
+			Exception e = thrown(ApiActionException)
+			e.message == 'Impossible de créer un contexte de liaison pour PRE sans objet de request'
+
+		cleanup:
+			LocaleContextHolder.resetLocaleContext()
 	}
 
 	void 'test can invoke a simple PRE Script to customize Http4 component with params and headers'() {
@@ -77,7 +109,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		given:
 			ActionRequest request = new ActionRequest(['format': 'xml'])
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(request)
 					.with(new ApiActionResponse())
 					.with(new ReactionAssetFacade())
@@ -124,12 +156,12 @@ class ApiActionScriptProcessorSpec extends Specification {
 			request.config.getProperty('proxyAuthPort') == 8080
 	}
 
-	void 'test can throw an MissingPropertyException if PRE try to use response object'() {
+	void 'test can throw an ApiActionException if PRE try to use response object'() {
 
 		given:
 			ActionRequest request = new ActionRequest(['format': 'xml'])
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
@@ -150,9 +182,47 @@ class ApiActionScriptProcessorSpec extends Specification {
 						}
 					""".stripIndent(), ApiActionScriptBinding.class.name)
 
-		then: 'A MissingPropertyException is thrown'
-			MissingPropertyException e = thrown(MissingPropertyException)
-			e.message == 'No such property: response for class: net_transitionmanager_integration'
+		then: 'A ApiActionException is thrown'
+			ApiActionException e = thrown(ApiActionException)
+			e.message == 'There is no property with name response bound in this script context'
+	}
+
+	void 'test can throw an ApiActionException if PRE try to use response object with an i18n message'() {
+
+		given:
+			LocaleContextHolder.setLocale(Locale.FRENCH)
+			messageSource.addMessage('apiAction.not.bound.property.exception', Locale.FRENCH, 'Il ny a pas de propriété avec une {0} de nom liée dans ce contexte de script')
+
+		and:
+			ActionRequest request = new ActionRequest(['format': 'xml'])
+
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+					.with(request)
+					.with(new ApiActionResponse().asImmutable())
+					.with(new ReactionAssetFacade())
+					.with(new ReactionTaskFacade())
+					.with(new ApiActionJob())
+					.build(ReactionScriptCode.PRE)
+
+		when: 'The PRE script is evaluated'
+			new GroovyShell(this.class.classLoader, scriptBinding)
+					.evaluate("""
+						request.param.format = 'json'
+						request.headers.add('header1', 'value1')
+						
+						if (response.status == SC.OK) {
+						   return SUCCESS
+						} else {
+						   return ERROR
+						}
+					""".stripIndent(), ApiActionScriptBinding.class.name)
+
+		then: 'A ApiActionException is thrown'
+			ApiActionException e = thrown(ApiActionException)
+			e.message == 'Il ny a pas de propriété avec une response de nom liée dans ce contexte de script'
+
+		cleanup:
+			LocaleContextHolder.resetLocaleContext()
 	}
 
 	void 'test can invoke a simple EVALUATE Script and return a ReactionScriptCode result'() {
@@ -162,7 +232,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			response.data = 'anything'
 			response.status = status
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(response.asImmutable())
 					.with(new ReactionAssetFacade())
@@ -200,7 +270,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ReactionAssetFacade asset = new ReactionAssetFacade()
 			ReactionTaskFacade task = new ReactionTaskFacade()
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(asset)
@@ -234,7 +304,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		given:
 			ReactionTaskFacade task = new ReactionTaskFacade()
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
