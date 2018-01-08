@@ -228,20 +228,14 @@ export class DataIngestionService {
 		};
 		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
-				return res.json();
+				let response = res.json();
+				response.data.domains = [];
+				for (let domain of Object.keys(response.data.data)) {
+					response.data.domains.push(domain);
+				}
+				return response;
 			})
 			.catch((error: any) => error.json());
-
-		/*let mockResponse = {
-			status: 'success',
-			data: {
-				isValid: true,
-				consoleLog: 'INFO - Console status changed: on\nINFO - Reading labels [0:name, 1:short_description, 2:used_for,' +
-				'3:sys_id, 4:sys_updated_on, 5:vendor, 6:sys_class_name, 7:department, 8:supported_by, 9:owned_by, 10:warranty_expiration, 11:fqdn]\n',
-				data: {}
-			}
-		};
-		return Observable.of(mockResponse);*/
 	}
 
 	checkSyntax(script: string, filename: string): Observable<any> {

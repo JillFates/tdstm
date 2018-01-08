@@ -40,9 +40,9 @@
                 <div *ngIf="testHasErrors() || syntaxHasErrors()" class="row">
                     <div class="col-md-12">
                         <h4 class="pull-left">Errors</h4>
-                        <textarea *ngIf="testHasErrors()" class="form-control console" [(ngModel)]="scriptTestResult.error" cols="30" rows="1" style="cursor: default; resize: vertical;">
+                        <textarea *ngIf="testHasErrors()" class="form-control console" [(ngModel)]="scriptTestResult.error" cols="30" rows="3" style="cursor: default; resize: vertical;">
 						</textarea>
-                        <textarea *ngIf="syntaxHasErrors()" class="form-control console" cols="30" rows="1" style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
+                        <textarea *ngIf="syntaxHasErrors()" class="form-control console" cols="30" rows="3" style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
                     </div>
                 </div>
 
@@ -59,88 +59,18 @@
 					</div>
 				</div>
 				<hr>
-				<div class="row">
+				<div class="row" *ngFor="let domain of scriptTestResult.domains">
 					<div class="col-md-12">
-						<h4 class="pull-left">Transformed Data Review</h4>
-						<button class="pull-right btn btn-default" (click)="toggleSection('transformed')">
-							<i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.transformed,'fa-angle-double-up':collapsed.transformed}" style="padding-right:0px"></i>
+						<h4 class="pull-left">Transformed Data Review - {{domain}}</h4>
+						<button class="pull-right btn btn-default" (click)="toggleSection(domain)">
+							<i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed[domain],'fa-angle-double-up':collapsed[domain]}" style="padding-right:0px"></i>
 						</button>
 					</div>
-					<div class="col-md-12" *ngIf="!collapsed.transformed">
+					<div class="col-md-12" *ngIf="!collapsed[domain]">
                         <div *ngIf="scriptTestResult.data && (!testHasErrors() || !syntaxHasErrors())">
-                            <!-- Application domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Application" [data]="scriptTestResult.data.Application">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Application[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Device domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Device" [data]="scriptTestResult.data.Device">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Device[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Database domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Database" [data]="scriptTestResult.data.Database">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Database[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Storage domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Storage" [data]="scriptTestResult.data.Storage">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Storage[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- External domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.External" [data]="scriptTestResult.data.External">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.External[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Task domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Task" [data]="scriptTestResult.data.Task">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Task[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Person domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Person" [data]="scriptTestResult.data.Person">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Person[0].elements;
-                                                           let columnIndex = index;"
-                                                   title="{{column.field.label}}">
-                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                        {{dataItem.elements[columnIndex].value}}
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                            <!-- Comment domain -->
-                            <kendo-grid *ngIf="scriptTestResult.data.Comment" [data]="scriptTestResult.data.Comment">
-                                <kendo-grid-column *ngFor="let column of scriptTestResult.data.Comment[0].elements;
+                            <!-- Grid domain -->
+                            <kendo-grid [data]="scriptTestResult.data[domain]">
+                                <kendo-grid-column *ngFor="let column of scriptTestResult.data[domain][0].elements;
                                                            let columnIndex = index;"
                                                    title="{{column.field.label}}">
                                     <ng-template kendoGridCellTemplate let-dataItem>

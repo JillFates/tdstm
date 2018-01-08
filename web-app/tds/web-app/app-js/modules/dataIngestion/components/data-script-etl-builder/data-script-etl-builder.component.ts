@@ -17,8 +17,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	private collapsed = {
 		code: true,
-		sample: false,
-		transformed: false
+		sample: false
 	};
 	private script: string;
 	private filename: string;
@@ -140,6 +139,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.testing = false;
 			this.clearLogVariables();
 			this.scriptTestResult = result.data;
+			for (let domain of this.scriptTestResult.domains) {
+				this.collapsed[domain] = false;
+			}
 			this.consoleSettings.scriptTestResult = this.scriptTestResult;
 			if (this.scriptTestResult.isValid) {
 				this.notifierService.broadcast({

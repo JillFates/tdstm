@@ -3,11 +3,13 @@ export class ScriptTestResultModel {
 	data: Array<any>;
 	isValid: boolean;
 	error?: string;
+	domains: Array<string> = [];
 
 	constructor() {
 		this.consoleLog = null;
 		this.data = null;
 		this.isValid = false;
+		this.domains = [];
 	}
 }
 
