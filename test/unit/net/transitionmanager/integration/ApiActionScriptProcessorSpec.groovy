@@ -8,8 +8,6 @@ import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.text.MessageFormat
-
 import static ReactionHttpStatus.NOT_FOUND
 import static ReactionHttpStatus.OK
 import static net.transitionmanager.integration.ReactionScriptCode.ERROR
@@ -20,10 +18,11 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 	StaticMessageSource messageSource
 
-	def setupSpec() {
-	}
-
-	def cleanupSpec() {
+	static doWithSpring = {
+		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
+			bean.scope = 'prototype'
+			messageSource = ref('messageSource')
+		}
 	}
 
 	def setup() {
@@ -35,7 +34,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 	void 'test can create a script binding context based on a ReactionScriptCode.#reactionScriptCode'() {
 
 		setup:
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
@@ -69,7 +68,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 	void 'test can throw an Exception if you try to create a script binding without the correct context objects'() {
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
-			new ApiActionScriptBindingBuilder(messageSource)
+			applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ReactionAssetFacade())
 					.with(new ReactionTaskFacade())
 					.with(new ApiActionJob())
@@ -90,7 +89,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 					'Impossible de créer un contexte de liaison pour {0} sans objet de {1}')
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
-			new ApiActionScriptBindingBuilder(messageSource)
+			applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ReactionAssetFacade())
 					.with(new ReactionTaskFacade())
 					.with(new ApiActionJob())
@@ -109,7 +108,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		given:
 			ActionRequest request = new ActionRequest(['format': 'xml'])
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse())
 					.with(new ReactionAssetFacade())
@@ -161,7 +160,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		given:
 			ActionRequest request = new ActionRequest(['format': 'xml'])
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
@@ -196,7 +195,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		and:
 			ActionRequest request = new ActionRequest(['format': 'xml'])
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())
@@ -232,7 +231,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			response.data = 'anything'
 			response.status = status
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(response.asImmutable())
 					.with(new ReactionAssetFacade())
@@ -270,7 +269,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ReactionAssetFacade asset = new ReactionAssetFacade()
 			ReactionTaskFacade task = new ReactionTaskFacade()
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(asset)
@@ -304,7 +303,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		given:
 			ReactionTaskFacade task = new ReactionTaskFacade()
 
-			ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(new ReactionAssetFacade())

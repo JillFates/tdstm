@@ -23,7 +23,7 @@ class ApiActionService {
 	CamelHostnameIdentifier camelHostnameIdentifier
 	DataScriptService dataScriptService
 	ProviderService providerService
-	ApiActionScriptBindingBuilder apiActionScriptBindingBuilder
+	def applicationContext
 	MessageSource messageSource
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
@@ -387,7 +387,7 @@ class ApiActionService {
 	 */
 	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+		ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
 				.with(response)
 				.with(asset)

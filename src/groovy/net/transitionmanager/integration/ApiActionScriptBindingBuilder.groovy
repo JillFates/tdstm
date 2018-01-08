@@ -1,13 +1,15 @@
 package net.transitionmanager.integration
 
 import org.springframework.context.MessageSource
+import org.springframework.context.annotation.Scope
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.stereotype.Component
 
 /**
  * Fluent API for Builder pattern.
  * You must define all the necessary params to build an instance of ApiActionScriptBinding
  * <code>
- *      ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
+ *      ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
  *              .with(new ActionRequest(['property1': 'value1']))
  *              .with(new ApiActionResponse().asImmutable())
  *              .with(new ReactionAssetFacade())
@@ -16,6 +18,8 @@ import org.springframework.context.i18n.LocaleContextHolder
  *                  .build(ReactionScriptCode.FINAL)
  * </code>
  */
+@Component
+@Scope("prototype")
 class ApiActionScriptBindingBuilder {
 
 	MessageSource messageSource
@@ -25,10 +29,6 @@ class ApiActionScriptBindingBuilder {
 	ReactionAssetFacade asset
 	ReactionTaskFacade task
 	ApiActionJob job
-
-	ApiActionScriptBindingBuilder(MessageSource messageSource){
-		this.messageSource = messageSource
-	}
 
 	ApiActionScriptBindingBuilder with(ActionRequest request) {
 		this.request = request

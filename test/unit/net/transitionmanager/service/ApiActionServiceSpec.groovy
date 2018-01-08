@@ -1,6 +1,8 @@
 package net.transitionmanager.service
 
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.integration.*
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -12,9 +14,16 @@ class ApiActionServiceSpec extends Specification {
 
 	StaticMessageSource messageSource
 
+	static doWithSpring = {
+		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
+			bean.scope = 'prototype'
+			messageSource = ref('messageSource')
+		}
+	}
+
 	def setup() {
 		messageSource = applicationContext.getBean(MessageSource)
-		assertNotNull messageSource
+		service.applicationContext = applicationContext
 	}
 
 	def 'test can evaluate a reaction PRE script'() {
