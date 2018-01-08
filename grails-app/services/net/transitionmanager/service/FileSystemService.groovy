@@ -1,6 +1,8 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.FileSystemUtil
 import grails.transaction.Transactional
+import net.transitionmanager.command.UploadTextContentCommand
 import org.springframework.beans.factory.InitializingBean
 import org.apache.commons.lang3.RandomStringUtils
 import groovy.util.logging.Slf4j
@@ -99,11 +101,10 @@ class FileSystemService  implements InitializingBean {
      */
     String getUniqueFilename(String directory, String prefix='', String extension='tmp') {
         String filename
-        // Remove a possible '.' at the beginning of the file extension.
-        if (extension.startsWith(".")) {
-            extension = extension.substring(1)
-        }
         int tries = maxUniqueTries
+        if (prefix == null) {
+            prefix = ''
+        }
         while(true) {
             filename = prefix + RandomStringUtils.randomAlphanumeric(32) + '.' + extension
             if (! temporaryFileExists(filename) ) {
@@ -125,12 +126,16 @@ class FileSystemService  implements InitializingBean {
      * @param rawInput
      * @return file name for the temporary file.
      */
-    String writeTemporaryFileFromRawInput(String prefix, String extension, String rawInput) {
-        // Create a temporary file, retrieving its name and output stream.
-        def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
-        os << rawInput
-        os.close()
-        return filename
+    String writeTemporaryFileFromRawInput(String prefix, UploadTextContentCommand uploadTextContentCommand) {
+        if (uploadTextContentCommand) {
+            String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
+            def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
+            os << uploadTextContentCommand.content
+            os.close()
+            return filename
+        } else {
+            throw new RuntimeException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
+        }
     }
 
     /**
