@@ -445,6 +445,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/fileSystem/uploadFile" {
+			controller = "wsFileSystem"
+			action = [
+					POST: "uploadFile"
+			]
+		}
+
 		///// LICENSES Manager API (BackOffice) /////////
 
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???

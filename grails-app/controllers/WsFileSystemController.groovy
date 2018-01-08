@@ -2,6 +2,7 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.FileUploadCommand
 import net.transitionmanager.command.UploadTextContentCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
@@ -32,9 +33,13 @@ class WsFileSystemController implements ControllerMethods{
         renderSuccessJson([filename: filename])
     }
 
-
-    def uploadFile() {
-
+    @HasPermission(Permission.UserGeneralAccess)
+    def uploadFile(FileUploadCommand fileUploadCommand) {
+        if (fileUploadCommand.hasErrors()) {
+            render (errorsInValidation(fileUploadCommand.errors) as JSON)
+        }
+        String filename = fileSystemService.copyToTemporaryFile(fileUploadCommand)
+        renderSuccessJson([filename: filename])
     }
 
 

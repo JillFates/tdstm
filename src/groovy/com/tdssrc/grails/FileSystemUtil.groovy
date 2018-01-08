@@ -1,6 +1,9 @@
 package com.tdssrc.grails
 
 import groovy.util.logging.Slf4j
+import org.springframework.web.multipart.MultipartFile
+
+import java.util.regex.Matcher
 
 @Slf4j
 class FileSystemUtil {
@@ -37,6 +40,35 @@ class FileSystemUtil {
             }
         }
         return extension
+    }
+
+    /**
+     * Return the file extension for a given file.
+     *
+     * @param file
+     * @return
+     */
+    static String getFileExtension(MultipartFile file) {
+        String extension = null
+        if (file) {
+            String filename = file.getOriginalFilename()
+            Matcher matcher = (filename =~ /.*\.(.*)$/)
+            if (matcher.matches()) {
+                extension = (matcher[0][1]).toLowerCase()
+            }
+        }
+        return extension
+    }
+
+    /**
+     * Determine if the given file has a accepted extension.
+     *
+     * @param file
+     * @return
+     */
+    static boolean validateExtension (MultipartFile file) {
+        String extension = getFileExtension(file)
+        return isValidExtension(extension)
     }
 
 }

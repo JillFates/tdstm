@@ -2,10 +2,13 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.FileSystemUtil
 import grails.transaction.Transactional
+import net.transitionmanager.command.FileUploadCommand
 import net.transitionmanager.command.UploadTextContentCommand
 import org.springframework.beans.factory.InitializingBean
 import org.apache.commons.lang3.RandomStringUtils
 import groovy.util.logging.Slf4j
+import org.springframework.web.multipart.MultipartFile
+
 import javax.management.RuntimeErrorException
 
 /**
@@ -136,6 +139,31 @@ class FileSystemService  implements InitializingBean {
         } else {
             throw new RuntimeException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
         }
+    }
+
+    /**
+     * Transfer an uploaded file to the temporary directory using the same extension
+     * and a randomized filename.
+     * @param file
+     * @return temp file's name.
+     */
+    String  copyToTemporaryFile(FileUploadCommand fileUploadCommand) {
+        String temporaryFilename = null
+        if (fileUploadCommand) {
+            MultipartFile file = fileUploadCommand.file
+            String extension = FileSystemUtil.getFileExtension(file)
+            OutputStream os
+            try {
+                (temporaryFilename, os) = createTemporaryFile('', extension)
+                file.transferTo(new File(getTemporaryFullFilename(temporaryFilename)))
+            } catch (Exception e) {
+                log.error(e.getMessage())
+                deleteTemporaryFile(temporaryFilename)
+                temporaryFilename = null
+                throw new InvalidParamException(e.getMessage())
+            }
+        }
+        return temporaryFilename
     }
 
     /**
