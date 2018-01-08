@@ -15,7 +15,7 @@ declare var jQuery: any;
 	instance;
 
 	ngAfterViewInit(): void {
-		console.log(this.el, CodeMirror);
+		// console.log(this.el, CodeMirror);
 		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
 			mode: 'groovy',
 			lineNumbers: true

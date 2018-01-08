@@ -8,12 +8,14 @@ import {APIActionModel} from '../model/api-action.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
 
 	private dataDefaultUrl = '../ws';
 	private dataIngestionUrl = '../ws/dataingestion';
+	private dataScriptUrl = '../ws/dataScript';
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -204,5 +206,62 @@ export class DataIngestionService {
 				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	saveScript(id: number, script: string): Observable<any> {
+		let postRequest = {
+			id: id,
+			script: script
+		};
+		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success';
+			})
+			.catch((error: any) => error.json());
+	}
+
+	testScript(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+
+		/*let mockResponse = {
+			status: 'success',
+			data: {
+				isValid: true,
+				consoleLog: 'INFO - Console status changed: on\nINFO - Reading labels [0:name, 1:short_description, 2:used_for,' +
+				'3:sys_id, 4:sys_updated_on, 5:vendor, 6:sys_class_name, 7:department, 8:supported_by, 9:owned_by, 10:warranty_expiration, 11:fqdn]\n',
+				data: {}
+			}
+		};
+		return Observable.of(mockResponse);*/
+	}
+
+	checkSyntax(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadFile(ref: string): Observable<any> {
+		return Observable.of( new HttpResponse(
+			{
+				status: 200,
+				body: { data: { filename: 'service_now_applications.csv' } }
+			}
+		));
 	}
 }
