@@ -13,13 +13,18 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.integration.*
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
 @Transactional
 class ApiActionService {
+
 	CamelHostnameIdentifier camelHostnameIdentifier
 	DataScriptService dataScriptService
 	ProviderService providerService
+	ApiActionScriptBindingBuilder apiActionScriptBindingBuilder
+	MessageSource messageSource
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -382,7 +387,7 @@ class ApiActionService {
 	 */
 	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = new ApiActionScriptBinding.Builder()
+		ApiActionScriptBinding scriptBinding = new ApiActionScriptBindingBuilder(messageSource)
 				.with(request)
 				.with(response)
 				.with(asset)
@@ -407,8 +412,10 @@ class ApiActionService {
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-			throw new Exception('Script must return SUCCESS or ERROR')
+			throw new ApiActionException(messageSource.getMessage('apiAction.not.return.result.exception',
+					[] as String[],
+					'Script must return SUCCESS or ERROR',
+					LocaleContextHolder.locale))
 		}
 	}
-
 }

@@ -2,10 +2,20 @@ package net.transitionmanager.service
 
 import grails.test.mixin.TestFor
 import net.transitionmanager.integration.*
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 
 @TestFor(ApiActionService)
 class ApiActionServiceSpec extends Specification {
+
+	StaticMessageSource messageSource
+
+	def setup() {
+		messageSource = applicationContext.getBean(MessageSource)
+		assertNotNull messageSource
+	}
 
 	def 'test can evaluate a reaction PRE script'() {
 
@@ -150,7 +160,51 @@ class ApiActionServiceSpec extends Specification {
 			)
 
 		then: 'An Exception is thrown'
-			Exception e = thrown(Exception)
+			ApiActionException e = thrown(ApiActionException)
 			e.message == 'Script must return SUCCESS or ERROR'
+	}
+
+	void 'test can throw an Exception if a reaction EVALUATE script does not return a ReactionScriptCode with i18n message'() {
+		setup:
+
+			LocaleContextHolder.setLocale(Locale.FRENCH)
+			messageSource.addMessage(
+					'apiAction.not.return.result.exception',
+					Locale.FRENCH,
+					'Le script doit renvoyer SUCCESS ou ERROR')
+
+			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
+			ApiActionResponse actionResponse = new ApiActionResponse()
+			actionResponse.data = 'anything'
+			actionResponse.status = ReactionHttpStatus.NOT_FOUND
+
+			ReactionAssetFacade asset = new ReactionAssetFacade()
+			ReactionTaskFacade task = new ReactionTaskFacade()
+			ApiActionJob job = new ApiActionJob()
+
+
+		when: 'A EVALUATE script is evaluated that does not return a an instance of ReactionScriptCode'
+			String script = """
+				 if (response.status == SC.OK) {
+					return SUCCESS
+				 } 
+			""".stripIndent()
+
+			service.evaluateReactionScript(
+					ReactionScriptCode.EVALUATE,
+					script,
+					actionRequest,
+					actionResponse.asImmutable(),
+					task,
+					asset,
+					job
+			)
+
+		then: 'An Exception is thrown'
+			ApiActionException e = thrown(ApiActionException)
+			e.message == 'Le script doit renvoyer SUCCESS ou ERROR'
+
+		cleanup:
+			LocaleContextHolder.resetLocaleContext()
 	}
 }
