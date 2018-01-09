@@ -19,9 +19,9 @@ class ApplicationListPage extends Page {
     }
 
     static content = {
-        alPageTitle(wait:true)      { $("section", 	class:"content-header").find("h1") }
+        alPageTitle                 (wait:true) { $("section", 	class:"content-header").find("h1") }
         alPageBreadcrumbs           { $("ol", class:"breadcrumb").find("li a")}
-        alPageMessage (required: false, wait:true) { $("div#messageId")}
+        alPageMessage               (required: false, wait:true) { $("div#messageId")}
         alCompanySelector           { $('select#filterSelect', name:'companyId')}
         alCompanySelectorDefault    { alCompanySelector.find("option", selected:"selected") }
 
@@ -45,7 +45,8 @@ class ApplicationListPage extends Page {
         alNameColHeader             { alColumnsHeader.find("div#jqgh_assetName")}
         alNameFilter                { $("input#gs_assetName") }
 
-        alGridRows                  { alView.find("table#applicationIdGrid").find("tr","role":"row", class:"ui-widget-content jqgrow ui-row-ltr")}
+        alGrid                      (required: false, wait:true){alView.find("table#applicationIdGrid")}
+        alGridRows                  (required: false, wait:true) { alGrid.find("tr","role":"row", class:"ui-widget-content jqgrow ui-row-ltr")}
         alGridSize                  { alGridRows.size()}
         alRowSize                   { alGridHeaderCols.size()}
 
