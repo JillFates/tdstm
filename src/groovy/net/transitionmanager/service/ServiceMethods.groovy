@@ -1,6 +1,8 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import org.springframework.context.MessageSource
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
@@ -8,6 +10,9 @@ import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
+
+	def applicationContext
+	MessageSource messageSource
 
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can

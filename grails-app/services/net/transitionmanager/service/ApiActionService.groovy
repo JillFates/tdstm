@@ -19,13 +19,11 @@ import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
 @Transactional
-class ApiActionService {
+class ApiActionService implements ServiceMethods {
 
 	CamelHostnameIdentifier camelHostnameIdentifier
 	DataScriptService dataScriptService
 	ProviderService providerService
-	def applicationContext
-	MessageSource messageSource
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
