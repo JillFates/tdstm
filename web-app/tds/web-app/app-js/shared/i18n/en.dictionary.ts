@@ -26,7 +26,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'DATA_INGESTION': {
 		'ADD_ARGUMENT': 'Add Argument',
-		'API_ACTIONS': 'Api Actions',
+		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'Data Scripts',
 		'PROVIDERS': 'Providers',
