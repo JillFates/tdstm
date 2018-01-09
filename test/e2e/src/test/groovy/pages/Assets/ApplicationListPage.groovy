@@ -29,7 +29,7 @@ class ApplicationListPage extends Page {
         alViewHeaderBar             { alView.find("div", class:"ui-jqgrid-titlebar ui-widget-header ui-corner-top ui-helper-clearfix")}
 // TODO following item have the elements inside the label
         //  alHeaderBarTitle          { $("span", class:"ui-jqgrid-title") }
-        alCreateAppBtn(wait:true)   { alViewHeaderBar.find("input", type: "button", "onclick":"EntityCrud.showAssetCreateView('APPLICATION');") }
+        alCreateAppBtn(wait:true)   { alViewHeaderBar.find("input", type: "button", "onclick":startsWith("EntityCrud.showAssetCreateView"))}
         alBulkDeleteBtn             { alViewHeaderBar.find("input#deleteAssetId", type: "button") }
         alJustPlanningCBox          { alViewHeaderBar.find("input#justPlanning", type: "checkbox") }
         alClearFiltersBtn           { alViewHeaderBar.find("input",class:"clearFilterId", type: "button") }
@@ -50,10 +50,15 @@ class ApplicationListPage extends Page {
         alRowSize                   { alGridHeaderCols.size()}
 
         alFirstAppName              { alGridRows[0].find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alFirstAppActions           { alGridRows[0].find("td", "aria-describedby":"applicationIdGrid_act")}
+        alFirstAppEdit              { alFirstAppActions.find("a", href:contains("EntityCrud.showAssetEditView"))}
+        alFirstCreateShowTasks      { alFirstAppActions.find("a", id:startsWith("icon_task"))}
+        alFirstCreateShowComments   { alFirstAppActions.find("a", href:contains("icon_comment"))}
+        alFirstAppClone             { alFirstAppActions.find("a", href:contains("EntityCrud.cloneAssetView"))}
 
         alGridPager                 { $("div#pg_applicationIdGridPager")}
-        alCreateappModal(required: false, wait:true) {$ ("div", class:"modal fade in")}
-        alManageappModal(required: false, wait:true) { $("div", "window-class":"modal-task")}
+        alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
+        alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}
 
 
     }
