@@ -45,11 +45,13 @@
                         <!-- file -->
                         <div *ngIf="uploadOption === 'file'" class="col-md-12">
                             <kendo-upload
-                                    [autoUpload]="false"
-                                    [saveUrl]="uploadSaveUrl"
-                                    [restrictions]="uploadRestrictions"
+                                    #kendoUploadInstance="kendoUpload"
+                                    [autoUpload]="file.autoUpload"
+                                    [saveUrl]="file.uploadSaveUrl"
+                                    [saveField]="'file'"
                                     [multiple]="false"
-                                    (success)="completeEventHandler($event)">
+                                    (success)="completeEventHandler($event)"
+                                    (upload)="uploadEventHandler($event)">
                             </kendo-upload><!---->
                         </div>
                         <!-- web service -->

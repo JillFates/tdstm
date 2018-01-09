@@ -1,9 +1,13 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {FileRestrictions, SuccessEvent} from '@progress/kendo-angular-upload';
+import {
+	FileRestrictions, SelectEvent, SuccessEvent, UploadComponent,
+	UploadEvent
+} from '@progress/kendo-angular-upload';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -11,13 +15,13 @@ import {AlertType} from '../../../../shared/model/alert.model';
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
-	// private allowedFileExtension = ['csv', 'txt', 'xml', 'json'];
-	// private fileLoadReference: string;
+	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
 	private uploadOption = 'csv';
 	private file: any = {
 		uploadRestrictions : { allowedExtensions: ['csv', 'txt', 'xml', 'json', '.xlxs', 'xls'] },
 		uploadSaveUrl : 'saveUrl',
-		fileLoadReference: ''
+		autoUpload: false,
+		uploadedFilename: null
 	};
 	private csv: any = {
 		options : ['csv', 'txt', 'xml', 'json'],
@@ -29,12 +33,6 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		private dataIngestionService: DataIngestionService,
 		private notifierService: NotifierService) {
 		super('#loadSampleData');
-	}
-
-	public completeEventHandler(e: SuccessEvent) {
-		console.log('File Uploaded!');
-		let filename = e.response.body.data.filename;
-		this.file.fileLoadReference = filename;
 	}
 
 	private validForm(): boolean {
@@ -52,7 +50,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 						name: AlertType.SUCCESS,
 						message: 'File saved successfully.'
 					});
-					this.close(result.data.filename);
+					this.file.uploadedFilename = result.data.filename;
 				} else {
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
@@ -60,6 +58,8 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 					});
 				}
 			});
+		} else if (this.uploadOption === 'file') {
+			this.kendoUploadInstance.uploadFiles();
 		} else {
 			console.log('upload option not supported, closing dialog ..');
 			this.close();
@@ -68,5 +68,14 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	protected cancelCloseDialog(): void {
 		this.dismiss();
+	}
+
+	private completeEventHandler(e: SuccessEvent) {
+		let filename = e.response.body.data.filename;
+		this.file.uploadedFilename = filename;
+	}
+
+	private uploadEventHandler(e: UploadEvent) {
+		this.file.uploadedFilename = null;
 	}
 }

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
-import {Response} from '@angular/http';
+import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
@@ -8,7 +8,7 @@ import {APIActionModel} from '../model/api-action.model';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
+import {HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -18,7 +18,7 @@ export class DataIngestionService {
 	private dataScriptUrl = '../ws/dataScript';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpInterceptor, private nativeHttp: Http) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
@@ -263,12 +263,14 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	uploadFile(ref: string): Observable<any> {
-		return Observable.of( new HttpResponse(
-			{
-				status: 200,
-				body: { data: { filename: 'service_now_applications.csv' } }
-			}
-		));
+	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
+		const headers = new Headers({});
+		const options = new RequestOptions({ headers: headers });
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
+			.map((res: Response) => {
+				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
 	}
 }

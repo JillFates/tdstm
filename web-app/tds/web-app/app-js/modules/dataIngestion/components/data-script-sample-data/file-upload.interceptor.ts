@@ -10,17 +10,13 @@ export class FileUploadInterceptor implements HttpInterceptor {
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		if (req.url === 'saveUrl') {
-			console.log(req);
 			let events: Observable<HttpEvent<any>>[] = [100].map((x) => Observable.of(<HttpProgressEvent>{
 				type: HttpEventType.UploadProgress,
 				loaded: x,
 				total: 100
 			}).delay(1000));
-
-			const uploadFileEvent = this.dataIngestionService.uploadFile('whatever..');
-			events.push(uploadFileEvent);
+			events.push(this.dataIngestionService.uploadFile(req.body));
 			return Observable.concat(...events);
 		}
-		// return next.handle(req);
 	}
 }
