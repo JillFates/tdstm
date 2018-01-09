@@ -15,7 +15,7 @@ class FileUploadCommand {
             if (file == null || file.empty) {
                 return "fileSystem.fileContent.empty"
             } else {
-                if (!FileSystemUtil.validateExtension(file)) {
+                if (!FileSystemUtil.validateExtension(file.getOriginalFilename())) {
                     return "fileSystem.fileExtension.invalid"
                 }
             }

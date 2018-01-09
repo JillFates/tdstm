@@ -1,3 +1,5 @@
+import com.tdssrc.grails.FileSystemUtil
+import net.transitionmanager.command.UploadTextContentCommand
 import spock.lang.Specification
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -51,6 +53,30 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			fileSystemService.deleteTemporaryFile(filename)
 		then: 'the file should no longer exist'
 			! fileSystemService.temporaryFileExists(filename)
+	}
+
+	def '3. Creating and deleting files from raw input'() {
+		when: "Creating a command object with a txt extension and some random content"
+			String extension = "TXT"
+			UploadTextContentCommand cmd = new UploadTextContentCommand(extension: extension, content: 'Hello, World!')
+		then: "The command object pass all validations."
+			!cmd.hasErrors()
+		when: "Attempting to create a temporary file using this command"
+			String filename = fileSystemService.writeTemporaryFileFromRawInput('', cmd)
+		then: "No exceptions were thrown"
+			noExceptionThrown()
+		and: "The method returned a filename"
+			filename != null
+		and: "The file exists"
+			fileSystemService.temporaryFileExists(filename)
+		when: "Trying retrieve the actual file"
+			File file = fileSystemService.getTemporaryFile(filename, true)
+		then: "No exceptions thrown"
+			noExceptionThrown()
+		and: "The file was returned"
+			file != null
+		and: "The file's extension matches the one used for writing the file."
+			FileSystemUtil.getFileExtension(file.getName()) == extension.toLowerCase()
 	}
 
 }

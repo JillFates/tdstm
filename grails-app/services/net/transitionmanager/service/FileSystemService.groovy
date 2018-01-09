@@ -88,6 +88,23 @@ class FileSystemService  implements InitializingBean {
     }
 
     /**
+     *
+     * @param filename
+     * @param throwException
+     * @return
+     */
+    File getTemporaryFile(String filename, boolean throwException = false) {
+        File file = null
+        validateFilename(filename)
+        if (temporaryFileExists(filename)) {
+            file = new File(getTemporaryFullFilename(filename))
+        } else if (throwException) {
+            throw new RuntimeException("Requested temporary file $filename doesn't exist.")
+        }
+        return file
+    }
+
+    /**
      * Used to determine if a file exists in the temporary directory
      * @param filename
      * @return true if the file exists otherwise false
@@ -130,14 +147,19 @@ class FileSystemService  implements InitializingBean {
      * @return file name for the temporary file.
      */
     String writeTemporaryFileFromRawInput(String prefix, UploadTextContentCommand uploadTextContentCommand) {
-        if (uploadTextContentCommand) {
-            String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
-            def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
-            os << uploadTextContentCommand.content
-            os.close()
-            return filename
-        } else {
-            throw new RuntimeException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
+        try {
+            if (uploadTextContentCommand) {
+                String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
+                def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
+                os << uploadTextContentCommand.content
+                os.close()
+                return filename
+            } else {
+                throw new RuntimeException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
+            }
+
+        }catch(Exception e){
+            e.printStackTrace()
         }
     }
 
@@ -147,11 +169,11 @@ class FileSystemService  implements InitializingBean {
      * @param file
      * @return temp file's name.
      */
-    String  copyToTemporaryFile(FileUploadCommand fileUploadCommand) {
+    String copyToTemporaryFile(FileUploadCommand fileUploadCommand) {
         String temporaryFilename = null
         if (fileUploadCommand) {
             MultipartFile file = fileUploadCommand.file
-            String extension = FileSystemUtil.getFileExtension(file)
+            String extension = FileSystemUtil.getFileExtension(file.getOriginalFilename())
             OutputStream os
             try {
                 (temporaryFilename, os) = createTemporaryFile('', extension)

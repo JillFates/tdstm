@@ -16,7 +16,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 class WsFileSystemController implements ControllerMethods{
 
     FileSystemService fileSystemService
-    MessageSource messageSource
 
     final static String FILE_DOESNT_EXIST_MSG = "fileSystem.fileNotExists"
     final static String FILE_DELETED_MSG = "fileSystem.fileDeleted"

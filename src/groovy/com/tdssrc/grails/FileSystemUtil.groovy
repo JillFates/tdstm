@@ -48,10 +48,9 @@ class FileSystemUtil {
      * @param file
      * @return
      */
-    static String getFileExtension(MultipartFile file) {
+    static String getFileExtension(String filename) {
         String extension = null
-        if (file) {
-            String filename = file.getOriginalFilename()
+        if (filename) {
             Matcher matcher = (filename =~ /.*\.(.*)$/)
             if (matcher.matches()) {
                 extension = (matcher[0][1]).toLowerCase()
@@ -66,8 +65,8 @@ class FileSystemUtil {
      * @param file
      * @return
      */
-    static boolean validateExtension (MultipartFile file) {
-        String extension = getFileExtension(file)
+    static boolean validateExtension (String filename) {
+        String extension = getFileExtension(filename)
         return isValidExtension(extension)
     }
 

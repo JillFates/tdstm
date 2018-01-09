@@ -4,6 +4,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.apache.commons.lang.RandomStringUtils as RSU
+import test.helper.ProviderTestHelper
 
 class ApiActionTestHelper {
     /**
