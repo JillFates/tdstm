@@ -37,6 +37,7 @@ class DataTransferBatch {
 	}
 
 	static constraints = {
+    userLogin nullable: true
 		dateCreated nullable: true
 		exportDatetime nullable: true
 		importFilename nullable: true
