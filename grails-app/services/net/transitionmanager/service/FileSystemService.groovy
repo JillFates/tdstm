@@ -171,6 +171,10 @@ class FileSystemService  implements InitializingBean {
     String copyToTemporaryFile(FileUploadCommand fileUploadCommand) {
         String temporaryFilename = null
         if (fileUploadCommand) {
+            if (!fileUploadCommand.validate()) {
+                // This should have been caught in the controller, but it doesn't hurt to double-check
+                throw new InvalidParamException("Attempted to create a temporary file using invalid input.")
+            }
             MultipartFile file = fileUploadCommand.file
             String extension = FileSystemUtil.getFileExtension(file.getOriginalFilename())
             OutputStream os
@@ -183,6 +187,8 @@ class FileSystemService  implements InitializingBean {
                 temporaryFilename = null
                 throw new InvalidParamException(e.getMessage())
             }
+        } else {
+            throw new InvalidParamException("copyToTemporaryFile called with null fileUploadCommand.s")
         }
         return temporaryFilename
     }

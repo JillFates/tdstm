@@ -1,6 +1,8 @@
 import com.tdssrc.grails.FileSystemUtil
+import net.transitionmanager.command.FileUploadCommand
 import net.transitionmanager.command.UploadTextContentCommand
 import net.transitionmanager.service.InvalidParamException
+import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Specification
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -109,7 +111,50 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
 		then: "An InvalidParamException is thrown"
 			thrown(InvalidParamException)
+	}
 
+	def "5. Create a temporary file from an uploaded file."() {
+		setup: "Create a temporary file for this test"
+			String extension = "txt"
+			UploadTextContentCommand cmd = new UploadTextContentCommand(extension: extension, content: "something important.")
+			String filename = fileSystemService.writeTemporaryFileFromRawInput('', cmd)
+			File file = fileSystemService.getTemporaryFile(filename, true)
+			MockMultipartFile multipartFile = new MockMultipartFile(filename, filename, "text/plain", new FileInputStream(file))
+		when: "Uploading a new file using an existing file"
+			FileUploadCommand cmd2 = new FileUploadCommand(file: multipartFile)
+			String filename2 = fileSystemService.copyToTemporaryFile(cmd2)
+		then: "No exception thrown"
+			noExceptionThrown()
+		and: "The filename for the new file isn't null"
+			filename2 != null
+		and: "The file was actually created"
+			fileSystemService.temporaryFileExists(filename2)
+		and: "The file extensions are the same"
+			FileSystemUtil.getFileExtension(filename2) == extension
+	}
 
+	def "6. Try to create a temporary file from an uploaded one"() {
+		when: "Trying to create a file from no input"
+			String filename = fileSystemService.copyToTemporaryFile(null)
+		then: "InvalidParamException is thrown"
+			thrown(InvalidParamException)
+		when: "Trying to create a file with an empty command"
+			filename = fileSystemService.copyToTemporaryFile(new FileUploadCommand())
+		then: "InvalidParamException is thrown"
+			thrown(InvalidParamException)
+		when: "Creating a file with an invalid extension"
+			String extension = "bogus"
+			def (String filename2, OutputStream os) = fileSystemService.createTemporaryFile('', extension)
+		then: "No exceptions thrown"
+			noExceptionThrown()
+		and: "The file has the expected extension"
+			FileSystemUtil.getFileExtension(filename2) == extension
+		when: "Trying to use that file and copy it to a temporary file"
+			File file = fileSystemService.getTemporaryFile(filename2, true)
+			MockMultipartFile multipartFile = new MockMultipartFile(filename2, filename2, "text/plain", new FileInputStream(file))
+			FileUploadCommand cmd = new FileUploadCommand(file: multipartFile)
+			filename = fileSystemService.copyToTemporaryFile(cmd)
+		then: "InvalidParamException is thrown"
+			thrown(InvalidParamException)
 	}
 }
