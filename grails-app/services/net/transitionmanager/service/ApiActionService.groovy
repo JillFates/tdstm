@@ -386,7 +386,7 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
 				.with(response)
 				.with(asset)

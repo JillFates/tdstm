@@ -11,7 +11,7 @@ import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
 
-	def applicationContext
+	def grailsApplication
 	MessageSource messageSource
 
 	/**

@@ -1,19 +1,19 @@
 package net.transitionmanager.service
 
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 
 @TestFor(ApiActionService)
+@TestMixin(GrailsUnitTestMixin)
 class ApiActionServiceSpec extends Specification {
 
-	StaticMessageSource messageSource
-
 	static doWithSpring = {
+
 		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 			bean.scope = 'prototype'
 			messageSource = ref('messageSource')
@@ -21,8 +21,7 @@ class ApiActionServiceSpec extends Specification {
 	}
 
 	def setup() {
-		messageSource = applicationContext.getBean(MessageSource)
-		service.applicationContext = applicationContext
+		service.grailsApplication = grailsApplication
 	}
 
 	def 'test can evaluate a reaction PRE script'() {
