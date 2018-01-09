@@ -95,38 +95,14 @@ class AssetExportService {
 
 			List<String> bundle = params.bundle
 
-			// Set flag if Use for Planning was one of the choosen options and remove from the list
+			// Set flag if Use for Planning was one of the chosen options and remove from the list
 			boolean useForPlanning = bundle.remove(MoveBundle.USE_FOR_PLANNING)
 			boolean allBundles = bundle.remove(ALL_BUNDLES_OPTION)
 			int bundleSize = bundle.size()
 
-			// Determine what will be used for the name of the file + what is shown in the title sheet
-			// Examples:
-			//      project-BundleName-AssetTypes-date.xlsx
-			//      project-2Bundles-AssetTypes-date.xlsx
-			//      project-All-AssetTypes-date.xlsx
-			//      project-Planning-AssetTypes-date.xlsx
-			//      project-Planning+2+Bundles-AssetTypes-date.xlsx
-
-			StringBuilder bundleNameList = new StringBuilder()
-
-			if (allBundles) {
-				bundleNameList.append('All Bundles')
-			} else {
-				if (useForPlanning) {
-					bundleNameList.append('Planning')
-					if (bundleSize) {
-						bundleNameList.append("+$bundleSize bundle" + (bundleSize > 1 ? 's' : ''))
-					}
-				} else {
-					if (bundleSize==1) {
-						MoveBundle mb = MoveBundle.read( bundle[0] )
-						bundleNameList.append(mb.name)
-					} else {
-						bundleNameList.append("$bundleSize bundles")
-					}
-				}
-			}
+      List bundles = bundle.collect { it ->
+         MoveBundle.read(it)
+      }
 
 			def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
@@ -390,6 +366,8 @@ class AssetExportService {
 				return
 			}
 
+       String bundleNames = bundles.join(" ")
+
 			//Add Title Information to master SpreadSheet
 			titleSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.TITLE)
 
@@ -397,9 +375,8 @@ class AssetExportService {
 			WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
 			WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
 			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project))
-			WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
 			WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
-
+			WorkbookUtil.addCell(titleSheet, 1, 5, bundleNames)
 			def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
 			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
 			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
@@ -1260,11 +1237,9 @@ class AssetExportService {
        //    - Bundle name(s) selected or ALL_BUNDLES
        //    - Letters symbolizing each of the tabs that were exported
        //    - The date that the spreadsheet was exported in yyyyMMdd_HHmm format
-       //    - The file extension to use
-       MoveBundle mb = MoveBundle.read(bundle[0])
        def nameParams = [project:project,
-                         moveBundle:(!allBundles ? mb: null),
-                         exportedEntity: exportedEntity,
+                         moveBundle:bundles,
+                         exportedEntities: exportedEntity,
                          allBundles: allBundles,
                          useForPlanning: useForPlanning]
        String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, nameParams, fileExtension)

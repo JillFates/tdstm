@@ -68,8 +68,20 @@ class FilenameUtilTests extends AbstractUnitSpec {
             'ABC_Company-Big_Move-ALL-20141020_2215.xlsx' == FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, aDate)
     }
 
+    @See('TM-8825, TM-8125')
+    def '04. Test multiple events for CLIENT_PROJECT_EVENT_DATE format'() {
+       given: 'a Project with the corresponding values and with multiple events (but not ALL)'
+       MoveEvent me1 = new MoveEvent([project:completeProject, name: 'M1-Hybrid'])
+       MoveEvent me2 = new MoveEvent([project:completeProject, name: 'M2-Physical'])
+       def events = [me1, me2]
+       def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+       def params = [project:completeProject, moveEvent: events] // the moveEvent param receives a list with the events
+       expect: 'the resulting file name match the expected file naming scheme, with the event names concatenated'
+       'ABC_Company-Big_Move-M1-Hybrid-M2-Physical-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, date)
+    }
+
    @See('TM-7958, TM-8097')
-   def '04. Test file name for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
+   def '05. Test file name for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
       given: 'a Project, Move Bundle and date with the corresponding values'
          MoveBundle mb = new MoveBundle([project:completeProject, name: 'ERP Assets'])
          def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
@@ -80,7 +92,7 @@ class FilenameUtilTests extends AbstractUnitSpec {
    }
 
    @See('TM-7958, TM-8097')
-   def '05. Test bad or incomplete properties for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
+   def '06. Test bad or incomplete properties for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
       given: 'a Project and Move Bundle with incomplete values (projectCode is missing)'
          MoveBundle mb = new MoveBundle([project:missingPropertiesProject, name: 'ERP Assets'])
          def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
@@ -90,7 +102,7 @@ class FilenameUtilTests extends AbstractUnitSpec {
    }
 
    @See('TM-8124, TM-8125')
-   def '06. Test ALL_BUNDLES for file name CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
+   def '07. Test ALL_BUNDLES for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
       given: 'a Project with the corresponding values and no particular move bundle, with ALL_BUNDLES for Bundle Name'
          def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
          def params = [project:completeProject, allBundles: true] // the allBundles param is flagged true
@@ -99,12 +111,24 @@ class FilenameUtilTests extends AbstractUnitSpec {
    }
 
    @See('TM-7958, TM-8097')
-   def '07. Test PLANNING for file name CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
+   def '08. Test PLANNING for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
       given: 'a Project with the corresponding values and no particular move bundle, with PLANNING for Bundle Name'
          MoveBundle mb = new MoveBundle([project:completeProject, name: 'ERP Assets'])
          def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
          def params = [project:completeProject, moveBundle:mb, useForPlanning: true] // the useForPlanning param is flagged true
       expect: 'the resulting file name match the expected file naming scheme, with PLANNING for Bundle Name'
       'ABC_Company-Big_Move-PLANNING-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
+   }
+
+   @See('TM-7958, TM-8097')
+   def '09. Test multiple bundles for CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE format'() {
+      given: 'a Project with the corresponding values and with multiple bundles (but not ALL_BUNDLES)'
+      MoveBundle mb1 = new MoveBundle([project:completeProject, name: 'M1-Hybrid'])
+      MoveBundle mb2 = new MoveBundle([project:completeProject, name: 'M2-Physical'])
+      def bundles = [mb1, mb2]
+      def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+      def params = [project:completeProject, moveBundle: bundles] // the moveBundle param receives a list with the bundles
+      expect: 'the resulting file name match the expected file naming scheme, with the bundle names concatenated'
+      'ABC_Company-Big_Move-M1-Hybrid-M2-Physical-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
    }
 }
