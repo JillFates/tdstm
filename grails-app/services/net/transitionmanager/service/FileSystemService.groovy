@@ -147,19 +147,18 @@ class FileSystemService  implements InitializingBean {
      * @return file name for the temporary file.
      */
     String writeTemporaryFileFromRawInput(String prefix, UploadTextContentCommand uploadTextContentCommand) {
-        try {
-            if (uploadTextContentCommand) {
-                String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
-                def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
-                os << uploadTextContentCommand.content
-                os.close()
-                return filename
-            } else {
-                throw new RuntimeException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
+        if (uploadTextContentCommand) {
+            if (!uploadTextContentCommand.validate()) {
+                // This should have been caught in the controller, but it doesn't hurt to double-check
+                throw new InvalidParamException("Attempted to create a temporary file using invalid input.")
             }
-
-        }catch(Exception e){
-            e.printStackTrace()
+            String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
+            def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
+            os << uploadTextContentCommand.content
+            os.close()
+            return filename
+        } else {
+            throw new InvalidParamException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
         }
     }
 

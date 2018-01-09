@@ -1,5 +1,6 @@
 import com.tdssrc.grails.FileSystemUtil
 import net.transitionmanager.command.UploadTextContentCommand
+import net.transitionmanager.service.InvalidParamException
 import spock.lang.Specification
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -77,6 +78,38 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			file != null
 		and: "The file's extension matches the one used for writing the file."
 			FileSystemUtil.getFileExtension(file.getName()) == extension.toLowerCase()
+		when: "Attempting to delete the file"
+			boolean deleted = fileSystemService.deleteTemporaryFile(filename)
+		then: "No exceptions thrown"
+			noExceptionThrown()
+		and: "The flag is true"
+			deleted
+		and: "The file no longer exists in the file system"
+			!fileSystemService.temporaryFileExists(filename)
 	}
 
+	def "4. Trying to create a temporary file with invalid input"() {
+		when: "The command object is null"
+			UploadTextContentCommand cmd = null
+			String filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
+		then: "An InvalidParamException is thrown"
+			thrown(InvalidParamException)
+		when: "Trying to write a file with an invalid extension"
+			cmd = new UploadTextContentCommand(extension: "jzon", content: "something")
+			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
+		then: "An InvalidParamException is thrown"
+			thrown(InvalidParamException)
+		when: "Trying to create a file with no content"
+			cmd = new UploadTextContentCommand(extension: "json")
+			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
+		then: "An InvalidParamException is thrown"
+			thrown(InvalidParamException)
+		when: "Trying to create a file with no extension"
+			cmd = new UploadTextContentCommand(content: "something")
+			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
+		then: "An InvalidParamException is thrown"
+			thrown(InvalidParamException)
+
+
+	}
 }
