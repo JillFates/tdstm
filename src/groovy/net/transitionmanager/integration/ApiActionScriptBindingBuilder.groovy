@@ -1,5 +1,6 @@
 package net.transitionmanager.integration
 
+import net.transitionmanager.i18n.Message
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Scope
 import org.springframework.context.i18n.LocaleContextHolder
@@ -64,7 +65,7 @@ class ApiActionScriptBindingBuilder {
 		params.each { String param ->
 
 			if (!this."${param}") {
-				String message = messageSource.getMessage('apiAction.invalid.params.exception',
+				String message = messageSource.getMessage(Message.ApiActionInvalidBindingParams,
 						[code, param] as String[],
 						'Can not build a biding context for {0} without {1} object',
 						LocaleContextHolder.locale)

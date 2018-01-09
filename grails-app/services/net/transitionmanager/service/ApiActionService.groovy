@@ -11,6 +11,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.context.MessageSource
@@ -18,13 +19,11 @@ import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
 @Transactional
-class ApiActionService {
+class ApiActionService implements ServiceMethods {
 
 	CamelHostnameIdentifier camelHostnameIdentifier
 	DataScriptService dataScriptService
 	ProviderService providerService
-	def applicationContext
-	MessageSource messageSource
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -412,7 +411,7 @@ class ApiActionService {
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-			throw new ApiActionException(messageSource.getMessage('apiAction.not.return.result.exception',
+			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
 					[] as String[],
 					'Script must return SUCCESS or ERROR',
 					LocaleContextHolder.locale))

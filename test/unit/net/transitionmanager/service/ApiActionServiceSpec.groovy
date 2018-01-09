@@ -1,8 +1,7 @@
 package net.transitionmanager.service
 
 import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -173,12 +172,12 @@ class ApiActionServiceSpec extends Specification {
 			e.message == 'Script must return SUCCESS or ERROR'
 	}
 
-	void 'test can throw an Exception if a reaction EVALUATE script does not return a ReactionScriptCode with i18n message'() {
+	void 'test can throw an Exception with i18n message if a reaction EVALUATE script does not return a ReactionScriptCode'() {
 		setup:
 
 			LocaleContextHolder.setLocale(Locale.FRENCH)
 			messageSource.addMessage(
-					'apiAction.not.return.result.exception',
+					Message.ApiActionMustReturnResults,
 					Locale.FRENCH,
 					'Le script doit renvoyer SUCCESS ou ERROR')
 
