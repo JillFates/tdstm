@@ -2,6 +2,7 @@ package net.transitionmanager.integration
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import net.transitionmanager.i18n.Message
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.StaticMessageSource
@@ -65,7 +66,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 	}
 
-	void 'test can throw an Exception if you try to create a script binding without the correct context objects'() {
+	void 'test can throw an Exception if it tries to create a script binding without the correct context objects'() {
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
 			applicationContext.getBean(ApiActionScriptBindingBuilder)
@@ -79,12 +80,12 @@ class ApiActionScriptProcessorSpec extends Specification {
 			e.message == 'Can not build a biding context for PRE without request object'
 	}
 
-	void 'test can throw an Exception if you try to create a script binding without the correct context objects with i18n message'() {
+	void 'test can throw an Exception with i18n message if it tries to create a script binding without the correct context objects'() {
 
 		setup:
 			LocaleContextHolder.setLocale(Locale.FRENCH)
 			messageSource.addMessage(
-					'apiAction.invalid.params.exception',
+					Message.ApiActionInvalidBindingParams,
 					Locale.FRENCH,
 					'Impossible de créer un contexte de liaison pour {0} sans objet de {1}')
 
@@ -186,11 +187,13 @@ class ApiActionScriptProcessorSpec extends Specification {
 			e.message == 'There is no property with name response bound in this script context'
 	}
 
-	void 'test can throw an ApiActionException if PRE try to use response object with an i18n message'() {
+	void 'test can throw an ApiActionException with an i18n message if PRE try to use response object'() {
 
 		given:
 			LocaleContextHolder.setLocale(Locale.FRENCH)
-			messageSource.addMessage('apiAction.not.bound.property.exception', Locale.FRENCH, 'Il ny a pas de propriété avec une {0} de nom liée dans ce contexte de script')
+			messageSource.addMessage(Message.ApiActionNotBoundProperty,
+					Locale.FRENCH,
+					'Il ny a pas de propriété avec une {0} de nom liée dans ce contexte de script')
 
 		and:
 			ActionRequest request = new ActionRequest(['format': 'xml'])

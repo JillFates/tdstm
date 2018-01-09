@@ -1,5 +1,6 @@
 package net.transitionmanager.integration
 
+import net.transitionmanager.i18n.Message
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -29,8 +30,9 @@ class ApiActionScriptBinding extends Binding {
 		if (variables?.containsKey(name)) {
 			return variables.get(name)
 		} else {
-			throw new ApiActionException(messageSource.getMessage('apiAction.not.bound.property.exception',
-					[ name ] as String[],
+			throw new ApiActionException(messageSource.getMessage(
+					Message.ApiActionNotBoundProperty,
+					[name] as String[],
 					'There is no property with name {0} bound in this script context',
 					LocaleContextHolder.locale))
 		}
