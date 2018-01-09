@@ -7,13 +7,14 @@
 <div id="cablingDialogId" style="display: none;"></div>
 
 <div id="depCommentDialog" class="static-dialog" style="display:none">
-	<textarea name="" id="depCommentTextarea" rows="5" cols="150" maxlength="65535"></textarea>
+	<textarea name="" id="depCommentTextarea" rows="5" cols="150" onkeyup="tdsCommon.validateMaxTextAreaLength(this, 'depCommentTextareaValidation', 'saveComment', 65535);"></textarea> <br />
+	<label id="depCommentTextareaValidation" style="display: none;" class="error-msg">Comment maximum length is 65535 characters.</label>
 	<input type="hidden" id="depCommentRowNo" name="" />
 	<input type="hidden" id="depCommentType" name="" />
 
 	<div class="buttons">
 		<span class="button">
-			<input type="button" class="save" value="Close" onclick="EntityCrud.onDepCommentDialogClose();"/>
+			<input id="saveComment" type="button" class="save" value="Close" onclick="EntityCrud.onDepCommentDialogClose();"/>
 		</span>
 		<a href="#" onclick="EntityCrud.onDepCommentDialogCancel();">Cancel</a>
 	</div>
