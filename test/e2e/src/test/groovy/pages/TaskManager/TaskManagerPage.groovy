@@ -5,10 +5,10 @@ import geb.Page
 class TaskManagerPage extends Page{
 
     static at = {
-        headerTitle.text() == "Task Manager"
-        justRemainingCB.value() == "on"
-        justMyTasksCB.value() != "on"
-        viewUnpublishedCB.value() != "on"
+        tmHeaderTitle.text() == "Task Manager"
+        tmJustRemainingCB.value() == "on"
+        tmJustMyTasksCB.value() != "on"
+        tmViewUnpublishedCB.value() != "on"
     }
 
     static content = {
@@ -17,16 +17,20 @@ class TaskManagerPage extends Page{
         projEventUser               { $("a#nav-project-name")}
 
         // START Layout elements
-        headerTitle                 { $("section", class:"content-header").find("h1") }
-        justRemainingCB             { $("input#justRemainingCB") }
-        justMyTasksCB               { $("input#justMyTasksCB")}
-        viewUnpublishedCB           { $("input#viewUnpublishedCB")}
-        createTaskBtLb              { $("#createtask_text_createTask")}
-        taskTColLb                  { $("#jqgh_taskNumber")}
-        firstElementTaskTbl         { $("#taskListIdGrid").$("tr")[1].$("td")[0].find("a")}
-        descriptionTColFlt          { $("#gs_comment")}
-        firstElementDesc            { $("#taskListIdGrid").$("tr")[1].$("td")[2]}
-        detailButton                { $("a", "ng-click":"doAction(button)").find("span",class:"ng-binding task_button")}
+        tmHeaderTitle                 { $("section", class:"content-header").find("h1") }
+        tmJustRemainingCB             { $("input#justRemainingCB") }
+        tmJustMyTasksCB               { $("input#justMyTasksCB")}
+        tmViewUnpublishedCB           { $("input#viewUnpublishedCB")}
+        tmCreateTaskBtn               { $("#createtask_text_createTask")}
+        tmTaskTColLb                  { $("#jqgh_taskNumber")}
+        tmFirstElementTaskTbl         { $("#taskListIdGrid").$("tr")[1].$("td")[0].find("a")}
+        tmDescriptionTColFlt          { $("#gs_comment")}
+        tmFirstElementDesc            { $("#taskListIdGrid").$("tr")[1].$("td")[2]}
+        tmFirstElementStatus          { $("#taskListIdGrid").$("tr")[1].$("td")[7].find("span").text()}
+        tmStatusButtonBar             { $("span#actionBarId")}
+        tmTaskDoneBtn (wait:true, required:false)   { $("a", "ng-click":"doAction(button)").find("span",text:"Done")}
+        tmTaskDetailBtn (wait:true, required:false)   { $("a", "ng-click":"doAction(button)").find("span",text:"Details...")}
+        tmTaskAssignMeBtn (wait:true, required:false) { $("a", "ng-click":"doAction(button)").find("span",text:"Assign To Me")}
     }
 }
 
