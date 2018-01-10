@@ -2,20 +2,14 @@ package net.transitionmanager.integration
 
 import grails.validation.Validateable
 import net.transitionmanager.command.CommandObject
-import org.grails.databinding.BindUsing
 
 @Validateable
 class ApiActionValidateScriptCommand implements CommandObject {
 
-	@BindUsing({ obj, source ->
-		List<ApiActionScriptCommand> scripts = [].withLazyDefault { new ApiActionScriptCommand() }
-
-		return scripts
-	})
-	List<Map<String, String>> scripts
+	List<ApiActionScriptCommand> scripts
 
 	static constraints = {
-		scripts nullable: false
+		scripts nullable: false, minSize: 1
 	}
 }
 
@@ -24,9 +18,20 @@ class ApiActionScriptCommand implements CommandObject {
 
 	String code
 	String script
+	ReactionScriptCode reactionScriptCode
 
 	static constraints = {
-		code nullable: false
-		script nullable: false
+		code nullable: false, blank: false, validator: { val, obj ->
+			if (val) {
+				obj.reactionScriptCode = ReactionScriptCode.lookup(val)
+				if (!obj.reactionScriptCode) {
+					false
+				} else {
+					true
+				}
+			}
+		}
+		script nullable: false, blank: false
+		reactionScriptCode nullable: true
 	}
 }

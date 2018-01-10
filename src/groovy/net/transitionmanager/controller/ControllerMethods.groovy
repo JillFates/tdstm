@@ -108,6 +108,10 @@ trait ControllerMethods {
 		errors(validationErrors.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) })
 	}
 
+	Map errorsInValidation(List<Errors> validationErrors) {
+		errors(validationErrors.findAll {it.allErrors}.collect {it.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) }}.flatten())
+	}
+
 	Map invalidParams(errorStringOrList) {
 		errors(CollectionUtils.asList(errorStringOrList))
 	}

@@ -80,7 +80,6 @@ class WsApiActionController implements ControllerMethods {
 		renderSuccessJson(apiAction.toMap(false))
 	}
 
-
 	/**
 	 * Update the corresponding ApiAction.
 	 */
@@ -95,74 +94,40 @@ class WsApiActionController implements ControllerMethods {
 	 * Validates
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	def validateSyntax() {
-
+	def validateSyntax(ApiActionValidateScriptCommand command) {
 
 		List<Map<String, ?>> data = []
 
-//		if (!command.validate()) {
-//			throw new InvalidParamException('Invalid parameters')
-//		}
-//		command.scripts.each { ApiActionScriptCommand scriptBinding ->
-//
-//			ReactionScriptCode code = ReactionScriptCode.valueOf(scriptBinding.code)
-//			String script = scriptBinding.script
-//			Map<String, ?> scriptResults = [code: code.name()]
-//			try {
-//
-//				Map<String, ?> result = apiActionService.evaluateReactionScript(
-//						code,
-//						script,
-//						new ActionRequest(),
-//						new ApiActionResponse(),
-//						new ReactionTaskFacade(),
-//						new ReactionAssetFacade(),
-//						new ApiActionJob()
-//				)
-//
-//				scriptResults.result = result.result?.toString()
-//				scriptResults.error = null
-//
-//			} catch (Exception ex){
-//				log.error("Exception ", ex)
-//				scriptResults.error = ex.getMessage()
-//			}
-//
-//			data.add(scriptResults)
-//		}
+		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
+			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
+		} else {
+			command.scripts.each { ApiActionScriptCommand scriptBindingCommand ->
 
-		def json = request.JSON
-//		ApiActionValidateScriptCommand command = new ApiActionValidateScriptCommand()
-//		bindData(json, command)
+				Map<String, ?> scriptResults = [code: scriptBindingCommand.reactionScriptCode.name()]
+				try {
 
-		json.each { JSONObject jsonObject ->
+					Map<String, ?> result = apiActionService.evaluateReactionScript(
+							scriptBindingCommand.reactionScriptCode,
+							scriptBindingCommand.script,
+							new ActionRequest(),
+							new ApiActionResponse(),
+							new ReactionTaskFacade(),
+							new ReactionAssetFacade(),
+							new ApiActionJob()
+					)
 
-			ReactionScriptCode code = ReactionScriptCode.valueOf(jsonObject.code)
-			String script = jsonObject.script
-			Map<String, ?> scriptResults = [code: code.name()]
-			try {
+					scriptResults.result = result.result?.toString()
+					scriptResults.error = null
 
-				Map<String, ?> result = apiActionService.evaluateReactionScript(
-						code,
-						script,
-						new ActionRequest(),
-						new ApiActionResponse(),
-						new ReactionTaskFacade(),
-						new ReactionAssetFacade(),
-						new ApiActionJob()
-				)
+				} catch (Exception ex){
+					log.error("Exception ", ex)
+					scriptResults.error = ex.getMessage()
+				}
 
-				scriptResults.result = result.result?.toString()
-				scriptResults.error = null
-
-			} catch (Exception ex){
-				log.error("Exception ", ex)
-				scriptResults.error = ex.getMessage()
+				data.add(scriptResults)
 			}
 
-			data.add(scriptResults)
+			renderSuccessJson(data)
 		}
-
-		renderSuccessJson(data)
 	}
 }

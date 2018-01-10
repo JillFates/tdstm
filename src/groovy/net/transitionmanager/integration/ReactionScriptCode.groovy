@@ -15,4 +15,21 @@ enum ReactionScriptCode {
 	STALLED,
 	PRE,
 	FINAL
+	/**
+	 * Lookup for ReactionScriptCodes from a String.
+	 * <code>
+	 *     assert ReactionScriptCode.lookup('EVALUATE') ==  ReactionScriptCode.EVALUATE
+	 *     assert ReactionScriptCode.lookup('FOO') ==  null
+	 * </code>
+	 * @param code
+	 * @return
+	 */
+	static ReactionScriptCode lookup(String code){
+		for (ReactionScriptCode reactionScriptCode: values()){
+			if (reactionScriptCode.name().equalsIgnoreCase(code)) {
+				return reactionScriptCode
+			}
+		}
+		return null
+	}
 }
