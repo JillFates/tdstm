@@ -49,11 +49,6 @@ class ProviderService implements ServiceMethods {
     Provider saveOrUpdateProvider(JSONObject providerJson, Long providerId = null) {
         Project currentProject = securityService.userCurrentProject
 
-        // Validate the provider name is unique.
-        if (!validateUniqueName(providerJson.name, providerId, currentProject)) {
-            throw new DomainUpdateException("Cannot update or create Provider because the name is not unique for this project.")
-        }
-
         Provider provider
 
         // Check if it's creating or updating a provider
@@ -64,6 +59,16 @@ class ProviderService implements ServiceMethods {
             // If it's creating a new provider, create a new instance.
             provider = new Provider()
         }
+
+        if (!providerJson.name) {
+            throw new InvalidParamException("The name for the Provider cannot be null.")
+        }
+        
+        // Validate the provider name is unique.
+        if (!validateUniqueName(providerJson.name, providerId, currentProject)) {
+            throw new DomainUpdateException("Cannot update or create Provider because the name is not unique for this project.")
+        }
+
 
         provider.with {
             name = providerJson.name
