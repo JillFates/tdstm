@@ -25,11 +25,6 @@ class DataScriptService implements ServiceMethods{
         // Get the current project
         Project currentProject = securityService.userCurrentProject
 
-        // Validate that there's no other DataScript for this project and provider with the same name
-        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
-            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
-        }
-
         DataScript dataScript
 
         // Get the current person
@@ -43,6 +38,14 @@ class DataScriptService implements ServiceMethods{
             dataScript = getDataScript(dataScriptId, currentProject)
         }
 
+        // Validate that there's no other DataScript for this project and provider with the same name
+        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
+            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
+        }
+
+        if (!dataScriptJson.name) {
+            throw new InvalidParamException("The DataScript name cannot be null.")
+        }
         // Find the provider
         Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject)
 
