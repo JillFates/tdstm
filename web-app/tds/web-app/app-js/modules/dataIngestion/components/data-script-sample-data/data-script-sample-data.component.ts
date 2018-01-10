@@ -36,10 +36,26 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	}
 
 	private validForm(): boolean {
-		if (this.uploadOption === 'csv' && this.csv.fileContent.length < 1) {
-			return false;
-		}
-		return true;
+		return this.file.uploadedFilename && this.file.uploadedFilename.length > 0;
+	}
+
+	private onUploadFileText(): void {
+		this.file.uploadedFilename = null;
+		this.dataIngestionService.uploadText(this.csv.fileContent, this.csv.selected).subscribe( result => {
+			if (result.status && result.data.filename) {
+				this.file.uploadedFilename = null;
+				this.notifierService.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'File saved successfully.'
+				});
+				this.file.uploadedFilename = result.data.filename;
+			} else {
+				this.notifierService.broadcast({
+					name: AlertType.DANGER,
+					message: 'File not saved.'
+				});
+			}
+		});
 	}
 
 	private onLoadData(): void {
@@ -75,7 +91,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		this.file.uploadedFilename = filename;
 	}
 
-	private uploadEventHandler(e: UploadEvent) {
+	private clearFilename(e: any) {
 		this.file.uploadedFilename = null;
 	}
 }

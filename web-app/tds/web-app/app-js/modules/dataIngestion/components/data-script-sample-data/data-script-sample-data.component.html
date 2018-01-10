@@ -29,7 +29,7 @@
                     <div class="row" style="margin-top: 10px;">
                         <!-- csv -->
                         <div *ngIf="uploadOption === 'csv'" class="col-md-12">
-                            <div class="form-group">
+                            <div class="form-group" style="margin-bottom: 0px;">
                                 <label for="fileExtension" class="col-sm-12 control-label">File extension:</label>
                                 <div class="col-sm-12">
                                     <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
@@ -37,8 +37,14 @@
                                                         [data]="csv.options.slice(1)"></kendo-dropdownlist>
                                 </div>
                                 <div class="col-sm-12">
-                                    <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; margin-top: 5px; padding-left: 0px; padding-right: 0px;"
+                                    <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; padding-left: 0px; padding-right: 0px;"
                                           [(ngModel)]="csv.fileContent"></textarea>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button [disabled]="csv.fileContent.length < 1" (click)="onUploadFileText()"
+                                            type="button" class="btn pull-right" style="margin-top: 5px;">
+                                        Upload
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -50,8 +56,9 @@
                                     [saveUrl]="file.uploadSaveUrl"
                                     [saveField]="'file'"
                                     [multiple]="false"
-                                    (success)="completeEventHandler($event)"
-                                    (upload)="uploadEventHandler($event)">
+                                    (select)="clearFilename($event)"
+                                    (upload)="clearFilename($event)"
+                                    (success)="completeEventHandler($event)">
                             </kendo-upload><!---->
                         </div>
                         <!-- web service -->
@@ -82,12 +89,9 @@
                             </div>
                         </div>
                     </div>
-
                 </form>
-
-
-
 			</div>
+
 			<div class="modal-footer form-group-center">
                 <button [disabled]="!validForm()" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
 					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.LOAD' | translate }}</button>
