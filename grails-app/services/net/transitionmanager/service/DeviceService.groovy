@@ -63,17 +63,19 @@ class DeviceService implements ServiceMethods {
 		else
 			asset.roomTarget = room
 
-		// Look for the rack or have created on the fly
-		def rack = rackService.findOrCreateRack(room, rackName)
-		if (!rack) {
-			return "Unable to create rack $location/$roomName/$rackName (${isSource ? 'Source' : 'Target'})"
-		}
+
+
 
     /* @See TM-7806
-       If an asset is of type 'VM', 'Virtual' or 'Blade', this should not be tracked at the rack level,
-       since this are not physical devices. */
+       If an asset is of type 'VM', 'Virtual' or 'Blade',
+       this should not be tracked at the rack level, since this are not physical devices. */
     String assetType = asset.assetType.toUpperCase()
     if (!(assetType == 'VM' || assetType == 'VIRTUAL' || assetType == 'BLADE')) {
+       // Look for the rack or have created on the fly
+       def rack = rackService.findOrCreateRack(room, rackName)
+       if (!rack) {
+          return "Unable to create rack $location/$roomName/$rackName (${isSource ? 'Source' : 'Target'})"
+       }
        if (isSource) {
           asset.rackSource = rack
        }
