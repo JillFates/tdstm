@@ -318,13 +318,13 @@
 			var requiredLabels = ["Name", "Code"];
 			// Iterate over the required fields. If they're empty, are the label to the list of empty fields.
 			for (var i = 0; i < requiredFields.length; i++) {
-				if ($(requiredFields[i]).val().length == 0) {
+				if ($(requiredFields[i]).val().length === 0) {
 					emptyFields.push(requiredLabels[i]);
 				}
 			}
 
 			// If any required field is empty, then false should be returned.
-			allFieldsOK = emptyFields.size() == 0;
+			allFieldsOK = emptyFields.size() === 0;
 			if (!allFieldsOK) {
 				alert("The following field(s) cannot be null: " + emptyFields.join(", "));
 			}
