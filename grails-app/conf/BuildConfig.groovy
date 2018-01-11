@@ -95,6 +95,7 @@ grails.project.dependency.resolution = {
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
+		runtime ':console:1.5.12'
 		/*
 		 TODO: oluna - the next plugins help to work with the resources and the Browsers Cache
 		 they may be removed after switching to asset-pipeline, I just leave it as a reference
