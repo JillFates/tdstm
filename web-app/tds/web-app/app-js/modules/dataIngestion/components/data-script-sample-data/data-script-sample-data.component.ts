@@ -29,6 +29,8 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		selected : 'csv',
 		fileContent : ''
 	};
+	private assetClassOptions: Array<string> = ['Application', 'Device'];
+	private assetClassSelected: string;
 
 	constructor(
 		private dataIngestionService: DataIngestionService,

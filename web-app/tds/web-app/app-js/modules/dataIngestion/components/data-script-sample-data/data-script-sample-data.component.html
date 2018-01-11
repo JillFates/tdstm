@@ -21,7 +21,7 @@
                                     <input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch from web service</label>
+                                    <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch data from web service</label>
                             </div>
                         </div>
                     </div>
@@ -73,12 +73,36 @@
                     <div *ngIf="uploadOption === 'service'">
                         <hr>
                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="includeHeaders">
+                                        Data include header labels <input id="includeHeaders" type="checkbox" value="" style="margin-left: 5px;">
+                                    </label>
+                                    <label class="col-sm-3 control-label" style="width: 115px;" for="" >Limit # of Rows</label>
+                                    <kendo-numerictextbox id="limitRows" name="limitRows"
+                                            [format]="'n'"
+                                            [min]="0"
+                                            [autoCorrect]="'true'">
+                                    </kendo-numerictextbox>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0px;">
+                                    <label class="col-sm-4 control-label" for="autoETL">
+                                        Auto Generate ETL script <input id="autoETL" type="checkbox" value="" style="margin-left: 15px;">
+                                    </label>
+                                    <label class="col-sm-3 control-label" style="width: 115px; text-align: right;" for="" >Asset Classes </label>
+                                    <kendo-dropdownlist id="assetClasses" name="assetClasses"
+                                                        [defaultItem]="'Select a class'"
+                                                        [(ngModel)]="assetClassSelected" [data]="assetClassOptions"></kendo-dropdownlist>
+                                </div>
+                            </div>
+
+                            <!--
                             <div class="col-md-6">
                                 <div class="checkbox">
                                     <label>
                                         <input type="checkbox" value="">Data include header</label>
                                 </div>
-                                <div class="form-group form-inline">
+                                <div class="fo  rm-group form-inline">
                                     <label for="" style="margin-right:60px;">Limit # of Rows</label>
                                     <input type="number" style="width:80px;" class="form-control">
                                 </div>
@@ -86,10 +110,12 @@
                             <div class="col-md-6">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" value="">Auto Generate ETL</label>
+                                        <input type="checkbox" value="">Auto Generate ETL script</label>
                                 </div>
                                 <select name="" id=""></select>
                             </div>
+                            -->
+
                         </div>
                     </div>
                 </form>
