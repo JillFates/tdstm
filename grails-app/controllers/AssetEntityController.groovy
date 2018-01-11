@@ -1679,8 +1679,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			eq('project', project)
 			order('name', 'asc')
 		}
+		List assetSummaryList = []
 
-		List assetSummaryList = moveBundles.collect { MoveBundle moveBundle ->
+		for (MoveBundle moveBundle in moveBundles) {
+
 			int physicalCount = AssetEntity.createCriteria().count() {
 				eq('moveBundle', moveBundle)
 				eq('assetClass', AssetClass.DEVICE)
@@ -1737,8 +1739,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			totalDatabase += databaseCount
 			totalFiles += filesCount
 
-			[name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
-			 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+			if (assetCount + applicationCount + physicalCount + databaseCount + filesCount > 0) {
+				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
+									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+			}
+
 		}
 
 		moveBundles = null

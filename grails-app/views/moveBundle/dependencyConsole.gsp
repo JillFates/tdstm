@@ -30,8 +30,7 @@
 		<tds:subHeader title="Dependency Analyzer" crumbs="['Assets','Dependency Analyzer']"/>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
-
+		<div id="DependencyGroupsTableId">
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">
 					<g:form name="checkBoxForm">

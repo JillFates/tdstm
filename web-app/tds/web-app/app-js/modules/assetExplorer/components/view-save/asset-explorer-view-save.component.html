@@ -24,7 +24,8 @@
                     </div>
 					<div class="checkbox" style="padding-left:160px;">
 						<label [ngClass]="{'disabled-input' : model.isSystem}">
-							<input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared"> {{ 'GLOBAL.SHARE_WITH_USERS' | translate }}
+							<input type="checkbox" [disabled]="model.isSystem" name="shared" [(ngModel)]="model.isShared">
+                            <span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
                         </label>
 					</div>
 				</div>

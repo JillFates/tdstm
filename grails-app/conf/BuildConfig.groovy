@@ -16,7 +16,6 @@ grails.project.dependency.resolution = {
 
 	repositories {
 		inherits true
-		mavenRepo 'http://tmdevold.tdsops.com/grails-maven'
 		mavenLocal()
 
 		//mavenRepo 'http://repo.grails.org/grails/plugins'
