@@ -10,8 +10,17 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-12">
-						<button type="button" [disabled]="!script || testing || !filename" (click)="onTestScript()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.TEST' | translate}}</button>
-						<button type="button" [disabled]="!script || checking || !filename" (click)="onCheckScriptSyntax()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}</button>
+						<button type="button" [disabled]="!script || !filename" (click)="onTestScript()" class="btn btn-default">
+                            {{ 'DATA_INGESTION.ETL_BUILDER.TEST' | translate}}
+                            <span *ngIf="operationStatus.test === 'success'" class="glyphicon glyphicon-ok"></span>
+                            <span *ngIf="operationStatus.test === 'fail'" class="glyphicon glyphicon-remove"></span>
+                        </button>
+						<button type="button" [disabled]="!script || !filename" (click)="onCheckScriptSyntax()" class="btn btn-default">
+                            <span class="fa fa-fw fa-code" style="font-weight: bold;"></span>
+                            {{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}
+                            <span *ngIf="operationStatus.syntax === 'success'" class="glyphicon glyphicon-ok"></span>
+                            <span *ngIf="operationStatus.syntax === 'fail'" class="glyphicon glyphicon-remove"></span>
+                        </button>
 						<button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
 						<button type="button" [disabled]="!scriptTestResult.consoleLog" (click)="onViewConsole()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.VIEW_CONSOLE' | translate}}</button>
 						<button class="pull-right btn btn-default" (click)="toggleSection('code')">
@@ -21,25 +30,28 @@
 				</div>
 				<div class="row" *ngIf="!collapsed.code">
 					<div class="col-md-12">
-						<code-mirror [(model)]="script" (change)="onCodeChange($event)" ></code-mirror>
+						<code-mirror [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<button [disabled]="!isScriptDirty()" (click)="onSave()"
+						<button [disabled]="!isScriptDirty() || (operationStatus.save && operationStatus.save !== 'success')" (click)="onSave()"
                                 type="button" class="btn btn-primary btn-resize pull-left">
-							<span class="fa fa-fw fa-floppy-o"></span> {{'GLOBAL.SAVE' | translate }}
+							<span class="fa fa-fw fa-floppy-o"></span>
+                            {{'GLOBAL.SAVE' | translate }}
                         </button>
+                        <span *ngIf="operationStatus.save === 'success'" class="glyphicon glyphicon-ok" style="margin-top: 7px; margin-left: 10px;"></span>
+                        <span *ngIf="operationStatus.save === 'fail'" class="glyphicon glyphicon-remove" style="margin-top: 7px; margin-left: 10px;"></span>
 						<button (click)="cancelCloseDialog()"
                                 type="button" class="btn btn-default btn-resize pull-right">
 							<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 					</div>
 				</div>
                 <!-- -->
-                <hr *ngIf="testHasErrors() || syntaxHasErrors()">
-                <div *ngIf="testHasErrors() || syntaxHasErrors()" class="row">
+                <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                     <div class="col-md-12">
-                        <h4 class="pull-left">Errors</h4>
+                        <span class="pull-left" style="color: #a94442;"><b>Syntax Errors</b></span>
+                        <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">close</span>
                         <textarea *ngIf="testHasErrors()" class="form-control console" [(ngModel)]="scriptTestResult.error" cols="30" rows="3" style="cursor: default; resize: vertical;">
 						</textarea>
                         <textarea *ngIf="syntaxHasErrors()" class="form-control console" cols="30" rows="3" style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
