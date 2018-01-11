@@ -18,7 +18,7 @@ export class DataIngestionService {
 	private dataScriptUrl = '../ws/dataScript';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor, private nativeHttp: Http) {
+	constructor(private http: HttpInterceptor) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
@@ -269,6 +269,22 @@ export class DataIngestionService {
 		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
 			.map((res: Response) => {
 				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
+		let body = JSON.stringify({filename: filename} );
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
+			.map((res: Response) => {
+				let response = res.json();
+				response.operation = 'delete';
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());

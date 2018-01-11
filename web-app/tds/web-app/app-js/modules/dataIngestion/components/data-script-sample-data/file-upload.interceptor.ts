@@ -18,5 +18,9 @@ export class FileUploadInterceptor implements HttpInterceptor {
 			events.push(this.dataIngestionService.uploadFile(req.body));
 			return Observable.concat(...events);
 		}
+		if (req.url === 'removeUrl') {
+			let filename = req.body.get('filename');
+			return this.dataIngestionService.deleteFile(filename);
+		}
 	}
 }

@@ -42,7 +42,7 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <button [disabled]="csv.fileContent.length < 1" (click)="onUploadFileText()"
-                                            type="button" class="btn pull-right" style="margin-top: 5px;">
+                                            type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
                                         Upload
                                     </button>
                                 </div>
@@ -54,10 +54,13 @@
                                     #kendoUploadInstance="kendoUpload"
                                     [autoUpload]="file.autoUpload"
                                     [saveUrl]="file.uploadSaveUrl"
+                                    [removeUrl]="file.uploadDeleteUrl"
                                     [saveField]="'file'"
+                                    [removeField]="'filename'"
                                     [multiple]="false"
                                     (select)="clearFilename($event)"
                                     (upload)="clearFilename($event)"
+                                    (remove)="onRemoveFile($event)"
                                     (success)="completeEventHandler($event)">
                             </kendo-upload><!---->
                         </div>
