@@ -22,14 +22,14 @@
 											<tbody>
 												<tr class="prop">
 													<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}" />
-													<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.validation.imp}">
+													<td colspan="2" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
 														<tdsAngular:tooltipSpan field="${standardFieldSpecs.assetName}">
 															${assetEntity.assetName}
 														</tdsAngular:tooltipSpan>
 													</td>
 
 													<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}" />
-													<td colspan="3" class="${standardFieldSpecs.validation.imp?:''}">
+													<td colspan="3" class="${standardFieldSpecs.description.imp?:''}">
 														<tdsAngular:tooltipSpan field="${standardFieldSpecs.description}">
 															${assetEntity.description}
 														</tdsAngular:tooltipSpan>
