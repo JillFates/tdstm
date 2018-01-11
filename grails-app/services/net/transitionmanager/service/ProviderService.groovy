@@ -21,6 +21,11 @@ class ProviderService implements ServiceMethods {
         if (!project) {
             project = securityService.userCurrentProject
         }
+
+        // Should the provider name be empty, throw an exception.
+        if (!providerName) {
+            throw new InvalidParamException("The name for the Provider cannot be null.")
+        }
         boolean isUnique = true
 
         // Lookup a provider with the given name and project
@@ -60,10 +65,6 @@ class ProviderService implements ServiceMethods {
             provider = new Provider()
         }
 
-        if (!providerJson.name) {
-            throw new InvalidParamException("The name for the Provider cannot be null.")
-        }
-        
         // Validate the provider name is unique.
         if (!validateUniqueName(providerJson.name, providerId, currentProject)) {
             throw new DomainUpdateException("Cannot update or create Provider because the name is not unique for this project.")
