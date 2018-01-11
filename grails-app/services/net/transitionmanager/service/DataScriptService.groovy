@@ -38,10 +38,6 @@ class DataScriptService implements ServiceMethods{
             dataScript = getDataScript(dataScriptId, currentProject)
         }
 
-        if (!dataScriptJson.name) {
-            throw new InvalidParamException("The DataScript name cannot be null.")
-        }
-        
         // Validate that there's no other DataScript for this project and provider with the same name
         if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
             throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
@@ -113,6 +109,12 @@ class DataScriptService implements ServiceMethods{
         if (!project) {
             project = securityService.userCurrentProject
         }
+
+        // If the name is null don't validate, throw an exception.
+        if (!dataScriptName) {
+            throw new InvalidParamException("The DataScript name cannot be null.")
+        }
+
         DataScript dataScript = DataScript.where {
             name == dataScriptName
             project == project
