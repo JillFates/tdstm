@@ -14,9 +14,13 @@ class ApiActionServiceSpec extends Specification {
 	StaticMessageSource messageSource
 
 	static doWithSpring = {
+		messageSourceService(MessageSourceService) { bean ->
+			messageSource = ref('messageSource')
+		}
+
 		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 			bean.scope = 'prototype'
-			messageSource = ref('messageSource')
+			messageSourceService = ref('messageSourceService')
 		}
 	}
 

@@ -11,8 +11,11 @@ package net.transitionmanager.i18n
  */
 interface Message {
 
-	String ApiActionNotBoundProperty = 'apiAction.not.bound.property.exception'
-	String ApiActionInvalidBindingParams = 'apiAction.invalid.binding.params.exception'
-	String ApiActionMustReturnResults = 'apiAction.must.return.result.exception'
+	String 	ApiActionNotBoundProperty 			= 'apiAction.not.bound.property.exception',
+			ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
+			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
+			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
+			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
+			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout'
 
 }

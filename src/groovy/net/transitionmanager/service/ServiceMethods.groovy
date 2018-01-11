@@ -1,7 +1,9 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.i18n.Message
 import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
@@ -12,7 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder
 trait ServiceMethods {
 
 	def applicationContext
-	MessageSource messageSource
+	MessageSourceService messageSourceService
 
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can
@@ -94,7 +96,7 @@ trait ServiceMethods {
 	 * @return the Http Request session object
 	 */
 	HttpSession getSession() {
-		HttpSession session
+		HttpSession session = null
 		if (RequestContextHolder.getRequestAttributes()) {
 			GrailsWebRequest grailsWebRequest = WebUtils.retrieveGrailsWebRequest()
 			if (grailsWebRequest) {
@@ -102,5 +104,14 @@ trait ServiceMethods {
 				session = request.session
 			}
 		}
+		return session
+	}
+
+	String getI18NMessage(String code, String defaultMessage) {
+		return getI18NMessage(code, [] as Object[], defaultMessage)
+	}
+
+	String getI18NMessage(String code, Object[] args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		return messageSourceService.getI18NMessage(code, args, defaultMessage, locale)
 	}
 }

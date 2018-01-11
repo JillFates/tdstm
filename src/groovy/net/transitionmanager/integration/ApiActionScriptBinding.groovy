@@ -1,6 +1,7 @@
 package net.transitionmanager.integration
 
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.MessageSourceService
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
@@ -9,10 +10,10 @@ import org.springframework.context.i18n.LocaleContextHolder
  */
 class ApiActionScriptBinding extends Binding {
 
-	MessageSource messageSource
+	MessageSourceService messageSourceService
 
-	ApiActionScriptBinding(MessageSource messageSource, Map vars = [:]) {
-		this.messageSource = messageSource
+	ApiActionScriptBinding(MessageSourceService messageSourceService, Map vars = [:]) {
+		this.messageSourceService = messageSourceService
 		this.variables.putAll([
 				SC: ReactionHttpStatus,
 				* : vars
@@ -30,11 +31,10 @@ class ApiActionScriptBinding extends Binding {
 		if (variables?.containsKey(name)) {
 			return variables.get(name)
 		} else {
-			throw new ApiActionException(messageSource.getMessage(
+			throw new ApiActionException(messageSourceService.getI18NMessage(
 					Message.ApiActionNotBoundProperty,
 					[name] as String[],
-					'There is no property with name {0} bound in this script context',
-					LocaleContextHolder.locale))
+					'There is no property with name {0} bound in this script context'))
 		}
 	}
 
