@@ -1,11 +1,11 @@
 package com.tdsops.etl
 
-class ETLReferenceElement {
+class ETLFindElement {
 
     ETLProcessor processor
     List<String> fields
 
-    ETLReferenceElement (ETLProcessor processor, List<?> fields) {
+    ETLFindElement(ETLProcessor processor, List<?> fields) {
         this.processor = processor
         this.fields = fields
     }
@@ -16,7 +16,7 @@ class ETLReferenceElement {
      * @param values
      * @return
      */
-    ETLReferenceElement with (Object... dataSourceFieldNames) {
+    ETLFindElement by (Object... dataSourceFieldNames) {
 
         if (!processor.project) {
             throw ETLProcessorException.nonProjectDefined()

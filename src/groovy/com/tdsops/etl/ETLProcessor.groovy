@@ -377,8 +377,8 @@ class ETLProcessor implements RangeChecker {
      * @param method
      * @return
      */
-    def reference (String... fields) {
-        new ETLReferenceElement(this, fields as List)
+    def find (String... fields) {
+        new ETLFindElement(this, fields as List)
     }
 
     /**

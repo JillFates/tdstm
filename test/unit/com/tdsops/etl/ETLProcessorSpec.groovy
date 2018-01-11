@@ -2908,7 +2908,7 @@ class ETLProcessorSpec extends Specification {
                             domain Application
                             set environment with Production
                             extract 'application id' load id
-                            reference id with id
+                            find id by id
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
@@ -3060,7 +3060,7 @@ class ETLProcessorSpec extends Specification {
                             domain Application
                             set environment with Production
                             extract 'application id' load id
-                            reference id with id
+                            find id by id
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
@@ -3155,7 +3155,7 @@ class ETLProcessorSpec extends Specification {
                             domain Application
                             set environment with Production
                             extract 'location' load Vendor
-                            reference assetName with Vendor
+                            find assetName by Vendor
                         }
                         """.stripIndent(),
                     ETLProcessor.class.name)
