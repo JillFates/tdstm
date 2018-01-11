@@ -20,8 +20,6 @@ class WsFileSystemController implements ControllerMethods{
     final static String FILE_DOESNT_EXIST_MSG = "fileSystem.fileNotExists"
     final static String FILE_DELETED_MSG = "fileSystem.fileDeleted"
 
-    Locale locale = LocaleContextHolder.locale
-
     /**
      * Endpoint for creating a temporary file in the system from a text input and file extension.
      * @param extension
@@ -57,6 +55,7 @@ class WsFileSystemController implements ControllerMethods{
      */
     @HasPermission(Permission.UserGeneralAccess)
     def deleteFile(){
+        Locale locale = LocaleContextHolder.locale
         boolean result = fileSystemService.deleteTemporaryFile(request.JSON.filename)
         if (result) {
             renderSuccessJson(messageSource.getMessage(FILE_DELETED_MSG, null, locale))
