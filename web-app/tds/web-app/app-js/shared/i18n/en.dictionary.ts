@@ -25,7 +25,8 @@ export const en_DICTIONARY: Object = {
 		'SYSTEM_VIEW': 'System View'
 	},
 	'DATA_INGESTION': {
-		'API_ACTIONS': 'Api Actions',
+		'ADD_ARGUMENT': 'Add Argument',
+		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'Data Scripts',
 		'PROVIDERS': 'Providers',

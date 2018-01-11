@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -8,8 +7,10 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
+import com.tds.asset.AssetComment
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
@@ -22,6 +23,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 class ApiActionService implements ServiceMethods {
 
 	CamelHostnameIdentifier camelHostnameIdentifier
+	CredentialService credentialService
 	DataScriptService dataScriptService
 	ProviderService providerService
 
@@ -90,13 +92,11 @@ class ApiActionService implements ServiceMethods {
 	 * Find and ApiAction by id and project it belongs to
 	 * @param id
 	 * @param project
+	 * @parm throwException
 	 * @return
 	 */
-	ApiAction find (Long id, Project project) {
-		return ApiAction.where {
-			id == id
-			project == project
-		}.get()
+	ApiAction find(Long id, Project project, boolean throwException = false) {
+		return GormUtil.findInProject(project, ApiAction, id, throwException)
 	}
 
 	/**
@@ -117,7 +117,10 @@ class ApiActionService implements ServiceMethods {
 			}
 		}.order("name", "asc").list()
 		List<Map> results = []
-		apiActions.each { results << it.toMap(minimalInfo) }
+		apiActions.each { apiAction ->
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			results << apiAction.toMap(agent, minimalInfo)
+		}
 		return results
 	}
 
@@ -261,7 +264,7 @@ class ApiActionService implements ServiceMethods {
 	 * @return the Agent class instance to invoke the method on
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
-	private AbstractAgent agentInstanceForAction (ApiAction action) {
+	AbstractAgent agentInstanceForAction (ApiAction action) {
 		Class clazz = agentClassForAction(action)
 		clazz.instance
 	}
@@ -311,18 +314,46 @@ class ApiActionService implements ServiceMethods {
 	 * @param value
 	 * @return
 	 */
-	def parseEnum (Class enumClass, String field, String value) {
+	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false) {
 		String baseErrorMsg = "Error trying to create or update an API Action."
-		if (!value) {
+		if (!value && mandatory) {
 			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
 		}
-		try {
-			return enumClass.valueOf(value)
-		} catch (IllegalArgumentException e) {
-			throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+		if (value) {
+			try {
+				return enumClass.valueOf(value)
+			} catch (IllegalArgumentException e) {
+				throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+			}
+		} else {
+			return null
 		}
+
 	}
 
+	/**
+	 *
+	 * @param project
+	 * @param provider
+	 * @param credentialId
+	 * @return
+	 */
+	Credential findCredential(Project project, Provider provider, Long credentialId) {
+		return Credential.where {
+			id == credentialId
+			project == project
+			provider == provider
+		}
+
+	}
+
+	/**
+	 * Create or Update an API Action based on a JSON Object.
+	 * @param project
+	 * @param apiActionJson
+	 * @param apiActionId
+	 * @return
+	 */
 	ApiAction saveOrUpdateApiAction (Project project, JSONObject apiActionJson, Long apiActionId = null) {
 
 		ApiAction apiAction
@@ -337,23 +368,25 @@ class ApiActionService implements ServiceMethods {
 
 		String actionName = apiActionJson.name
 
-		if (!validateApiActionName(project, apiActionJson.name)) {
+		// Make sure the name is valid. Fail otherwise.
+		if (!validateApiActionName(project, apiActionJson.name, apiActionId)) {
 			throw new InvalidParamException("Invalid name for API Action.")
-		}
-
-		DataScript dataScript = null
-		if (apiActionJson.defaultDataScriptId) {
-			dataScript = dataScriptService.getDataScript(NumberUtil.toLong(apiActionJson.defaultDataScriptId), project)
 		}
 
 		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
 
+		Credential credentials = getCredential(project, prov, apiActionJson)
+
+		DataScript dataScript = getDataScript(project, prov, apiActionJson)
+
+
 		apiAction.with {
-			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass)
+			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass, true)
 			agentMethod = apiActionJson.agentMethod
 			asyncQueue = apiActionJson.asyncQueue
 			callbackMethod = apiActionJson.callbackMethod
 			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
+			credential = credentials
 			description = apiActionJson.description
 			defaultDataScript = dataScript
 			description = apiActionJson.description
@@ -368,6 +401,41 @@ class ApiActionService implements ServiceMethods {
 		apiAction.save(failOnError: true)
 		return apiAction
 
+	}
+
+	/**
+	 * Return the corresponding credential from this API Action JSON, validating that its provider matches
+	 * the one for the API Action.
+	 * The credential is not mandatory, so if none is provided, no exception will be thrown. However, if an
+	 * invalid value is passed, the application will detect and throw an error.
+	 * @param project
+	 * @param provider
+	 * @param credentialId
+	 * @return
+	 */
+	private Credential getCredential(Project project, Provider provider, JSONObject apiActionJson) {
+		Credential credential = null
+		if (apiActionJson.credentialId) {
+			Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
+			credential = credentialService.findByProjectAndProvider(credentialId, project, provider, true)
+		}
+		return credential
+	}
+
+	/**
+	 * Find and return a DataScript with the given id for the corresponding provider and project.
+	 * @param project
+	 * @param provider
+	 * @param apiActionJson
+	 * @return
+	 */
+	private DataScript getDataScript(Project project, Provider provider, JSONObject apiActionJson) {
+		DataScript dataScript = null
+		if (apiActionJson.defaultDataScriptId) {
+			Long dataScriptId = NumberUtil.toLong(apiActionJson.defaultDataScriptId)
+			dataScript = dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, true)
+		}
+		return dataScript
 	}
 
 	/**
