@@ -93,7 +93,8 @@ export const en_DICTIONARY: Object = {
 		'CLEAR_FILTERS': 'Clear filters',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
-		'PLEASE_SELECT': 'Please Select..'
+		'PLEASE_SELECT': 'Please Select..',
+		'CONTINUE': 'Continue',
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

@@ -1,13 +1,10 @@
 import {Component, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
-import {
-	FileRestrictions, RemoveEvent, SelectEvent, SuccessEvent, UploadComponent,
-	UploadEvent
-} from '@progress/kendo-angular-upload';
+import { FileRestrictions, RemoveEvent, SuccessEvent, UploadComponent } from '@progress/kendo-angular-upload';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -16,7 +13,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	private uploadOption = 'csv';
+	private loadSourceOption = 'csv';
 	private file: any = {
 		uploadRestrictions : { allowedExtensions: ['csv', 'txt', 'xml', 'json', '.xlxs', 'xls'] },
 		uploadSaveUrl : 'saveUrl',
@@ -29,16 +26,35 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		selected : 'csv',
 		fileContent : ''
 	};
-	private assetClassOptions: Array<string> = ['Application', 'Device'];
-	private assetClassSelected: string;
+	private webService: any = {
+		options: undefined,
+		selected: undefined,
+	};
+
+	private autoETL = false;
+	private assetClassOptions: Array<any> = [
+		{ text: 'Select a class', value:  -1 },
+		{ text: 'Application', value: 0 },
+		{ text: 'Device', value: 1 }
+	];
+	private assetClassSelected = this.assetClassOptions[0];
+	private apiActionOptions = [];
 
 	constructor(
 		private dataIngestionService: DataIngestionService,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private importAssetsService: ImportAssetsService) {
 		super('#loadSampleData');
+		this.importAssetsService.getManualOptions().subscribe( (result) => {
+			this.webService.options = result.actions;
+			this.webService.selected = this.webService.options[0];
+		});
 	}
 
 	private validForm(): boolean {
+		if (this.loadSourceOption === 'service' && this.autoETL && this.assetClassSelected.value === -1) {
+			return false;
+		}
 		return this.file.uploadedFilename && this.file.uploadedFilename.length > 0;
 	}
 
@@ -64,10 +80,6 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		this.close();
 	}
 
-	protected cancelCloseDialog(): void {
-		this.dismiss();
-	}
-
 	private completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
 		if (response.operation === 'delete') { // file deleted successfully
@@ -85,5 +97,9 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	private onRemoveFile(e: RemoveEvent) {
 		e.data = { filename: this.file.uploadedFilename};
+	}
+
+	protected cancelCloseDialog(): void {
+		this.dismiss();
 	}
 }

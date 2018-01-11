@@ -15,20 +15,20 @@
                         <div class="col-md-12">
                             <div class="radio">
                                 <label>
-                                    <input type="radio" selected value="csv" [(ngModel)]="uploadOption" name="uploadOption">Paste content (CSV, JSON, XML)
+                                    <input type="radio" selected value="csv" [(ngModel)]="loadSourceOption" name="loadSourceOption">Paste content (CSV, JSON, XML)
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="file" [(ngModel)]="uploadOption" name="uploadOption">Upload file (Excel, CSV, JSON, XML)
+                                    <input type="radio" value="file" [(ngModel)]="loadSourceOption" name="loadSourceOption">Upload file (Excel, CSV, JSON, XML)
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="service" [(ngModel)]="uploadOption" name="uploadOption">Fetch data from web service</label>
+                                    <input type="radio" value="service" [(ngModel)]="loadSourceOption" name="loadSourceOption">Fetch data from web service</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 10px;">
                         <!-- csv -->
-                        <div *ngIf="uploadOption === 'csv'" class="col-md-12">
+                        <div *ngIf="loadSourceOption === 'csv'" class="col-md-12">
                             <div class="form-group" style="margin-bottom: 0px;">
                                 <label for="fileExtension" class="col-sm-12 control-label">File extension:</label>
                                 <div class="col-sm-12">
@@ -49,7 +49,7 @@
                             </div>
                         </div>
                         <!-- file -->
-                        <div *ngIf="uploadOption === 'file'" class="col-md-12">
+                        <div *ngIf="loadSourceOption === 'file'" class="col-md-12">
                             <kendo-upload
                                     #kendoUploadInstance="kendoUpload"
                                     [autoUpload]="file.autoUpload"
@@ -65,18 +65,36 @@
                             </kendo-upload><!---->
                         </div>
                         <!-- web service -->
-                        <div *ngIf="uploadOption === 'service'" class="col-md-12">
-                            <select name="" id=""></select>
+                        <div *ngIf="loadSourceOption === 'service'" class="col-md-12">
+
+                            <div class="form-group" style="margin-bottom: 0px;">
+                                <label for="apiaction" class="col-sm-12 control-label">Api Action:</label>
+                                <div class="col-sm-12">
+                                    <kendo-dropdownlist id="apiaction" name="apiaction" class="form-control"
+                                                        [(ngModel)]="webService.selected"
+                                                        [data]="webService.options"
+                                                        textField="name"
+                                                        valueField="id">
+                                    </kendo-dropdownlist>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
+                                        Fetch
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div *ngIf="uploadOption === 'service'">
+                    <!-- Options not displayed for Phase 1, will be supported on Phase 2 -->
+                    <div style="display: none;">
                         <hr>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label" for="includeHeaders">
-                                        Data include header labels <input id="includeHeaders" type="checkbox" value="" style="margin-left: 5px;">
+                                        Data include header labels
+                                        <input id="includeHeaders" type="checkbox" value="" style="margin-left: 5px;">
                                     </label>
                                     <label class="col-sm-3 control-label" style="width: 115px;" for="" >Limit # of Rows</label>
                                     <kendo-numerictextbox id="limitRows" name="limitRows"
@@ -87,43 +105,29 @@
                                 </div>
                                 <div class="form-group" style="margin-bottom: 0px;">
                                     <label class="col-sm-4 control-label" for="autoETL">
-                                        Auto Generate ETL script <input id="autoETL" type="checkbox" value="" style="margin-left: 15px;">
+                                        Auto Generate ETL script
+                                        <input [(ngModel)]="autoETL"
+                                               id="autoETL" name="autoETL" type="checkbox" value="" style="margin-left: 15px;">
                                     </label>
-                                    <label class="col-sm-3 control-label" style="width: 115px; text-align: right;" for="" >Asset Classes </label>
+                                    <label class="col-sm-3 control-label" style="width: 115px; text-align: right;" for="" >Asset Classes <span style="color: red;" *ngIf="autoETL">*</span></label>
                                     <kendo-dropdownlist id="assetClasses" name="assetClasses"
-                                                        [defaultItem]="'Select a class'"
-                                                        [(ngModel)]="assetClassSelected" [data]="assetClassOptions"></kendo-dropdownlist>
+                                                        [(ngModel)]="assetClassSelected"
+                                                        [data]="assetClassOptions"
+                                                        textField="text"
+                                                        valueField="value">
+                                    </kendo-dropdownlist>
                                 </div>
                             </div>
-
-                            <!--
-                            <div class="col-md-6">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="">Data include header</label>
-                                </div>
-                                <div class="fo  rm-group form-inline">
-                                    <label for="" style="margin-right:60px;">Limit # of Rows</label>
-                                    <input type="number" style="width:80px;" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="">Auto Generate ETL script</label>
-                                </div>
-                                <select name="" id=""></select>
-                            </div>
-                            -->
 
                         </div>
                     </div>
                 </form>
-			</div>
+
+            </div>
 
 			<div class="modal-footer form-group-center">
                 <button [disabled]="!validForm()" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
-					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.LOAD' | translate }}</button>
+					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.CONTINUE' | translate }}</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
 			</div>
