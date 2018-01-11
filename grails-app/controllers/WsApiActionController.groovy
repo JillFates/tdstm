@@ -74,10 +74,15 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionCreate)
     def create() {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
-        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
-        renderSuccessJson(apiAction.toMap(agent, false))
+        try {
+            Project project = securityService.userCurrentProject
+            ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
+            AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+            renderSuccessJson(apiAction.toMap(agent, false))
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+
     }
 
 

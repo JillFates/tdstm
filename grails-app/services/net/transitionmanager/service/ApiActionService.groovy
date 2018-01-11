@@ -264,7 +264,7 @@ class ApiActionService implements ServiceMethods {
 	 * @return the Agent class instance to invoke the method on
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
-	private AbstractAgent agentInstanceForAction (ApiAction action) {
+	AbstractAgent agentInstanceForAction (ApiAction action) {
 		Class clazz = agentClassForAction(action)
 		clazz.instance
 	}

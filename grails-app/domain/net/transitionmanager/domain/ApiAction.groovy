@@ -17,8 +17,6 @@ import groovy.transform.ToString
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
-	static tmpcount = 0
-
 	String name
 	String description
 
