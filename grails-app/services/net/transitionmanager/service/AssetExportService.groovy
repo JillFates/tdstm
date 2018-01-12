@@ -100,10 +100,6 @@ class AssetExportService {
 			boolean allBundles = bundle.remove(ALL_BUNDLES_OPTION)
 			int bundleSize = bundle.size()
 
-      List bundles = bundle.collect { it ->
-         MoveBundle.read(it)
-      }
-
 			def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
 			Project project = Project.get(projectId)
@@ -150,6 +146,8 @@ class AssetExportService {
 				query += ' AND d.moveBundle.useForPlanning = TRUE '
 			}
 
+			List<MoveBundle> bundles = []
+			String bundleNames = allBundles ? 'All Bundles' : 'Planning Bundles'
 			// Setup for multiple bundle selection
 			if (! allBundles && bundleSize) {
 				List bundleIds = []
@@ -163,6 +161,9 @@ class AssetExportService {
 				String bundleStr = bundleIds.join(',')
 				query += " AND d.moveBundle.id IN(${bundleStr})"
 				//queryParams.bundles = bundles
+
+				bundles = MoveBundle.where { project == project && id in bundleIds }.list()
+				bundleNames = bundles.join(", ")
 			}
 
 			/*
@@ -365,8 +366,6 @@ class AssetExportService {
 				progressService.update(key, 100, 'Cancelled', missingHeaders.join("<br/>"))
 				return
 			}
-
-       String bundleNames = bundles.join(" ")
 
 			//Add Title Information to master SpreadSheet
 			titleSheet = WorkbookUtil.getSheetFromWorkbook(workbook, WorkbookSheetName.TITLE)

@@ -19,7 +19,7 @@ class FilenameUtil {
      *
      * @param nameFormat  The file name format to be used to create the name scheme.
      * If none is chosen, the default format will be used.
-     * @param nameValues  The properties/values to construct the file name.
+     * @param nameValues  A Map with the properties/values to construct the file name.
      * This will vary depending on the nameFormat chosen.
      * @param fileExtension  The extension of the resulting file name (optional)
      * @param date  The date to be used in the file name. Optional, if no date is provided one will be created.
@@ -48,7 +48,7 @@ class FilenameUtil {
      * This format consist of a set of property values separated by '-'.
      * If the properties have spaces in between, those will be replaced with underscores (_)
      * (ej: 'Sample Project' will be 'Sample_Project').
-     * The complete resulting format is as follows: "Project_Client-Project_Code-Event_Name-yyyymmdd_hhmm"
+     * The complete resulting format is as follows: "Project_Client-Project_Code-Event(s)-yyyymmdd_hhmm"
      * For more information see TM-8124.
      * For tests on this see TM-8125, and refer to FilenameUtilTests class.
      *
@@ -56,26 +56,26 @@ class FilenameUtil {
      *
      * project:  Mandatory
      * The project entity to use.
-     * The client name and ProjectCode will be extracted to write in the resulting file name.
+     * The client's name and ProjectCode will be extracted to write in the resulting file name.
      * <p>
      * moveEvent:  Mandatory (unless some optional params are present, see the details below).
-     * The Event entity to use. The event name will be used in the file name.(moveEvent:anEvent)
+     * The Event entity to use. The event's name will be used in the file name.([moveEvent:anEvent])
      * You can also send a list with just one event, for the same result. (moveEvent:anEvent or moveEvent:[anEvent])
-     * If more than one event is sent in the list, the event names will be concatenated in the resulting filename.
-     * (eg: for moveEvent:[eventOne, eventTwo] will be 'eventOne-eventTwo').
+     * If more than one event is sent in the list, it will return the number of events + '_events' string.
+     * (eg: for moveEvent:[eventOne, eventTwo] will be '2_events').
      * <p>
      * allEvents:  Optional.
-     * If true, the event name part will be 'ALL' and not bundle name ([allEvents:true]).
+     * If true, the event part will be 'ALL' and not event's name ([allEvents:true]).
      * In this case the mandatory property 'moveEvent' is not required, and it will be ignored if present.
      * <p>
-     * If any values or properties are missing, an empty String is returned.
+     * If any mandatory values or properties are missing, an empty String is returned.
      * @param date  The date to be used in the file name.
      * @return  The resulting file name.
      */
    private static String clientProjectEventDateFormatter(Map nameValues, Date date) {
 
-      String projectClient = nameValues.project?.client?.name?.replaceAll("\\s","_")
-      String projectCode = nameValues.project?.projectCode?.replaceAll("\\s","_")
+      String projectClient = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.project?.client?.name)
+      String projectCode = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.project?.projectCode)
       String eventName = buildEventName(nameValues)
       String formattedDate = TimeUtil.formatDate(TimeUtil.BIG_ENDIAN, date, TimeUtil.FORMAT_DATE_TIME_26)
       if(projectClient == null || projectCode == null || eventName == null) {
@@ -97,20 +97,20 @@ class FilenameUtil {
     *
     * project:  Mandatory
     * The project entity to use.
-    * The client name and ProjectCode will be extracted to write in the resulting file name.
+    * The client's name and ProjectCode will be extracted to write in the resulting file name.
     * <p>
     * moveBundle:  Mandatory (unless some optional params are present, see the details below).
-    * The moveBundle entity to use. The bundle name will be used in the file name.(moveBundle:aBundle)
+    * The moveBundle entity to use. The bundle's name will be used in the file name.([moveBundle:aBundle])
     * You can also send a list with just one bundle, for the same result. (moveBundle:aBundle or moveBundle:[aBundle])
-    * If more than one bundle is sent in the list, the bundle names will be concatenated in the resulting filename.
-    * (eg: for moveBundle:[bundleOne, bundleTwo] will be 'bundleOne-bundleTwo').
+    * If more than one bundle is sent in the list, it will return the number of bundles + '_bundles' string.
+    * (eg: for moveBundle:[bundleOne, bundleTwo] will be '2_bundles').
     * <p>
     * allBundles:  Optional.
-    * If true, the bundle name part will be 'ALL' and not bundle name ([allBundles:true]).
-    * In this case the mandatory property 'moveBundle' is not required.
+    * If true, the bundle part will be 'ALL' and not bundle's name ([allBundles:true]).
+    * In this case the mandatory property 'moveBundle' is not required, and will be ignored if present.
     * <p>
-    * useForPlanning:  Optional.
-    * If true the bundle name part will be 'PLANNING' and not the bundle name ([useForPlanning:true]).
+    * useForPlanning:  Optional. Has precedence over moveBundle and allBundles options.
+    * If true the bundle part will be 'PLANNING' and not the bundle's name ([useForPlanning:true]).
     * In this case the mandatory property 'moveBundle' is not required, and will be ignored if present.
     * <p>
     * exportedEntities:  Optional.
@@ -124,8 +124,8 @@ class FilenameUtil {
     */
    private static String clientProjectBundleCheckboxesDateFormatter(Map nameValues, Date date) {
 
-      String projectClient = nameValues.project?.client?.name?.replaceAll("\\s","_")
-      String projectCode = nameValues.project?.projectCode?.replaceAll("\\s","_")
+      String projectClient = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.project?.client?.name)
+      String projectCode = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.project?.projectCode)
       String bundleName = buildBundleName(nameValues)
       String useForPlanning = nameValues.useForPlanning ? 'PLANNING' : ''
       String exportedEntities = nameValues.exportedEntities
@@ -148,12 +148,13 @@ class FilenameUtil {
     }
 
     /**
-     * This returns the bundleName, depending on the nameValues present.
+     * This returns the bundleName part of the filename, depending on the nameValues present.
      * If the 'allBundles' param is present and true, it will return ALL_BUNDLES.
-     * If not and multiple bundles are present in the moveBundle param, it will return the bundle names
-     * concatenated by (-) (eg: for moveBundle:[bundleOne, bundleTwo] will be 'bundleOne-bundleTwo').
-     * Finally if it's just one bundle it will return the bundle name.
-     * (This can be received in two forms, moveBundle:aBundle or moveBundle:[aBundle])
+     * Otherwise, if multiple bundles are present in the moveBundle param,
+     * it will return the number of bundles concatenated with the '_bundles' string.
+     * (eg: for moveBundle:[bundleOne, bundleTwo] will be '2_bundles').
+     * Finally if it's just one bundle, it will return the bundle's name.
+     * (This can be received in two forms, moveBundle:aBundle or moveBundle:[aBundle], with the same result.)
      *
      * @param nameValues  The properties needed to construct the file name.
      * @return  The resulting file name.
@@ -165,13 +166,12 @@ class FilenameUtil {
           def moveBundle = nameVaules.moveBundle
           if (moveBundle instanceof List){
              if(moveBundle.size() == 1) { // if the list has just one bundle, use the name of that
-                bundleName = moveBundle[0].name?.replaceAll("\\s","_")
-             } else if (moveBundle.size() > 1) { // concatenate names
-                def bundles = moveBundle.collect {it.name?.replaceAll("\\s","_")}
-                bundleName = bundles.join('-')
+                bundleName = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(moveBundle[0].name)
+             } else if (moveBundle.size() > 1) { // return 'N_bundles'
+                bundleName = moveBundle.size() + '_bundles'
              }
           } else if (moveBundle instanceof MoveBundle) {
-             bundleName = moveBundle?.name?.replaceAll("\\s","_")
+             bundleName = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(moveBundle?.name)
           }
        }
        else {
@@ -180,12 +180,13 @@ class FilenameUtil {
     }
 
    /**
-    * This returns the eventName, depending on the nameValues present.
+    * This returns the eventName part of the filename, depending on the nameValues present.
     * If the 'allEvents' param is present and true, it will return ALL.
-    * If not and multiple events are present in the moveEvent param, it will return the event names
-    * concatenated by (-) (eg: for moveEvent:[eventOne, eventTwo] will be 'eventOne-eventTwo').
-    * Finally if it's just one event it will return the event name.
-    * (This can be received in two forms, moveEvent:anEvent or moveEvent:[anEvent])
+    * Otherwise, if multiple events are present in the moveEvent param,
+    * it will return the number of events concatenated with the '_events' string.
+    * (eg: for moveEvent:[eventOne, eventTwo] will be '2_events').
+    * Finally if it's just one event, it will return the event's name.
+    * (This can be received in two forms, moveEvent:anEvent or moveEvent:[anEvent], with the same result.)
     *
     * @param nameValues  The properties needed to construct the file name.
     * @return  The resulting file name.
@@ -197,13 +198,12 @@ class FilenameUtil {
          def moveEvent = nameVaules.moveEvent
          if (moveEvent instanceof List){
             if(moveEvent.size() == 1) { // if the list has just one event, use the name of that
-               eventName = moveEvent[0].name?.replaceAll("\\s","_")
-            } else if (moveEvent.size() > 1) { // concatenate names
-               def events = moveEvent.collect {it.name?.replaceAll("\\s","_")}
-               eventName = events.join('-')
+               eventName = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(moveEvent[0].name)
+            } else if (moveEvent.size() > 1) { // return 'N_events'
+               eventName = moveEvent.size() + '_events'
             }
          } else if (moveEvent instanceof MoveEvent) {
-            eventName = moveEvent?.name?.replaceAll("\\s","_")
+            eventName = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(moveEvent?.name)
          }
       }
       else {

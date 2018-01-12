@@ -1023,9 +1023,7 @@ class ReportsController implements ControllerMethods {
 			def eventNames = moveEvents.collect{it.name}
 			eventsTitleSheet = eventNames.join(", ")
 		}
-		def nameParams = [project:project,
-						  moveEvent:(!allEvents ? moveEvents[0]: null),
-						  allEvents: allEvents]
+		def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
 		String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams, 'xls')
 
 		//set MIME TYPE as Excel
@@ -1118,11 +1116,12 @@ class ReportsController implements ControllerMethods {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		} else {
-			boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
-			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
-			def nameParams = [project:project,
-							  moveEvent:(!allEvents ? moveEvents[0]: null),
-							  allEvents: allEvents]
+			boolean allEvents = reqEvents.remove("all")
+			def moveEvents
+			if (reqEvents) {
+				moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+      }
+			def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
 			String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams)
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":filename,"_file":"taskReport"])

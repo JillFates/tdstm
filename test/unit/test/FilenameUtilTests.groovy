@@ -76,8 +76,8 @@ class FilenameUtilTests extends AbstractUnitSpec {
        def events = [me1, me2]
        def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
        def params = [project:completeProject, moveEvent: events] // the moveEvent param receives a list with the events
-       expect: 'the resulting file name match the expected file naming scheme, with the event names concatenated'
-       'ABC_Company-Big_Move-M1-Hybrid-M2-Physical-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, date)
+       expect: 'the resulting file name match the expected file naming scheme, with just the number of events for the EVENT part'
+       'ABC_Company-Big_Move-2_events-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, params, fileExtension, date)
     }
 
    @See('TM-7958, TM-8097')
@@ -128,7 +128,7 @@ class FilenameUtilTests extends AbstractUnitSpec {
       def bundles = [mb1, mb2]
       def date = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
       def params = [project:completeProject, moveBundle: bundles] // the moveBundle param receives a list with the bundles
-      expect: 'the resulting file name match the expected file naming scheme, with the bundle names concatenated'
-      'ABC_Company-Big_Move-M1-Hybrid-M2-Physical-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
+      expect: 'the resulting file name match the expected file naming scheme, with just the number of bundles for the PROJECT_BUNDLE part'
+      'ABC_Company-Big_Move-2_bundles-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
    }
 }
