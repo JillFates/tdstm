@@ -7,6 +7,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.service.TaskService
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.ClassUtils
@@ -28,20 +29,16 @@ class TaskFacade {
 	 * @return
 	 */
 	Object getProperty(String name) {
-		Object taskProperty = null
+//		Object taskProperty = null
 		try {
-			taskProperty = GormUtil.getDomainProperty(task, name)
-		} catch (InvalidPropertyException e) {
-			// swallow this one
-		}
-		if (Objects.nonNull(taskProperty)) {
+			GrailsDomainClassProperty taskProperty = GormUtil.getDomainProperty(task, name)
 			Object value = task.getProperty(name)
-			if (Objects.isNull(value) || value instanceof String || ClassUtils.isPrimitiveOrWrapper(value.class)) {
-				return value
+			if (GormUtil.isReferenceProperty(task, taskProperty.name)) {
+				value.toString()
 			} else {
-				return value.toString()
+				value
 			}
-		} else {
+		} catch (InvalidPropertyException e) {
 			throw new MissingPropertyException("No such property: " + name)
 		}
 	}
