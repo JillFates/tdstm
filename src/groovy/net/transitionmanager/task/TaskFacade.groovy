@@ -29,10 +29,9 @@ class TaskFacade {
 	 * @return
 	 */
 	Object getProperty(String name) {
-//		Object taskProperty = null
 		try {
 			GrailsDomainClassProperty taskProperty = GormUtil.getDomainProperty(task, name)
-			Object value = task.getProperty(name)
+			Object value = task.getProperty(taskProperty.name)
 			if (GormUtil.isReferenceProperty(task, taskProperty.name)) {
 				value.toString()
 			} else {
