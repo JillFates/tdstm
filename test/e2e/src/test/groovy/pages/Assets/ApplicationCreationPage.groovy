@@ -4,6 +4,7 @@ import geb.Page
 class ApplicationCreationPage extends Page{
 
     static at = {
+        waitFor {acModalWindow.displayed}
         acModalTitle.text()             == "Application Create"
         acModalSaveBtn.text().trim()    == "Save"
         acModalCancelBtn.text().trim()  == "Cancel"
@@ -12,7 +13,7 @@ class ApplicationCreationPage extends Page{
 
     static content = {
 
-        acModalWindow(wait:true)        { $("div","aria-describedby":"createEntityView")}
+        acModalWindow                   (wait:true) { $("div","aria-describedby":"createEntityView")}
         acModalTitle                    { acModalWindow.find("span#ui-id-4") }
         acModalAppName                  { acModalWindow.find("input#assetName")}
         acModalDescription              { acModalWindow.find("input#description")}

@@ -22,10 +22,10 @@ class ApplicationListPage extends Page {
         alPageTitle                 (wait:true) { $("section", 	class:"content-header").find("h1") }
         alPageBreadcrumbs           { $("ol", class:"breadcrumb").find("li a")}
         alPageMessage               (required: false, wait:true) { $("div#messageId")}
-        alCompanySelector           { $('select#filterSelect', name:'companyId')}
-        alCompanySelectorDefault    { alCompanySelector.find("option", selected:"selected") }
+
 
         alView                      { $("div#gview_applicationIdGrid")}
+        alLoadingGrid               { $("div#load_applicationIdGrid")}
         alViewHeaderBar             { alView.find("div", class:"ui-jqgrid-titlebar ui-widget-header ui-corner-top ui-helper-clearfix")}
 // TODO following item have the elements inside the label
         //  alHeaderBarTitle          { $("span", class:"ui-jqgrid-title") }
@@ -50,8 +50,8 @@ class ApplicationListPage extends Page {
         alGridSize                  { alGridRows.size()}
         alRowSize                   { alGridHeaderCols.size()}
 
-        alFirstAppName              { alGridRows[0].find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
-        alFirstAppActions           { alGridRows[0].find("td", "aria-describedby":"applicationIdGrid_act")}
+        alFirstAppName              { alGridRows.first().find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alFirstAppActions           { alGridRows.first().find("td", "aria-describedby":"applicationIdGrid_act")}
         alFirstAppEdit              { alFirstAppActions.find("a", href:contains("EntityCrud.showAssetEditView"))}
         alFirstCreateShowTasks      { alFirstAppActions.find("a", id:startsWith("icon_task"))}
         alFirstCreateShowComments   { alFirstAppActions.find("a", href:contains("icon_comment"))}
