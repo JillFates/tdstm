@@ -15,41 +15,47 @@
                         <div class="col-md-12">
                             <div class="radio">
                                 <label>
-                                    <input type="radio" selected value="csv" [(ngModel)]="loadSourceOption" name="loadSourceOption">Paste content (CSV, JSON, XML)
+                                    <input type="radio" selected value="{{OPTIONS.CSV}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Paste content (CSV, JSON, XML)
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="file" [(ngModel)]="loadSourceOption" name="loadSourceOption">Upload file (Excel, CSV, JSON, XML)
+                                    <input type="radio" value="{{OPTIONS.FILE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Upload file (Excel, CSV, JSON, XML)
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="service" [(ngModel)]="loadSourceOption" name="loadSourceOption">Fetch data from web service</label>
+                                    <input type="radio" value="{{OPTIONS.SERVICE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Fetch data from web service</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 10px;">
                         <!-- csv -->
-                        <div *ngIf="loadSourceOption === 'csv'" class="col-md-12">
+                        <div *ngIf="OPTIONS.selected === OPTIONS.CSV" class="col-md-12">
                             <div class="form-group" style="margin-bottom: 0px;">
                                 <label for="fileExtension" class="col-sm-12 control-label">File extension:</label>
                                 <div class="col-sm-12">
                                     <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
-                                                        [(ngModel)]="csv.selected"
-                                                        [data]="csv.options.slice(1)"></kendo-dropdownlist>
+                                                        [(ngModel)]="csv.selected" (ngModelChange)="csv.state = 'dirty'"
+                                                        [data]="csv.options.slice(1)"
+                                                        textField="text"
+                                                        valueField="value">
+                                    </kendo-dropdownlist>
                                 </div>
                                 <div class="col-sm-12">
                                     <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; padding-left: 0px; padding-right: 0px;"
-                                          [(ngModel)]="csv.fileContent"></textarea>
+                                          [(ngModel)]="csv.fileContent" (ngModelChange)="csv.state = 'dirty'"></textarea>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button [disabled]="csv.fileContent.length < 1" (click)="onUploadFileText()"
+                                    <button [disabled]="csv.fileContent.length < 1 || csv.state === 'success' || csv.selected.value === -1" (click)="onUploadFileText()"
                                             type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
                                         Upload
+                                        <input *ngIf="csv.state === 'success'" [(ngModel)]="csv.checked" (change)="onSelectFilename(OPTIONS.CSV)"
+                                               name="csvchecked" type="checkbox" style="margin-left: 5px;" >
                                     </button>
                                 </div>
                             </div>
                         </div>
+
                         <!-- file -->
-                        <div *ngIf="loadSourceOption === 'file'" class="col-md-12">
+                        <div *ngIf="OPTIONS.selected === OPTIONS.FILE" class="col-md-12">
                             <kendo-upload
                                     #kendoUploadInstance="kendoUpload"
                                     [autoUpload]="file.autoUpload"
@@ -64,22 +70,32 @@
                                     (success)="completeEventHandler($event)">
                             </kendo-upload><!---->
                         </div>
-                        <!-- web service -->
-                        <div *ngIf="loadSourceOption === 'service'" class="col-md-12">
 
-                            <div class="form-group" style="margin-bottom: 0px;">
-                                <label for="apiaction" class="col-sm-12 control-label">Api Action:</label>
+                        <!-- web service -->
+                        <div *ngIf="OPTIONS.selected === OPTIONS.SERVICE" class="col-md-12">
+
+                            <div *ngIf="webService.options.length === 0" style="margin: 30px 0px 30px 0px; text-align: center;">
+                                <span *ngIf="webService.options.length === 0">
+                                    <i>Presently there are no data source actions defined.</i>
+                                </span>
+                            </div>
+
+                            <div *ngIf="webService.options.length > 0" class="form-group" style="margin-bottom: 0px;">
                                 <div class="col-sm-12">
                                     <kendo-dropdownlist id="apiaction" name="apiaction" class="form-control"
                                                         [(ngModel)]="webService.selected"
                                                         [data]="webService.options"
                                                         textField="name"
-                                                        valueField="id">
+                                                        valueField="id"
+                                                        [defaultItem]="{name: 'Select a source', id: -1}">
                                     </kendo-dropdownlist>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
+                                    <button [disabled]="!webService.selected || webService.selected.id === -1" (click)="onFetch()"
+                                            type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
                                         Fetch
+                                        <input *ngIf="webService.state === 'success'" [(ngModel)]="webService.checked" (change)="onSelectFilename(OPTIONS.SERVICE)"
+                                               name="webservicecheck" type="checkbox" style="margin-left: 5px;" >
                                     </button>
                                 </div>
                             </div>

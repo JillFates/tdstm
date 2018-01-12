@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import { FileRestrictions, RemoveEvent, SuccessEvent, UploadComponent } from '@progress/kendo-angular-upload';
 import {DataIngestionService} from '../../service/data-ingestion.service';
@@ -13,22 +13,42 @@ import {ImportAssetsService} from '../../../importAssets/service/import-assets.s
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	private loadSourceOption = 'csv';
+
+	private OPTIONS: any = {
+		CSV: 'csv',
+		FILE: 'file',
+		SERVICE: 'service',
+		selected: undefined,
+		useFileFrom: undefined
+	};
 	private file: any = {
 		uploadRestrictions : { allowedExtensions: ['csv', 'txt', 'xml', 'json', '.xlxs', 'xls'] },
 		uploadSaveUrl : 'saveUrl',
 		uploadDeleteUrl : 'removeUrl',
 		autoUpload: false,
-		uploadedFilename: null
+		uploadedFilename: undefined,
+		checked: false
 	};
 	private csv: any = {
-		options : ['csv', 'txt', 'xml', 'json'],
-		selected : 'csv',
-		fileContent : ''
+		options : [
+			{ text: 'Select a format', value: -1 },
+			{ text: 'csv', value: 0 },
+			{ text: 'txt', value: 1 },
+			{ text: 'xml', value: 2 },
+			{ text: 'json', value: 3 }
+		],
+		selected : undefined,
+		fileContent : '',
+		filename: undefined,
+		state: undefined,
+		checked: false
 	};
 	private webService: any = {
-		options: undefined,
+		options: [],
 		selected: undefined,
+		state: undefined,
+		filename: undefined,
+		checked: false
 	};
 
 	private autoETL = false;
@@ -44,36 +64,68 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		private dataIngestionService: DataIngestionService,
 		private notifierService: NotifierService,
 		private importAssetsService: ImportAssetsService) {
-		super('#loadSampleData');
+			super('#loadSampleData');
+			this.onPageLoad();
+	}
+
+	private onPageLoad(): void {
+		this.csv.selected = this.csv.options[0];
+		this.OPTIONS.selected = this.OPTIONS.CSV;
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
-			this.webService.options = result.actions;
-			this.webService.selected = this.webService.options[0];
+			if (result.actions && result.actions.length > 0) {
+				this.webService.options = result.actions;
+			}
 		});
+	}
+
+	private onSelectFilename(option: string): void {
+		if (this.csv.checked) {
+			this.OPTIONS.useFileFrom = this.OPTIONS.CSV;
+		} else if (this.file.checked) {
+			this.OPTIONS.useFileFrom = this.OPTIONS.FILE;
+		} else if (this.webService.checked) {
+			this.OPTIONS.useFileFrom = this.OPTIONS.SERVICE;
+		}
+		console.log(this.OPTIONS.useFileFrom);
 	}
 
 	private validForm(): boolean {
-		if (this.loadSourceOption === 'service' && this.autoETL && this.assetClassSelected.value === -1) {
-			return false;
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV && this.csv.filename.length > 0) {
+			return true;
 		}
-		return this.file.uploadedFilename && this.file.uploadedFilename.length > 0;
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE && this.webService.filename.length > 0) {
+			return true;
+		}
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE && this.file.uploadedFilename.length > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	private onUploadFileText(): void {
-		this.file.uploadedFilename = null;
-		this.dataIngestionService.uploadText(this.csv.fileContent, this.csv.selected).subscribe( result => {
-			if (result.status && result.data.filename) {
-				this.notifierService.broadcast({
-					name: AlertType.SUCCESS,
-					message: 'File saved successfully.'
-				});
-				this.file.uploadedFilename = result.data.filename;
+		this.dataIngestionService.uploadText(this.csv.fileContent, this.csv.selected.text).subscribe( result => {
+			if (result.status === 'success' && result.data.filename) {
+				this.csv.filename = result.data.filename;
+				this.csv.state = 'success';
+			} else {
+				this.csv.state = 'fail';
+			}
+		});
+	}
+
+	private onFetch(): void {
+		this.importAssetsService.postFetch(this.webService.selected).subscribe( (result) => {
+			if (result.status === 'success' && result.data.filename) {
+				this.webService.state = 'success';
+				this.webService.filename = result.data.filename;
 			} else {
 				this.notifierService.broadcast({
 					name: AlertType.DANGER,
-					message: 'File not saved.'
+					message: result.errors[0]
 				});
+				this.webService.state = 'fail';
 			}
-		});
+		} );
 	}
 
 	private onLoadData(): void {
@@ -83,16 +135,18 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	private completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
 		if (response.operation === 'delete') { // file deleted successfully
-			console.log(response.data);
+			// console.log(response.data);
 			this.clearFilename();
 		} else { // file uploaded successfully
 			let filename = response.filename;
 			this.file.uploadedFilename = filename;
+			this.OPTIONS.useFileFrom = this.OPTIONS.FILE;
 		}
 	}
 
 	private clearFilename(e?: any) {
 		this.file.uploadedFilename = null;
+		this.OPTIONS.useFileFrom = null;
 	}
 
 	private onRemoveFile(e: RemoveEvent) {
