@@ -42,48 +42,90 @@ class TaskFacade {
 		}
 	}
 
+	/**
+	 * Used to determine if the task is done or completed
+	 * @return
+	 */
 	boolean isDone() {
 		return task.isDone()
 	}
 
+	/**
+	 * Used to determine if the task has been started
+	 * @return
+	 */
 	boolean isStarted() {
 		return task.isStarted()
 	}
 
+	/**
+	 * Used to determine if the task is in the HOLD status
+	 * @return
+	 */
 	boolean isOnHold() {
 		return task.isOnHold()
 	}
 
+	/**
+	 * Used to determine if the task is automated
+	 * @return
+	 */
 	boolean isAutomatic() {
 		return task.isAutomatic()
 	}
 
+	/**
+	 * Returns the estimated duration of the task in minutes
+	 * @return
+	 */
 	int durationInMinutes() {
 		return task.durationInMinutes()
 	}
 
+	/**
+	 * Updates a task status to STARTED and records the date/time and description of the activity in the Task comment section
+	 */
 	void start() {
 		updateTaskStatus(AssetCommentStatus.STARTED)
 	}
 
+	/**
+	 * Updates the task status to DONE and records the date/time and description of the activity in the Task comment section
+	 */
 	void done() {
 		updateTaskStatus(AssetCommentStatus.COMPLETED)
 	}
 
+	/**
+	 * Places task on HOLD and records the date/time and description of the reason the task was placed on hold
+	 * @param message
+	 */
 	void error(String message) {
 		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, message)
 	}
 
+	/**
+	 * Places task on HOLD and records the date/time and description indicating that action didn't
+	 * complete in the specified time window. This is applicable for polling tasks used with asynchronous activities.
+	 */
 	void lapsed() {
-		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.getI18NMessage(Message.ApiActionTaskMessageLapsed))
+		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.i18nMessage(Message.ApiActionTaskMessageLapsed))
 	}
 
+	/**
+	 * Places task on HOLD and records the date/time and description indicating that no progress was made with
+	 * the action progress with the stalledAfter period of time.
+	 * This is applicable for polling tasks used with asynchronous activities.
+	 */
 	void stalled() {
-		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.getI18NMessage(Message.ApiActionTaskMessageStalled))
+		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.i18nMessage(Message.ApiActionTaskMessageStalled))
 	}
 
+	/**
+	 * Places task on HOLD and records the date/time and description indicating that API action network call timed-out.
+	 */
 	void timedOut() {
-		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.getI18NMessage(Message.ApiActionTaskMessageTimedout))
+		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.HOLD, messageSourceService.i18nMessage(Message.ApiActionTaskMessageTimedout))
 	}
 
 	private void addTaskCommentNoteAndUpdateStatus(String status, String message) {
@@ -92,6 +134,11 @@ class TaskFacade {
 		updateTaskStatus(status, whom)
 	}
 
+	/**
+	 * Update task with provided status and whom. If whom is null it gets an automatic person from database
+	 * @param status
+	 * @param whom
+	 */
 	private void updateTaskStatus(String status, Person whom = null) {
 		whom = whom ?: getWhom()
 		task = taskService.setTaskStatus(task, status, whom)
