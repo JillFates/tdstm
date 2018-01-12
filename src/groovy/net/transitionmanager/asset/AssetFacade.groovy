@@ -3,7 +3,6 @@ package net.transitionmanager.asset
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
-import org.springframework.util.ClassUtils
 
 /**
  * This class provides the ability to inspect and interact with the Asset that maybe associated with the action.
@@ -33,10 +32,10 @@ class AssetFacade {
     Object getProperty(String name) {
         String propertyName = getAssetPropertyOrCustomFieldName(name)
         Object value = asset.getProperty(propertyName)
-        if (ClassUtils.isPrimitiveOrWrapper(value.class)) {
-            return value
-        } else {
+        if (GormUtil.isReferenceProperty(asset, propertyName)) {
             return value.toString()
+        } else {
+            return value
         }
     }
 
@@ -48,10 +47,10 @@ class AssetFacade {
     void setProperty(String name, Object value) {
         if (name != 'readonly') {
             checkReadonly(name)
-            if (value instanceof String || ClassUtils.isPrimitiveOrWrapper(value.class)) {
-                asset.setProperty(getAssetPropertyOrCustomFieldName(name), value)
-            } else {
+            if (GormUtil.isReferenceProperty(asset, name)) {
                 raiseReadOnlyPropertyException(name)
+            } else {
+                asset.setProperty(getAssetPropertyOrCustomFieldName(name), value)
             }
         }
     }
@@ -62,15 +61,11 @@ class AssetFacade {
      * @return
      */
     private String getAssetPropertyOrCustomFieldName(String name) {
-        Object assetProperty = null
         try {
-            assetProperty = GormUtil.getDomainProperty(asset, name)
-        } catch (InvalidPropertyException e) {
-            // swallow this one
-        }
-        if (Objects.nonNull(assetProperty)) {
+            GormUtil.getDomainProperty(asset, name)
             return name
-        } else {
+        } catch (InvalidPropertyException e) {
+            // if the name is not a AssetEntity property let's try with custom fields
             return getAssetCustomFieldName(name)
         }
     }
