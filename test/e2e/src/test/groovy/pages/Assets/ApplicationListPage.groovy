@@ -57,6 +57,13 @@ class ApplicationListPage extends Page {
         alFirstCreateShowComments   { alFirstAppActions.find("a", href:contains("icon_comment"))}
         alFirstAppClone             { alFirstAppActions.find("a", href:contains("EntityCrud.cloneAssetView"))}
 
+        alLastAppName               { alGridRows.last().find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alLastAppActions            { alGridRows.last().find("td", "aria-describedby":"applicationIdGrid_act")}
+        alLastAppEdit               { alLastAppActions.find("a", href:contains("EntityCrud.showAssetEditView"))}
+        alLastCreateShowTasks       { alLastAppActions.find("a", id:startsWith("icon_task"))}
+        alLastCreateShowComments    { alLastAppActions.find("a", href:contains("icon_comment"))}
+        alLastAppClone              { alLastAppActions.find("a", href:contains("EntityCrud.cloneAssetView"))}
+
         alGridPager                 { $("div#pg_applicationIdGridPager")}
         alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
         alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}

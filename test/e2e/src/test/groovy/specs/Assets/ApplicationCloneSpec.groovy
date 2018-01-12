@@ -195,7 +195,7 @@ class ApplicationCloneSpec extends GebReportingSpec{
         when:
         at ApplicationDetailsPage
         then:
-// TODO some Application Detail items can be reached because cannot be identified by itself. Will chaneg this feature after FE code has reviewed
+// TODO some Application Detail items can't be reached because have duplicated locators. Will change this feature after FE code has reviewed
         waitFor{adModalAppName[1].text().trim() == appName}
         waitFor{adModalCloseBtn.click()}
     }
@@ -213,15 +213,69 @@ class ApplicationCloneSpec extends GebReportingSpec{
         waitFor{alGridRows.size() == appCountBefore + 1}
     }
 
-    def "Open Cloned Application Modal Window By Edit Icon"() {
-        testKey = "TM-XXXX"
+    def "Filter applications again and verify the Clone action icon for the last Application"() {
+        testKey = "TM-8495"
         given:
         at ApplicationListPage
         when:
-        waitFor {alFirstAppEdit.click()}
+        waitFor {alNameFilter.click()}
+        alNameFilter = appName
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
+        waitFor{alLastAppName.text().trim() == appName}
         then:
-        at ApplicationEditionPage
-        aeModalAppName.value() ==  appName
+        at ApplicationListPage
+        when:
+        waitFor {alLastAppClone.click()}
+        then:
+        at AssetClonePage
+        waitFor { asclModalTitle.text().trim() == "Clone " + appName }
+        waitFor { asclModalCancelBtn.click()}
+    }
+
+    def "Open last Application Detail Modal Window and start Clone by button"() {
+        testKey = "TM-8495"
+        given:
+        at ApplicationListPage
+        when:
+        waitFor {alLastAppName.click()}
+        then:
+        at ApplicationDetailsPage
+        waitFor {adModalTitle.text().trim() == "Application Detail"}
+// TODO the Application Detail name can't be reached for duplicated localtor. Will change after FE code has reviewed
+        waitFor{adModalAppName[1].text().trim() == appName}
+        when:
+        waitFor {adModalCloneBtn.click()}
+        then:
+// TODO Application Detail modal window title changes from "Application Detail" to "[Asset name] Detail".
+        waitFor {adModalTitle.text().trim() == appName + " Detail"}
+        at AssetClonePage
+        waitFor { asclModalTitle.text().trim() == "Clone " + appName }
+        waitFor { asclModalAssetCloneName.value() == appName }
+    }
+
+    def "Type the same name and verify the messages"() {
+        testKey = "TM-8495"
+        given:
+        at AssetClonePage
+        when:
+        asclModalAssetCloneName = appName + " "
+        then:
+        waitFor {asclModalErrorMsg.text().trim() == "Name already exists,"}
+        waitFor {asclModalViewAssetMsg.text().trim() == "click here to view"}
+    }
+
+    def "Click on view asset message and verify on details"() {
+        testKey = "TM-8495"
+        given:
+        at AssetClonePage
+        when:
+        asclModalViewAssetMsg.click()
+        then:
+        waitFor {!asclModalWindow.displayed}
+        at ApplicationDetailsPage
+// TODO the Application Detail name can't be reached because the duplicated locator. Will change after FE code has reviewed
+        waitFor{adModalAppName[1].text().trim() == appName}
     }
 
 }
