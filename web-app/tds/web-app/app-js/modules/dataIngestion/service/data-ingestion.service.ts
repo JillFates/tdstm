@@ -104,6 +104,7 @@ export class DataIngestionService {
 							interval: INTERVAL.MINUTES
 						}
 					};
+					APIActionModel.createBasicReactions(r);
 				});
 				return dataScriptModels;
 			})

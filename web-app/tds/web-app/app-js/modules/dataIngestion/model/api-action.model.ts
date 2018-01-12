@@ -152,7 +152,6 @@ export class APIActionModel {
 		this.provider = { id: null, name: '' };
 		this.agentClass = { id: null, name: '' };
 		this.agentMethod = { id: null, name: ''};
-		this.eventReactions = [];
 		this.pollingInterval = false;
 		this.producesData = false;
 		this.polling =  {
@@ -169,17 +168,21 @@ export class APIActionModel {
 					interval: INTERVAL.MINUTES
 				}
 			};
+		APIActionModel.createBasicReactions(this);
+	}
 
-		this.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
-		this.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
-		this.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
-		this.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
-		this.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
+	public static createBasicReactions(apiActionModel: APIActionModel): void {
+		apiActionModel.eventReactions = [];
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
 	}
 }
 
