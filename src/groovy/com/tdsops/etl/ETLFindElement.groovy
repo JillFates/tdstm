@@ -2,61 +2,69 @@ package com.tdsops.etl
 
 class ETLFindElement {
 
-    ETLProcessor processor
-    List<String> fields
+	ETLDomain domain
+	ETLProcessor processor
+	List<String> fields
 
-    ETLFindElement(ETLProcessor processor, List<?> fields) {
-        this.processor = processor
-        this.fields = fields
-    }
-    /**
-     *
-     *
-     *
-     * @param values
-     * @return
-     */
-    ETLFindElement by (Object... dataSourceFieldNames) {
+	ETLFindElement(ETLProcessor processor, ETLDomain domain) {
+		this.processor = processor
+		this.domain = domain
+	}
+	/**
+	 *
+	 *
+	 *
+	 * @param values
+	 * @return
+	 */
 
-        if (!processor.project) {
-            throw ETLProcessorException.nonProjectDefined()
-        }
+	ETLFindElement by(String... fields) {
+		this.fields = fields
+		this
+	}
 
-        Map<String, ?> fieldsMap = [:]
+	ETLFindElement with (Object... dataSourceFieldNames) {
 
-        processor.currentRowResult[processor.selectedDomain].elements.each {
-            fieldsMap[it?.field?.name] = it
-            fieldsMap[it?.field?.label] = it
-        }
+		if (!processor.project) {
+			throw ETLProcessorException.nonProjectDefined()
+		}
 
-        List<Map<String, ?>> dataSourceFields = []
+		Map<String, ?> fieldsMap = [:]
 
-        dataSourceFieldNames.each {
-            if (fieldsMap.containsKey(it)) {
-                dataSourceFields.add(fieldsMap[it])
-            }
-        }
+		processor.currentRowResult[processor.selectedDomain].elements.each {
+			fieldsMap[it?.field?.name] = it
+			fieldsMap[it?.field?.label] = it
+		}
 
-        if (dataSourceFields.size() != fields.size()) {
-            throw ETLProcessorException.incorrectAmountOfParameters(fields, new ArrayList(dataSourceFieldNames))
-        }
+		List<Map<String, ?>> dataSourceFields = []
 
-        Map<String, ?> fieldsSpec = fields.withIndex().collectEntries { def field, int i ->
-            [("$field".toString()): dataSourceFields[i].value]
-        }
+		dataSourceFieldNames.each {
+			if (fieldsMap.containsKey(it)) {
+				dataSourceFields.add(fieldsMap[it])
+			}
+		}
 
-        List assets = AssetClassQueryHelper.where(processor.project, processor.selectedDomain, fieldsSpec)
+		if (dataSourceFields.size() != fields.size()) {
+			throw ETLProcessorException.incorrectAmountOfParameters(fields, new ArrayList(dataSourceFieldNames))
+		}
 
-        if (assets.size()) {
-            //processor.addAssetEntityReferenced(assets.first())
-            for (asset in assets) {
-                processor.addAssetEntityReferenced(asset)
-            }
+		Map<String, ?> fieldsSpec = fields.withIndex().collectEntries { def field, int i ->
+			[("$field".toString()): dataSourceFields[i].value]
+		}
 
-            // TODO - references should list all found assets
-            //} else if (assets.size() > 1) {
-            //    throw ETLProcessorException.nonUniqueResults(fields)
-        }
-        this
-    }
+		List assets = AssetClassQueryHelper.where(processor.project, processor.selectedDomain, fieldsSpec)
+
+		if (assets.size()) {
+			//processor.addAssetEntityReferenced(assets.first())
+			for (asset in assets) {
+				processor.addAssetEntityReferenced(asset)
+			}
+		}
+		this
+	}
+
+	ETLFindElement 'for'(String dependentId){
+
+
+	}
 }
