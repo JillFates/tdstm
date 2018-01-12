@@ -1,3 +1,5 @@
+import { INTERVAL } from '../../../shared/model/constants';
+
 export class APIActionColumnModel {
 	columns: any[];
 
@@ -143,6 +145,42 @@ export class APIActionModel {
 		name?: string
 	};
 	eventReactions?: EventReaction[];
+
+	constructor() {
+		this.name = '';
+		this.description = '';
+		this.provider = { id: null, name: '' };
+		this.agentClass = { id: null, name: '' };
+		this.agentMethod = { id: null, name: ''};
+		this.eventReactions = [];
+		this.pollingInterval = false;
+		this.producesData = false;
+		this.polling =  {
+				frequency: {
+					value: 0,
+					interval: INTERVAL.SECONDS
+				},
+				lapsedAfter: {
+					value: 0,
+					interval: INTERVAL.MINUTES
+				},
+				stalledAfter: {
+					value: 0,
+					interval: INTERVAL.MINUTES
+				}
+			};
+
+		this.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		this.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
+		this.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		this.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
+		this.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
+	}
 }
 
 export class EventReaction {

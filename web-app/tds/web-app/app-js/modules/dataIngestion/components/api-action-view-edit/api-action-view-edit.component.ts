@@ -1,4 +1,4 @@
-import {Component, ViewChild, HostListener} from '@angular/core';
+import {Component, ViewChild, HostListener, OnInit} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -37,7 +37,7 @@ declare var jQuery: any;
 		}
 	`]
 })
-export class APIActionViewEditComponent {
+export class APIActionViewEditComponent implements OnInit {
 
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
@@ -91,6 +91,7 @@ export class APIActionViewEditComponent {
 	];
 	private currentTab = 0;
 	public isEditing = false;
+	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
 			name: 'javascript'
@@ -104,6 +105,7 @@ export class APIActionViewEditComponent {
 			field: 'name'
 		}]
 	};
+	public validInfoForm = false;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -125,6 +127,24 @@ export class APIActionViewEditComponent {
 		this.getParameters();
 		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
+	}
+
+	ngOnInit(): void {
+		this.prepareFormListener();
+	}
+
+	/**
+	 * The NgIf hides elements completely in the UI but makes transition of tabs more smooth
+	 * Some complex component like Grid or Code Source got affected by this
+	 * this method subscribe the listener to have control of each tab validation.
+	 */
+	protected prepareFormListener(): void {
+		setTimeout(() => {
+			this.apiActionForm.valueChanges.subscribe(val => {
+				this.verifyIsValidForm();
+			});
+			this.verifyIsValidForm();
+		}, 100);
 	}
 
 	/**
@@ -303,7 +323,36 @@ export class APIActionViewEditComponent {
 	}
 
 	protected setCurrentTab(num: number): void {
+		if (this.currentTab === 0) {
+			this.verifyIsValidForm();
+		}
+		if (num === 0) {
+			this.prepareFormListener();
+		}
 		this.currentTab = num;
+	}
+
+	/**
+	 *  Verify if the Form is on a Valid state when switching between tabs.
+	 */
+	protected verifyIsValidForm(): void {
+		// Test API Action Form
+		if (this.apiActionForm) {
+			this.validInfoForm = this.apiActionForm.valid &&
+				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
+
+			if (this.apiActionModel.producesData) {
+				this.validInfoForm = this.apiActionModel.defaultDataScript.id !== 0;
+			}
+			if (!this.validInfoForm && !this.initFormLoad) {
+				for (let i in this.apiActionForm.controls) {
+					if (this.apiActionForm.controls[i]) {
+						this.apiActionForm.controls[i].markAsTouched();
+					}
+				}
+			}
+			this.initFormLoad = false;
+		}
 	}
 
 	/**
@@ -315,12 +364,16 @@ export class APIActionViewEditComponent {
 			this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
 				(result: any) => {
 					this.agentMethodList = new Array<AgentMethodModel>();
+					this.agentMethodList.push({id: 0, name: 'Select...'});
+
 					if (this.apiActionModel.agentMethod) {
 						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
-					} else {
-						this.agentMethodList.push({id: 0, name: 'Select...'});
+					}
+
+					if (!this.apiActionModel.agentMethod) {
 						this.apiActionModel.agentMethod = this.agentMethodList[0];
 					}
+
 					this.modifySignatureByProperty('agentMethod');
 					this.agentMethodList = result;
 				},

@@ -10,7 +10,7 @@
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
-                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': !apiActionForm?.form?.valid && !isCurrentTab(0)}">Info</span></a>
+                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': !validInfoForm && !isCurrentTab(0)}">Info</span></a>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(1)}">
 						<a href="#tab_2" (click)="setCurrentTab(1)" data-toggle="tab">Parameters</a>
@@ -246,7 +246,7 @@
 																	[(ngModel)]="apiActionModel.defaultDataScript"
 																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
 																	[required]="apiActionModel.producesData"
-																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.producesData?.id == 0}"></kendo-dropdownlist>
+																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
                                                 <label class="control-label label-detail">{{apiActionModel.defaultDataScript.name}}</label>
@@ -667,7 +667,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!apiActionForm?.form?.valid || (apiActionModel.agentMethod?.id == 0 ||  apiActionModel.agentClass?.id == 0 || apiActionModel.provider?.id == 0) || (apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0)">
+		 class="btn btn-primary pull-left" [disabled]="!validInfoForm">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-code"></span> Check Syntax</button>
