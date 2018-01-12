@@ -31,35 +31,12 @@ class AssetFacade {
      * @return
      */
     Object getProperty(String name) {
-        switch (name) {
-            case 'project':
-            case 'room':
-            case 'model':
-            case 'manufacturer':
-            case 'moveBundle':
-            case 'sourceChassis':
-            case 'targetChassis':
-            case 'owner':
-            case 'rackSource':
-            case 'roomSource':
-            case 'rackTarget':
-            case 'roomTarget':
-            case 'appOwner':
-            case 'modifiedBy':
-                Object assetProperty = GormUtil.getDomainProperty(asset, name)
-                if (Objects.nonNull(assetProperty)) {
-                    Object value = asset.getProperty(name)
-                    if (value instanceof String || ClassUtils.isPrimitiveOrWrapper(value.class)) {
-                        return value
-                    } else {
-                        return value.toString()
-                    }
-                } else {
-                    return null
-                }
-                break;
-            default:
-                return asset.getProperty(getAssetPropertyOrCustomFieldName(name))
+        String propertyName = getAssetPropertyOrCustomFieldName(name)
+        Object value = asset.getProperty(propertyName)
+        if (ClassUtils.isPrimitiveOrWrapper(value.class)) {
+            return value
+        } else {
+            return value.toString()
         }
     }
 

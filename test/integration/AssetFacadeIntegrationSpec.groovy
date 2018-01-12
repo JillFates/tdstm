@@ -73,6 +73,20 @@ class AssetFacadeIntegrationSpec extends Specification {
 			project.toString() == assetFacade.project
 	}
 
+	void "test setting an asset integer property should be able to set new value and read it"() {
+		setup: 'giving an asset with basic properties'
+			Project project = projectTestHelper.createProject(null)
+			MoveBundle moveBundle = moveBundleTestHelper.createBundle(project, null)
+			AssetEntity assetEntity = assetEntityTestHelper.createAssetEntity(AssetClass.DATABASE, project, moveBundle)
+			AssetFacade assetFacade = new AssetFacade(assetEntity, null, false)
+		when: 'setting asset property value'
+			assetFacade.dependencyBundle = Integer.valueOf('1')
+		then: 'the value should be able to be read'
+			1 == assetFacade.dependencyBundle
+		and:
+			project.toString() == assetFacade.project
+	}
+
 	void "test getting an asset non java type property should return the string representation"() {
 		setup: 'giving an asset with basic properties'
 			Project project = projectTestHelper.createProject(null)
