@@ -6,11 +6,21 @@ export const LOADER_IDLE_PERIOD = 150;
 export const MAX_OPTIONS = [25, 50, 100, 250, 500, 1000];
 export const MAX_DEFAULT = 25;
 
-export enum Keystroke {
+// Intervals
+export enum INTERVAL {
+	SECONDS = 'Seconds',
+	MINUTES = 'Minutes',
+	HOURS = 'Hours'
+}
+
+export const INTERVALS = [INTERVAL.SECONDS, INTERVAL.MINUTES, INTERVAL.HOURS];
+
+export enum KEYSTROKE {
 	ENTER = 'Enter',
 	TAB = 'Tab',
 	SHIFT_RIGHT = 'ShiftRight',
-	SHIFT_LEFT = 'ShiftLeft'
+	SHIFT_LEFT = 'ShiftLeft',
+	ESCAPE = 'Escape'
 };
 
 export enum DIALOG_SIZE {
@@ -19,3 +29,5 @@ export enum DIALOG_SIZE {
 	LG = 'lg',
 	XLG = 'xlg'
 };
+
+export const DATA_TYPES = ['String', 'No Idea'];

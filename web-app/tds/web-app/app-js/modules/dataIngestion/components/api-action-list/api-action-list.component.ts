@@ -1,17 +1,23 @@
-import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { process, CompositeFilterDescriptor, SortDescriptor, State } from '@progress/kendo-data-query';
-import { CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult } from '@progress/kendo-angular-grid';
+import {Component, Inject} from '@angular/core';
+import {Observable} from 'rxjs/Observable';
+import {process, CompositeFilterDescriptor, SortDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, RowArgs, DataStateChangeEvent, GridDataResult} from '@progress/kendo-angular-grid';
 
-import { DataIngestionService } from '../../service/data-ingestion.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import { APIActionColumnModel, APIActionModel } from '../../model/api-action.model';
-import { COLUMN_MIN_WIDTH, Flatten, ActionType, BooleanFilterData, DefaultBooleanFilterData } from '../../../../shared/model/data-list-grid.model';
-import { APIActionViewEditComponent } from '../api-action-view-edit/api-action-view-edit.component';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
+import {DataIngestionService} from '../../service/data-ingestion.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
+import {
+	COLUMN_MIN_WIDTH,
+	Flatten,
+	ActionType,
+	BooleanFilterData,
+	DefaultBooleanFilterData
+} from '../../../../shared/model/data-list-grid.model';
+import {APIActionViewEditComponent} from '../api-action-view-edit/api-action-view-edit.component';
+import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'api-action-list',
@@ -43,6 +49,7 @@ export class APIActionListComponent {
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	private interval = INTERVAL;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -141,12 +148,42 @@ export class APIActionListComponent {
 	}
 
 	protected onCreate(): void {
-		let dataScriptModel: APIActionModel = {
+		let apiActionModel: APIActionModel = {
 			name: '',
 			description: '',
-			provider: { id: null, name: '' }
+			provider: { id: null, name: '' },
+			agentClass: { id: null, name: '' },
+			agentMethod: { id: null, name: ''},
+			eventReactions: [],
+			pollingInterval: false,
+			producesData: false,
+			polling: {
+				frequency: {
+					value: 0,
+					interval: this.interval.SECONDS
+				},
+				lapsedAfter: {
+					value: 0,
+					interval: this.interval.MINUTES
+				},
+				stalledAfter: {
+					value: 0,
+					interval: this.interval.MINUTES
+				}
+			}
 		};
-		this.openAPIActionDialogViewEdit(dataScriptModel, ActionType.CREATE);
+
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
+		this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 	}
 
 	/**
@@ -196,20 +233,21 @@ export class APIActionListComponent {
 	}
 
 	/**
-	 * Open The Dialog to Create, View or Edit the DataScript
-	 * @param {DataScriptModel} dataScriptModel
+	 * Open The Dialog to Create, View or Edit the Api Action
+	 * @param {APIActionModel} apiActionModel
 	 * @param {number} actionType
 	 */
 	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number): void {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
-		], DIALOG_SIZE.XLG).then(result => {
+		], DIALOG_SIZE.XLG, false).then(result => {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
 				setTimeout(() => {
-					this.selectRow(result.apiAction.id);
-					this.openAPIActionDialogViewEdit(result.apiAction, ActionType.VIEW);
+					this.selectRow(result.id);
+					let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
+					this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
 				}, 500);
 			}
 		}).catch(result => {

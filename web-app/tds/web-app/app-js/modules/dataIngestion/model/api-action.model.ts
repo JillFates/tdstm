@@ -25,7 +25,7 @@ export class APIActionColumnModel {
 				type: 'text'
 			}, {
 				label: 'Method',
-				property: 'agentMethod',
+				property: 'agentMethod.name',
 				type: 'text',
 				width: 200
 			}, {
@@ -35,7 +35,7 @@ export class APIActionColumnModel {
 				width: 100
 			}, {
 				label: 'Default Data Script',
-				property: 'defaultDataScriptName',
+				property: 'defaultDataScript.name',
 				type: 'text'
 			}, {
 				label: 'Created',
@@ -54,24 +54,140 @@ export class APIActionColumnModel {
 	}
 }
 
+export class APIActionParameterColumnModel {
+	columns: any[];
+
+	constructor() {
+		this.columns = [
+			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 68,
+				locked: true
+			}, {
+				label: 'Name',
+				property: 'name',
+				type: 'text',
+				width: 180
+			}, {
+				label: 'Data Type',
+				property: 'dataType',
+				type: 'text',
+				width: 110
+			}, {
+				label: 'Context',
+				property: 'context.value',
+				type: 'text',
+				width: 140
+			}, {
+				label: 'value',
+				property: 'value',
+				type: 'text',
+				width: 240
+			}, {
+				label: 'Description',
+				property: 'description',
+				type: 'text',
+				width: 277
+			}
+		];
+	}
+}
+
 export class APIActionModel {
 	id?: number;
 	name: string;
 	description: string;
-	agentMethod?: string;
-	agentClass?: string;
+	agentMethod?: {
+		id?: number,
+		name?: string
+	};
+	agentClass?: {
+		id?: number,
+		name?: string
+	};
 	asyncQueue?: string;
 	callbackMethod?: string;
 	callbackMode?: string;
 	methodParams?: string;
-	pollingInterval?: number;
+	pollingInterval?: boolean;
+	polling?: {
+		frequency?: {
+			value?: number;
+			interval?: string;
+		};
+		lapsedAfter?: {
+			value?: number;
+			interval?: string;
+		};
+		stalledAfter?: {
+			value?: number;
+			interval?: string;
+		}
+	};
 	timeout?: number;
 	provider?: {
 		id?: number,
 		name: string
 	};
-	defaultDataScriptName?: string;
-	producesData?: number;
+	defaultDataScript?: {
+		id?: number,
+		name?: string
+	};
+	producesData?: boolean;
 	dateCreated?: Date;
 	lastModified?: Date;
+	credential?: {
+		id?: number,
+		name?: string
+	};
+	eventReactions?: EventReaction[];
 }
+
+export class EventReaction {
+	type: EventReactionType;
+	selected?: boolean;
+	value?: string;
+	open?: boolean;
+	valid?: boolean;
+	error?: string;
+
+	constructor(type: EventReactionType, selected: boolean, value: string) {
+		this.type = type;
+		this.selected = selected;
+		this.value = value;
+		this.open = true;
+		this.valid = true;
+		this.error = '';
+	}
+}
+
+export class APIActionParameterModel {
+	id?: number;
+	name?: string;
+	description?: string;
+	dataType?: string;
+	context?: ParameterContextModel;
+	value?: string;
+	field?: string;
+	currentFieldList?: Array<any>;
+}
+
+export class ParameterContextModel {
+	assetClass?: string;
+	value?: string;
+}
+
+export enum EventReactionType {
+	STATUS = 'status',
+	SUCCESS = 'success',
+	DEFAULT = 'default',
+	ERROR = 'error',
+	FAILED = 'failed',
+	TIMEDOUT = 'timedout',
+	LAPSED = 'lapsed',
+	STALLED = 'stalled',
+	PRE_API_CALL = 'preApiCall',
+	FINALIZED_API_CALL = 'finalizedApiCall'
+};

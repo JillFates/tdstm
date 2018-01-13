@@ -49,9 +49,9 @@ export class DataScriptColumnModel {
 
 export class DataScriptModel {
 	id?: number;
-	name: string;
-	description: string;
-	mode: DataScriptMode;
+	name?: string;
+	description?: string;
+	mode?: DataScriptMode;
 	etlSourceCode?: string;
 	provider?: {
 		id?: number,
