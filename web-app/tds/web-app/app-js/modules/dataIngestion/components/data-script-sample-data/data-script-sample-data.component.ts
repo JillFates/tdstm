@@ -129,7 +129,17 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	}
 
 	private onLoadData(): void {
-		this.close();
+		let filename = null;
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
+			filename = this.csv.filename;
+		}
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE) {
+			filename = this.webService.filename;
+		}
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE) {
+			filename = this.file.uploadedFilename;
+		}
+		this.close(filename);
 	}
 
 	private completeEventHandler(e: SuccessEvent) {

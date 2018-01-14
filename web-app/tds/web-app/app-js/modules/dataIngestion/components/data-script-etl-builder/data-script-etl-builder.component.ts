@@ -21,9 +21,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private script: string;
 	private filename: string;
-	// private checking = false;
-	// private saving = false;
-	// private testing = false;
 	private operationStatus = {
 		save: undefined,
 		test: undefined,
@@ -47,7 +44,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private promptService: UIPromptService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
-		this.filename = 'service_now_applications.csv';
 	}
 
 	/**
@@ -183,7 +179,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 
 	private clearLogVariables(operation?: string): void {
-		// this.scriptChanged = false;
 		this.closeErrorsSection = false;
 		if (operation === 'save') {
 			this.scriptTestResult = new ScriptTestResultModel();

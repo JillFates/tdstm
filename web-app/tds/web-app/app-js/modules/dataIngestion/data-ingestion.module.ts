@@ -25,6 +25,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { InputsModule } from '@progress/kendo-angular-inputs';
+import { LayoutModule } from '@progress/kendo-angular-layout';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
@@ -45,6 +46,7 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		HttpClientModule,
 		UploadModule,
 		InputsModule,
+		LayoutModule,
 		AssetExplorerModule, // So we can use Shared components that belongs to this module
 		UIRouterModule.forChild({ states: DATA_INGESTION_STATES })
 	],
