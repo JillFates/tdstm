@@ -4,6 +4,7 @@ import geb.Page
 class ApplicationEditionPage extends Page{
 
     static at = {
+        waitFor {aeModalWindow.displayed}
         aeModalTitle.text()             == "Application Edit"
         aeModalUpdateBtn.value()        == "Update"
         aeModalDeleteBtn.value()        == "Delete"
@@ -54,7 +55,7 @@ class ApplicationEditionPage extends Page{
         aeModalIsDepStatusSelector      (required:false){ aeModalIsDepFirstDDs.find("select", id:startsWith("status_dependent"))}
 
 
-        aeModalUpdateBtn                { aeModalWindow.find("input#assetUpdateButton")}
+        aeModalUpdateBtn                (wait:true, required:false) { aeModalWindow.find("input#assetUpdateButton")}
         aeModalDeleteBtn                { aeModalWindow.find("input", type:"submit", name:"_action_Delete")}
         aeModalCancelBtn                { aeModalWindow.find("input", type:"button", onclick:"\$('#editEntityView').dialog('close');")}
         aeModalCloseBtn                 { aeModalWindow.find("button", class:"ui-dialog-titlebar-close")}

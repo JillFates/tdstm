@@ -4,25 +4,15 @@ import geb.Page
 class ApplicationDetailsPage extends Page{
 
     static at = {
-        adModalTitle.text() == "Application Detail"
+        waitFor {adModalWindow.displayed}
         adModalEditBtn.text().trim() == "Edit"
         adModalDeleteBtn.text().trim() == "Delete"
         adModalCloseBtn
-        adModalSuppColTitles[0].text().trim() == "Class"
-		adModalSuppColTitles[1].text().trim() == "Name"
-        adModalSuppColTitles[2].text().trim() == "Bundle"
-		adModalSuppColTitles[3].text().trim() == "Type"
-        adModalSuppColTitles[4].text().trim() == "Status"
-        adModalIsDepColTitles[0].text().trim() == "Class"
-        adModalIsDepColTitles[1].text().trim() == "Name"
-        adModalIsDepColTitles[2].text().trim() == "Bundle"
-        adModalIsDepColTitles[3].text().trim() == "Type"
-        adModalIsDepColTitles[4].text().trim() == "Status"
     }
 
     static content = {
 
-        adModalWindow(wait:true)        { $("div","aria-describedby":"showEntityView")}
+        adModalWindow                   (wait:true) { $("div","aria-describedby":"showEntityView","aria-labelledby":"ui-id-7")}
         adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title") }
 // TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
         adModalAppName                  { adModalWindow.find("span","data-content":"Asset Name *")}
@@ -33,10 +23,10 @@ class ApplicationDetailsPage extends Page{
         adModalBundle                   { adModalWindow.find("span","data-content":"Bundle")}
         adModalPlanStatus               { adModalWindow.find("span","data-content":"Plan Status")}
 
-        adModalSuppColTitles            { adModalWindow.find("tr#deps td div",0).find("table thead tr th")}
-        adModalSuppList                 { adModalWindow.find("tr#deps td div",0).find("table tbody tr")}
-        adModalIsDepColTitles           { adModalWindow.find("tr#deps td div",1).find("table thead tr th")}
-        adModalIsDepList                { adModalWindow.find("tr#deps td div",1).find("table tbody tr")}
+        adModalSuppColTitles            (required:false) { adModalWindow.find("tr#deps td div",0).find("table thead tr th")}
+        adModalSuppList                 (required:false) { adModalWindow.find("tr#deps td div",0).find("table tbody tr")}
+        adModalIsDepColTitles           (required:false) { adModalWindow.find("tr#deps td div",1).find("table thead tr th")}
+        adModalIsDepList                (required:false) { adModalWindow.find("tr#deps td div",1).find("table tbody tr")}
 
 //TODO following butttons have no ID to reference them
         adModalEditBtn                  { adModalWindow.find("button", "onclick":contains("EntityCrud.showAssetEditView"))}
