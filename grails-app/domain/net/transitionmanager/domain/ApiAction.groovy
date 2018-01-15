@@ -88,19 +88,19 @@ class ApiAction {
 	String reactionJson
 
 	// Flag indicating that the action interacts with a Task.
-	Integer useWithAsset
+	Integer useWithAsset = 0
 
 	// Flag indicating that the action interacts with an Asset.
-	Integer useWithTask
+	Integer useWithTask = 0
 
 	// The frequency that a polling action is called (seconds)
-	Integer pollingFrequency
+	Integer pollingFrequency = 0
 
 	// The time period after after which a polling action is determined to have lapsed (seconds)
-	Integer pollingLapsedAfter
+	Integer pollingLapsedAfter = 0
 
 	// The time period after no increment in status of a polling action results in the LAPSED event get invoked (seconds)
-	Integer pollingStalledAfter
+	Integer pollingStalledAfter = 0
 
 	static belongsTo = [
 		project: Project,
