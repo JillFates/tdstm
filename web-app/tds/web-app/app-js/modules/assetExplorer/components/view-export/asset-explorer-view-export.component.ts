@@ -18,7 +18,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
-	protected exportFileName = this.fileName;
 	protected dataToExport: any[] = [];
 	private defaultLimitRows = 0;
 	private defaultOffset = 0;
@@ -43,6 +42,8 @@ export class AssetExplorerViewExportComponent {
 
 			return definition;
 		});
+
+		this.getFileName();
 	}
 
 	/**
@@ -67,23 +68,24 @@ export class AssetExplorerViewExportComponent {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
-					this.prepareExportData(result);
+					this.onExportDataResponse(result['assets']);
 				}, err => console.log(err));
 		} else {
 			this.assetExpService.query(this.assetExportModel.queryId, this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
-					this.prepareExportData(result);
+					this.onExportDataResponse(result['assets']);
 				}, err => console.log(err));
 		}
 	}
 
-	private prepareExportData(resultAssets: any): void {
-		this.assetExpService.getFileName(this.fileName)
+	/**
+	 * Get the file Name to export the file
+	 */
+	private getFileName(): void {
+		this.assetExpService.getFileName(this.assetExportModel.viewName)
 			.subscribe(result => {
-				this.exportFileName = result;
-				this.onExportDataResponse(resultAssets['assets']);
+				this.fileName = result;
 			}, err => console.log(err));
-
 	}
 
 	private getPropertyColumnField(domain: string, separator: string, property: string): string {
