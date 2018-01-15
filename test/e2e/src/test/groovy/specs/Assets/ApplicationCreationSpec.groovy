@@ -103,19 +103,16 @@ class ApplicationCreationSpec extends GebReportingSpec{
         at ApplicationDetailsPage
     }
 
-    def "Validate Task Details"() {
+    def "Validate Application Details"() {
         testKey = "TM-XXXX"
         when:
         at ApplicationDetailsPage
         then:
-// TODO following items are located by array intead of itself because cannot be identified
+// TODO some items cannot located due to missing ID's
         waitFor{adModalAppName[1].text().trim() == appName}
-        adModalDescription[1].text().trim() == appDesc
-        adModalSME1[1].text().trim() == appSME1
-        adModalSME2[1].text().trim() == appSME2
-        adModalAppOwner[1].text().trim() == appOwner
-        adModalBundle[1].text().trim().startsWith(appBundle)
-        adModalPlanStatus[1].text().trim() == appStatus
+        adModalSME1.text().trim() == appSME1
+        adModalSME2.text().trim() == appSME2
+        adModalAppOwner.text().trim() == appOwner
 
     }
 
