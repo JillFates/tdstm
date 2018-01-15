@@ -289,12 +289,12 @@ class ApplicationEditionSpec extends GebReportingSpec{
         when:
         at ApplicationDetailsPage
         then:
-// TODO following items are located by array intead of itself because cannot be identified
+// TODO following items are located by array instead of itself because cannot be identified
         waitFor{adModalAppName[1].text().trim() == appName}
 // TODO some items cannot be located due to missing ID's
-        adModalSME1.text().trim() == appSME1
-        adModalSME2.text().trim() == appSME2
-        adModalAppOwner.text().trim() == appOwner
+        adModalSME1.text().trim().contains(appSME1)
+        adModalSME2.text().trim().contains(appSME2)
+        adModalAppOwner.text().trim().contains(appOwner)
 // TODO Dependency elements are unreachable due to missing ID's
 
     }
