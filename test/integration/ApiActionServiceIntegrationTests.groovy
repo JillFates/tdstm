@@ -347,7 +347,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 				pollingStalledAfter = 0
 				useWithTask = 0
 				useWithAsset = 0
-				pollingFrequency = 0
 			}
 		when: "Creating an API Action"
 			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
@@ -410,7 +409,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 			pollingStalledAfter = 0
 			useWithTask = 0
 			useWithAsset = 0
-			pollingFrequency = 0
 		}
 		when: "Creating an API Action"
 			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
@@ -492,7 +490,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 				pollingStalledAfter = 0
 				useWithTask = 0
 				useWithAsset = 0
-				pollingFrequency = 0
 			}
 		when: "Validating the command object"
 			cmd.validate()

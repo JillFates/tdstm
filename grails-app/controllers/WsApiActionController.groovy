@@ -75,13 +75,8 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionCreate)
     def create(ApiActionCommand apiActionCommand) {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionCommand)
-        if (apiActionCommand.hasErrors()) {
-           render (errorsInValidation(apiActionCommand.errors) as JSON)
-        } else {
-            renderSuccessJson(ApiActionCommand.toMap(apiAction))
-        }
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand)
+        renderSuccessJson(ApiActionCommand.toMap(apiAction))
     }
 
 
@@ -90,12 +85,7 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionEdit)
     def update(Long id, ApiActionCommand apiActionCommand) {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionCommand, id)
-        if (apiActionCommand.hasErrors()) {
-            render (errorsInValidation(apiActionCommand.errors) as JSON)
-        } else {
-            renderSuccessJson(apiActionCommand.toMap(apiAction))
-        }
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
+        renderSuccessJson(apiActionCommand.toMap(apiAction))
     }
 }

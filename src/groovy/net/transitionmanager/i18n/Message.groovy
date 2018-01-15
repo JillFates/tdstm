@@ -18,17 +18,12 @@ interface Message {
 	/*
 		i18N messages for working with API Action endpoints.
 	 */
-	String ApiActionInvalidId = "apiActionCommand.id.invalid"
-	String ApiActionInvalidAgentClass = "apiActionCommand.agentClass.invalid"
-	String ApiActionInvalidCallbackMode = "apiActionCommand.callbackMode.invalid"
-	String ApiActionInvalidCredential = "apiActionCommand.credentialId.invalid"
-	String ApiActionInvalidDefaultDataScript = "apiActionCommand.defaultDataScriptId.invalid"
-	String ApiActionInvalidName = "apiActionCommand.name.invalid"
-	String ApiActionInvalidProvider = "apiActionCommand.providerId.invalid"
+	String InvalidFieldForDomain = "domain.invalid.field"
+
+
 	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
 	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
 	// Messages for the different errors in the ApiAction reactionJson
-	String ApiActionInvalidReactionJson = "apiAction.reactionJson.invalid"
 	String ApiActionMissingEvaluateOrSuccessInReactionJson = "apiAction.reactionJson.emptyEvaluateOrSuccess"
 	String ApiActionMissingDefaultAndErrorInReactionJson = "apiAction.reactionJson.emptyDefaultAndError"
 

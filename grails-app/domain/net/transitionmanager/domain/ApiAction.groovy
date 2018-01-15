@@ -93,8 +93,6 @@ class ApiAction {
 	// Flag indicating that the action interacts with an Asset.
 	Integer useWithTask = 0
 
-	// The frequency that a polling action is called (seconds)
-	Integer pollingFrequency = 0
 
 	// The time period after after which a polling action is determined to have lapsed (seconds)
 	Integer pollingLapsedAfter = 0
@@ -113,17 +111,17 @@ class ApiAction {
 		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
-		credential nullable: true
-		defaultDataScript nullable: true
+		credential nullable: true, validator: crossProviderValidator
+		defaultDataScript nullable: true, validator: crossProviderValidator
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
-		name nullable: false, size: 1..64
+		name nullable: false, size: 1..64, unique: 'project'
 		methodParams nullable: true
 		lastModified nullable: true
-		pollingFrequency nullable: false, range: 0..1
 		pollingLapsedAfter nullable: false, range: 0..1
 		pollingStalledAfter nullable: false, range: 0..1
 		producesData nullable: false, range:0..1
+		provider nullable: false
 		reactionJson size: 1..65535, blank: false, validator: reactionJsonValidator
 		timeout nullable: true
 		useWithAsset nullable: false, range: 0..1
@@ -206,4 +204,17 @@ class ApiAction {
 			return Message.ApiActionInvalidReactionJson
 		}
 	}
+
+	/**
+	 * Validator that accepts a field of an ApiAction and the corresponding
+	 * ApiAction and checks that the providers are the same.
+	 */
+	static crossProviderValidator = { aDomain, apiAction ->
+		if (aDomain) {
+			if (aDomain.provider.id != apiAction.provider.id) {
+				return Message.InvalidFieldForDomain
+			}
+		}
+	}
+
 }

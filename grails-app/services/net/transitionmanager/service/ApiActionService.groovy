@@ -341,28 +341,27 @@ class ApiActionService implements ServiceMethods {
 
 	/**
 	 * Create or Update an API Action based on a JSON Object.
-	 * @param project
 	 * @param apiActionJson
 	 * @param apiActionId
+	 * @param project
 	 * @return
 	 */
-	ApiAction saveOrUpdateApiAction (Project project, ApiActionCommand apiActionCommand, Long apiActionId = null) {
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
 		ApiAction apiAction = null
-		// Set the project and the id so they're available when validating the Command Object.
-		apiActionCommand.project = project
-		apiActionCommand.id = apiActionId
 
-		if (apiActionCommand.validate()) {
-			// If there's an apiActionId then it's an update operation.
-			if (apiActionId) {
-				// Retrieve the corresponding API Action instance
-				apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
-			} else {
-				apiAction = new ApiAction(project: project)
-			}
-			apiActionCommand.populateDomain(apiAction)
-			apiAction.save(failOnError: true)
+		if (!project) {
+			project = securityService.userCurrentProject
 		}
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+		apiActionCommand.populateDomain(apiAction)
+		apiAction.save(failOnError: true)
 		return apiAction
 
 	}
