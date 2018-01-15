@@ -14,6 +14,7 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     def testKey
     static testCount
     static filterPattern = "App For E2E"
+    static appCountBefore
     static appName
 
     def setupSpec() {
@@ -35,7 +36,7 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     }
 
     def "Go To Asset Applications"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at MenuPage
         when:
@@ -45,13 +46,17 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     }
 
     def "Filter Applications on List and get first occurrence"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at ApplicationListPage
         when:
         waitFor {alNameFilter.click()}
         alNameFilter = filterPattern
+        then:
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
         waitFor{alFirstAppName.text().trim().contains(filterPattern)}
+        when:
         appName = alFirstAppName.text().trim()
         waitFor{alFirstAppName.click()}
         then:
@@ -60,8 +65,8 @@ class ApplicationDeletionSpec extends GebReportingSpec{
         adModalAppName[1].text().trim() == appName
     }
 
-    def "Open Edit Application Modal Window by Edit Button"() {
-        testKey = "TM-XXXX"
+    def "Open Edit Application Modal Window by Edit Button and cacncel"() {
+        testKey = "TM-8493"
         given:
         at ApplicationDetailsPage
         when:
@@ -76,22 +81,24 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     }
 
     def "Filter Applications on List again using the app name"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at ApplicationListPage
         when:
         waitFor {alNameFilter.click()}
         alNameFilter = appName
-        waitFor{alFirstAppName.text().trim() == appName}
         then:
-        at ApplicationListPage
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
+        waitFor{alFirstAppName.text().trim() == appName}
     }
 
     def "Open Edit Application Modal Window By Edit Icon"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at ApplicationListPage
         when:
+        appCountBefore = alGridRows.size()
         waitFor {alFirstAppEdit.click()}
         then:
         at ApplicationEditionPage
@@ -99,7 +106,7 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     }
 
     def "Delete Application"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at ApplicationEditionPage
         when:
@@ -109,15 +116,16 @@ class ApplicationDeletionSpec extends GebReportingSpec{
     }
 
     def "Validate Application is not on List"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8493"
         given:
         at ApplicationListPage
         when:
         waitFor {alNameFilter.click()}
         alNameFilter = appName
         then:
-        at ApplicationListPage
-        waitFor{alGridRows.size() == 0}
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
+        waitFor{alGridRows.size() == appCountBefore - 1}
     }
 
 
