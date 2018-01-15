@@ -18,6 +18,7 @@ class WsFilenameController implements ControllerMethods {
     */
     def viewExportFilename(String viewName) {
        def params = [viewName:viewName]
-       return renderAsJson('suggested-filename' + viewName + 'endofFilename')
+       // TODO IF viewName is null
+       return renderAsJson(filename:'mock-filename'+viewName+'end')
     }
 }
