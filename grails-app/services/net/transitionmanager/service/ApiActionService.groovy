@@ -348,8 +348,10 @@ class ApiActionService implements ServiceMethods {
 	 */
 	ApiAction saveOrUpdateApiAction (Project project, ApiActionCommand apiActionCommand, Long apiActionId = null) {
 		ApiAction apiAction = null
-		// Set the project so it's available when validating the Command Object.
+		// Set the project and the id so they're available when validating the Command Object.
 		apiActionCommand.project = project
+		apiActionCommand.id = apiActionId
+
 		if (apiActionCommand.validate()) {
 			// If there's an apiActionId then it's an update operation.
 			if (apiActionId) {

@@ -91,7 +91,6 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def update(Long id, ApiActionCommand apiActionCommand) {
         Project project = securityService.userCurrentProject
-        apiActionCommand.id = id
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionCommand, id)
         if (apiActionCommand.hasErrors()) {
             render (errorsInValidation(apiActionCommand.errors) as JSON)
