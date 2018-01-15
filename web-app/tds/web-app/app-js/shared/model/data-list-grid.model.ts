@@ -16,3 +16,18 @@ export enum ActionType {
 	CREATE,
 	EDIT
 };
+
+export class GridColumnModel {
+	label: string;
+	property: string;
+	type: string;
+	format?: string;
+	width: number;
+	locked: boolean;
+
+	constructor() {
+		this.type = 'text';
+		this.width = COLUMN_MIN_WIDTH;
+		this.locked = true;
+	}
+}

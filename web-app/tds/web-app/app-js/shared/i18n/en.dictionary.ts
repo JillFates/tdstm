@@ -69,8 +69,9 @@ export const en_DICTIONARY: Object = {
 			'VIEW_DATA': 'View Data'
 		}
 	},
-	'DEPENDENCY_INJECTION': {
-		'MANUAL_ASSET_IMPORT': 'Manual Asset Import'
+	'DEPENDENCY_BATCH': {
+		'MANAGE_LIST': 'Manage Dependency Batches',
+		'DEPENDENCY_BATCH': 'Dependency Batch'
 	},
 	'GLOBAL': {
 		'OK': 'Ok',
