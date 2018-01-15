@@ -58,19 +58,19 @@ class ApplicationEditionSpec extends GebReportingSpec{
         acModalSME1Selector.click()
         waitFor { acModalSelectorValues.size() > 2 }
         appSME1 = acModalSelectorValues[2].text()
-        acModalSelectorValues.find("div", role:"option", text: appSME1).click()
+        acModalSelectorValues.find("div", role:"option", text: appSME1).first().click()
         acModalSME2Selector.click()
         waitFor { acModalSelectorValues.size() > 2 }
         appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-2,2)].text()
-        acModalSelectorValues.find("div", role:"option", text: appSME2).click()
+        acModalSelectorValues.find("div", role:"option", text: appSME2).first().click()
         acModalAppOwnerSelector.click()
         waitFor { acModalSelectorValues.size() > 2 }
         appOwner = acModalSelectorValues.last().text()
-        acModalSelectorValues.find("div", role:"option", text: appOwner).click()
+        acModalSelectorValues.find("div", role:"option", text: appOwner).first().click()
         acModalBundleSelector.click()
-        acModalBundleSelector.find("option", text: appBundleOld).click()
+        acModalBundleSelector.find("option", text: appBundleOld).first().click()
         acModalPlanStatusSelector.click()
-        acModalPlanStatusSelector.find("option", text: appStatusOld).click()
+        acModalPlanStatusSelector.find("option", text: appStatusOld).first().click()
         acModalSaveBtn.click()
         at ApplicationDetailsPage
         waitFor { adModalCloseBtn.click() }
@@ -86,50 +86,69 @@ class ApplicationEditionSpec extends GebReportingSpec{
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Asset Applications"() {
-        testKey = "TM-XXXX"
+    def "Go To Asset Applications and filter created Application on List"() {
+        testKey = "TM-8492"
         given:
         at MenuPage
         when:
         menuModule.goToApplications()
         then:
         at ApplicationListPage
-    }
-
-    def "Filter created Application on List"() {
-        testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
         when:
         waitFor {alNameFilter.click()}
         alNameFilter = appNameOld
+        then:
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
         waitFor{alFirstAppName.text().trim() == appNameOld}
+        when:
         waitFor{alFirstAppName.click()}
         then:
         at ApplicationDetailsPage
     }
 
-    def "Open Edit Application Modal Window"() {
-        testKey = "TM-XXXX"
+    def "Open Edit Application Modal Window by Edit Button and Cancel"() {
+        testKey = "TM-8492"
         given:
         at ApplicationDetailsPage
         when:
         waitFor {adModalEditBtn.click()}
         then:
         at ApplicationEditionPage
+        when:
+        aeModalCancelBtn.click()
+        then:
+        at ApplicationListPage
+    }
+
+    def "filter created Application on List and open de Application edit modal window by icon en left"() {
+        testKey = "TM-8492"
+        given:
+        at ApplicationListPage
+        when:
+        waitFor {alNameFilter.click()}
+        alNameFilter = appNameOld
+        then:
+        waitFor {alLoadingGrid.displayed}
+        waitFor {!alLoadingGrid.displayed}
+        waitFor{alFirstAppName.text().trim() == appNameOld}
+        when:
+        waitFor{alFirstAppEdit.click()}
+        then:
+        at ApplicationEditionPage
     }
 
     def "Edit Application - Change Names and Static dropdowns"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationEditionPage
         when:
         aeModalAppName = appName
         aeModalDescription = appDesc
         aeModalBundleSelector.click()
-        waitFor { aeModalBundleSelector.find("option", text: appBundle).click() }
+        waitFor { aeModalBundleSelector.find("option", text: appBundle).first().click() }
         aeModalPlanStatusSelector.click()
-        waitFor { aeModalPlanStatusSelector.find("option", text: appStatus).click() }
+        waitFor { aeModalPlanStatusSelector.find("option", text: appStatus).first().click() }
         then:
         aeModalAppName.value() == appName
         aeModalDescription.value() == appDesc
@@ -138,22 +157,22 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Edit Application - Change dynamic Dropdowns"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationEditionPage
         when:
         aeModalSME1Selector.click()
         waitFor { aeModalSelectorValues.size() > 2 }
         appSME1 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appSME1).click()
+        aeModalSelectorValues.find("div", role: "option", text: appSME1).first().click()
         aeModalSME2Selector.click()
         waitFor { aeModalSelectorValues.size() > 2 }
         appSME2 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appSME2).click()
+        aeModalSelectorValues.find("div", role: "option", text: appSME2).first().click()
         aeModalAppOwnerSelector.click()
         waitFor { aeModalSelectorValues.size() > 2 }
         appOwner = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appOwner).click()
+        aeModalSelectorValues.find("div", role: "option", text: appOwner).first().click()
         then:
         at ApplicationEditionPage
         aeModalSME1Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME1
@@ -163,7 +182,7 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Edit Application - add Support"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationEditionPage
         when:
@@ -178,19 +197,19 @@ class ApplicationEditionSpec extends GebReportingSpec{
         aeModalSuppList.size() > 0
         when:
         aeModalSuppFreqSelector.click()
-        waitFor { aeModalSuppFreqSelector.find("option", text: suppFreq).click() }
+        waitFor { aeModalSuppFreqSelector.find("option", text: suppFreq).first().click() }
         aeModalSuppClassSelector.click()
-        waitFor { aeModalSuppClassSelector.find("option", text: suppClass).click() }
+        waitFor { aeModalSuppClassSelector.find("option", text: suppClass).first().click() }
         aeModalSuppNameSelector.click()
         waitFor { aeModalSelectorValues.size() > 2 }
         suppName = aeModalSelectorValues[Math.abs(new Random().nextInt() % (aeModalSelectorValues.size()))].text()
-        waitFor { aeModalSelectorValues.find("div", role: "option", text: suppName).click() }
+        waitFor { aeModalSelectorValues.find("div", role: "option", text: suppName).first().click() }
         aeModalSuppBundleSelector.click()
-        waitFor { aeModalSuppBundleSelector.find("option", text: suppBundle).click() }
+        waitFor { aeModalSuppBundleSelector.find("option", text: suppBundle).first().click() }
         aeModalSuppTypeSelector.click()
-        waitFor { aeModalSuppTypeSelector.find("option", text: suppType).click() }
+        waitFor { aeModalSuppTypeSelector.find("option", text: suppType).first().click() }
         aeModalSuppStatusSelector.click()
-        waitFor { aeModalSuppStatusSelector.find("option", text: suppStatus).click() }
+        waitFor { aeModalSuppStatusSelector.find("option", text: suppStatus).first().click() }
         then:
         aeModalSuppFreqSelector.find("option", value: aeModalSuppFreqSelector.value()).text().trim() == suppFreq
         aeModalSuppClassSelector.find("option", value: aeModalSuppClassSelector.value()).text().trim() == suppClass
@@ -201,7 +220,7 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Edit Application - add Is Dependent on"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationEditionPage
         when:
@@ -216,19 +235,19 @@ class ApplicationEditionSpec extends GebReportingSpec{
         aeModalIsDepList.size() > 0
         when:
         aeModalIsDepFreqSelector.click()
-        waitFor { aeModalIsDepFreqSelector.find("option", text: isDepFreq).click() }
+        waitFor { aeModalIsDepFreqSelector.find("option", text: isDepFreq).first().click() }
         aeModalIsDepClassSelector.click()
-        waitFor { aeModalIsDepClassSelector.find("option", text: isDepClass).click() }
+        waitFor { aeModalIsDepClassSelector.find("option", text: isDepClass).first().click() }
         aeModalIsDepNameSelector.click()
         waitFor { aeModalSelectorValues.size() > 2 }
         isDepName = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()))].text()
-        waitFor { aeModalSelectorValues.find("div", role: "option", text: isDepName).click() }
+        waitFor { aeModalSelectorValues.find("div", role: "option", text: isDepName).first().click() }
         aeModalIsDepBundleSelector.click()
-        waitFor { aeModalIsDepBundleSelector.find("option", text: isDepBundle).click() }
+        waitFor { aeModalIsDepBundleSelector.find("option", text: isDepBundle).first().click() }
         aeModalIsDepTypeSelector.click()
-        waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).click() }
+        waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
         aeModalIsDepStatusSelector.click()
-        waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).click() }
+        waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).first().click() }
         then:
         aeModalIsDepFreqSelector.find("option", value:aeModalIsDepFreqSelector.value()).text().trim() == isDepFreq
         aeModalIsDepClassSelector.find("option", value:aeModalIsDepClassSelector.value()).text().trim() == isDepClass
@@ -239,7 +258,7 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Edit Application - Save Changes and close modal"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationEditionPage
         when:
@@ -253,7 +272,7 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Filter edited Application on List"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         given:
         at ApplicationListPage
         when:
@@ -266,7 +285,7 @@ class ApplicationEditionSpec extends GebReportingSpec{
     }
 
     def "Validate Application Details"() {
-        testKey = "TM-XXXX"
+        testKey = "TM-8492"
         when:
         at ApplicationDetailsPage
         then:
