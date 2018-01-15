@@ -182,7 +182,7 @@ trait ControllerMethods {
 
 			default:
 				if (log) {
-					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e, 20)
+					log.warn ExceptionUtil.stackTraceToString('Unexpected Exception', e)
 				}
 
 				renderErrorJson('An unresolved error has occurred')
