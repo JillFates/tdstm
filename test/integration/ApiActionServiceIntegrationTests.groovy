@@ -1,5 +1,6 @@
 import com.tdssrc.grails.JsonUtil
 import grails.validation.ValidationException
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -9,7 +10,9 @@ import com.tdssrc.grails.GormUtil
 
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.ApiActionService
@@ -17,7 +20,7 @@ import net.transitionmanager.service.AwsService
 
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-
+import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.codehaus.groovy.grails.web.json.JSONObject
 //import spock.lang.Specification
@@ -29,6 +32,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	ApiActionService apiActionService
 	ApiActionTestHelper apiActionHelper = new ApiActionTestHelper()
+	ProviderService providerService
 	ProviderTestHelper providerHelper = new ProviderTestHelper()
 
 	private ApiAction action
@@ -56,7 +60,8 @@ class ApiActionServiceIntegrationTests extends Specification {
 	'''
 
 	void setup() {
-
+		ApiActionCommand.apiActionService = apiActionService
+		ApiActionCommand.providerService = providerService
 		project = projectHelper.createProject()
 		project.save(flush:true)
 		// println "projct ${project.hasErrors()}, ${project.id}"
@@ -282,18 +287,18 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 		when: "Trying to delete an API Action that belongs to some other project"
 			apiActionService.delete(apiAction2.id, project)
-		then: "A DomainUpdateException is thrown"
-			thrown InvalidParamException
+		then: "A EmptyResultException is thrown"
+			thrown EmptyResultException
 
 		when: "trying to delete an API Action that doesn't exist"
 			apiActionService.delete(0, project)
-		then: "A DomainUpdateException is thrown"
-			thrown InvalidParamException
+		then: "A EmptyResultException is thrown"
+			thrown EmptyResultException
 
 		when: "trying to delete an API Action without passing a project"
 			apiActionService.delete(apiAction2.id, null)
 		then: "An EmptyResultException is thrown"
-			thrown InvalidParamException
+			thrown EmptyResultException
 
 
 
@@ -324,99 +329,121 @@ class ApiActionServiceIntegrationTests extends Specification {
 		setup: "some useful values"
 			Provider provider = providerHelper.createProvider(project)
 			String apiName = RSU.randomAlphabetic(10)
-			String json = """
-							{
-								"name": "Api Action 2",
-								"description": "some description",
-								"providerId": ${provider.id},
-								"agentClass": "AWS",
-								"agentMethod": "X",
-								"callbackMode": "NA",
-								"callbackMethod": "Y",
-								"asyncQueue": "AQ",
-								"producesData": 0,
-								"pollingInterval": 0,
-								"timeout": 0
-							}
-							"""
-			JSONObject apiActionJson = JsonUtil.parseJson(json)
+			ApiActionCommand cmd = new ApiActionCommand()
+			cmd.with {
+				name = apiName
+				description = "some description"
+				providerId = provider.id
+				agentClass = "AWS"
+				agentMethod = "X"
+				callbackMode = "NA"
+				callbackMethod = "Y"
+				asyncQueue = "AQ"
+				producesData = 0
+				pollingInterval = 0
+				timeout = 0
+				reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+				pollingLapsedAfter = 0
+				pollingStalledAfter = 0
+				useWithTask = 0
+				useWithAsset = 0
+				pollingFrequency = 0
+			}
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
 		then: "The operation succeeded"
 			apiAction != null
+		and: "No errors detected for the Command Object"
+			!cmd.hasErrors()
 		when: "Trying to create a second API Action with the same name"
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
-		then: "An Error is thrown"
-			thrown InvalidParamException
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
+		then: "The Api Action is null"
+			apiAction2 == null
+		and: "The Command Object detected the error in the name"
+			cmd.errors.hasFieldErrors("name")
 		when: "Trying to create an ApiAction with missing params"
-			apiActionJson.remove("agentMethod")
-			apiActionJson.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
-		then: "A ValidationException is thrown"
-			thrown ValidationException
+			cmd.agentMethod = null
+			cmd.name = RSU.randomAlphabetic(10)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
+		then: "The missing field causes the validation step to fail."
+			cmd.errors.hasFieldErrors("agentMethod")
+		and: "It's the only error"
+			cmd.errors.allErrors.size() == 1
+		and: "the action is null"
+			apiAction2 == null
 		when: "Trying to create with invalid enum"
-			apiActionJson.agentMethod = "X"
-			apiActionJson.agentClass = "BOGUS"
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
-		then: "An InvalidParamException is thrown"
-			thrown InvalidParamException
+			cmd.agentMethod = "X"
+			cmd.agentClass = "BOGUS"
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
+		then: "The enum field fails the validation"
+			cmd.errors.hasFieldErrors("agentClass")
 		when: "Trying to assign a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
-			apiActionJson.providerId = provider2.id
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
-		then: "A DomainUpdateException is thrown"
-			thrown DomainUpdateException
-
+			cmd.providerId = provider2.id
+			cmd.agentClass = "AWS"
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
+		then: "providerId fails the validation"
+			cmd.errors.hasFieldErrors("providerId")
 
 	}
 
-	def "13. Test Update ApiActions with valid and invalid data"() {
+	def "13. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
-			Provider provider = providerHelper.createProvider(project)
-			String apiName = RSU.randomAlphabetic(10)
-			String json = """
-								{
-									"name": "Api Action 2",
-									"description": "some description",
-									"providerId": ${provider.id},
-									"agentClass": "AWS",
-									"agentMethod": "X",
-									"callbackMode": "NA",
-									"callbackMethod": "Y",
-									"asyncQueue": "AQ",
-									"producesData": 0,
-									"pollingInterval": 0,
-									"timeout": 0
-								}
-								"""
-			JSONObject apiActionJson = JsonUtil.parseJson(json)
+		Provider provider = providerHelper.createProvider(project)
+		String apiName = RSU.randomAlphabetic(10)
+		ApiActionCommand cmd = new ApiActionCommand()
+		cmd.with {
+			name = apiName
+			description = "some description"
+			providerId = provider.id
+			agentClass = "AWS"
+			agentMethod = "X"
+			callbackMode = "NA"
+			callbackMethod = "Y"
+			asyncQueue = "AQ"
+			producesData = 0
+			pollingInterval = 0
+			timeout = 0
+			reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+			pollingLapsedAfter = 0
+			pollingStalledAfter = 0
+			useWithTask = 0
+			useWithAsset = 0
+			pollingFrequency = 0
+		}
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
 		then: "The operation succeeded"
 			apiAction != null
+		and: "No errors detected for the Command Object"
+			!cmd.hasErrors()
 		when: "Trying to update the API Action with a different name"
 			String newName =  RSU.randomAlphabetic(10)
-			apiActionJson.name = newName
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
+			cmd.name = newName
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction.id)
 		then: "the name was updated"
 			apiAction2.name == newName
 		and: "the id didn't change (the action was updated)"
 			apiAction.id == apiAction2.id
-		when: "we try to set the name to that of an existing Action"
-			apiActionJson.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson)
-			apiAction = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
-		then: "An InvalidParamException is thrown"
-			thrown InvalidParamException
+		when: "we try to update the name to that of an existing Action"
+			cmd.name = RSU.randomAlphabetic(10)
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
+			apiAction = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction.id)
+		then: "The name fails the validations"
+			cmd.errors.hasFieldErrors("name")
+		and: "The API Action returned is null"
+			apiAction == null
 		when: "Trying to update with a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
-			apiActionJson.name = RSU.randomAlphabetic(10)
-			apiActionJson.providerId = provider2.id
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, apiActionJson, apiAction.id)
-		then: "A DomainUpdateException is thrown"
-			thrown DomainUpdateException
+			cmd.name = RSU.randomAlphabetic(10)
+			cmd.providerId = provider2.id
+			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction2.id)
+		then: "The providerId fails the validation"
+			cmd.errors.hasFieldErrors("providerId")
+		and: "The API Action is null"
+			apiAction2 == null
 
 
 	}
@@ -427,21 +454,77 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: "The correct value was parsed"
 			agentClass == AgentClass.AWS
 		when: "Trying with an invalid value"
-			agentClass = apiActionService.parseEnum(AgentClass, "someField", RSU.randomAlphabetic(10))
+			agentClass = apiActionService.parseEnum(AgentClass, "someField", RSU.randomAlphabetic(10), true, true)
 		then: "An InvalidParamException is thrown"
 			thrown InvalidParamException
 		when: "Trying with an invalid value"
-			agentClass = apiActionService.parseEnum(AgentClass, "someField", null)
+			agentClass = apiActionService.parseEnum(AgentClass, "someField", null, true, true)
 		then: "An InvalidParamException is thrown"
 			thrown InvalidParamException
 		when: "Trying with a class that is not an Enum"
-			agentClass = apiActionService.parseEnum(Integer, "someField", "AWS")
+			agentClass = apiActionService.parseEnum(Integer, "someField", "AWS", true, true)
 		then: "An InvalidParamException is thrown"
 			thrown InvalidParamException
 		when: "Trying with a null class.	"
 			agentClass = apiActionService.parseEnum(null, "someField", "AWS")
 		then: "An NullPointerException is thrown"
 			thrown NullPointerException
+	}
+
+	def "15. Test reactionJson for The API Action in different scenarios" () {
+		setup: "Create a valid ApiActionCommand"
+			Provider provider = providerHelper.createProvider(project)
+			ApiActionCommand cmd = new ApiActionCommand(project: project)
+			cmd.with {
+				name = RSU.randomAlphabetic(10)
+				description = "some description"
+				providerId = provider.id
+				agentClass = "AWS"
+				agentMethod = "X"
+				callbackMode = "NA"
+				callbackMethod = "Y"
+				asyncQueue = "AQ"
+				producesData = 0
+				pollingInterval = 0
+				timeout = 0
+				reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+				pollingLapsedAfter = 0
+				pollingStalledAfter = 0
+				useWithTask = 0
+				useWithAsset = 0
+				pollingFrequency = 0
+			}
+		when: "Validating the command object"
+			cmd.validate()
+		then: "No errors detected"
+			!cmd.hasErrors()
+		when: "Using a JSON with no SUCCESS"
+			cmd.reactionJson = "{\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+			cmd.validate()
+		then: "The command object fails"
+			cmd.hasErrors()
+		and: "The cause of the failure is the reactionJson field"
+			cmd.errors.hasFieldErrors("reactionJson")
+		and: "It's the only field failing"
+			cmd.errors.allErrors.size() == 1
+		and: "The cause is the missing attribute in the JSON"
+			cmd.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+		when: "Using a JSON with no DEFAULT and no ERROR"
+			cmd.reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\"}"
+			cmd.validate()
+		then: "The validation of the command object fails of the missing attributes."
+			cmd.errors.allErrors[0].code == Message.ApiActionMissingDefaultAndErrorInReactionJson
+		when: "Using a JSON with no EVALUATE"
+			cmd.reactionJson = "{\"SUCCESS\": \"success\" ,\"DEFAULT\": \"default\"}"
+			cmd.validate()
+		then: "The validation of the command object fails of the missing attributes."
+			cmd.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+		when: "Using an invalid JSON"
+			cmd.reactionJson = "BOGUS"
+			cmd.validate()
+		then: "The validation of the command object fails of the missing attributes."
+			cmd.errors.allErrors[0].code == Message.ApiActionInvalidReactionJson
+
 	}
 
 	/*

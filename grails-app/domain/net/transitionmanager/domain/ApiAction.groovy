@@ -1,6 +1,6 @@
 package net.transitionmanager.domain
 
-import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AbstractAgent
@@ -8,6 +8,10 @@ import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
 import groovy.transform.ToString
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.service.InvalidParamException
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -74,6 +78,30 @@ class ApiAction {
 	Date dateCreated
 	Date lastModified
 
+	// The URL to the endpoint
+	String endpointUrl
+
+	// The Path to the endpoint
+	String endpointPath
+
+	// The JSON hash that will contain the scripts to be invoked appropriately.
+	String reactionJson
+
+	// Flag indicating that the action interacts with a Task.
+	Integer useWithAsset
+
+	// Flag indicating that the action interacts with an Asset.
+	Integer useWithTask
+
+	// The frequency that a polling action is called (seconds)
+	Integer pollingFrequency
+
+	// The time period after after which a polling action is determined to have lapsed (seconds)
+	Integer pollingLapsedAfter
+
+	// The time period after no increment in status of a polling action results in the LAPSED event get invoked (seconds)
+	Integer pollingStalledAfter
+
 	static belongsTo = [
 		project: Project,
 		provider: Provider
@@ -87,11 +115,19 @@ class ApiAction {
 		callbackMode nullable: true
 		credential nullable: true
 		defaultDataScript nullable: true
+		endpointPath nullable: true, blank: true
+		endpointUrl nullable: true, blank: true
 		name nullable: false, size: 1..64
 		methodParams nullable: true
 		lastModified nullable: true
+		pollingFrequency nullable: false, range: 0..1
+		pollingLapsedAfter nullable: false, range: 0..1
+		pollingStalledAfter nullable: false, range: 0..1
 		producesData nullable: false, range:0..1
+		reactionJson size: 1..65535, blank: false, validator: reactionJsonValidator
 		timeout nullable: true
+		useWithAsset nullable: false, range: 0..1
+		useWithTask nullable: false, range: 0..1
 	}
 
 	static mapping = {
@@ -141,58 +177,33 @@ class ApiAction {
 		return list
 	}
 
-	/**
-	 * Create a map with the data for this ApiAction
-	 * @param agent - agent instance for the corresponding agent class.
-	 * @param minimalInfo - flag that signals if only the m
-	 * @return
-	 */
-	Map toMap(AbstractAgent agent, boolean minimalInfo = true) {
-		if (agent == null) {
-			throw new RuntimeException("Agent cannot be null.")
-		}
-		Map fields = [id: id, name: name]
-		if (!minimalInfo) {
-			Map credentialMap = null
-			if (credential) {
-				credentialMap = [id: credential.id, name: credential.name]
-			}
-
-			Map defaultDataScriptMap = null
-			if (defaultDataScript) {
-				defaultDataScriptMap = [id: defaultDataScript.id, name: defaultDataScript.name]
-			}
-
-			fields.agentClass  = [
-			        id: agent.agentClass.name(),
-					name: agent.name
-			]
-			fields.agentMethod = agentMethod
-			fields.asyncQueue = asyncQueue
-			fields.callbackMethod = callbackMethod
-			fields.callbackMode = callbackMode? callbackMode.name() : null
-			fields.credential = credentialMap
-			fields.dateCreated = dateCreated
-			fields.defaultDataScript = defaultDataScriptMap
-			fields.description = description
-			fields.lastModified = lastModified
-			fields.methodParams = methodParams
-			fields.pollingInterval = pollingInterval
-			fields.producesData = producesData
-			fields.provider = [
-					id  : provider.id,
-					name: provider.name
-			]
-			fields.timeout = timeout
-
-		}
-		return fields
-	}
-
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
 		lastModified = TimeUtil.nowGMT()
+	}
+
+	/**
+	 * Custom validator for the reactionJson that evaluates that:
+	 * - The string is a valid JSON.
+	 * - EVALUATE and SUCCESS are present.
+	 * - DEFAULT or ERROR are present.
+	 */
+	static reactionJsonValidator = { String reactionJsonString ->
+		try {
+			JSONObject reactionJson = JsonUtil.parseJson(reactionJsonString)
+			// EVALUATE and SUCCESS are mandatory.
+			if (reactionJson[ReactionScriptCode.EVALUATE.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
+				// Either DEFAULT or ERROR need to be specified.
+				if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
+					return Message.ApiActionMissingDefaultAndErrorInReactionJson
+				}
+			} else {
+				return Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+			}
+		} catch (InvalidParamException e) {
+			return Message.ApiActionInvalidReactionJson
+		}
 	}
 }

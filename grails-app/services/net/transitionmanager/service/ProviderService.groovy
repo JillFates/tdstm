@@ -89,7 +89,7 @@ class ProviderService implements ServiceMethods {
      * @param project
      * @return
      */
-    Provider getProvider(Long providerId, Project project = null) {
+    Provider getProvider(Long providerId, Project project = null, boolean throwException = false) {
         if (!project) {
             project = securityService.userCurrentProject
         }
@@ -99,7 +99,7 @@ class ProviderService implements ServiceMethods {
             project == project
         }.find()
 
-        if (!provider) {
+        if (!provider && throwException) {
             throw new DomainUpdateException("No Provider with id ${providerId} exists for this project.")
         }
         return provider
@@ -120,7 +120,7 @@ class ProviderService implements ServiceMethods {
      * @param providerId
      */
     void deleteProvider(Long providerId) {
-        Provider provider = getProvider(providerId)
+        Provider provider = getProvider(providerId, null, true)
         if (provider) {
             provider.delete()
         }

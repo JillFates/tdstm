@@ -44,7 +44,7 @@ class DataScriptService implements ServiceMethods{
         }
 
         // Find the provider
-        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject)
+        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject, true)
 
         // Copy the values received from the JSON Object over to the DataScript instance.
         dataScript.with {
