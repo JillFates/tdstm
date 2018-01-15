@@ -1,7 +1,5 @@
 package tdstm
 
-import com.tdsops.tm.enums.FilenameFormat
-import com.tdssrc.grails.FilenameUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -20,6 +18,6 @@ class WsFilenameController implements ControllerMethods {
     */
     def viewExportFilename(String viewName) {
        def params = [viewName:viewName]
-       return renderAsJson([FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params)])
+       return renderAsJson('suggested-filename' + viewName + 'endofFilename')
     }
 }
