@@ -25,13 +25,12 @@ interface Message {
 	String ApiActionInvalidDefaultDataScript = "apiActionCommand.defaultDataScriptId.invalid"
 	String ApiActionInvalidName = "apiActionCommand.name.invalid"
 	String ApiActionInvalidProvider = "apiActionCommand.providerId.invalid"
-
+	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
+	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
 	// Messages for the different errors in the ApiAction reactionJson
 	String ApiActionInvalidReactionJson = "apiAction.reactionJson.invalid"
 	String ApiActionMissingEvaluateOrSuccessInReactionJson = "apiAction.reactionJson.emptyEvaluateOrSuccess"
 	String ApiActionMissingDefaultAndErrorInReactionJson = "apiAction.reactionJson.emptyDefaultAndError"
-	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
-	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
 
 
 }
