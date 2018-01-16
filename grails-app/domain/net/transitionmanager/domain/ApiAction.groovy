@@ -187,7 +187,7 @@ class ApiAction {
 	 * - EVALUATE and SUCCESS are present.
 	 * - DEFAULT or ERROR are present.
 	 */
-	static reactionJsonValidator = { String reactionJsonString ->
+	static reactionJsonValidator = { String reactionJsonString, ApiAction apiAction ->
 		try {
 			JSONObject reactionJson = JsonUtil.parseJson(reactionJsonString)
 			// EVALUATE and SUCCESS are mandatory.
@@ -199,7 +199,27 @@ class ApiAction {
 			} else {
 				return Message.ApiActionMissingEvaluateOrSuccessInReactionJson
 			}
-		} catch (InvalidParamException e) {
+
+			boolean errors = false
+			// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode.
+			for (key in reactionJson.keySet()) {
+				try {
+					ReactionScriptCode.valueOf(key)
+				} catch (IllegalArgumentException iae) {
+					logger.warn("Unrecognized key $key in reaction JSON.")
+					reactionJson.remove(key)
+					errors = true
+				}
+			}
+
+			// If errors were detected update the reactionJson.
+			if (errors) {
+				apiAction.reactionJson = JsonUtil.toJson(reactionJson)
+				// Set to true, otherwise the validation fails and it doesn't run again.
+				return true
+			}
+
+		} catch (InvalidParamException ipe) {
 			return Message.InvalidFieldForDomain
 		}
 	}
