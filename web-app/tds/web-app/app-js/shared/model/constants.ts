@@ -31,3 +31,5 @@ export enum DIALOG_SIZE {
 };
 
 export const DATA_TYPES = ['String', 'No Idea'];
+
+export const ERROR_STATUS = 'error';
