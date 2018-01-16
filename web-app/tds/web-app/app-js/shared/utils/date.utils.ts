@@ -14,4 +14,13 @@ export class DateUtils {
 		return compose;
 
 	}
+
+	public static getTimestamp(): String {
+		let time = new Date();
+		return time.getFullYear().toString() +
+				(time.getMonth() + 1 < 10 ? ('0' + (time.getMonth() + 1)) : time.getMonth() + 1) +
+				(time.getDate() + 1 < 10 ? ('0' + (time.getDate())) : time.getDate()) + '_' +
+				time.getHours() +
+				time.getMinutes();
+	}
 }
