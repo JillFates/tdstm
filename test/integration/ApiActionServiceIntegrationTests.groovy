@@ -60,7 +60,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 	'''
 
 	void setup() {
-		ApiActionCommand.apiActionService = apiActionService
 		project = projectHelper.createProject()
 		project.save(flush:true)
 		// println "projct ${project.hasErrors()}, ${project.id}"

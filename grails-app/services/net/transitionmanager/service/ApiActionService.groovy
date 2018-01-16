@@ -120,7 +120,7 @@ class ApiActionService implements ServiceMethods {
 		}.order("name", "asc").list()
 		List<Map> results = []
 		apiActions.each { apiAction ->
-			results << ApiActionCommand.toMap(apiAction, minimalInfo)
+			results << apiActionToMap(apiAction, minimalInfo)
 		}
 		return results
 	}
@@ -360,7 +360,10 @@ class ApiActionService implements ServiceMethods {
 		} else {
 			apiAction = new ApiAction(project: project)
 		}
-		apiActionCommand.populateDomain(apiAction)
+
+		// Populate the apiAction with the properties from the command object.
+		apiAction.properties = apiActionCommand.properties
+
 		apiAction.save(failOnError: true)
 		return apiAction
 
@@ -448,5 +451,29 @@ class ApiActionService implements ServiceMethods {
 	String validateReactionJson(String reactionJson) {
 		String errorCode = null
 
+	}
+
+	/**
+	 * Return a map representation for an ApiAction.
+	 * @param apiAction
+	 * @param minimalInfo - flag that indicates that only the id and the name are required.
+	 * @return
+	 */
+	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
+		Map<String, Object> apiActionMap = null
+		List<String> properties = null
+		if (minimalInfo) {
+			properties = ["id", "name"]
+		}
+
+		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
+
+		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		if (!minimalInfo) {
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+		}
+
+		return apiActionMap
 	}
 }

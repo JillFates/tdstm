@@ -452,6 +452,35 @@ public class GormUtil {
 	}
 
 	/**
+	 * Retrieve a list of domain properties. If a list of property names is given, only
+	 * those properties will be included. If a list of properties to be skipped is provided,
+	 * those properties will be excluded.
+	 * @param domainClass
+	 * @param properties
+	 * @return
+	 */
+	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
+		List<GrailsDomainClassProperty> domainProperties = []
+		if (properties) {
+			for (String property in properties) {
+				GrailsDomainClassProperty domainProperty = getDomainProperty(domainClass, property)
+				if (domainProperty) {
+					domainProperties << domainProperty
+				}
+			}
+		} else {
+			DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+			domainProperties = dfdc.getPersistentProperties()
+		}
+
+		if (skipProperties) {
+			domainProperties = domainProperties.findAll { !(it.name in skipProperties) }
+		}
+		return domainProperties
+
+	}
+
+	/**
 	 * Used to get the list of persistent properties for a given domain class
 	 * @param domainInst - the Domain instance to get the properties for
 	 * @param propertyName - the name of a property to retrieve
@@ -971,5 +1000,45 @@ public class GormUtil {
 			}
 		}
 		return instance
+	}
+
+	/**
+	 * Return a map representation for the given domain object
+	 * @param domainObject
+	 * @param properties - you can narrow down the list of properties to be included by providing a list with their names.
+	 * @param skipProperties - you can exclude certain properties by passing their names in this list.
+	 * @return
+	 */
+	static Map domainObjectToMap(domainObject, List<String> properties = null, List<String> skipProperties = null) {
+
+		if (!domainObject) {
+			return null
+		}
+
+		Map domainMap = [:]
+
+		Class domainClass = domainObject.class
+		if (isDomainClass(domainClass)) {
+			// Get all the domain properties.
+			List<GrailsDomainClassProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
+
+			// Iterate over all the domain properties
+			for (GrailsDomainClassProperty property : domainProperties) {
+				// if the property is an enum, copy its .name()
+				if (property.type.isEnum()) {
+					if (domainObject[property.name]) {
+						domainMap[property.name] = domainObject[property.name].name()
+					}
+					// if the property is a reference, call this method recursively with a predefined list of fields..
+				} else if (isDomainClass(property.type)) {
+					domainMap[property.name] = domainObjectToMap(domainObject[property.name], ["id", "name"])
+				} else {
+					// If it's a regular property, just copy its value.
+					domainMap[property.name] = domainObject[property.name]
+				}
+			}
+		}
+
+		return domainMap
 	}
 }

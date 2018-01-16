@@ -55,7 +55,7 @@ class WsApiActionController implements ControllerMethods {
     def fetch(Long id){
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
-        renderSuccessJson(ApiActionCommand.toMap(apiAction))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
     /**
@@ -76,7 +76,7 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionCreate)
     def create(ApiActionCommand apiActionCommand) {
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand)
-        renderSuccessJson(ApiActionCommand.toMap(apiAction))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
 
@@ -86,6 +86,6 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def update(Long id, ApiActionCommand apiActionCommand) {
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
-        renderSuccessJson(apiActionCommand.toMap(apiAction))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 }
