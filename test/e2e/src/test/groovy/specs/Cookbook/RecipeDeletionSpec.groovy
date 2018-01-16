@@ -33,17 +33,17 @@ class RecipeDeletionSpec extends GebReportingSpec {
 
     def "Delete Recipe"() {
         testKey = "TM-7243"
-
         given:
         at CookbookPage
-
         when: "Top most Geb Recipe is deleted"
         def gebRecipeCountBeforeDelete = gebRecipes.size()
         println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
         withConfirm(true) { deleteRecipeButtons[0].click() }
         println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
-
         then: "Count of geb recipes is down by 1"
+        waitFor { successMessage.present}
+        waitFor { !successMessage.present}
+        waitFor { loadingIndicator.hasClass("ng-hide")}
         waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
         println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
     }

@@ -17,15 +17,17 @@ class CookbookPage extends Page {
     }
 
     static content = {
-        pageTitle(wait:true)        { $("section", 	class:"content-header").find("h1") }
+        pageTitle                   (wait:true) { $("section", 	class:"content-header").find("h1") }
         pageBreadcrumb              { $("o1", class:"breadcrumb")}
+        loadingIndicator            (required:false, wait:true){ $("#cookbookRecipesEditor").find("loading-indicator").find("div","ng-show":"isLoading")}
+        successMessage              (required:false, wait:true){ $("#cookbookRecipesEditor").find("div.alert.alert-success.animateShow")}
         contextSelectorLabel        { $("label", for:"contextSelector").text() }
         contextSelector             { $("select#contextSelector") }
         contextSelectorDefault      { $("select#contextSelector").find("option", selected:"selected") }
         createRecipeButton          { $("a#generateRecipe") }
 
-        createRecipeModal(required: false, wait:true) {$ ("div", class:"modal fade in")}
-        taskDetailsModal(required: false, wait:true)  { $("div", "window-class":"modal-task")}
+        createRecipeModal           (required: false, wait:true) {$ ("div", class:"modal fade in")}
+        taskDetailsModal            (required: false, wait:true)  { $("div", "window-class":"modal-task")}
  // TODO following item have the checkbox inside the label
  //     viewArchivedCBoxLabel       { $("label", for:"viewArchived").text() }
         viewArchivedCBox            { $("input#viewArchived") }
@@ -43,7 +45,7 @@ class CookbookPage extends Page {
         recipeGridRowsActions       { recipeGridRows.find("a", class:"actions")}
         gridSize                    { recipeGridRows.size()}
         rowSize                     { recipeGridHeaderCols.size()}
-        gebRecipes(required: false) { recipeGridRows.find("span.ng-binding", text: "Geb Recipe Test") }
-        gebRecipesWithTasks(required: false) { recipeGridRows.find("span.ng-binding", text: "Geb Recipe With Tasks Test") }
+        gebRecipes                  (required: false) { recipeGridRows.find("span.ng-binding", text:contains("Geb Recipe")) }
+        gebRecipesWithTasks         (required: false) { recipeGridRows.find("span.ng-binding", text:contains("Geb Recipe With Tasks Test")) }
     }
 }
