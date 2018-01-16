@@ -92,7 +92,6 @@ class WsApiActionController implements ControllerMethods {
 
     }
 
-
     /**
      * Update the corresponding ApiAction.
      */
@@ -107,38 +106,10 @@ class WsApiActionController implements ControllerMethods {
 	@HasPermission(Permission.ActionInvoke)
 	def validateSyntax(ApiActionValidateScriptCommand command) {
 
-		List<Map<String, ?>> data = []
-
 		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
 			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
 		} else {
-			command.scripts.each { ApiActionScriptCommand scriptBindingCommand ->
-
-				Map<String, ?> scriptResults = [code: scriptBindingCommand.reactionScriptCode.name()]
-				try {
-
-					Map<String, ?> result = apiActionService.evaluateReactionScript(
-							scriptBindingCommand.reactionScriptCode,
-							scriptBindingCommand.script,
-							new ActionRequest(),
-							new ApiActionResponse(),
-							new ReactionTaskFacade(),
-							new ReactionAssetFacade(),
-							new ApiActionJob()
-					)
-
-					scriptResults.result = result.result?.toString()
-					scriptResults.error = null
-
-				} catch (Exception ex){
-					log.error("Exception ", ex)
-					scriptResults.error = ex.getMessage()
-				}
-
-				data.add(scriptResults)
-			}
-
-			renderSuccessJson(data)
+			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
 		}
 	}
 

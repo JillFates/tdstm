@@ -1,21 +1,16 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.*
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import com.tds.asset.AssetComment
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.*
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
@@ -471,6 +466,42 @@ class ApiActionService implements ServiceMethods {
 				result: result
 		]
 	}
+
+	/**
+	 * It validates a request with a list of API action/reaction scripts.
+	 * @see net.transitionmanager.service.ApiActionService#evaluateReactionScript
+	 * @param scripts a list of net.transitionmanager.integration.ApiActionScriptCommand
+	 * @return a List with results of evaluating every instance of ApiActionScriptCommand
+	 */
+	List<Map<String, ?>> validateSyntax(List<ApiActionScriptCommand> scripts) {
+
+		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
+
+			Map<String, ?> scriptResults = [code: scriptBindingCommand.reactionScriptCode.name()]
+			try {
+
+				Map<String, ?> result = evaluateReactionScript(
+						scriptBindingCommand.reactionScriptCode,
+						scriptBindingCommand.script,
+						new ActionRequest(),
+						new ApiActionResponse(),
+						new ReactionTaskFacade(),
+						new ReactionAssetFacade(),
+						new ApiActionJob()
+				)
+
+				scriptResults.result = result.result?.toString()
+				scriptResults.error = null
+
+			} catch (Exception ex) {
+				log.error("Exception evaluating script ${scriptBindingCommand.script} with code: ${scriptBindingCommand.code}", ex)
+				scriptResults.error = ex.getMessage()
+			}
+
+			scriptResults
+		}
+	}
+
 	/**
 	 * It checks if the code is ReactionScriptCode.EVALUATE and the results is an instance of ReactionScriptCode.
 	 * If results it is not an instance of ReactionScriptCode,  It throws an Exception.

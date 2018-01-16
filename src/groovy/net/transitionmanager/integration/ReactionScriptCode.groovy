@@ -21,15 +21,10 @@ enum ReactionScriptCode {
 	 *     assert ReactionScriptCode.lookup('EVALUATE') ==  ReactionScriptCode.EVALUATE
 	 *     assert ReactionScriptCode.lookup('FOO') ==  null
 	 * </code>
-	 * @param code
-	 * @return
+	 * @param value a String value
+	 * @return an instance of net.transitionmanager.integration.ReactionScriptCode or null if the value is not a valid code
 	 */
-	static ReactionScriptCode lookup(String code){
-		for (ReactionScriptCode reactionScriptCode: values()){
-			if (reactionScriptCode.name().equalsIgnoreCase(code)) {
-				return reactionScriptCode
-			}
-		}
-		return null
+	static ReactionScriptCode lookup(String value) {
+		return ReactionScriptCode.enumConstantDirectory().get(value)
 	}
 }

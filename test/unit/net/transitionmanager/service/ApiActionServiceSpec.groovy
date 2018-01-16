@@ -214,4 +214,30 @@ class ApiActionServiceSpec extends Specification {
 		cleanup:
 			LocaleContextHolder.resetLocaleContext()
 	}
+
+	void 'test can validate syntax for a list fo scripts'() {
+
+		given:
+			List<ApiActionScriptCommand> scripts = [
+					new ApiActionScriptCommand(code: 'EVALUATE', script: 'if (response.status == SC.OK) {\n   return SUCCESS\n} else {\n   return ERROR\n}', reactionScriptCode: ReactionScriptCode.EVALUATE),
+					new ApiActionScriptCommand(code: 'SUCCESS', script: 'task.done()', reactionScriptCode: ReactionScriptCode.SUCCESS)
+			]
+
+		when: 'a List of scripts is evaluated'
+			List<Map<String, ?>> results = service.validateSyntax(scripts)
+
+		then: 'service returns a list of results associated with codes'
+			results.size() == 2
+			with (results[0]) {
+				code == 'EVALUATE'
+				result == 'ERROR'
+				!error
+			}
+
+			with (results[1]) {
+				code == 'SUCCESS'
+				result == 'true'
+				!error
+			}
+	}
 }

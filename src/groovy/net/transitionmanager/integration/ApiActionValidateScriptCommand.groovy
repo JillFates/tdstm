@@ -3,6 +3,24 @@ package net.transitionmanager.integration
 import grails.validation.Validateable
 import net.transitionmanager.command.CommandObject
 
+/**
+ * API action command object for /ws/apiAction/validateSyntax request.
+ * It should be bind with the following JSON content example:
+ * <pre>
+ {
+ *		"scripts" : [
+ *		{
+ *			"code": "EVALUATE",
+ *			"script": "if (response.status == SC.OK) {\n   return SUCCESS\n} else {\n   return ERROR\n}"
+ *		},
+ *		{
+ *			"code": "SUCCESS",
+ *			"script": "task.done()"
+ *		}
+ *		]
+ *	}
+ * </pre>
+ */
 @Validateable
 class ApiActionValidateScriptCommand implements CommandObject {
 
@@ -13,25 +31,3 @@ class ApiActionValidateScriptCommand implements CommandObject {
 	}
 }
 
-@Validateable
-class ApiActionScriptCommand implements CommandObject {
-
-	String code
-	String script
-	ReactionScriptCode reactionScriptCode
-
-	static constraints = {
-		code nullable: false, blank: false, validator: { val, obj ->
-			if (val) {
-				obj.reactionScriptCode = ReactionScriptCode.lookup(val)
-				if (!obj.reactionScriptCode) {
-					false
-				} else {
-					true
-				}
-			}
-		}
-		script nullable: false, blank: false
-		reactionScriptCode nullable: true
-	}
-}
