@@ -976,15 +976,7 @@ public class GormUtil {
 	 * @return
 	 */
 	static boolean isReferenceProperty(Object domainObject, String propertyName) {
-		if (!isDomainProperty(domainObject, propertyName)) {
-			return false
-		}
-		try {
-			GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
-			return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
-		} catch (InvalidPropertyException e) {
-			logger.info(e.message)
-			return false
-		}
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
 	}
 }

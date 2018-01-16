@@ -43,20 +43,19 @@ class AssetFacadeIntegrationSpec extends Specification {
 		when: 'setting asset property value'
 			assetFacade.dependencyBundle = Integer.valueOf('1')
 		then: 'the value should be able to be read'
-			1 == assetFacade.dependencyBundle
-		and: 'facade project property should be a String instance'
-			assetFacade.project instanceof String
+			assetFacade.dependencyBundle instanceof Integer
 	}
 
 	void "test setting an asset date property should be able to set new value and read it"() {
 		setup: 'giving an asset with basic properties'
 			AssetFacade assetFacade = new AssetFacade(assetEntity, null, false)
+			Date now = new Date()
 		when: 'setting asset property value'
-			assetFacade.purchaseDate = new Date()
+			assetFacade.purchaseDate = now
 		then: 'the value should be able to be read'
 			assetFacade.purchaseDate
 		and: 'and the value should be an instance of Date'
-			assetFacade.purchaseDate instanceof Date
+			now == assetFacade.purchaseDate
 	}
 
 	void "test setting an asset enum property should be able to set new value and read it"() {

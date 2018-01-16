@@ -2,7 +2,6 @@ package net.transitionmanager.asset
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
-import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 
 /**
  * This class provides the ability to inspect and interact with the Asset that maybe associated with the action.
@@ -47,9 +46,14 @@ class AssetFacade {
     void setProperty(String name, Object value) {
         if (name != 'readonly') {
             checkReadonly(name)
-            if (GormUtil.isReferenceProperty(asset, name)) {
-                raiseReadOnlyPropertyException(name)
+            if (GormUtil.isDomainProperty(asset, name)) {
+                if (GormUtil.isReferenceProperty(asset, name)) {
+                    raiseReadOnlyPropertyException(name)
+                } else {
+                    asset.setProperty(getAssetPropertyOrCustomFieldName(name), value)
+                }
             } else {
+                // property might be a custom field
                 asset.setProperty(getAssetPropertyOrCustomFieldName(name), value)
             }
         }
@@ -61,11 +65,9 @@ class AssetFacade {
      * @return
      */
     private String getAssetPropertyOrCustomFieldName(String name) {
-        try {
-            GormUtil.getDomainProperty(asset, name)
+        if (GormUtil.isDomainProperty(asset, name)) {
             return name
-        } catch (InvalidPropertyException e) {
-            // if the name is not a AssetEntity property let's try with custom fields
+        } else {
             return getAssetCustomFieldName(name)
         }
     }
