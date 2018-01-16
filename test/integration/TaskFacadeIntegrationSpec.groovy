@@ -50,6 +50,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task start using TaskFacade should start task and update status'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isStarted()
 		when: 'staring the task'
 			taskFacade.start()
 		then: 'the task status should be updated accordingly'
@@ -61,6 +63,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task done using TaskFacade should complete the task and update status'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isDone()
 		when: 'completing the task'
 			taskFacade.done()
 		then: 'the task status should be updated accordingly'
@@ -72,6 +76,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task error using TaskFacade should put the task on hold and add a new note indicating the error reason'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
 		when: 'marking the task as in error'
 			taskFacade.error('Test task in error')
 		then: 'the task status should be updated accordingly'
@@ -85,6 +91,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task lapsed using TaskFacade should put the task on hold and a new note with the lapsed i18n message should be added'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
 		when: 'marking the task as lapsed'
 			taskFacade.lapsed()
 		then: 'the task status should be updated accordingly'
@@ -98,6 +106,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task stalled using TaskFacade should put the task on hold and a new note with the stalled i18n message should be added'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
 		when: 'marking the task as stalled'
 			taskFacade.stalled()
 		then: 'the task status should be updated accordingly'
@@ -111,6 +121,8 @@ class TaskFacadeIntegrationSpec extends Specification {
 	void 'test task timedout using TaskFacade should put the task on hold and a new note with the timed out i18n message should be added'() {
 		setup: 'giving a task facade with an asset comment'
 			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
 		when: 'marking the task as timed out'
 			taskFacade.timedOut()
 		then: 'the task status should be updated accordingly'
