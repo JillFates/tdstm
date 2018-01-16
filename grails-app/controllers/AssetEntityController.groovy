@@ -1739,7 +1739,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			totalDatabase += databaseCount
 			totalFiles += filesCount
 
-			if (assetCount + applicationCount + physicalCount + databaseCount + filesCount > 0) {
+			if (!justPlanning || assetCount || applicationCount || physicalCount || databaseCount || filesCount) {
 				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
 									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
 			}
