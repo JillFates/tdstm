@@ -7,8 +7,8 @@ databaseChangeLog = {
                 ADD COLUMN reaction_json TEXT NOT NULL,
                 ADD COLUMN use_with_asset TINYINT DEFAULT 0,
                 ADD COLUMN use_with_task TINYINT DEFAULT 0,
-                ADD COLUMN polling_lapsed_after INT(8),
-                ADD COLUMN polling_stalled_after INT(8)
+                ADD COLUMN polling_lapsed_after INT(8) NOT NULL DEFAULT 0,
+                ADD COLUMN polling_stalled_after INT(8) NOT NULL DEFAULT 0
             """)
     }
 }

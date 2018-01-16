@@ -483,6 +483,11 @@ public class GormUtil {
 
 		if (allProperties) {
 			domainProperties = dfdc.getPersistentProperties()
+			// Grails won't fetch the Id property if it's not properly defined as a field
+			GrailsDomainClassProperty idProperty = dfdc.getPersistentProperty("id")
+			if (idProperty) {
+				domainProperties << idProperty
+			}
 		}
 
 		if (skipProperties) {
