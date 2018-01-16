@@ -16,9 +16,12 @@ class WsFilenameController implements ControllerMethods {
     * @param viewName  The name of the view to save provided by the user
     * @return  The full file name formatted according to the given rules for a View Manager export file.
     */
-    def viewExportFilename(String viewName) {
-       def params = [viewName:viewName]
-       // TODO IF viewName is null
-       return renderAsJson(filename:'mock-filename'+viewName+'end')
+    def viewExportFilename() {
+       String viewName = request.JSON.viewName
+       if (viewName) {
+          return renderSuccessJson('Big_Move_'+ "-" + viewName)
+       } else {
+          return renderFailureJson('Error: viewName cannot be null.')
+       }
     }
 }
