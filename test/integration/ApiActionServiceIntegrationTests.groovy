@@ -61,7 +61,6 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	void setup() {
 		ApiActionCommand.apiActionService = apiActionService
-		ApiActionCommand.providerService = providerService
 		project = projectHelper.createProject()
 		project.save(flush:true)
 		// println "projct ${project.hasErrors()}, ${project.id}"
@@ -327,13 +326,13 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	def "12. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
-			Provider provider = providerHelper.createProvider(project)
+			Provider provider1 = providerHelper.createProvider(project)
 			String apiName = RSU.randomAlphabetic(10)
 			ApiActionCommand cmd = new ApiActionCommand()
 			cmd.with {
 				name = apiName
 				description = "some description"
-				providerId = provider.id
+				provider = provider1
 				agentClass = "AWS"
 				agentMethod = "X"
 				callbackMode = "NA"
@@ -348,54 +347,40 @@ class ApiActionServiceIntegrationTests extends Specification {
 				useWithTask = 0
 				useWithAsset = 0
 			}
+
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, project)
 		then: "The operation succeeded"
 			apiAction != null
-		and: "No errors detected for the Command Object"
-			!cmd.hasErrors()
 		when: "Trying to create a second API Action with the same name"
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
-		then: "The Api Action is null"
-			apiAction2 == null
-		and: "The Command Object detected the error in the name"
-			cmd.errors.hasFieldErrors("name")
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+		then: "A ValidationException is thrown"
+			thrown ValidationException
 		when: "Trying to create an ApiAction with missing params"
 			cmd.agentMethod = null
 			cmd.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
-		then: "The missing field causes the validation step to fail."
-			cmd.errors.hasFieldErrors("agentMethod")
-		and: "It's the only error"
-			cmd.errors.allErrors.size() == 1
-		and: "the action is null"
-			apiAction2 == null
-		when: "Trying to create with invalid enum"
-			cmd.agentMethod = "X"
-			cmd.agentClass = "BOGUS"
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
-		then: "The enum field fails the validation"
-			cmd.errors.hasFieldErrors("agentClass")
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+		then: "The missing field causes the validation step to fail with a ValidationException."
+			thrown ValidationException
 		when: "Trying to assign a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
-			cmd.providerId = provider2.id
+			cmd.provider = provider2
 			cmd.agentClass = "AWS"
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
-		then: "providerId fails the validation"
-			cmd.errors.hasFieldErrors("providerId")
-
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+		then: "The invalid reference makes the validation fail with a ValidationException."
+			thrown ValidationException
 	}
 
 	def "13. Test Create ApiActions with valid and invalid data"() {
 		setup: "some useful values"
-		Provider provider = providerHelper.createProvider(project)
+		Provider provider1 = providerHelper.createProvider(project)
 		String apiName = RSU.randomAlphabetic(10)
 		ApiActionCommand cmd = new ApiActionCommand()
 		cmd.with {
 			name = apiName
 			description = "some description"
-			providerId = provider.id
+			provider = provider1
 			agentClass = "AWS"
 			agentMethod = "X"
 			callbackMode = "NA"
@@ -411,39 +396,31 @@ class ApiActionServiceIntegrationTests extends Specification {
 			useWithAsset = 0
 		}
 		when: "Creating an API Action"
-			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, cmd)
+			ApiAction apiAction = apiActionService.saveOrUpdateApiAction(cmd, null, project)
 		then: "The operation succeeded"
 			apiAction != null
-		and: "No errors detected for the Command Object"
-			!cmd.hasErrors()
 		when: "Trying to update the API Action with a different name"
 			String newName =  RSU.randomAlphabetic(10)
 			cmd.name = newName
-			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction.id)
+			ApiAction apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, project)
 		then: "the name was updated"
 			apiAction2.name == newName
 		and: "the id didn't change (the action was updated)"
 			apiAction.id == apiAction2.id
 		when: "we try to update the name to that of an existing Action"
 			cmd.name = RSU.randomAlphabetic(10)
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd)
-			apiAction = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction.id)
-		then: "The name fails the validations"
-			cmd.errors.hasFieldErrors("name")
-		and: "The API Action returned is null"
-			apiAction == null
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd,null, project)
+			apiAction = apiActionService.saveOrUpdateApiAction(cmd, apiAction.id, project)
+		then: "The name fails the validations throwing a ValidationException"
+			thrown ValidationException
 		when: "Trying to update with a provider of another project"
 			Project project2 = projectHelper.createProject()
 			Provider provider2 = providerHelper.createProvider(project2)
 			cmd.name = RSU.randomAlphabetic(10)
-			cmd.providerId = provider2.id
-			apiAction2 = apiActionService.saveOrUpdateApiAction(project, cmd, apiAction2.id)
-		then: "The providerId fails the validation"
-			cmd.errors.hasFieldErrors("providerId")
-		and: "The API Action is null"
-			apiAction2 == null
-
-
+			cmd.provider = provider2
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, apiAction2.id, project)
+		then: "A ValidationException is thrown"
+			thrown ValidationException
 	}
 
 	def "14. Test parseEnum with different valid and invalid inputs"(){
@@ -471,12 +448,12 @@ class ApiActionServiceIntegrationTests extends Specification {
 
 	def "15. Test reactionJson for The API Action in different scenarios" () {
 		setup: "Create a valid ApiActionCommand"
-			Provider provider = providerHelper.createProvider(project)
-			ApiActionCommand cmd = new ApiActionCommand(project: project)
-			cmd.with {
+			Provider provider1 = providerHelper.createProvider(project)
+			ApiAction apiAction = new ApiAction(project: project)
+			apiAction.with {
 				name = RSU.randomAlphabetic(10)
 				description = "some description"
-				providerId = provider.id
+				provider= provider1
 				agentClass = "AWS"
 				agentMethod = "X"
 				callbackMode = "NA"
@@ -492,38 +469,37 @@ class ApiActionServiceIntegrationTests extends Specification {
 				useWithAsset = 0
 			}
 		when: "Validating the command object"
-			cmd.validate()
+			apiAction.validate()
 		then: "No errors detected"
-			!cmd.hasErrors()
+			!apiAction.hasErrors()
 		when: "Using a JSON with no SUCCESS"
-			cmd.reactionJson = "{\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
-			cmd.validate()
-		then: "The command object fails"
-			cmd.hasErrors()
+			apiAction.reactionJson = "{\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+			apiAction.validate()
+		then: "The validation fails"
+			apiAction.hasErrors()
 		and: "The cause of the failure is the reactionJson field"
-			cmd.errors.hasFieldErrors("reactionJson")
+			apiAction.errors.hasFieldErrors("reactionJson")
 		and: "It's the only field failing"
-			cmd.errors.allErrors.size() == 1
+			apiAction.errors.allErrors.size() == 1
 		and: "The cause is the missing attribute in the JSON"
-			cmd.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+			apiAction.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
 		when: "Using a JSON with no DEFAULT and no ERROR"
-			cmd.reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\"}"
-			cmd.validate()
+			apiAction.reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\"}"
+			apiAction.validate()
 		then: "The validation of the command object fails of the missing attributes."
-			cmd.errors.allErrors[0].code == Message.ApiActionMissingDefaultAndErrorInReactionJson
+			apiAction.errors.allErrors[0].code == Message.ApiActionMissingDefaultAndErrorInReactionJson
 		when: "Using a JSON with no EVALUATE"
-			cmd.reactionJson = "{\"SUCCESS\": \"success\" ,\"DEFAULT\": \"default\"}"
-			cmd.validate()
-		then: "The validation of the command object fails of the missing attributes."
-			cmd.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+			apiAction.reactionJson = "{\"SUCCESS\": \"success\" ,\"DEFAULT\": \"default\"}"
+			apiAction.validate()
+		then: "The validation fails because of the missing attributes."
+			apiAction.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
 		when: "Using an invalid JSON"
-			cmd.reactionJson = "BOGUS"
-			cmd.validate()
+			apiAction.reactionJson = "BOGUS"
+			apiAction.validate()
 		then: "The validation of the command object fails of the missing attributes."
-			cmd.errors.allErrors[0].code == Message.ApiActionInvalidReactionJson
+			apiAction.errors.allErrors[0].code == Message.InvalidFieldForDomain
 
 	}
-
 	/*
 	 * This closure is used to validate the 'invoke' test case such that it validates that the argument
 	 * sent to the awsService.sendSnsNotification method are properly formed

@@ -3,7 +3,6 @@ package net.transitionmanager.domain
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
-import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
@@ -121,7 +120,7 @@ class ApiAction {
 		pollingLapsedAfter nullable: false, range: 0..1
 		pollingStalledAfter nullable: false, range: 0..1
 		producesData nullable: false, range:0..1
-		provider nullable: false
+		provider nullable: false, validator: providerValidator
 		reactionJson size: 1..65535, blank: false, validator: reactionJsonValidator
 		timeout nullable: true
 		useWithAsset nullable: false, range: 0..1
@@ -201,7 +200,17 @@ class ApiAction {
 				return Message.ApiActionMissingEvaluateOrSuccessInReactionJson
 			}
 		} catch (InvalidParamException e) {
-			return Message.ApiActionInvalidReactionJson
+			return Message.InvalidFieldForDomain
+		}
+	}
+
+	/**
+	 * A validator that takes an API Action and a field and checks
+	 * that both reference the same project.
+	 */
+	static providerValidator = { provider, apiAction ->
+		if (provider.project.id != apiAction.project.id) {
+			return Message.InvalidFieldForDomain
 		}
 	}
 
@@ -209,9 +218,9 @@ class ApiAction {
 	 * Validator that accepts a field of an ApiAction and the corresponding
 	 * ApiAction and checks that the providers are the same.
 	 */
-	static crossProviderValidator = { aDomain, apiAction ->
-		if (aDomain) {
-			if (aDomain.provider.id != apiAction.provider.id) {
+	static crossProviderValidator = { aField, apiAction ->
+		if (aField) {
+			if (aField.provider.id != apiAction.provider.id) {
 				return Message.InvalidFieldForDomain
 			}
 		}
