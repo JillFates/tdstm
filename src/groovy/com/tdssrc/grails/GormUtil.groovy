@@ -17,6 +17,7 @@ import org.codehaus.groovy.grails.validation.Constraint
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.opensaml.xml.signature.P
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
@@ -455,21 +456,32 @@ public class GormUtil {
 	 * Retrieve a list of domain properties. If a list of property names is given, only
 	 * those properties will be included. If a list of properties to be skipped is provided,
 	 * those properties will be excluded.
+	 * If
 	 * @param domainClass
 	 * @param properties
 	 * @return
 	 */
 	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
 		List<GrailsDomainClassProperty> domainProperties = []
+		boolean allProperties = false
+		DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
 		if (properties) {
 			for (String property in properties) {
-				GrailsDomainClassProperty domainProperty = getDomainProperty(domainClass, property)
+				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
 				if (domainProperty) {
 					domainProperties << domainProperty
+				} else {
+					/* if at least one property wasn't found, assume there's not enough information and all the
+					properties should be returned. */
+					allProperties = true
+					break
 				}
 			}
 		} else {
-			DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+			allProperties = true
+		}
+
+		if (allProperties) {
 			domainProperties = dfdc.getPersistentProperties()
 		}
 
@@ -1009,12 +1021,13 @@ public class GormUtil {
 	 * @param skipProperties - you can exclude certain properties by passing their names in this list.
 	 * @return
 	 */
-	static Map domainObjectToMap(domainObject, List<String> properties = null, List<String> skipProperties = null) {
+	static Map domainObjectToMap(domainObject, List<String> properties = null, List<String> skipProperties = null, boolean navigateReferences = true) {
 
 		if (!domainObject) {
 			return null
 		}
 
+		List<String> minimalProperties = ["id", "name"]
 		Map domainMap = [:]
 
 		Class domainClass = domainObject.class
@@ -1031,7 +1044,17 @@ public class GormUtil {
 					}
 					// if the property is a reference, call this method recursively with a predefined list of fields..
 				} else if (isDomainClass(property.type)) {
-					domainMap[property.name] = domainObjectToMap(domainObject[property.name], ["id", "name"])
+					if (navigateReferences) {
+						domainMap[property.name] = domainObjectToMap(domainObject[property.name], minimalProperties, null, false)
+					}
+
+				} else if (Collection.isAssignableFrom(property.type)){
+					if (navigateReferences) {
+						List<Map> listReferences = []
+						for (element in domainObject[property.name]) {
+							listReferences << domainObjectToMap(element, minimalProperties, null, false)
+						}
+					}
 				} else {
 					// If it's a regular property, just copy its value.
 					domainMap[property.name] = domainObject[property.name]
