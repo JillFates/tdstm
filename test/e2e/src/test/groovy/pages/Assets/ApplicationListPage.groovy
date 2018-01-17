@@ -19,17 +19,17 @@ class ApplicationListPage extends Page {
     }
 
     static content = {
-        alPageTitle(wait:true)      { $("section", 	class:"content-header").find("h1") }
+        alPageTitle                 (wait:true) { $("section", 	class:"content-header").find("h1") }
         alPageBreadcrumbs           { $("ol", class:"breadcrumb").find("li a")}
-        alPageMessage (required: false, wait:true) { $("div#messageId")}
-        alCompanySelector           { $('select#filterSelect', name:'companyId')}
-        alCompanySelectorDefault    { alCompanySelector.find("option", selected:"selected") }
+        alPageMessage               (required: false, wait:true) { $("div#messageId")}
+
 
         alView                      { $("div#gview_applicationIdGrid")}
+        alLoadingGrid               { $("div#load_applicationIdGrid")}
         alViewHeaderBar             { alView.find("div", class:"ui-jqgrid-titlebar ui-widget-header ui-corner-top ui-helper-clearfix")}
 // TODO following item have the elements inside the label
         //  alHeaderBarTitle          { $("span", class:"ui-jqgrid-title") }
-        alCreateAppBtn(wait:true)   { alViewHeaderBar.find("input", type: "button", "onclick":"EntityCrud.showAssetCreateView('APPLICATION');") }
+        alCreateAppBtn(wait:true)   { alViewHeaderBar.find("input", type: "button", "onclick":startsWith("EntityCrud.showAssetCreateView"))}
         alBulkDeleteBtn             { alViewHeaderBar.find("input#deleteAssetId", type: "button") }
         alJustPlanningCBox          { alViewHeaderBar.find("input#justPlanning", type: "checkbox") }
         alClearFiltersBtn           { alViewHeaderBar.find("input",class:"clearFilterId", type: "button") }
@@ -45,15 +45,28 @@ class ApplicationListPage extends Page {
         alNameColHeader             { alColumnsHeader.find("div#jqgh_assetName")}
         alNameFilter                { $("input#gs_assetName") }
 
-        alGridRows                  { alView.find("table#applicationIdGrid").find("tr","role":"row", class:"ui-widget-content jqgrow ui-row-ltr")}
+        alGrid                      (required: false, wait:true){alView.find("table#applicationIdGrid")}
+        alGridRows                  (required: false, wait:true) { alGrid.find("tr","role":"row", class:"ui-widget-content jqgrow ui-row-ltr")}
         alGridSize                  { alGridRows.size()}
         alRowSize                   { alGridHeaderCols.size()}
 
-        alFirstAppName              { alGridRows[0].find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alFirstAppName              { alGridRows.first().find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alFirstAppActions           { alGridRows.first().find("td", "aria-describedby":"applicationIdGrid_act")}
+        alFirstAppEdit              { alFirstAppActions.find("a", href:contains("EntityCrud.showAssetEditView"))}
+        alFirstCreateShowTasks      { alFirstAppActions.find("a", id:startsWith("icon_task"))}
+        alFirstCreateShowComments   { alFirstAppActions.find("a", href:contains("icon_comment"))}
+        alFirstAppClone             { alFirstAppActions.find("a", href:contains("EntityCrud.cloneAssetView"))}
+
+        alLastAppName               { alGridRows.last().find("td","aria-describedby":"applicationIdGrid_assetName").find("a")}
+        alLastAppActions            { alGridRows.last().find("td", "aria-describedby":"applicationIdGrid_act")}
+        alLastAppEdit               { alLastAppActions.find("a", href:contains("EntityCrud.showAssetEditView"))}
+        alLastCreateShowTasks       { alLastAppActions.find("a", id:startsWith("icon_task"))}
+        alLastCreateShowComments    { alLastAppActions.find("a", href:contains("icon_comment"))}
+        alLastAppClone              { alLastAppActions.find("a", href:contains("EntityCrud.cloneAssetView"))}
 
         alGridPager                 { $("div#pg_applicationIdGridPager")}
-        alCreateappModal(required: false, wait:true) {$ ("div", class:"modal fade in")}
-        alManageappModal(required: false, wait:true) { $("div", "window-class":"modal-task")}
+        alCreateappModal            (required: false, wait:true) {$ ("div", class:"modal fade in")}
+        alManageappModal            (required: false, wait:true) { $("div", "window-class":"modal-task")}
 
 
     }
