@@ -1,6 +1,8 @@
 package net.transitionmanager.integration
 
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.MessageSourceService
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Scope
 import org.springframework.context.i18n.LocaleContextHolder
@@ -19,11 +21,11 @@ import org.springframework.stereotype.Component
  *                  .build(ReactionScriptCode.FINAL)
  * </code>
  */
-@Component
-@Scope("prototype")
+//@Component
+//@Scope("prototype")
 class ApiActionScriptBindingBuilder {
 
-	MessageSource messageSource
+	MessageSourceService messageSourceService
 
 	ActionRequest request
 	ApiActionResponse response
@@ -65,11 +67,10 @@ class ApiActionScriptBindingBuilder {
 		params.each { String param ->
 
 			if (!this."${param}") {
-				String message = messageSource.getMessage(Message.ApiActionInvalidBindingParams,
-						[code, param] as String[],
-						'Can not build a biding context for {0} without {1} object',
-						LocaleContextHolder.locale)
-
+				String message = messageSourceService.i18nMessage(
+						Message.ApiActionInvalidBindingParams,
+						[code, param] as Object[],
+						'Can not build a biding context for {0} without {1} object')
 				throw new ApiActionException(message)
 			}
 		}
@@ -88,7 +89,7 @@ class ApiActionScriptBindingBuilder {
 		switch (code) {
 			case ReactionScriptCode.PRE:
 				checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
-				binding = new ApiActionScriptBinding(messageSource,
+				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request: request,
 								asset  : asset,
@@ -98,19 +99,19 @@ class ApiActionScriptBindingBuilder {
 				break
 			case ReactionScriptCode.STATUS:
 				checkParams(ReactionScriptCode.STATUS, ['request', 'response'])
-				binding = new ApiActionScriptBinding(messageSource,
+				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request : request,
 								response: response,
 								*       : ReactionScriptCode.values()
 										.collectEntries {
 									[(it.name()): it]
-										}
+								}
 						])
 				break
 			default:
 				checkParams(ReactionScriptCode.DEFAULT, ['request', 'response', 'asset', 'task', 'job'])
-				binding = new ApiActionScriptBinding(messageSource,
+				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request : request,
 								response: response,

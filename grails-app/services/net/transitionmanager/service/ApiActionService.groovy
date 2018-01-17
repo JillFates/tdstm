@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -7,14 +8,12 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.*
 import net.transitionmanager.command.ApiActionCommand
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import com.tds.asset.AssetComment
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.*
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
+import org.codehaus.groovy.control.ErrorCollector
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
@@ -412,9 +411,16 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
+	Map<String, ?> invokeReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
 				.with(response)
 				.with(asset)
@@ -431,6 +437,100 @@ class ApiActionService implements ServiceMethods {
 				result: result
 		]
 	}
+
+	/**
+	 * This method is used to parse the scripts syntax
+	 * First prepares an instance of ApiActionScriptProcessor.
+	 * Then it creates an instance of ApiActionScriptBinding based on code parameter.
+	 * After that it parses the script using an instance of GroovyShell.
+	 * @param code an instance of ReactionScriptCode to create a instance of ApiActionScriptBinding
+	 * @param script the script code to be evaluated
+	 * @param request ActionRequest instance to be bound in the ApiActionScriptBinding instance
+	 * @param response ApiActionResponse instance to be bound in the ApiActionScriptBinding instance
+	 * @param task ReactionTaskFacade instance to be bound in the ApiActionScriptBinding instance
+	 * @param asset ReactionAssetFacade instance to be bound in the ApiActionScriptBinding instance
+	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
+	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
+	 */
+	Map<String, ?> compileReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
+
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
+				.with(request)
+				.with(response)
+				.with(asset)
+				.with(task)
+				.with(job)
+				.build(ReactionScriptCode.FINAL)
+
+		List<Map<String, ?>> errors = []
+
+		try {
+
+			new GroovyShell(this.class.classLoader, scriptBinding)
+					.parse(script, ApiActionScriptBinding.class.name)
+
+		} catch (MultipleCompilationErrorsException cfe) {
+			ErrorCollector errorCollector = cfe.getErrorCollector()
+			log.error("ETL script parse errors: " + errorCollector.getErrorCount(), cfe)
+			errors = errorCollector.getErrors()
+		}
+
+		List errorsMap = errors.collect { error ->
+			[
+					startLine  : (error.cause?.startLine)?:"",
+					endLine    : (error.cause?.endLine)?:"",
+					startColumn: (error.cause?.startColumn)?:"",
+					endColumn  : (error.cause?.endColumn)?:"",
+					fatal      : (error.cause?.fatal)?:"",
+					message    : (error.cause?.message)?:""
+			]
+		}
+
+		return [
+				validSyntax: errors.isEmpty(),
+				errors     : errorsMap
+		]
+	}
+
+	/**
+	 * It validates a request with a list of API action/reaction scripts.
+	 * @see net.transitionmanager.service.ApiActionService#invokeReactionScript
+	 * @param scripts a list of net.transitionmanager.integration.ApiActionScriptCommand
+	 * @return a List with results of evaluating every instance of ApiActionScriptCommand
+	 */
+	List<Map<String, ?>> validateSyntax(List<ApiActionScriptCommand> scripts) {
+
+		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
+
+			Map<String, ?> scriptResults = [code: scriptBindingCommand.code.name()]
+			try {
+
+				scriptResults = compileReactionScript(
+						scriptBindingCommand.code,
+						scriptBindingCommand.script,
+						new ActionRequest(),
+						new ApiActionResponse(),
+						new ReactionTaskFacade(),
+						new ReactionAssetFacade(),
+						new ApiActionJob()
+				)
+
+			} catch (Exception ex) {
+				log.error("Exception evaluating script ${scriptBindingCommand.script} with code: ${scriptBindingCommand.code}", ex)
+				scriptResults.error = ex.getMessage()
+			}
+
+			return scriptResults
+		}
+	}
+
 	/**
 	 * It checks if the code is ReactionScriptCode.EVALUATE and the results is an instance of ReactionScriptCode.
 	 * If results it is not an instance of ReactionScriptCode,  It throws an Exception.
@@ -439,10 +539,8 @@ class ApiActionService implements ServiceMethods {
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.STATUS && !(result instanceof ReactionScriptCode)) {
-			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
-					[] as String[],
-					'Script must return SUCCESS or ERROR',
-					LocaleContextHolder.locale))
+			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
+					'Script must return SUCCESS or ERROR'))
 		}
 	}
 
