@@ -188,12 +188,7 @@ class WsDataScriptController implements ControllerMethods {
 
         Project project = securityService.getUserCurrentProjectOrException()
 
-        DataScript dataScript = fetchDomain(DataScript, [id: command.id])
-
-        if (!dataScript) {
-            sendNotFound()
-            return
-        }
+        DataScript dataScript = dataScriptService.getDataScript(command.id)
 
         if (dataScript.project != project) {
             securityService.reportViolation("attempted to ACTION dataview ($command.id) not assoc with project")
