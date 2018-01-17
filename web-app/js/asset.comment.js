@@ -109,7 +109,7 @@ function invokeAction(commentId) {
  */
 function resetAction(commentId) {
     updateStatus(commentId);
-    if (confirm("Reset Action?")) {
+    if (confirm("Are you sure you want to reset the action?")) {
         $("#messageDivId").show();
         $("#messageDivId").html("Starting to set default power connections.")
         jQuery.ajax({
