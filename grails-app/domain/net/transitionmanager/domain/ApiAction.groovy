@@ -75,6 +75,7 @@ class ApiAction {
 	CallbackMode callbackMode = CallbackMode.NA
 
 	Date dateCreated
+
 	Date lastModified
 
 	// The URL to the endpoint
@@ -83,8 +84,20 @@ class ApiAction {
 	// The Path to the endpoint
 	String endpointPath
 
+	// A flag that indicates if the action will poll for a result
+	Integer isPolling = 0
+
+	// The time period after after which a polling action is determined to have lapsed (seconds)
+	Integer pollingLapsedAfter = 0
+
+	// The time period after no increment in status of a polling action results in the LAPSED event get invoked (seconds)
+	Integer pollingStalledAfter = 0
+
+	// A flag that indicates that all of the syntax of the reactionScripts has been validated
+	Integer reactionScriptsValid = 0
+
 	// The JSON hash that will contain the scripts to be invoked appropriately.
-	String reactionJson
+	String reactionScripts
 
 	// Flag indicating that the action interacts with a Task.
 	Integer useWithAsset = 0
@@ -92,12 +105,6 @@ class ApiAction {
 	// Flag indicating that the action interacts with an Asset.
 	Integer useWithTask = 0
 
-
-	// The time period after after which a polling action is determined to have lapsed (seconds)
-	Integer pollingLapsedAfter = 0
-
-	// The time period after no increment in status of a polling action results in the LAPSED event get invoked (seconds)
-	Integer pollingStalledAfter = 0
 
 	static belongsTo = [
 		project: Project,
@@ -114,14 +121,16 @@ class ApiAction {
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
-		name nullable: false, size: 1..64, unique: 'project'
-		methodParams nullable: true
+		isPolling nullable: false, range: 0..1
 		lastModified nullable: true
+		methodParams nullable: true
+		name nullable: false, size: 1..64, unique: 'project'
 		pollingLapsedAfter nullable: false, range: 0..1
 		pollingStalledAfter nullable: false, range: 0..1
 		producesData nullable: false, range:0..1
 		provider nullable: false, validator: providerValidator
-		reactionJson size: 1..65535, blank: false, validator: reactionJsonValidator
+		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
+		reactionScriptsValid nullable: false, range: 0..1
 		timeout nullable: true
 		useWithAsset nullable: false, range: 0..1
 		useWithTask nullable: false, range: 0..1
@@ -190,14 +199,15 @@ class ApiAction {
 	static reactionJsonValidator = { String reactionJsonString, ApiAction apiAction ->
 		try {
 			JSONObject reactionJson = JsonUtil.parseJson(reactionJsonString)
-			// EVALUATE and SUCCESS are mandatory.
-			if (reactionJson[ReactionScriptCode.EVALUATE.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
+			// STATUS and SUCCESS are mandatory.
+			if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
 				// Either DEFAULT or ERROR need to be specified.
 				if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
+					apiAction.reactionScriptsValid = 0
 					return Message.ApiActionMissingDefaultAndErrorInReactionJson
 				}
 			} else {
-				return Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+				return Message.ApiActionMissingStatusOrSuccessInReactionJson
 			}
 
 			boolean errors = false
@@ -214,10 +224,13 @@ class ApiAction {
 
 			// If errors were detected update the reactionJson.
 			if (errors) {
-				apiAction.reactionJson = JsonUtil.toJson(reactionJson)
-				// Set to true, otherwise the validation fails and it doesn't run again.
-				return true
+				apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
 			}
+
+			apiAction.reactionScriptsValid = errors ? 0 : 1
+
+			// Set to true, otherwise the validation fails.
+			return true
 
 		} catch (InvalidParamException ipe) {
 			return Message.InvalidFieldForDomain

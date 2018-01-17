@@ -32,7 +32,7 @@ class ApiActionTestHelper {
                 pollingLapsedAfter: 0,
                 pollingStalledAfter: 0,
                 project: project,
-                reactionJson: "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}",
+                reactionScripts: "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}",
                 useWithAsset: 0,
                 useWithTask: 0
         )

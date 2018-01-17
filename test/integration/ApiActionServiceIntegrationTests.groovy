@@ -1,8 +1,6 @@
-import com.tdssrc.grails.JsonUtil
 import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
@@ -11,7 +9,6 @@ import com.tdssrc.grails.GormUtil
 import net.transitionmanager.agent.*
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
@@ -22,7 +19,7 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.service.ProviderService
 import org.apache.commons.lang.RandomStringUtils as RSU
-import org.codehaus.groovy.grails.web.json.JSONObject
+
 //import spock.lang.Specification
 import spock.lang.*
 import test.helper.ProviderTestHelper
@@ -340,7 +337,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				producesData = 0
 				pollingInterval = 0
 				timeout = 0
-				reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+				reactionScripts = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
 				pollingLapsedAfter = 0
 				pollingStalledAfter = 0
 				useWithTask = 0
@@ -388,7 +385,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			producesData = 0
 			pollingInterval = 0
 			timeout = 0
-			reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+			reactionScripts = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
 			pollingLapsedAfter = 0
 			pollingStalledAfter = 0
 			useWithTask = 0
@@ -461,7 +458,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 				producesData = 0
 				pollingInterval = 0
 				timeout = 0
-				reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+				reactionScripts = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
 				pollingLapsedAfter = 0
 				pollingStalledAfter = 0
 				useWithTask = 0
@@ -472,7 +469,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: "No errors detected"
 			!apiAction.hasErrors()
 		when: "Using a JSON with no SUCCESS"
-			apiAction.reactionJson = "{\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
+			apiAction.reactionScripts = "{\"EVALUATE\": \"evaluate\",\"ERROR\": \"error\"}"
 			apiAction.validate()
 		then: "The validation fails"
 			apiAction.hasErrors()
@@ -481,19 +478,19 @@ class ApiActionServiceIntegrationTests extends Specification {
 		and: "It's the only field failing"
 			apiAction.errors.allErrors.size() == 1
 		and: "The cause is the missing attribute in the JSON"
-			apiAction.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+			apiAction.errors.allErrors[0].code == Message.ApiActionMissingStatusOrSuccessInReactionJson
 		when: "Using a JSON with no DEFAULT and no ERROR"
-			apiAction.reactionJson = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\"}"
+			apiAction.reactionScripts = "{\"SUCCESS\": \"success\",\"EVALUATE\": \"evaluate\"}"
 			apiAction.validate()
 		then: "The validation of the command object fails of the missing attributes."
 			apiAction.errors.allErrors[0].code == Message.ApiActionMissingDefaultAndErrorInReactionJson
 		when: "Using a JSON with no EVALUATE"
-			apiAction.reactionJson = "{\"SUCCESS\": \"success\" ,\"DEFAULT\": \"default\"}"
+			apiAction.reactionScripts = "{\"SUCCESS\": \"success\" ,\"DEFAULT\": \"default\"}"
 			apiAction.validate()
 		then: "The validation fails because of the missing attributes."
-			apiAction.errors.allErrors[0].code == Message.ApiActionMissingEvaluateOrSuccessInReactionJson
+			apiAction.errors.allErrors[0].code == Message.ApiActionMissingStatusOrSuccessInReactionJson
 		when: "Using an invalid JSON"
-			apiAction.reactionJson = "BOGUS"
+			apiAction.reactionScripts = "BOGUS"
 			apiAction.validate()
 		then: "The validation of the command object fails of the missing attributes."
 			apiAction.errors.allErrors[0].code == Message.InvalidFieldForDomain

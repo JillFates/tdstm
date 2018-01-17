@@ -83,7 +83,7 @@ class ApiActionServiceSpec extends Specification {
 			""".stripIndent()
 
 			Map<String, ?> response = service.evaluateReactionScript(
-					ReactionScriptCode.EVALUATE,
+					ReactionScriptCode.STATUS,
 					script,
 					actionRequest,
 					actionResponse,
@@ -158,7 +158,7 @@ class ApiActionServiceSpec extends Specification {
 			""".stripIndent()
 
 			service.evaluateReactionScript(
-					ReactionScriptCode.EVALUATE,
+					ReactionScriptCode.STATUS,
 					script,
 					actionRequest,
 					actionResponse.asImmutable(),
@@ -199,7 +199,7 @@ class ApiActionServiceSpec extends Specification {
 			""".stripIndent()
 
 			service.evaluateReactionScript(
-					ReactionScriptCode.EVALUATE,
+					ReactionScriptCode.STATUS,
 					script,
 					actionRequest,
 					actionResponse.asImmutable(),

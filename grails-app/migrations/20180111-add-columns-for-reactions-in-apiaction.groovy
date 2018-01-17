@@ -4,9 +4,11 @@ databaseChangeLog = {
         sql ("""ALTER TABLE api_action
                 ADD COLUMN endpoint_path VARCHAR(255),
                 ADD COLUMN endpoint_url VARCHAR(255),
-                ADD COLUMN reaction_json TEXT NOT NULL,
-                ADD COLUMN use_with_asset TINYINT DEFAULT 0,
-                ADD COLUMN use_with_task TINYINT DEFAULT 0,
+                ADD COLUMN is_polling TINYINT NOT NULL DEFAULT 0,
+                ADD COLUMN reaction_scripts JSON NOT NULL,
+                ADD COLUMN reaction_scripts_valid TINYINT NOT NULL DEFAULT 0,
+                ADD COLUMN use_with_asset TINYINT NOT NULL DEFAULT 0,
+                ADD COLUMN use_with_task TINYINT NOT NULL DEFAULT 0,
                 ADD COLUMN polling_lapsed_after INT(10) NOT NULL DEFAULT 0,
                 ADD COLUMN polling_stalled_after INT(10) NOT NULL DEFAULT 0
             """)

@@ -27,6 +27,7 @@ class ApiActionCommand{
     String description
     String endpointPath
     String endpointUrl
+    Integer isPolling
     String methodParams
     String name
     Integer pollingInterval
@@ -34,10 +35,9 @@ class ApiActionCommand{
     Integer pollingStalledAfter
     Integer producesData
     Provider provider
-    String reactionJson
+    String reactionScripts
     Integer timeout
     Integer useWithAsset
     Integer useWithTask
-
-
+    
 }

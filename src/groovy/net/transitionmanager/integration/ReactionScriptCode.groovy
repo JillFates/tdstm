@@ -5,7 +5,7 @@ package net.transitionmanager.integration
  */
 enum ReactionScriptCode {
 
-	EVALUATE,
+	STATUS,
 	SUCCESS,
 	ERROR,
 	DEFAULT,

@@ -24,7 +24,7 @@ interface Message {
 	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
 	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
 	// Messages for the different errors in the ApiAction reactionJson
-	String ApiActionMissingEvaluateOrSuccessInReactionJson = "apiAction.reactionJson.emptyEvaluateOrSuccess"
+	String ApiActionMissingStatusOrSuccessInReactionJson = "apiAction.reactionJson.emptyStatusOrSuccess"
 	String ApiActionMissingDefaultAndErrorInReactionJson = "apiAction.reactionJson.emptyDefaultAndError"
 
 

@@ -15,8 +15,6 @@ import com.tds.asset.AssetComment
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
@@ -440,7 +438,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param result
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
-		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
+		if (code == ReactionScriptCode.STATUS && !(result instanceof ReactionScriptCode)) {
 			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
 					[] as String[],
 					'Script must return SUCCESS or ERROR',

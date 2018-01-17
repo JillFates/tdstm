@@ -96,8 +96,8 @@ class ApiActionScriptBindingBuilder {
 								job    : job
 						])
 				break
-			case ReactionScriptCode.EVALUATE:
-				checkParams(ReactionScriptCode.EVALUATE, ['request', 'response'])
+			case ReactionScriptCode.STATUS:
+				checkParams(ReactionScriptCode.STATUS, ['request', 'response'])
 				binding = new ApiActionScriptBinding(messageSource,
 						[
 								request : request,
