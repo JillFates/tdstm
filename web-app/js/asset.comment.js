@@ -109,22 +109,25 @@ function invokeAction(commentId) {
  */
 function resetAction(commentId) {
     updateStatus(commentId);
-
-    jQuery.ajax({
-        url:contextPath+'/ws/task/'+commentId+'/resetAction',
-        data: {},
-        type:'POST',
-        success: function(data) {
-            if (typeof data.error !== 'undefined') {
-                alert(data.error);
-            } else {
-                pageSubmit();
+    if (confirm("Reset Action?")) {
+        $("#messageDivId").show();
+        $("#messageDivId").html("Starting to set default power connections.")
+        jQuery.ajax({
+            url: contextPath + '/ws/task/' + commentId + '/resetAction',
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (typeof data.error !== 'undefined') {
+                    alert(data.error);
+                } else {
+                    pageSubmit();
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("An unexpected error occurred while attempting to update task/comment")
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert("An unexpected error occurred while attempting to update task/comment")
-        }
-    });
+        });
+    }
 }
 
 /**
