@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdsops.etl.ETLProcessor
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
@@ -450,13 +449,14 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	Map<String, ?> invokeReactionScript(ReactionScriptCode code,
-										String script,
-										ActionRequest request,
-										ApiActionResponse response,
-										ReactionTaskFacade task,
-										ReactionAssetFacade asset,
-										ApiActionJob job) {
+	Map<String, ?> invokeReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
 
 		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
@@ -490,12 +490,14 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	Map<String, ?> compileReactionScript(ReactionScriptCode code, String script,
-										 ActionRequest request,
-										 ApiActionResponse response,
-										 ReactionTaskFacade task,
-										 ReactionAssetFacade asset,
-										 ApiActionJob job) {
+	Map<String, ?> compileReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
 
 		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
