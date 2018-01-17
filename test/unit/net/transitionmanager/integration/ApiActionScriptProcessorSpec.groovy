@@ -4,9 +4,7 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -18,8 +16,6 @@ import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 @TestMixin(GrailsUnitTestMixin)
 class ApiActionScriptProcessorSpec extends Specification {
 
-	StaticMessageSource messageSource
-
 	static doWithSpring = {
 		messageSourceService(MessageSourceService) { bean ->
 			messageSource = ref('messageSource')
@@ -29,11 +25,6 @@ class ApiActionScriptProcessorSpec extends Specification {
 			bean.scope = 'prototype'
 			messageSourceService = ref('messageSourceService')
 		}
-	}
-
-	def setup() {
-		messageSource = applicationContext.getBean(MessageSource)
-		assertNotNull messageSource
 	}
 
 	@Unroll

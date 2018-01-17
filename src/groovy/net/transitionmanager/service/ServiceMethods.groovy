@@ -1,8 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.i18n.Message
-import org.springframework.context.MessageSource
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.context.i18n.LocaleContextHolder
 
 import javax.servlet.http.HttpServletRequest
@@ -13,7 +12,7 @@ import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
 
-	def applicationContext
+	GrailsApplication grailsApplication
 	MessageSourceService messageSourceService
 
 	/**

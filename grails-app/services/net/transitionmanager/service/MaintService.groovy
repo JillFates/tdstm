@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.InitializingBean
 
 import javax.servlet.ServletContext
@@ -21,7 +20,6 @@ class MaintService implements InitializingBean, ServiceMethods {
 	static boolean inMaintMode = false
 
 	ServletContext servletContext
-	GrailsApplication grailsApplication
 
 	@CompileDynamic
 	void afterPropertiesSet() {

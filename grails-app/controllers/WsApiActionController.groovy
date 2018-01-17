@@ -6,6 +6,13 @@ import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ApiActionValidateScriptCommand
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.SecurityService
@@ -85,7 +92,6 @@ class WsApiActionController implements ControllerMethods {
 
     }
 
-
     /**
      * Update the corresponding ApiAction.
      */
@@ -96,4 +102,15 @@ class WsApiActionController implements ControllerMethods {
         AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
         renderSuccessJson(apiAction.toMap(agent, false))
     }
+
+	@HasPermission(Permission.ActionInvoke)
+	def validateSyntax(ApiActionValidateScriptCommand command) {
+
+		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
+			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
+		} else {
+			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
+		}
+	}
+
 }
