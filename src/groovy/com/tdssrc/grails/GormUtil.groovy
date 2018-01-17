@@ -11,13 +11,13 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import org.hibernate.FlushMode
 import org.hibernate.Session
 import org.hibernate.SessionFactory
-import org.opensaml.xml.signature.P
 import org.springframework.context.MessageSource
 import org.springframework.util.Assert
 
@@ -1017,6 +1017,17 @@ public class GormUtil {
 			}
 		}
 		return instance
+	}
+
+	/**
+	 * Determine if a domain property represents a referenced class type or if the property is an association
+	 * @param domainObject
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isReferenceProperty(Object domainObject, String propertyName) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
 	}
 
 	/**
