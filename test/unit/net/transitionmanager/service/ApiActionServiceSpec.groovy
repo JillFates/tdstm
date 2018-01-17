@@ -24,6 +24,42 @@ class ApiActionServiceSpec extends Specification {
 		service.grailsApplication = grailsApplication
 	}
 
+	def 'test can validate syntax for a reaction PRE script'() {
+
+		setup: 'Given an instance of ApiActionScriptProcessor'
+
+			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
+			ApiActionResponse actionResponse = new ApiActionResponse()
+			ReactionAssetFacade asset = new ReactionAssetFacade()
+			ReactionTaskFacade task = new ReactionTaskFacade()
+			ApiActionJob job = new ApiActionJob()
+
+		when: 'A PRE script is evaluated'
+			String script = """
+				request.param.format = 'json'
+				request.headers.add('header1', 'value1')
+						
+				request.config.setProperty('proxyAuthHost', '123.88.23.42')
+				request.config.setProperty('proxyAuthPort', 8080)
+			""".stripIndent()
+
+			Map<String, ?> response = service.compileReactionScript(
+					ReactionScriptCode.PRE,
+					script,
+					actionRequest,
+					actionResponse,
+					task,
+					asset,
+					job
+			)
+
+		then: 'Service result returns the last interaction within the script'
+			with(response) {
+				validSyntax
+				!errors
+			}
+	}
+
 	def 'test can evaluate a reaction PRE script'() {
 
 		setup: 'Given an instance of ApiActionScriptProcessor'
@@ -43,7 +79,7 @@ class ApiActionServiceSpec extends Specification {
 				request.config.setProperty('proxyAuthPort', 8080)
 			""".stripIndent()
 
-			Map<String, ?> response = service.evaluateReactionScript(
+			Map<String, ?> response = service.invokeReactionScript(
 					ReactionScriptCode.PRE,
 					script,
 					actionRequest,
@@ -81,7 +117,7 @@ class ApiActionServiceSpec extends Specification {
 				}
 			""".stripIndent()
 
-			Map<String, ?> response = service.evaluateReactionScript(
+			Map<String, ?> response = service.invokeReactionScript(
 					ReactionScriptCode.EVALUATE,
 					script,
 					actionRequest,
@@ -118,7 +154,7 @@ class ApiActionServiceSpec extends Specification {
 				}
 			""".stripIndent()
 
-			Map<String, ?> response = service.evaluateReactionScript(
+			Map<String, ?> response = service.invokeReactionScript(
 					ReactionScriptCode.SUCCESS,
 					script,
 					actionRequest,
@@ -156,7 +192,7 @@ class ApiActionServiceSpec extends Specification {
 				 } 
 			""".stripIndent()
 
-			service.evaluateReactionScript(
+			service.invokeReactionScript(
 					ReactionScriptCode.EVALUATE,
 					script,
 					actionRequest,
@@ -197,7 +233,7 @@ class ApiActionServiceSpec extends Specification {
 				 } 
 			""".stripIndent()
 
-			service.evaluateReactionScript(
+			service.invokeReactionScript(
 					ReactionScriptCode.EVALUATE,
 					script,
 					actionRequest,
@@ -215,12 +251,12 @@ class ApiActionServiceSpec extends Specification {
 			LocaleContextHolder.resetLocaleContext()
 	}
 
-	void 'test can validate syntax for a list fo scripts'() {
+	void 'test can validate syntax for a list fo scripts with error messages'() {
 
 		given:
 			List<ApiActionScriptCommand> scripts = [
-					new ApiActionScriptCommand(code: 'EVALUATE', script: 'if (response.status == SC.OK) {\n   return SUCCESS\n} else {\n   return ERROR\n}', reactionScriptCode: ReactionScriptCode.EVALUATE),
-					new ApiActionScriptCommand(code: 'SUCCESS', script: 'task.done()', reactionScriptCode: ReactionScriptCode.SUCCESS)
+					new ApiActionScriptCommand(code: ReactionScriptCode.EVALUATE, script: 'if (response.status == SC.OK) \n   return SUCCESS\n} else {\n   return ERROR\n}'),
+					new ApiActionScriptCommand(code: ReactionScriptCode.SUCCESS, script: 'task.done()')
 			]
 
 		when: 'a List of scripts is evaluated'
@@ -228,16 +264,21 @@ class ApiActionServiceSpec extends Specification {
 
 		then: 'service returns a list of results associated with codes'
 			results.size() == 2
-			with (results[0]) {
-				code == 'EVALUATE'
-				result == 'ERROR'
-				!error
-			}
+			with(results[0]) {
+				!validSyntax
+				errors.size() == 1
+				with(errors[0]) {
+					startLine == 3
+					endLine == 3
+					startColumn == 1
+					endColumn == 2
+					fatal == true
+					message == 'unexpected token: } @ line 3, column 1.'
+			}   }
 
-			with (results[1]) {
-				code == 'SUCCESS'
-				result == 'true'
-				!error
+			with(results[1]) {
+				validSyntax
+				!errors
 			}
 	}
 }

@@ -6,22 +6,11 @@ import net.transitionmanager.command.CommandObject
 @Validateable
 class ApiActionScriptCommand implements CommandObject {
 
-	String code
+	ReactionScriptCode code
 	String script
-	ReactionScriptCode reactionScriptCode
 
 	static constraints = {
-		code nullable: false, blank: false, validator: { val, obj ->
-			if (val) {
-				obj.reactionScriptCode = ReactionScriptCode.lookup(val)
-				if (!obj.reactionScriptCode) {
-					false
-				} else {
-					true
-				}
-			}
-		}
+		code nullable: false, blank: false
 		script nullable: false, blank: false
-		reactionScriptCode nullable: true
 	}
 }
