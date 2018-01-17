@@ -67,7 +67,7 @@ class ApiActionScriptBindingBuilder {
 		params.each { String param ->
 
 			if (!this."${param}") {
-				String message = messageSourceService.getI18NMessage(
+				String message = messageSourceService.i18nMessage(
 						Message.ApiActionInvalidBindingParams,
 						[code, param] as Object[],
 						'Can not build a biding context for {0} without {1} object')

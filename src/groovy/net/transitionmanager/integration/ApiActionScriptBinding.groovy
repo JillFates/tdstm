@@ -31,7 +31,7 @@ class ApiActionScriptBinding extends Binding {
 		if (variables?.containsKey(name)) {
 			return variables.get(name)
 		} else {
-			throw new ApiActionException(messageSourceService.getI18NMessage(
+			throw new ApiActionException(messageSourceService.i18nMessage(
 					Message.ApiActionNotBoundProperty,
 					[name] as String[],
 					'There is no property with name {0} bound in this script context'))

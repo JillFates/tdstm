@@ -30,7 +30,7 @@ class MessageSourceServiceSpec extends Specification {
         setup: 'giving a MessageSourceService'
             MessageSourceService messageSourceService = applicationContext.getBean(MessageSourceService)
         expect: 'a blank message when a message code does not exists'
-            '' == messageSourceService.getI18NMessage('property.does.not.exists.unit.test.message')
+            '' == messageSourceService.i18nMessage('property.does.not.exists.unit.test.message')
     }
 
     void "test getting an i18n message should return expected value"() {
@@ -38,7 +38,7 @@ class MessageSourceServiceSpec extends Specification {
             MessageSourceService messageSourceService = applicationContext.getBean(MessageSourceService)
             messageSource.addMessage('unit.test.message', Locale.ENGLISH, 'Blah')
         expect: 'a default locale message should be returned for the code provided'
-            'Blah' == messageSourceService.getI18NMessage('unit.test.message')
+            'Blah' == messageSourceService.i18nMessage('unit.test.message')
     }
 
     void "test getting a non existing i18n message for a different locale should return null when default message is null"() {
@@ -46,7 +46,7 @@ class MessageSourceServiceSpec extends Specification {
             MessageSourceService messageSourceService = applicationContext.getBean(MessageSourceService)
             messageSource.addMessage('unit.test.message', Locale.ENGLISH, 'Blah')
         expect: 'null should be returned when getting a message for a different locale'
-            null == messageSourceService.getI18NMessage('unit.test.message', null, null, Locale.FRANCE)
+            null == messageSourceService.i18nMessage('unit.test.message', null, null, Locale.FRANCE)
     }
 
     void "test getting an interpolated i18n message should return the expected value"() {
@@ -54,7 +54,7 @@ class MessageSourceServiceSpec extends Specification {
             MessageSourceService messageSourceService = applicationContext.getBean(MessageSourceService)
             messageSource.addMessage('unit.test.message', Locale.ENGLISH, 'Hello {0}')
         expect: 'the expected interpolated message should be returned'
-            'Hello world' == messageSourceService.getI18NMessage('unit.test.message', ['world'] as Object[])
+            'Hello world' == messageSourceService.i18nMessage('unit.test.message', ['world'] as Object[])
     }
 
 }
