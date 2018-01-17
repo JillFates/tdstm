@@ -3,6 +3,7 @@ package net.transitionmanager.integration
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.MessageSourceService
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.context.support.StaticMessageSource
@@ -20,9 +21,13 @@ class ApiActionScriptProcessorSpec extends Specification {
 	StaticMessageSource messageSource
 
 	static doWithSpring = {
+		messageSourceService(MessageSourceService) { bean ->
+			messageSource = ref('messageSource')
+		}
+
 		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 			bean.scope = 'prototype'
-			messageSource = ref('messageSource')
+			messageSourceService = ref('messageSourceService')
 		}
 	}
 

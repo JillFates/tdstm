@@ -479,10 +479,8 @@ class ApiActionService implements ServiceMethods {
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
-					[] as String[],
-					'Script must return SUCCESS or ERROR',
-					LocaleContextHolder.locale))
+			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
+					'Script must return SUCCESS or ERROR'))
 		}
 	}
 }
