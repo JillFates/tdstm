@@ -60,7 +60,7 @@ class ApiActionServiceSpec extends Specification {
 			}
 	}
 
-	def 'test can evaluate a reaction EVALUATE script'() {
+	def 'test can evaluate a reaction STATUS script'() {
 
 		setup: 'Given an instance of ApiActionScriptProcessor'
 
@@ -73,7 +73,7 @@ class ApiActionServiceSpec extends Specification {
 			ReactionTaskFacade task = new ReactionTaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
-		when: 'A EVALUATE script is evaluated'
+		when: 'A STATUS script is evaluated'
 			String script = """
 				if (response.status == SC.OK) {
 					return SUCCESS
@@ -111,7 +111,7 @@ class ApiActionServiceSpec extends Specification {
 			ReactionTaskFacade task = new ReactionTaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
-		when: 'A EVALUATE script is evaluated'
+		when: 'A STATUS script is evaluated'
 			String script = """
 				// Check to see if the asset is a VM
 				if ( asset.isaDevice() && asset.isaDatabase() ) {
@@ -138,7 +138,7 @@ class ApiActionServiceSpec extends Specification {
 			task.isDone()
 	}
 
-	void 'test can throw an Exception if a reaction EVALUATE script does not return a ReactionScriptCode'() {
+	void 'test can throw an Exception if a reaction STATUS script does not return a ReactionScriptCode'() {
 		setup:
 			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
 			ApiActionResponse actionResponse = new ApiActionResponse()
@@ -150,7 +150,7 @@ class ApiActionServiceSpec extends Specification {
 			ApiActionJob job = new ApiActionJob()
 
 
-		when: 'A EVALUATE script is evaluated that does not return a an instance of ReactionScriptCode'
+		when: 'A STATUS script is evaluated that does not return a an instance of ReactionScriptCode'
 			String script = """
 				 if (response.status == SC.OK) {
 					return SUCCESS
@@ -172,7 +172,7 @@ class ApiActionServiceSpec extends Specification {
 			e.message == 'Script must return SUCCESS or ERROR'
 	}
 
-	void 'test can throw an Exception with i18n message if a reaction EVALUATE script does not return a ReactionScriptCode'() {
+	void 'test can throw an Exception with i18n message if a reaction STATUS script does not return a ReactionScriptCode'() {
 		setup:
 
 			LocaleContextHolder.setLocale(Locale.FRENCH)
@@ -191,7 +191,7 @@ class ApiActionServiceSpec extends Specification {
 			ApiActionJob job = new ApiActionJob()
 
 
-		when: 'A EVALUATE script is evaluated that does not return a an instance of ReactionScriptCode'
+		when: 'A STATUS script is evaluated that does not return a an instance of ReactionScriptCode'
 			String script = """
 				 if (response.status == SC.OK) {
 					return SUCCESS

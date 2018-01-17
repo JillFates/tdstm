@@ -39,5 +39,4 @@ class ApiActionCommand{
     Integer timeout
     Integer useWithAsset
     Integer useWithTask
-    
 }
