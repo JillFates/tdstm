@@ -13,10 +13,13 @@ import spock.lang.Specification
 class ApiActionServiceSpec extends Specification {
 
 	static doWithSpring = {
+		messageSourceService(MessageSourceService) { bean ->
+			messageSource = ref('messageSource')
+		}
 
 		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 			bean.scope = 'prototype'
-			messageSource = ref('messageSource')
+			messageSourceService = ref('messageSourceService')
 		}
 	}
 

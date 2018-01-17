@@ -522,12 +522,12 @@ class ApiActionService implements ServiceMethods {
 
 		List errorsMap = errors.collect { error ->
 			[
-					startLine  : error.cause?.startLine,
-					endLine    : error.cause?.endLine,
-					startColumn: error.cause?.startColumn,
-					endColumn  : error.cause?.endColumn,
-					fatal      : error.cause?.fatal,
-					message    : error.cause?.message
+					startLine  : (error.cause?.startLine)?:"",
+					endLine    : (error.cause?.endLine)?:"",
+					startColumn: (error.cause?.startColumn)?:"",
+					endColumn  : (error.cause?.endColumn)?:"",
+					fatal      : (error.cause?.fatal)?:"",
+					message    : (error.cause?.message)?:""
 			]
 		}
 
@@ -577,10 +577,8 @@ class ApiActionService implements ServiceMethods {
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
-					[] as String[],
-					'Script must return SUCCESS or ERROR',
-					LocaleContextHolder.locale))
+			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
+					'Script must return SUCCESS or ERROR'))
 		}
 	}
 }
