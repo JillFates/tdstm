@@ -23,7 +23,6 @@ class ApiActionService implements ServiceMethods {
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	ProviderService providerService
 	SecurityService securityService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
@@ -542,11 +541,6 @@ class ApiActionService implements ServiceMethods {
 			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
 					'Script must return SUCCESS or ERROR'))
 		}
-	}
-
-	String validateReactionJson(String reactionJson) {
-		String errorCode = null
-
 	}
 
 	/**
