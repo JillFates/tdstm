@@ -124,7 +124,7 @@ function resetAction(commentId) {
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                alert("An unexpected error occurred while attempting to update task/comment")
+                alert("An unexpected error occurred while attempting to reset the action")
             }
         });
     }
