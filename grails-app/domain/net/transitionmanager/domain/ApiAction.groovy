@@ -211,19 +211,22 @@ class ApiAction {
 			}
 
 			boolean errors = false
+
+			Set<String> invalidKeys = []
 			// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode.
 			for (key in reactionJson.keySet()) {
 				try {
 					ReactionScriptCode.valueOf(key)
 				} catch (IllegalArgumentException iae) {
 					logger.warn("Unrecognized key $key in reaction JSON.")
-					reactionJson.remove(key)
+					invalidKeys << key
 					errors = true
 				}
 			}
 
 			// If errors were detected update the reactionJson.
 			if (errors) {
+				reactionJson.keySet().removeAll(invalidKeys)
 				apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
 			}
 
