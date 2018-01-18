@@ -48,7 +48,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 		  },
 		  {	"param": "serverRefId",
 			"desc": "The unique id used to reference the server in the API",
-			"context": "SERVER",
+			"context": "ASSET",
 			"property": "assetName"
 		  },
 		  {	"param": "groupRefCode",
@@ -197,10 +197,10 @@ class ApiActionServiceIntegrationTests extends Specification {
 		then: 'the task action should still be invocable'
 			task.isActionInvocable()
 
-		when: 'the task status is set to DONE'
-			task.status = AssetCommentStatus.DONE
-		then: 'the task action should still be invocable since people may jump directly to DONE'
-			task.isActionInvocable()
+		when: 'the task status is set to COMPLETED'
+			task.status = AssetCommentStatus.COMPLETED
+		then: 'the task action should not be invocable since people may jump directly to COMPLETED'
+			! task.isActionInvocable()
 
 		when: 'the task apiAction property is not set'
 			task.apiAction = null
