@@ -4,7 +4,7 @@ import {Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
-import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
+import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 import {INTERVAL} from '../../../shared/model/constants';
 
@@ -202,15 +202,34 @@ export class DataIngestionService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			providerId: model.provider.id,
+			provider: model.provider.id,
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
+			endpointUrl: model.endpointUrl,
+			endpointPath: model.endpointPath,
 			producesData: (model.producesData) ? 1 : 0,
-			pollingInterval: (model.isPolling) ? 1 : 0
+			isPolling: (model.isPolling) ? 1 : 0,
+			pollingInterval: model.polling.frequency.value,
+			pollingLapsedAfter: model.polling.lapsedAfter.value,
+			pollingStalledAfter: model.polling.stalledAfter.value,
 		};
 
+		let reaction = {
+			'STATUS': model.eventReactions[0].value,
+			'SUCCESS': model.eventReactions[1].value,
+			'DEFAULT': model.eventReactions[2].value,
+			'ERROR': model.eventReactions[3].value,
+			'FAILED': model.eventReactions[4].value,
+			'LAPSED': model.eventReactions[5].value,
+			'STALLED': model.eventReactions[6].value,
+			'PRE': model.eventReactions[7].value,
+			'FINALIZE': model.eventReactions[8].value
+		};
+
+		postRequest['reactionScripts'] = JSON.stringify(reaction);
+
 		if (postRequest.producesData === 1) {
-			postRequest['defaultDataScriptId'] = model.defaultDataScript.id;
+			postRequest['defaultDataScript'] = model.defaultDataScript.id;
 		}
 
 		if (!model.id) {
