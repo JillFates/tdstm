@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import grails.util.Metadata
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
 
@@ -14,8 +13,6 @@ class EnvironmentService implements InitializingBean, ServiceMethods {
 	String version
 	String build
 	String buildHash
-
-	GrailsApplication grailsApplication
 
 	void afterPropertiesSet() {
 		Resource resource = grailsApplication.mainContext.getResource(grailsApplication.config.tdsops.buildFile)

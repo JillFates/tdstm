@@ -43,7 +43,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 class PersonService implements ServiceMethods {
 
 	def auditService
-	def grailsApplication
 	def jdbcTemplate
 	def moveEventService
 	def namedParameterJdbcTemplate

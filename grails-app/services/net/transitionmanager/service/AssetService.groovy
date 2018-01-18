@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.asset.AssetFacade
 
 class AssetService {
 
@@ -30,5 +31,16 @@ class AssetService {
                 asset[field.field] = field.default
             }
         }
+    }
+
+    /**
+     * Factory method that constructs a AssetFacade populating the custom fields specs for the asset entity type provided
+     * @param assetEntity - the assent entity
+     * @param readonly - whether the facade needs to be readonly
+     * @return
+     */
+    AssetFacade getAssetFacade(AssetEntity assetEntity, boolean readonly) {
+        Map<String, ?> fieldSpecs = customDomainService.customFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
+        return new AssetFacade(assetEntity, fieldSpecs, readonly)
     }
 }

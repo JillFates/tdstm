@@ -4,6 +4,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.apache.commons.lang.RandomStringUtils as RSU
+import test.helper.ProviderTestHelper
 
 class ApiActionTestHelper {
     /**
@@ -27,7 +28,13 @@ class ApiActionTestHelper {
                 asyncQueue: 'test_outbound_queue',
                 callbackMethod: 'updateTaskState',
                 callbackMode: CallbackMode.MESSAGE,
-                project: project
+                pollingFrequency: 0,
+                pollingLapsedAfter: 0,
+                pollingStalledAfter: 0,
+                project: project,
+                reactionScripts: "{\"SUCCESS\": \"success\",\"STATUS\": \"status\",\"ERROR\": \"error\"}",
+                useWithAsset: 0,
+                useWithTask: 0
         )
         apiAction.save(flush:true, failOnError: true)
         return apiAction

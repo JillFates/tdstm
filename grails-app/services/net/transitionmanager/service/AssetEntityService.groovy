@@ -158,7 +158,6 @@ class AssetEntityService implements ServiceMethods {
 			PowerA: 'powerA', PowerB: 'powerB', PowerC: 'powerC', Type: 'rackType', Front: 'front',
 			Model: 'model', Source: 'source'].asImmutable()
 
-	GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
