@@ -4,11 +4,11 @@
         <div>
             <div class="box-body box-with-empty-header">
                 <kendo-grid
-                        [data]="batchList"
-                        [filter]="gridStates.filter"
+                        [data]="gridOperationsHelper.gridData"
+                        [filter]="gridOperationsHelper.state.filter"
                         [filterable]="true"
                         (filterChange)="filterChange($event)"
-                        [sort]="gridStates.sort"
+                        [sort]="gridOperationsHelper.state.sort"
                         [sortable]="{mode:'single'}"
                         [pageSize]="25"
                         [resizable]="true"

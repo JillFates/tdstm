@@ -104,6 +104,6 @@ export class DependencyBatchService {
 				ignored: 0
 			}
 		];
-		return Observable.of( {data: mockResult} );
+		return Observable.of( mockResult );
 	}
 }

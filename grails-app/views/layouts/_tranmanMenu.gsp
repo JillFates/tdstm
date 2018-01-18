@@ -276,6 +276,11 @@
                                     <g:link controller="dataTransferBatch" action="list">Manage Batches</g:link>
                                 </li>
                             </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.DataTransferBatchView}">
+                                <li class="menu-child-item menu-parent-assets-manage-dependency-batches">
+                                    <g:link controller="module" action="dependencybatch" id="list">Manage Dependency Batches</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
                                     <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
