@@ -100,7 +100,7 @@ class ProviderService implements ServiceMethods {
         }.find()
 
         if (!provider && throwException) {
-            throw new DomainUpdateException("No Provider with id ${providerId} exists for this project.")
+            throw new EmptyResultException("No Provider with id ${providerId} exists for this project.")
         }
         return provider
     }
