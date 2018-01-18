@@ -406,7 +406,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[0].open, 'fa-angle-double-left': !apiActionModel.eventReactions[0].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[0].open, 'fa-angle-double-right': !apiActionModel.eventReactions[0].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -432,7 +432,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[1])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[1].open, 'fa-angle-double-left': !apiActionModel.eventReactions[1].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[1].open, 'fa-angle-double-right': !apiActionModel.eventReactions[1].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -457,7 +457,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[2])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[2].open, 'fa-angle-double-left': !apiActionModel.eventReactions[2].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[2].open, 'fa-angle-double-right': !apiActionModel.eventReactions[2].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -482,7 +482,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[3])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[3].open, 'fa-angle-double-left': !apiActionModel.eventReactions[3].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[3].open, 'fa-angle-double-right': !apiActionModel.eventReactions[3].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -507,7 +507,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[4])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[4].open, 'fa-angle-double-left': !apiActionModel.eventReactions[4].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[4].open, 'fa-angle-double-right': !apiActionModel.eventReactions[4].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -524,7 +524,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[5].selected">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[5].selected && apiActionModel.isPolling">
 											<div class="form-group">
 												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -532,7 +532,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[5])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[5].open, 'fa-angle-double-left': !apiActionModel.eventReactions[5].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[5].open, 'fa-angle-double-right': !apiActionModel.eventReactions[5].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -549,7 +549,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[6].selected">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[6].selected && apiActionModel.isPolling">
 											<div class="form-group">
 												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -557,7 +557,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[6])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[6].open, 'fa-angle-double-left': !apiActionModel.eventReactions[6].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[6].open, 'fa-angle-double-right': !apiActionModel.eventReactions[6].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -574,8 +574,8 @@
 												</div>
 											</div>
 										</div>
-										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel() && apiActionModel.isPolling">Customize:</label>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected && apiActionModel.isPolling">
+										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel()">Customize:</label>
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected">
 											<div class="form-group">
 												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before API Call <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -583,7 +583,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[7].open, 'fa-angle-double-left': !apiActionModel.eventReactions[7].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[7].open, 'fa-angle-double-right': !apiActionModel.eventReactions[7].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -600,7 +600,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected && apiActionModel.isPolling">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected">
 											<div class="form-group">
 												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Action <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -608,7 +608,7 @@
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[8].open, 'fa-angle-double-left': !apiActionModel.eventReactions[8].open}" style="padding-right:0px;"></i>
+														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[8].open, 'fa-angle-double-right': !apiActionModel.eventReactions[8].open}" style="padding-right:0px;"></i>
 													</button>
 												</div>
 											</div>
@@ -638,7 +638,7 @@
 		 class="btn btn-primary pull-left" [disabled]="!validInfoForm">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" class="btn btn-primary pull-left">
-			<span class="fa fa-fw fa-code"></span> Check Syntax</button>
+			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn btn-danger">
