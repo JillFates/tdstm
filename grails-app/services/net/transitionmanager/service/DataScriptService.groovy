@@ -88,7 +88,7 @@ class DataScriptService implements ServiceMethods{
         }.find()
 
         if (!dataScript) {
-            throw new DomainUpdateException("No DataScript with id ${dataScriptId} exists for this project.")
+            throw new EmptyResultException("No DataScript with id ${dataScriptId} exists for this project.")
         }
 
         return dataScript
