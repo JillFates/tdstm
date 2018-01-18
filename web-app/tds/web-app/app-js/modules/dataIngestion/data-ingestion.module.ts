@@ -18,14 +18,16 @@ import { APIActionViewEditComponent } from './components/api-action-view-edit/ap
 import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 import { PopupPollingComponent } from './components/popups/popup-polling.component';
+import { PopupProvidesDataComponent } from './components/popups/popup-provides-data.component';
 // Import Kendo Modules
-import { DropDownListModule } from '@progress/kendo-angular-dropdowns';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
-import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { DateInputsModule,  } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { LayoutModule } from '@progress/kendo-angular-layout';
+import { NumericTextBoxModule } from '@progress/kendo-angular-inputs';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
@@ -38,11 +40,12 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		DropDownListModule,
+		DropDownsModule,
 		GridModule,
 		DateInputsModule,
 		SortableModule,
 		PopupModule,
+		NumericTextBoxModule,
 		HttpClientModule,
 		UploadModule,
 		InputsModule,
@@ -60,7 +63,8 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		DataScriptSampleDataComponent,
 		APIActionListComponent,
 		APIActionViewEditComponent,
-		PopupPollingComponent
+		PopupPollingComponent,
+		PopupProvidesDataComponent
 	],
 	providers: [DataIngestionService,
 		ImportAssetsService, {

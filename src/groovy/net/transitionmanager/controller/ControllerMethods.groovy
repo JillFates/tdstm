@@ -108,6 +108,16 @@ trait ControllerMethods {
 		errors(validationErrors.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) })
 	}
 
+	/**
+	 * It collects a list of Errors and translate them using messageSource bean.
+	 * Those translated error messages are used in error response content.
+	 * @param validationErrors
+	 * @return
+	 */
+	Map errorsInValidation(List<Errors> validationErrors) {
+		errors(validationErrors.findAll {it.allErrors}.collect {it.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) }}.flatten())
+	}
+
 	Map invalidParams(errorStringOrList) {
 		errors(CollectionUtils.asList(errorStringOrList))
 	}

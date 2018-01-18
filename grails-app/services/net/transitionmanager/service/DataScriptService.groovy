@@ -25,11 +25,6 @@ class DataScriptService implements ServiceMethods{
         // Get the current project
         Project currentProject = securityService.userCurrentProject
 
-        // Validate that there's no other DataScript for this project and provider with the same name
-        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
-            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
-        }
-
         DataScript dataScript
 
         // Get the current person
@@ -41,6 +36,11 @@ class DataScriptService implements ServiceMethods{
         } else {
             // Fetch the DataScript with the given id.
             dataScript = getDataScript(dataScriptId, currentProject)
+        }
+
+        // Validate that there's no other DataScript for this project and provider with the same name
+        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
+            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
         }
 
         // Find the provider
@@ -109,6 +109,12 @@ class DataScriptService implements ServiceMethods{
         if (!project) {
             project = securityService.userCurrentProject
         }
+
+        // If the name is null don't validate, throw an exception.
+        if (!dataScriptName) {
+            throw new InvalidParamException("The DataScript name cannot be null.")
+        }
+
         DataScript dataScript = DataScript.where {
             name == dataScriptName
             project == project
@@ -151,5 +157,27 @@ class DataScriptService implements ServiceMethods{
         if (dataScript) {
             dataScript.delete()
         }
+    }
+
+    /**
+     * Find a DataScript with the given id, project and provider.
+     *
+     * @param id
+     * @param project
+     * @param provider
+     * @param throwException
+     * @return
+     */
+    DataScript findByProjectAndProvider(Long id, Project project, Provider provider, boolean throwException = false) {
+        DataScript dataScript = DataScript.where {
+            id == id
+            project == project
+            provider == provider
+        }.find()
+
+        if (! dataScript && throwException) {
+            throw new EmptyResultException("No DataScript exists with the ID $id for the Project $project and Provider $provider.")
+        }
+        return dataScript
     }
 }

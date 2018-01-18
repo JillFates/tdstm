@@ -1,7 +1,9 @@
 package net.transitionmanager.domain
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
+import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
@@ -14,6 +16,7 @@ import groovy.transform.ToString
 @Slf4j(value='logger')
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
+
 	String name
 	String description
 
@@ -62,6 +65,9 @@ class ApiAction {
 	// The method that the async response should call to return response
 	String callbackMethod = ''
 
+	// Optional credentials required by the agent.
+	Credential credential
+
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
@@ -76,13 +82,16 @@ class ApiAction {
 	static constraints = {
 		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
-		asyncQueue nullable: false, size: 0..64
-		callbackMode nullable: false
+		asyncQueue nullable: true, size: 0..64
+		callbackMethod nullable: true
+		callbackMode nullable: true
+		credential nullable: true
 		defaultDataScript nullable: true
 		name nullable: false, size: 1..64
 		methodParams nullable: true
 		lastModified nullable: true
 		producesData nullable: false, range:0..1
+		timeout nullable: true
 	}
 
 	static mapping = {
@@ -97,7 +106,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsList']
+	static transients = ['methodParamsList', 'agent']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -134,19 +143,37 @@ class ApiAction {
 
 	/**
 	 * Create a map with the data for this ApiAction
+	 * @param agent - agent instance for the corresponding agent class.
 	 * @param minimalInfo - flag that signals if only the m
 	 * @return
 	 */
-	Map toMap(boolean minimalInfo = true) {
+	Map toMap(AbstractAgent agent, boolean minimalInfo = true) {
+		if (agent == null) {
+			throw new RuntimeException("Agent cannot be null.")
+		}
 		Map fields = [id: id, name: name]
 		if (!minimalInfo) {
-			fields.agentClass  = agentClass.name()
+			Map credentialMap = null
+			if (credential) {
+				credentialMap = [id: credential.id, name: credential.name]
+			}
+
+			Map defaultDataScriptMap = null
+			if (defaultDataScript) {
+				defaultDataScriptMap = [id: defaultDataScript.id, name: defaultDataScript.name]
+			}
+
+			fields.agentClass  = [
+			        id: agent.agentClass.name(),
+					name: agent.name
+			]
 			fields.agentMethod = agentMethod
 			fields.asyncQueue = asyncQueue
 			fields.callbackMethod = callbackMethod
-			fields.callbackMode = callbackMode.name()
+			fields.callbackMode = callbackMode? callbackMode.name() : null
+			fields.credential = credentialMap
 			fields.dateCreated = dateCreated
-			fields.defaultDataScriptName = defaultDataScript
+			fields.defaultDataScript = defaultDataScriptMap
 			fields.description = description
 			fields.lastModified = lastModified
 			fields.methodParams = methodParams

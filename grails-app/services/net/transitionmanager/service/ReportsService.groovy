@@ -19,14 +19,12 @@ import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
 import org.apache.commons.lang.math.RandomUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Transactional
 class ReportsService implements ServiceMethods {
 
-	GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	RunbookService runbookService

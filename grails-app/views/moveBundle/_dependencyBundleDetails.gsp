@@ -3,22 +3,22 @@
 <div style="margin-top: 10px;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
-		<div style="margin-left: 0px; margin-bottom: 10px;">
-			<div class="message" id="messageId" style="display:none">${flash.message}</div>
-        	<div style="width: 250px; margin-bottom: 3px">
-				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;
+		<div class="message" id="messageId" style="display:none">${flash.message}</div>
+		<div class="row">
+        	<div class="col-sm-3" style="width: 260px;">
+				<b>Dependency Groups</b>
 				<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-				<input  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
+				<input style="margin-left: 10px;"  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 				</tds:hasPermission>
 			</div>
-			<div class="planBundleSel">
-				<g:form name="bundleForm" action="dependencyConsole">	
+			<div class="col-sm-8">
+				<g:form name="bundleForm" action="dependencyConsole">
 					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
 					Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
-					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>&nbsp;&nbsp;
-					<span class="checkboxContainer">
+					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>
+					<span class="checkboxContainer" style="margin-left: 10px;">
 						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" />
-						<label for="assinedGroupCB" class="pointer">&nbsp;Show ONLY Work In Progress</label>
+						<label for="assinedGroupCB" class="pointer" style="margin-left: 3px;">Show ONLY Work In Progress</label>
 					</span>
 					<span style="margin-left: 1em">
 						<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
@@ -27,7 +27,9 @@
 					</span>
 				</g:form>
 			</div>
-			&nbsp;Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
+		</div>
+		<div class="row">
+			<div class="col-md-12">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
 		</div>
 		<div id="processDiv" style="display: none;">
 			<img src="${resource(dir:'images',file:'processing.gif')}" />

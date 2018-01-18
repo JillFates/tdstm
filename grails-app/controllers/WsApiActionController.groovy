@@ -2,9 +2,17 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ApiActionValidateScriptCommand
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.SecurityService
@@ -51,8 +59,9 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def fetch(Long id){
         Project project = securityService.userCurrentProject
-        ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
-        renderSuccessJson(apiAction.toMap(false))
+        ApiAction apiAction = apiActionService.find(id, project, true)
+        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+        renderSuccessJson(apiAction.toMap(agent,false))
     }
 
     /**
@@ -72,11 +81,16 @@ class WsApiActionController implements ControllerMethods {
      */
     @HasPermission(Permission.ActionCreate)
     def create() {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
-        renderSuccessJson(apiAction.toMap(false))
-    }
+        try {
+            Project project = securityService.userCurrentProject
+            ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
+            AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+            renderSuccessJson(apiAction.toMap(agent, false))
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
 
+    }
 
     /**
      * Update the corresponding ApiAction.
@@ -85,6 +99,18 @@ class WsApiActionController implements ControllerMethods {
     def update(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON, id)
-        renderSuccessJson(apiAction.toMap(false))
+        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
+        renderSuccessJson(apiAction.toMap(agent, false))
     }
+
+	@HasPermission(Permission.ActionInvoke)
+	def validateSyntax(ApiActionValidateScriptCommand command) {
+
+		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
+			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
+		} else {
+			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
+		}
+	}
+
 }

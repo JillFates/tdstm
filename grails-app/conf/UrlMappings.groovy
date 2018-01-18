@@ -716,6 +716,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/validateSyntax" {
+			controller = "wsApiAction"
+			action = [
+					POST: "validateSyntax"
+			]
+		}
+
 		"/ws/dataScript/testScript" {
 			controller = "wsDataScript"
 			action = [

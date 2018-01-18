@@ -44,4 +44,16 @@ export class ObjectUtils {
 		return composed;
 	}
 
+	/**
+	 * Helper method to modify the Data Signature by passing the property and the new value
+	 * @param {string} dataSignature
+	 * @param property
+	 * @param value
+	 * @returns {string}
+	 */
+	public static modifySignatureByProperty(dataSignature: string, property: any, value: any): string {
+		let dataInstance = JSON.parse(dataSignature);
+		dataInstance[property] = value;
+		return JSON.stringify(dataInstance);
+	}
 }

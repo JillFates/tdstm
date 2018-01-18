@@ -252,6 +252,14 @@ class AssetComment {
 		status == COMPLETED
 	}
 
+	boolean isStarted() {
+		status == STARTED
+	}
+
+	boolean isOnHold() {
+		status == HOLD
+	}
+
 	boolean isRunbookTask() {
 		moveDayCategories.contains(category)
 	}

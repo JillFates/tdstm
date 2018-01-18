@@ -5,12 +5,13 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.EmptyResultException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
@@ -940,6 +941,9 @@ public class GormUtil {
 				try{
 					// fetch the instance
 					instance = type.get(id)
+					if (!instance) {
+						errorMsg = "The domain object with type $type couldn't be found using the id $id"
+					}
 				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
 				} catch(Exception e) {
 					errorMsg = "The domain object with type $type couldn't be found using the id $id"
@@ -962,9 +966,22 @@ public class GormUtil {
 		if (errorMsg) {
 			logger.error(errorMsg)
 			if (throwException) {
-				throw new InvalidParamException(errorMsg)
+				throw new EmptyResultException(errorMsg)
+			} else {
+				instance = null
 			}
 		}
 		return instance
+	}
+
+	/**
+	 * Determine if a domain property represents a referenced class type or if the property is an association
+	 * @param domainObject
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isReferenceProperty(Object domainObject, String propertyName) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
 	}
 }
