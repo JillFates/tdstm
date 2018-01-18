@@ -126,10 +126,10 @@
 										<div class="form-group">
 											<label for="apiActionEndpointURL" class="col-sm-3 control-label">Endpoint URL:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointURL" />
+												<input type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointURL}}</label>
+												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
 											</div>
 										</div>
 										<div class="form-group">
@@ -151,7 +151,7 @@
 											<popup-polling></popup-polling>
 										</div>
 										<div class="form-group intervals-content">
-											<label class="col-sm-4 control-label">Frequency:</label>
+											<label class="col-sm-4 control-label">Interval:</label>
 											<div class="col-sm-3" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-numerictextbox
 														name="apiActionFrequencyValue"

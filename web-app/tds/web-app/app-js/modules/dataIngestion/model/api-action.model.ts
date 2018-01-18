@@ -144,6 +144,8 @@ export class APIActionModel {
 		id?: number,
 		name?: string
 	};
+	endpointUrl?: '';
+	endpointPath?: '';
 	eventReactions?: EventReaction[];
 
 	constructor() {
@@ -154,6 +156,8 @@ export class APIActionModel {
 		this.agentMethod = { id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
+		this.endpointUrl = '';
+		this.endpointPath = '';
 		this.polling =  {
 				frequency: {
 					value: 0,
