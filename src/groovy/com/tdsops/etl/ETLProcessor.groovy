@@ -17,6 +17,8 @@ class ETLProcessor implements RangeChecker {
 	List<getl.data.Field> fields
 	ETLFieldsValidator fieldsValidator
 	ETLBinding binding
+	ETLProcessorResult result
+
 	Integer currentRowIndex = 0
 	Integer currentColumnIndex = 0
 	/**
@@ -75,6 +77,7 @@ class ETLProcessor implements RangeChecker {
 		this.debugConsole = console
 		this.fieldsValidator = fieldsValidator
 		this.binding = new ETLBinding(this)
+		this.result = new ETLProcessorResult(this)
 	}
 
 	/**
@@ -90,6 +93,7 @@ class ETLProcessor implements RangeChecker {
 			throw ETLProcessorException.invalidDomain(domain)
 		}
 
+		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
 		this
 	}
@@ -529,6 +533,20 @@ class ETLProcessor implements RangeChecker {
 		}
 	}
 
+	/**
+	 * And an entry in the Dependency results.
+	 * @param findElement
+	 */
+	void addDependency(ETLFindElement findElement) {
+		result.addDependency(findElement)
+	}
+	/**
+	 * And an entry in the Dependency results.
+	 * @param findElement
+	 */
+	void addDependencyWarnMessage(ETLFindElement findElement) {
+		//result.addDependency(findElement)
+	}
 	/**
 	 * Applies a global transformation for a given element
 	 * @param element

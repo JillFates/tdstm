@@ -156,7 +156,10 @@ class ETLProcessorSpec extends Specification {
 	void 'test can define a the primary domain' () {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project),
+												GroovyMock(Dataset),
+												GroovyMock(DebugConsole),
+												GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -168,6 +171,18 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
+
+		and: 'A new result was added in the result'
+			with (etlProcessor.result ){
+				domains.size() == 1
+				with (domains[0]) {
+					domain == ETLDomain.Application.name()
+					fields == []
+					data == [:]
+				}
+			}
+
+
 	}
 
 	void 'test can add groovy comments' () {
@@ -189,6 +204,16 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
+
+		and: 'A new result was added in the result'
+			with (etlProcessor.result ){
+				domains.size() == 1
+				with (domains[0]) {
+					domain == ETLDomain.Application.name()
+					fields == []
+					data == [:]
+				}
+			}
 	}
 
 	void 'test can throw an exception if an invalid domain is defined' () {
@@ -210,7 +235,7 @@ class ETLProcessorSpec extends Specification {
 			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 	}
 
-	void 'test can define a domain more than once within the script' () {
+	void 'test can define a several domains in an ETL script' () {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
@@ -228,6 +253,62 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'The last domain selected could be recovered'
 			etlProcessor.selectedDomain == ETLDomain.Storage
+
+
+		and: 'A new result was added in the result'
+			with (etlProcessor.result ){
+				domains.size() == 3
+				with (domains[0]) {
+					domain == ETLDomain.Application.name()
+					fields == []
+					data == [:]
+				}
+				with (domains[1]) {
+					domain == ETLDomain.Device.name()
+					fields == []
+					data == [:]
+				}
+				with (domains[2]) {
+					domain == ETLDomain.Storage.name()
+					fields == []
+					data == [:]
+				}
+			}
+	}
+
+	void 'test can define a domain more than once in an ETL script' () {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(Dataset), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+
+						domain Application
+						domain Device
+						domain Application
+						
+					""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'The last domain selected could be recovered'
+			etlProcessor.selectedDomain == ETLDomain.Application
+
+		and: 'A new result was added in the result'
+			with (etlProcessor.result ){
+				domains.size() == 2
+				with (domains[0]) {
+					domain == ETLDomain.Application.name()
+					fields == []
+					data == [:]
+				}
+				with (domains[1]) {
+					domain == ETLDomain.Device.name()
+					fields == []
+					data == [:]
+				}
+			}
 	}
 
 	void 'test can throw an Exception if the skip parameter is bigger that rows count' () {
@@ -285,6 +366,37 @@ class ETLProcessorSpec extends Specification {
 		and:
 			etlProcessor.currentRowIndex == 1
 	}
+
+	void 'test can use SOURCE reference object to connect with data source' () {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						domain Device
+						read labels
+						SOURCE.readLabels
+						
+					""".stripIndent(), ETLProcessor.class.name)
+
+		then: 'A column map is created'
+			etlProcessor.column('device id').index == 0
+			etlProcessor.column(0).label == 'device id'
+
+		and:
+			etlProcessor.column('model name').index == 1
+			etlProcessor.column(1).label == 'model name'
+
+		and:
+			etlProcessor.column('manufacturer name').index == 2
+			etlProcessor.column(2).label == 'manufacturer name'
+
+		and:
+			etlProcessor.currentRowIndex == 1
+	}
+
 	/**
 	 * The iterate command will create a loop that iterate over the remaining rows in the data source
 	 */
@@ -2378,11 +2490,6 @@ class ETLProcessorSpec extends Specification {
 
 	void 'test can extract a field value and load into a domain object property name' () {
 
-		// The 'load into' command will take whatever value is in the internal register and map it to the domain object
-		// property name.  The command takes a String argument that will map to the property name of the domain. This
-		// should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
-		// with an explaination that the property does not exist and reference the line of the error if possible.
-
 		given:
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
@@ -2526,10 +2633,6 @@ class ETLProcessorSpec extends Specification {
 
 	void 'test can process multiple domains in same row' () {
 
-		// The 'load into' command will take whatever value is in the internal register and map it to the domain object
-		// property name.  The command takes a String argument that will map to the property name of the domain. This
-		// should use the AssetFieldSettings Specifications for the domain to validate the property names. It should error
-		// with an explaination that the property does not exist and reference the line of the error if possible.
 		given:
 			applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
 			applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -2724,13 +2827,13 @@ class ETLProcessorSpec extends Specification {
 						iterate {
 						
 							domain Application
-							set environment with Production
+							load environment with Production
 							extract 1 load id
 							extract 'vendor name' load appVendor
 							
 							domain Device
 							extract 1 load id 
-							set location with 'Development'        
+							load location with 'Development'        
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2798,7 +2901,7 @@ class ETLProcessorSpec extends Specification {
 			}
 	}
 
-	void 'test can reference a domain Property Name with loaded Data Value' () {
+	void 'test can find a domain Property Name with loaded Data Value' () {
 
 		given:
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -2950,7 +3053,163 @@ class ETLProcessorSpec extends Specification {
 			}
 	}
 
-	void 'test can throw an Exception if script reference to a domain Property and it was not defined in the ETL Processor' () {
+	void 'test can find a domain Property Name with loaded Data Value for a dependent' () {
+
+		given:
+			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, [
+					[constraints: [required: 0],
+					 control    : 'Number',
+					 default    : '',
+					 field      : 'id',
+					 imp        : 'U',
+					 label      : 'Id',
+					 order      : 0,
+					 shared     : 0,
+					 show       : 0,
+					 tip        : "",
+					 udf        : 0
+					],
+					[constraints: [required: 0],
+					 control    : 'String',
+					 default    : '',
+					 field      : 'appVendor',
+					 imp        : 'N',
+					 "label"    : "Vendor",
+					 order      : 0,
+					 shared     : 0,
+					 show       : 0,
+					 tip        : "",
+					 udf        : 0
+					],
+					[constraints: [required: 0],
+					 control    : 'String',
+					 default    : '',
+					 field      : 'environment',
+					 imp        : 'N',
+					 "label"    : "Environment",
+					 order      : 0,
+					 shared     : 0,
+					 show       : 0,
+					 tip        : "",
+					 udf        : 0
+					]
+			])
+			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, [
+					[constraints: [required: 0],
+					 control    : 'Number',
+					 default    : '',
+					 field      : 'id',
+					 imp        : 'U',
+					 label      : 'Id',
+					 order      : 0,
+					 shared     : 0,
+					 show       : 0,
+					 tip        : "",
+					 udf        : 0
+					],
+					[constraints: [required: 0],
+					 control    : 'String',
+					 default    : '',
+					 "field"    : "location",
+					 imp        : 'N',
+					 "label"    : "Location",
+					 order      : 0,
+					 shared     : 0,
+					 show       : 0,
+					 tip        : "",
+					 udf        : 0
+					]
+			])
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> applications = [
+					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						
+						iterate {
+						   // Try to find the Application using different searches
+							find Application by id with assetId for assetId 
+							find Application by assetName, assetType with primaryName, primaryType for assetId 
+							find Application by assetName with primaryName for assetId
+							find Asset by assetName with primaryName for assetId warn 'found with wrong asset class'
+							
+						}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+
+			with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+
+				with(elements[0]) {
+					originalValue == "Production"
+					value == "Production"
+					field.name == "environment"
+				}
+
+				with(elements[1]) {
+					originalValue == "152254"
+					value == "152254"
+					field.name == "id"
+				}
+
+				reference == [152254]
+			}
+
+			with(etlProcessor.results.get(ETLDomain.Application)[1]) {
+
+				with(elements[0]) {
+					originalValue == "Production"
+					value == "Production"
+					field.name == "environment"
+				}
+
+				with(elements[1]) {
+					originalValue == "152255"
+					value == "152255"
+					field.name == "id"
+				}
+
+				reference == [152255]
+			}
+	}
+
+	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor' () {
 
 		given:
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -3071,7 +3330,7 @@ class ETLProcessorSpec extends Specification {
 			e.message == 'Project not defined.'
 	}
 
-	void 'test can reference multiple asset entities for a domain Property Name with loaded Data Value' () {
+	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value' () {
 
 		given:
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
