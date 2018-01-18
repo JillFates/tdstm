@@ -24,6 +24,7 @@ export class GridColumnModel {
 	format?: string;
 	width: number;
 	locked: boolean;
+	filter?: any;
 
 	constructor() {
 		this.type = 'text';

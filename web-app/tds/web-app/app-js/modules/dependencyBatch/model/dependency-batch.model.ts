@@ -25,7 +25,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Id',
 				property: 'id',
 				type: 'text',
-				width: 100,
+				width: 50,
 				locked: false
 			},
 			{
@@ -40,7 +40,7 @@ export class DependencyBatchColumnsModel {
 				property: 'importedDate',
 				type: 'date',
 				format: '{0:d}',
-				width: 170,
+				width: 130,
 				locked: false
 			},
 			{
@@ -61,7 +61,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Provider',
 				property: 'provider',
 				type: 'text',
-				width: 100,
+				width: 130,
 				locked: false
 			},
 			{
@@ -82,35 +82,35 @@ export class DependencyBatchColumnsModel {
 				label: 'Records',
 				property: 'records',
 				type: 'text',
-				width: 100,
+				width: 80,
 				locked: false
 			},
 			{
 				label: 'Errors',
 				property: 'errors',
 				type: 'text',
-				width: 100,
+				width: 80,
 				locked: false
 			},
 			{
 				label: 'Pending',
 				property: 'pending',
 				type: 'text',
-				width: 100,
+				width: 80,
 				locked: false
 			},
 			{
 				label: 'Processed',
 				property: 'processed',
 				type: 'text',
-				width: 100,
+				width: 80,
 				locked: false
 			},
 			{
 				label: 'Processed',
 				property: 'ignored',
 				type: 'text',
-				width: 100,
+				width: 80,
 				locked: false
 			},
 		];

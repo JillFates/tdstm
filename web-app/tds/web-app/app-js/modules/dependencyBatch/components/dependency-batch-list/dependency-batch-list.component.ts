@@ -3,7 +3,7 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DependencyBatchColumnsModel, DependencyBatchModel} from '../../model/dependency-batch.model';
 import {State} from '@progress/kendo-data-query';
-import {RowArgs} from '@progress/kendo-angular-grid';
+import {GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -25,6 +25,7 @@ export class DependencyBatchListComponent {
 	private selectedRows = [];
 	private isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	private batchList: Array<DependencyBatchModel>;
+	public gridData: GridDataResult;
 
 	constructor(
 		private dependencyBatchService: DependencyBatchService,
@@ -38,5 +39,9 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.getBatchList().subscribe( result => {
 			this.batchList = result.data;
 		});
+	}
+
+	protected onFilter(column: any): void {
+		// call utils here
 	}
 }
