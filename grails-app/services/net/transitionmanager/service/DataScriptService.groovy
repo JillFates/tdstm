@@ -25,11 +25,6 @@ class DataScriptService implements ServiceMethods{
         // Get the current project
         Project currentProject = securityService.userCurrentProject
 
-        // Validate that there's no other DataScript for this project and provider with the same name
-        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
-            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
-        }
-
         DataScript dataScript
 
         // Get the current person
@@ -43,8 +38,13 @@ class DataScriptService implements ServiceMethods{
             dataScript = getDataScript(dataScriptId, currentProject)
         }
 
+        // Validate that there's no other DataScript for this project and provider with the same name
+        if (!validateUniqueName(dataScriptJson.name, dataScriptId, dataScriptJson.providerId, currentProject)) {
+            throw new DomainUpdateException("Cannot update or create DataScript because the name is not unique for this project and provider.")
+        }
+
         // Find the provider
-        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject)
+        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject, true)
 
         // Copy the values received from the JSON Object over to the DataScript instance.
         dataScript.with {
@@ -88,7 +88,7 @@ class DataScriptService implements ServiceMethods{
         }.find()
 
         if (!dataScript) {
-            throw new DomainUpdateException("No DataScript with id ${dataScriptId} exists for this project.")
+            throw new EmptyResultException("No DataScript with id ${dataScriptId} exists for this project.")
         }
 
         return dataScript
@@ -109,6 +109,12 @@ class DataScriptService implements ServiceMethods{
         if (!project) {
             project = securityService.userCurrentProject
         }
+
+        // If the name is null don't validate, throw an exception.
+        if (!dataScriptName) {
+            throw new InvalidParamException("The DataScript name cannot be null.")
+        }
+
         DataScript dataScript = DataScript.where {
             name == dataScriptName
             project == project

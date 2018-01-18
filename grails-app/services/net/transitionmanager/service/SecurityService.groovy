@@ -64,7 +64,6 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 	def auditService
 	def emailDispatchService
-	def grailsApplication
 	def partyRelationshipService
 	def personService
 	def springSecurityService

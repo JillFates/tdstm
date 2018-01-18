@@ -38,7 +38,6 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FlushMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -49,7 +48,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import java.text.DateFormat
-import java.text.ParseException
 import java.util.regex.Matcher
 
 import static com.tdsops.tm.enums.domain.AssetClass.*
@@ -66,7 +64,6 @@ class ImportService implements ServiceMethods {
 			"INSERT INTO data_transfer_value " +
 					"(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, field_name, has_error, error_text) VALUES "
 
-	GrailsApplication grailsApplication
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService assetEntityService
 	DeviceService deviceService

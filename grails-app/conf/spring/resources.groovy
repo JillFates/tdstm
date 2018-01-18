@@ -14,6 +14,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.task.TaskFacade
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
@@ -176,9 +177,14 @@ beans = {
 	}
 
 	camelHostnameIdentifier(CamelHostnameIdentifier)
+	taskFacade(TaskFacade) { bean ->
+		bean.scope = 'prototype'
+		taskService = ref('taskService')
+		messageSourceService = ref('messageSourceService')
+	}
 
 	apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 		bean.scope = 'prototype'
-		messageSource = ref('messageSource')
+		messageSourceService = ref('messageSourceService')
 	}
 }

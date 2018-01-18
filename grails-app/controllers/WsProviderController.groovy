@@ -55,7 +55,7 @@ class WsProviderController implements ControllerMethods{
     @HasPermission(Permission.ProviderView)
     def getProvider(Long id) {
         try {
-            Provider provider = providerService.getProvider(id)
+            Provider provider = providerService.getProvider(id, null, true)
             renderSuccessJson([provider: provider.toMap()])
         } catch(Exception e) {
             handleException(e, logger)

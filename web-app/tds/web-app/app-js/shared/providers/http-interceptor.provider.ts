@@ -19,6 +19,7 @@ import { NotifierService } from '../services/notifier.service';
 import { AlertType } from '../model/alert.model';
 // Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #2
 import { cache, CacheSignature } from '../services/cache';
+import { ERROR_STATUS } from '../model/constants';
 
 Observable.prototype.cache = cache;
 
@@ -85,6 +86,9 @@ export class HttpInterceptor extends Http {
 		if (response.headers.get('x-login-url')) {
 			window.location.href = response.headers.get('x-login-url');
 		}
+
+		this.intercept200Errors(response);
+
 		return response;
 	}
 
@@ -117,6 +121,32 @@ export class HttpInterceptor extends Http {
 				});
 			}
 		});
+	}
+
+	/**
+	 * The app return 200 even when an error occurs
+	 * This interceptor read the response looking for a error in the response
+	 * if exists, pop up the information to the user.
+	 * @param response
+	 */
+	intercept200Errors(response: any): void {
+		if (response && response['_body']) {
+			try {
+				let bodyResponse = JSON.parse(response['_body']);
+				if (bodyResponse['status'] === ERROR_STATUS) {
+					this.notifierService.broadcast({
+						name: AlertType.DANGER,
+						message: bodyResponse['errors']
+					});
+					this.notifierService.broadcast({
+						name: 'httpRequestHandlerCompletedWithErrors',
+					});
+				}
+			} catch (error) {
+				// There is only one place doing it, the Asset Explorer.
+				console.warn('Request Body is not a JSON object');
+			}
+		}
 	}
 
 }

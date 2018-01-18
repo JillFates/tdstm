@@ -5,7 +5,7 @@ package net.transitionmanager.integration
  */
 enum ReactionScriptCode {
 
-	EVALUATE,
+	STATUS,
 	SUCCESS,
 	ERROR,
 	DEFAULT,
@@ -15,4 +15,16 @@ enum ReactionScriptCode {
 	STALLED,
 	PRE,
 	FINAL
+	/**
+	 * Lookup for ReactionScriptCodes from a String.
+	 * <code>
+	 *     assert ReactionScriptCode.lookup('EVALUATE') ==  ReactionScriptCode.EVALUATE
+	 *     assert ReactionScriptCode.lookup('FOO') ==  null
+	 * </code>
+	 * @param value a String value
+	 * @return an instance of net.transitionmanager.integration.ReactionScriptCode or null if the value is not a valid code
+	 */
+	static ReactionScriptCode lookup(String value) {
+		return ReactionScriptCode.enumConstantDirectory().get(value)
+	}
 }
