@@ -89,21 +89,21 @@ export class DataIngestionService {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
-					r.pollingInterval = (r.pollingInterval === 1);
 					r.polling = {
 						frequency: {
-							value: 0,
+							value: r.pollingInterval,
 							interval: INTERVAL.SECONDS
 						},
 						lapsedAfter: {
-							value: 0,
+							value: r.pollingLapsedAfter,
 							interval: INTERVAL.MINUTES
 						},
 						stalledAfter: {
-							value: 0,
+							value: r.pollingStalledAfter,
 							interval: INTERVAL.MINUTES
 						}
 					};
+					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
 					APIActionModel.createBasicReactions(r);
 				});
 				return dataScriptModels;
@@ -223,14 +223,12 @@ export class DataIngestionService {
 			'LAPSED': model.eventReactions[5].value,
 			'STALLED': model.eventReactions[6].value,
 			'PRE': model.eventReactions[7].value,
-			'FINALIZE': model.eventReactions[8].value
+			'FINAL': model.eventReactions[8].value
 		};
 
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
-		if (postRequest.producesData === 1) {
-			postRequest['defaultDataScript'] = model.defaultDataScript.id;
-		}
+		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))

@@ -434,7 +434,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Show only the Customize Label if one Custom is selected
 	 */
 	showsCustomizeLabel(): boolean {
-		let events = [EventReactionType.PRE, EventReactionType.FINALIZE];
+		let events = [EventReactionType.PRE, EventReactionType.FINAL];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
