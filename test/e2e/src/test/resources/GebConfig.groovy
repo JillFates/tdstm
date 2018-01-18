@@ -33,7 +33,12 @@ environments {
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local chrome browser : ${browserLocation}"
-            driver = { new ChromeDriver() }
+            driver = {
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--start-maximized");
+                def driverinstance = new ChromeDriver(chromeOptions)
+                driverinstance
+            }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
@@ -53,7 +58,11 @@ environments {
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local firefox browser : ${browserLocation}"
-            driver = { new FirefoxDriver() }
+            driver = {
+                driverinstance = new FirefoxDriver()
+                driverinstance.manage().window().maximize()
+                driverinstance
+            }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid browser location: ${browserLocation}"
             driver = {
