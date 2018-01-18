@@ -400,7 +400,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param pollingObject
 	 */
 	protected onIntervalChange(interval: any, pollingObject: any): void {
-		let newVal = DateUtils.convertInterval(pollingObject, interval);
+		let newVal = DateUtils.convertInterval(pollingObject, interval.interval);
 		pollingObject.interval = interval.interval;
 		pollingObject.value = newVal;
 	}

@@ -7,7 +7,7 @@ import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 import {INTERVAL} from '../../../shared/model/constants';
-
+import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -95,11 +95,11 @@ export class DataIngestionService {
 							interval: INTERVAL.SECONDS
 						},
 						lapsedAfter: {
-							value: r.pollingLapsedAfter,
+							value: DateUtils.convertInterval({ value: r.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						},
 						stalledAfter: {
-							value: r.pollingStalledAfter,
+							value: DateUtils.convertInterval({ value: r.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						}
 					};
@@ -209,9 +209,9 @@ export class DataIngestionService {
 			endpointPath: model.endpointPath,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
-			pollingInterval: model.polling.frequency.value,
-			pollingLapsedAfter: model.polling.lapsedAfter.value,
-			pollingStalledAfter: model.polling.stalledAfter.value,
+			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
+			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
+			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
 		};
 
 		let reaction = {
