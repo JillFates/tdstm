@@ -1,3 +1,5 @@
+import {INTERVAL} from '../model/constants';
+
 export class DateUtils {
 
 	/**
@@ -13,5 +15,40 @@ export class DateUtils {
 		}
 		return compose;
 
+	}
+
+	/**
+	 * Convert a interval from one to another.
+	 * @param intervalBase
+	 * @param intervalTarget
+	 * @returns {string}
+	 */
+	public static convertInterval(intervalBase: any, intervalTarget: any): number {
+		if (intervalBase.interval === INTERVAL.SECONDS) {
+			if (intervalTarget.interval === INTERVAL.MINUTES) {
+				return intervalBase.value / 60;
+			}
+			if (intervalTarget.interval === INTERVAL.HOURS) {
+				return intervalBase.value / 3600;
+			}
+		}
+
+		if (intervalBase.interval === INTERVAL.MINUTES) {
+			if (intervalTarget.interval === INTERVAL.HOURS) {
+				return intervalBase.value / 60;
+			}
+			if (intervalTarget.interval === INTERVAL.SECONDS) {
+				return intervalBase.value * 60;
+			}
+		}
+
+		if (intervalBase.interval === INTERVAL.HOURS) {
+			if (intervalTarget.interval === INTERVAL.MINUTES) {
+				return intervalBase.value * 60;
+			}
+			if (intervalTarget.interval === INTERVAL.SECONDS) {
+				return intervalBase.value * 3600;
+			}
+		}
 	}
 }

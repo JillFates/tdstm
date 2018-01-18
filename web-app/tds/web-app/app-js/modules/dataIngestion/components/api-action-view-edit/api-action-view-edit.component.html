@@ -167,8 +167,9 @@
 												<kendo-dropdownlist
 														name="apiActionFrequencyInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.frequency.interval"
+														[(ngModel)]="selectedInterval.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
@@ -193,8 +194,9 @@
 												<kendo-dropdownlist
 														name="apiActionAssumeLapsedAfterInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.lapsedAfter.interval"
+														[(ngModel)]="selectedLapsed.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
@@ -219,8 +221,9 @@
 												<kendo-dropdownlist
 														name="apiActionAssmeStalledAfterInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.stalledAfter.interval"
+														[(ngModel)]="selectedStalled.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>

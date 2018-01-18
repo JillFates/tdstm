@@ -116,16 +116,16 @@ export class APIActionModel {
 	isPolling?: boolean;
 	polling?: {
 		frequency?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		lapsedAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		stalledAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		}
 	};
 	timeout?: number;
