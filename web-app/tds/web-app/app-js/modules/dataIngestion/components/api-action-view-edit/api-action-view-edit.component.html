@@ -145,7 +145,7 @@
 									<div class="col-md-5">
 										<div class="form-check">
 											<label class="form-check-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.pollingInterval" class="form-check-input">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" class="form-check-input">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -159,8 +159,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.frequency.value"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -168,8 +168,8 @@
 														name="apiActionFrequencyInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.frequency.interval"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
@@ -185,8 +185,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -194,8 +194,8 @@
 														name="apiActionAssumeLapsedAfterInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.lapsedAfter.interval"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
@@ -211,8 +211,8 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
 											</div>
 											<div class="col-sm-3 dropdown" *ngIf="modalType !== actionTypes.VIEW">
@@ -220,8 +220,8 @@
 														name="apiActionAssmeStalledAfterInterval"
 														[data]="intervals"
 														[(ngModel)]="apiActionModel.polling.stalledAfter.interval"
-														[disabled]="!apiActionModel.pollingInterval"
-														[required]="apiActionModel.pollingInterval">
+														[disabled]="!apiActionModel.isPolling"
+														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-3" *ngIf="modalType === actionTypes.VIEW">
@@ -364,42 +364,35 @@
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2">
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="apiActionTimeout" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0"> Timeout
-													</label>
-												</div>
-											</div>
-											<div class="col-md-2" style="width: 70px !important;">
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0"> Lapsed
-													</label>
-												</div>
-											</div>
-											<div class="col-md-2">
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0"> Stalled
-													</label>
-												</div>
-											</div>
-											<div *ngIf="apiActionModel.pollingInterval">
-												<div class="col-md-2 customize"><label>Customize:</label></div>
-												<div class="col-md-3">
+											<div *ngIf="apiActionModel.isPolling">
+												<div class="col-md-2" style="width: 70px !important;">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0"> Before API Call
+															<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0"> Lapsed
 														</label>
 													</div>
 												</div>
-												<div class="col-md-3">
+												<div class="col-md-2">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[9].selected" [disabled]="apiActionModel.eventReactions[9].value.length > 0"> After API Call
+															<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0"> Stalled
 														</label>
 													</div>
+												</div>
+											</div>
+											<div class="col-md-2 customize"><label>Customize:</label></div>
+											<div class="col-md-3">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0"> Before API Call
+													</label>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0"> Post Action
+													</label>
 												</div>
 											</div>
 										</div>
@@ -533,7 +526,7 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[5].selected">
 											<div class="form-group">
-												<label for="apiActionTimeout" class="col-sm-8 control-label">Timed Out <span class="font-normal">-logic to perform if an API call timed out before completing.</span></label>
+												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[5])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
@@ -545,7 +538,7 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[5].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionTimeout" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
+													<code-mirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[5].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
@@ -558,7 +551,7 @@
 										</div>
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[6].selected">
 											<div class="form-group">
-												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
+												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[6])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
@@ -570,7 +563,7 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[6].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
+													<code-mirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[6].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
@@ -581,9 +574,10 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected">
+										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel() && apiActionModel.isPolling">Customize:</label>
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected && apiActionModel.isPolling">
 											<div class="form-group">
-												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
+												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before API Call <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[7])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
@@ -595,7 +589,7 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[7].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
+													<code-mirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[7].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
@@ -606,10 +600,9 @@
 												</div>
 											</div>
 										</div>
-										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel() && apiActionModel.pollingInterval">Customize:</label>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected && apiActionModel.pollingInterval">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected && apiActionModel.isPolling">
 											<div class="form-group">
-												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Pre API Call <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
+												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Action <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[8])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
@@ -621,39 +614,14 @@
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[8].open">
 												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
+													<code-mirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[8].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
 													</div>
 												</div>
 												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[8].value}}</label>
-												</div>
-											</div>
-										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[9].selected && apiActionModel.pollingInterval">
-											<div class="form-group">
-												<label for="apiActionAfterCall" class="col-sm-8 control-label">Finalized API Call <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
-												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[9])">
-														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
-													</button>
-													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[9])">
-														<i aria-hidden="true" class="fa fa-angle-double-down" [ngClass]="{'fa-angle-double-down': apiActionModel.eventReactions[9].open, 'fa-angle-double-left': !apiActionModel.eventReactions[9].open}" style="padding-right:0px;"></i>
-													</button>
-												</div>
-											</div>
-											<div class="form-group" *ngIf="apiActionModel.eventReactions[9].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[9].value"></code-mirror>
-													<div *ngIf="!apiActionModel.eventReactions[9].valid" style="margin-left: 50px;">
-														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[9].error" readonly></textarea>
-													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[9].value</label>
+													<label class="control-label label-detail">{{apiActionModel.eventReactions[8].value</label>
 												</div>
 											</div>
 										</div>

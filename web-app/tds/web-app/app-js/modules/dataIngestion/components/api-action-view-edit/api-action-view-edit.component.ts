@@ -419,7 +419,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Show only the Event Label if one Event is selected
 	 */
 	showsEventLabel(): boolean {
-		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.TIMEDOUT, EventReactionType.LAPSED, EventReactionType.STALLED];
+		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
@@ -431,10 +431,10 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Show only the Customize Label if one Custm is selected
+	 * Show only the Customize Label if one Custom is selected
 	 */
 	showsCustomizeLabel(): boolean {
-		let events = [EventReactionType.PRE_API_CALL, EventReactionType.FINALIZED_API_CALL];
+		let events = [EventReactionType.PRE, EventReactionType.FINALIZE];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {

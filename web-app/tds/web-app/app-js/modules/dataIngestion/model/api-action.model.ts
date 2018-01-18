@@ -113,7 +113,7 @@ export class APIActionModel {
 	callbackMethod?: string;
 	callbackMode?: string;
 	methodParams?: string;
-	pollingInterval?: boolean;
+	isPolling?: boolean;
 	polling?: {
 		frequency?: {
 			value?: number;
@@ -152,7 +152,7 @@ export class APIActionModel {
 		this.provider = { id: null, name: '' };
 		this.agentClass = { id: null, name: '' };
 		this.agentMethod = { id: null, name: ''};
-		this.pollingInterval = false;
+		this.isPolling = false;
 		this.producesData = false;
 		this.polling =  {
 				frequency: {
@@ -178,11 +178,10 @@ export class APIActionModel {
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZE, false, ''));
 	}
 }
 
@@ -221,14 +220,13 @@ export class ParameterContextModel {
 }
 
 export enum EventReactionType {
-	STATUS = 'status',
-	SUCCESS = 'success',
-	DEFAULT = 'default',
-	ERROR = 'error',
-	FAILED = 'failed',
-	TIMEDOUT = 'timedout',
-	LAPSED = 'lapsed',
-	STALLED = 'stalled',
-	PRE_API_CALL = 'preApiCall',
-	FINALIZED_API_CALL = 'finalizedApiCall'
+	STATUS = 'STATUS',
+	SUCCESS = 'SUCCESS',
+	DEFAULT = 'DEFAULT',
+	ERROR = 'ERROR',
+	FAILED = 'FAILED',
+	LAPSED = 'LAPSED',
+	STALLED = 'STALLED',
+	PRE = 'PRE',
+	FINALIZE = 'FINALIZE'
 };

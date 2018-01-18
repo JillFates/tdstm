@@ -206,7 +206,7 @@ export class DataIngestionService {
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			producesData: (model.producesData) ? 1 : 0,
-			pollingInterval: (model.pollingInterval) ? 1 : 0
+			pollingInterval: (model.isPolling) ? 1 : 0
 		};
 
 		if (postRequest.producesData === 1) {
