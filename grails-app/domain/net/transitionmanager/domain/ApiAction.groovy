@@ -125,8 +125,8 @@ class ApiAction {
 		lastModified nullable: true
 		methodParams nullable: true
 		name nullable: false, size: 1..64, unique: 'project'
-		pollingLapsedAfter nullable: false, range: 0..1
-		pollingStalledAfter nullable: false, range: 0..1
+		pollingLapsedAfter nullable: false
+		pollingStalledAfter nullable: false
 		producesData nullable: false, range:0..1
 		provider nullable: false, validator: providerValidator
 		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
