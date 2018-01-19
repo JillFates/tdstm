@@ -469,7 +469,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param row
 	 */
 	private void addCrudRowData (Integer rowIndex, Map row) {
-		currentRow = new Row(rowIndex, fields.collect { row[it.name] }, this)
+		currentRow = new Row(rowIndex, dataSetFacade.fields().collect { row[it.name] }, this)
 		rows.add(currentRow)
 		currentRow
 	}
