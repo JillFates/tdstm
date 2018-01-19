@@ -1,4 +1,4 @@
-import {Component, ViewChild, HostListener, OnInit} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -22,6 +22,7 @@ import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 
 declare var jQuery: any;
 
@@ -48,6 +49,10 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionAgent', { read: DropDownListComponent }) apiActionAgent: DropDownListComponent;
 	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent }) apiActionAgentMethod: DropDownListComponent;
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
+
+	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	public codeMirrorComponent: CodeMirrorComponent;
+
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
 	public agentList = new Array<AgentModel>();
@@ -339,6 +344,15 @@ export class APIActionViewEditComponent implements OnInit {
 		if (num === 0) {
 			this.prepareFormListener();
 		}
+
+		if (num === 2) {
+			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
+				comps.forEach((child) => {
+					this.codeMirrorComponent = child;
+					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+				});
+			});
+		}
 		this.currentTab = num;
 	}
 
@@ -557,5 +571,13 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	private modifySignatureByProperty(property: any): void {
 		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.apiActionModel[property]);
+	}
+
+	/**
+	 * Verify if this is on View mode
+	 * @returns {boolean}
+	 */
+	isViewMode(): boolean {
+		return this.modalType === this.actionTypes.VIEW;
 	}
 }

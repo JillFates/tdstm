@@ -342,28 +342,28 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="apiActionModel.eventReactions[1].value.length > 0"> Success
+														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="apiActionModel.eventReactions[1].value.length > 0 || modalType === actionTypes.VIEW"> Success
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionDefault" [(ngModel)]="apiActionModel.eventReactions[2].selected" [disabled]="apiActionModel.eventReactions[2].value.length > 0"> Default
+														<input type="checkbox" name="apiActionDefault" [(ngModel)]="apiActionModel.eventReactions[2].selected" [disabled]="apiActionModel.eventReactions[2].value.length > 0 || modalType === actionTypes.VIEW"> Default
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0"> Error
+														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0 || modalType === actionTypes.VIEW"> Error
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0"> Failed
+														<input type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0 || modalType === actionTypes.VIEW"> Failed
 													</label>
 												</div>
 											</div>
@@ -371,14 +371,14 @@
 												<div class="col-md-2" style="width: 70px !important;">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0"> Lapsed
+															<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0 || modalType === actionTypes.VIEW"> Lapsed
 														</label>
 													</div>
 												</div>
 												<div class="col-md-2">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0"> Stalled
+															<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
 														</label>
 													</div>
 												</div>
@@ -387,14 +387,14 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0"> Before API Call
+														<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0"> Post Action
+														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Action
 													</label>
 												</div>
 											</div>
@@ -405,7 +405,7 @@
 											<div class="form-group">
 												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">logic to determine the Success or other status based on API response.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[0])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[0])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
@@ -414,15 +414,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[0].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionStatusDetermination" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[0].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionStatusDetermination" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[0].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[0].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[0].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -431,7 +428,7 @@
 											<div class="form-group">
 												<label for="apiActionSuccess" class="col-sm-8 control-label">Success <span class="font-normal">- logic to be performed upon the API call being successful.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[1])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[1])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[1])">
@@ -440,15 +437,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[1].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionSuccess" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[1].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionSuccess" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[1].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[1].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[1].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[1].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -456,7 +450,7 @@
 											<div class="form-group">
 												<label for="apiActionDefault" class="col-sm-8 control-label">Default <span class="font-normal">- logic to be performed for events not explicitly defined.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[2])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[2])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[2])">
@@ -465,15 +459,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[2].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[2].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[2].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -481,7 +472,7 @@
 											<div class="form-group">
 												<label for="apiActionError" class="col-sm-8 control-label">Error <span class="font-normal">- logic to perform when the API call fails for any cause.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[3])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[3])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[3])">
@@ -490,15 +481,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[3].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[3].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[3].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -506,7 +494,7 @@
 											<div class="form-group">
 												<label for="apiActionFailed" class="col-sm-8 control-label">Failed <span class="font-normal">-logic to perform when API call receives 400 or 500 series HTTP error code.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[4])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[4])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[4])">
@@ -515,15 +503,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[4].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[4].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[4].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -531,7 +516,7 @@
 											<div class="form-group">
 												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[5])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[5])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[5])">
@@ -540,15 +525,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[5].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[5].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[5].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -556,7 +538,7 @@
 											<div class="form-group">
 												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[6])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[6])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[6])">
@@ -565,15 +547,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[6].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[6].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[6].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -582,7 +561,7 @@
 											<div class="form-group">
 												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before API Call <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[7])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[7])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[7])">
@@ -591,15 +570,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[7].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[7].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[7].value}}</label>
 												</div>
 											</div>
 										</div>
@@ -607,7 +583,7 @@
 											<div class="form-group">
 												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Action <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
-													<button class="btn btn-default" (click)="verifyCode(apiActionModel.eventReactions[8])">
+													<button class="btn btn-default" *ngIf="modalType !== actionTypes.VIEW" (click)="verifyCode(apiActionModel.eventReactions[8])">
 														<i aria-hidden="true" class="fa fa-thumbs-o-up" style="padding-right:0px;"></i>
 													</button>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[8])">
@@ -616,15 +592,12 @@
 												</div>
 											</div>
 											<div class="form-group" *ngIf="apiActionModel.eventReactions[8].open">
-												<div class="col-sm-12" *ngIf="modalType !== actionTypes.VIEW">
-													<code-mirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
+												<div class="col-sm-12">
+													<code-mirror #codeMirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[8].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
 														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
 													</div>
-												</div>
-												<div class="col-sm-12" *ngIf="modalType === actionTypes.VIEW">
-													<label class="control-label label-detail">{{apiActionModel.eventReactions[8].value</label>
 												</div>
 											</div>
 										</div>
