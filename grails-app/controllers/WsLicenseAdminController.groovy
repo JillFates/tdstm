@@ -38,7 +38,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	 * @return
      */
 	def fetchProjects(){
-		List<Project> projects = projectService.getUserProjects()
+		List<Project> projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
 
 		List<Map> initialData = [[id:"all", name:"-- Multiple Projects --", client:[id:'', name:'']]]
 
