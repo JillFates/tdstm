@@ -532,6 +532,18 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 * Execute the API to validated every Syntax Value.
+	 */
+	onCheckAllSyntax(): void {
+		/**  this.apiActionModel.eventReactions.
+		this.dataIngestionService.validateCode(allScript).subscribe(
+			(result: any) => {
+
+			},
+			(err) => console.log(err)); */
+	}
+
+	/**
 	 * Refresh the list of elements after update, create or delete parameters / arguments
 	 */
 	public refreshParametersList(): void {

@@ -104,7 +104,7 @@ export class DataIngestionService {
 						}
 					};
 					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					APIActionModel.createBasicReactions(r);
+					APIActionModel.createReactions(r, r.reactionScripts);
 				});
 				return dataScriptModels;
 			})
@@ -292,7 +292,7 @@ export class DataIngestionService {
 	}
 
 	validateCode(): Observable<any> {
-		return this.http.post(`${this.dataIngestionUrl}/`, null)
+		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, null)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

@@ -640,7 +640,7 @@
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
 		 class="btn btn-primary pull-left" [disabled]="!validInfoForm">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
-		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" class="btn btn-primary pull-left">
+		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditApiAction()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
