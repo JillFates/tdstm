@@ -110,8 +110,6 @@ function invokeAction(commentId) {
 function resetAction(commentId) {
     updateStatus(commentId);
     if (confirm("Are you sure you want to reset the action?")) {
-        $("#messageDivId").show();
-        $("#messageDivId").html("Starting to set default power connections.")
         jQuery.ajax({
             url: contextPath + '/ws/task/' + commentId + '/resetAction',
             data: {},
@@ -122,10 +120,7 @@ function resetAction(commentId) {
                 } else {
                     pageSubmit();
                 }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert("An unexpected error occurred while attempting to reset the action")
-            }
+            } // No error handler, since all errors should be trapped by jquery global interceptor
         });
     }
 }

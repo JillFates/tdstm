@@ -38,7 +38,7 @@
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">
-              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Look Up Action" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
+              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
             </td>
 					</tr>
 					<tr id="categoryTrId">
