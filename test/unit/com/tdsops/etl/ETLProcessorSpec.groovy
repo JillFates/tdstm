@@ -30,12 +30,12 @@ class ETLProcessorSpec extends Specification {
 	@Shared
 	JSONConnection jsonConnection
 
-	CSVDataset simpleDataSet
-	JSONDataset jsonDataSet
-	CSVDataset environmentDataSet
-	CSVDataset applicationDataSet
-	CSVDataset nonSanitizedDataSet
-	CSVDataset sixRowsDataSet
+	DataSetFacade simpleDataSet
+	DataSetFacade jsonDataSet
+	DataSetFacade environmentDataSet
+	DataSetFacade applicationDataSet
+	DataSetFacade nonSanitizedDataSet
+	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
 
@@ -51,12 +51,14 @@ class ETLProcessorSpec extends Specification {
 	}
 
 	def setup () {
-		simpleDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-		simpleDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		simpleDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		simpleDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
 
-		new Flow().writeTo(dest: simpleDataSet, dest_append: true) { updater ->
+		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+
+		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
+		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+
+		new Flow().writeTo(dest: simpleDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
 			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
 			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
@@ -69,29 +71,29 @@ class ETLProcessorSpec extends Specification {
 				{ "device id": "152256", "model name": "Slideaway", "manufacturer name": "ATEN"}
 		]""".stripIndent()
 
-		jsonDataSet = new JSONDataset(connection: jsonConnection, fileName: jsonFile.path, rootNode: ".", convertToList: true)
-		jsonDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		jsonDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		jsonDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		jsonDataSet = new DataSetFacade(new JSONDataset(connection: jsonConnection, fileName: jsonFile.path, rootNode: ".", convertToList: true))
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
+		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
 
-		environmentDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-		environmentDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		environmentDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		environmentDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
-		environmentDataSet.field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING")
+		environmentDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
+		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
+		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
+		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING")
 
-		new Flow().writeTo(dest: environmentDataSet, dest_append: true) { updater ->
+		new Flow().writeTo(dest: environmentDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'environment': 'Prod'])
 			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'environment': 'Prod'])
 			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'environment': 'Dev'])
 		}
 
-		sixRowsDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-		sixRowsDataSet.field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		sixRowsDataSet.field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		sixRowsDataSet.field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
+		sixRowsDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
+		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
+		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
 
-		new Flow().writeTo(dest: sixRowsDataSet, dest_append: true) { updater ->
+		new Flow().writeTo(dest: sixRowsDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
 			updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
 			updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
@@ -100,13 +102,13 @@ class ETLProcessorSpec extends Specification {
 			updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
 		}
 
-		applicationDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-		applicationDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		applicationDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		applicationDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		applicationDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
+		applicationDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
+		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
-		new Flow().writeTo(dest: applicationDataSet, dest_append: true) { updater ->
+		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
@@ -141,13 +143,13 @@ class ETLProcessorSpec extends Specification {
 				]
 		])
 
-		nonSanitizedDataSet = new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true)
-		nonSanitizedDataSet.field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		nonSanitizedDataSet.field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		nonSanitizedDataSet.field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		nonSanitizedDataSet.field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
+		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
+		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
+		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
+		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
-		new Flow().writeTo(dest: nonSanitizedDataSet, dest_append: true) { updater ->
+		new Flow().writeTo(dest: nonSanitizedDataSet.getDataSet(), dest_append: true) { updater ->
 			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
@@ -181,8 +183,6 @@ class ETLProcessorSpec extends Specification {
 					data == [:]
 				}
 			}
-
-
 	}
 
 	void 'test can add groovy comments' () {
@@ -370,14 +370,18 @@ class ETLProcessorSpec extends Specification {
 	void 'test can use SOURCE reference object to connect with data source' () {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					sixRowsDataSet,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 					.evaluate("""
 						domain Device
 						read labels
-						SOURCE.readLabels
+						SOURCE.rows()
 						
 					""".stripIndent(), ETLProcessor.class.name)
 
@@ -417,7 +421,7 @@ class ETLProcessorSpec extends Specification {
 					ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
-			etlProcessor.currentRowIndex == sixRowsDataSet.readRows
+			etlProcessor.currentRowIndex == sixRowsDataSet.readRows()
 	}
 
 	void 'test can iterate over all data source rows from a json dataset' () {

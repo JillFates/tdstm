@@ -1,7 +1,6 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
-import getl.data.Dataset
 import net.transitionmanager.domain.Project
 
 /**
@@ -13,7 +12,7 @@ class ETLProcessor implements RangeChecker {
 	static final String CURR_ELEMENT_VARNAME = 'CE'
 
 	Project project
-	Dataset dataSet
+	DataSetFacade dataSetFacade
 	List<getl.data.Field> fields
 	ETLFieldsValidator fieldsValidator
 	ETLBinding binding
@@ -67,16 +66,16 @@ class ETLProcessor implements RangeChecker {
 	 *
 	 * @param binding
 	 * @param project
-	 * @param dataSet
+	 * @param dataSetFacade
 	 * @param console
 	 * @param fieldsValidator
 	 */
-	ETLProcessor (Project project, Dataset dataSet, DebugConsole console, ETLFieldsValidator fieldsValidator) {
+	ETLProcessor (Project project, DataSetFacade dataSetFacade, DebugConsole console, ETLFieldsValidator fieldsValidator) {
 		this.project = project
-		this.dataSet = dataSet
+		this.dataSetFacade = dataSetFacade
 		this.debugConsole = console
 		this.fieldsValidator = fieldsValidator
-		this.binding = new ETLBinding(this)
+		this.binding = new ETLBinding(this, ['SOURCE': this.dataSetFacade])
 		this.result = new ETLProcessorResult(this)
 	}
 
@@ -107,8 +106,7 @@ class ETLProcessor implements RangeChecker {
 
 		if ("labels".equalsIgnoreCase(dataPart)) {
 
-			fields = this.dataSet.connection.driver.fields(this.dataSet)
-			fields.eachWithIndex { getl.data.Field field, Integer index ->
+			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: field.name, index: index)
 				columns.add(column)
 				columnsMap[column.label] = column
@@ -132,7 +130,7 @@ class ETLProcessor implements RangeChecker {
 			[iterate: { Closure closure ->
 				from--
 				to--
-				List<Map> rows = this.dataSet.rows()
+				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
 				doIterate(subList, closure)
@@ -152,7 +150,7 @@ class ETLProcessor implements RangeChecker {
 
 		[iterate: { Closure closure ->
 			List rowNumbers = numbers as List
-			List rows = this.dataSet.rows()
+			List rows = this.dataSetFacade.rows()
 			List subList = rowNumbers.collect { int number ->
 				number--
 				rangeCheck(number, rows.size())
@@ -195,7 +193,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor iterate (Closure closure) {
-		doIterate(this.dataSet.rows(), closure)
+		doIterate(this.dataSetFacade.rows(), closure)
 	}
 
 	/**
@@ -285,7 +283,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor skip (Integer amount) {
-		if (amount + currentRowIndex <= this.dataSet.readRows) {
+		if (amount + currentRowIndex <= this.dataSetFacade.readRows()) {
 			currentRowIndex += amount
 		} else {
 			throw ETLProcessorException.invalidSkipStep(amount)
