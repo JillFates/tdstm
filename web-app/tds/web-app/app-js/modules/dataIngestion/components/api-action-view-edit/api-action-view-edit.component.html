@@ -10,7 +10,7 @@
 				<!-- Tabs within a box -->
 				<ul class="nav nav-tabs">
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
-                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': !validInfoForm && !isCurrentTab(0)}">Info</span></a>
+                        <a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': (!validInfoForm && !isCurrentTab(0)) && modalType !== actionTypes.VIEW}">Info</span></a>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(1)}">
 						<a href="#tab_2" (click)="setCurrentTab(1)" data-toggle="tab">Parameters</a>
