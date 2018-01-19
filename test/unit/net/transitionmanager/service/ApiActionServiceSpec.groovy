@@ -120,7 +120,7 @@ class ApiActionServiceSpec extends Specification {
 				}
 			""".stripIndent()
 
-			Map<String, ?> response = service.evaluateReactionScript(
+			Map<String, ?> response = service.invokeReactionScript(
 					ReactionScriptCode.STATUS,
 					script,
 					actionRequest,
@@ -258,7 +258,7 @@ class ApiActionServiceSpec extends Specification {
 
 		given:
 			List<ApiActionScriptCommand> scripts = [
-					new ApiActionScriptCommand(code: ReactionScriptCode.EVALUATE, script: 'if (response.status == SC.OK) \n   return SUCCESS\n} else {\n   return ERROR\n}'),
+					new ApiActionScriptCommand(code: ReactionScriptCode.STATUS, script: 'if (response.status == SC.OK) \n   return SUCCESS\n} else {\n   return ERROR\n}'),
 					new ApiActionScriptCommand(code: ReactionScriptCode.SUCCESS, script: 'task.done()')
 			]
 
