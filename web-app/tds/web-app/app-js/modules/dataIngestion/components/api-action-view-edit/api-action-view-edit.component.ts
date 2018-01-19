@@ -21,6 +21,7 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 declare var jQuery: any;
 
@@ -62,6 +63,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private dataSignature: string;
 	private intervals = INTERVALS;
 	public interval = INTERVAL;
+	public selectedInterval = {value: 0, interval: ''};
+	public selectedLapsed = {value: 0, interval: ''};
+	public selectedStalled = {value: 0, interval: ''};
 	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
@@ -117,7 +121,13 @@ export class APIActionViewEditComponent implements OnInit {
 		private customDomainService: CustomDomainService,
 		private dialogService: UIDialogService) {
 
+		// Sub Objects are not being created, just copy
 		this.apiActionModel = Object.assign({}, this.originalModel);
+
+		this.selectedInterval = Object.assign({}, this.originalModel.polling.frequency);
+		this.selectedLapsed = Object.assign({}, this.originalModel.polling.lapsedAfter);
+		this.selectedStalled = Object.assign({}, this.originalModel.polling.stalledAfter);
+
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 
 		this.getProviders();
@@ -386,6 +396,15 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 *
+	 * @param pollingObject
+	 */
+	protected onIntervalChange(interval: any, pollingObject: any): void {
+		let newVal = DateUtils.convertInterval(pollingObject, interval.interval);
+		pollingObject.interval = interval.interval;
+		pollingObject.value = newVal;
+	}
+	/**
 	 * On a new Provider Value change
 	 * @param value
 	 */
@@ -434,7 +453,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Show only the Customize Label if one Custom is selected
 	 */
 	showsCustomizeLabel(): boolean {
-		let events = [EventReactionType.PRE, EventReactionType.FINALIZE];
+		let events = [EventReactionType.PRE, EventReactionType.FINAL];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {

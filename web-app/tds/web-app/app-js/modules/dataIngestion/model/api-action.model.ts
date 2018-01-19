@@ -116,16 +116,16 @@ export class APIActionModel {
 	isPolling?: boolean;
 	polling?: {
 		frequency?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		lapsedAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		stalledAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		}
 	};
 	timeout?: number;
@@ -154,6 +154,7 @@ export class APIActionModel {
 		this.provider = { id: null, name: '' };
 		this.agentClass = { id: null, name: '' };
 		this.agentMethod = { id: null, name: ''};
+		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
 		this.endpointUrl = '';
@@ -185,7 +186,7 @@ export class APIActionModel {
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZE, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINAL, false, ''));
 	}
 }
 
@@ -232,5 +233,5 @@ export enum EventReactionType {
 	LAPSED = 'LAPSED',
 	STALLED = 'STALLED',
 	PRE = 'PRE',
-	FINALIZE = 'FINALIZE'
+	FINAL = 'FINAL'
 };

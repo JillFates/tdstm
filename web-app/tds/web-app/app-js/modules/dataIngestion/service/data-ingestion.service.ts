@@ -7,7 +7,7 @@ import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 import {INTERVAL} from '../../../shared/model/constants';
-
+import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -89,21 +89,21 @@ export class DataIngestionService {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
-					r.pollingInterval = (r.pollingInterval === 1);
 					r.polling = {
 						frequency: {
-							value: 0,
+							value: r.pollingInterval,
 							interval: INTERVAL.SECONDS
 						},
 						lapsedAfter: {
-							value: 0,
+							value: DateUtils.convertInterval({ value: r.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						},
 						stalledAfter: {
-							value: 0,
+							value: DateUtils.convertInterval({ value: r.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						}
 					};
+					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
 					APIActionModel.createBasicReactions(r);
 				});
 				return dataScriptModels;
@@ -209,9 +209,9 @@ export class DataIngestionService {
 			endpointPath: model.endpointPath,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
-			pollingInterval: model.polling.frequency.value,
-			pollingLapsedAfter: model.polling.lapsedAfter.value,
-			pollingStalledAfter: model.polling.stalledAfter.value,
+			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
+			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
+			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
 		};
 
 		let reaction = {
@@ -223,14 +223,12 @@ export class DataIngestionService {
 			'LAPSED': model.eventReactions[5].value,
 			'STALLED': model.eventReactions[6].value,
 			'PRE': model.eventReactions[7].value,
-			'FINALIZE': model.eventReactions[8].value
+			'FINAL': model.eventReactions[8].value
 		};
 
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
-		if (postRequest.producesData === 1) {
-			postRequest['defaultDataScript'] = model.defaultDataScript.id;
-		}
+		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))

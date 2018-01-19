@@ -145,7 +145,7 @@
 									<div class="col-md-5">
 										<div class="form-check">
 											<label class="form-check-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" class="form-check-input">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -167,8 +167,9 @@
 												<kendo-dropdownlist
 														name="apiActionFrequencyInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.frequency.interval"
+														[(ngModel)]="selectedInterval.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
@@ -193,8 +194,9 @@
 												<kendo-dropdownlist
 														name="apiActionAssumeLapsedAfterInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.lapsedAfter.interval"
+														[(ngModel)]="selectedLapsed.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
@@ -219,8 +221,9 @@
 												<kendo-dropdownlist
 														name="apiActionAssmeStalledAfterInterval"
 														[data]="intervals"
-														[(ngModel)]="apiActionModel.polling.stalledAfter.interval"
+														[(ngModel)]="selectedStalled.interval"
 														[disabled]="!apiActionModel.isPolling"
+														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
 											</div>
@@ -230,7 +233,7 @@
 										</div>
 										<div class="form-check">
 											<label for="apiActionProduceData" class="form-check-label">
-												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" class="form-check-input">
+												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
 												Provides Data
 											</label>
 											<popup-provides-data></popup-provides-data>
@@ -249,7 +252,7 @@
 																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail">{{apiActionModel.defaultDataScript.name}}</label>
+                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
 											</div>
 										</div>
 									</div>
