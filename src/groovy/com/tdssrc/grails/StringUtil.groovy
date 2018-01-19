@@ -277,8 +277,10 @@ class StringUtil {
 	 * and then replace all white spaces with a '+'
 	 */
 	 static String sanitizeAndStripSpaces(String str){
-	 if (!str) return str
-	 sanitize(str).replaceAll(/\s/, "+")
+		 if (str) {
+			 str = sanitize(str).replaceAll(/\s/, "+")
+		 }
+		 return str
 	 }
 
    /**
@@ -286,9 +288,11 @@ class StringUtil {
     * and then replace all white spaces with a '_'
     */
    static String sanitizeAndReplaceSpacesWithUnderscore(String str){
-	 if (!str) return str
-	 sanitize(str).replaceAll(/\s/, "_")
-   }
+		 if (str) {
+			 str = sanitize(str).replaceAll(/\s/, "_")
+		 }
+		 return str
+	 }
 
 	/**
 	 * Escape string being used in Dot graphs to avoid unterminated strings

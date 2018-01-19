@@ -1120,7 +1120,7 @@ class ReportsController implements ControllerMethods {
 			def moveEvents
 			if (reqEvents) {
 				moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
-      }
+			}
 			def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
 			String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams)
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
