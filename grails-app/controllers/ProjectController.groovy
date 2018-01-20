@@ -86,7 +86,7 @@ class ProjectController implements ControllerMethods {
 
 		int totalRows = projectList?.isEmpty() ? 0 : projectList?.getTotalCount()
 		int numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
-a
+
 		def results = projectList?.collect {
 			String startDate = TimeUtil.formatDate(it.startDate)
 			String completionDate = TimeUtil.formatDate(it.completionDate)
