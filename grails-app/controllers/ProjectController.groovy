@@ -137,7 +137,7 @@ class ProjectController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to delet the user's current project
+	 * Used to delete the user's current project
 	 */
 	@HasPermission(Permission.ProjectDelete)
 	def delete() {
