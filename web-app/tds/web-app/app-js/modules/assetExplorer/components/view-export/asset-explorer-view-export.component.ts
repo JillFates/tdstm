@@ -5,6 +5,7 @@ import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {FieldImportance} from '../../../fieldSettings/model/field-settings.model';
 import {AssetExportModel} from '../../model/asset-export-model';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'asset-explorer-view-export',
@@ -18,6 +19,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 export class AssetExplorerViewExportComponent {
 	private columns: any[];
 	protected fileName = 'asset_explorer';
+	protected exportFileName = '';
 	protected dataToExport: any[] = [];
 	private defaultLimitRows = 0;
 	private defaultOffset = 0;
@@ -68,11 +70,13 @@ export class AssetExplorerViewExportComponent {
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
+					this.exportFileName = this.fileName + '-' + DateUtils.getTimestamp();
 					this.onExportDataResponse(result['assets']);
 				}, err => console.log(err));
 		} else {
 			this.assetExpService.query(this.assetExportModel.queryId, this.assetExportModel.assetQueryParams)
 				.subscribe(result => {
+					this.exportFileName = this.fileName + '-' + DateUtils.getTimestamp();
 					this.onExportDataResponse(result['assets']);
 				}, err => console.log(err));
 		}
