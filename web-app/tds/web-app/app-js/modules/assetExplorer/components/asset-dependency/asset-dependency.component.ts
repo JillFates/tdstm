@@ -6,6 +6,10 @@ import { DependecyService } from '../../service/dependecy.service';
 	selector: 'asset-dependency',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/asset-dependency/asset-dependency.component.html',
 	styles: [`
+	table {
+        margin-top: 10px;
+	}
+	
 	.modal-body th {
 		background: white !important;
 	}

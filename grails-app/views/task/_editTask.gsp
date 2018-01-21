@@ -53,6 +53,7 @@
 							<g:if test="${canAssign}">
 							<!-- default to NONE -->
 								<select ng-model="acData.apiAction.id">
+									<option value="null"></option>
 									<g:each var="apiAction" in="${apiActionList}">
 										<option value="${apiAction.id}">${apiAction.name}</option>
 									</g:each>
@@ -60,6 +61,7 @@
 							</g:if>
 							<g:else>
 								<select ng-model="acData.apiAction.id" ng-if="acData.apiAction != null" ng-disabled="acData.apiAction == null || <%= !canAssign %>">
+									<option value="null"></option>
 									<g:each var="apiAction" in="${apiActionList}">
 										<option value="${apiAction.id}">${apiAction.name}</option>
 									</g:each>

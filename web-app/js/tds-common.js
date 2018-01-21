@@ -528,6 +528,23 @@ var tdsCommon = {
 			value: nextDay
 		});
 		grid.thead.find('tr th:first').trigger('click');
+	},
+
+	/**
+	 * Validate if the element has reached the max length
+	 * @param element
+	 * @param errorHtml
+	 * @param maxLength
+	 */
+	validateMaxTextAreaLength: function(element, errorElementId, saveElementId, maxLength) {
+		var currentValue = jQuery(element).val();
+		if(currentValue && currentValue.length >= maxLength) {
+			jQuery('#'+errorElementId).show();
+			jQuery('#'+saveElementId).prop('disabled', true);
+		} else {
+			jQuery('#'+errorElementId).hide();
+			jQuery('#'+saveElementId).prop('disabled', false);
+		}
 	}
 
 }

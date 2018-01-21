@@ -336,8 +336,15 @@ class CommentService implements ServiceMethods {
 
 			// Assign ApiAction to task
 			if(params.containsKey("apiActionId")){
-				long id = Long.parseLong(params.apiActionId)
-				assetComment.apiAction = apiActionService.find(id, assetComment.project)
+				Long id = NumberUtil.toLong(params.apiActionId)
+				if (id) {
+					assetComment.apiAction = apiActionService.find(id, assetComment.project)
+				} else {
+					assetComment.apiAction = null
+					assetComment.apiActionInvokedAt = null
+					assetComment.apiActionCompletedAt = null
+				}
+
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This

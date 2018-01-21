@@ -1,11 +1,16 @@
 package net.transitionmanager.domain
 
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import groovy.util.logging.Slf4j
 import groovy.transform.ToString
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.service.InvalidParamException
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -14,6 +19,7 @@ import groovy.transform.ToString
 @Slf4j(value='logger')
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
+
 	String name
 	String description
 
@@ -62,11 +68,43 @@ class ApiAction {
 	// The method that the async response should call to return response
 	String callbackMethod = ''
 
+	// Optional credentials required by the agent.
+	Credential credential
+
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
 	Date dateCreated
+
 	Date lastModified
+
+	// The URL to the endpoint
+	String endpointUrl
+
+	// The Path to the endpoint
+	String endpointPath
+
+	// A flag that indicates if the action will poll for a result
+	Integer isPolling = 0
+
+	// The time period after after which a polling action is determined to have lapsed (seconds)
+	Integer pollingLapsedAfter = 0
+
+	// The time period after no increment in status of a polling action results in the LAPSED event get invoked (seconds)
+	Integer pollingStalledAfter = 0
+
+	// A flag that indicates that all of the syntax of the reactionScripts has been validated
+	Integer reactionScriptsValid = 0
+
+	// The JSON hash that will contain the scripts to be invoked appropriately.
+	String reactionScripts
+
+	// Flag indicating that the action interacts with a Task.
+	Integer useWithAsset = 0
+
+	// Flag indicating that the action interacts with an Asset.
+	Integer useWithTask = 0
+
 
 	static belongsTo = [
 		project: Project,
@@ -76,13 +114,26 @@ class ApiAction {
 	static constraints = {
 		agentClass  nullable: false
 		agentMethod nullable: false, size: 1..64
-		asyncQueue nullable: false, size: 0..64
-		callbackMode nullable: false
-		defaultDataScript nullable: true
-		name nullable: false, size: 1..64
-		methodParams nullable: true
+		asyncQueue nullable: true, size: 0..64
+		callbackMethod nullable: true
+		callbackMode nullable: true
+		credential nullable: true, validator: crossProviderValidator
+		defaultDataScript nullable: true, validator: crossProviderValidator
+		endpointPath nullable: true, blank: true
+		endpointUrl nullable: true, blank: true
+		isPolling nullable: false, range: 0..1
 		lastModified nullable: true
+		methodParams nullable: true
+		name nullable: false, size: 1..64, unique: 'project'
+		pollingLapsedAfter nullable: false, range: 0..1
+		pollingStalledAfter nullable: false, range: 0..1
 		producesData nullable: false, range:0..1
+		provider nullable: false, validator: providerValidator
+		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
+		reactionScriptsValid nullable: false, range: 0..1
+		timeout nullable: true
+		useWithAsset nullable: false, range: 0..1
+		useWithTask nullable: false, range: 0..1
 	}
 
 	static mapping = {
@@ -97,7 +148,7 @@ class ApiAction {
 		}
 	}
 
-	static transients = ['methodParamsList']
+	static transients = ['methodParamsList', 'agent']
 
 	/*
 	 * Used to determine if the action is performed asyncronously
@@ -132,40 +183,80 @@ class ApiAction {
 		return list
 	}
 
-	/**
-	 * Create a map with the data for this ApiAction
-	 * @param minimalInfo - flag that signals if only the m
-	 * @return
-	 */
-	Map toMap(boolean minimalInfo = true) {
-		Map fields = [id: id, name: name]
-		if (!minimalInfo) {
-			fields.agentClass  = agentClass.name()
-			fields.agentMethod = agentMethod
-			fields.asyncQueue = asyncQueue
-			fields.callbackMethod = callbackMethod
-			fields.callbackMode = callbackMode.name()
-			fields.dateCreated = dateCreated
-			fields.defaultDataScriptName = defaultDataScript
-			fields.description = description
-			fields.lastModified = lastModified
-			fields.methodParams = methodParams
-			fields.pollingInterval = pollingInterval
-			fields.producesData = producesData
-			fields.provider = [
-					id  : provider.id,
-					name: provider.name
-			]
-			fields.timeout = timeout
-
-		}
-		return fields
-	}
-
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
 		lastModified = TimeUtil.nowGMT()
 	}
+
+	/**
+	 * Custom validator for the reactionJson that evaluates that:
+	 * - The string is a valid JSON.
+	 * - EVALUATE and SUCCESS are present.
+	 * - DEFAULT or ERROR are present.
+	 */
+	static reactionJsonValidator = { String reactionJsonString, ApiAction apiAction ->
+		try {
+			JSONObject reactionJson = JsonUtil.parseJson(reactionJsonString)
+			// STATUS and SUCCESS are mandatory.
+			if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
+				// Either DEFAULT or ERROR need to be specified.
+				if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
+					apiAction.reactionScriptsValid = 0
+					return Message.ApiActionMissingDefaultAndErrorInReactionJson
+				}
+			} else {
+				return Message.ApiActionMissingStatusOrSuccessInReactionJson
+			}
+
+			boolean errors = false
+			// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode.
+			for (key in reactionJson.keySet()) {
+				try {
+					ReactionScriptCode.valueOf(key)
+				} catch (IllegalArgumentException iae) {
+					logger.warn("Unrecognized key $key in reaction JSON.")
+					reactionJson.remove(key)
+					errors = true
+				}
+			}
+
+			// If errors were detected update the reactionJson.
+			if (errors) {
+				apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
+			}
+
+			apiAction.reactionScriptsValid = errors ? 0 : 1
+
+			// Set to true, otherwise the validation fails.
+			return true
+
+		} catch (InvalidParamException ipe) {
+			return Message.InvalidFieldForDomain
+		}
+	}
+
+	/**
+	 * A validator that takes an API Action and a field and checks
+	 * that both reference the same project.
+	 */
+	static providerValidator = { provider, apiAction ->
+		if (provider.project.id != apiAction.project.id) {
+			return Message.InvalidFieldForDomain
+		}
+	}
+
+	/**
+	 * Validator that accepts a field of an ApiAction and the corresponding
+	 * ApiAction and checks that the providers are the same.
+	 */
+	static crossProviderValidator = { aField, apiAction ->
+		if (aField) {
+			if (aField.provider.id != apiAction.provider.id) {
+				return Message.InvalidFieldForDomain
+			}
+		}
+	}
+
 }

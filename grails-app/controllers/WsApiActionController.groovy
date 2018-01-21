@@ -1,10 +1,20 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.agent.AbstractAgent
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ApiActionValidateScriptCommand
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.SecurityService
@@ -51,8 +61,8 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def fetch(Long id){
         Project project = securityService.userCurrentProject
-        ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
-        renderSuccessJson(apiAction.toMap(false))
+        ApiAction apiAction = apiActionService.find(id, project, true)
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
     /**
@@ -71,20 +81,28 @@ class WsApiActionController implements ControllerMethods {
      * Create a new ApiAction.
      */
     @HasPermission(Permission.ActionCreate)
-    def create() {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
-        renderSuccessJson(apiAction.toMap(false))
+    def create(ApiActionCommand apiActionCommand) {
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand)
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
-
 
     /**
      * Update the corresponding ApiAction.
      */
     @HasPermission(Permission.ActionEdit)
-    def update(Long id) {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON, id)
-        renderSuccessJson(apiAction.toMap(false))
+    def update(Long id, ApiActionCommand apiActionCommand) {
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
+
+	@HasPermission(Permission.ActionInvoke)
+	def validateSyntax(ApiActionValidateScriptCommand command) {
+
+		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
+			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
+		} else {
+			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
+		}
+	}
+
 }

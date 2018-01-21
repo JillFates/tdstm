@@ -1,0 +1,8 @@
+<span style="cursor:pointer;" #popUpPolling (click)="onToggle()"><i class="fa  fa-question"></i></span>
+<kendo-popup [anchor]="popUpPolling" [popupClass]="'content popup'" *ngIf="show">
+   <div>
+        <label>
+            The checkbox should be selected for end-points that are used to fetch data that can be used to in the import process. The Default Data Script will be the ETL script used to process the data by default.
+        </label>
+   </div>
+</kendo-popup>

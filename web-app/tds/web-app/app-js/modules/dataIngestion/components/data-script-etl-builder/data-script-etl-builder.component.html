@@ -21,7 +21,7 @@
 				</div>
 				<div class="row" *ngIf="!collapsed.code">
 					<div class="col-md-12">
-						<code-mirror [(model)]="code" (change)="onCodeChange($event)" ></code-mirror>
+						<code-mirror [mode]="'groovy'" [(model)]="code" (change)="onCodeChange($event)" ></code-mirror>
 					</div>
 				</div>
 				<div class="row">

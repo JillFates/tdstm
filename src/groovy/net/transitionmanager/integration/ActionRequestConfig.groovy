@@ -14,12 +14,12 @@ package net.transitionmanager.integration
  */
 class ActionRequestConfig extends HashMap<String, Object> {
 
-    Object getProperty(String key) {
-        return this.get(key)
-    }
+	Object getProperty(String key) {
+		return this.get(key)
+	}
 
-    void setProperty(String key, Object value) {
-        this.put(key, value)
-    }
+	void setProperty(String key, Object value) {
+		this.put(key, value)
+	}
 
 }

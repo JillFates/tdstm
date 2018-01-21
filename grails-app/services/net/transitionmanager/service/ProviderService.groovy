@@ -21,6 +21,11 @@ class ProviderService implements ServiceMethods {
         if (!project) {
             project = securityService.userCurrentProject
         }
+
+        // Should the provider name be empty, throw an exception.
+        if (!providerName) {
+            throw new InvalidParamException("The name for the Provider cannot be null.")
+        }
         boolean isUnique = true
 
         // Lookup a provider with the given name and project
@@ -49,11 +54,6 @@ class ProviderService implements ServiceMethods {
     Provider saveOrUpdateProvider(JSONObject providerJson, Long providerId = null) {
         Project currentProject = securityService.userCurrentProject
 
-        // Validate the provider name is unique.
-        if (!validateUniqueName(providerJson.name, providerId, currentProject)) {
-            throw new DomainUpdateException("Cannot update or create Provider because the name is not unique for this project.")
-        }
-
         Provider provider
 
         // Check if it's creating or updating a provider
@@ -64,6 +64,12 @@ class ProviderService implements ServiceMethods {
             // If it's creating a new provider, create a new instance.
             provider = new Provider()
         }
+
+        // Validate the provider name is unique.
+        if (!validateUniqueName(providerJson.name, providerId, currentProject)) {
+            throw new DomainUpdateException("Cannot update or create Provider because the name is not unique for this project.")
+        }
+
 
         provider.with {
             name = providerJson.name
@@ -89,7 +95,7 @@ class ProviderService implements ServiceMethods {
      * @param project
      * @return
      */
-    Provider getProvider(Long providerId, Project project = null) {
+    Provider getProvider(Long providerId, Project project = null, boolean throwException = false) {
         if (!project) {
             project = securityService.userCurrentProject
         }
@@ -99,8 +105,8 @@ class ProviderService implements ServiceMethods {
             project == project
         }.find()
 
-        if (!provider) {
-            throw new DomainUpdateException("No Provider with id ${providerId} exists for this project.")
+        if (!provider && throwException) {
+            throw new EmptyResultException("No Provider with id ${providerId} exists for this project.")
         }
         return provider
     }
@@ -120,7 +126,7 @@ class ProviderService implements ServiceMethods {
      * @param providerId
      */
     void deleteProvider(Long providerId) {
-        Provider provider = getProvider(providerId)
+        Provider provider = getProvider(providerId, null, true)
         if (provider) {
             provider.delete()
         }

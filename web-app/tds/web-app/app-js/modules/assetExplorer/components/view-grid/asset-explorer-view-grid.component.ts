@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Rx';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, Keystroke } from '../../../../shared/model/constants';
+import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -79,6 +79,7 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	bulkItems = {};
 	bulkSelectedItems: string[] = [];
+	private columnFiltersOldValues = [];
 
 	constructor(
 		private userPref: PreferenceService,
@@ -134,6 +135,9 @@ export class AssetExplorerViewGridComponent {
 		if (column.filter) {
 			column.filter = '';
 			this.state.skip = 0;
+			if ( this.preventFilterSearch(column)) {
+				return; // prevent search
+			}
 			this.onReload();
 		}
 	}
@@ -147,10 +151,20 @@ export class AssetExplorerViewGridComponent {
 		this.onReload();
 	}
 
-	onFilterKeyUp(e: KeyboardEvent): void {
-		if (e.code === Keystroke.ENTER) {
+	private preventFilterSearch(column: ViewColumn): boolean {
+		let key = `${column.domain}_${column.property}`;
+		let oldVal = this.columnFiltersOldValues[key];
+		this.columnFiltersOldValues[key] = column.filter;
+		return oldVal === column.filter;
+	}
+
+	onFilterKeyUp(e: KeyboardEvent, column?: any): void {
+		if ( this.preventFilterSearch(column)) {
+			return; // prevent search
+		}
+		if (e.code === KEYSTROKE.ENTER) {
 			this.onFilter();
-		} else if (e.code !== Keystroke.TAB && e.code !== Keystroke.SHIFT_RIGHT && e.code !== Keystroke.SHIFT_LEFT) {
+		} else if (e.code !== KEYSTROKE.TAB && e.code !== KEYSTROKE.SHIFT_RIGHT && e.code !== KEYSTROKE.SHIFT_LEFT) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}

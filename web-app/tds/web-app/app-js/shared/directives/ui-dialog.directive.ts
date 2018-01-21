@@ -41,7 +41,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	size = 'md';
 	tdsUiDialog: any;
 
-	cmpRef: ComponentRef<{}>; // Instace of the component
+	cmpRef: ComponentRef<{}>; // Instance of the component
 
 	resolve: any;
 	reject: any;
