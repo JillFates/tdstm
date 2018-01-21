@@ -16,6 +16,9 @@ interface Message {
 			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
 			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
 			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
-			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout'
+			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
+			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
+			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension'
 
 }

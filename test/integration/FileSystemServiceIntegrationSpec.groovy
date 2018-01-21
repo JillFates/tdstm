@@ -1,14 +1,11 @@
 import com.tdssrc.grails.FileSystemUtil
-import net.transitionmanager.command.FileUploadCommand
-import net.transitionmanager.command.UploadTextContentCommand
+import grails.validation.ValidationException
+import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadTextCommand
 import net.transitionmanager.service.InvalidParamException
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
-import spock.lang.See
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidRequestException
 
@@ -58,14 +55,15 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			! fileSystemService.temporaryFileExists(filename)
 	}
 
-	def '3. Creating and deleting files from raw input'() {
+	def '3. Creating and deleting files from text upload'() {
 		when: "Creating a command object with a txt extension and some random content"
 			String extension = "TXT"
-			UploadTextContentCommand cmd = new UploadTextContentCommand(extension: extension, content: 'Hello, World!')
+			String fileContent = 'Hello, World!'
+			UploadTextCommand cmd = new UploadTextCommand(extension: extension, content: fileContent)
 		then: "The command object pass all validations."
 			!cmd.hasErrors()
 		when: "Attempting to create a temporary file using this command"
-			String filename = fileSystemService.writeTemporaryFileFromRawInput('', cmd)
+			String filename = fileSystemService.transferFileToFileSystem(cmd)
 		then: "No exceptions were thrown"
 			noExceptionThrown()
 		and: "The method returned a filename"
@@ -73,13 +71,14 @@ class FileSystemServiceIntegrationSpec extends Specification {
 		and: "The file exists"
 			fileSystemService.temporaryFileExists(filename)
 		when: "Trying retrieve the actual file"
-			File file = fileSystemService.getTemporaryFile(filename, true)
+			InputStream is = fileSystemService.openTemporaryFile(filename)
+			String readContent = is.getText()
 		then: "No exceptions thrown"
 			noExceptionThrown()
-		and: "The file was returned"
-			file != null
+		and: "The file's content matches the original content."
+			fileContent == readContent
 		and: "The file's extension matches the one used for writing the file."
-			FileSystemUtil.getFileExtension(file.getName()) == extension.toLowerCase()
+			FileSystemUtil.getFileExtension(filename) == extension.toLowerCase()
 		when: "Attempting to delete the file"
 			boolean deleted = fileSystemService.deleteTemporaryFile(filename)
 		then: "No exceptions thrown"
@@ -90,71 +89,74 @@ class FileSystemServiceIntegrationSpec extends Specification {
 			!fileSystemService.temporaryFileExists(filename)
 	}
 
-	def "4. Trying to create a temporary file with invalid input"() {
+	def "4. Testing uploadText with invalid input"() {
 		when: "The command object is null"
-			UploadTextContentCommand cmd = null
-			String filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
-		then: "An InvalidParamException is thrown"
-			thrown(InvalidParamException)
+			UploadTextCommand cmd = null
+			String filename = fileSystemService.transferFileToFileSystem(cmd)
+		then: "null is returned."
+			filename == null
 		when: "Trying to write a file with an invalid extension"
-			cmd = new UploadTextContentCommand(extension: "jzon", content: "something")
-			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
-		then: "An InvalidParamException is thrown"
-			thrown(InvalidParamException)
+			cmd = new UploadTextCommand(extension: "jzon", content: "something")
+			filename = fileSystemService.transferFileToFileSystem(cmd)
+		then: "the filename is null"
+			filename == null
+		and: "the command object has validation errors"
+			cmd.errors.hasFieldErrors("extension")
 		when: "Trying to create a file with no content"
-			cmd = new UploadTextContentCommand(extension: "json")
-			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
-		then: "An InvalidParamException is thrown"
-			thrown(InvalidParamException)
+			cmd = new UploadTextCommand(extension: "json")
+			filename = fileSystemService.transferFileToFileSystem(cmd)
+		then: "The filename is null"
+			filename == null
+		and: "the field content in the command has errors"
+			cmd.errors.hasFieldErrors("content")
 		when: "Trying to create a file with no extension"
-			cmd = new UploadTextContentCommand(content: "something")
-			filename = fileSystemService.writeTemporaryFileFromRawInput(null, cmd)
-		then: "An InvalidParamException is thrown"
-			thrown(InvalidParamException)
+			cmd = new UploadTextCommand(content: "something")
+			filename = fileSystemService.transferFileToFileSystem(cmd)
+		then: "The command has errors for the field 'extension'"
+			cmd.errors.hasFieldErrors('extension')
 	}
 
-	def "5. Create a temporary file from an uploaded file."() {
-		setup: "Create a temporary file for this test"
+	def "5. Test uploadFile with valid inputs"() {
+		setup: "Set required objects for the test"
 			String extension = "txt"
-			UploadTextContentCommand cmd = new UploadTextContentCommand(extension: extension, content: "something important.")
-			String filename = fileSystemService.writeTemporaryFileFromRawInput('', cmd)
-			File file = fileSystemService.getTemporaryFile(filename, true)
-			MockMultipartFile multipartFile = new MockMultipartFile(filename, filename, "text/plain", new FileInputStream(file))
-		when: "Uploading a new file using an existing file"
-			FileUploadCommand cmd2 = new FileUploadCommand(file: multipartFile)
-			String filename2 = fileSystemService.copyToTemporaryFile(cmd2)
-		then: "No exception thrown"
-			noExceptionThrown()
-		and: "The filename for the new file isn't null"
-			filename2 != null
-		and: "The file was actually created"
-			fileSystemService.temporaryFileExists(filename2)
-		and: "The file extensions are the same"
-			FileSystemUtil.getFileExtension(filename2) == extension
-	}
+			String uploadFileName = "mockfile.${extension}"
+			String content = "Hello, World!"
+			MultipartFile multiPartFile = new MockMultipartFile(uploadFileName, uploadFileName, "text/plain", content.getBytes())
+			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
+		when: "Uploading the file to the system"
+			String filename = fileSystemService.transferFileToFileSystem(cmd)
 
-	def "6. Try to create a temporary file from an uploaded one"() {
-		when: "Trying to create a file from no input"
-			String filename = fileSystemService.copyToTemporaryFile(null)
-		then: "InvalidParamException is thrown"
-			thrown(InvalidParamException)
-		when: "Trying to create a file with an empty command"
-			filename = fileSystemService.copyToTemporaryFile(new FileUploadCommand())
-		then: "InvalidParamException is thrown"
-			thrown(InvalidParamException)
-		when: "Creating a file with an invalid extension"
-			String extension = "bogus"
-			def (String filename2, OutputStream os) = fileSystemService.createTemporaryFile('', extension)
+		then: "The command doesn't have errors"
+			!cmd.hasErrors()
+		and: "A filename was returned"
+			filename != null
+		and: "That file actually exists"
+			fileSystemService.temporaryFileExists(filename)
+		and: "The extension matches the original file's extension"
+			extension == FileSystemUtil.getFileExtension(filename)
+		and: "The content of the saved file matches the content in the MultiPartFile"
+			fileSystemService.openTemporaryFile(filename).getText() == content
+		when: "Attempting to delete the file"
+			boolean deleted = fileSystemService.deleteTemporaryFile(filename)
 		then: "No exceptions thrown"
 			noExceptionThrown()
-		and: "The file has the expected extension"
-			FileSystemUtil.getFileExtension(filename2) == extension
-		when: "Trying to use that file and copy it to a temporary file"
-			File file = fileSystemService.getTemporaryFile(filename2, true)
-			MockMultipartFile multipartFile = new MockMultipartFile(filename2, filename2, "text/plain", new FileInputStream(file))
-			FileUploadCommand cmd = new FileUploadCommand(file: multipartFile)
-			filename = fileSystemService.copyToTemporaryFile(cmd)
-		then: "InvalidParamException is thrown"
-			thrown(InvalidParamException)
+		and: "The flag is true"
+			deleted
+		and: "The file no longer exists in the file system"
+			!fileSystemService.temporaryFileExists(filename)
+	}
+
+	def "6. Text uploadFile with invalid input"() {
+		setup: "Set the required objects for this feature."
+			String uploadFileName = "mockfile.xtx"
+			String content = "Hello, World!"
+			MultipartFile multiPartFile = new MockMultipartFile(uploadFileName, uploadFileName, "text/plain", content.getBytes())
+			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
+		when: "Trying to upload this file to the system"
+			String filename = fileSystemService.transferFileToFileSystem(cmd)
+		then: "The command doesn't pass the validation"
+			cmd.hasErrors()
+		and: "The filename is null"
+			filename == null
 	}
 }

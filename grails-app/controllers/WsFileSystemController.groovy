@@ -2,12 +2,13 @@ import com.tdsops.common.security.spring.HasPermission
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.FileUploadCommand
-import net.transitionmanager.command.UploadTextContentCommand
+import net.transitionmanager.command.FileCommand
+import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadTextCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.FileSystemService
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
 
@@ -17,9 +18,6 @@ class WsFileSystemController implements ControllerMethods{
 
     FileSystemService fileSystemService
 
-    final static String FILE_DOESNT_EXIST_MSG = "fileSystem.fileNotExists"
-    final static String FILE_DELETED_MSG = "fileSystem.fileDeleted"
-
     /**
      * Endpoint for creating a temporary file in the system from a text input and file extension.
      * @param extension
@@ -27,12 +25,8 @@ class WsFileSystemController implements ControllerMethods{
      * @return temporary file's name
      */
     @HasPermission(Permission.UserGeneralAccess)
-    def uploadText(UploadTextContentCommand uploadTextContentCommand) {
-        if (uploadTextContentCommand.hasErrors()) {
-            render (errorsInValidation(uploadTextContentCommand.errors) as JSON)
-        }
-        String filename = fileSystemService.writeTemporaryFileFromRawInput(null, uploadTextContentCommand)
-        renderSuccessJson([filename: filename])
+    def uploadText(UploadTextCommand uploadTextCommand) {
+        doFileUpload(uploadTextCommand)
     }
 
     /**
@@ -41,12 +35,23 @@ class WsFileSystemController implements ControllerMethods{
      * @return
      */
     @HasPermission(Permission.UserGeneralAccess)
-    def uploadFile(FileUploadCommand fileUploadCommand) {
-        if (fileUploadCommand.hasErrors()) {
-            render (errorsInValidation(fileUploadCommand.errors) as JSON)
+    def uploadFile(UploadFileCommand fileUploadCommand) {
+        doFileUpload(fileUploadCommand)
+    }
+
+    /**
+     * Do the actual uploading of a file to the file system.
+     *
+     * @param fileCommand
+     * @return
+     */
+    private def doFileUpload(FileCommand fileCommand) {
+        String fileName = fileSystemService.transferFileToFileSystem(fileCommand)
+        if (fileCommand.hasErrors()) {
+            render (errorsInValidation(fileCommand.errors) as JSON)
+        } else {
+            renderSuccessJson([filename: fileName])
         }
-        String filename = fileSystemService.copyToTemporaryFile(fileUploadCommand)
-        renderSuccessJson([filename: filename])
     }
 
     /**
@@ -58,9 +63,9 @@ class WsFileSystemController implements ControllerMethods{
         Locale locale = LocaleContextHolder.locale
         boolean result = fileSystemService.deleteTemporaryFile(request.JSON.filename)
         if (result) {
-            renderSuccessJson(messageSource.getMessage(FILE_DELETED_MSG, null, locale))
+            renderSuccessJson(messageSource.getMessage(Message.FileSystemFileDeleted, null, locale))
         } else {
-            renderErrorJson(messageSource.getMessage(FILE_DOESNT_EXIST_MSG, null, locale))
+            renderErrorJson(messageSource.getMessage(Message.FileSystemFileNotExists, null, locale))
         }
     }
 

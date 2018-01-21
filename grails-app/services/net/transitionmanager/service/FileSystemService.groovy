@@ -2,8 +2,9 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.FileSystemUtil
 import grails.transaction.Transactional
-import net.transitionmanager.command.FileUploadCommand
-import net.transitionmanager.command.UploadTextContentCommand
+import net.transitionmanager.command.FileCommand
+import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadTextCommand
 import org.springframework.beans.factory.InitializingBean
 import org.apache.commons.lang3.RandomStringUtils
 import groovy.util.logging.Slf4j
@@ -88,23 +89,6 @@ class FileSystemService  implements InitializingBean {
     }
 
     /**
-     *
-     * @param filename
-     * @param throwException
-     * @return
-     */
-    File getTemporaryFile(String filename, boolean throwException = false) {
-        File file = null
-        validateFilename(filename)
-        if (temporaryFileExists(filename)) {
-            file = new File(getTemporaryFullFilename(filename))
-        } else if (throwException) {
-            throw new RuntimeException("Requested temporary file $filename doesn't exist.")
-        }
-        return file
-    }
-
-    /**
      * Used to determine if a file exists in the temporary directory
      * @param filename
      * @return true if the file exists otherwise false
@@ -139,61 +123,6 @@ class FileSystemService  implements InitializingBean {
     }
 
     /**
-     * Create a temporary file in the system named random + extension
-     * a write to it the input given.
-     * @param prefix
-     * @param extension
-     * @param rawInput
-     * @return file name for the temporary file.
-     */
-    String writeTemporaryFileFromRawInput(String prefix, UploadTextContentCommand uploadTextContentCommand) {
-        if (uploadTextContentCommand) {
-            if (!uploadTextContentCommand.validate()) {
-                // This should have been caught in the controller, but it doesn't hurt to double-check
-                throw new InvalidParamException("Attempted to create a temporary file using invalid input.")
-            }
-            String extension = FileSystemUtil.formatExtension(uploadTextContentCommand.extension)
-            def (String filename, OutputStream os) = createTemporaryFile(prefix, extension)
-            os << uploadTextContentCommand.content
-            os.close()
-            return filename
-        } else {
-            throw new InvalidParamException("writeTemporaryFileFromRawInput called with null uploadTextContentCommand.")
-        }
-    }
-
-    /**
-     * Transfer an uploaded file to the temporary directory using the same extension
-     * and a randomized filename.
-     * @param file
-     * @return temp file's name.
-     */
-    String copyToTemporaryFile(FileUploadCommand fileUploadCommand) {
-        String temporaryFilename = null
-        if (fileUploadCommand) {
-            if (!fileUploadCommand.validate()) {
-                // This should have been caught in the controller, but it doesn't hurt to double-check
-                throw new InvalidParamException("Attempted to create a temporary file using invalid input.")
-            }
-            MultipartFile file = fileUploadCommand.file
-            String extension = FileSystemUtil.getFileExtension(file.getOriginalFilename())
-            OutputStream os
-            try {
-                (temporaryFilename, os) = createTemporaryFile('', extension)
-                file.transferTo(new File(getTemporaryFullFilename(temporaryFilename)))
-            } catch (Exception e) {
-                log.error(e.getMessage())
-                deleteTemporaryFile(temporaryFilename)
-                temporaryFilename = null
-                throw new InvalidParamException(e.getMessage())
-            }
-        } else {
-            throw new InvalidParamException("copyToTemporaryFile called with null fileUploadCommand.s")
-        }
-        return temporaryFilename
-    }
-
-    /**
      * Used to delete a temporary file
      * @param filename - the name of the file without any path information
      * @return a flag that the file was actually deleted
@@ -222,5 +151,58 @@ class FileSystemService  implements InitializingBean {
             securityService.reportViolation("attempted to access file with path separator ($filename)")
             throw new InvalidRequestException('Filename contains path separator')
         }
+    }
+
+    /**
+     * Take a FileCommand instance and transfer the corresponding file
+     * to the file system by delegating the task in one of the overloaded
+     * implementations of writeFileFromCommand.
+     *
+     * @param fileCommand
+     * @return the filename for the temporary file that was created.
+     */
+    String transferFileToFileSystem(FileCommand fileCommand) {
+        String temporaryFileName = null
+        if (fileCommand && fileCommand.validate()) {
+            temporaryFileName = writeFileFromCommand(fileCommand)
+        }
+        return temporaryFileName
+    }
+
+    /**
+     * Write a file to the temporary directory using the extension and the content
+     * given in the command object.
+     * @param uploadTextCommand
+     * @return
+     */
+    private String writeFileFromCommand(UploadTextCommand uploadTextCommand) {
+        String extension = FileSystemUtil.formatExtension(uploadTextCommand.extension)
+        def (String filename, OutputStream os) = createTemporaryFile('', extension)
+        os << uploadTextCommand.content
+        os.close()
+        return filename
+    }
+
+    /**
+     * Copy an uploaded file to the temporary directory.
+     *
+     * @param uploadFileCommand
+     * @return
+     */
+    private String writeFileFromCommand(UploadFileCommand uploadFileCommand) {
+        String extension = FileSystemUtil.getFileExtension(uploadFileCommand.file.getOriginalFilename())
+        OutputStream os
+        String temporaryFileName
+        try {
+            (temporaryFileName, os) = createTemporaryFile('', extension)
+            os.write(uploadFileCommand.file.getBytes())
+            os.close()
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            deleteTemporaryFile(temporaryFileName)
+            throw new InvalidParamException(e.getMessage())
+        }
+
+        return temporaryFileName
     }
 }

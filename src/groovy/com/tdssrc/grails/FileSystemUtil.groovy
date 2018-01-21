@@ -8,19 +8,21 @@ import java.util.regex.Matcher
 @Slf4j
 class FileSystemUtil {
 
-    private static final String[] ALLOWED_EXTENSIONS = ["csv", "txt", "json", "xls", "xlsx", "xml"]
+    /** These are the accepted file extensions when uploading ETL files */
+    public static final String[] ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ["csv", "txt", "json", "xls", "xlsx", "xml"]
 
     /**
-     * Determine if the given extension should be allowed.
+     * Format a file extension and validate it's among the accepted extensions.
      *
      * @param extension
+     * @param acceptedExtension
      * @return
      */
-    static boolean isValidExtension(String extension) {
+    static boolean isValidExtension(String extension, List<String> acceptedExtension) {
         boolean isValid = false
         extension = formatExtension(extension)
         if (extension) {
-            isValid = extension in ALLOWED_EXTENSIONS
+            isValid = extension in acceptedExtension
         }
         return isValid
     }
@@ -43,7 +45,7 @@ class FileSystemUtil {
     }
 
     /**
-     * Return the file extension for a given file.
+     * Return the file extension for a given file in lower case.
      *
      * @param file
      * @return
@@ -60,14 +62,16 @@ class FileSystemUtil {
     }
 
     /**
-     * Determine if the given file has a accepted extension.
+     * Given a filename, this function extracts and formats its extension and
+     * then validates that it's among the accepted extensions.
      *
      * @param file
+     * @param accepted extensions
      * @return
      */
-    static boolean validateExtension (String filename) {
+    static boolean validateExtension (String filename, List<String> acceptedExtension) {
         String extension = getFileExtension(filename)
-        return isValidExtension(extension)
+        return isValidExtension(extension, acceptedExtension)
     }
 
 }
