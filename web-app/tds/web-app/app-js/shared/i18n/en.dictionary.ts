@@ -71,11 +71,17 @@ export const en_DICTIONARY: Object = {
 	},
 	'DEPENDENCY_BATCH': {
 		'MANAGE_LIST': 'Manage Dependency Batches',
-		'DEPENDENCY_BATCH': 'Dependency Batch'
+		'DEPENDENCY_BATCH': 'Dependency Batch',
+		'LIST': {
+			'PENDING_TOOLTIP': 'Queue to be processed',
+			'QUEUED_TOOLTIP': 'Remove from queue',
+			'PROCESSING_TOOLTIP': 'Stop processing'
+		}
 	},
 	'GLOBAL': {
 		'OK': 'Ok',
 		'ADD': 'Add',
+		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
 		'CREATE': 'Create',
 		'CLOSE': 'Close',

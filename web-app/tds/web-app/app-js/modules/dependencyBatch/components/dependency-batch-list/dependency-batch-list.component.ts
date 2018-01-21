@@ -3,7 +3,7 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DependencyBatchColumnsModel, DependencyBatchModel} from '../../model/dependency-batch.model';
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
+import {CellClickEvent, GridDataResult, RowArgs, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from './data-grid-operations.helper';
 
 @Component({
@@ -13,11 +13,12 @@ import {DataGridOperationsHelper} from './data-grid-operations.helper';
 export class DependencyBatchListComponent {
 
 	private columnsModel: DependencyBatchColumnsModel;
-	private selectedRows = [];
-	private isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
-	// private gridData: GridDataResult;
-	// private resultSet: DependencyBatchModel[];
-	private gridOperationsHelper: DataGridOperationsHelper;
+	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
+	private dataGridOperationsHelper: DataGridOperationsHelper;
+	private initialSort: any = [{
+		dir: 'desc',
+		field: 'importedDate'
+	}];
 
 	constructor(
 		private dependencyBatchService: DependencyBatchService,
@@ -27,34 +28,12 @@ export class DependencyBatchListComponent {
 
 	private onLoad(): void {
 		this.columnsModel = new DependencyBatchColumnsModel();
-		let state: State = {
-			sort: [{
-				dir: 'asc',
-				field: 'id'
-			}],
-			filter: {
-				filters: [],
-				logic: 'and'
-			}
-		};
 		this.dependencyBatchService.getBatchList().subscribe( result => {
-			this.gridOperationsHelper = new DataGridOperationsHelper(result, state);
+			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings);
 		});
 	}
 
-	protected onFilter(column: any): void {
-		this.gridOperationsHelper.onFilter(column);
+	private openBatchDetail(cellClick: CellClickEvent): void {
+		console.log( (cellClick as any).dataItem );
 	}
-
-	protected clearValue(column: any): void {
-		this.gridOperationsHelper.clearValue(column);
-	}
-
-	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.gridOperationsHelper.filterChange(filter);
-	}
-
-	// protected onFilter(column: any): void {
-	// 	GridFiltersUtils.filterColumn(column, this.gridStates, this.gridData, this.resultSet);
-	// }
 }

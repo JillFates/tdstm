@@ -53,7 +53,7 @@ export class DependencyBatchService {
 				datascript: 'TM File Import',
 				filename: 'dep_cmdb.xls',
 				records: 20,
-				errors: 5,
+				errors: 0,
 				pending: 20,
 				processed: 10,
 				ignored: 1
@@ -68,7 +68,7 @@ export class DependencyBatchService {
 				datascript: 'TM File Import',
 				filename: 'dep_cmdb_v2.xls',
 				records: 40,
-				errors: 5,
+				errors: 3,
 				pending: 8,
 				processed: 21,
 				ignored: 1
@@ -98,7 +98,7 @@ export class DependencyBatchService {
 				datascript: 'TM File Import',
 				filename: 'batch_load2.xls',
 				records: 50,
-				errors: 2,
+				errors: 0,
 				pending: 10,
 				processed: 1,
 				ignored: 0

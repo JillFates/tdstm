@@ -22,10 +22,18 @@ export class DependencyBatchColumnsModel {
 	constructor() {
 		this.columns = [
 			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 70,
+				locked: true,
+				cellStyle: {'text-align': 'center'}
+			},
+			{
 				label: 'Id',
 				property: 'id',
-				type: 'text',
-				width: 50,
+				type: 'number',
+				width: 60,
 				locked: false
 			},
 			{
@@ -39,8 +47,8 @@ export class DependencyBatchColumnsModel {
 				label: 'Imported At',
 				property: 'importedDate',
 				type: 'date',
-				format: '{0:d}',
-				width: 130,
+				format: '{0:yyyy/MM/dd HH:mm:ss}',
+				width: 200,
 				locked: false
 			},
 			{
@@ -54,7 +62,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Domain',
 				property: 'domain',
 				type: 'text',
-				width: 100,
+				width: 130,
 				locked: false
 			},
 			{
@@ -68,48 +76,48 @@ export class DependencyBatchColumnsModel {
 				label: 'Datascript',
 				property: 'datascript',
 				type: 'text',
-				width: 100,
+				width: 130,
 				locked: false
 			},
 			{
 				label: 'File Name',
 				property: 'filename',
 				type: 'text',
-				width: 100,
+				width: 150,
 				locked: false
 			},
 			{
 				label: 'Records',
 				property: 'records',
-				type: 'text',
+				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Errors',
 				property: 'errors',
-				type: 'text',
+				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Pending',
 				property: 'pending',
-				type: 'text',
+				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Processed',
 				property: 'processed',
-				type: 'text',
-				width: 80,
+				type: 'number',
+				width: 100,
 				locked: false
 			},
 			{
-				label: 'Processed',
+				label: 'Ignored',
 				property: 'ignored',
-				type: 'text',
+				type: 'number',
 				width: 80,
 				locked: false
 			},

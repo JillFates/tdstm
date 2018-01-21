@@ -1,16 +1,27 @@
 import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GridDataResult} from '@progress/kendo-angular-grid';
+import {CompositeFilterDescriptor, process, SortDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult, RowArgs, SelectableSettings} from '@progress/kendo-angular-grid';
 
 export class DataGridOperationsHelper {
 
 	public gridData: GridDataResult;
 	public resultSet: Array<any>;
-	public state: State;
+	public state: State = {
+		filter: {
+			filters: [],
+			logic: 'and'
+		}
+	};
+	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.index) >= 0;
+	public selectedRows = [];
+	private selectableSettings: SelectableSettings;
 
-	constructor(result: any, state: State) {
-		this.state = state;
+	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings) {
+		this.state.sort = defaultSort;
 		this.resultSet = result;
+		if (selectableSettings) {
+			this.selectableSettings = selectableSettings;
+		}
 		this.gridData = process(this.resultSet, this.state);
 	}
 
@@ -89,5 +100,25 @@ export class DataGridOperationsHelper {
 		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	public sortChange(sort): void {
+		this.state.sort = sort;
+		this.gridData = process(this.resultSet, this.state);
+	}
+
+	/**
+	 * Catch the Selected Row
+	 * @param {SelectionEvent} event
+	 */
+	public selectCell(event: CellClickEvent): void {
+		if (event.columnIndex > 0) {
+			this.selectedRows = [];
+			if (this.selectableSettings.mode === 'single') {
+				this.selectedRows.push(event.rowIndex);
+			} else {
+				this.selectedRows.push(event.rowIndex);
+			}
+		}
 	}
 }

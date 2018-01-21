@@ -1,6 +1,7 @@
 import {Ng2StateDeclaration} from '@uirouter/angular';
 import {HeaderComponent} from '../../shared/modules/header/header.component';
 import {DependencyBatchListComponent} from './components/dependency-batch-list/dependency-batch-list.component';
+import {Permission} from '../../shared/model/permission.model';
 
 export class DependencyBatchStates {
 	public static readonly DEPENDENCY_BATCH_LIST = {
@@ -19,7 +20,7 @@ export const dependencyBatchList: Ng2StateDeclaration = <Ng2StateDeclaration>{
 			menu: ['DEPENDENCY_BATCH.DEPENDENCY_BATCH', 'DEPENDENCY_BATCH.MANAGE_LIST']
 		},
 		requiresAuth: true,
-		// requiresPermission: '',
+		requiresPermission: Permission.DataTransferBatchView
 	},
 	views: {
 		'headerView@tds': {component: HeaderComponent},

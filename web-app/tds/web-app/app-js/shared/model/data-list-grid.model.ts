@@ -25,6 +25,10 @@ export class GridColumnModel {
 	width: number;
 	locked: boolean;
 	filter?: any;
+	headerStyle?: any;
+	headerClass?: Array<string>;
+	cellStyle?: any;
+	cellClass?: string|Array<string>;
 
 	constructor() {
 		this.type = 'text';
