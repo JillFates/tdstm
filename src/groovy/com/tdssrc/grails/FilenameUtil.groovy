@@ -29,17 +29,20 @@ class FilenameUtil {
 				String filename =''
 				switch (nameFormat) {
 						case FilenameFormat.CLIENT_PROJECT_EVENT_DATE:
-							 filename = clientProjectEventDateFormatter(nameValues, date)
+							filename = clientProjectEventDateFormatter(nameValues, date)
 								break
 						case FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE:
-							 filename = clientProjectBundleCheckboxesDateFormatter(nameValues, date)
-							 break
+							filename = clientProjectBundleCheckboxesDateFormatter(nameValues, date)
+							break
+						case FilenameFormat.PROJECT_VIEW_DATE:
+							filename = projectViewDateFormatter(nameValues, date)
+						break
 						default:
-								filename = filenameDefaultFormat(nameValues, date)
+							filename = filenameDefaultFormat(nameValues, date)
 								break
 				}
 				if (filename && fileExtension) {
-					 filename = filename << '.' + fileExtension  // appends file extension, if exists
+					filename = filename << '.' + fileExtension  // appends file extension, if exists
 				}
 				return filename
 		}
@@ -136,6 +139,41 @@ class FilenameUtil {
 			}
 			return projectClient + '-' + projectCode + '-' + (useForPlanning ?: bundleName) + '-' + (exportedEntities ? exportedEntities + '-' : '' ) + formattedDate
 	 }
+
+	/**
+	 * This format consist of a set of property values separated by '-'.
+	 * If the properties have spaces in between, those will be replaced with underscores (_)
+	 * (ej: 'Sample Project' will be 'Sample_Project').
+	 * The complete resulting format is as follows: "Project_Code-View_Name-yyyymmdd_hhmm"
+	 * For more information see TM-7872.
+	 *
+	 * @param nameValues  A Map with the properties needed to construct the file name.
+	 *
+	 * project:  Mandatory
+	 * The project entity to use.
+	 * The ProjectCode will be extracted to write in the resulting file name.
+	 * viewName:  Mandatory
+	 * The moveBundle entity to use. The name of the view to use in the filename.
+	 * <p>
+	 * excludeDate:  Optional.
+	 * If true, the date part of the filename will not be returned, leaving it as blank.
+	 * In this case the mandatory property 'moveBundle' is not required, and will be ignored if present.
+	 * <p>
+	 * If any mandatory values or properties are missing, an empty String is returned.
+	 * @param date  The date to be used in the file name.
+	 * @return  The resulting file name.
+	 */
+	private static String projectViewDateFormatter(Map nameValues, Date date) {
+
+		String projectCode = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.project?.projectCode)
+		String viewName = StringUtil.sanitizeAndReplaceSpacesWithUnderscore(nameValues.viewName)
+		String formattedDate = TimeUtil.formatDate(TimeUtil.BIG_ENDIAN, date, TimeUtil.FORMAT_DATE_TIME_26)
+		if( projectCode == null || viewName == null) {
+			logger.error 'FilenameUtil: Error while creating file name - Some required properties are missing'
+			return ''
+		}
+		return projectCode + '-' + viewName + (nameValues.excludeDate ? '': '-' + formattedDate)
+	}
 
 		/**
 		 * This is the default format used if none is chosen.

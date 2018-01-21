@@ -130,4 +130,23 @@ class FilenameUtilTests extends AbstractUnitSpec {
 			expect: 'the resulting file name match the expected file naming scheme, with just the number of bundles for the PROJECT_BUNDLE part'
 				'ABC_Company-Big_Move-2_bundles-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
 		}
+
+		@See('TM-7872')
+		def '10. Test file name for PROJECT_VIEW_DATE format'() {
+			given: 'a Project and View Name with the corresponding values'
+				def viewName = 'My Applications'
+				aDate = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+				def params = [project:completeProject, viewName: viewName]
+			expect: 'the resulting file name match the expected file naming scheme'
+				'Big_Move-My_Applications-20141020_2215.xlsx' == FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params, fileExtension, aDate)
+		}
+
+		@See('TM-7872')
+		def '11. Test file name for PROJECT_VIEW_DATE format, without date and extension'() {
+			given: 'a Project and View Name with the corresponding values, and we use the excludeDate param'
+			def viewName = 'My Applications'
+			def params = [project:completeProject, viewName: viewName, excludeDate: true]
+			expect: 'the resulting file name match the expected file naming scheme'
+			'Big_Move-My_Applications' == FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params)
+		}
 }
