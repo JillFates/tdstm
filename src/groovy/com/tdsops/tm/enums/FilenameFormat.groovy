@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 enum FilenameFormat {
     CLIENT_PROJECT_EVENT_DATE('Project_Client-Project_Code-Event_Name-yyyymmdd_hhmm'),
+    CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE('Project_Client-Project_Code-Bundle(s)_CheckboxCodes-yyyymmdd_hhmm'),
     DEFAULT('Default')
 
     private String value
