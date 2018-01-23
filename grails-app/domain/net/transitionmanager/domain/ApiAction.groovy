@@ -119,6 +119,7 @@ class ApiAction {
 		callbackMode nullable: true
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
+		description nullable: true
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
 		isPolling nullable: false, range: 0..1
