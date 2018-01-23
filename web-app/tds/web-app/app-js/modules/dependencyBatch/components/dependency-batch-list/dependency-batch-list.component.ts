@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {DependencyBatchColumnsModel, DependencyBatchModel} from '../../model/dependency-batch.model';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult, RowArgs, SelectableSettings} from '@progress/kendo-angular-grid';
+import {DependencyBatchColumnsModel} from '../../model/dependency-batch.model';
+import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from './data-grid-operations.helper';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -19,6 +19,10 @@ export class DependencyBatchListComponent {
 		dir: 'desc',
 		field: 'importedDate'
 	}];
+	private checkboxSelectionConfig = {
+		useColumn: 'id'
+	};
+	private viewArchived = false;
 
 	constructor(
 		private dependencyBatchService: DependencyBatchService,
@@ -28,12 +32,35 @@ export class DependencyBatchListComponent {
 
 	private onLoad(): void {
 		this.columnsModel = new DependencyBatchColumnsModel();
+		if ( !this.canRunActions() ) {
+			this.columnsModel.columns.splice(0, 1);
+		}
 		this.dependencyBatchService.getBatchList().subscribe( result => {
-			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings);
+			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
 		});
 	}
 
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		console.log( (cellClick as any).dataItem );
+	}
+
+	private onViewArchived(): void {
+		if (this.viewArchived) {
+			console.log('show ARCHIVED batches, reload');
+		} else {
+			console.log('show UN-ARCHIVED batches, reload');
+		}
+	}
+
+	private canRunActions(): boolean {
+		return this.permissionService.hasPermission(Permission.DataTransferBatchProcess);
+	}
+
+	private canBulkDelete(): boolean {
+		return this.permissionService.hasPermission(Permission.DataTransferBatchDelete);
+	}
+
+	private canBulkArchive(): boolean {
+		return this.permissionService.hasPermission(Permission.DataTransferBatchProcess);
 	}
 }

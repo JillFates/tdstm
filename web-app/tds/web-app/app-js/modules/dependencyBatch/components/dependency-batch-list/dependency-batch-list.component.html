@@ -13,7 +13,7 @@
                         [pageSize]="25"
                         [resizable]="true"
                         (sortChange)="dataGridOperationsHelper.sortChange($event)"
-                        [pageable]="{ pageSizes:[25,50,100,500,1000], info: true}"
+                        [pageable]="{pageSizes:[25,50,100,500,1000], info: true}"
                         [selectable]="selectableSettings"
                         [rowSelected]="dataGridOperationsHelper.isRowSelected"
                         (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchDetail($event)">
@@ -21,15 +21,58 @@
                              Toolbar Template
                         -->
                         <ng-template kendoGridToolbarTemplate [position]="'top'">
-                            <button class="btn btn-default" id="btnBulkDelete" type="button">
+                            <button *ngIf="canBulkDelete()" [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
-                            <button class="btn btn-default" id="btnBulkArchive" type="button">
-                                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span> {{ 'GLOBAL.ARCHIVE' | translate }}
+                            <button *ngIf="canBulkArchive()" [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    class="btn btn-default" id="btnBulkArchive" type="button">
+                                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+                                <span *ngIf="!viewArchived"> {{ 'GLOBAL.ARCHIVE' | translate }} </span>
+                                <span *ngIf="viewArchived"> {{ 'DEPENDENCY_BATCH.LIST.UNARCHIVE' | translate }} </span>
                             </button>
+                                <label class="view-archived">
+                                    <input name="viewArchived" type="checkbox"
+                                           (change)="onViewArchived()" [(ngModel)]="viewArchived">
+                                    {{'DEPENDENCY_BATCH.LIST.VIEW_ARCHIVED' | translate}}
+                                </label>
                         </ng-template>
 
-                        <!-- Columns -->
+                        <!--
+                            Select All column
+                        -->
+                        <kendo-grid-column *ngIf="canBulkDelete() || canBulkArchive()" title="" [locked]="true" [filterable]="false" [width]="45">
+                            <ng-template kendoGridHeaderTemplate>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <div class="checkbox checkbox-grid">
+                                            <label>
+                                                <input type="checkbox" name="selectAll"
+                                                       [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
+                                                       (change)="dataGridOperationsHelper.onSelectAllCheckboxes()" >
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <div class="checkbox checkbox-grid">
+                                            <label style="min-height: 15px;">
+                                                <input type="checkbox"
+                                                       [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                                       name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                                       (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-grid-column>
+                        <!--
+                            Columns
+                        -->
                         <kendo-grid-column *ngFor="let column of columnsModel.columns"
                                        field="{{column.property}}"
                                        [locked]="column.locked"

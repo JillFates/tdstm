@@ -75,7 +75,9 @@ export const en_DICTIONARY: Object = {
 		'LIST': {
 			'PENDING_TOOLTIP': 'Queue to be processed',
 			'QUEUED_TOOLTIP': 'Remove from queue',
-			'PROCESSING_TOOLTIP': 'Stop processing'
+			'PROCESSING_TOOLTIP': 'Stop processing',
+			'VIEW_ARCHIVED': 'View Archived',
+			'UNARCHIVE': 'Unarchive'
 		}
 	},
 	'GLOBAL': {

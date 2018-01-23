@@ -14,13 +14,22 @@ export class DataGridOperationsHelper {
 	};
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.index) >= 0;
 	public selectedRows = [];
+	public bulkItems: any = {};
+	public selectAllCheckboxes = false;
 	private selectableSettings: SelectableSettings;
+	private checkboxSelectionConfig: any;
 
-	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings) {
+	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
 		this.state.sort = defaultSort;
 		this.resultSet = result;
 		if (selectableSettings) {
 			this.selectableSettings = selectableSettings;
+		}
+		if (checkboxSelectionConfig) {
+			for (let item of result) {
+				this.bulkItems[item[checkboxSelectionConfig.useColumn]] = false;
+			}
+			this.checkboxSelectionConfig = checkboxSelectionConfig;
 		}
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -119,6 +128,22 @@ export class DataGridOperationsHelper {
 			} else {
 				this.selectedRows.push(event.rowIndex);
 			}
+		}
+	}
+
+	public onSelectAllCheckboxes(): void {
+		Object.keys(this.bulkItems).forEach(key => {
+			this.bulkItems[key] = this.selectAllCheckboxes;
+		});
+	}
+
+	public getCheckboxSelectedItems(): Array<any> {
+		return Object.keys(this.bulkItems).filter(key =>  this.bulkItems[key] === true );
+	}
+
+	public onCheckboxChange(key: any): void {
+		if (!this.bulkItems[key]) {
+			this.selectAllCheckboxes = false;
 		}
 	}
 }
