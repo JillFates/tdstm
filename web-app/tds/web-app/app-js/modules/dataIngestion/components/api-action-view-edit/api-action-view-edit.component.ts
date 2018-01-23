@@ -496,16 +496,6 @@ export class APIActionViewEditComponent implements OnInit {
 		eventReaction.open = !eventReaction.open;
 	}
 
-	/**
-	 *  Verify the current Event Reaction input is a valid code
-	 * @param {EventReaction} eventReaction
-	 */
-	verifyCode(eventReaction: EventReaction): void {
-		// to all validateCode on date ingestion service
-		eventReaction.valid = false;
-		eventReaction.error = 'Error at Line 3: Unknow variable burt!';
-	}
-
 	onEditParameters(): void {
 		this.isEditing = true;
 	}
@@ -560,16 +550,21 @@ export class APIActionViewEditComponent implements OnInit {
 	 * so we can attach this event to different validations
 	 * @returns {Observable<any>}
 	 */
-	validateAllSyntax(): Observable<any> {
+	validateAllSyntax(singleEventReaction?: EventReaction): Observable<any> {
 		return new Observable(observer => {
 			let scripts = [];
-			this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
-				eventReaction.valid = true;
-				eventReaction.error = '';
-				if (eventReaction.value !== '') {
-					scripts.push({code: eventReaction.type, script: eventReaction.value});
-				}
-			});
+			// Doing a single Event reaction Validation
+			if (singleEventReaction) {
+				scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
+			} else {
+				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
+					eventReaction.valid = true;
+					eventReaction.error = '';
+					if (eventReaction.value !== '') {
+						scripts.push({code: eventReaction.type, script: eventReaction.value});
+					}
+				});
+			}
 			this.dataIngestionService.validateCode(scripts).subscribe(
 				(result: any) => {
 					this.invalidScriptSyntax = false;
@@ -589,6 +584,14 @@ export class APIActionViewEditComponent implements OnInit {
 				},
 				(err) => console.log(err));
 		});
+	}
+
+	/**
+	 *  Verify the current Event Reaction input is a valid code
+	 * @param {EventReaction} eventReaction
+	 */
+	verifyCode(eventReaction: EventReaction): void {
+		this.validateAllSyntax(eventReaction).subscribe();
 	}
 
 	/**
