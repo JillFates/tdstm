@@ -490,7 +490,7 @@ digraph runbook {
 						fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 						color = taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
-						automatedTasks << it.id
+						automatedTasks << task.id
 					}
 					else {
 						fontcolor = taskStatusColorMap[colorKey][0]
