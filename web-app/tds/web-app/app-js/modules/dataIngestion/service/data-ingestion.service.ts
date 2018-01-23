@@ -291,8 +291,8 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	validateCode(): Observable<any> {
-		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, null)
+	validateCode(scripts: any): Observable<any> {
+		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

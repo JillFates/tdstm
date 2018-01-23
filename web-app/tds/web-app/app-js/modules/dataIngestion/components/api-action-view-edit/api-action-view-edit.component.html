@@ -16,7 +16,7 @@
 						<a href="#tab_2" (click)="setCurrentTab(1)" data-toggle="tab">Parameters</a>
 					</li>
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(2)}">
-						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab">Reaction</a>
+						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
 					</li>
 					<!-- <li role="presentation" [ngClass]="{'active':isCurrentTab(3)}">
 						<a href="#tab_4" (click)="setCurrentTab(3)" data-toggle="tab">Test</a>
@@ -418,7 +418,7 @@
 													<code-mirror #codeMirror id="apiActionStatusDetermination" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[0].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[0].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -441,7 +441,7 @@
 													<code-mirror #codeMirror id="apiActionSuccess" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[1].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[1].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[1].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[1].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -463,7 +463,7 @@
 													<code-mirror #codeMirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[2].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -485,7 +485,7 @@
 													<code-mirror #codeMirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[3].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -507,7 +507,7 @@
 													<code-mirror #codeMirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[4].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -529,7 +529,7 @@
 													<code-mirror #codeMirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[5].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -551,7 +551,7 @@
 													<code-mirror #codeMirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[6].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -574,7 +574,7 @@
 													<code-mirror #codeMirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[7].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -596,7 +596,7 @@
 													<code-mirror #codeMirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
 													<div *ngIf="!apiActionModel.eventReactions[8].valid" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -611,7 +611,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!validInfoForm">
+		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || invalidScriptSyntax">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>

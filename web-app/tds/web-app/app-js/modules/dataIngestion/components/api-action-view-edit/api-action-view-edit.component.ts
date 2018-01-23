@@ -23,6 +23,8 @@ import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import * as R from 'ramda';
+import {Observable} from 'rxjs/Observable';
 
 declare var jQuery: any;
 
@@ -36,6 +38,10 @@ declare var jQuery: any;
 		.invalid-form {
 			color: red;
 			font-weight: bold;
+		}
+		
+		.script-error {
+			margin-bottom: 18px;
 		}
 	`]
 })
@@ -103,7 +109,7 @@ export class APIActionViewEditComponent implements OnInit {
 	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
-			name: 'javascript'
+			name: 'groovy' // Looks like we lack of JS support for coloring
 		},
 		rows: 10,
 		cols: 4
@@ -115,7 +121,7 @@ export class APIActionViewEditComponent implements OnInit {
 		}]
 	};
 	public validInfoForm = false;
-
+	public invalidScriptSyntax = false;
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
@@ -127,11 +133,11 @@ export class APIActionViewEditComponent implements OnInit {
 		private dialogService: UIDialogService) {
 
 		// Sub Objects are not being created, just copy
-		this.apiActionModel = Object.assign({}, this.originalModel);
+		this.apiActionModel = R.clone(this.originalModel);
 
-		this.selectedInterval = Object.assign({}, this.originalModel.polling.frequency);
-		this.selectedLapsed = Object.assign({}, this.originalModel.polling.lapsedAfter);
-		this.selectedStalled = Object.assign({}, this.originalModel.polling.stalledAfter);
+		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
+		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
+		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 
@@ -266,11 +272,15 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
-			(result: any) => {
-				this.activeDialog.close(result);
-			},
-			(err) => console.log(err));
+		this.validateAllSyntax().subscribe(() => {
+			if (!this.invalidScriptSyntax) {
+				this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
+					(result: any) => {
+						this.activeDialog.close(result);
+					},
+					(err) => console.log(err));
+			}
+		});
 	}
 
 	/**
@@ -546,15 +556,46 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 * Execute the validation and return an Observable
+	 * so we can attach this event to different validations
+	 * @returns {Observable<any>}
+	 */
+	validateAllSyntax(): Observable<any> {
+		return new Observable(observer => {
+			let scripts = [];
+			this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
+				eventReaction.valid = true;
+				eventReaction.error = '';
+				if (eventReaction.value !== '') {
+					scripts.push({code: eventReaction.type, script: eventReaction.value});
+				}
+			});
+			this.dataIngestionService.validateCode(scripts).subscribe(
+				(result: any) => {
+					this.invalidScriptSyntax = false;
+					result.forEach((eventResult: any) => {
+						let eventReaction = this.apiActionModel.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
+						if (!eventResult['validSyntax']) {
+							let errorResult = '';
+							eventResult.errors.forEach((error: string) => {
+								errorResult += error['message'] + '\n';
+							});
+							eventReaction.error = errorResult;
+							eventReaction.valid = false;
+							this.invalidScriptSyntax = true;
+						}
+					});
+					observer.next();
+				},
+				(err) => console.log(err));
+		});
+	}
+
+	/**
 	 * Execute the API to validated every Syntax Value.
 	 */
 	onCheckAllSyntax(): void {
-		/**  this.apiActionModel.eventReactions.
-		this.dataIngestionService.validateCode(allScript).subscribe(
-			(result: any) => {
-
-			},
-			(err) => console.log(err)); */
+		this.validateAllSyntax().subscribe();
 	}
 
 	/**
