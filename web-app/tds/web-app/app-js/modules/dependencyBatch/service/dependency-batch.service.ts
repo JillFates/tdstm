@@ -7,6 +7,7 @@ import {DependencyBatchModel} from '../model/dependency-batch.model';
 export class DependencyBatchService {
 
 	private dependencyBatchUrl = '../ws/dependencybatch';
+	private mockRunningBatchFlag = false;
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -30,7 +31,7 @@ export class DependencyBatchService {
 			},
 			{
 				id: 2,
-				status: 'Processing',
+				status: 'Pending',
 				importedDate: new Date(),
 				importedBy: 'TDS Admin',
 				domain: 'Dependencies',
@@ -90,7 +91,7 @@ export class DependencyBatchService {
 			},
 			{
 				id: 6,
-				status: 'Processing',
+				status: 'Pending',
 				importedDate: new Date(),
 				importedBy: 'TDS Admin',
 				domain: 'Dependencies',
@@ -105,5 +106,22 @@ export class DependencyBatchService {
 			}
 		];
 		return Observable.of( mockResult );
+	}
+
+	startBatch(batchId: number): Observable<any> {
+		// The endpoint /ws/import/process/$ID will be called
+		let mockResult = {};
+		if ( !this.mockRunningBatchFlag ) {
+			mockResult = { status: 'success', data: {} };
+			this.mockRunningBatchFlag = true;
+		} else {
+			mockResult = { status: 'error', error: 'Another batch is already running ...' };
+		}
+		return Observable.of( mockResult );
+	}
+
+	stopBatch(batchId: number): Observable<any> {
+		this.mockRunningBatchFlag = false;
+		return Observable.of( { status: 'success', data: {}} );
 	}
 }

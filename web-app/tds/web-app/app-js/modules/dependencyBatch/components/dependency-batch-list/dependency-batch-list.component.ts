@@ -5,6 +5,8 @@ import {DependencyBatchColumnsModel} from '../../model/dependency-batch.model';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AlertType} from '../../../../shared/model/alert.model';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -26,7 +28,8 @@ export class DependencyBatchListComponent {
 
 	constructor(
 		private dependencyBatchService: DependencyBatchService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private notifierService: NotifierService) {
 		this.onLoad();
 	}
 
@@ -50,6 +53,34 @@ export class DependencyBatchListComponent {
 		} else {
 			console.log('show UN-ARCHIVED batches, reload');
 		}
+	}
+
+	private onPlayButton(item: any): void {
+		this.dependencyBatchService.startBatch(item.id).subscribe( (result) => {
+			if (result.status === 'success') {
+				let batchFound = this.dataGridOperationsHelper.resultSet.find( batch => {
+					return batch.id === item.id;
+				});
+				batchFound.status = 'Processing';
+			} else {
+				this.notifierService.broadcast({
+					name: AlertType.DANGER,
+					message: result.error
+				});
+				console.log(result.error);
+			}
+		});
+	}
+
+	private onStopButton(item: any): void {
+		this.dependencyBatchService.stopBatch(item.id).subscribe( (result) => {
+			if (result.status === 'success') {
+				let batchFound = this.dataGridOperationsHelper.resultSet.find( batch => {
+					return batch.id === item.id;
+				});
+				batchFound.status = 'Pending';
+			}
+		});
 	}
 
 	private canRunActions(): boolean {
