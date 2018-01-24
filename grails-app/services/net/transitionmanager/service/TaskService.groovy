@@ -542,7 +542,7 @@ class TaskService implements ServiceMethods {
 		log.info "setTaskStatus() task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
 
 		// Override the whom if this is an automated task being completed
-		if (task.isAutomatic() && status == ACS.COMPLETED) {
+		if (task.isAutomatic() && status == ACS.READY) {
 			whom = getAutomaticPerson()
 
 			if (ACTIONABLE_STATUSES.contains(status) ) {
