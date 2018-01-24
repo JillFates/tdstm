@@ -325,6 +325,12 @@ class AssetComment {
 
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+		// If the API Action changed, clear out related properties
+		if (this.dirtyPropertyNames.contains('apiAction')) {
+			apiActionCompletedAt = null
+			apiActionInvokedAt = null
+		}
+		return true
 	}
 
 	String toString() {
