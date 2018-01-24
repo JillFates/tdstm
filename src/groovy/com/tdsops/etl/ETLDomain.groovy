@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 enum ETLDomain {
 
-	Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model
+	Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency
 
 
 	/**
@@ -17,11 +17,6 @@ enum ETLDomain {
 	 * @return
 	 */
 	static ETLDomain lookup(String code){
-		for (ETLDomain value: values()){
-			if (value.name().equalsIgnoreCase(code)) {
-				return value
-			}
-		}
-		return null
+		return ETLDomain.enumConstantDirectory().get(code)
 	}
 }

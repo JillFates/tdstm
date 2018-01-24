@@ -38,22 +38,41 @@ class ETLProcessorResult {
 		if (!reference) {
 			reference = [
 					domain: domain.name(),
-					fields: [],
-					data  : [:]
+					fields: [] as Set,
+					data  : []
 			]
 			domains.add(reference)
 		}
 	}
 
 	/**
-	 * Collects all the necessary information to build an entry in the 'Dependency' map results
+	 * Adds a find Element to the TEL Processor result
 	 * @param findElement an instance of ETLFindElement
 	 */
-	void addDependency(ETLFindElement findElement) {
-		//Dependency.fields.addAll()
+	void addFindElement(ETLFindElement findElement) {
+		reference.find = findElement
 	}
 
-	void loadElement(ETLDomain domain, Element element) {
+	/**
+	 * Appends a loaded element in the results
+	 * @param element
+	 */
+	void loadElement(Element element) {
+		Map data = [
+				op       : 'I',
+				warn     : false,
+				duplicate: false,
+				errors   : [],
+				fields: [
+						("${element.field.name}".toString()): [
+								value        : element.value,
+								originalValue: element.originalValue
+						]
+				]
+		]
+		reference.fields.add(element.field.name)
+		reference.data.add(data)
+
 
 
 	}

@@ -19,8 +19,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Incorrect skip step: $skip".toString())
     }
 
-    static ETLProcessorException invalidCommand (String message) {
-        new ETLProcessorException(message)
+    static ETLProcessorException notCurrentFindElement() {
+        new ETLProcessorException('There is a find element previously executed')
     }
 
     static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain) {
@@ -73,6 +73,14 @@ class ETLProcessorException extends GroovyRuntimeException {
 
     static ETLProcessorException invalidRange (String message) {
         new ETLProcessorException(message)
+    }
+
+    static ETLProcessorException UnknownVariable (Object value) {
+        new ETLProcessorException("Unknown variable: ${value}".toString())
+    }
+
+    static ETLProcessorException unknownDataSetProperty (Object value) {
+        new ETLProcessorException("Unknown dataSet property: ${value}".toString())
     }
 
     static ETLProcessorException currentElementNotDefined () {

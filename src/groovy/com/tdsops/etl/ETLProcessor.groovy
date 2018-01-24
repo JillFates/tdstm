@@ -13,7 +13,6 @@ class ETLProcessor implements RangeChecker {
 
 	Project project
 	DataSetFacade dataSetFacade
-	List<getl.data.Field> fields
 	ETLFieldsValidator fieldsValidator
 	ETLBinding binding
 	ETLProcessorResult result
@@ -33,6 +32,8 @@ class ETLProcessor implements RangeChecker {
 	Row currentRow
 
 	ETLDomain selectedDomain
+	ETLFindElement currentFindElement
+	@Deprecated
 	Map<ETLDomain, List<ReferenceResult>> results = [:]
 	Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
@@ -75,7 +76,7 @@ class ETLProcessor implements RangeChecker {
 		this.dataSetFacade = dataSetFacade
 		this.debugConsole = console
 		this.fieldsValidator = fieldsValidator
-		this.binding = new ETLBinding(this, ['SOURCE': this.dataSetFacade])
+		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
 	}
 
@@ -170,6 +171,7 @@ class ETLProcessor implements RangeChecker {
 
 		rows.each { def row ->
 			currentColumnIndex = 0
+			binding.addDynamicVariable('SOURCE', new DataSetRowFacade(row))
 			closure(addCrudRowData(currentRowIndex, row))
 
 			currentRowResult.each { ETLDomain key, ReferenceResult value ->
@@ -377,7 +379,7 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Create a Find object for a particular Domain instance.
 	 * If the String is an invalid Domain, it throws an Exception.
-	 * @param method
+	 * @param domain
 	 * @return
 	 */
 	def find (String domain) {
@@ -387,7 +389,26 @@ class ETLProcessor implements RangeChecker {
         }
 
         debugConsole.info("find Domain: $findDomain")
-        new ETLFindElement(this, findDomain)
+		currentFindElement = new ETLFindElement(this, findDomain)
+		result.addFindElement(currentFindElement)
+		return currentFindElement
+	}
+
+	/**
+	 * Adds another find results in the current find element
+	 * @param domain
+	 */
+	def elseFind(String domain) {
+		ETLDomain findDomain = ETLDomain.lookup(domain)
+		if (findDomain == null) {
+			throw ETLProcessorException.invalidDomain(findDomain)
+		}
+
+		if (!currentFindElement) {
+			throw ETLProcessorException.notCurrentFindElement()
+		}
+
+		return currentFindElement.elseFind(findDomain)
 	}
 
 	/**
@@ -426,7 +447,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldName
 	 * @return
 	 */
-	private Map<String, ?> lookUpFieldSpecs (ETLDomain domain, String field) {
+	Map<String, ?> lookUpFieldSpecs (ETLDomain domain, String field) {
 
 		Map<String, ?> fieldSpec
 
@@ -496,6 +517,8 @@ class ETLProcessor implements RangeChecker {
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
 
+		result.loadElement(element)
+
 		if (!currentRowResult.containsKey(selectedDomain)) {
 			currentRowResult[selectedDomain] = new ReferenceResult()
 		}
@@ -532,11 +555,11 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * And an entry in the Dependency results.
+	 * And an entry for a finding command results.
 	 * @param findElement
 	 */
-	void addDependency(ETLFindElement findElement) {
-		result.addDependency(findElement)
+	void addFindElement(ETLFindElement findElement) {
+		result.addFindElement(findElement)
 	}
 	/**
 	 * And an entry in the Dependency results.

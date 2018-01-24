@@ -256,12 +256,12 @@ class Element implements RangeChecker {
      * Saves a new variable in the binding context in order to use it later
      * It's used in this ETL script command
      * <code>
-     *     extract 3 transform with lowercase() store myVar
+     *     extract 3 transform with lowercase() set myVar
      * </code>
      * * @param variableName
      * @return
      */
-    Element store (String variableName) {
+    Element set (String variableName) {
         processor.addDynamicVariable(variableName, this)
     }
 

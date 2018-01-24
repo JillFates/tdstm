@@ -6,7 +6,6 @@ import net.transitionmanager.domain.Project
 
 class AssetClassQueryHelper {
 
-
     static AssetClass assetClassFor (ETLDomain domain) {
         AssetClass assetClass = null
 
