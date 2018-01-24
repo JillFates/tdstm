@@ -1,4 +1,5 @@
 import { INTERVAL } from '../../../shared/model/constants';
+import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
 
 export class APIActionColumnModel {
 	columns: any[];
@@ -209,7 +210,7 @@ export class EventReaction {
 	selected?: boolean;
 	value?: string;
 	open?: boolean;
-	valid?: boolean;
+	state?: CHECK_ACTION;
 	error?: string;
 
 	constructor(type: EventReactionType, selected: boolean, value: string) {
@@ -217,7 +218,7 @@ export class EventReaction {
 		this.selected = selected;
 		this.value = value;
 		this.open = true;
-		this.valid = true;
+		this.state = CHECK_ACTION.UNKNOWN;
 		this.error = '';
 	}
 }

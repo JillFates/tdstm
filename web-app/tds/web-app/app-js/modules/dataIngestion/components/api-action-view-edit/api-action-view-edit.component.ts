@@ -25,6 +25,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
 import {Observable} from 'rxjs/Observable';
+import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 
 declare var jQuery: any;
 
@@ -57,6 +58,7 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+
 	public codeMirrorComponent: CodeMirrorComponent;
 
 	public apiActionModel: APIActionModel;
@@ -122,6 +124,7 @@ export class APIActionViewEditComponent implements OnInit {
 	};
 	public validInfoForm = false;
 	public invalidScriptSyntax = false;
+	public checkActionModel = CHECK_ACTION;
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
@@ -555,10 +558,12 @@ export class APIActionViewEditComponent implements OnInit {
 			let scripts = [];
 			// Doing a single Event reaction Validation
 			if (singleEventReaction) {
-				scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
+				if (singleEventReaction.value !== '') {
+					scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
+				}
 			} else {
 				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
-					eventReaction.valid = true;
+					eventReaction.state = this.checkActionModel.UNKNOWN;
 					eventReaction.error = '';
 					if (eventReaction.value !== '') {
 						scripts.push({code: eventReaction.type, script: eventReaction.value});
@@ -576,8 +581,10 @@ export class APIActionViewEditComponent implements OnInit {
 								errorResult += error['message'] + '\n';
 							});
 							eventReaction.error = errorResult;
-							eventReaction.valid = false;
+							eventReaction.state = this.checkActionModel.INVALID;
 							this.invalidScriptSyntax = true;
+						} else {
+							eventReaction.state = this.checkActionModel.VALID;
 						}
 					});
 					observer.next();
