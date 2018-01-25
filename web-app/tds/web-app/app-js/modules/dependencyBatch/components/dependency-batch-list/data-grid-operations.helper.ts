@@ -146,4 +146,9 @@ export class DataGridOperationsHelper {
 			this.selectAllCheckboxes = false;
 		}
 	}
+
+	public reloadData(result: any): void {
+		this.resultSet = result;
+		this.gridData = process(this.resultSet, this.state);
+	}
 }

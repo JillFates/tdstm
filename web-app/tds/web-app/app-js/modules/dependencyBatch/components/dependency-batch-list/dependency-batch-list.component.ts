@@ -43,16 +43,28 @@ export class DependencyBatchListComponent {
 		});
 	}
 
+	private loadBatchList(): void {
+		this.dependencyBatchService.getBatchList().subscribe( result => {
+			this.dataGridOperationsHelper.reloadData(result);
+		});
+	}
+
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		console.log( (cellClick as any).dataItem );
 	}
 
 	private onViewArchived(): void {
 		if (this.viewArchived) {
-			console.log('show ARCHIVED batches, reload');
+			this.loadArchivedBatchList();
 		} else {
-			console.log('show UN-ARCHIVED batches, reload');
+			this.loadBatchList();
 		}
+	}
+
+	private loadArchivedBatchList(): void {
+		this.dependencyBatchService.getArchivedBatchList().subscribe( result => {
+			this.dataGridOperationsHelper.reloadData(result);
+		});
 	}
 
 	private onPlayButton(item: any): void {

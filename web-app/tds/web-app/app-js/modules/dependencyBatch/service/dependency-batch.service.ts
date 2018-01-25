@@ -108,6 +108,42 @@ export class DependencyBatchService {
 		return Observable.of( mockResult );
 	}
 
+	getArchivedBatchList(): Observable<any> {
+		let mockResult: Array<DependencyBatchModel> = [
+			{
+				id: 1,
+				status: 'Completed',
+				importedDate: new Date(),
+				importedBy: 'David Ontiveros',
+				domain: 'Dependencies',
+				provider: 'Service Now',
+				datascript: 'TM File Import',
+				filename: 'load_file_v1.xls',
+				records: 30,
+				errors: 0,
+				pending: 0,
+				processed: 28,
+				ignored: 2
+			},
+			{
+				id: 2,
+				status: 'Completed',
+				importedDate: new Date(),
+				importedBy: 'TDS Admin',
+				domain: 'Dependencies',
+				provider: 'TransitionManager',
+				datascript: 'TM File Import',
+				filename: 'dep_cmdb.xls',
+				records: 21,
+				errors: 0,
+				pending: 0,
+				processed: 20,
+				ignored: 1,
+			}
+		];
+		return Observable.of( mockResult );
+	}
+
 	startBatch(batchId: number): Observable<any> {
 		// The endpoint /ws/import/process/$ID will be called
 		let mockResult = {};
