@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
-import {Response} from '@angular/http';
+import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
@@ -10,6 +10,7 @@ import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -17,6 +18,8 @@ export class DataIngestionService {
 	private dataDefaultUrl = '../ws';
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
+	private dataScriptUrl = '../ws/dataScript';
+	private fileSystemUrl = '../ws/fileSystem';
 
 	mockData: CredentialModel[] = [
 		{
@@ -323,6 +326,87 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	saveScript(id: number, script: string): Observable<any> {
+		let postRequest = {
+			id: id,
+			script: script
+		};
+		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success';
+			})
+			.catch((error: any) => error.json());
+	}
+
+	testScript(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let response = res.json();
+				response.data.domains = [];
+				for (let domain of Object.keys(response.data.data)) {
+					response.data.domains.push(domain);
+				}
+				return response;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	checkSyntax(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadText(content: string, extension: string): Observable<any> {
+		let postRequest = {
+			content: content,
+			extension: extension
+		};
+		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
+		const headers = new Headers({});
+		const options = new RequestOptions({ headers: headers });
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
+			.map((res: Response) => {
+				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
+		let body = JSON.stringify({filename: filename} );
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
+			.map((res: Response) => {
+				let response = res.json();
+				response.operation = 'delete';
+				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());
 	}

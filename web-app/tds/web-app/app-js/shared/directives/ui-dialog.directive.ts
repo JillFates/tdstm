@@ -109,7 +109,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		this.extraNotifier = this.notifierService.on('dialog.extra', event => {
 			const cmpRef = this.compCreator.insert(event.component, event.params, this.extraDialog);
 			const instance = cmpRef.instance as any;
-			instance.open(event.resolve, event.reject, cmpRef);
+			instance.open(event.resolve, event.reject, cmpRef, event.enableEsc, event.draggable);
 		});
 
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
