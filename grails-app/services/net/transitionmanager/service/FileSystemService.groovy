@@ -2,16 +2,15 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.FileSystemUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
-import org.springframework.beans.factory.InitializingBean
 import org.apache.commons.lang3.RandomStringUtils
-import groovy.util.logging.Slf4j
-import org.springframework.web.multipart.MultipartFile
+import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.InitializingBean
 
 import javax.management.RuntimeErrorException
-
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
@@ -106,9 +105,7 @@ class FileSystemService  implements InitializingBean {
     String getUniqueFilename(String directory, String prefix='', String extension='tmp') {
         String filename
         int tries = maxUniqueTries
-        if (prefix == null) {
-            prefix = ''
-        }
+        prefix = StringUtils.defaultIfEmpty(prefix, '')
         while(true) {
             filename = prefix + RandomStringUtils.randomAlphanumeric(32) + '.' + extension
             if (! temporaryFileExists(filename) ) {
