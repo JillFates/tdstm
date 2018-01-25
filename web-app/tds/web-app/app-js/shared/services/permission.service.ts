@@ -28,7 +28,7 @@ export class PermissionService {
 
 	hasPermission(value: string): boolean {
 		if (this.permissions) {
-			return this.permissions[value] as boolean;
+			return (this.permissions.find((r) => r === value)) as boolean;
 		} else {
 			console.log('ERROR: permissions isnt defined');
 			return false;

@@ -9,14 +9,14 @@ import net.transitionmanager.service.SecurityService
  * @author oluna@tdsi.com
  */
 @Secured('isAuthenticated()')
-@Slf4j
+@Slf4j(value='logger')
 class WsSecurityController implements ControllerMethods {
 	SecurityService securityService
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def permissions(){
 		try {
-			renderSuccessJson(securityService.currentUserPermissionMap())
+			renderSuccessJson(securityService.currentUserPermissionList())
 		}
 		catch (e) {
 			handleException e, logger
