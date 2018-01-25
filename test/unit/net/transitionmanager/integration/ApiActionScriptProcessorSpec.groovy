@@ -49,7 +49,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 		where: 'The ReactionScriptCode instance is defined'
 			reactionScriptCode          || hasRequest | hasResponse | hasTask | hasAsset | hasJob | hasSC
-			ReactionScriptCode.EVALUATE || true       | true        | false   | false    | false  | true
+			ReactionScriptCode.STATUS   || true       | true        | false   | false    | false  | true
 			ReactionScriptCode.SUCCESS  || true       | true        | true    | true     | true   | true
 			ReactionScriptCode.ERROR    || true       | true        | true    | true     | true   | true
 			ReactionScriptCode.DEFAULT  || true       | true        | true    | true     | true   | true
@@ -236,7 +236,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.with(new ReactionAssetFacade())
 					.with(new ReactionTaskFacade())
 					.with(new ApiActionJob())
-					.build(ReactionScriptCode.EVALUATE)
+					.build(ReactionScriptCode.STATUS)
 
 		expect: 'The evaluation of the script returns a ReactionScriptCode'
 			new GroovyShell(this.class.classLoader, scriptBinding)

@@ -17,7 +17,6 @@ declare var jQuery: any;
 	instance;
 
 	ngAfterViewInit(): void {
-		// console.log(this.el, CodeMirror);
 		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
 			mode: this.mode,
 			lineNumbers: true
@@ -28,6 +27,14 @@ declare var jQuery: any;
 			this.change.emit({ newValue: this.instance.getValue(), oldValue: this.model });
 			this.modelChange.emit(this.instance.getValue());
 		});
+	}
+
+	/**
+	 * Disable the Input
+	 * @param {boolean} disable
+	 */
+	public setDisabled(disable: boolean): void {
+		this.instance.options.disableInput = disable;
 	}
 
 }

@@ -7,6 +7,7 @@ import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.*
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.*
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
@@ -22,7 +23,7 @@ class ApiActionService implements ServiceMethods {
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	ProviderService providerService
+	SecurityService securityService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -107,7 +108,7 @@ class ApiActionService implements ServiceMethods {
 
 		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
 
-		List apiActions = ApiAction.where {
+		List<ApiAction> apiActions = ApiAction.where {
 			project == project
 			if (producesDataFilter != null) {
 				producesData == producesDataFilter
@@ -115,8 +116,7 @@ class ApiActionService implements ServiceMethods {
 		}.order("name", "asc").list()
 		List<Map> results = []
 		apiActions.each { apiAction ->
-			AbstractAgent agent = agentInstanceForAction(apiAction)
-			results << apiAction.toMap(agent, minimalInfo)
+			results << apiActionToMap(apiAction, minimalInfo)
 		}
 		return results
 	}
@@ -285,6 +285,9 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	boolean validateApiActionName (Project project, String name, Long apiActionId = null) {
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
 		boolean isValid = false
 
 		// Both name and project are required for validating.
@@ -300,6 +303,7 @@ class ApiActionService implements ServiceMethods {
 				isValid = true
 			}
 		}
+
 		return isValid
 
 	}
@@ -311,49 +315,39 @@ class ApiActionService implements ServiceMethods {
 	 * @param value
 	 * @return
 	 */
-	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false) {
+	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false, Boolean throwException = false) {
 		String baseErrorMsg = "Error trying to create or update an API Action."
-		if (!value && mandatory) {
-			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
-		}
+		Object result = null
 		if (value) {
 			try {
-				return enumClass.valueOf(value)
+				result = enumClass.valueOf(value)
 			} catch (IllegalArgumentException e) {
-				throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+				if (throwException) {
+					throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+				}
 			}
 		} else {
-			return null
+			if (mandatory && throwException) {
+				throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
+			}
 		}
-
-	}
-
-	/**
-	 *
-	 * @param project
-	 * @param provider
-	 * @param credentialId
-	 * @return
-	 */
-	Credential findCredential(Project project, Provider provider, Long credentialId) {
-		return Credential.where {
-			id == credentialId
-			project == project
-			provider == provider
-		}
+		return result
 
 	}
 
 	/**
 	 * Create or Update an API Action based on a JSON Object.
-	 * @param project
 	 * @param apiActionJson
 	 * @param apiActionId
+	 * @param project
 	 * @return
 	 */
-	ApiAction saveOrUpdateApiAction (Project project, JSONObject apiActionJson, Long apiActionId = null) {
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
+		ApiAction apiAction = null
 
-		ApiAction apiAction
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
 
 		// If there's an apiActionId then it's an update operation.
 		if (apiActionId) {
@@ -363,37 +357,8 @@ class ApiActionService implements ServiceMethods {
 			apiAction = new ApiAction(project: project)
 		}
 
-		String actionName = apiActionJson.name
-
-		// Make sure the name is valid. Fail otherwise.
-		if (!validateApiActionName(project, apiActionJson.name, apiActionId)) {
-			throw new InvalidParamException("Invalid name for API Action.")
-		}
-
-		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
-
-		Credential credentials = getCredential(project, prov, apiActionJson)
-
-		DataScript dataScript = getDataScript(project, prov, apiActionJson)
-
-
-		apiAction.with {
-			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass, true)
-			agentMethod = apiActionJson.agentMethod
-			asyncQueue = apiActionJson.asyncQueue
-			callbackMethod = apiActionJson.callbackMethod
-			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
-			credential = credentials
-			description = apiActionJson.description
-			defaultDataScript = dataScript
-			description = apiActionJson.description
-			methodParams = apiActionJson.methodParams
-			name = actionName
-			pollingInterval = NumberUtil.toInteger(apiActionJson.pollingInterval)
-			producesData = NumberUtil.toZeroOrOne(apiActionJson.producesData)
-			provider = prov
-			timeout = NumberUtil.toInteger(apiActionJson.timeout)
-		}
+		// Populate the apiAction with the properties from the command object.
+		apiAction.properties = apiActionCommand.properties
 
 		apiAction.save(failOnError: true)
 		return apiAction
@@ -410,29 +375,25 @@ class ApiActionService implements ServiceMethods {
 	 * @param credentialId
 	 * @return
 	 */
-	private Credential getCredential(Project project, Provider provider, JSONObject apiActionJson) {
-		Credential credential = null
-		if (apiActionJson.credentialId) {
-			Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
-			credential = credentialService.findByProjectAndProvider(credentialId, project, provider, true)
+	Credential getCredential(Project project, Provider provider, Long credentialId, boolean throwException = false) {
+		if (!project) {
+			project = securityService.userCurrentProject
 		}
-		return credential
+		return credentialService.findByProjectAndProvider(credentialId, project, provider, throwException)
 	}
 
 	/**
 	 * Find and return a DataScript with the given id for the corresponding provider and project.
 	 * @param project
 	 * @param provider
-	 * @param apiActionJson
+	 * @param dataScriptId
 	 * @return
 	 */
-	private DataScript getDataScript(Project project, Provider provider, JSONObject apiActionJson) {
-		DataScript dataScript = null
-		if (apiActionJson.defaultDataScriptId) {
-			Long dataScriptId = NumberUtil.toLong(apiActionJson.defaultDataScriptId)
-			dataScript = dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, true)
+	DataScript getDataScript(Project project, Provider provider,  Long dataScriptId) {
+		if (!project) {
+			project = securityService.userCurrentProject
 		}
-		return dataScript
+		return dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, false)
 	}
 
 	/**
@@ -532,6 +493,7 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		return [
+				code: code.name(),
 				validSyntax: errors.isEmpty(),
 				errors     : errorsMap
 		]
@@ -547,7 +509,7 @@ class ApiActionService implements ServiceMethods {
 
 		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
 
-			Map<String, ?> scriptResults = [code: scriptBindingCommand.code.name()]
+			Map<String, ?> scriptResults = [:]
 			try {
 
 				scriptResults = compileReactionScript(
@@ -576,9 +538,33 @@ class ApiActionService implements ServiceMethods {
 	 * @param result
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
-		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
+		if (code == ReactionScriptCode.STATUS && !(result instanceof ReactionScriptCode)) {
 			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
 					'Script must return SUCCESS or ERROR'))
 		}
+	}
+
+	/**
+	 * Return a map representation for an ApiAction.
+	 * @param apiAction
+	 * @param minimalInfo - flag that indicates that only the id and the name are required.
+	 * @return
+	 */
+	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
+		Map<String, Object> apiActionMap = null
+		List<String> properties = null
+		if (minimalInfo) {
+			properties = ["id", "name"]
+		}
+
+		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
+
+		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		if (!minimalInfo) {
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+		}
+
+		return apiActionMap
 	}
 }

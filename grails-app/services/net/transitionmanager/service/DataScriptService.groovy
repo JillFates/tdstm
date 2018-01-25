@@ -44,7 +44,7 @@ class DataScriptService implements ServiceMethods{
         }
 
         // Find the provider
-        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject)
+        Provider providerInstance = providerService.getProvider(dataScriptJson.providerId, currentProject, true)
 
         // Copy the values received from the JSON Object over to the DataScript instance.
         dataScript.with {
@@ -88,7 +88,7 @@ class DataScriptService implements ServiceMethods{
         }.find()
 
         if (!dataScript) {
-            throw new DomainUpdateException("No DataScript with id ${dataScriptId} exists for this project.")
+            throw new EmptyResultException("No DataScript with id ${dataScriptId} exists for this project.")
         }
 
         return dataScript

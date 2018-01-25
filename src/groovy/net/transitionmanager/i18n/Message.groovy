@@ -21,4 +21,17 @@ interface Message {
 			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension'
 
+	/*
+		i18N messages for working with API Action endpoints.
+	 */
+	String InvalidFieldForDomain = "domain.invalid.field"
+
+
+	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
+	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
+	// Messages for the different errors in the ApiAction reactionJson
+	String ApiActionMissingStatusOrSuccessInReactionJson = "apiAction.reactionJson.emptyStatusOrSuccess"
+	String ApiActionMissingDefaultAndErrorInReactionJson = "apiAction.reactionJson.emptyDefaultAndError"
+
+
 }

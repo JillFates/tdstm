@@ -210,4 +210,6 @@ databaseChangeLog = {
     include file: '20171221-add-credential-and-agentclass-to-apiaction.groovy'
 	include file: '20171227-rename-all-assets-view.groovy'
     include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
+	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
+	include file: '20180123-api-action-make-description-nullable.groovy'
 }
