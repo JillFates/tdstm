@@ -26,6 +26,8 @@ import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.com
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
+import { DynamicComponent } from './components/dynamic.component';
+import { CheckActionComponent } from './components/check-action/check-action.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -36,8 +38,6 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
 import { DictionaryService } from './services/dictionary.service';
-// Components
-import { DynamicComponent } from './components/dynamic.component';
 
 @NgModule({
 	imports: [
@@ -61,7 +61,8 @@ import { DynamicComponent } from './components/dynamic.component';
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
 		DynamicComponent,
-		CodeMirrorComponent
+		CodeMirrorComponent,
+		CheckActionComponent
 	],
 	providers: [
 		AuthService,
@@ -90,7 +91,8 @@ import { DynamicComponent } from './components/dynamic.component';
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		DynamicComponent,
-		CodeMirrorComponent
+		CodeMirrorComponent,
+		CheckActionComponent
 	],
 	entryComponents: [DynamicComponent]
 })
