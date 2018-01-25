@@ -198,45 +198,46 @@ class ApiAction {
 	 * - DEFAULT or ERROR are present.
 	 */
 	static reactionJsonValidator = { String reactionJsonString, ApiAction apiAction ->
+		JSONObject reactionJson = null
 		try {
-			JSONObject reactionJson = JsonUtil.parseJson(reactionJsonString)
-			// STATUS and SUCCESS are mandatory.
-			if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
-				// Either DEFAULT or ERROR need to be specified.
-				if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
-					apiAction.reactionScriptsValid = 0
-					return Message.ApiActionMissingDefaultAndErrorInReactionJson
-				}
-			} else {
-				return Message.ApiActionMissingStatusOrSuccessInReactionJson
-			}
-
-			boolean errors = false
-
-			Set<String> invalidKeys = []
-			// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode.
-			for (key in reactionJson.keySet()) {
-				if (!ReactionScriptCode.lookup(key)) {
-					logger.warn("Unrecognized key $key in reaction JSON.")
-					invalidKeys << key
-					errors = true
-				}
-			}
-
-			// If errors were detected update the reactionJson.
-			if (errors) {
-				reactionJson.keySet().removeAll(invalidKeys)
-				apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
-			}
-
-			apiAction.reactionScriptsValid = errors ? 0 : 1
-
-			// Set to true, otherwise the validation fails.
-			return true
-
-		} catch (InvalidParamException ipe) {
+			reactionJson = JsonUtil.parseJson(reactionJsonString)
+		} catch(InvalidParamException e ) {
 			return Message.InvalidFieldForDomain
 		}
+
+		// STATUS and SUCCESS are mandatory.
+		if (reactionJson[ReactionScriptCode.STATUS.name()] && reactionJson[ReactionScriptCode.SUCCESS.name()]) {
+			// Either DEFAULT or ERROR need to be specified.
+			if (!reactionJson[ReactionScriptCode.DEFAULT.name()] && !reactionJson[ReactionScriptCode.ERROR.name()]) {
+				apiAction.reactionScriptsValid = 0
+				return Message.ApiActionMissingDefaultAndErrorInReactionJson
+			}
+		} else {
+			return Message.ApiActionMissingStatusOrSuccessInReactionJson
+		}
+
+		boolean errors = false
+
+		Set<String> invalidKeys = []
+		// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
+		for (key in reactionJson.keySet()) {
+			if (!ReactionScriptCode.lookup(key)) {
+				logger.warn("Unrecognized key $key in reaction JSON.")
+				invalidKeys << key
+				errors = true
+			}
+		}
+
+		// If errors were detected update the reactionJson.
+		if (errors) {
+			reactionJson.keySet().removeAll(invalidKeys)
+			apiAction.reactionScripts = JsonUtil.toJson(reactionJson)
+		}
+
+		apiAction.reactionScriptsValid = errors ? 0 : 1
+
+		// Set to true, otherwise the validation fails.
+		return true
 	}
 
 	/**
