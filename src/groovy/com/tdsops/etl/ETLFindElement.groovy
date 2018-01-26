@@ -31,8 +31,8 @@ class ETLFindElement {
 	/**
 	 * Defines a new find option. See this code:
 	 * <pre>
-	 *	find Application for assetId by id with assetId
-	 *	elseFind Application for assetId by assetName, assetType with primaryName, primaryType
+	 * 	find Application for assetId by id with assetId
+	 * 	elseFind Application for assetId by assetName, assetType with primaryName, primaryType
 	 * </pre>
 	 * @param domain
 	 * @return
@@ -61,12 +61,12 @@ class ETLFindElement {
 	 * @return
 	 */
 	ETLFindElement by(String... fields) {
-		for(field in fields){
+		for (field in fields) {
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
 		}
-		if(!currentFind.dependentId){
-			if(fields.size() != 1){
+		if (!currentFind.dependentId) {
+			if (fields.size() != 1) {
 				throw ETLProcessorException.findElementWithoutDependentIdDefinition(fields)
 			}
 			currentFind.dependentId = fields[0]
@@ -116,11 +116,11 @@ class ETLFindElement {
 		return values.collect { def value ->
 			def fieldValue
 
-			switch (value){
+			switch (value) {
 				case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
-					fieldValue = value
+					fieldValue = ((DomainField) value).value
 					break
-				case Element:			// LocalVariable
+				case Element:            // LocalVariable
 					fieldValue = ((Element) value).value
 					break
 				case SourceField:
@@ -162,10 +162,10 @@ class ETLFindElement {
 
 	private void setCurrentDomain(ETLDomain domain) {
 		currentFind = [
-		        domain: domain.name(),
-				fields: [],
-				values: [],
-				queryParams:[:]
+				domain     : domain.name(),
+				fields     : [],
+				values     : [],
+				queryParams: [:]
 
 		]
 	}

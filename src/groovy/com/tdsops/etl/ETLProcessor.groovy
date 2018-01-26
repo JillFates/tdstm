@@ -9,9 +9,28 @@ import net.transitionmanager.domain.Project
  */
 class ETLProcessor implements RangeChecker {
 
+	/**
+	 * Static variable name definition for CE script variable
+	 */
 	static final String CURR_ELEMENT_VARNAME = 'CE'
-
+	/**
+	 * Static variable name definition for DOMAIN script variable
+	 */
+	static final String DOMAIN_VARNAME = 'DOMAIN'
+	/**
+	 * Static variable name definition for SOURCE script variable
+	 */
+	static final String SOURCE_VARNAME = 'SOURCE'
+	/**
+	 * Project used in some commands.
+	 */
 	Project project
+	/**
+	 * DataSet wrapper used to mange commands sent to DataSet object.
+	 * It wrapps a GETL Datasource instance.
+	 * @see getl.data.Dataset
+	 * @see getl.data.Field
+	 */
 	DataSetFacade dataSetFacade
 	ETLFieldsValidator fieldsValidator
 	ETLBinding binding
@@ -60,11 +79,9 @@ class ETLProcessor implements RangeChecker {
 	static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
 
 	/**
-	 *
 	 * Creates an instance of ETL processor with a source of data,
 	 * a domain mapper validator and an instance of fieldsValidator
 	 * with a map of available transformations
-	 *
 	 * @param binding
 	 * @param project
 	 * @param dataSetFacade
@@ -171,7 +188,8 @@ class ETLProcessor implements RangeChecker {
 
 		rows.each { def row ->
 			currentColumnIndex = 0
-			binding.addDynamicVariable('SOURCE', new DataSetRowFacade(row))
+			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
+			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			closure(addCrudRowData(currentRowIndex, row))
 
 			currentRowResult.each { ETLDomain key, ReferenceResult value ->

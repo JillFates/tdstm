@@ -101,7 +101,7 @@ class ETLProcessorResult {
 	 * Calculates the current data map based on row index
 	 * @return a map with the current data node
 	 */
-	private Map<String, ?> currentData() {
+	Map<String, ?> currentData() {
 
 		if(reference.data.size() < processor.currentRowIndex){
 			Map data = [

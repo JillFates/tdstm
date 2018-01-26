@@ -83,6 +83,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unknown dataSet property: ${value}".toString())
     }
 
+    static ETLProcessorException unknownDomainProperty (Object value) {
+        new ETLProcessorException("Unknown DOMAIN property: ${value}".toString())
+    }
+
     static ETLProcessorException currentElementNotDefined () {
         new ETLProcessorException('CE (current element) is not defined.')
     }

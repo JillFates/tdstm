@@ -19,6 +19,4 @@ class DataSetRowFacade {
 		}
 		return new SourceField(row[name])
 	}
-
-
 }
