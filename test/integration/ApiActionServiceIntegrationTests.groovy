@@ -40,7 +40,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 	private Project project
 	ProjectTestHelper projectHelper = new ProjectTestHelper()
 
-	private static final String paramsJson = '''
+	private static final String paramsJson = """
 		[ { "param": "taskId",
 			"desc": "The id of the task",
 			"context": "TASK",
@@ -48,7 +48,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 		  },
 		  {	"param": "serverRefId",
 			"desc": "The unique id used to reference the server in the API",
-			"context": "ASSET",
+			"context": "${ContextType.ASSET.name()}",
 			"property": "assetName"
 		  },
 		  {	"param": "groupRefCode",
@@ -56,7 +56,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			"value": "xk324-kj1i2-23ks-9sdl"
 		  }
 		]
-	'''
+	"""
 
 	void setup() {
 		project = projectHelper.createProject()
