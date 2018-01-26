@@ -7,6 +7,8 @@ import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -27,6 +29,7 @@ export class DependencyBatchListComponent {
 	private viewArchived = false;
 
 	constructor(
+		private dialogService: UIDialogService,
 		private dependencyBatchService: DependencyBatchService,
 		private permissionService: PermissionService,
 		private notifierService: NotifierService) {
@@ -50,7 +53,11 @@ export class DependencyBatchListComponent {
 	}
 
 	private openBatchDetail(cellClick: CellClickEvent): void {
-		console.log( (cellClick as any).dataItem );
+		this.dialogService.open(DependencyBatchDetailDialogComponent, []).then(result => {
+			// silence is golden
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	private onViewArchived(): void {
