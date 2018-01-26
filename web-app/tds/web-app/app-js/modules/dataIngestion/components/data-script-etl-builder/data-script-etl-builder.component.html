@@ -5,7 +5,7 @@
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
-				<h4 class="modal-title">{{ 'DATA_INGESTION.ETL_BUILDER_TITLE' | translate}}</h4>
+				<h4 class="modal-title">{{ 'DATA_INGESTION.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
 			</div>
 			<div class="modal-body" style="height: 600px; overflow: auto;">
                 <div class="modal-body-container">
@@ -31,7 +31,7 @@
                     </div>
                     <div class="row" *ngIf="!collapsed.code">
                         <div class="col-md-12">
-                            <code-mirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
+                            <code-mirror #codeMirror [mode]="'groovy'" [(model)]="script" (change)="onScriptChange($event)" ></code-mirror>
                         </div>
                     </div>
                     <div class="row">
@@ -52,10 +52,19 @@
                     <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <span class="pull-left" style="color: #a94442;"><b>Syntax Errors</b></span>
-                            <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">close</span>
-                            <textarea *ngIf="testHasErrors()" class="form-control console" [(ngModel)]="scriptTestResult.error" cols="30" rows="3" style="cursor: default; resize: vertical;">
-						</textarea>
-                            <textarea *ngIf="syntaxHasErrors()" class="form-control console" cols="30" rows="3" style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
+                            <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
+                                <button aria-label="Close" class="close" type="button" style="margin-right: 5px; opacity: unset;">
+					                <span aria-hidden="true">×</span>
+				                </button>
+                            </span>
+                            <textarea *ngIf="testHasErrors()" class="form-control console"
+                                      [(ngModel)]="scriptTestResult.error"
+                                      cols="30" rows="3" readonly
+                                      style="cursor: default; resize: vertical;"></textarea>
+                            <textarea *ngIf="syntaxHasErrors()"
+                                      class="form-control console"
+                                      cols="30" rows="3" readonly
+                                      style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
                         </div>
                     </div>
 

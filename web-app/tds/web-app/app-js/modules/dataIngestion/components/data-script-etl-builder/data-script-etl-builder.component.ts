@@ -1,13 +1,13 @@
-import { Component, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import {Component, Output, EventEmitter, AfterViewInit, ViewChild} from '@angular/core';
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
 import {DataScriptModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AlertType} from '../../../../shared/model/alert.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -15,6 +15,7 @@ import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxRes
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 
+	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	private collapsed = {
 		code: true,
 		sample: false
@@ -78,6 +79,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
 			this.scriptValidSyntaxResult = result.data;
 			this.operationStatus.syntax = this.scriptValidSyntaxResult.validSyntax ? 'success' : 'fail';
+			// mark on code mirror error syntax if present.
+			const errorLines: Array<number> = this.scriptValidSyntaxResult.errors.map( error => {
+				return error.startLine - 1;
+			});
+			this.codeMirrorComponent.addSyntaxErrors(errorLines);
 		});
 	}
 
@@ -188,8 +194,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		if (operation === 'test') {
 			this.scriptTestResult = new ScriptTestResultModel();
 			this.consoleSettings.scriptTestResult = new ScriptTestResultModel();
+			// also clean syntax results
+			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 		if (operation === 'syntax') {
+			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
+			// also clean test results
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 	}
