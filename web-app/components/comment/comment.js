@@ -1306,13 +1306,13 @@ tds.comments.service.CommentService = function (utils, http, q) {
 
 	var resetAction = function (commentId) {
 		var deferred = q.defer();
-		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/resetAction')).
-			success(function (data, status, headers, config) {
-				deferred.resolve(data);
-			}).
-			error(function (data, status, headers, config) {
-				deferred.reject(data);
-			});
+            if (confirm("Are you sure you want to reset the action?")) {
+                http.post(utils.url.applyRootPath('/ws/task/' + commentId + '/resetAction')).success(function (data, status, headers, config) {
+                    deferred.resolve(data);
+                }).error(function (data, status, headers, config) {
+                    deferred.reject(data);
+                });
+            }
 		return deferred.promise;
 	};
 
