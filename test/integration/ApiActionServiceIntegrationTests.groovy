@@ -43,7 +43,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 	private static final String paramsJson = """
 		[ { "param": "taskId",
 			"desc": "The id of the task",
-			"context": "TASK",
+			"context": "${ContextType.TASK.name()}",
 			"property": "id"
 		  },
 		  {	"param": "serverRefId",
@@ -52,7 +52,7 @@ class ApiActionServiceIntegrationTests extends Specification {
 			"property": "assetName"
 		  },
 		  {	"param": "groupRefCode",
-			"context": "USER_DEF",
+			"context": "${ContextType.USER_DEF.name()}",
 			"value": "xk324-kj1i2-23ks-9sdl"
 		  }
 		]
