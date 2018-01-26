@@ -86,4 +86,15 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException currentElementNotDefined () {
         new ETLProcessorException('CE (current element) is not defined.')
     }
+
+	static ETLProcessorException findElementWithoutDependentIdDefinition (String... fields) {
+		new ETLProcessorException("Find commands does not have dependant definition using multiple field names ${fields.join(',')}".toString())
+	}
+
+	static ETLProcessorException invalidFindCommand (String dependentId) {
+		new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value".toString())
+	}
+
+
+
 }

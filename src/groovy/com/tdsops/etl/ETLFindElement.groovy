@@ -45,6 +45,17 @@ class ETLFindElement {
 	}
 
 	/**
+	 * Defines the dependentId for the current find element
+	 * @param dependentId
+	 * @return
+	 */
+	ETLFindElement 'for'(String dependentId) {
+		checkAssetFieldSpec(dependentId)
+		currentFind.dependentId = dependentId
+		this
+	}
+
+	/**
 	 * Define the list of fields that are located in dataSource and used to find domain instances
 	 * @param fields
 	 * @return
@@ -52,52 +63,76 @@ class ETLFindElement {
 	ETLFindElement by(String... fields) {
 		for(field in fields){
 			checkAssetFieldSpec(field)
-			currentFind.findings.fields.add(field)
+			currentFind.fields.add(field)
+		}
+		if(!currentFind.dependentId){
+			if(fields.size() != 1){
+				throw ETLProcessorException.findElementWithoutDependentIdDefinition(fields)
+			}
+			currentFind.dependentId = fields[0]
 		}
 		this
 	}
 
 	/**
 	 * Sets the dataSource Fields and executes the query looking for assets
-	 * based on currentFind.findings.assetFields
+	 * based on currentFind.fields
 	 * @param values
 	 * @return
 	 */
 	ETLFindElement with(Object... values) {
 
 		checkProject()
+		currentFind.values = checkValues(values)
 
-		currentFind.findings.values = values as List
+		currentFind.kv = [
+				currentFind.fields,
+				currentFind.values
+		].transpose().collectEntries { it }
 
-		if (currentFind.findings.fields.size() != values.size()) {
+		currentFind.assets = AssetClassQueryHelper.where(
+				ETLDomain.lookup(currentFind.domain),
+				processor.project,
+				currentFind.kv)
+		processor.addFindElement(this)
+		this
+	}
+
+	/**
+	 * It checks if the amount of values is equals to the number of fields.
+	 * After that, it converts all the according to their types.
+	 * If there is not a valid type it throws an ETLProcessorException
+	 * @param values a list of values
+	 * @return a list of converted values according to their types
+	 */
+	private List<?> checkValues(Object... values) {
+
+		if (currentFind.fields.size() != values.size()) {
 			throw ETLProcessorException.incorrectAmountOfParameters(
-					currentFind.findings.fields,
-					currentFind.findings.values)
+					currentFind.fields,
+					values)
 		}
 
-		Map<String, ?> fieldsSpec = currentFind.findings.values.withIndex().collectEntries { def value, int i ->
-
+		return values.collect { def value ->
 			def fieldValue
 
-			if(value instanceof DomainField) { 			//DOMAIN.name // Label name or property name from fieldSpecs
-
-			} else if(value instanceof Element) { 		// LocalVariable
-				fieldValue = ((Element)value).value
-			} else if(value instanceof SourceField) { 	// SOURCE.'application id'
-				fieldValue = ((SourceField)value).value
-			} else if(value instanceof String) {
-				fieldValue = value
-			} else {
-				throw ETLProcessorException.UnknownVariable(value)
+			switch (value){
+				case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
+					fieldValue = value
+					break
+				case Element:			// LocalVariable
+					fieldValue = ((Element) value).value
+					break
+				case SourceField:
+					fieldValue = ((SourceField) value).value // SOURCE.'application id'
+					break
+				default:
+					fieldValue = value
+					break
 			}
 
-			String fieldName = currentFind.findings.fields[i]
-			[("$fieldName".toString()): fieldValue]
+			return fieldValue
 		}
-
-		currentFind.findings.assets = AssetClassQueryHelper.where(processor.project, currentFind.domain, fieldsSpec)
-
-		this
 	}
 
 	/**
@@ -110,39 +145,28 @@ class ETLFindElement {
 		}
 	}
 
-	/**
-	 * Defines the dependentId for the current find element
-	 * @param dependentId
-	 * @return
-	 */
-	ETLFindElement 'for'(String dependentId) {
-		checkAssetFieldSpec(dependentId)
-		currentFind.dependentId = dependentId
-		this
-	}
-
-
 	ETLFindElement warn(String message) {
-		this.currentFind.findings.warnMessage = message
+		this.currentFind.warnMessage = message
 		this.processor.addDependencyWarnMessage(this)
 		this
 	}
 
 	/**
 	 * Checks a fieldSpec based on asset field name
+	 * using the selected domain in the current script
 	 * @param fieldName an asset field name
 	 */
 	private Map<String, ?> checkAssetFieldSpec(String fieldName) {
-		return processor.lookUpFieldSpecs(currentFind.domain, fieldName)
+		return processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 	}
 
 	private void setCurrentDomain(ETLDomain domain) {
 		currentFind = [
-		        domain: domain,
-				findings: [
-				        fields: [],
-						values: []
-				],
+		        domain: domain.name(),
+				fields: [],
+				values: [],
+				queryParams:[:]
+
 		]
 	}
 

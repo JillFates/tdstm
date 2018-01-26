@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
@@ -1011,14 +1012,17 @@ class ETLProcessorSpec extends Specification {
 					ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.getElement(0, 1)) {
-				value == "Microsoft\b\nIncorporated"
-				field.name == "appVendor"
-			}
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.appVendor) {
+					originalValue.contains('Microsoft\b\nInc')
+					value == 'Microsoft\b\nIncorporated'
+				}
 
-			with(etlProcessor.getElement(1, 1)) {
-				value == "Mozilla\t\t\0Incorporated"
-				field.name == "appVendor"
+				with(data[1].fields.appVendor) {
+					originalValue.contains('Mozilla\t\t\0Inc')
+					value == 'Mozilla\t\t\0Incorporated'
+				}
 			}
 	}
 
@@ -1039,14 +1043,17 @@ class ETLProcessorSpec extends Specification {
 					ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.getElement(0, 1)) {
-				value == "Mirosoft\b\nIn"
-				field.name == "appVendor"
-			}
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.appVendor) {
+					originalValue.contains('Microsoft\b\nInc')
+					value == "Mirosoft\b\nIn"
+				}
 
-			with(etlProcessor.getElement(1, 1)) {
-				value == "Mozill\t\t\0In"
-				field.name == "appVendor"
+				with(data[1].fields.appVendor) {
+					originalValue.contains('Mozilla\t\t\0Inc')
+					value == "Mozill\t\t\0In"
+				}
 			}
 	}
 
@@ -1295,10 +1302,11 @@ class ETLProcessorSpec extends Specification {
 	void 'test can enable console and log domain selected'() {
 
 		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					simpleDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -1309,7 +1317,7 @@ class ETLProcessorSpec extends Specification {
 					ETLProcessor.class.name)
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
+			etlProcessor.debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
 					.append(System.lineSeparator())
 					.append("INFO - Selected Domain: Device")
 					.append(System.lineSeparator())
@@ -1506,17 +1514,17 @@ class ETLProcessorSpec extends Specification {
 					originalValue == '152255'
 				}
 
-				with(data[1].fields.appVendor) {
+				with(data[0].fields.appVendor) {
 					value == 'Microsoft'
 					originalValue == 'Microsoft'
 				}
 
-				with(data[2].fields.id) {
+				with(data[1].fields.id) {
 					value == '152256'
 					originalValue == '152256'
 				}
 
-				with(data[3].fields.appVendor) {
+				with(data[1].fields.appVendor) {
 					value == 'Mozilla'
 					originalValue == 'Mozilla'
 				}
@@ -1529,17 +1537,17 @@ class ETLProcessorSpec extends Specification {
 					originalValue == '1522'
 				}
 
-				with(data[1].fields.name) {
+				with(data[0].fields.name) {
 					value == 'SRW24G1'
 					originalValue == 'SRW24G1'
 				}
 
-				with(data[2].fields.id) {
+				with(data[1].fields.id) {
 					value == '1523'
 					originalValue == '1523'
 				}
 
-				with(data[3].fields.name) {
+				with(data[1].fields.name) {
 					value == 'ZPHA MODULE'
 					originalValue == 'ZPHA MODULE'
 				}
@@ -2222,7 +2230,7 @@ class ETLProcessorSpec extends Specification {
 							domain Application
 							set environment with Production
 							extract 'application id' load id
-							find Application 'for' id by id with SOURCE.'application id'
+							find Application by id with SOURCE.'application id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2230,7 +2238,7 @@ class ETLProcessorSpec extends Specification {
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
+				domain == ETLDomain.Application.name()
 				with(data[0].fields.environment) {
 					originalValue == 'Production'
 					value == 'Production'
@@ -2239,6 +2247,11 @@ class ETLProcessorSpec extends Specification {
 				with(data[1].fields.id) {
 					originalValue == '152254'
 					value == '152254'
+
+					with(find.query) {
+						domain == 'Application'
+						kv == [id: '152254']
+					}
 				}
 
 				with(data[2].fields.environment) {
@@ -2249,6 +2262,11 @@ class ETLProcessorSpec extends Specification {
 				with(data[3].fields.id) {
 					originalValue == '152255'
 					value == '152255'
+
+					with(find.query) {
+						domain == 'Application'
+						kv == [id: '152255']
+					}
 				}
 			}
 	}
@@ -2259,13 +2277,25 @@ class ETLProcessorSpec extends Specification {
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 
 		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,vendor name,technology,location
-				152255,Microsoft,(xlsx updated),ACME Data Center
-				152255,Mozilla,NGM,ACME Data Center
-			""".stripIndent())
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+61038,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+61055,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+61058,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+61059,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+61062,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+61074,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+61083,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+60824,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+60825,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+60826,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+60827,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+60828,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+60829,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+60830,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
 
 		and:
 			Project GMDEMO = Mock(Project)
@@ -2274,23 +2304,57 @@ class ETLProcessorSpec extends Specification {
 			Project TMDEMO = Mock(Project)
 			TMDEMO.getId() >> 125612l
 
-			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			List<AssetEntity> assetEntities = [
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
 				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					[id: 61038l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+					[id: 61055l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+					[id: 61058l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
 				mock
 			}
 
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			GroovyMock(AssetDependency, global: true)
+			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
 			}
 
 		and:
@@ -2305,12 +2369,22 @@ class ETLProcessorSpec extends Specification {
 					.evaluate("""
 						console on
 						read labels
+						domain Dependency
 						iterate {
-							domain Application
-							set environment with Production
-							extract 'application id' load id
-							find Application 'for' id by id with SOURCE.'application id'
-							elseFind Application 'for' id by assetClass, assetName with 'Application', SOURCE.'location'
+						
+							extract assetdependencyid load id
+							find Dependency 'for' id by id with SOURCE.'assetdependencyid' 
+							
+							// Process the PRIMARY asset in the dependency
+    						extract assetid load asset
+							
+							// Set some local variables to be reused
+							extract assetname set primaryName
+							extract assettype set primaryType
+    
+							 // find Application 'for' asset by id with DOMAIN.asset 
+   							 // elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+   
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2318,25 +2392,23 @@ class ETLProcessorSpec extends Specification {
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+				domain == ETLDomain.Dependency.name()
+				fields == ['id', 'asset'] as Set
+				data.size() == 14
+				data.collect { it.fields.id.value } == [
+						'61038', '61055', '61058', '61059', '61062', '61074', '61083', '60824', '60825', '60826', '60827', '60828', '60829', '60830'
+				]
 
-				with(data[1].fields.id) {
-					originalValue == '152254'
-					value == '152254'
-				}
+				data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999', '152098', '152100', '152106', '152117', '152118', '152118', '152118'
+				]
 
-				with(data[2].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[3].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+				with(data[0].fields.id.find) {
+					query.size() == 1
+					with(query[0]) {
+						domain == ETLDomain.Dependency.name()
+						kv.id == '61038'
+					}
 				}
 			}
 
@@ -2756,14 +2828,14 @@ class ETLProcessorSpec extends Specification {
 	}
 
 	/**
-	 * Helper method to create Fields Specs based on Asset Class definition
-	 * @param assetClass
+	 * Helper method to create Fields Specs based on Asset definition
+	 * @param asset
 	 * @return
 	 */
-	private List<Map<String, ?>> buildFieldSpecsFor(AssetClass assetClass) {
+	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch (assetClass) {
+		switch (asset) {
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
 						buildFieldSpec('id', 'Id', 'Number'),
@@ -2784,6 +2856,14 @@ class ETLProcessorSpec extends Specification {
 						buildFieldSpec('name', 'Name'),
 						buildFieldSpec('environment', 'Environment'),
 						buildFieldSpec('assetClass', 'Asset Class'),
+				]
+				break
+			case ETLDomain.Dependency:
+				fieldSpecs = [
+						buildFieldSpec('id', 'Id', 'Number'),
+						buildFieldSpec('assetName', 'AssetName'),
+						buildFieldSpec('assetType', 'AssetType'),
+						buildFieldSpec('asset', 'Asset'),
 				]
 				break
 			case AssetClass.STORAGE:
