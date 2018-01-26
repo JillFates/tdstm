@@ -171,7 +171,7 @@ class ETLProcessorSpec extends Specification {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				data == []
+				data[0].fields == [:]
 			}
 	}
 
@@ -204,7 +204,7 @@ class ETLProcessorSpec extends Specification {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
-					data == []
+					data[0].fields == [:]
 				}
 			}
 	}
@@ -251,17 +251,17 @@ class ETLProcessorSpec extends Specification {
 			etlProcessor.result.domains.size() == 3
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				data == []
+				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
-				data == []
+				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[2]) {
 				domain == ETLDomain.Storage.name()
-				data == []
+				data[0].fields == [:]
 			}
 	}
 
@@ -288,12 +288,12 @@ class ETLProcessorSpec extends Specification {
 			etlProcessor.result.domains.size() == 2
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				data == []
+				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
-				data == []
+				data[0].fields == [:]
 			}
 	}
 
@@ -1932,17 +1932,17 @@ class ETLProcessorSpec extends Specification {
 					value == "Microsoft"
 				}
 
-				with(data[1].fields.description) {
+				with(data[0].fields.description) {
 					originalValue == "Microsoft"
 					value == "Microsoft"
 				}
 
-				with(data[2].fields.appVendor) {
+				with(data[1].fields.appVendor) {
 					originalValue == "Mozilla"
 					value == "Mozilla"
 				}
 
-				with(data[3].fields.description) {
+				with(data[1].fields.description) {
 					originalValue == "Mozilla"
 					value == "Mozilla"
 				}
@@ -2130,27 +2130,27 @@ class ETLProcessorSpec extends Specification {
 					value == 'Production'
 				}
 
-				with(data[1].fields.id) {
+				with(data[0].fields.id) {
 					originalValue == '152254'
 					value == '152254'
 				}
 
-				with(data[2].fields.appVendor) {
+				with(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
 				}
 
-				with(data[3].fields.environment) {
+				with(data[1].fields.environment) {
 					originalValue == 'Production'
 					value == 'Production'
 				}
 
-				with(data[4].fields.id) {
+				with(data[1].fields.id) {
 					originalValue == '152255'
 					value == '152255'
 				}
 
-				with(data[5].fields.appVendor) {
+				with(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
 				}
@@ -2164,17 +2164,17 @@ class ETLProcessorSpec extends Specification {
 					value == '152254'
 				}
 
-				with(data[1].fields.location) {
+				with(data[0].fields.location) {
 					originalValue == 'Development'
 					value == 'Development'
 				}
 
-				with(data[2].fields.id) {
+				with(data[1].fields.id) {
 					originalValue == '152255'
 					value == '152255'
 				}
 
-				with(data[3].fields.location) {
+				with(data[1].fields.location) {
 					originalValue == 'Development'
 					value == 'Development'
 				}
@@ -2244,26 +2244,28 @@ class ETLProcessorSpec extends Specification {
 					value == 'Production'
 				}
 
-				with(data[1].fields.id) {
+				with(data[0].fields.id) {
 					originalValue == '152254'
 					value == '152254'
 
-					with(find.query) {
+					find.query.size() == 1
+					with(find.query[0]) {
 						domain == 'Application'
 						kv == [id: '152254']
 					}
 				}
 
-				with(data[2].fields.environment) {
+				with(data[1].fields.environment) {
 					originalValue == 'Production'
 					value == 'Production'
 				}
 
-				with(data[3].fields.id) {
+				with(data[1].fields.id) {
 					originalValue == '152255'
 					value == '152255'
 
-					with(find.query) {
+					find.query.size() == 1
+					with(find.query[0]) {
 						domain == 'Application'
 						kv == [id: '152255']
 					}
@@ -2422,6 +2424,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 
 		and:
 			Project GMDEMO = Mock(Project)
@@ -2465,10 +2468,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						
 						iterate {
 						   // Try to find the Application using different searches
-							find Application by id with assetId for assetId 
-							find Application by assetName, assetType with primaryName, primaryType for assetId 
-							find Application by assetName with primaryName for assetId
-							find Asset by assetName with primaryName for assetId warn 'found with wrong asset class'
+							find Application 'for' assetId by id with assetId  
+							//find Application 'for' assetId by assetName, assetType with primaryName, primaryType 
+							//find Application 'for' assetId by assetName with primaryName
+							//find Asset 'for' assetId by assetName with primaryName warn 'found with wrong asset class'
 							
 						}
 						""".stripIndent(),
@@ -2592,10 +2595,11 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(GMDEMO, applicationDataSet, console, validator)
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -2606,7 +2610,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							domain Application
 							set environment with Production
 							extract 'location' load Vendor
-							find assetName by Vendor
+							find Application 'for' id by assetName by SOURCE.'application id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
