@@ -11,17 +11,18 @@
                 <div class="modal-body-container">
                     <div class="row">
                         <div class="col-md-12">
-                            <button type="button" [disabled]="!script || !filename" (click)="onTestScript()" class="btn btn-default">
-                                {{ 'DATA_INGESTION.ETL_BUILDER.TEST' | translate}}
-                                <span *ngIf="operationStatus.test === 'success'" class="glyphicon glyphicon-ok"></span>
-                                <span *ngIf="operationStatus.test === 'fail'" class="glyphicon glyphicon-remove"></span>
-                            </button>
-                            <button type="button" [disabled]="!script || !filename" (click)="onCheckScriptSyntax()" class="btn btn-default">
-                                <span class="fa fa-fw fa-code" style="font-weight: bold;"></span>
-                                {{ 'DATA_INGESTION.ETL_BUILDER.CHECK_SYNTAX' | translate}}
-                                <span *ngIf="operationStatus.syntax === 'success'" class="glyphicon glyphicon-ok"></span>
-                                <span *ngIf="operationStatus.syntax === 'fail'" class="glyphicon glyphicon-remove"></span>
-                            </button>
+                            <tds-check-action
+                                    [disabled]="!script || !filename"
+                                    [name]="'Test'"
+                                    (click)="onTestScript()"
+                                    [(model)]="operationStatus.test">
+                            </tds-check-action>
+                            <tds-check-action
+                                    [disabled]="!script || !filename"
+                                    [name]="'Check Syntax'"
+                                    (click)="onCheckScriptSyntax()"
+                                    [(model)]="operationStatus.syntax">
+                            </tds-check-action>
                             <button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
                             <button type="button" [disabled]="!scriptTestResult.consoleLog" (click)="onViewConsole()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.VIEW_CONSOLE' | translate}}</button>
                             <button class="pull-right btn btn-default" (click)="toggleSection('code')">
@@ -40,9 +41,8 @@
                                     type="button" class="btn btn-primary btn-resize pull-left">
                                 <span class="fa fa-fw fa-floppy-o"></span>
                                 {{'GLOBAL.SAVE' | translate }}
+                                <i *ngIf="operationStatus.save === 'fail'" class="glyphicon glyphicon-remove" style="margin-left: 3px;"></i>
                             </button>
-                            <span *ngIf="operationStatus.save === 'success'" class="glyphicon glyphicon-ok" style="margin-top: 7px; margin-left: 10px;"></span>
-                            <span *ngIf="operationStatus.save === 'fail'" class="glyphicon glyphicon-remove" style="margin-top: 7px; margin-left: 10px;"></span>
                             <button (click)="cancelCloseDialog()"
                                     type="button" class="btn btn-default btn-resize pull-right">
                                 <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>

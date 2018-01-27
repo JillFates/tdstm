@@ -42,4 +42,11 @@ export class CodeMirrorComponent implements AfterViewInit {
 			this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
 		}
 	}
+
+	public clearSyntaxErrors(): void {
+		const elems = this.instance.display.lineDiv.querySelectorAll('.line-with-syntax-errors');
+		for (let elem of elems) {
+			elem.classList.remove('line-with-syntax-errors');
+		}
+	}
 }
