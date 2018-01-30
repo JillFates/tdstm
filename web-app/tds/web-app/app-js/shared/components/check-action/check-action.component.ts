@@ -24,7 +24,7 @@ import {CHECK_ACTION} from './model/check-action.model';
 })
 
 export class CheckActionComponent implements DoCheck {
-	@Output('click') onCallback: EventEmitter<any> = new EventEmitter();
+	@Output('onClick') onCallback: EventEmitter<any> = new EventEmitter();
 	@Input('model') model: any;
 	@Input('name') name: string;
 	@Input('disabled') disabled = false;
@@ -58,10 +58,18 @@ export class CheckActionComponent implements DoCheck {
 	}
 
 	/**
+	 * Determine is buttons should be disabled.
+	 * @returns {boolean}
+	 */
+	private preventClick(): boolean {
+		return this.model.state === CHECK_ACTION.VALID || this.disabled;
+	}
+
+	/**
 	 * Return the event so it can be managed by the Parent
 	 */
 	protected onCheckThumbBindAction(): void {
-		if (this.model.state !== CHECK_ACTION.VALID) {
+		if (!this.preventClick()) {
 			this.onCallback.emit();
 		}
 	}
