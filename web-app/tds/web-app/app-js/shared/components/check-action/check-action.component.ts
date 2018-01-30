@@ -27,7 +27,7 @@ export class CheckActionComponent implements DoCheck {
 	@Output('click') onCallback: EventEmitter<any> = new EventEmitter();
 	@Input('model') model: any;
 	@Input('name') name: string;
-	@Input('disabled') disabled = false
+	@Input('disabled') disabled = false;
 	private checkActionModel = CHECK_ACTION;
 
 	private differ: any;
