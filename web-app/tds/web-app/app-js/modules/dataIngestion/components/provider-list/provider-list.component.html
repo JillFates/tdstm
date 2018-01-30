@@ -8,9 +8,9 @@
 						[filter]="filter"
 						[filterable]="true"
 						(filterChange)="filterChange($event)"
-						[pageSize]="10"
-						[pageable]="{ pageSizes: true, info: true}"
+						[pageSize]="defaultPageSize"
 						(cellClick)="cellClick($event)"
+						[pageable]="{ pageSizes: defaultPageOptions , info: true}"
 						[selectable]="true"
 						[rowSelected]="isRowSelected">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
