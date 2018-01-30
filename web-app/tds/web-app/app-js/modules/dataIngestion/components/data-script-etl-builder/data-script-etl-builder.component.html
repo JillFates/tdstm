@@ -14,13 +14,13 @@
                             <tds-check-action
                                     [disabled]="!script || !filename"
                                     [name]="'Test'"
-                                    (click)="onTestScript()"
+                                    (onClick)="onTestScript()"
                                     [(model)]="operationStatus.test">
                             </tds-check-action>
                             <tds-check-action
                                     [disabled]="!script || !filename"
                                     [name]="'Check Syntax'"
-                                    (click)="onCheckScriptSyntax()"
+                                    (onClick)="onCheckScriptSyntax()"
                                     [(model)]="operationStatus.syntax">
                             </tds-check-action>
                             <button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
