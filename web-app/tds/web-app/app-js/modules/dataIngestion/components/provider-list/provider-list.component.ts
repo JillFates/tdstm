@@ -11,6 +11,7 @@ import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../model/data-script.mod
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
+import {PageChangeEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'provider-list',
@@ -25,11 +26,15 @@ export class ProviderListComponent {
 	public providerColumnModel = new ProviderColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
-	public gridData: any[];
+	public gridData = {
+		data: [],
+		total: 0
+	};
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
 	public defaultPageSize = MAX_DEFAULT;
 	public defaultPageOptions = MAX_OPTIONS;
+	public skip = 0;
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
@@ -41,14 +46,14 @@ export class ProviderListComponent {
 		providers.subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.gridData = filterBy(this.resultSet, this.filter);
+				this.loadPageData();
 			},
 			(err) => console.log(err));
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
 		this.filter = filter;
-		this.gridData = filterBy(this.resultSet, filter);
+		this.loadPageData();
 	}
 
 	protected onFilter(column: any): void {
@@ -152,7 +157,7 @@ export class ProviderListComponent {
 		this.dataIngestionService.getProviders().subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.gridData = filterBy(this.resultSet, this.filter);
+				this.gridData.data = filterBy(this.resultSet, this.filter);
 			},
 			(err) => console.log(err));
 	}
@@ -177,5 +182,24 @@ export class ProviderListComponent {
 	private selectRow(dataItemId: number): void {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
+	}
+
+	/**
+	 * Manage Pagination
+	 * @param {PageChangeEvent} event
+	 */
+	public pageChange(event: PageChangeEvent): void {
+		this.skip = event.skip;
+		this.loadPageData();
+	}
+
+	/**
+	 * Change the Model to the Page + Filter
+	 */
+	public loadPageData(): void {
+		this.gridData = {
+			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.filter),
+			total: this.resultSet.length
+		};
 	}
 }
