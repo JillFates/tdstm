@@ -9,6 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {COLUMN_MIN_WIDTH, Flatten, ActionType} from '../../model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
+import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 
 @Component({
@@ -27,6 +28,8 @@ export class ProviderListComponent {
 	public gridData: any[];
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
+	public defaultPageSize = MAX_DEFAULT;
+	public defaultPageOptions = MAX_OPTIONS;
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
