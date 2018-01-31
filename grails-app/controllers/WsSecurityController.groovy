@@ -15,6 +15,6 @@ class WsSecurityController implements ControllerMethods {
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def permissions(){
-		renderSuccessJson(securityService.currentUserPermissionList())
+		renderSuccessJson(securityService.currentUserPermissionMap())
 	}
 }
