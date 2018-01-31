@@ -1,8 +1,11 @@
 package com.tdsops.etl
 
 /**
- *
- *
+ * Defines a Row Facade used in commands like the following:
+ * <pre>
+ *		find Application 'for' id by id with SOURCE.'application id'
+ * </pre>
+ * Source application will recover the Dataset 'application id'
  */
 class DataSetRowFacade {
 

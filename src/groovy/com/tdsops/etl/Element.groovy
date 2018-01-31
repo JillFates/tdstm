@@ -51,7 +51,7 @@ class Element implements RangeChecker {
         Map<String, ?> fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 
         if (fieldSpec) {
-            field.name = fieldName
+            field.name = fieldSpec.field
             domain = processor.selectedDomain
 
             field.label = fieldSpec.label

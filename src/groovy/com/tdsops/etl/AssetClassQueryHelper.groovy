@@ -34,10 +34,16 @@ class AssetClassQueryHelper {
 		List assets = []
 
 		switch (domain) {
-			case ETLDomain.Application ||
-					ETLDomain.Device ||
-					ETLDomain.Database ||
-					ETLDomain.Storage:
+			case ETLDomain.Application:
+				assets = assetEntities(project, fieldsSpec)
+				break
+			case ETLDomain.Device:
+				assets = assetEntities(project, fieldsSpec)
+				break
+			case ETLDomain.Database:
+				assets = assetEntities(project, fieldsSpec)
+				break
+			case ETLDomain.Storage:
 				assets = assetEntities(project, fieldsSpec)
 				break
 			case ETLDomain.Dependency:
@@ -58,7 +64,7 @@ class AssetClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select AE
+            select count(*)
               from AssetEntity AE
              where  AE.project = :project and $hqlWhere  
         """.stripIndent()
@@ -76,12 +82,13 @@ class AssetClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select AE
+            select count(*)
               from AssetDependency AE
              where $hqlWhere  
         """.stripIndent()
 
-		return AssetDependency.executeQuery(hql, hqlParams(fieldsSpec))
+		Map<String, ?> params = hqlParams(fieldsSpec)
+		return AssetDependency.executeQuery(hql, params)
 	}
 
 	/**

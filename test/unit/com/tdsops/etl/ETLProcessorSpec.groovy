@@ -1,7 +1,9 @@
 package com.tdsops.etl
 
+import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -26,7 +28,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(FileSystemService)
-@Mock([DataScript])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
 class ETLProcessorSpec extends Specification {
 
 	@Shared
@@ -2349,12 +2351,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
 			GroovyMock(AssetDependency, global: true)
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
@@ -2374,8 +2370,8 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						read labels
 						domain Dependency
 						iterate {
-							extract assetdependencyid load id
-							find Dependency 'for' id by id with DOMAIN.'id'
+							extract AssetDependencyId load id
+							find Dependency 'for' id by id with DOMAIN.id
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2388,12 +2384,40 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect {it.toString()}
 
-				(1..14).eachWithIndex { int value, int index ->
-					with(data[index].fields.id.find) {
+
+				with(data[0].fields.id) {
+					find.size == 1
+					find.results == [ 1 ]
+					find.matchOn == 1
+					find.query.size() == 1
+					find.query[0].domain == ETLDomain.Dependency.name()
+					find.query[0].kv.id == '1'
+				}
+
+				with(data[1].fields.id) {
+					find.size == 1
+					find.results == [ 2 ]
+					find.matchOn == 1
+					find.query.size() == 1
+					find.query[0].domain == ETLDomain.Dependency.name()
+					find.query[0].kv.id == '2'
+				}
+
+				with(data[2].fields.id) {
+					find.size == 1
+					find.results == [ 3 ]
+					find.matchOn == 1
+					find.query.size() == 1
+					find.query[0].domain == ETLDomain.Dependency.name()
+					find.query[0].kv.id == '3'
+				}
+
+				(3..13).each { int value ->
+					with(data[value].fields.id.find) {
 						query.size() == 1
 						with(query[0]) {
 							domain == ETLDomain.Dependency.name()
-							kv.id == value.toString()
+							kv.id == (value + 1).toString()
 						}
 					}
 				}
@@ -2402,6 +2426,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		cleanup:
 			service.deleteTemporaryFile(fileName)
 	}
+
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
 
@@ -2478,13 +2503,13 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(AssetEntity, global: true)
+			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
 		and:
-			GroovyMock(AssetDependency, global: true)
+			GroovySpy(AssetDependency, global: true)
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
 			}
@@ -2504,20 +2529,21 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 						
-							extract assetdependencyid load id
+							extract AssetDependencyId load id
 							find Dependency 'for' id by id with DOMAIN.id
 							
 							// Process the PRIMARY asset in the dependency
-    						extract assetid load asset
+    						extract AssetId load asset
 							
 							// Set some local variables to be reused
-							extract assetname set primaryName
-							extract assettype set primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application 'for' asset by id with DOMAIN.asset 
    							elseFind Application 'for' asset by assetName, assetType with SOURCE.'assetname', primaryType
        						elseFind Application 'for' asset by assetName with SOURCE.'dependentname'
     						elseFind Asset 'for' asset by assetName with SOURCE.'dependentname' warn 'found with wrong asset class'
+    						
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2578,6 +2604,144 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can grab the reference to the FINDINGS to be used later'() {
+
+		given:
+			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> assetEntities = [
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					[id: 1l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+					[id: 2l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+					[id: 3l, asset: assetEntities.find {it.getId() == 151954l}, dependent: assetEntities.find {it.getId() == 152402l}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovySpy(AssetDependency, global: true)
+			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+						
+							extract AssetDependencyId load id
+							find Dependency 'for' id by id with DOMAIN.id
+							
+							// Grab the reference to the FINDINGS to be used later. 
+							def primaryFindings = FINDINGS
+	
+							if (primaryFindings.size() > 0 ){
+							 	set comment with 'Asset results found'		
+							} else {
+							 	set comment with 'Asset results not found'
+							}
+						}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+				fields == ['id', 'comment'] as Set
+				data.size() == 14
+				data.collect { it.fields.id.value } == (1..14).collect{ it.toString() }
+
+				// Validates command: find Application 'for' asset by id with DOMAIN.asset
+				(1..13).eachWithIndex { int value, int index ->
+					with(data[index].fields.id.find) {
+						query.size() == 1
+						with(query[0]) {
+							domain == ETLDomain.Dependency.name()
+							kv.id == value.toString()
+						}
+					}
+				}
+				// Validates command: set comment with 'Asset results found'
+				data[0..2].collect { it.fields.comment.value }.unique() == ['Asset results found']
+				data[3..data.size()-1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
 
 		given:
@@ -2627,12 +2791,8 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						
 						iterate {
-						   // Try to find the Application using different searches
-							find Application 'for' asset by id with assetId  
-							//find Application 'for' assetId by assetName, assetType with primaryName, primaryType 
-							//find Application 'for' assetId by assetName with primaryName
-							//find Asset 'for' assetId by assetName with primaryName warn 'found with wrong asset class'
-							
+							extract 'application id' load asset
+							find Application 'for' asset by id with DOMAIN.asset  
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -2640,23 +2800,14 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+				domain == ETLDomain.Dependency.name()
 
-				with(data[1].fields.id) {
+				with(data[0].fields.asset) {
 					originalValue == '152254'
 					value == '152254'
 				}
 
-				with(data[2].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[3].fields.id) {
+				with(data[1].fields.asset) {
 					originalValue == '152255'
 					value == '152255'
 				}
@@ -2723,7 +2874,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'Project not defined.'
 	}
 
-	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value'() {
+	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
 
 		given:
 			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
@@ -2735,23 +2886,29 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			Project TMDEMO = Mock(Project)
 			TMDEMO.getId() >> 125612l
 
-			List<AssetEntity> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			List<Application> applications = [
+					[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
 			].collect {
-				AssetEntity mock = Mock()
+				Application mock = Mock()
 				mock.getId() >> it.id
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
+				mock.getAssetName() >> it.assetName
 				mock.getProject() >> it.project
+				mock.getAppVendor() >> it.appVendor
 				mock
 			}
 
 		and:
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
+				if(args.containsKey('id')){
+					applications.findAll { it.getId() == args.id && it.project.id == args.project.id }
+				} else {
+					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
+				}
+
 			}
 
 		and:
@@ -2769,48 +2926,72 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						iterate {
 							domain Application
 							set environment with Production
-							extract 'location' load Vendor
-							find Application 'for' id by assetName by SOURCE.'application id'
+							extract 'vendor name' load Vendor
+							extract 'application id' load id
+							find Application 'for' id by id with SOURCE.'application id'
+							elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
 
-			with(etlProcessor.results.get(ETLDomain.Application)[0]) {
+				with(data[0]) {
+					fields.environment.originalValue == 'Production'
+					fields.environment.value == 'Production'
 
-				with(elements[0]) {
-					originalValue == "Production"
-					value == "Production"
-					field.name == "environment"
+					fields.appVendor.originalValue == 'Microsoft'
+					fields.appVendor.value == 'Microsoft'
+
+					fields.id.originalValue == '152254'
+					fields.id.value == '152254'
+
+					// Validating queries
+					with(fields.id.find) {
+						query[0].domain == ETLDomain.Application.name()
+						query[0].kv == [id :'152254']
+
+						query[1].domain == ETLDomain.Application.name()
+						query[1].kv == [appVendor : 'Microsoft']
+
+						size == 1
+						results == [ 152254 ]
+						matchOn == 1
+					}
+
+					!fields.id.warn
+					!fields.id.warnMsg
 				}
 
-				with(elements[1]) {
-					originalValue == "ACME Data Center"
-					value == "ACME Data Center"
-					field.name == "Vendor"
-					field.label == "Vendor"
+				with(data[1]) {
+					fields.environment.originalValue == 'Production'
+					fields.environment.value == 'Production'
+
+					fields.appVendor.originalValue == 'Mozilla'
+					fields.appVendor.value == 'Mozilla'
+
+					fields.id.originalValue == '152255'
+					fields.id.value == '152255'
+
+					// Validating queries
+					with(fields.id.find) {
+						query[0].domain == ETLDomain.Application.name()
+						query[0].kv == [id :'152255']
+
+						query[1].domain == ETLDomain.Application.name()
+						query[1].kv == [appVendor : 'Mozilla']
+
+						size == 1
+						results == [ 152253 ]
+						matchOn == 2
+					}
+
+					fields.id.warn
+					fields.id.warnMsg == 'found without asset id field'
 				}
-
-				reference == [152254, 152255]
-			}
-
-			with(etlProcessor.results.get(ETLDomain.Application)[1]) {
-
-				with(elements[0]) {
-					originalValue == "Production"
-					value == "Production"
-					field.name == "environment"
-				}
-
-				with(elements[1]) {
-					originalValue == "ACME Data Center"
-					value == "ACME Data Center"
-					field.name == "Vendor"
-					field.label == "Vendor"
-				}
-
-				reference == [152254, 152255]
 			}
 	}
 
@@ -3028,6 +3209,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						buildFieldSpec('assetName', 'AssetName'),
 						buildFieldSpec('assetType', 'AssetType'),
 						buildFieldSpec('asset', 'Asset'),
+						buildFieldSpec('comment', 'Comment'),
+						buildFieldSpec('status', 'Status'),
+						buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
+						buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
 				]
 				break
 			case AssetClass.STORAGE:

@@ -22,6 +22,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	static final String SOURCE_VARNAME = 'SOURCE'
 	/**
+	 * Static variable name definition for SOURCE script variable
+	 */
+	static final String FINDINGS_VARNAME = 'FINDINGS'
+	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -159,8 +163,10 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Iterates a given number of rows based on its ordinal position
 	 * <code>
-	 * from 1, 3, 5 iterate {*       ......
-	 *}* </code>
+	 * from 1, 3, 5 iterate {
+	 * 			......
+	 * }
+	 * </code>
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
@@ -190,14 +196,9 @@ class ETLProcessor implements RangeChecker {
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
+
 			closure(addCrudRowData(currentRowIndex, row))
 
-			currentRowResult.each { ETLDomain key, ReferenceResult value ->
-				if (!results.containsKey(key)) {
-					results[key] = []
-				}
-				results[key].add(value)
-			}
 			currentRowResult = [:]
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
@@ -345,10 +346,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	def extract (String columnName) {
 
-		if (!columnsMap.containsKey(columnName)) {
+		if (!columnsMap.containsKey(columnName.toLowerCase())) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
 		}
-		currentColumnIndex = columnsMap[columnName].index
+		currentColumnIndex = columnsMap[columnName.toLowerCase()].index
 
 		doExtract()
 	}
@@ -366,11 +367,21 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * Set field values in results. From an extracted value or just as a fixed new Element
+	 * Set field values in results. From an extracted value or just as a fixed new Element.
+	 * Set an Element that create new results loading values without extract previously
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		set environment with Production
+	 *		set environment with SOURCE.'application id'
+	 *		set environment with DOMAIN.id
+	 *		.....
+	 *	}
+	 * </pre>
 	 * @param field
 	 * @return
 	 */
-	def set (final String field) {
+	def set(final String field) {
 
 		[
 				with: { value ->
@@ -408,6 +419,7 @@ class ETLProcessor implements RangeChecker {
 
         debugConsole.info("find Domain: $findDomain")
 		currentFindElement = new ETLFindElement(this, findDomain)
+		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
 		return currentFindElement
 	}
 
@@ -572,18 +584,18 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * And an entry for a finding command results.
+	 * Adds an entry for a finding command results.
 	 * @param findElement
 	 */
 	void addFindElement(ETLFindElement findElement) {
 		result.addFindElement(findElement)
 	}
 	/**
-	 * And an entry in the Dependency results.
+	 * Adds a warn message in the current result
 	 * @param findElement
 	 */
-	void addDependencyWarnMessage(ETLFindElement findElement) {
-		//result.addDependency(findElement)
+	void addFindWarnMessage(ETLFindElement findElement) {
+		result.addFindWarnMessage(findElement)
 	}
 	/**
 	 * Applies a global transformation for a given element

@@ -58,8 +58,25 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Adds a find Element to the TEL Processor result
-	 * @param findElement an instance of ETLFindElement
+	 * Adds a find Element to the ETL Processor result.
+	 * It also prepares query map results.
+	 * with the domain.data following the current format:
+	 * <pre>
+	 *  [
+	 *  	"size": 3,
+	 * 		"matchOn": 2,
+	 * 		"results": [
+	 * 			115123,
+	 * 			115123,
+	 * 			115123
+	 * 		]
+	 * 	]
+	 * </pre>
+	 * Size is the total amount of results. Results are the id of the domain classes
+	 * collected by the find command, and matcOn defines the ordinal position
+	 * in the query object list where those results where found.
+	 * @param findElement is an instance of ETLFindElement
+	 * 			used to calculate a query data result
 	 */
 	void addFindElement(ETLFindElement findElement) {
 
@@ -71,11 +88,35 @@ class ETLProcessorResult {
 			throw ETLProcessorException.invalidFindCommand(dependentId)
 		}
 
-		data.fields[dependentId].find.query.add([
+		Map<String, ?> find = data.fields[dependentId].find
+
+		find.query.add([
 				domain: findElement.currentFind.domain,
 				kv    : findElement.currentFind.kv
 		])
 
+		if (findElement.results) {
+			find.size = findElement.results.size
+			find.results = findElement.results.objects.collect {it.id}
+			find.matchOn = findElement.results.matchOn
+		}
+	}
+
+	/**
+	 * Ass a war message in the result instance
+	 * <pre>
+	 *		find Application 'for' id by id with SOURCE.'application id'
+	 *		elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
+	 * <pre>
+	 * @param findElement
+	 */
+	void addFindWarnMessage(ETLFindElement findElement) {
+
+		if(findElement.currentFind.objects){
+			Map<String, ?> data = reference.data.last()
+			data.fields[findElement.currentFind.dependentId].warn = true
+			data.fields[findElement.currentFind.dependentId].warnMsg = findElement.warnMessage
+		}
 	}
 
 	/**
@@ -91,6 +132,7 @@ class ETLProcessorResult {
 				value        : element.value,
 				originalValue: element.originalValue,
 				error        : false,
+				warn     : false,
 				find         : [
 						query: []
 				]
@@ -103,7 +145,7 @@ class ETLProcessorResult {
 	 */
 	Map<String, ?> currentData() {
 
-		if(reference.data.size() < processor.currentRowIndex){
+		if (reference.data.size() < processor.currentRowIndex) {
 			Map data = [
 					op       : 'I',
 					warn     : false,

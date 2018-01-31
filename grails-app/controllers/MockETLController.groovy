@@ -114,7 +114,7 @@ iterate {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.results as JSON),
+                jsonResult          : (etlProcessor?.result.domains as JSON),
                 dataScriptId        : params.dataScriptId,
                 providerName        : params.providerName,
                 dataScriptName      : params.dataScriptName,

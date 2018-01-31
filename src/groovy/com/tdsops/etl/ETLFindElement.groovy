@@ -15,7 +15,9 @@ package com.tdsops.etl
 class ETLFindElement {
 
 	ETLProcessor processor
+	String warnMessage
 	Map<String, ?> currentFind = [:]
+	Map<String, ?> results
 	List<Map<String, ?>> findings = []
 
 	/**
@@ -90,10 +92,20 @@ class ETLFindElement {
 				currentFind.values
 		].transpose().collectEntries { it }
 
-		currentFind.assets = AssetClassQueryHelper.where(
-				ETLDomain.lookup(currentFind.domain),
-				processor.project,
-				currentFind.kv)
+		if (!results) {
+			currentFind.objects = AssetClassQueryHelper.where(
+					ETLDomain.lookup(currentFind.domain),
+					processor.project,
+					currentFind.kv)
+
+			if (!currentFind.objects.isEmpty()) {
+				results = [
+						size  : currentFind.objects.size(),
+						objects: currentFind.objects,
+						matchOn: findings.size() + 1
+				]
+			}
+		}
 		processor.addFindElement(this)
 		this
 	}
@@ -146,8 +158,8 @@ class ETLFindElement {
 	}
 
 	ETLFindElement warn(String message) {
-		this.currentFind.warnMessage = message
-		this.processor.addDependencyWarnMessage(this)
+		this.warnMessage = message
+		this.processor.addFindWarnMessage(this)
 		this
 	}
 
@@ -170,4 +182,22 @@ class ETLFindElement {
 		]
 	}
 
+	/**
+	 * Defines if an instance of ETLFindElement has results or not
+	 * @return true if the instance has result or false
+	 * 				if there is any result yet
+	 */
+	boolean hasResults() {
+		return results != null
+	}
+
+	/**
+	 * Returns the size of results
+	 * @return a positive integer value.
+	 * 			A number bigger than 0 when there is results
+	 * 			or 0 in there is not results yet
+	 */
+	int resultSize() {
+		return hasResults() ? results.objects.size(): 0
+	}
 }

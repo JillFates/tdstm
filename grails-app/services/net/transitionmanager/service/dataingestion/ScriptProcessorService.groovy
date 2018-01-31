@@ -26,8 +26,8 @@ class ScriptProcessorService {
      * @param fileName
      * @return
      */
-    Map<ETLDomain, List<ReferenceResult>> execute (Project project, String scriptContent, String fileName) {
-        process(project, scriptContent, fileName).results
+    ETLProcessorResult execute (Project project, String scriptContent, String fileName) {
+        return process(project, scriptContent, fileName).result
     }
 
     /**
@@ -51,7 +51,7 @@ class ScriptProcessorService {
 
         new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
-        etlProcessor
+        return etlProcessor
     }
 
     /**
@@ -72,7 +72,7 @@ class ScriptProcessorService {
         validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
         validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
         validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
-        validator
+        return validator
     }
 
     /**
@@ -105,9 +105,9 @@ class ScriptProcessorService {
         }
 
         result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = etlProcessor?.results
+        result.data = etlProcessor?.result.domains
 
-        result
+        return result
     }
 
     /**
@@ -178,7 +178,7 @@ class ScriptProcessorService {
         log.info "Updating DataScript ID: ${dataScript.id} with the following script content: ${scriptContent}"
         dataScript.etlSourceCode = scriptContent
         dataScript.save(failOnError: true)
-        dataScript
+        return dataScript
     }
 
 }
