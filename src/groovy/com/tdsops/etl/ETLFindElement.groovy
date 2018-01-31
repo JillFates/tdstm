@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.GormUtil
+
 /**
  * ETL find command implementation.
  * <code>
@@ -169,6 +171,9 @@ class ETLFindElement {
 	 * @param fieldName an asset field name
 	 */
 	private Map<String, ?> checkAssetFieldSpec(String fieldName) {
+
+		//GormUtil.isDomainProperty() && GormUtil.isReferenceProperty()
+
 		return processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 	}
 

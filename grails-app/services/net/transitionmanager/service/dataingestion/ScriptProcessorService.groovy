@@ -47,7 +47,7 @@ class ScriptProcessorService {
 
         ETLAssetClassFieldsValidator validator = createFieldsSpecValidator(project)
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator)
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 
         new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
@@ -92,7 +92,7 @@ class ScriptProcessorService {
             CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
 
             etlProcessor = new ETLProcessor(project,
-                    new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true),
+                    new DataSetFacade(new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
@@ -105,7 +105,7 @@ class ScriptProcessorService {
         }
 
         result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = etlProcessor?.result.domains
+        result.data = [ETLInfo: etlProcessor.result.ETLInfo, domains: etlProcessor.result.domains]
 
         return result
     }
@@ -136,7 +136,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, new ETLAssetClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLAssetClassFieldsValidator())
 
         List<Map<String, ?>> errors = []
 

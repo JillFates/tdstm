@@ -41,8 +41,7 @@ iterate {
     extract 3 transform with uppercase() load description
     
     set environment with 'Production'
-    //reference id with id
-    reference assetName, id with Name, id
+    find Application 'for' id with id
 
     domain Device
     
@@ -114,7 +113,7 @@ iterate {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.result.domains as JSON),
+                jsonResult          : (etlProcessor?.result?.domains as JSON),
                 dataScriptId        : params.dataScriptId,
                 providerName        : params.providerName,
                 dataScriptName      : params.dataScriptName,

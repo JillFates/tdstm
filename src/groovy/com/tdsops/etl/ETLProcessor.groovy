@@ -56,8 +56,6 @@ class ETLProcessor implements RangeChecker {
 
 	ETLDomain selectedDomain
 	ETLFindElement currentFindElement
-	@Deprecated
-	Map<ETLDomain, List<ReferenceResult>> results = [:]
 	Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
 	Set globalTransformers = [] as Set
