@@ -11,24 +11,19 @@ class DataSetFacade {
 		this.dataSet = dataSet
 	}
 
-	Object getProperty(String name) {
-
-
-	}
-
 	/**
 	 * Return rows from dataset
 	 * @return
 	 */
 	List<Map> rows() {
-		dataSet.rows()
+		return dataSet.rows()
 	}
 
 	/**
 	 * Count reading rows from dataset
 	 */
 	Long readRows() {
-		dataSet.readRows
+		return dataSet.readRows
 	}
 
 	/**
@@ -36,6 +31,14 @@ class DataSetFacade {
 	 * @return a list of GETL fields
 	 */
 	List<Field> fields() {
-		dataSet.connection.driver.fields(dataSet)
+		return dataSet.connection.driver.fields(dataSet)
+	}
+
+	/**
+	 * Returns the original file name from dataset instance.
+	 * @return a String value with the filename
+	 */
+	String fileName(){
+		return dataSet.params.fileName
 	}
 }

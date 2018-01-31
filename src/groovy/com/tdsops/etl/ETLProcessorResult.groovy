@@ -15,7 +15,7 @@ class ETLProcessorResult {
 	/**
 	 * ETL info map details
 	 */
-	Map<String, ?> ETLInfo = [:]
+	Map<String, ?> ETLInfo
 
 	/**
 	 *
@@ -31,6 +31,9 @@ class ETLProcessorResult {
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
+		this.ETLInfo = [
+				originalFilename: processor.dataSetFacade.fileName()
+		]
 	}
 	/**
 	 * Adds a new json entry in results list

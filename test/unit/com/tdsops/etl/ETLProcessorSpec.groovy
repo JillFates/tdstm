@@ -1458,6 +1458,7 @@ class ETLProcessorSpec extends Specification {
 					ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == 'Application'
