@@ -18,6 +18,7 @@ class ETLFindElement {
 
 	ETLProcessor processor
 	String warnMessage
+	ETLDomain currentDomain
 	Map<String, ?> currentFind = [:]
 	Map<String, ?> results
 	List<Map<String, ?>> findings = []
@@ -54,7 +55,7 @@ class ETLFindElement {
 	 * @return
 	 */
 	ETLFindElement 'for'(String dependentId) {
-		checkAssetFieldSpec(dependentId)
+		checkAssetFieldReference(dependentId)
 		currentFind.dependentId = dependentId
 		this
 	}
@@ -171,13 +172,28 @@ class ETLFindElement {
 	 * @param fieldName an asset field name
 	 */
 	private Map<String, ?> checkAssetFieldSpec(String fieldName) {
-
-		//GormUtil.isDomainProperty() && GormUtil.isReferenceProperty()
-
 		return processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 	}
 
+	/**
+	 * Checks
+	 * @param fieldName
+	 */
+	void checkAssetFieldReference(String fieldName){
+
+		Class<?> clazz = ETLDomain.lookupDomainClass(currentDomain)
+
+		if(!GormUtil.isDomainProperty(clazz.newInstance(), fieldName)) {
+			throw ETLProcessorException.invalidDomainPropertyName(currentDomain, fieldName)
+		}
+		if(!GormUtil.isDomainIdentifier(clazz, fieldName) &&
+				!GormUtil.isReferenceProperty(clazz.newInstance(), fieldName)){
+			throw ETLProcessorException.invalidDomainReference(currentDomain, fieldName)
+		}
+	}
+
 	private void setCurrentDomain(ETLDomain domain) {
+		currentDomain = domain
 		currentFind = [
 				domain     : domain.name(),
 				fields     : [],

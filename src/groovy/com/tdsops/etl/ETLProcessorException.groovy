@@ -95,9 +95,20 @@ class ETLProcessorException extends GroovyRuntimeException {
 		new ETLProcessorException("Find commands does not have dependant definition using multiple field names ${fields.join(',')}".toString())
 	}
 
-	static ETLProcessorException invalidFindCommand (String dependentId) {
-		new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value".toString())
-	}
+    static ETLProcessorException invalidFindCommand (String dependentId) {
+        new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value".toString())
+    }
+
+    static ETLProcessorException invalidDomainPropertyName (ETLDomain domain, String fieldName) {
+        new ETLProcessorException("$fieldName is not a domain property for ${domain.name()}".toString())
+    }
+
+    static ETLProcessorException invalidDomainReference (ETLDomain domain, String fieldName) {
+		new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
+    }
+
+
+
 
 
 

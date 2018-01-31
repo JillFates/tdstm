@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -2357,6 +2358,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -2515,6 +2528,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -2547,8 +2572,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
-
-			def json = JsonOutput.toJson(etlProcessor.result.domains)
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -2686,6 +2709,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -2777,6 +2812,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					applicationDataSet,
@@ -2848,6 +2895,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					applicationDataSet,
@@ -2909,6 +2968,18 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
 				}
 
+			}
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
 			}
 
 		and:
