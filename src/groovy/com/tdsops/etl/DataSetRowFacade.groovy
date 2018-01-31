@@ -5,7 +5,7 @@ package com.tdsops.etl
  * <pre>
  *		find Application 'for' id by id with SOURCE.'application id'
  * </pre>
- * Source application will recover the Dataset 'application id'
+ * Source application will recover the Dataset 'application id' over each row
  */
 class DataSetRowFacade {
 

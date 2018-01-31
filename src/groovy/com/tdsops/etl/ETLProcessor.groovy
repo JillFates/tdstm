@@ -4,8 +4,18 @@ import com.tds.asset.AssetEntity
 import net.transitionmanager.domain.Project
 
 /**
- *
- *
+ * Class that receives all the ETL initial commands.
+ * <pre>
+ *	extract dataSetFieldName load assetFieldName
+ *	set assetFieldName with 'A simple label value'
+ *  iterate {
+ *     ....
+ *  }
+ * </pre>
+ * There is a method for each one of this methods in ETLProcessor class.
+ * @see com.tdsops.etl.ETLProcessor#load
+ * @see com.tdsops.etl.ETLProcessor#set
+ * @see com.tdsops.etl.ETLProcessor#iterate
  */
 class ETLProcessor implements RangeChecker {
 
@@ -36,8 +46,20 @@ class ETLProcessor implements RangeChecker {
 	 * @see getl.data.Field
 	 */
 	DataSetFacade dataSetFacade
+	/**
+	 * An instance of this interface should be assigned
+	 * to be used in fieldSpec validations
+	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 */
 	ETLFieldsValidator fieldsValidator
+	/**
+	 * Represents the variable bindings of an ETL script.
+	 */
 	ETLBinding binding
+	/**
+	 * Object where all the results will be collected
+	 * when an ETL script is being executing.
+	 */
 	ETLProcessorResult result
 
 	Integer currentRowIndex = 0
@@ -46,7 +68,9 @@ class ETLProcessor implements RangeChecker {
 	 * Current Element. Assigned and exposed in dsl scripts using 'CURR_ELEMENT_VARNAME' number
 	 */
 	Element currentElement
-
+	/**
+	 * A debug output assignable in the ETLProcessor creation
+	 */
 	DebugConsole debugConsole
 
 	List<Column> columns = []
@@ -58,6 +82,9 @@ class ETLProcessor implements RangeChecker {
 	ETLFindElement currentFindElement
 	Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
+	/**
+	 * A set of Global transformations that will be apply over each iteration
+	 */
 	Set globalTransformers = [] as Set
 
 	static Trimmer = { Element element ->
@@ -100,11 +127,9 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 *
 	 * Selects a domain or throws an ETLProcessorException in case of an invalid domain
-	 *
-	 * @param domain
-	 * @return
+	 * @param domain a domain String value
+	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor domain (String domain) {
 		selectedDomain = ETLDomain.values().find { it.name() == domain }
@@ -140,8 +165,10 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Iterate command from one row to another one using their position in the DataSet.
 	 * <code>
-	 *  from 1 to 3 iterate {*   ..........
-	 *}*  <code>
+	 *  from 1 to 3 iterate {
+	 *  	...
+	 *  }
+	 * <code>
 	 * @param from
 	 * @return a Map with the next steps in this command.
 	 */
