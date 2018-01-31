@@ -1,7 +1,10 @@
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.*
@@ -13,7 +16,7 @@ import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import spock.lang.Specification
 
 @TestFor(ScriptProcessorService)
-@Mock([DataScript, Project, Database, AssetEntity, Setting])
+@Mock([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
 class ScriptProcessorServiceSpec extends Specification {
 
     String sixRowsDataSetFileName
@@ -147,6 +150,18 @@ class ScriptProcessorServiceSpec extends Specification {
             GroovyMock(AssetEntity, global: true)
             AssetEntity.executeQuery(_, _) >> { String query, Map args ->
                 applications.findAll { it.id == args.id && it.project.id == args.project.id }
+            }
+
+        and:
+            GroovyMock(GormUtil, global: true)
+            GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+                true
+            }
+            GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+                propertyName == 'id'
+            }
+            GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+                true
             }
 
         and:

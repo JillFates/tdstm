@@ -378,7 +378,7 @@ public class GormUtil {
 	 * @return tru if property is an identifier for clazz parameter
 	 */
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
-		getDomainClass(clazz).identifier.name == propertyName
+		getDomainClass(clazz)?.identifier.name == propertyName
 	}
 
 	static boolean hasStringId(Class clazz) {
