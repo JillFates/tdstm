@@ -3,7 +3,7 @@
  * UI Active Dialog its a singleton intance of the current opened dialog and provide the way to close it and access
  * its component
  */
-import { Injectable, ComponentRef } from '@angular/core';
+import {Injectable, ComponentRef, HostListener, AfterViewInit, OnInit} from '@angular/core';
 import { NotifierService } from './notifier.service';
 
 @Injectable()
@@ -31,14 +31,16 @@ export class UIDialogService {
 		});
 	}
 
-	extra(component: any, params: Array<any>): Promise<any> {
+	extra(component: any, params: Array<any>, enableEsc = false, draggable = false): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.extra',
 				component: component,
 				params: params,
 				resolve: resolve,
-				reject: reject
+				reject: reject,
+				enableEsc: enableEsc,
+				draggable: draggable
 			});
 		});
 	}
@@ -98,22 +100,47 @@ export class UIActiveDialogService {
 }
 
 declare var jQuery: any;
+const ESCAPE_KEYCODE = 27;
 
 export class UIExtraDialog {
 	modalIntance: any;
 	resolve: any;
 	reject: any;
 	cmpRef: ComponentRef<{}>;
+	private enableEsc = false;
 
-	constructor(private modalSelector: string) {
+	constructor(private modalSelector: string) {}
+
+	@HostListener('document:keydown', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent) {
+		if (event.keyCode === ESCAPE_KEYCODE && this.enableEsc) {
+			this.onEscKeyPressed();
+		}
 	}
 
-	open(resolve, reject, comp: ComponentRef<{}>) {
+	/**
+	 * This function should be overrided by child class if needed to perform specific actions.
+	 */
+	onEscKeyPressed(): void {
+		// override if needed
+	}
+
+	open(resolve, reject, comp: ComponentRef<{}>, enableEsc: boolean, draggable: boolean) {
 		this.resolve = resolve;
 		this.reject = reject;
 		this.cmpRef = comp;
 		this.modalIntance = jQuery(this.modalSelector);
-		this.modalIntance.modal('show');
+		this.enableEsc = enableEsc;
+		// enable/disable exit on ESCAPE key
+		this.modalIntance.modal({
+			keyboard: !enableEsc
+		}).modal('show');
+		// make it draggable
+		if (draggable) {
+			this.modalIntance.draggable({
+				handle: '.modal-header'
+			});
+		}
 	}
 
 	close(value?: any) {

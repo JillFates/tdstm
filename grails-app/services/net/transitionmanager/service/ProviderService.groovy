@@ -58,8 +58,8 @@ class ProviderService implements ServiceMethods {
 
         // Check if it's creating or updating a provider
         if (providerId) {
-            // Find the corresponding provider
-            provider = getProvider(providerId, currentProject)
+            // Find the corresponding provider, fail otherwise
+            provider = getProvider(providerId, currentProject, true)
         } else {
             // If it's creating a new provider, create a new instance.
             provider = new Provider()

@@ -37,6 +37,6 @@ class ApiActionCommand{
     Provider provider
     String reactionScripts
     Integer timeout
-    Integer useWithAsset
-    Integer useWithTask
+    Integer useWithAsset = 0
+    Integer useWithTask = 0
 }
