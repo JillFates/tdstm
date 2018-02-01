@@ -474,7 +474,7 @@ class SecurityServiceTests extends Specification {
         	securityService.assumeUserIdentity(userRoleUser.username, false)
         when:'the securityService.currentUserPermissionAsMap method is called'
         	Map permissions = securityService.currentUserPermissionMap()
-        	then:'a map should be returned containing multiple elements'
+		then:'a map should be returned containing multiple elements'
         	!permissions.isEmpty()
         and:'the map should contain the Permission.UserGeneralAccess permission'
         	permissions.containsKey(Permission.UserGeneralAccess)
@@ -483,12 +483,12 @@ class SecurityServiceTests extends Specification {
     }
 
     def '18. Calling currentUserPermissionAsMap as an authenticated and privileged user' () {
-        given:'a user whom is authenticated has been assigned the ADMIN role'
+		given:'a user whom is authenticated has been assigned the ADMIN role'
         	createPrivAccount()
         	securityService.assumeUserIdentity(privUser.username, false)
         when:'the securityService.currentUserPermissionAsMap method is called'
         	Map permissions = securityService.currentUserPermissionMap()
-        	then:'a map should be returned containing multiple elements'
+        then:'a map should be returned containing multiple elements'
         	!permissions.isEmpty()
         and:'the map should contain the Permission.UserGeneralAccess permission'
         	permissions.containsKey(Permission.UserGeneralAccess)
