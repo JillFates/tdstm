@@ -38,7 +38,6 @@ class ETLBinding extends Binding {
         Object result = variables.get(name)
 
         if (result == null && !variables.containsKey(name)) {
-            //throw new MissingPropertyException(name, this.getClass())
             result = name
         }
 
@@ -48,11 +47,10 @@ class ETLBinding extends Binding {
     /**
      * Adds a new Dynamic variable from an ETL script.
      * It uses name parameter to define it in an internal map definition.
-     *
      * @param name the name of the variable to be added dynamically within the binding context.
      * @param value the ETL Element define for the name variable
      */
-    void addDynamicVariable (String name, Element value) {
+    void addDynamicVariable (String name, def value) {
         dynamicVariables.add(name)
         this.variables[name] = value
     }

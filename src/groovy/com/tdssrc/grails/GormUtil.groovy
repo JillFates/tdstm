@@ -371,6 +371,16 @@ public class GormUtil {
 		}
 	}
 
+	/**
+	 * Validates if a property is an identifier for a domain class
+	 * @param clazz a Class to be used in the identifier detection
+	 * @param propertyName a String with the peroperty name to be used in the validation
+	 * @return tru if property is an identifier for clazz parameter
+	 */
+	static boolean isDomainIdentifier(Class clazz, String propertyName){
+		getDomainClass(clazz)?.identifier.name == propertyName
+	}
+
 	static boolean hasStringId(Class clazz) {
 		getDomainClass(clazz).identifier.type == String
 	}
