@@ -24,7 +24,7 @@ class Provider {
     ]
 
     static constraints = {
-        name size:1..255, unique: 'project'
+        name blank: false, size:1..255, unique: 'project'
         description size:0..255, nullable: true
         comment size:0..65254, nullable: true
         lastUpdated nullable: true
