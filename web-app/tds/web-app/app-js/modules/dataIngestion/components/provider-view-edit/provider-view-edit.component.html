@@ -42,7 +42,7 @@
 		</form>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveProvider()" class="btn btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
+		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveProvider()" class="btn btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique ||  isEmptyValue()"><span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditProvider()" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteProvider()" class="btn btn-danger"><span class="fa fa-fw fa-trash"></span> Delete</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
