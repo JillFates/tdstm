@@ -7,17 +7,19 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.search.FieldSearchData
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
-
 /**
  * Service class with main database operations for Dataview.
  * @see Dataview
  */
 class DataviewService implements ServiceMethods {
+
+	static PartyRelationshipService partyRelationshipService
 
 	SecurityService securityService
 
@@ -355,13 +357,34 @@ class DataviewService implements ServiceMethods {
              where AE.project = :project and $conditions
         """
 
-		log.debug "DataViewService previewQuery hql: ${hql}, count hql: $countHql"
 
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
-		def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
+	    def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
 
-		previewQueryResults(assets, totalAssets[0], dataviewSpec)
+	    Map queryResults = previewQueryResults(assets, totalAssets[0], dataviewSpec)
+
+	    postProcessAssetQuery(queryResults, whereInfo.mixedFields)
+
+	    return queryResults
+
     }
+
+	/**
+	 * After the query for assets is invoked, this method needs to be called
+	 * to perform some final operations on the assets, if needed.
+	 *
+	 * @param assets
+	 * @param mixedFieldsInfo
+	 */
+	private void postProcessAssetQuery(Map queryResults, Map mixedFieldsInfo) {
+		// Check if mixed fields were detected when building the query.
+		if (mixedFieldsInfo) {
+			mixedFieldsInfo.each {field, fieldInfo ->
+				Closure transformer = mixedTransformerFor(field)
+				transformer(queryResults, field, fieldInfo)
+			}
+		}
+	}
 
 	/**
 	 * Retrieve the list of favorite data views for the current person,
@@ -510,22 +533,81 @@ class DataviewService implements ServiceMethods {
 			]
 		}
 
-		dataviewSpec.filterColumns.each { Map column ->
+		// Populate this list with the mix fields that the user is using for filtering.
+		Map<String, List> currentMixedFields = [:]
 
-			FieldSearchData fieldSearchData = new FieldSearchData([
-					column: propertyFor(column),
-					columnAlias: namedParameterFor(column),
-					domain: domainFor(column),
-					filter: filterFor(column)
-			])
+		// The keys for all the declared mixed fields.
+		Set mixedKeys = mixedFields.keySet()
 
-			SqlUtil.parseParameter(fieldSearchData)
 
-			whereConditions << fieldSearchData.sqlSearchExpression
-			whereParams += fieldSearchData.sqlSearchParameters
+		Map additionalInfo = [:]
+
+		// Iterate over each column
+		dataviewSpec.columns.each { Map column ->
+
+			// Check if the user provided a filter expressio.
+			if (filterFor(column)) {
+				// Create a basic FieldSearchData with the info for filtering an individual field.
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						column: propertyFor(column),
+						columnAlias: namedParameterFor(column),
+						domain: domainFor(column),
+						filter: filterFor(column)
+				])
+
+				String property = propertyFor(column)
+				// Check if the current column requires special treatment (e.g. startupBy, etc.)
+
+				if (property in mixedKeys) {
+					// Flag the fieldSearchData as mixed.
+					fieldSearchData.setMixed(true)
+					// Retrieve the additional results (e.g: persons matching the filter).
+					Closure sourceForField = sourceFor(property)
+					Map additionalResults = sourceForField(project, filterFor(column))
+					// Keep a copy of this results for later use.
+					currentMixedFields[property] = additionalResults
+					// Add additional information for the query (e.g: the staff ids for IN clause).
+					Closure paramsInjector = injectWhereParamsFor(property)
+					paramsInjector(fieldSearchData, property, additionalResults)
+					// Add the sql where clause for including the additional fields in the query
+					Closure whereInjector = injectWhereClauseFor(property)
+					whereInjector(fieldSearchData, property)
+				}
+
+				// Trigger the parsing of the parameter.
+				SqlUtil.parseParameter(fieldSearchData)
+
+				// Append the where clause to the list of conditions.
+				whereConditions << fieldSearchData.sqlSearchExpression
+				// Add the parameters required for this field.
+				whereParams += fieldSearchData.sqlSearchParameters
+
+			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
+			} else {
+				String property = propertyFor(column)
+				if (property in mixedKeys) {
+					Closure sourceForField = sourceFor(property)
+					Map additionalResults = sourceForField(project, filterFor(column))
+					// Keep a copy of this results for later use.
+					currentMixedFields[property] = additionalResults
+				}
+
+			}
+
 		}
 
-		return [conditions: whereConditions.join(" AND \n"), params: whereParams]
+		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: currentMixedFields]
+	}
+
+	/**
+	 * Return a list with the id and name for each individual associated with the
+	 * project whose name match the given filter.
+	 * @param project
+	 * @param filter
+	 * @return
+	 */
+	private List<Map> getAssociatedStaff(Project project, String filter) {
+
 	}
 
 
@@ -614,6 +696,141 @@ class DataviewService implements ServiceMethods {
 	private static String filterFor(Map column) {
 		return column.filter
 	}
+
+
+	/**
+	 * Return the closure for fetching additional elements for this
+	 * mixed field.
+	 *
+	 * @param mixedField
+	 * @return
+	 */
+	private static Closure sourceFor(String mixedField) {
+		return mixedFields[mixedField]["source"]
+	}
+
+	/**
+	 * Return the closure that needs to be executed in order to
+	 * do the final replacement/transformation.
+	 *
+	 * @param mixedField
+	 * @return
+	 */
+	private static Closure mixedTransformerFor(String mixedField) {
+		return mixedFields[mixedField]["transform"]
+	}
+
+	private static String mixedAliasFor(String mixedField) {
+		return mixedFields[mixedField]["mixedAlias"]
+	}
+
+	/**
+	 * Return the closure that is executed to add additional where clauses according to the field.
+	 *
+	 * @param mixedField
+	 * @return
+	 */
+	private static Closure injectWhereClauseFor(String mixedField) {
+		return mixedFields[mixedField]["injectWhereClause"]
+	}
+
+	/**
+	 * Return the closure to be executed to perform additional work on the
+	 * given field before triggering the search, like providing the list
+	 * of staff ids for the by properties.
+	 *
+	 * @param mixedField
+	 * @return
+	 */
+	private static Closure injectWhereParamsFor(String mixedField) {
+		return mixedFields[mixedField]["injectWhereParams"]
+	}
+
+	/**
+	 * Return the alias to be used while post processing the query results.
+	 *
+	 * @param field
+	 * @return
+	 */
+	private static String postProcessAliasFor(String field) {
+		return mixedFields[field]["postProcessAlias"]
+	}
+
+	/**
+	 * Tansformer for the By fields that replaces IDs with the
+	 * corresponding person's fullname.
+	 */
+	private static transformByField = { Map queryResults, field,  mixedResults->
+		queryResults.assets.each { asset ->
+			String fieldAlias = postProcessAliasFor(field)
+			String originalValue = asset[fieldAlias]
+			if (NumberUtil.isLong(originalValue)) {
+				asset[fieldAlias] = mixedResults[originalValue]
+			}
+		}
+
+	}
+
+	/**
+	 * Add the where for querying a list of persons ids.
+	 */
+	private static injectByPropertyWhereClause = { FieldSearchData fieldSearchData, String field ->
+		fieldSearchData.setMixedSqlExpression("${field} in (:${mixedAliasFor(field)}")
+	}
+
+	/**
+	 * Add the staff ids as a list of strings.
+	 */
+	private static injectByPropertyWhereParams = { FieldSearchData fieldSearchData, String property, Map additionalResults ->
+		Set ids = additionalResults.keySet()
+		fieldSearchData.addSqlSearchParameter(mixedAliasFor(property), ids)
+	}
+
+	/**
+	 * Source for the By fields. It returns a map[id: fullName] for the persons
+	 * that match the filter criteria.
+	 */
+	private static getMatchingStaff = { Project project, String filter ->
+		Map results = [:]
+		List<Person> individuals = partyRelationshipService.getAssociatedStaffByName(project, filter)
+		for (Person person : individuals) {
+			results[person.id.toString()] = person.toString()
+		}
+		return results
+	}
+
+
+	/**
+	 * Mixed fields are those, such as startupBy, shutdownBy and testingBy that may
+	 * contain references to different things (teams, staff, other properties, etc).
+	 *
+	 * In this map you should specify the field and define a closure to be executed
+	 * in order to fetch additional records (like persons) and the closure that
+	 * is going to be executed to do the actual replacement/transformation.
+	 */
+	private static final Map mixedFields = [
+			'AE.shutdownBy': [source: getMatchingStaff,
+			                  injectWhereParams: injectByPropertyWhereParams,
+			                  injectWhereClause: injectByPropertyWhereClause ,
+			                  transform: transformByField,
+			                  postProcessAlias: "application_shutdownBy",
+			                  mixedAlias: "mixedShutdownBy"
+			],
+			'AE.startupBy': [source: getMatchingStaff,
+			                 injectWhereParams: injectByPropertyWhereParams,
+			                 injectWhereClause: injectByPropertyWhereClause ,
+			                 transform: transformByField,
+			                 postProcessAlias: "application_startupBy",
+			                 mixedAlias: "mixedStartupBy"
+			],
+			'AE.testingBy': [source: getMatchingStaff,
+			                 injectWhereParams: injectByPropertyWhereParams,
+			                 injectWhereClause: injectByPropertyWhereClause ,
+			                 transform: transformByField,
+			                 postProcessAlias: "application_testingBy",
+			                 mixedAlias: "mixedTestingBy"
+			]
+	]
 
     private static final Map<String, Map> transformations = [
 		'id'             : [property: 'AE.id', type: Long, namedParameter: 'id', join: ''],

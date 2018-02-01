@@ -10,6 +10,10 @@ class FieldSearchData {
 
     private Map parsedInfo = [:]
 
+    boolean mixed = false
+
+    String mixedSqlExpression
+
     private static final REQUIRED_FIELDS = ["domain", "column", "filter"]
 
     /**
@@ -113,7 +117,11 @@ class FieldSearchData {
     }
 
     String getSqlSearchExpression() {
-        return parsedInfo.searchExpression
+        String expression = parsedInfo.searchExpression
+        if (isMixed()) {
+            expression = "($mixedSqlExpression) OR ${expression})"
+        }
+        return expression
     }
 
     void addSqlSearchParameter(String param, Object value) {
@@ -126,5 +134,17 @@ class FieldSearchData {
 
     Map getSqlSearchParameters() {
         return parsedInfo.parameters
+    }
+
+    boolean isMixed() {
+        return mixed
+    }
+
+    void setMixed(boolean mixed) {
+        this.mixed = mixed
+    }
+
+    void setMixedSqlExpression(expression) {
+        mixedSqlExpression = expression
     }
 }

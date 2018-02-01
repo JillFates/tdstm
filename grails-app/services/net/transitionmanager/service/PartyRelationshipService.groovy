@@ -2,23 +2,14 @@ package net.transitionmanager.service
 
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRelationshipType
-import net.transitionmanager.domain.PartyRole
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.*
 import org.springframework.jdbc.core.JdbcTemplate
 
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
@@ -404,6 +395,50 @@ class PartyRelationshipService implements ServiceMethods {
 		// def persons = staffing*.partyIdTo
 
 		//persons = persons.unique().sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
+	}
+
+	/**
+	 * Using the same filtering capabilities available for assets, this method looks up
+	 * the staff associated with this project (Owner, Client, partners) whose name matches
+	 * the filter provided.
+	 *
+	 * @param project
+	 * @param nameFilter
+	 * @return
+	 */
+	List<Person> getAssociatedStaffByName(Project project, String nameFilter) {
+		List<Party> companies = getProjectCompanies(project)
+		Map params = [:]
+
+		String hqlQuery = """
+			SELECT pr.partyIdTo
+			FROM PartyRelationship pr
+			WHERE pr.partyRelationshipType='STAFF'
+				AND pr.partyIdFrom IN (:companies)
+				AND pr.roleTypeCodeFrom='COMPANY'
+				AND pr.roleTypeCodeTo='STAFF' 
+			"""
+		if (nameFilter && nameFilter.trim()) {
+			FieldSearchData fieldSearchData = new FieldSearchData([
+					column: SqlUtil.personFullName('partyIdTo', 'pr'),
+					columnAlias: "personName",
+					domain: "Person",
+					filter: nameFilter
+			])
+
+			SqlUtil.parseParameter(fieldSearchData)
+
+			String nameCondition = fieldSearchData.sqlSearchExpression
+			params = fieldSearchData.sqlSearchParameters
+			hqlQuery += " AND $nameCondition"
+		}
+
+
+		params["companies"] = CollectionUtils.asList(companies)
+
+
+		return Person.executeQuery(hqlQuery, params)
+
 	}
 
 	/**
