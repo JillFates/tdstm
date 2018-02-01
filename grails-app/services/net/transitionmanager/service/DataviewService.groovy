@@ -381,7 +381,9 @@ class DataviewService implements ServiceMethods {
 		if (mixedFieldsInfo) {
 			mixedFieldsInfo.each {field, fieldInfo ->
 				Closure transformer = mixedTransformerFor(field)
-				transformer(queryResults, field, fieldInfo)
+				if (transformer) {
+					transformer(queryResults, field, fieldInfo)
+				}
 			}
 		}
 	}
@@ -534,7 +536,7 @@ class DataviewService implements ServiceMethods {
 		}
 
 		// Populate this list with the mix fields that the user is using for filtering.
-		Map<String, List> currentMixedFields = [:]
+		Map<String, List> mixedFieldsInfo = [:]
 
 		// The keys for all the declared mixed fields.
 		Set mixedKeys = mixedFields.keySet()
@@ -563,9 +565,9 @@ class DataviewService implements ServiceMethods {
 					fieldSearchData.setMixed(true)
 					// Retrieve the additional results (e.g: persons matching the filter).
 					Closure sourceForField = sourceFor(property)
-					Map additionalResults = sourceForField(project, filterFor(column))
+					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
 					// Keep a copy of this results for later use.
-					currentMixedFields[property] = additionalResults
+					mixedFieldsInfo[property] = additionalResults
 					// Add additional information for the query (e.g: the staff ids for IN clause).
 					Closure paramsInjector = injectWhereParamsFor(property)
 					paramsInjector(fieldSearchData, property, additionalResults)
@@ -587,16 +589,16 @@ class DataviewService implements ServiceMethods {
 				String property = propertyFor(column)
 				if (property in mixedKeys) {
 					Closure sourceForField = sourceFor(property)
-					Map additionalResults = sourceForField(project, filterFor(column))
+					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
 					// Keep a copy of this results for later use.
-					currentMixedFields[property] = additionalResults
+					mixedFieldsInfo[property] = additionalResults
 				}
 
 			}
 
 		}
 
-		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: currentMixedFields]
+		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: mixedFieldsInfo]
 	}
 
 
@@ -706,7 +708,12 @@ class DataviewService implements ServiceMethods {
 	 * @return
 	 */
 	private static Closure mixedTransformerFor(String mixedField) {
-		return mixedFields[mixedField]["transform"]
+		Closure transformer = null
+		Map field = mixedFields[mixedField]
+		if (field) {
+			transformer = field["transform"]
+		}
+		return transformer
 	}
 
 	private static String mixedAliasFor(String mixedField) {
@@ -778,13 +785,37 @@ class DataviewService implements ServiceMethods {
 	/**
 	 * Source for the By fields. It returns a map[id: fullName] for the persons
 	 * that match the filter criteria.
+	 *
+	 * This closure is smart enough to avoid querying the database multiple times
+	 * when all the staff is required.
 	 */
-	private static getMatchingStaff = { Project project, String filter ->
+	private static getMatchingStaff = { Project project, String filter, Map mixedFieldsInfo ->
 		Map results = [:]
-		List<Person> individuals = partyRelationshipService.getAssociatedStaffByName(project, filter)
-		for (Person person : individuals) {
-			results[person.id.toString()] = person.toString()
+		boolean setAllStaff = false
+		// Check if the filter is empty, in which case all the persons are required.
+		if (!filter || !filter.trim()) {
+			// Check if we already fetched all the persons
+			if (mixedFieldsInfo["allStaff"]) {
+				results = mixedFieldsInfo["allStaff"]
+			// If they haven't been fetched, signal that they should be gathered and 'allStaff' set.
+			} else {
+				setAllStaff = true
+			}
 		}
+
+		// Check if the query needs to be executed
+		if (!results) {
+			List<Person> individuals = partyRelationshipService.getAssociatedStaffByName(project, filter)
+			for (Person person : individuals) {
+				results[person.id.toString()] = person.toString()
+			}
+		}
+
+		// If the flag is set, update the mixedFieldsInfo to avoid executing the same query a second time.
+		if (setAllStaff) {
+			mixedFieldsInfo["allStaff"] = results
+		}
+
 		return results
 	}
 
