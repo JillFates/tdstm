@@ -131,12 +131,15 @@
                             </li>
                         </tds:hasPermission>
                         <li class="divider"></li>
-                        <li class="menu-child-item">
-                            <a href="/tdstm/mockETL">Mock ETL</a>
+                        <li class="menu-parent-item">Integrations</li>
+                        <li class="menu-child-item ">
+                            <g:link class="mmlink" controller="module" action="provider" id="list">
+                                Providers
+                            </g:link>
                         </li>
                         <li class="menu-child-item ">
-                            <g:link class="mmlink" controller="module" action="import" id="assets">
-                                Manual Asset Import
+                            <g:link class="mmlink" controller="module" action="credential" id="list">
+                                Credentials
                             </g:link>
                         </li>
                         <li class="menu-child-item ">
@@ -145,18 +148,8 @@
                             </g:link>
                         </li>
                         <li class="menu-child-item ">
-                            <g:link class="mmlink" controller="module" action="provider" id="list">
-                                Providers
-                            </g:link>
-                        </li>
-                        <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="action" id="list">
-                                API Actions
-                            </g:link>
-                        </li>
-                        <li class="menu-child-item ">
-                            <g:link class="mmlink" controller="module" action="credential" id="list">
-                                Credentials
+                                Actions
                             </g:link>
                         </li>
                     </ul>
@@ -266,19 +259,29 @@
                                 </li>
                             </tds:hasPermission>
                             <li class="divider"></li>
+                            <tds:hasPermission permission="${Permission.AssetExport}">
+                                <li class="menu-child-item menu-parent-assets-export-assets">
+                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
+                                </li>
+                            </tds:hasPermission>
+                            <li class="menu-child-item menu-parent-assets-import-assets">
+                                <g:link controller="module" action="import" id="assets">Import Assets (ETL)</g:link>
+                            </li>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
-                                    <g:link controller="assetEntity" action="assetImport">Import Assets</g:link>
+                                    <g:link controller="assetEntity" action="assetImport">Import Assets (TM XLS)</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-manage-batches">
-                                    <g:link controller="dataTransferBatch" action="list">Manage Batches</g:link>
+                                    <g:link controller="dataTransferBatch" action="list">Manage Asset Batches</g:link>
                                 </li>
                             </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetExport}">
-                                <li class="menu-child-item menu-parent-assets-export-assets">
-                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
+                            <tds:hasPermission permission="${Permission.AssetImport}">
+                                <li class="menu-child-item ">
+                                    <g:link class="mmlink" controller="module" action="dependencybatch" id="list">
+                                        Manage Dep. Batches
+                                    </g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.HelpMenuView}">
