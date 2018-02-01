@@ -357,7 +357,6 @@ class DataviewService implements ServiceMethods {
              where AE.project = :project and $conditions
         """
 
-
 		def assets = AssetEntity.executeQuery(hql, whereParams, dataviewSpec.args)
 	    def totalAssets = AssetEntity.executeQuery(countHql, whereParams)
 
@@ -566,14 +565,20 @@ class DataviewService implements ServiceMethods {
 					// Retrieve the additional results (e.g: persons matching the filter).
 					Closure sourceForField = sourceFor(property)
 					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
-					// Keep a copy of this results for later use.
-					mixedFieldsInfo[property] = additionalResults
-					// Add additional information for the query (e.g: the staff ids for IN clause).
-					Closure paramsInjector = injectWhereParamsFor(property)
-					paramsInjector(fieldSearchData, property, additionalResults)
-					// Add the sql where clause for including the additional fields in the query
-					Closure whereInjector = injectWhereClauseFor(property)
-					whereInjector(fieldSearchData, property)
+					if (additionalResults) {
+						// Keep a copy of this results for later use.
+						mixedFieldsInfo[property] = additionalResults
+						// Add additional information for the query (e.g: the staff ids for IN clause).
+						Closure paramsInjector = injectWhereParamsFor(property)
+						paramsInjector(fieldSearchData, property, additionalResults)
+						// Add the sql where clause for including the additional fields in the query
+						Closure whereInjector = injectWhereClauseFor(property)
+						whereInjector(fieldSearchData, property)
+					} else {
+					// If no additional results, then unset the flag as no additional filtering should be required.
+						fieldSearchData.setMixed(false)
+					}
+
 				}
 
 				// Trigger the parsing of the parameter.

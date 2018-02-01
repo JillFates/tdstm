@@ -422,7 +422,7 @@ class PartyRelationshipService implements ServiceMethods {
 			FieldSearchData fieldSearchData = new FieldSearchData([
 					column: SqlUtil.personFullName('partyIdTo', 'pr'),
 					columnAlias: "personName",
-					domain: "Person",
+					domain: Person,
 					filter: nameFilter
 			])
 
