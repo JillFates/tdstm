@@ -599,17 +599,6 @@ class DataviewService implements ServiceMethods {
 		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: currentMixedFields]
 	}
 
-	/**
-	 * Return a list with the id and name for each individual associated with the
-	 * project whose name match the given filter.
-	 * @param project
-	 * @param filter
-	 * @return
-	 */
-	private List<Map> getAssociatedStaff(Project project, String filter) {
-
-	}
-
 
     /**
      * Columnn filters value could be split by '|' separator
