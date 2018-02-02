@@ -100,7 +100,7 @@
                     </td>
                 </tr>
                 <tr id="deps">
-                    <g:render template="/angular/common/dependentShow" model="[asset:asset]" ></g:render>
+                    <g:render template="/angular/common/dependentShow" model="[assetEntity:asset]" ></g:render>
                 </tr>
                 <tr id="commentListId">
                     <g:render template="/angular/common/commentList" model="[asset:asset, prefValue:prefValue, viewUnpublishedValue:viewUnpublishedValue]" ></g:render>

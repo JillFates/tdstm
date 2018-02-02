@@ -20,12 +20,14 @@ import java.text.DateFormat
 @Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
-	SecurityService securityService
-	AssetEntityService assetEntityService
-	PageRenderer groovyPageRenderer
-	ControllerService controllerService
+
 	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	ControllerService controllerService
+	DatabaseService databaseService
 	DeviceService deviceService
+	PageRenderer groovyPageRenderer
+	SecurityService securityService
 	StorageService storageService
 	UserPreferenceService userPreferenceService
 
@@ -260,6 +262,9 @@ class WsAssetController implements ControllerMethods {
 				break
 			case "STORAGE":
 				model << storageService.getModelForShow(asset.project, asset, params)
+				break
+			case "DATABASE":
+				model << databaseService.getModelForShow(asset.project, asset, params)
 				break
 			default:
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
