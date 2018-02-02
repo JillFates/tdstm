@@ -55,6 +55,7 @@
 						{name:'category',width:'80',formatter: myLinkFormatter}"
 					sortname="'lastUpdated'"
 					sortorder="'desc'"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					caption="'Asset Comment:'"
 					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
 					showPager="true">
@@ -72,7 +73,7 @@
 					var editButton = '';
 					if (${canEditComments})
 						editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
-							"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+							"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>"
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject) {

@@ -89,6 +89,7 @@
 						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'lastname'"
 					caption="listCaption"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
 					gridComplete="function(){bindResize('personId')}"
 					showPager="true"
@@ -135,7 +136,7 @@
 
 	<div class="body fluid">
 		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+			<div class="message">${raw(flash.message)}</div>
 		</g:if>
 		<div id="messageId" class="message nodisplay"></div>
 		<span id="spinnerId" class="nodisplay">Merging ...<img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>

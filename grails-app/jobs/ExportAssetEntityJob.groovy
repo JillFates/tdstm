@@ -2,6 +2,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdsops.common.lang.ExceptionUtil
 import net.transitionmanager.service.AssetExportService
 import net.transitionmanager.service.ProgressService
+import org.quartz.JobDataMap
+import org.quartz.JobExecutionContext
 
 class ExportAssetEntityJob {
 
@@ -19,13 +21,13 @@ class ExportAssetEntityJob {
 	 * @param context
 	 * @return void
 	 */
-	 def execute(context) {
-	 	try {
-			def dataMap = context.mergedJobDataMap
+	def execute(JobExecutionContext context) {
+		JobDataMap dataMap = context.mergedJobDataMap
+		try {
 			assetExportService.export(dataMap)
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-			progressService.fail(progressKey, e.getMessage())
+			progressService.fail(dataMap.key, e.getMessage())
 		} finally {
 			GormUtil.releaseLocalThreadMemory()
 		}

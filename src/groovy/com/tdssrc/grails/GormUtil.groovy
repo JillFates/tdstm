@@ -2,13 +2,16 @@ package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
@@ -450,6 +453,51 @@ public class GormUtil {
 	}
 
 	/**
+	 * Retrieve a list of domain properties. If a list of property names is given, only
+	 * those properties will be included. If a list of properties to be skipped is provided,
+	 * those properties will be excluded.
+	 * If
+	 * @param domainClass
+	 * @param properties
+	 * @return
+	 */
+	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
+		List<GrailsDomainClassProperty> domainProperties = []
+		boolean allProperties = false
+		DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+		if (properties) {
+			for (String property in properties) {
+				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
+				if (domainProperty) {
+					domainProperties << domainProperty
+				} else {
+					/* if at least one property wasn't found, assume there's not enough information and all the
+					properties should be returned. */
+					allProperties = true
+					break
+				}
+			}
+		} else {
+			allProperties = true
+		}
+
+		if (allProperties) {
+			domainProperties = dfdc.getPersistentProperties()
+			// Grails won't fetch the Id property if it's not properly defined as a field
+			GrailsDomainClassProperty idProperty = dfdc.getPersistentProperty("id")
+			if (idProperty) {
+				domainProperties << idProperty
+			}
+		}
+
+		if (skipProperties) {
+			domainProperties = domainProperties.findAll { !(it.name in skipProperties) }
+		}
+		return domainProperties
+
+	}
+
+	/**
 	 * Used to get the list of persistent properties for a given domain class
 	 * @param domainInst - the Domain instance to get the properties for
 	 * @param propertyName - the name of a property to retrieve
@@ -595,18 +643,21 @@ public class GormUtil {
 
 	/**
 	 * Used to clone a domain object to a new object subsituting key properties,
-	 * NOTE: the new object is NOT persisted in the Database
+	 * note that the new object is NOT persisted in the Database. The method will copy all properties excluding
+	 * any Collection properties and those in the replaceKeys parameter. The replaceKeys allows swapping out certain
+	 * properties with specified values instead of cloning from the origin domain.
 	 * @param originalDomain - the domain to clone properties from
 	 * @param replaceKeys - a Map of property name(s) and the associated values to set, if value is null then it is not set
 	 * @return the cloned object
 	 */
-	static Object domainClone(Object originalDomain,  Map replaceKeys = [:]) {
-		logger.debug("** Clonning: {} *****", originalDomain.getClass())
-		if (!isDomainClass(originalDomain.getClass())) {
-			throw new RuntimeException('a Grails domain object parameter is required')
+	static Object domainClone(Object originDomain,  Map replaceKeys = [:]) {
+		logger.debug("** Clonning: {} *****", originDomain.getClass())
+		if (!isDomainClass(originDomain.getClass())) {
+			throw new RuntimeException('A non-Grails Domain object was received')
 		}
 
-		Object newDomain = originalDomain.getClass().getConstructor().newInstance()
+		// Create a new domain object
+		Object newDomain = originDomain.getClass().getConstructor().newInstance()
 
 		// Assign the key values to the domain
 		replaceKeys.each { key, value ->
@@ -617,12 +668,19 @@ public class GormUtil {
 
 		// Get the list of persistent properties from the domain that are not the keys being overridden
 		List keys = replaceKeys.keySet() as List
-		List props = persistentProperties(originalDomain)
+		List props = persistentProperties(originDomain)
 
 		// Strip off the replacement keys from the list and then copy over the values to the new domain
 		props = props - keys
-		props.each { p ->
-			newDomain[p] = originalDomain[p]
+
+		// Iterate over all of the properties and assign to the new domain object
+		for (p in props) {
+			// Skip over properties that are of Collection type (TM-6879)
+			if (originDomain[p] instanceof Collection) {
+				continue
+			}
+
+			newDomain[p] = originDomain[p]
 		}
 
 		return newDomain
@@ -906,5 +964,120 @@ public class GormUtil {
 	 */
 	static Class getDomainPropertyType(Class clazz, String property) {
 		return GrailsClassUtils.getPropertyType(clazz, property)
+	}
+
+	/**
+	 * Find an instance of the given type using the id provided for the
+	 * project specified.
+	 *
+	 * @param project
+	 * @param type
+	 * @param id
+	 * @param throwException
+	 * @return
+	 */
+	static <T> T findInProject(Project project, Class<T> type, id, boolean throwException = false) {
+		T instance = null
+		String errorMsg
+		// Project, type and id are mandatory
+		if (type && id && project) {
+			// Check if the class is a domain class.
+			if (isDomainClass(type)) {
+				try{
+					// fetch the instance
+					instance = type.get(id)
+					if (!instance) {
+						errorMsg = "The domain object with type $type couldn't be found using the id $id"
+					}
+				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
+				} catch(Exception e) {
+					errorMsg = "The domain object with type $type couldn't be found using the id $id"
+				}
+
+				// Make sure the domain class has a 'project' field.
+				if (instance && isDomainProperty(instance, 'project')) {
+					// Validate the projects' id match.
+					if (project.id != instance.project.id) {
+						errorMsg = "The domain object with type $type and id $id doesn't belong to project ${project.name}."
+					}
+				}
+			} else {
+				errorMsg = "$type is not a domain class."
+			}
+		} else {
+			errorMsg = "findInProject requires a project, a domain class and an id."
+		}
+
+		if (errorMsg) {
+			logger.error(errorMsg)
+			if (throwException) {
+				throw new EmptyResultException(errorMsg)
+			} else {
+				instance = null
+			}
+		}
+		return instance
+	}
+
+	/**
+	 * Determine if a domain property represents a referenced class type or if the property is an association
+	 * @param domainObject
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isReferenceProperty(Object domainObject, String propertyName) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
+	}
+
+	/**
+	 * Return a map representation for the given domain object
+	 * @param domainObject
+	 * @param properties - you can narrow down the list of properties to be included by providing a list with their names.
+	 * @param skipProperties - you can exclude certain properties by passing their names in this list.
+	 * @return
+	 */
+	static Map domainObjectToMap(domainObject, List<String> properties = null, List<String> skipProperties = null, boolean navigateReferences = true) {
+
+		if (!domainObject) {
+			return null
+		}
+
+		List<String> minimalProperties = ["id", "name"]
+		Map domainMap = [:]
+
+		Class domainClass = domainObject.class
+		if (isDomainClass(domainClass)) {
+			// Get all the domain properties.
+			List<GrailsDomainClassProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
+
+			// Iterate over all the domain properties
+			for (GrailsDomainClassProperty property : domainProperties) {
+				// if the property is an enum, copy its .name()
+				if (property.type.isEnum()) {
+					if (domainObject[property.name]) {
+						domainMap[property.name] = domainObject[property.name].name()
+					}
+					// if the property is a reference, call this method recursively with a predefined list of fields..
+				} else if (isDomainClass(property.type)) {
+					if (navigateReferences) {
+						domainMap[property.name] = domainObjectToMap(domainObject[property.name], minimalProperties, null, false)
+					}
+
+				} else if (Collection.isAssignableFrom(property.type)){
+					if (navigateReferences) {
+						List<Map> listReferences = []
+						for (element in domainObject[property.name]) {
+							listReferences << domainObjectToMap(element, minimalProperties, null, false)
+						}
+					}
+				} else {
+					// If it's a regular property, just copy its value.
+					domainMap[property.name] = domainObject[property.name]
+				}
+			}
+		}
+
+		return domainMap
 	}
 }

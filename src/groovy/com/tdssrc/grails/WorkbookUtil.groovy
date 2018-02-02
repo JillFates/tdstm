@@ -4,11 +4,11 @@ import com.tdsops.tm.asset.WorkbookSheetName
 import groovy.transform.CompileStatic
 import groovy.util.logging.Commons
 import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.streaming.SXSSFSheet
-import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFDataValidationConstraint
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -72,14 +72,14 @@ class WorkbookUtil {
 	 * @param type
 	 * @return
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer type = null) {
 		CellStyle style = null
 
 		if (type != null) {
 			style = createCellStyle(sheet, type)
 		}
 
-		addCell(sheet, columnIdx, rowIdx, value, type, style)
+		return addCell(sheet, columnIdx, rowIdx, value, type, style)
 	}
 
 	/**
@@ -91,7 +91,7 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType = null, CellStyle cellStyle = null) {
 		Cell cell = getOrCreateCell(row, colIdx)
 
 		if(cellType) {
@@ -100,7 +100,8 @@ class WorkbookUtil {
 		if (cellStyle != null) {
 			cell.setCellStyle(cellStyle)
 		}
-		setCellValue(cell, value)
+
+		return setCellValue(cell, value)
 	}
 
 	/**
@@ -112,15 +113,15 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Row row, int colIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		CellStyle cellStyle = null
 		if(cellType){
 			cellStyle = getCellStyle(row.sheet, cellType, workbookCellStyles)
 		}
-		addCell(row, colIdx, value, cellType, cellStyle)
+		return addCell(row, colIdx, value, cellType, cellStyle)
 	}
 
-		/**
+	/**
 	 * Adds a cell to a Workbook with specific cell style
 	 * @param sheet
 	 * @param columnIdx
@@ -129,9 +130,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param cellStyle
 	 */
-	static void addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
+	static Cell addCell(Sheet sheet, int columnIdx, int rowIdx, Object value, Integer cellType, CellStyle cellStyle) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, columnIdx, value, cellType, cellStyle)
+		return addCell(row, columnIdx, value, cellType, cellStyle)
 	}
 
 	/**
@@ -143,9 +144,9 @@ class WorkbookUtil {
 	 * @param cellType
 	 * @param workbookCellStyles
 	 */
-	static void addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
+	static Cell addCell(Sheet sheet, int colIdx, int rowIdx, Object value, Integer cellType, Map<Integer, CellStyle> workbookCellStyles) {
 		def row = getOrCreateRow(sheet, rowIdx)
-		addCell(row, colIdx, value, cellType, workbookCellStyles)
+		return addCell(row, colIdx, value, cellType, workbookCellStyles)
 	}
 
 
@@ -171,12 +172,40 @@ class WorkbookUtil {
 	 * @param cell
 	 * @param value
 	 */
-	static void setCellValue(Cell cell, Object value) {
-		if (value instanceof Long || value instanceof Integer || value instanceof Double) {
-			cell.setCellValue((Double) value)
-		} else {
-			cell.setCellValue(value.toString())
+	static Cell setCellValue(Cell cell, Object value) {
+		switch (value) {
+			case Number :
+				cell.setCellValue((double) value)
+				break
+
+			default :
+				cell.setCellValue(value.toString())
 		}
+
+		return cell
+	}
+
+	/**
+	 * Add a cell to a row and the style
+	 * @param row
+	 * @param col
+	 * @param value
+	 * @param cellStyles
+	 * @return
+	 */
+	static Cell addCellAndStyle(Row row, int col, Object value , List<CellStyle> cellStyles) {
+		Cell cell = null
+
+		if ( value != null || ( (value instanceof String) && ((String)value).length() > 0 )) {
+			cell = addCell(row, col, value)
+
+			CellStyle cellStyle = cellStyles[col]
+			if (cellStyle) {
+				cell.cellStyle = cellStyle
+			}
+		}
+
+		return cell
 	}
 
 	static int getColumnsCount(Sheet sheet) {
@@ -186,7 +215,7 @@ class WorkbookUtil {
 			String value
 			def c = row.getLastCellNum()
 			while (c >= 0) {
-			value = getStringCellValue(sheet, c, 0)
+				value = getStringCellValue(sheet, c, 0)
 				if (!StringUtil.isBlank(value)) {
 					result = c + 1
 					break
@@ -208,7 +237,7 @@ class WorkbookUtil {
 
 	/**
 	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will use the 
-	* user's currently configured timezone to read the values as string.
+	 * user's currently configured timezone to read the values as string.
 	 *
 	 * @param sheet - the sheet to extract the value
 	 * @param columnIdx - the column to reference (offset starts at zero)
@@ -219,7 +248,7 @@ class WorkbookUtil {
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
 	 * @throws java.text.ParseException - if the field contains an invalid formatted String value
 	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
-	*/
+	 */
 	static Date getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, HttpSession session, Collection formatterTypes=null) {
 		Date result = null
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
@@ -240,7 +269,7 @@ class WorkbookUtil {
 						try {
 							if(formatterType == TimeUtil.FORMAT_DATE){ //Parse to DATE only
 								result = TimeUtil.parseDate(TimeUtil.getUserDateFormat(session), cellVal, formatterType.toString())
-						}else{
+							}else{
 								result = TimeUtil.parseDateTime(cellVal, formatterType.toString())
 							}
 							if (result) {
@@ -268,7 +297,7 @@ class WorkbookUtil {
 	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will make an assumption
 	 * that the date in the spreadsheet is in GMT.
 	 *
-	* The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
+	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
 	 * if the cell type is wrong or there was a parser error.
 	 *
 	 * @param sheet - the sheet to extract the value
@@ -291,8 +320,8 @@ class WorkbookUtil {
 	/**
 	 * Used to read a datetime value from a cell in a spreadsheet using a DateFormat formatter. The formatter will be set to the
 	 * timezone that was passed. This will attempt to read the numeric value which will have a datetime that was generated into
-	* the timezone of the user's Timezone so it will read it in and convert the date back to GMT appropriately.
-	*
+	 * the timezone of the user's Timezone so it will read it in and convert the date back to GMT appropriately.
+	 *
 	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
 	 * if the cell type is wrong or there was a parser error.
 	 *
@@ -308,7 +337,6 @@ class WorkbookUtil {
 	static Date getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormatter, failedIndicator=-1) {
 		Date result = null
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
-		// println "getDateTimeCellValue() called for $columnIdx,$rowIdx, cellType=${cell.getCellType()} FORMAT:'${ dateFormatter.toPattern() }'"
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BLANK:
@@ -319,34 +347,25 @@ class WorkbookUtil {
 					// Dates stored in the spreadsheet are done since they are already stored without TZ
 					Date dateInTz = cell.getDateCellValue()
 
-				// Now we need to shift the date to GMT so that it is correct TZ
+					// Now we need to shift the date to GMT so that it is correct TZ
 					result = TimeUtil.moveDateToGMT(dateInTz, tzId)
-					// println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
-
 					break
-
-				case Cell.CELL_TYPE_STRING:						String str = cell.getStringCellValue()
+				case Cell.CELL_TYPE_STRING:
+					String str = cell.getStringCellValue()
 					if (str) {
 						try {
 							// Let's not assume that the user set the Timezone on the parser
-							// println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-						TimeZone tz=TimeZone.getTimeZone(tzId)
+							TimeZone tz=TimeZone.getTimeZone(tzId)
 							dateFormatter.setTimeZone(tz)
 							result = dateFormatter.parse(str)
-					} catch (e) {
-						log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
-							// println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }"
-						//result = failedIndicator
+						} catch (e) {
+							log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${dateFormatter}'"
 							result = null
 						}
-						// println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})"
-					// println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
 					}
 					break
-
 				default:
 					// If the cell type is any other value just fail
-					//result = failedIndicator
 					result = null
 					break
 			}
@@ -444,14 +463,14 @@ class WorkbookUtil {
 	}
 
 	/**
-	  Used to clean up String values by escaping quotes and other things
+	 * Used to clean up String values by escaping quotes and other things
 	 */
 	static String sanitize(String value) {
 		return value?.replace("\\", "\\\\").replace("'","\\'")
 	}
 
 	/**
-	  Used to get the column code (AA, BF) from the column index
+	 * Used to get the column code (AA, BF) from the column index
 	 * @param colIdx - the offset start at zero for column A
 	 * @return The spreadsheet column code
 	 */
@@ -477,9 +496,9 @@ class WorkbookUtil {
 		def createFormulaString = {
 			String validationColumnCode = columnCode(validationColumn)
 			String formula = new StringBuffer("'${validationSheet.getSheetName()}'!")
-					.append("\$$validationColumnCode\$$firstValidationRow:")
-					.append("\$$validationColumnCode\$$lastValidationRow")
-					.toString()
+					  .append("\$$validationColumnCode\$$firstValidationRow:")
+					  .append("\$$validationColumnCode\$$lastValidationRow")
+					  .toString()
 			return formula
 		}
 
@@ -488,23 +507,23 @@ class WorkbookUtil {
 		if(lastTargetRow < firstTargetRow){
 			lastTargetRow = firstTargetRow
 		}
-  		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
+		CellRangeAddressList addressList = new CellRangeAddressList(firstTargetRow, lastTargetRow, targetColumn, targetColumn)
 
-  		Name namedRange = validationSheet.getWorkbook().createName()
-  		String name = "list_${targetSheet.getSheetName()}_${validationColumn}"
-  		namedRange.setNameName(name)
-  		namedRange.setRefersToFormula(createFormulaString())
-  		def dvConstraint = dvHelper.createFormulaListConstraint(name)
+		Name namedRange = validationSheet.getWorkbook().createName()
+		String name = "list_${targetSheet.getSheetName()}_${validationColumn}"
+		namedRange.setNameName(name)
+		namedRange.setRefersToFormula(createFormulaString())
+		def dvConstraint = dvHelper.createFormulaListConstraint(name)
 
-  		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
-  		if(dvConstraint instanceof XSSFDataValidationConstraint){
-  			dataValidation.setSuppressDropDownArrow(false)
+		DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+		if(dvConstraint instanceof XSSFDataValidationConstraint){
+			dataValidation.setSuppressDropDownArrow(false)
 			dataValidation.setShowErrorBox(true)
-  		}else{
-  			dataValidation.setSuppressDropDownArrow(true)
-  		}
+		}else{
+			dataValidation.setSuppressDropDownArrow(true)
+		}
 
-  		targetSheet.addValidationData(dataValidation)
+		targetSheet.addValidationData(dataValidation)
 	}
 
 
@@ -570,28 +589,39 @@ class WorkbookUtil {
 	}
 
 	/**
-	 * Get a SXSSFWorkbook from XSSFWorkbook
+	 * Clone a Workbook from the original one
 	 * @param workbook
-	 * @return SXSSFWorkbook
+	 * @return cloned workbook
 	 */
-	static SXSSFWorkbook getStreamableWorkbookInstanceFromXSSFWorkbook(Workbook workbook) {
-		// Save XSSFWorkbook
-		File tempXSSFWorkbook = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null)
-		FileOutputStream fileOutputStream =  new FileOutputStream(tempXSSFWorkbook)
-		workbook.write(fileOutputStream)
+	static Workbook cloneWorkbookInstance(Workbook originalWorkbook) {
+		File tempWorkbook = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null)
+		FileOutputStream fileOutputStream =  new FileOutputStream(tempWorkbook)
+		originalWorkbook.write(fileOutputStream)
 		fileOutputStream.close()
 
-		// Open a new XSSFWorkbook from the one saved previously
-		FileInputStream fileInputStream = new FileInputStream(tempXSSFWorkbook)
-		XSSFWorkbook wb_template = new XSSFWorkbook(fileInputStream)
-		fileInputStream.close()
-		workbook.close()
-		tempXSSFWorkbook.delete()
+		// Open a new Workbook from the one saved previously
+		FileInputStream fileInputStream = new FileInputStream(tempWorkbook)
 
-		// Create an SXSSFWorkbook
-		SXSSFWorkbook streamableWorkbook = new SXSSFWorkbook(wb_template)
-		//streamableWorkbook.setCompressTempFiles(true)
-		return streamableWorkbook
+		Workbook wb_template
+		if ( originalWorkbook instanceof XSSFWorkbook ) {
+			XSSFWorkbook xssfWorkbook = new XSSFWorkbook( fileInputStream )
+			wb_template = xssfWorkbook
+
+			// wb_template = new SXSSFWorkbook( xssfWorkbook )
+
+		} else if ( originalWorkbook instanceof  HSSFWorkbook ) {
+			wb_template = new HSSFWorkbook( fileInputStream )
+
+		} else {
+			throw new RuntimeException ( "Unsupported format Exception , Kill me please!" )
+
+		}
+
+		fileInputStream.close()
+		originalWorkbook.close()
+		tempWorkbook.delete()
+
+		return wb_template
 	}
 
 	/**
@@ -678,5 +708,37 @@ class WorkbookUtil {
 			}
 		}
 		return true
+	}
+
+	/**
+	 * Get a list of the Cellstyles from the header of the Spreadsheet
+	 * @param workbookCellStyles
+	 * @param sheet
+	 * @return
+	 */
+	static List<CellStyle> getHeaderStyles(Map<Integer, CellStyle> workbookCellStyles, Sheet sheet) {
+		List<CellStyle> rowStyles = []
+		Row rowHeader =  sheet.getRow(0)
+		int lastCellNum = rowHeader.getLastCellNum()
+
+		for( int i = 0; i <= lastCellNum; i++ ) {
+
+			CellStyle cellStyle = null
+			Cell cell = rowHeader.getCell(i)
+			if(cell) {
+				short dataFormat = cell.cellStyle.dataFormat
+
+				cellStyle = workbookCellStyles.get(dataFormat)
+
+				if( cellStyle == null ) {
+					cellStyle = sheet.workbook.createCellStyle()
+					cellStyle.dataFormat = dataFormat
+				}
+			}
+
+			rowStyles << cellStyle
+		}
+
+		return rowStyles
 	}
 }

@@ -137,7 +137,7 @@ class LicensedClient {
 		Closure dateTimeParser = {String strDate ->
 			if(strDate){
 				try {
-					return  org.apache.tools.ant.util.DateUtils.parseIso8601DateTime(strDate)
+					return 	Date.parse("yyyy-MM-dd'T'HH:mm:ssX", strDate)
 				}catch(ParseException pe){
 					log.error("Error Parsing Date", pe)
 				}

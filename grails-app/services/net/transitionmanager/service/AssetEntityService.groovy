@@ -2,6 +2,8 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
+import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.domain.AppMoveEvent
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -19,6 +21,7 @@ import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
@@ -147,7 +150,7 @@ class AssetEntityService implements ServiceMethods {
 	].asImmutable()
 
 	private static final Map<String, String> TITLE_BY_FILTER = [
-			all: 'All Devices', other: 'Other Devices', physical: 'Physical Device', physicalServer: 'Physical Server',
+			all: 'Devices', other: 'Other Devices', physical: 'Physical Device', physicalServer: 'Physical Server',
 			server: 'Server', storage: 'Storage Device', virtualServer: 'Virtual Server'].asImmutable()
 
 	private static final Map<String, String> RACK_MAP = [
@@ -155,7 +158,6 @@ class AssetEntityService implements ServiceMethods {
 			PowerA: 'powerA', PowerB: 'powerB', PowerC: 'powerC', Type: 'rackType', Front: 'front',
 			Model: 'model', Source: 'source'].asImmutable()
 
-	GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
@@ -650,7 +652,7 @@ class AssetEntityService implements ServiceMethods {
 
 		validateAssetsAssocToProject([assetEntity.id], project)
 
-		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'comment']
+		List<String> propNames = ['dataFlowFreq', 'type', 'status', 'dataFlowDirection', 'comment', 'c1', 'c2', 'c3', 'c4']
 
 		AssetDependency assetDependency = AssetDependency.get(dependencyId)
 		if (!assetDependency) {
@@ -945,29 +947,83 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Delete asset and associated records - use this method when we want to delete any asset
+	 * @param asset - the asset object to be deleted
 	 */
 	void deleteAsset(AssetEntity asset) {
-		Map<String, Object> assetMap = [asset: asset]
-		ProjectAssetMap.executeUpdate('DELETE ProjectAssetMap WHERE asset=:asset', assetMap)
-		AssetComment.executeUpdate('UPDATE AssetComment SET assetEntity=null WHERE assetEntity=:asset', assetMap)
-		ApplicationAssetMap.executeUpdate('DELETE ApplicationAssetMap WHERE asset=:asset', assetMap)
-		AssetEntityVarchar.executeUpdate('DELETE AssetEntityVarchar WHERE assetEntity=:asset', assetMap)
-		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset=:asset', assetMap)
-		AssetCableMap.executeUpdate('DELETE AssetCableMap WHERE assetFrom=:asset', assetMap)
+		deleteAssets([asset.id])
+	}
+
+	/**
+	 * Used to delete a list of any of the asset class domain records. It will also delete or null the
+	 * references in other domains appropriately.
+	 * @param assetIds - a list of validated asset ids to be deleted
+	 * @return the number of assets that were deleted
+	 */
+	int deleteAssets(List<Long> assetIds) {
+		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
+
+		ProjectAssetMap.where { asset in assets }.deleteAll()
+		AssetEntityVarchar.where { assetEntity in assets }.deleteAll()
+
+		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
+
+		// Delete asset comments
+		AssetComment.where {
+			assetEntity in assets
+			commentType != AssetCommentType.TASK
+		}.deleteAll()
+
+		// Null out asset references in Tasks
+		AssetComment.executeUpdate('''
+			UPDATE AssetComment c SET c.assetEntity=null
+			WHERE c.assetEntity.id IN (:assets)
+			''',
+			[assets: assetIds])
+
+		// Delete cabling where asset is the From in the relationship
+		AssetCableMap.where { assetFrom in assets }.deleteAll()
+
+		// Null out cable references where the asset is the To in the relationship
 		AssetCableMap.executeUpdate('''
 			UPDATE AssetCableMap
 			SET cableStatus=:status, assetTo=null, assetToPort=null
-			WHERE assetTo=:asset''', assetMap + [status: AssetCableStatus.UNKNOWN])
-		AssetDependency.executeUpdate('DELETE AssetDependency WHERE asset=:asset or dependent=:asset ', assetMap)
-		AssetDependencyBundle.executeUpdate('DELETE AssetDependencyBundle WHERE asset = :asset', assetMap)
+			WHERE assetTo.id in (:assets)''', [assets: assetIds] + [status: AssetCableStatus.UNKNOWN])
+
+		AssetDependency.where {
+			asset in assets || dependent in assets
+		}.deleteAll()
+
+		AssetDependencyBundle.where { asset in assets }.deleteAll()
 
 		// Clear any possible Chassis references
-		AssetEntity.executeUpdate(
-				'UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL WHERE sourceChassis=:asset',
-				assetMap)
-		AssetEntity.executeUpdate(
-				'UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL WHERE targetChassis=:asset',
-				assetMap)
+		AssetEntity.executeUpdate('''
+			UPDATE AssetEntity SET sourceChassis=NULL, sourceBladePosition=NULL
+			WHERE sourceChassis.id in (:assets)
+			''',
+			[assets: assetIds])
+
+		AssetEntity.executeUpdate('''
+			UPDATE AssetEntity SET targetChassis=NULL, targetBladePosition=NULL
+			WHERE targetChassis.id in (:assets)
+			''',
+			[assets: assetIds])
+
+		// Delete a few Application related domains for those where the id matches an Application. This
+		// shouldn't be an issue when deleting other asset classes because nothing will be found.
+		ApplicationAssetMap.executeUpdate('''
+			DELETE ApplicationAssetMap
+			WHERE application.id in :assetIds OR asset.id in :assetIds''',
+			[assetIds:assetIds])
+
+		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application.id in :assetIds',
+			[assetIds:assetIds] )
+
+		// Last but not least, delete the asset itself. Note that GORM/Hibernate is smart
+		// enough to know when a subclass of AssetEntity is being references so deleting AssetEntity will
+		// delete Application, Database or other domains that extend it. Pretty cool - huh!
+		int count = AssetEntity.where { id in assetIds }.deleteAll()
+
+		return count
 	}
 
 	/**
@@ -1616,30 +1672,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Get config by entityType and validation
-	 * @deprecated This function is no longer needed.
-	 */
-	@Deprecated
-	Map getConfig(String type, String validation, projectAttributes = null) {
-		throw new RuntimeException('getConfig no longer used')
-		Project project = securityService.userCurrentProject
-		def allconfig = projectService.getConfigByEntity(type)
-		List<Map<String, String>> fields = projectService.getFields(type, projectAttributes) + projectService.getCustoms(projectAttributes)
-		def config = [:]
-		String validationType = ValidationType.valuesAsMap[validation]
-		fields.each { Map f ->
-			if (allconfig[f.label]) {
-				config[f.label] = allconfig[f.label]['phase'][validationType]
-			}
-		}
-
-		// Fetch the custom fields settings for visible fields.
-		List customs = getCustomFieldsSettings(project, type, true)
-
-		return [project: project, config: config, customs: customs]
-	}
-
-	/**
 	 * This method returns the settings for the custom fields for the given
 	 * asset type. Results are sorted by order and field.
 	 *
@@ -1738,36 +1770,56 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Delete assets by asset type.
-	 * @param type
-	 * @param assetList - list of ids for which assets are requested to deleted
-	 * @return
+	 * Used to delete assets in bulk with a list of asset ids for a specific project
+	 * @param project - the project that the assets should belong to
+	 * @param domainToDelete - the name of the domain to be deleted
+	 * @param assetIdList - list of ids for which assets are requested to deleted
+	 * @return a count of the number of records that are deleted
 	 */
-	String deleteBulkAssets(type, assetList) {
-		def resp
-		def assetNames = []
-		try {
-			//Collecting as a list of data type long
-			assetList = assetList*.toLong()
-			if (type == "dependencies") {
-				AssetDependency.getAll(assetList).findAll().each { ad ->
-					assetNames << ad.dependent?.assetName + "  AND Asset  " + ad.asset?.assetName
-					ad.delete()
-				}
+	String deleteBulkAssets(Project project, String type, List<String> assetIdList) {
+
+        // if no ids given don't process anything.
+		if (assetIdList.isEmpty()) {
+            return "0 $type records were deleted"
+        }
+
+		List<Long> assetIds = []
+		assetIdList.each { v ->
+			Long id = NumberUtil.toPositiveLong(v, -1)
+			if (id > 0) {
+				assetIds << id
 			}
-			else {
-				AssetEntity.getAll(assetList).findAll().each { ae ->
-					assetNames << ae.assetName
-					deleteAsset(ae)
-					ae.delete()
-				}
-			}
-			resp = "$type ${WebUtil.listAsMultiValueString(assetNames)} deleted."
-		}catch(Exception e) {
-			e.printStackTrace()
-			resp = "Error while deleting $type"
 		}
-		return resp
+		log.debug "deleteBulkAssets: $assetIds to be deleted"
+		int count = assetIds.size()
+
+		// Now make sure that the ids are associated to the project
+		List<Long> validatedAssetIds =
+			AssetEntity.where {
+				project == project
+				id in assetIds
+			}
+			.projections { property 'id' }
+			.list()
+
+		if (count != validatedAssetIds.size()) {
+			List<Long> idsNotInProject = assetIds - validatedAssetIds
+			log.warn "deleteBulkAssets called with asset ids not assigned to project ($assetIds)"
+		}
+
+		if (validatedAssetIds.size() > 0) {
+			if (type == "dependencies") {
+				count = AssetDependency.where {
+					id in validatedAssetIds
+				}.deleteAll()
+			} else {
+				count = deleteAssets(validatedAssetIds)
+			}
+		} else {
+			count = 0
+		}
+
+		return "$count $type record${count==1? ' was' : 's were'} deleted"
 	}
 
 	/**
@@ -1937,7 +1989,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return appPref
 	 */
 	// TODO : JPM 9/2014 : Rename getExistingPref method to getColumnPreferences
-	Map getExistingPref(String prefName) {
+	Map getExistingPref(com.tdsops.tm.enums.domain.UserPreferenceEnum prefName) {
 		def colPref
 		def existingPref = userPreferenceService.getPreference(prefName)
 
@@ -1948,28 +2000,28 @@ class AssetEntityService implements ServiceMethods {
 
 		if (!colPref) {
 			switch (prefName) {
-				case 'App_Columns':
+				case PREF.App_Columns:
 					colPref = ['1': 'sme', '2': 'environment', '3': 'validation', '4': 'planStatus', '5': 'moveBundle']
 					break
-				case 'Asset_Columns':
+				case PREF.Asset_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
-				case 'Physical_Columns':
+				case PREF.Physical_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
-				case 'Database_Columns':
+				case PREF.Database_Columns:
 					colPref = ['1': 'dbFormat','2': 'size','3': 'validation','4': 'planStatus','5': 'moveBundle']
 					break
-				case 'Storage_Columns':
+				case PREF.Storage_Columns:
 					colPref = ['1': 'fileFormat','2': 'size','3': 'validation','4': 'planStatus','5': 'moveBundle']
 					break
-				case 'Task_Columns':
+				case PREF.Task_Columns:
 					colPref = ['1': 'assetName','2': 'assetType','3': 'assignedTo','4': 'role', '5': 'category']
 					break
-				case 'Model_Columns':
+				case PREF.Model_Columns:
 					colPref = ['1': 'description','2': 'assetType','3': 'powerUse','4': 'modelConnectors']
 					break
-				case 'Dep_Columns':
+				case PREF.Dep_Columns:
 					colPref = ['1': 'frequency','2': 'comment']
 					break
 			}
@@ -2254,8 +2306,7 @@ class AssetEntityService implements ServiceMethods {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 
-		// def prefType = (listType == 'server') ? 'Asset_Columns' : 'Physical_Columns'
-		def prefType = 'Asset_Columns'
+		def prefType = PREF.Asset_Columns
 		def fieldPrefs = getExistingPref(prefType)
 
 		// The hack for the dot notation
@@ -2342,7 +2393,7 @@ class AssetEntityService implements ServiceMethods {
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DEVICE.toString(), true)
 
-		String prefType = 'Asset_Columns'
+		def prefType = PREF.Asset_Columns
 		def assetPref= getExistingPref(prefType)
 
 		List assetPrefColumns = assetPref*.value
@@ -2565,15 +2616,26 @@ class AssetEntityService implements ServiceMethods {
 		// Handle the filtering by each column's text field
 		def whereConditions = []
 		def queryParams = [:]
-		filterParams.each {key, val ->
-			if (val && val.trim().size()) {
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, AssetEntity)
+		filterParams.each { key, val ->
+			if (val?.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: AssetEntity,
+						column: key,
+						filter: val,
+						columnAlias: "assets.${key}"
+
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
 		if (whereConditions.size()) {
 			firstWhere = false
-			query.append(" WHERE assets.${whereConditions.join(" AND assets.")}")
+			query.append(" WHERE ${whereConditions.join(" AND ")}")
 		}
 		if (params.moveBundleId) {
 			// TODO : JPM 9/2014 : params.moveBundleId!='unAssigned' - is that even possible anymore? moveBundle can't be unassigned...
@@ -2897,6 +2959,66 @@ class AssetEntityService implements ServiceMethods {
 		]
 
 		return map
+	}
+
+	/**
+	 * Used to clone an asset and optionally the dependencies associated with the asset
+	 * @param assetId - the id of the asset to be cloned
+	 * @param name - the name to set the new asset name to
+	 * @param dependencies - a flag to control if dependencies should be cloned
+	 * @param errors - an initialize List object that will be populated with one or more error messages if the method fails
+	 * @return the id number of the newly created asset
+	 */
+	Long clone(Long assetId, String name, Boolean cloneDependencies, List<String> errors) {
+		AssetEntity clonedAsset
+		if(!errors) {
+
+			//  params son assetId
+			AssetEntity assetToClone = AssetEntity.get(assetId)
+			if (!assetToClone) {
+				errors << "The asset specified to clone was not found"
+			} else {
+				//check that the asset is part of the project
+				if (!securityService.isCurrentProjectId(assetToClone.projectId)) {
+					log.error(
+							"Security Violation, user {} attempted to access an asset not associated to the project",
+							securityService.getCurrentUsername()
+					)
+					errors << "Asset not found in current project"
+				}
+				if (!errors) {
+					Map defaultValues = [
+						assetName : name,
+						validation: ValidationType.DIS,
+						environment: ''
+					]
+					if (assetToClone.isaDevice()) {
+						defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
+					}
+					clonedAsset = assetToClone.clone(defaultValues)
+
+					// Cloning assets dependencies if requested
+					if (clonedAsset.save() && cloneDependencies) {
+						for (dependency in assetToClone.supportedDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									dependent: clonedAsset,
+									status   : AssetDependencyStatus.QUESTIONED
+							])
+
+							clonedDependency.save()
+						}
+						for (dependency in assetToClone.requiredDependencies()) {
+							AssetDependency clonedDependency = dependency.clone([
+									asset : clonedAsset,
+									status: AssetDependencyStatus.QUESTIONED
+							])
+							clonedDependency.save()
+						}
+					}
+					return clonedAsset.id
+				}
+			}
+		}
 	}
 
 }

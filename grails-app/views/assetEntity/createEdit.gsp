@@ -133,10 +133,10 @@
 										/>
 							</tds:tooltipSpan>
 							</td>
-							<td class="label {standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
+							<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
 								<label for="sourceLocationId">Location/Room</label>
 							</td>
-							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
+                            <td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
 									<tds:tooltipSpan class="useRoomS" field="${standardFieldSpecs.sourceLocation}">
 										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
@@ -163,7 +163,7 @@
 												/>
 									</span>
 							</td>
-							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.sourceLocation.imp?:''}" data-for="sourceLocationId">
+							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.targetLocation.imp?:''}" data-for="sourceLocationId">
 									<tds:tooltipSpan class="useRoomT" field="${standardFieldSpecs.targetLocation}">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
@@ -237,7 +237,7 @@
 									<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
 								</tds:tooltipSpan>
 							</td>
-							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
+							<td class="label rackLabel ${standardFieldSpecs.targetRack.imp?:''}" data-for="sourceRackId">
 								<tds:tooltipSpan class="useRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRack}">
 									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 																				   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
@@ -459,6 +459,7 @@
 															  onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 					</tds:hasPermission>
 					<span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#createEntityView').dialog('close'); $('#showEntityView').dialog('close'); $('#editEntityView').dialog('close');"/> </span>
+                    <input type="submit" id="assetUpdateSubmit" style="display:none;">
 				</div>
 			</td>
 		</tr>
@@ -502,6 +503,16 @@
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
         $('[data-toggle="popover"]').popover();
-	})(jQuery);
+
+        // TM-7943 - mozilla browser based hack-fix for this particular scenario when displaying tooltip popover w/ select2 component.
+        if (isMozillaBrowser) {
+            $('.select2-offscreen').each(function () {
+                $(this).on('select2-open', function () {
+                    $('div.popover').hide();
+                });
+            });
+        }
+
+    })(jQuery);
 
 </script>

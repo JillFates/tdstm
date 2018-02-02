@@ -403,7 +403,7 @@ class UserLoginController implements ControllerMethods {
 				//
 				// Made it throught the guantlet of password requirements so lets update the password
 				//
-				securityService.setUserLoginPassword(userLogin, params.password)
+				securityService.setUserLoginPassword(userLogin, params.password, params.confirmPassword)
 
 				if (!userLogin.save()) {
 					log.warn "updatePassword() failed to update user password for $userLogin : ${GormUtil.allErrorsString(userLogin)}"

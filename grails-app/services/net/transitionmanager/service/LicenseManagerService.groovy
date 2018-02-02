@@ -144,10 +144,15 @@ class LicenseManagerService extends LicenseCommonService {
 				build()
 		*/
 
-		byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
-		String trns = new String(Base64.encodeBase64(licenseData))
+		try {
+			byte[] licenseData = LicenseCreator.getInstance().signAndSerializeLicense(license)
+			String trns = new String(Base64.encodeBase64(licenseData))
 
-		return trns
+			return trns
+		}catch(e){
+			log.error("License Creation Problem", e)
+			throw e
+		}
 	}
 
 	/**

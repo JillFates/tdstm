@@ -1,6 +1,7 @@
 package com.tdsops.common.security
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.TdsUserDetails
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -63,6 +64,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			}
 
 			EventType type = (EventType) data.type
+
 			Map<String, Object> jsonData = [:]
 			jsonData.eventTime = new Date()
 			jsonData.type = type.name()
@@ -80,10 +82,22 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 					catch (e) {
 						valueToString = '{{ Error occurred rendering as String }}'
 					}
+
 					if (valueToString.length() > 500) {
 						valueToString = valueToString.substring(0, 500) + '...'
 					}
 					jsonData.attributeValue = valueToString
+				}
+			}
+
+			if (type in [EventType.sessionCreated, EventType.sessionDestroyed]) {
+				log.debug "\n***********\n*********** $type ${jsonData.sessionId}\n***********"
+				try {
+					// Create a stacktrace to puposefully log where in the application that the session was created
+					throw new RuntimeException("$type")
+				} 
+				catch (e) {
+					log.debug ExceptionUtil.stackTraceToString(e, 80)
 				}
 			}
 
@@ -92,8 +106,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 					jsonData.sessionCreationTime = session.creationTime
 				}
 				jsonData.sessionLastAccessedTime = session.lastAccessedTime
-			}
-			catch (IllegalStateException e) {
+			} catch (IllegalStateException e) {
 				// ignored; both method calls throw IllegalStateException if invalidated,
 				// but there's no way to check that the session is still active
 			}
@@ -104,8 +117,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			jsonData.authInfo = authInfo
 
 			logger.debug '{} {}', LOGGER_PREFIX, (jsonData as JSON)
-		}
-		catch (e) {
+		} catch (e) {
 			handleException 'sessionCreated', e
 		}
 	}

@@ -3,12 +3,14 @@ import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
 import { UIPromptService } from '../../directives/ui-prompt.directive';
-// import {TranslateService} from 'ng2-translate';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 declare var jQuery: any;
 @Component({
 	selector: 'header',
 	templateUrl: '../tds/web-app/app-js/shared/modules/header/header.component.html',
+	providers: [TranslatePipe],
+	styles: [`.font-weight-bold { font-weight:bold; }`]
 })
 
 export class HeaderComponent implements AfterViewInit {
@@ -23,6 +25,7 @@ export class HeaderComponent implements AfterViewInit {
 
 	constructor(
 		@Inject('taskCount') tasks,
+		translatePipe: TranslatePipe,
 		state: StateService,
 		notifierService: NotifierService,
 		promptService: UIPromptService) {
@@ -61,10 +64,8 @@ export class HeaderComponent implements AfterViewInit {
 
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.pageMetaData = this.state.$current.data.page;
-			// translate.get(this.pageMetaData.title).subscribe((translateWord: string) => {
-			//     document.title = translateWord;
-			// });
 
+			document.title = translatePipe.transform(this.pageMetaData.title, []);
 		}
 	}
 

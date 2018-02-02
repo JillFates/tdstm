@@ -24,9 +24,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
-import org.jmesa.facade.TableFacade
-import org.jmesa.facade.TableFacadeImpl
-import org.jmesa.limit.Limit
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -51,49 +48,6 @@ class ProjectUtilController implements ControllerMethods {
 			}
 			redirect(controller: "project", action: "list")
 		}
-	}
-
-	/**
-	 * Return a list of projects , sorted desc by dateCreated
-	 */
-	@HasPermission(Permission.ProjectView)
-	def searchList() {
-		List<Project> projectList
-		String sort = params.sort ?: 'dateCreated'
-		String order = params.order ?: 'desc'
-		if (securityService.hasPermission(Permission.ProjectShowAll)) {
-			projectList = Project.findAll(sort: sort, order: order)
-		}
-		else {
-			PartyRelationship userCompany = PartyRelationship.executeQuery('''
-				from PartyRelationship
-				where partyRelationshipType.id = 'STAFF'
-				  and partyIdTo.id = :currentPersonId
-				  and roleTypeCodeFrom.id = 'COMPANY'
-				  and roleTypeCodeTo.id = 'STAFF'
-				''', [currentPersonId: securityService.currentPersonId.toLong()], [max: 1])[0]
-
-			projectList = Project.findAll('''
-				from Project
-				where id in (select partyIdFrom.id from PartyRelationship
-				             where partyIdTo=:partyId and roleTypeCodeFrom='PROJECT')
-				   or client = :partyId
-				order by ''' + sort + ' ' + order,
-					[partyId: userCompany?.partyIdFrom, sort: sort, order: order])
-		}
-
-		TableFacade tableFacade = new TableFacadeImpl("tag", request)
-		tableFacade.items = projectList
-
-		Limit limit = tableFacade.limit
-		if (limit.exported) {
-			tableFacade.setExportTypes(response, limit.exportType)
-			tableFacade.setColumnProperties("projectCode", "name", "dateCreated", "lastUpdated", "comment")
-			tableFacade.render()
-			return
-		}
-
-		[projectList: projectList]
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)

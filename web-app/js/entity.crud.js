@@ -231,6 +231,7 @@ var EntityCrud = (function ($) {
 
 	// Creates a Select2 control for an Asset Name selector used in Depenedencies
 	pub.assetNameSelect2 = function (element) {
+	    var currentSelector = '';
 		element.select2({
 			minimumInputLength: 0,
 			width: '100%',
@@ -244,16 +245,24 @@ var EntityCrud = (function ($) {
 				dataType: 'json',
 				quietMillis: quietMillis,
 				data: function (term, page) {
+                    currentSelector = $(this)[0];
+                    var selectElement = $(this).select2('data');
+                    var selectValue = '';
+                    if(selectElement && selectElement !== null) {
+                        selectValue = $(this).select2('data').text;
+                    }
 					return {
 						q: term,
+                        value: selectValue,
 						max: 25,
-						page: page,
+						page: $(this).data('select2').resultsPage,
 						assetClassOption: $(this).data("asset-type"),
 					};
 				},
 				results: function (data, page) {
-					var more = (page * 25) < data.total;
-					return { results: data.results, more: more };
+                    $(currentSelector).data('select2').resultsPage = data.page + 1;
+					var more = (data.page * 25) < data.total;
+					return { results: data.results, more: more};
 				}
 			}
 		});
@@ -1093,6 +1102,12 @@ var EntityCrud = (function ($) {
 	};
 	// Private method used by fetchAssetDependencyEditView to fetch the edit view for the asset dependencies
 	var fetchAssetDependencyEditView = function (assetA, assetB, action) {
+		var editModal = pub.getEditModal();
+
+		if (editModal.length) {
+			pub.closeShowModal();
+		}
+
 		var assetDependencies = {
 			assetAId: assetA.id,
 			assetBId: assetB.id
@@ -1105,7 +1120,11 @@ var EntityCrud = (function ($) {
 			success: function (resp) {
 				var currentScope = angular.element('.body').scope();
 				if(currentScope) {
-					currentScope.$emit('viewAssetDependency', resp.data, action);
+					if(currentScope.commentsScope) {
+						currentScope.commentsScope.$emit('viewAssetDependency', resp.data, action);
+					} else {
+						currentScope.$emit('viewAssetDependency', resp.data, action);
+					}
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -1570,19 +1589,23 @@ var EntityCrud = (function ($) {
 	 * @param iconLinkId - the DOM id of the A tag that contains the icon that is changed accordingly
 	 */
 	pub.onDepCommentDialogClose = function () {
-		var modal = $('#depCommentDialog');
-		var type = $('#depCommentType').val();
-		var rowNo = $('#depCommentRowNo').val();
 		var textarea = $('#depCommentTextarea');
 
-		var hiddenInput = $('input:hidden[name=comment_' + type + '_' + rowNo + ']')
+		if (textarea.val().length > 65535) {
+			alert("The length of the comment exceeds the allowed maximum of 65535 characters.")
+		} else {
+            var modal = $('#depCommentDialog');
+            var type = $('#depCommentType').val();
+            var rowNo = $('#depCommentRowNo').val();
+            var hiddenInput = $('input:hidden[name=comment_' + type + '_' + rowNo + ']')
+            hiddenInput.val(textarea.val());
+            modal.dialog('close');
+            // Update the icon based on if there is content
+            var iconMode = hiddenInput.val() ? 'edit' : 'add';
+            $('#commLink_' + type + '_' + rowNo).html('<img border="0px" src="' + tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">'));
+		}
 
-		hiddenInput.val(textarea.val());
-		modal.dialog('close');
 
-		// Update the icon based on if there is content
-		var iconMode = hiddenInput.val() ? 'edit' : 'add';
-		$('#commLink_' + type + '_' + rowNo).html('<img border="0px" src="' + tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">'));
 	};
 
 	/**
@@ -2335,6 +2358,8 @@ function clearFilter(gridId) {
 	$("[id^=gs_]").each(function () {
 		data[$(this).attr("name")] = '';//{assetName='',appOwner:'',environment:'',....}
 	});
+    // When clearing out the filters, also clear the filter param.
+    data["filter"] = ''
 	$("#" + gridId + "Grid").setGridParam({ postData: data });
 	$('.ui-icon-refresh').click();
 	$(".clearFilterId").attr("disabled", "disabled");

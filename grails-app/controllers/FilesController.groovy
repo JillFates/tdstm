@@ -4,6 +4,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
@@ -53,7 +54,7 @@ class FilesController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def fieldPrefs = assetEntityService.getExistingPref('Storage_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.Storage_Columns)
 
 		[fileFormat: filters?.fileFormatFilter, fileName: filters?.assetNameFilter ?:'',
 		 filesPref: fieldPrefs, size: filters?.sizeFilter] +
@@ -94,7 +95,7 @@ class FilesController implements ControllerMethods {
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.STORAGE.toString(), true)
 
-		Map filePref= assetEntityService.getExistingPref('Storage_Columns')
+		Map filePref= assetEntityService.getExistingPref(PREF.Storage_Columns)
 		List prefColumns = filePref*.value
 		for (String fieldName in prefColumns) {
 			if (fieldNameMap.containsKey(fieldName)) {
@@ -187,12 +188,23 @@ class FilesController implements ControllerMethods {
 		def queryParams = [:]
 		filterParams.each {key, val ->
 			if (val && val.trim().size()) {
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Files)
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: Files,
+						column: key,
+						filter: val,
+						columnAlias: "files.${key}"
+
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
 		if (whereConditions.size()) {
-			query.append(" WHERE files.${whereConditions.join(" AND files.")}")
+			query.append(" WHERE ${whereConditions.join(" AND ")}")
 		}
 
 		if (params.moveBundleId) {
@@ -359,7 +371,6 @@ class FilesController implements ControllerMethods {
 
 		def assetName = files.assetName
 		assetEntityService.deleteAsset(files)
-		files.delete()
 
 		flash.message = "Storage $assetName deleted"
 		if (params.dstPath =='dependencyConsole') {
@@ -370,20 +381,4 @@ class FilesController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		def assetNames = []
-
-		params.id.split(",").each { assetId ->
-			def files = Files.get(assetId)
-			if (files) {
-				assetNames.add(files.assetName)
-				assetEntityService.deleteAsset(files)
-
-				files.delete()
-			}
-		}
-
-		render "Files ${WebUtil.listAsMultiValueString(assetNames)} deleted"
-	}
 }

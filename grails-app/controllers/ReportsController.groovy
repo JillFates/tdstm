@@ -6,12 +6,14 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -986,7 +988,7 @@ class ReportsController implements ControllerMethods {
 					  break
 
 				case "Generate Pdf" :
-					  exportTaskReportPdf(taskList, tzId, project)
+					  exportTaskReportPdf(taskList, tzId, project, reqEvents)
 					  break
 
 				default :
@@ -1013,21 +1015,20 @@ class ReportsController implements ControllerMethods {
 		File file = grailsApplication.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
 
 		def currDate = TimeUtil.nowGMT()
-		String eventsFileName = "ALL"
-		String eventsTitleSheet = eventsFileName
-		if(reqEvents.size() > 1 || reqEvents[0] != "all"){
-			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+		String eventsTitleSheet = "ALL"
+		boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
+		def moveEvents = []
+		if(!allEvents){
+			moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
 			def eventNames = moveEvents.collect{it.name}
-			eventsFileName = eventNames.join("-")
 			eventsTitleSheet = eventNames.join(", ")
 		}
-		def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
-		String filename = project.client.name + '-' + ( project.name ?: project.id ) + "-${eventsFileName}-${exportDate}"
-
+		def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
+		String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams, 'xls')
 
 		//set MIME TYPE as Excel
 		response.setContentType( "application/vnd.ms-excel" )
-		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+		setHeaderContentDisposition(filename)
 
 
 		def book = new HSSFWorkbook(new FileInputStream( file ))
@@ -1074,9 +1075,10 @@ class ReportsController implements ControllerMethods {
 	 * @param taskList : list of tasks
 	 * @param tzId : timezone
 	 * @param project : project instance
+	 * @param reqEvents : list of requested events.
 	 * @return : will generate a pdf file having task task list
 	 */
-	def exportTaskReportPdf(taskList, tzId, project){
+	def exportTaskReportPdf(taskList, tzId, project, reqEvents){
 		def currDate = new Date()
 		def reportFields = []
 
@@ -1114,7 +1116,13 @@ class ReportsController implements ControllerMethods {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		} else {
-			String filename = project.name + '-TaskReport'
+			boolean allEvents = reqEvents.remove("all")
+			def moveEvents
+			if (reqEvents) {
+				moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			}
+			def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
+			String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams)
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":filename,"_file":"taskReport"])
 		}

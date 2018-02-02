@@ -36,4 +36,13 @@ enum SizeScale {
 	}
 
 	static List<String> getLabels(String locale = 'en') { labels }
+
+	// Convert enum to a representation with key/values
+	static List<Object> getAsJsonList() {
+		List<Object> stringList = new ArrayList<Object>();
+		keys.each {
+			stringList.add([ 'value' :(it.name()), 'text': it.getValue()])
+		}
+		return stringList
+	}
 }

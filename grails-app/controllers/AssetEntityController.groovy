@@ -4,11 +4,13 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
+import com.tds.asset.CommentNote
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -21,6 +23,7 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -30,7 +33,10 @@ import grails.transaction.Transactional
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
@@ -45,6 +51,7 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
@@ -71,6 +78,7 @@ import net.transitionmanager.utils.Profiler
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -88,7 +96,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 @SuppressWarnings('GrMethodMayBeStatic')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
-class AssetEntityController implements ControllerMethods {
+class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
@@ -257,7 +265,7 @@ class AssetEntityController implements ControllerMethods {
 
 		// closure used to redirect user with an error message for sever issues
 		def failWithError = { message ->
-			log.error "upload() $securityService.currentUsername was $message"
+			log.error "upload() failed for user $securityService.currentUsername due to $message"
 			forward action: forwardAction, params: [error: message]
 		}
 
@@ -270,9 +278,11 @@ class AssetEntityController implements ControllerMethods {
 			forward action:forwardAction, params: [ message: message.toString() ]
 
 		} catch (InvalidParamException ipe) {
+			log.info 'upload() failed due to invalid parameter'
 			failWithError ipe.message
 		} catch (Exception e) {
-			failWithError e.message
+			log.error ExceptionUtil.stackTraceToString('upload() failed with an exception', e)
+			failWithError 'an unexpected error occurred'
 		}
 	}
 
@@ -560,11 +570,18 @@ class AssetEntityController implements ControllerMethods {
 			def workflowTransition = assetComment?.workflowTransition
 			String workflow = workflowTransition?.name
 
-			def noteList = assetComment.notes.sort{it.dateCreated}
+			// Get a list of the Notes associated with the task/comment
 			def notes = []
-			noteList.each {
-				notes << [TimeUtil.formatDateTime(it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
-				          it.createdBy?.toString(), it.note, it.createdBy?.id]
+			def notesList = CommentNote.createCriteria().list(max: 50) {
+				eq('assetComment', assetComment)
+				order('dateCreated', 'desc')
+			}
+			for (note in notesList) {
+				notes << [
+					TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
+					note.createdBy?.toString(),
+					note.note,
+					note.createdBy?.id]
 			}
 
 			// Get the name of the User Role by Name to display
@@ -625,6 +642,11 @@ class AssetEntityController implements ControllerMethods {
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 			def canEdit = userCanEditComments(assetComment.commentType)
 
+			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
+
+			ApiAction apiAction = assetComment.apiAction
+			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
 			commentList << [
@@ -650,6 +672,7 @@ class AssetEntityController implements ControllerMethods {
 				statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
 				successorsCount: successorsCount,
 				predecessorsCount: predecessorsCount,
+				taskSpecId: assetComment.taskSpec,
 				assetId: assetComment.assetEntity?.id ?: "",
 				assetType: assetComment.assetEntity?.assetType,
 				assetClass: assetComment.assetEntity?.assetClass?.toString(),
@@ -658,7 +681,14 @@ class AssetEntityController implements ControllerMethods {
 				instructionsLinkURL: instructionsLinkURL ?: "",
 				instructionsLinkLabel: instructionsLinkLabel ?: "",
 				canEdit: canEdit,
+				apiAction:apiActionMap,
+				actionMode: actionMode,
+				actionInvocable: assetComment.isActionInvocable(),
+				actionMode: actionMode,
 				lastUpdated: lastUpdated,
+				apiActionId: assetComment.apiAction?.id,
+				action: assetComment.apiAction?.name
+				//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
 			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
@@ -986,6 +1016,9 @@ class AssetEntityController implements ControllerMethods {
 		licenseAdminService.isLicenseCompliant(project)
 
 		try {
+			// Flag if the request contained any params that should enable the "Clear Filters" button.
+			boolean filteredRequest = false
+
 			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
 				userPreferenceService.setPreference(PREF.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
 			}
@@ -1000,14 +1033,14 @@ class AssetEntityController implements ControllerMethods {
 			def filters = session.TASK?.JQ_FILTERS
 
 			// Deal with the parameters
-			def taskPref = assetEntityService.getExistingPref('Task_Columns')
+			def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
 
 			// column name and its associated javascript cell formatter name
-			def formatterMap = [assetEntity:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
+			def formatterMap = [assetEntity:'assetFormatter', assetName:'assetFormatter', estStart:'estStartFormatter', estFinish: 'estFinishFormatter']
 			def moveEvent
 
 
@@ -1041,13 +1074,19 @@ class AssetEntityController implements ControllerMethods {
 			def justRemaining = userPreferenceService.getPreference(PREF.JUST_REMAINING) ?: "1"
 			// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 			def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-			boolean viewUnpublished = (userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true') ? '1' : '0'
+			String viewUnpublished = (userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true') ? '1' : '0'
 			def timeToRefresh = userPreferenceService.getPreference(PREF.TASKMGR_REFRESH)
 			def entities = assetEntityService.entityInfo(project)
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
 			def companiesList = partyRelationshipService.getCompaniesList()
 			def role = filters?.role ?: params.role ?: ''
 			def status = params.status ?: filters?.status ?: ''
+
+			// If there's a status or filters set, then the Clear Filters button should be enabled.
+			if (status || params.filter) {
+				filteredRequest = true
+			}
+
 			return [
 					timeToUpdate: timeToRefresh ?: 60,
 					servers: entities.servers,
@@ -1080,10 +1119,11 @@ class AssetEntityController implements ControllerMethods {
 					formatterMap: formatterMap,
 			        staffRoles: taskService.getTeamRolesForTasks(),
 					assetCommentFields: assetCommentFields.sort { it.value },
-			        sizePref: userPreferenceService.getPreference(PREF.ASSET_LIST_SIZE) ?: '25',
+			        sizePref: userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
 			        partyGroupList: companiesList,
 					company: project.client,
-					step: params.step]
+					step: params.step,
+					filteredRequest: filteredRequest]
 		} catch (RuntimeException e) {
 			log.error e.message, e
 			response.sendError(401, "Unauthorized Error")
@@ -1182,11 +1222,11 @@ class AssetEntityController implements ControllerMethods {
 	def listTaskJSON() {
 		String sortIndex =  params.sidx ?: session.TASK?.JQ_FILTERS?.sidx
 		String sortOrder =  params.sord ?: session.TASK?.JQ_FILTERS?.sord
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = (currentPage - 1) * maxRows
 
-		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.TASK_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
 
 		Project project = securityService.userCurrentProject
 		def today = new Date().clearTime()
@@ -1226,12 +1266,18 @@ class AssetEntityController implements ControllerMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 
 		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
+		/*
+		 oluna 170921 (for the developer of the future) : the use of "DATE like param" in the queries is interpolated due to the fact that we are comparing against the
+		 	String "Date" representation of the field ("2017-05-13 17:35:24") and if we try to use "named-params" it will fail the type-check (comparing Strings to Dates)
+		 	so leave this implementation alone unless you find a better way :)
+		*/
 		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%$params.dueDate%' ",[project:project])?.dueDate : []
 		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%$params.estStart%' ",[project:project])?.estStart : []
 		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%$params.actStart%' ",[project:project])?.actStart : []
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%$params.dateCreated%' ",[project:project])?.dateCreated : []
 		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%$params.dateResolved%' ",[project:project])?.dateResolved : []
 		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%$params.estFinish%' ",[project:project])?.estFinish : []
+		def statusUpdated = params.statusUpdated ? AssetComment.findAll("from AssetComment where project=:project and statusUpdated like '%$params.statusUpdated%' ",[project:project])?.statusUpdated : []
 
 		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%$params.assignedTo%","%$params.assignedTo%") : []
@@ -1260,6 +1306,12 @@ class AssetEntityController implements ControllerMethods {
 			if (params.comment) {
 				ilike('comment', "%$params.comment%")
 			}
+			if (params.resolution) {
+				ilike('resolution', "%$params.resolution%")
+			}
+			if (params.instructionsLink) {
+				ilike('instructionsLink', "%$params.instructionsLink%")
+			}
 			if (params.status) {
 				ilike('status', "%$params.status%")
 			}
@@ -1275,7 +1327,7 @@ class AssetEntityController implements ControllerMethods {
 			if (durations) {
 				'in'('duration', durations)
 			}
-			if (params.durationScale) {
+			if (params.durationScale) {+
 				ilike('durationScale', "%$params.durationScale%")
 			}
 			if (params.category) {
@@ -1296,11 +1348,22 @@ class AssetEntityController implements ControllerMethods {
 			if (taskNumbers) {
 				'in'('taskNumber', taskNumbers)
 			}
-
 			if (params.isResolved?.isNumber()) {
 				eq('isResolved', params.int('isResolved'))
 			}
-
+			if (params.priority?.isNumber()) {
+				eq('priority', params.int('priority'))
+			}
+			if (StringUtil.isLike(params.isPublished, 'true')) {
+				eq('isPublished', true)
+			} else if (StringUtil.isLike(params.isPublished, 'false')) {
+					eq('isPublished', false)
+			}
+			if (StringUtil.isLike(params.sendNotification, 'true')) {
+				eq('sendNotification', true)
+			} else if (StringUtil.isLike(params.sendNotification, 'false')) {
+					eq('sendNotification', false)
+			}
 			if (params.hardAssigned?.isNumber()) {
 				eq('hardAssigned', params.int('hardAssigned'))
 			}
@@ -1323,23 +1386,24 @@ class AssetEntityController implements ControllerMethods {
 			if (estFinishdates) {
 				'in'('estFinish',estFinishdates)
 			}
+			if (statusUpdated) {
+				'in'('statusUpdated',statusUpdated)
+			}
 			if (dateCreateddates) {
 				'in'('dateCreated',dateCreateddates)
 			}
 			if (dateResolveddates) {
 				'in'('dateResolved',dateResolveddates)
 			}
-
 			if (createdBy) {
 				'in'('createdBy', createdBy)
 			}
 			if (resolvedBy) {
-				'in'('createdBy', resolvedBy)
+				'in'('resolvedBy', resolvedBy)
 			}
 			if (assigned) {
 				'in'('assignedTo', assigned)
 			}
-
 			if (sortIndex && sortOrder) {
 				String sortIdx
 				switch(sortIndex) {
@@ -1370,7 +1434,6 @@ class AssetEntityController implements ControllerMethods {
 			if (moveEvent) {
 				eq("moveEvent", moveEvent)
 			}
-
 			if (params.justRemaining == "1") {
 				ne("status", AssetCommentStatus.COMPLETED)
 			}
@@ -1405,7 +1468,7 @@ class AssetEntityController implements ControllerMethods {
 		def estStartClass
 		def estFinishClass
 		def nowGMT = TimeUtil.nowGMT()
-		def taskPref = assetEntityService.getExistingPref('Task_Columns')
+		def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
 
 
 		def results = tasks?.collect {
@@ -1518,7 +1581,7 @@ class AssetEntityController implements ControllerMethods {
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
-			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|lastUpdated/:
+			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
 				result = TimeUtil.formatDateTime(task[value])
 			break
 			case "event": result = task.moveEvent?.name; break
@@ -1603,6 +1666,8 @@ class AssetEntityController implements ControllerMethods {
 	def assetSummary() {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
+		String justPlanningPref = userPreferenceService.getPreference(null, PREF.ASSET_JUST_PLANNING, "false")
+		Boolean justPlanning = BooleanUtils.toBoolean(justPlanningPref)
 
 		int totalAsset = 0
 		int totalPhysical = 0
@@ -1610,17 +1675,63 @@ class AssetEntityController implements ControllerMethods {
 		int totalDatabase = 0
 		int totalFiles = 0
 
-		List assetSummaryList = MoveBundle.findAllByProject(project, [sort: 'name']).collect { MoveBundle moveBundle ->
-			int physicalCount = AssetEntity.executeQuery('''
-				select count(*) from AssetEntity
-				where moveBundle=:mb
-				  and assetClass=:ac
-				  and coalesce(assetType) not in (:at)
-			''', [mb: moveBundle, ac: AssetClass.DEVICE, at: AssetType.virtualServerTypes])[0]
-			int assetCount = AssetEntity.countByMoveBundleAndAssetTypeInList(moveBundle, AssetType.serverTypes, params)
-			int applicationCount = Application.countByMoveBundle(moveBundle)
-			int databaseCount = Database.countByMoveBundle(moveBundle)
-			int filesCount = Files.countByMoveBundle(moveBundle)
+		def moveBundles = MoveBundle.withCriteria {
+			eq('project', project)
+			order('name', 'asc')
+		}
+		List assetSummaryList = []
+
+		for (MoveBundle moveBundle in moveBundles) {
+
+			int physicalCount = AssetEntity.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				eq('assetClass', AssetClass.DEVICE)
+				or {
+					isNull('assetType')
+					not {
+						'in'('assetType', AssetType.virtualServerTypes)
+					}
+				}
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int assetCount = AssetEntity.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				and {
+					'in' ('assetType', AssetType.serverTypes)
+				}
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int applicationCount = Application.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int databaseCount = Database.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
+
+			int filesCount = Files.createCriteria().count() {
+				eq('moveBundle', moveBundle)
+				if (justPlanning) {
+					createAlias('moveBundle', 'mb')
+					eq('mb.useForPlanning', justPlanning)
+				}
+			}
 
 			totalAsset += assetCount
 			totalPhysical += physicalCount
@@ -1628,10 +1739,14 @@ class AssetEntityController implements ControllerMethods {
 			totalDatabase += databaseCount
 			totalFiles += filesCount
 
-			[name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
-			 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+			if (!justPlanning || assetCount || applicationCount || physicalCount || databaseCount || filesCount) {
+				assetSummaryList << [name: moveBundle, assetCount: assetCount, applicationCount: applicationCount, physicalCount: physicalCount,
+									 databaseCount: databaseCount, filesCount: filesCount, id: moveBundle.id]
+			}
+
 		}
 
+		moveBundles = null
 		[assetSummaryList: assetSummaryList, totalAsset: totalAsset, totalApplication: totalApplication,
 		 totalDatabase: totalDatabase,totalPhysical: totalPhysical, totalFiles: totalFiles]
 	}
@@ -1704,7 +1819,7 @@ class AssetEntityController implements ControllerMethods {
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
-			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id 
+			LEFT OUTER JOIN room srcr ON srcr.room_id = ae.room_source_id
 			LEFT OUTER JOIN room tarr ON tarr.room_id = ae.room_target_id
 			"""
 			assetDependentlist = jdbcTemplate.queryForList(queryFordepsList, project.id)
@@ -1993,7 +2108,7 @@ class AssetEntityController implements ControllerMethods {
 					depGroups = -1
 
 				def assetDependencies = AssetDependency.executeQuery('''
-					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future,
+					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.type as type, ad.isFuture AS future,
 					                ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
 					                (CASE WHEN ad.asset.moveBundle != ad.dependent.moveBundle
 					                       AND ad.status in (:statuses)
@@ -2035,6 +2150,8 @@ class AssetEntityController implements ControllerMethods {
 						notApplicable = true
 					}
 
+					def dependencyStatus = it.status
+					def dependencyType = it.type
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if (sourceIndex != -1 && targetIndex != -1) {
@@ -2046,9 +2163,21 @@ class AssetEntityController implements ControllerMethods {
 						linkTable[sourceIndex][targetIndex] = true
 						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
 
-						graphLinks << [id: i, source: sourceIndex, target: targetIndex, value: 2, statusColor: statusColor,
-						               opacity: opacity, unresolved: !it.resolved, notApplicable: notApplicable,
-						               future: future, bundleConflict: it.bundleConflict, duplicate: duplicate]
+						graphLinks << [
+								id: i,
+								source: sourceIndex,
+								target: targetIndex,
+								value: 2,
+								statusColor: statusColor,
+								bundleConflict: it.bundleConflict,
+								dependencyStatus: dependencyStatus,
+								dependencyType: dependencyType,
+								duplicate: duplicate,
+								future: future,
+								opacity: opacity,
+								unresolved: !it.resolved,
+								notApplicable: notApplicable,
+							]
 						i++
 					}
 				}
@@ -2058,6 +2187,8 @@ class AssetEntityController implements ControllerMethods {
 					graphNodes[it.source].dependsOn.add(it.id)
 					graphNodes[it.target].supports.add(it.id)
 				}
+
+				def entities = assetEntityService.entityInfo(project)
 
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
@@ -2078,6 +2209,19 @@ class AssetEntityController implements ControllerMethods {
 				model.moveBundleMap = moveBundleIndexMap as JSON
 				model.moveEventMap = moveEventIndexMap as JSON
 				model.depGroup = params.dependencyBundle
+				model.dependencyType = entities.dependencyType
+				model.dependencyStatus = entities.dependencyStatus
+				model.connectionTypes = '{}'
+				model.statusTypes = '{}'
+				if (project.depConsoleCriteria) {
+					def depConsoleCriteria = JsonUtil.parseJson(project.depConsoleCriteria)
+					if (depConsoleCriteria.connectionTypes) {
+						model.connectionTypes = JsonUtil.toJson(depConsoleCriteria.connectionTypes)
+					}
+					if (depConsoleCriteria.statusTypes) {
+						model.statusTypes = JsonUtil.toJson(depConsoleCriteria.statusTypes)
+					}
+				}
 
 				// Render dependency graph
 				render(template:'dependencyGraph', model:model)
@@ -2099,7 +2243,8 @@ class AssetEntityController implements ControllerMethods {
 	*/
 	@HasPermission(Permission.AssetDelete)
 	def deleteBulkAsset() {
-		renderAsJson(resp: assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]")))
+		Project project = projectForWs
+		renderAsJson(resp: assetEntityService.deleteBulkAssets(project, params.type, params.list("assetLists[]")))
 	}
 
 	/**
@@ -2121,7 +2266,12 @@ class AssetEntityController implements ControllerMethods {
 
 		//def workFlowTransitions = WorkflowTransition.findAllByWorkflow(workFlow) TODO : should be removed after completion of this new feature
 		if (assetEntity) {
-			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			def existingWorkflows
+			if (assetCommentId) {
+				existingWorkflows = AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId).workflowTransition
+			} else {
+				existingWorkflows = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
+			}
 			workFlowTransitions.removeAll(existingWorkflows)
 		}
 
@@ -2328,7 +2478,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def taskList = taskService.search(project, params.category, task, moveEventId)
+		def taskList = taskService.search(project, task, moveEventId)
 
 		if (format=='json') {
 			def list = []
@@ -2355,7 +2505,7 @@ class AssetEntityController implements ControllerMethods {
 		if (!project) return
 
 		def task
-		def moveEventId=params.moveEvent
+		def moveEventId=NumberUtil.toLong(params.moveEvent)
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
 		def filterDesc=params['filter[filters][0][value]']
@@ -2367,7 +2517,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		def tasksData = taskService.search(project, params.category, task, moveEventId, page, pageSize, filterDesc)
+		def tasksData = taskService.search(project, task, moveEventId, page, pageSize, filterDesc)
 
 		def list = []
 
@@ -2394,17 +2544,18 @@ class AssetEntityController implements ControllerMethods {
 		def moveEventId = params.moveEvent
 		def taskId = params.taskId
 		def task
-
+		int taskIdx = 0
 		if (params.commentId) {
 			task = AssetComment.findByIdAndProject(params.commentId, project)
-			if (!task) {
+			// If the task was found, retrieve its index.
+			if (task) {
+				taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
+			} else {
 				log.warn "predecessorSelectHtml - Unable to find task id $params.commentId in project $project.id"
 			}
 		}
 
-		def taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
-
-		renderSuccessJson([taskIdx.intValue()])
+		renderSuccessJson([taskIdx])
 	}
 
 	/**
@@ -2488,34 +2639,6 @@ class AssetEntityController implements ControllerMethods {
 	}
 
 	/**
-	 * Gets validation for particular fields
-	 * @param type,validation
-	 */
-	@HasPermission(Permission.AssetView)
-	def retrieveAssetImportance() {
-		renderAsJson assetEntityService.getConfig(params.type, params.validation).config
-	}
-
-	/**
-	 * Gets highlighting css for particular fields
-	 */
-	@HasPermission(Permission.AssetView)
-	def retrieveHighlightCssMap() {
-		def assetType = params.type
-		Class clazz
-		switch(assetType) {
-			case 'Application': clazz = Application; break
-			case 'Database':    clazz = Database; break
-			case 'Files':       clazz = Files; break
-			default:            clazz = AssetEntity; break
-		}
-
-		def assetEntity = params.id ? clazz.get(params.id) : clazz.newInstance(appOwner: '')
-		def configMap = assetEntityService.getConfig(assetType, params.validation)
-		renderAsJson assetEntityService.getHighlightedInfo(assetType, assetEntity, configMap)
-	}
-
-	/**
 	 * Updates columnList with custom labels.
 	 * @param entityDTAMap :  dataTransferEntityMap for entity type
 	 * @param columnslist :  column Names
@@ -2559,7 +2682,7 @@ class AssetEntityController implements ControllerMethods {
 
 		def entities = assetEntityService.entityInfo(project)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		def depPref = assetEntityService.getExistingPref('Dep_Columns')
+		def depPref = assetEntityService.getExistingPref(PREF.Dep_Columns)
 		def attributes = ['c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
 		def columnLabelpref = [:]
 		depPref.each { key, value ->
@@ -2600,7 +2723,7 @@ class AssetEntityController implements ControllerMethods {
 		                    dependentBundle: params.dependentBundle, status: params.status,frequency: params.frequency,
 		                    comment: params.comment, c1: params.c1, c2: params.c2, c3: params.c3, c4: params.c4,
 		                    direction: params.direction]
-		def depPref= assetEntityService.getExistingPref('Dep_Columns')
+		def depPref= assetEntityService.getExistingPref(PREF.Dep_Columns)
 		StringBuffer query = new StringBuffer("""
 			SELECT * FROM (
 				SELECT asset_dependency_id AS id,
@@ -2921,22 +3044,20 @@ class AssetEntityController implements ControllerMethods {
 	 * @param max
 	 * @param page
 	 * @param q
+	 * @param value
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetListForSelect2() {
 		def results = []
 		long total = 0
+		int currentPage
 
 		Project project = securityService.userCurrentProject
-		if (project) {
+ 		if (project) {
 
 			// The following will perform a count query and then a query for a subset of results based on the max and page
-			// params passed into the request. The query will be constructed with @COLS@ tag that can be substitued when performing
+			// params passed into the request. The query will be constructed with @COLS@ tag that can be substituted when performing
 			// the actual queries.
-
-			int max = NumberUtil.limit(params.int('max', 10), 1, 25)
-			int currentPage = NumberUtil.limit(params.int('page', 1), 1, 1000)
-			int offset = (currentPage - 1) * max
 
 			// This map will drive how the query is constructed for each of the various options
 			Map qmap = [
@@ -2995,8 +3116,9 @@ class AssetEntityController implements ControllerMethods {
 					qparams.assetType = qm.assetType
 				}
 
-				query.append("ORDER BY a.assetName ASC")
+				StringBuffer wquery = new StringBuffer(query) // This one is set aside for later use
 
+				query.append("ORDER BY a.assetName ASC")
 				log.debug "***** Query: $query\nParams: $qparams"
 
 				// Perform query and move data into normal map
@@ -3006,6 +3128,35 @@ class AssetEntityController implements ControllerMethods {
 				total = qm.domain.executeQuery(cquery, qparams)[0]
 
 				if (total > 0) {
+
+					// calculate the page and offset for the list of elements to be returned
+					def value = params.value
+					int max = NumberUtil.limit(params.int('max', 10), 1, 25)
+
+
+					// if there is a value selected in the select2 combo, calculate the page the element is in
+					// so we return only the list of elements on the same page
+					// also check that the page is 1, if not then the user is just scrolling and we should
+					// simply use that value as the page value
+					if (value && params.int('page') == 1)  { // calculate currentPage based on value
+
+						// calculate the element position in the list
+						wquery.append('AND a.assetName > :value ')
+						wquery.append("ORDER BY a.assetName ASC")
+						def cGreaterQuery = wquery.toString().replace('@COLS@', queryCount)
+						log.debug "***** Count Greater Than Query: $cGreaterQuery"
+						qparams << [value: value]
+						def majors = qm.domain.executeQuery(cGreaterQuery, qparams)[0]
+						def elementPosition = total - majors
+						// Then, calculate in which page the element is in
+						currentPage = Math.ceil(elementPosition / max )
+						qparams.remove('value')
+					}
+					else { // if select2 has no value, do the standard procedure to calculate currentPage
+						currentPage = NumberUtil.limit(params.int('page', 1), 1, 1000)
+					}
+					int offset = (currentPage - 1) * max
+
 					def rquery = query.toString().replace('@COLS@', queryColumns)
 					// rquery = rquery + " ORDER BY a.assetName"
 					log.debug "***** Results Query: $rquery"
@@ -3021,7 +3172,7 @@ class AssetEntityController implements ControllerMethods {
 			}
 		}
 
-		renderAsJson(results: results, total: total)
+		renderAsJson(results: results, total: total, page: currentPage)
 	}
 
 	/**

@@ -140,7 +140,7 @@
 									</div>
 									<div class="row eventRunbook">
 										<div class="col-md-12">
-											<b>Runbook Status:</b><span id="eventRunbook"></span>
+											Runbook Status: <span id="eventRunbook"></span>
 										</div>
 									</div>
 								</div>
@@ -246,10 +246,10 @@
 													<span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
 												</li>
 												<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}">
-													<span id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+													<div id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}" title=""></div>
 												</li>
 												<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}">
-													<span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+													<div id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}" title=""></div>
 												</li>
 											</ul>
 											<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
@@ -932,6 +932,7 @@
 					actStartFormatted += ": ("+ steps[i].startOverdueDuration +")"
 				}
 				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(actStartFormatted);
+                $("#act_start_"+moveBundleId+"_"+steps[i].tid).attr('title', actStartFormatted);
 				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M" && ${runbookOn} != 1) {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
@@ -947,6 +948,7 @@
 						actCompFormatted += ": ("+ steps[i].startOverdueDuration +")"
 					}
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(actCompFormatted);
+                    $("#act_completion_"+moveBundleId+"_"+steps[i].tid).attr('title',actCompFormatted);
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){

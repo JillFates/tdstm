@@ -11,7 +11,7 @@
 				background-color: #ecf0f5 !important;
 			}
 			.k-grid-content tr td {
-				padding: 8px 12px;
+				padding: 2px 6px;
 			}
 			 .k-grid{
 				 height: auto !important;
@@ -175,7 +175,8 @@
 				},
 			 	dataBound: onDataBound,
 				 pageable: {
-					 pageSize: 50,
+					 pageSize: ${raw(com.tdsops.common.ui.Pagination.MAX_DEFAULT)},
+					 pageSizes: [ ${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) } ]
 				 },
 			}).data("kendoGrid");
 

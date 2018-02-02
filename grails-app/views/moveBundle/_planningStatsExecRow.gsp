@@ -13,7 +13,7 @@
 <g:set var="percUnassigned" value="${assetCount ? (unassignedCount/assetCount)*100 : 0}" />
 <g:set var="percUnassigned" value="${(percUnassigned > 0 && percUnassigned < 1) ? 1 : Math.round(percUnassigned)}" />
 <tr>
-	<td nowrap="nowrap">
+	<td nowrap="nowrap" style="text-align: right;">
 		<g:if test="${unassignedCount == 0 }">
 			<img src="${resource(dir:'images',file:'checked-icon.png')}" />
 		</g:if><g:else>

@@ -15,6 +15,7 @@ import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_DT_FORMAT
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_PROJ
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_ROOM
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.CURR_TZ
+import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_BUNDLE
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.MOVE_EVENT
 import static com.tdsops.tm.enums.domain.UserPreferenceEnum.sessionOnlyPreferences
 
@@ -180,7 +181,7 @@ class UserPreferenceService implements ServiceMethods {
 
 	/**
 	 * Set the user preference for the provided user account, or the currently authenticated user if null.
-	 * Note that if it is setting CURR_PROJ to a new value it will automatically call
+	 * Note that if it is setting CURR_PROJ to a new value it will automatically call ??? JPM 11/2017 -- Not sure that this is true
 	 * removeProjectAssociatedPreferences to clear out project specific settings.
 	 *
 	 * @param userLogin - the user to set the preference for
@@ -189,96 +190,104 @@ class UserPreferenceService implements ServiceMethods {
 	 * @return true if the set was successful
 	 */
 	@Transactional
-	boolean setPreference(UserLogin userLogin = null, String preferenceCode, value) {
-		userLogin = resolve(userLogin)
-		if (!userLogin) return
-
-		boolean saved = false
-		value = value?.toString()
-
-		log.debug 'setPreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
-
-		// Date start = new Date()
-
-		if (value && value != "null" && userLogin) {
-
-			//If is session only preference just store in the Session and we are done
-			if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
-				session?.setAttribute(preferenceCode, value)
-
-				/*
-				I always wonder if I should break here or assign to the saver variable and
-				add the else block in the next code section, but in other hand I think is cleaner
-				*/
-				return true
-			}
-
-			// Note that session does not exist for Quartz jobs
+	boolean setPreference(UserLogin userLogin = null, String preferenceCode, Object value) {
+		// If is session only preference just store in the Session and we are done
+		if (UserPreferenceEnum.isSessionOnlyPreference(preferenceCode)) {
 			if (session) {
-				//remove from the session cache so that getUserPreference won't find the previous value.
-				session.removeAttribute(preferenceCode)
+				def previousValue = session.getAttribute(preferenceCode)
+				if (previousValue == null || previousValue != value) {
+					session.setAttribute(preferenceCode, value)
+				}
 			}
-
-			UserPreference userPreference = getUserPreference(userLogin, preferenceCode)
-			String prefValue = userPreference?.value
-
-			//log.debug 'setPreference() phase 1 took {}', TimeUtil.elapsed(start)
-			//start = new Date()
-
-			//	remove the movebundle and event preferences if user switched to different project
-			if (preferenceCode == CURR_PROJ.value() && prefValue && prefValue != value) {
-				removeProjectAssociatedPreferences(userLogin)
-			}
-
-			//log.debug 'setPreference() phase 2 took {}', TimeUtil.elapsed(start)
-			//start = new Date()
-
-			if (userPreference == null) {
-				userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode)
-			}
-			userPreference.value = value
-			save userPreference, true
-			saved = !userPreference.hasErrors()
-
-			// log.debug 'setPreference() phase 3 took {}', TimeUtil.elapsed(start)
-			// start = new Date()
-
-			// Call getPreference() to load the preference into session
-			getPreference(userLogin, preferenceCode)
-
-			// log.debug 'setPreference() phase 4 took {}', TimeUtil.elapsed(start)
+			return true
 		}
 
-		return saved
+		userLogin = resolve(userLogin)
+		UserPreferenceEnum userPreferenceEnum = UserPreferenceEnum.valueOfNameOrValue(preferenceCode)
+		UserPreference userPreference = storePreference(userLogin, userPreferenceEnum, value)
+
+		if (userPreference) {
+			// Note that session does not exist for Quartz jobs so we should check for a session object
+			if (session) {
+				// Set or update the session with the new value 
+				def previousValue = session.getAttribute(preferenceCode)
+				if (previousValue == null || previousValue != userPreference.value) {
+					session.setAttribute(preferenceCode, userPreference.value)
+					session.setAttribute(preferenceCode, userPreference.value)
+				}
+			}
+			return true
+		}
+
+		return false
 	}
 
-	/* Saves a user preference after making sure that it passes validation using the constraints map */
+	/**
+	 * Used to store a user preference into database only and will NOT set the value in to the session.  It will validate preference value 
+	 * is not null and constraints passes before persisting.
+	 * @param userLogin
+	 * @param preferenceCode
+	 * @param value
+	 */
 	@Transactional
-	void savePreference(String code, value) {
+	UserPreference storePreference(UserLogin userLogin, UserPreferenceEnum preferenceCode, Object value) {
+		if (!userLogin) return null
 
-		if (!(code in prefCodeConstraints)) {
-			throw new InvalidRequestException()
+		value = value?.toString()
+
+		// TODO : JPM 11/2017 : Testing the value to a string 'null' does not seem correct.
+		if (!value || value == 'null') {
+			return null
 		}
 
-		if (!ConstraintsValidator.validate(value, prefCodeConstraints[code])) {
+		if (!ConstraintsValidator.validate(value, prefCodeConstraints[preferenceCode.value()])) {
 			throw new InvalidParamException()
 		}
 
-		setPreference(code, value)
+		UserPreference userPreference = UserPreference.where {
+			userLogin == userLogin && preferenceCode == preferenceCode.value()
+		}.get()
+
+		boolean isNew = false
+		if (userPreference) {
+			//	remove the movebundle and event preferences if user switched to different project
+			if (preferenceCode == CURR_PROJ && userPreference.value != value) {
+				removeProjectAssociatedPreferences(userLogin)
+			}
+		} else {
+			userPreference = new UserPreference(userLogin: userLogin, preferenceCode: preferenceCode.value())
+			isNew = true
+		}
+
+		if (isNew || userPreference.value != value) {
+			log.debug 'storePreference: setting user ({}) preference {}={}', userLogin, preferenceCode, value
+			userPreference.value = value
+			save(userPreference, true)
+		}
+		return userPreference
 	}
 
+	/**
+	 * Removes an user preference
+	 * @param userLogin
+	 * @param preference
+	 * @return
+	 */
 	@Transactional
 	boolean removePreference(UserLogin userLogin = null, UserPreferenceEnum preference) {
 		removePreference(userLogin, preference.value())
 	}
 
 	/**
-	 * @deprecated
+	 * Removes an user preference from database and user http session if present
+	 * @param user
+	 * @param prefCode
+	 * @return
 	 */
 	@Transactional
 	boolean removePreference(UserLogin user = null, String prefCode) {
 		user = resolve(user)
-		if (!user) return
+		if (!user) return false
 
 		int updateCount = UserPreference.where { userLogin == user && preferenceCode == prefCode }.deleteAll()
 		if (updateCount) {
@@ -291,6 +300,7 @@ class UserPreferenceService implements ServiceMethods {
 		}
 
 		session?.removeAttribute(prefCode)
+		return true
 	}
 
 	/**
@@ -303,9 +313,29 @@ class UserPreferenceService implements ServiceMethods {
 		removeProjectAssociatedPreference userLogin, CURR_ROOM
 	}
 
+	/**
+	 * Remove the Move Bundle preferences when user switched to different project.
+	 */
+	@Transactional
+	void removeBundleAssociatedPreferences(UserLogin userLogin) {
+		removeProjectAssociatedPreference userLogin, MOVE_BUNDLE
+		removeProjectAssociatedPreference userLogin, CURR_BUNDLE
+	}
+
+	/**
+	 * Get current project id user preference.
+	 * @param userLogin
+	 * @return
+	 */
 	String getCurrentProjectId(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_PROJ
 	}
+
+	/**
+	 * Set current project id user preference
+	 * @param userLogin
+	 * @param projectId
+	 */
 	void setCurrentProjectId(UserLogin userLogin = null, projectId) {
 		// Session doesn't exist for Quartz jobs
 		if (session) {
@@ -317,6 +347,12 @@ class UserPreferenceService implements ServiceMethods {
 		setPreference userLogin, CURR_PROJ, projectId
 	}
 
+	/**
+	 * Get current time zone user preference
+	 * @param userLogin
+	 * @param defaultTimeZoneId
+	 * @return
+	 */
 	String getTimeZone(UserLogin userLogin = null, String defaultTimeZoneId = null) {
 		String tzId = getPreference userLogin, CURR_TZ, defaultTimeZoneId
 		/* If there's no user preference and no default value's been specified
@@ -326,35 +362,81 @@ class UserPreferenceService implements ServiceMethods {
 		}
 		return tzId
 	}
+
+	/**
+	 * Set time zone user preference
+	 * @param userLogin
+	 * @param timeZoneId
+	 */
 	void setTimeZone(UserLogin userLogin = null, String timeZoneId) {
 		setPreference userLogin, CURR_TZ, timeZoneId
 	}
 
+	/**
+	 * Get current date format user preference
+	 * @param userLogin
+	 * @return
+	 */
 	String getDateFormat(UserLogin userLogin = null) {
 		getPreference userLogin, CURR_DT_FORMAT, TimeUtil.getDefaultFormatType()
 	}
+
+	/**
+	 * Set date format user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setDateFormat(UserLogin userLogin = null, String value) {
 		setPreference userLogin, CURR_DT_FORMAT, value
 	}
 
+	/**
+	 * Get current move event id user preference
+	 * @param userLogin
+	 * @return
+	 */
 	String getMoveEventId(UserLogin userLogin = null) {
 		getPreference userLogin, MOVE_EVENT
 	}
+
+	/**
+	 * Set move event id user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setMoveEventId(UserLogin userLogin = null, value) {
 		setPreference userLogin, MOVE_EVENT, value
 	}
 
+	/**
+	 * Get current move bundle id user preference
+	 * @return
+	 */
 	String getMoveBundleId() {
 		getPreference CURR_BUNDLE
 	}
+
+	/**
+	 * Set move bundle id user preference
+	 * @param userLogin
+	 * @param value
+	 */
 	void setMoveBundleId(UserLogin userLogin = null, value) {
 		setPreference userLogin, CURR_BUNDLE, value
 	}
 
+	/**
+	 * Get a map of import user preferences
+	 * @return
+	 */
 	Map<String, String> getImportPreferences() {
 		getPreferencesMap(UserPreferenceEnum.importPreferenceKeys)
 	}
 
+	/**
+	 * Get a map of export user preferences
+	 * @return
+	 */
 	Map<String, String> getExportPreferences() {
 		getPreferencesMap(UserPreferenceEnum.exportPreferenceKeys)
 	}
@@ -419,6 +501,11 @@ class UserPreferenceService implements ServiceMethods {
 		valuesByCode
 	}
 
+	/**
+	 * Remove all project related user preferences
+	 * @param userLogin
+	 * @param pref
+	 */
 	private void removeProjectAssociatedPreference(UserLogin userLogin, UserPreferenceEnum pref) {
 		if (removePreference(userLogin, pref)) {
 			log.debug 'Removed {} preference as user switched to other project', pref

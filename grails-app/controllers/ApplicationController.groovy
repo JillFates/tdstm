@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
@@ -59,7 +60,7 @@ class ApplicationController implements ControllerMethods {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 
-		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.App_Columns)
 
 		[appName: filters?.assetNameFilter ?: '', appPref: fieldPrefs, appSme: filters?.appSmeFilter ?: '',
 		 availabaleRoles: partyRelationshipService.getStaffingRoles(), // TODO - This should be replaced with the staffRoles which is in the defaultModel already
@@ -92,7 +93,7 @@ class ApplicationController implements ControllerMethods {
 		]
 
 		// Get the list of the user's column preferences
-		Map appPref = assetEntityService.getExistingPref('App_Columns')
+		Map appPref = assetEntityService.getExistingPref(PREF.App_Columns)
 		List<String> prefColumns = appPref*.value
 
 		// Get the list of fields for the domain
@@ -120,7 +121,7 @@ class ApplicationController implements ControllerMethods {
 		String justPlanning = userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING) ?: 'true'
 		Map<String, String> customizeQuery = assetEntityService.getAppCustomQuery(appPref)
 
-		def queryParams = [:]
+		Map queryParams = [:]
 		def query = new StringBuilder('''
 			SELECT * FROM (SELECT a.app_id AS appId, ae.asset_name AS assetName, a.latency AS latency,
 			                      if (ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus,
@@ -203,15 +204,26 @@ class ApplicationController implements ControllerMethods {
 
 		// Handle the filtering by each column's text field
 
-		def whereConditions = []
-		filterParams.each { key, val ->
-			if (val?.trim()) {
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Application)
+		List<String> whereConditions = []
+
+		filterParams.each { column, filter ->
+			if (filter?.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: Application,
+						column: column,
+						filter: filter,
+						columnAlias: "apps.${column}"
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
 
 		if (whereConditions) {
-			query.append(" WHERE apps.${whereConditions.join(" AND apps.")}")
+			query.append(" WHERE ${whereConditions.join(" AND ")}")
 			firstWhere = false
 		}
 
@@ -320,15 +332,17 @@ class ApplicationController implements ControllerMethods {
 	def columnAssetPref() {
 		def column = params.columnValue
 		String fromKey = params.from
-		def existingColsMap = assetEntityService.getExistingPref(params.type)
+		def prefCode = params.type as PREF
+		assert prefCode
+		def existingColsMap = assetEntityService.getExistingPref(prefCode)
 		String key = existingColsMap.find { it.value == column }?.key
 		if (key) {
 			existingColsMap[key] = params.previousValue
 		}
 
 		existingColsMap[fromKey] = column
-		userPreferenceService.setPreference(params.type, existingColsMap as JSON)
-		render true
+		userPreferenceService.setPreference(prefCode, existingColsMap as JSON)
+		render 'ok'
 	}
 
 	@HasPermission(Permission.AssetCreate)
@@ -494,17 +508,4 @@ class ApplicationController implements ControllerMethods {
 		}
 	}
 
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		String ids = params.id
-		List<String> assetNames = []
-		for (assetId in ids.split(',')) {
-			Application application = Application.get(assetId)
-			if (application) {
-				assetNames << application.assetName
-				applicationService.deleteApplication(application)
-			}
-		}
-		render 'Application ' + WebUtil.listAsMultiValueString(assetNames) + ' deleted'
-	}
 }

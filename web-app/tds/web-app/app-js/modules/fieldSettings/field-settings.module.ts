@@ -42,7 +42,15 @@ import { CustomDomainService } from './service/custom-domain.service';
 		MinMaxConfigurationPopupComponent
 	],
 	providers: [FieldSettingsService, CustomDomainService],
-	exports: [FieldSettingsListComponent]
+	exports: [
+		SelectListConfigurationPopupComponent,
+		FieldSettingsImportanceComponent,
+		MinMaxConfigurationPopupComponent
+	],
+	entryComponents: [
+		SelectListConfigurationPopupComponent,
+		MinMaxConfigurationPopupComponent
+	]
 })
 
 export class FieldSettingsModule {

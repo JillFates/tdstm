@@ -1,0 +1,13 @@
+<span style="cursor:pointer;" #popUpPolling (click)="onToggle()"><i class="fa  fa-question"></i></span>
+<kendo-popup [anchor]="popUpPolling" [popupClass]="'content popup'" *ngIf="show">
+   <div>
+        <label>
+            Polling actions are used to monitor long running asynchronous processes that provide a status can be derived from the end-point. The feature has the following options:
+        </label>
+        <ul>
+            <li>Frequency - how often that the end-point should be polled.</li>
+            <li>Assume Lapsed after - the time after which action should be considered Lapsed. Set to zero (0) to prevent LAPSED event.</li>
+            <li>Assume Stalled after - the time after which no incremental progress change was detected from the end-point. Set to zero (0) to prevent STALLED event.</li>
+        </ul>
+   </div>
+</kendo-popup>

@@ -1,16 +1,95 @@
-<kendo-grid (mouseup)="onMouseUp()" (mousemove)="onMouseMove($event)">
-	<kendo-grid-column [sortable]="{mode:'multiple'}" *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}.{{column.property}}"
-	 [width]="column.width">
-		<ng-template kendoGridHeaderTemplate>
-			<div>
-				<label for=""> {{column.label}}</label>
-				<i style="cursor:e-resize" (mousedown)="onMouseDown($event,column)" class="fa fa-arrows-h pull-right"></i>
+<style>
+    .asset-detail-link {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<kendo-grid #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+ [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
+ (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
+	<!-- Toolbar -->
+    <ng-template kendoGridToolbarTemplate [position]="'top'">
+		<div class="col-sm-6">
+			<div class="checkbox pull-left">
+				<label>
+					<input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
-			<div class=" has-feedback" style="margin-bottom:0px;">
-				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Default Filter"
-				 value="">
-				<span style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+			<button type="button" class="btn btn-default btnDelete pull-left" id="btnDeleteAll" [disabled]="!hasItensSelected()" (click)="onBulkDelete()">
+				<i class="fa fa-fw fa-trash"></i> {{'GLOBAL.DELETE' | translate}}</button>
+		</div>
+		<div (click)="onReload()" class="kendo-grid-toolbar__refresh-btn btnReload">
+			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+		</div>
+		<div class="kendo-grid-toolbar__refresh-btn btnClear">
+			<button type="button" class="btn btn-default" id="btnClear" [disabled]="!hasFilterApplied()" (click)="onClearFilters()">
+				<i class="fa fa-fw fa-times"></i> {{'GLOBAL.CLEAR_FILTERS' | translate}}</button>
+		</div>
+	</ng-template>
+
+    <!-- Select All column -->
+    <kendo-grid-column title="" [locked]="true" [filterable]="false" [width]="55">
+		<ng-template kendoGridHeaderTemplate>
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<div class="checkbox checkbox-grid">
+						<label>
+							<input type="checkbox" [(ngModel)]="selectAll" (change)="onSelectAll()" name="selectAll">
+						</label>
+					</div>
+				</div>
+			</div>
+		</ng-template>
+		<ng-template kendoGridCellTemplate let-dataItem>
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<div class="checkbox checkbox-grid">
+						<label style="min-height: 15px;">
+							<input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
+						</label>
+					</div>
+				</div>
 			</div>
 		</ng-template>
 	</kendo-grid-column>
+
+    <!-- Configured Columns -->
+    <kendo-grid-column *ngFor="let column of model.columns" [locked]="column.locked" field="{{column.domain}}_{{column.property}}"
+	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
+		<ng-template kendoGridHeaderTemplate>
+			<div style="width:95%;float:left;">
+				<div>
+					<label for=""> {{getPropertyLabel(column)}}</label>
+				</div>
+			</div>
+		</ng-template>
+		<ng-template kendoGridFilterCellTemplate>
+			<div class="has-feedback" style="margin-bottom:0px;">
+				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter"
+				 (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
+				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
+				 aria-hidden="true"></span>
+			</div>
+		</ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span [ngClass]="getCellClass(column)">
+                {{dataItem[column.domain+'_'+column.property]}}
+            </span>
+        </ng-template>
+	</kendo-grid-column>
+
+    <!-- No records -->
+    <ng-template kendoGridNoRecordsTemplate>
+	</ng-template>
+
+    <!-- Pagination footer -->
+	<ng-template kendoPagerTemplate let-totalPages="totalPages" let-pageSize="pageSize" let-currentPage="currentPage">
+		<kendo-pager-prev-buttons></kendo-pager-prev-buttons>
+		<kendo-pager-next-buttons></kendo-pager-next-buttons>
+		<kendo-pager-page-sizes [pageSizes]="maxOptions"></kendo-pager-page-sizes>
+		<div *ngIf="showMessage" class="grid-message">
+			<label>{{ gridMessage | translate }}</label>
+		</div>
+		<kendo-pager-info></kendo-pager-info>
+	</ng-template>
+
 </kendo-grid>

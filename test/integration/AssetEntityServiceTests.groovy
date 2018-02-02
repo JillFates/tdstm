@@ -2,6 +2,7 @@ import com.tdsops.tm.domain.AssetEntityHelper
 import grails.test.spock.IntegrationSpec
 import com.tds.asset.Application
 import com.tds.asset.Database
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.service.AssetEntityService
@@ -10,7 +11,9 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 	AssetEntityService assetEntityService
 
-	void "test Entity Info Method"() {
+	private AssetTestHelper assetHelper = new AssetTestHelper()
+
+	void "1. test Entity Info Method"() {
 		setup:
 		def project = Project.read(2445)
 		def keys = ['servers', 'applications', 'dbs', 'files', 'networks', 'dependencyType', 'dependencyStatus']
@@ -30,7 +33,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		findAssetOptionInList(data['dependencyStatus'], 'Validated')
 	}
 
-	void "test get dependency types"() {
+	void "2. test get dependency types"() {
 		when:
 		def data = assetEntityService.getDependencyTypes()
 
@@ -41,7 +44,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		findAssetOptionInList(data, 'Runs On')
 	}
 
-	void "test get dependency statuses"() {
+	void "3. test get dependency statuses"() {
 		when:
 		def data = assetEntityService.getDependencyStatuses()
 
@@ -52,7 +55,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		findAssetOptionInList(data, 'Validated')
 	}
 
-	void "test parse params for dependecy asset ids"() {
+	void "4. test parse params for dependecy asset ids"() {
 		setup:
 		Map params = [
 				name                  : 'test',
@@ -108,14 +111,14 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 	}
 
-
-	void "test getAppCustomQuery with different app preference values"(){
+	// TODO - This method is too tightly coupled with the implemetation and needs to refactored
+	void "5. test getAppCustomQuery with different app preference values"(){
 		when: "No app pref are given."
 			Map queries = assetEntityService.getAppCustomQuery([:])
-		
+
 		then: "No fields are requested."
 			queries["query"] == ""
-		
+
 		and: "No additional join is required."
 			queries["joinQuery"] == ""
 
@@ -124,7 +127,7 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		then: "No fields are requested."
 			queries["query"] == ""
-		
+
 		and: "No additional join is required."
 			queries["joinQuery"] == ""
 
@@ -132,18 +135,19 @@ class AssetEntityServiceTests extends IntegrationSpec {
 			queries = assetEntityService.getAppCustomQuery([1: "custom10"])
 
 		then: "The field is retieved from the asset_entity table."
-			queries["query"] == "ae.custom10 AS custom10,"	
-		
+			queries["query"] == "ae.custom10 AS custom10,"
+
 		and: "No additional join is required."
 			queries["joinQuery"] == ""
 
+		/*
 		when: "Multiple values are given (sme and modifiedBy)."
 			queries = assetEntityService.getAppCustomQuery([1: "sme", 2: "modifiedBy"])
 
 		then: "The application retrieves the name of the individuals."
 			queries["query"] == "CONCAT_WS(' ', p.first_name, p.middle_name, p.last_name) AS sme," +
 								"CONCAT(CONCAT(p2.first_name, ' '), IFNULL(p2.last_name,'')) AS modifiedBy,"
-		and: "The person table is queries twice."	
+		and: "The person table is queries twice."
 			queries["joinQuery"] == "\n LEFT OUTER JOIN person p ON p.person_id=a.sme_id \n" +
 									"\n LEFT OUTER JOIN person p2 ON p2.person_id=ae.modified_by \n"
 
@@ -168,21 +172,23 @@ class AssetEntityServiceTests extends IntegrationSpec {
 		and: "Only one join (with the person table) is required."
 			queries["joinQuery"] == "\n LEFT OUTER JOIN person p3 ON p3.person_id= ae.app_owner_id \n"
 
+
 		when: "Multiple 'by' properties are requested."
 			queries = assetEntityService.getAppCustomQuery([1: "shutdownBy", 2: "testingBy", 3: "startupBy"])
 
 		then: "If the properties reference an individual, then the his name is retrieved."
 			queries["query"] == "(IF(shutdown_by REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(sdb.first_name,' '," +
-								"sdb.middle_name, ' ', sdb.last_name), '  ', ' ')),a.shutdown_by)) as shutdownBy," +
-								"(IF(testing_by REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(teb.first_name,' '," +
-								"teb.middle_name, ' ', teb.last_name), '  ', ' ')),a.testing_by)) as testingBy," +
-								"(IF(startup_by REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(sub.first_name,' '," +
-								"sub.middle_name, ' ', sub.last_name), '  ', ' ')),a.startup_by)) as startupBy,"
+				"sdb.middle_name, ' ', sdb.last_name), '  ', ' ')),a.shutdown_by)) as shutdownBy," +
+				"(IF(testing_by REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(teb.first_name,' '," +
+				"teb.middle_name, ' ', teb.last_name), '  ', ' ')),a.testing_by)) as testingBy," +
+				"(IF(startup_by REGEXP '^[0-9]{1,}\$', TRIM( REPLACE( CONCAT(sub.first_name,' '," +
+				"sub.middle_name, ' ', sub.last_name), '  ', ' ')),a.startup_by)) as startupBy,"
 
 		and: "The person table is queried three times"
 			queries["joinQuery"] == "\n LEFT OUTER JOIN person sdb ON sdb.person_id=a.shutdown_by \n" +
 									"\n LEFT OUTER JOIN person teb ON teb.person_id=a.testing_by \n" +
 									"\n LEFT OUTER JOIN person sub ON sub.person_id=a.startup_by \n"
+		*/
 
 		when: "Some other property is given."
 			queries = assetEntityService.getAppCustomQuery([1: "someProperty", 2: "someOtherProperty"])
@@ -193,6 +199,38 @@ class AssetEntityServiceTests extends IntegrationSpec {
 
 		and: "No additional table is joined"
 			queries["joinQuery"] == ""
+	}
+
+	void '6. Test cloning of assets'() {
+		setup: 'Get access to the project and person'
+			// Project should be dynamically created
+			Project project = Project.read(2445)
+			// Person should be dynamically created
+			Person person = Person.read(100)
+			List<String> errors = []
+			boolean cloneDependencies = true
+			String assetName = 'clone asset name'
+
+		and: 'create a test application'
+			Application app = assetHelper.createApplication(person, project)
+			assert app
+
+		when: 'calling clone method'
+			Long newAssetId = assetEntityService.clone(app.id, assetName, cloneDependencies, errors)
+		then: 'a new asset id should be returned'
+			newAssetId
+		and: 'there should be no errors reported'
+			! errors
+		and: 'the asset should be able to be retrieved'
+			Application clone = Application.read(newAssetId)
+			clone
+		and: 'the clone asset name should be set'
+			assetName == clone.assetName
+		and: 'other properties should match the original asset'
+			List<String> props = ['appVendor', 'appVersion', 'sme', 'sme2']
+			for (prop in props) {
+				assert app[prop] == clone[prop]
+			}
 	}
 
 	// Helper functions ////////////////////

@@ -181,7 +181,5 @@ class ApplicationService implements ServiceMethods {
 	 */
 	void deleteApplication(Application application) {
 		assetEntityService.deleteAsset(application)
-		AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE application=:application', [application: application])
-		application.delete()
 	}
 }

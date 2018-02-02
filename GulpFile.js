@@ -7,6 +7,7 @@ var _ = require('lodash'),
     browserify = require('browserify'),
     buffer = require('vinyl-buffer'),
     concat = require('gulp-concat'),
+	clean = require('gulp-clean'),
     del = require('del'),
     fs = require('fs'),
     gulp = require('gulp'),
@@ -35,16 +36,9 @@ var taskPath = "./gulp-tasks";
  */
 gulp.task('build', ['build-app', 'build-vendor']);
 
-gulp.task('build-app', function () {
+gulp.task('build-app', ['clean-app', 'validate-js'], function () {
     var generatedFile = 'web-app/dist/App.js',
         browserifyProcesor;
-
-    if (fs.existsSync(generatedFile)) {
-        console.error('Clean old App.js compiled file.');
-        fs.unlink(generatedFile);
-    }
-
-    validateJS('web-app/app-js/**/*.js');
 
     console.error('Compiling App.js file.');
 
@@ -71,14 +65,9 @@ gulp.task('build-app', function () {
 
 });
 
-gulp.task('build-vendor', function () {
+gulp.task('build-vendor', ['clean-vendor',], function () {
     var generatedFile = 'web-app/dist/Vendors.js',
         b;
-
-    if (fs.existsSync(generatedFile)) {
-        console.error('Clean old Vendors.js compiled file.');
-        fs.unlink(generatedFile);
-    }
 
     console.error('Compiling Vendors.js file.');
 
@@ -109,15 +98,13 @@ gulp.task('build-vendor', function () {
  * To run on Prod use gulp build --PROD otherwhise will run on DevMode by default
  * PROD mode will remove the sourcemapping
  */
-gulp.task('watch-build', function () {
+gulp.task('watch-build', ['validate-js'], function () {
     var generatedFile = 'web-app/dist/App.js',
         b = browserify({
             entries: ['./web-app/app-js/main.js'],
             debug: true,
         })
             .transform(babelify.configure());
-
-    validateJS('web-app/app-js/**/*.js');
 
     // Exclude all NPM Package from the build
     getNPMPackageIds().forEach(function (id) {
@@ -130,8 +117,7 @@ gulp.task('watch-build', function () {
 
     return watcher
     // wait until any change is triggered to recreate the App.js file
-        .on('update', function () {
-            validateJS('web-app/app-js/**/*.js');
+        .on('update', ['validate-js'], function () {
             var updateStart = Date.now();
             console.log('Building ./web-app/dist/App.js');
             watcher.bundle()
@@ -150,13 +136,6 @@ gulp.task('watch-build', function () {
         })
         .pipe(source('App.js'))
         .pipe(gulp.dest('./web-app/dist/'));
-});
-
-/**
- * Verified the quality of the code after and report any error found on it
- */
-gulp.task('js-hint-tool', function (cb) {
-    validateJS('web-app/app-js/**/*.js');
 });
 
 /**
@@ -197,18 +176,37 @@ gulp.task('sass:watch', function () {
  * @param src specifying which files to check
  * @return {*}
  */
-function validateJS(src) {
-    console.log('Running Quality Code checker for ' + src);
-    var filter = gulpFilter(['**/*.*', '!**/vendors/**']);
-    return gulp.src([src], {base: 'web-app'})
-        .pipe(filter)
-        .pipe(jshint())
-        .pipe(jshint.reporter('default', {verbose: true}))
-        .pipe(jshint.reporter('fail')).on('error', function (error) {
-            console.log(error.toString());
-        })
-        .pipe(filter.restore());
-}
+gulp.task('validate-js', function() {
+	console.log('Running Quality Code Checker');
+	var src = 'web-app/app-js/**/*.js';
+	var filter = gulpFilter(['**/*.*', '!**/vendors/**']);
+	return gulp.src([src], {base: 'web-app'})
+		.pipe(filter)
+		.pipe(jshint())
+		.pipe(jshint.reporter('default', {verbose: true}))
+		.pipe(jshint.reporter('fail')).on('error', function (error) {
+			console.log(error.toString());
+		})
+		.pipe(filter.restore());
+});
+
+/**
+ * Clean the App File by controlling the callback
+ */
+gulp.task('clean-app', function () {
+	console.log('Cleaning previous compiled App.js file.');
+	return gulp.src('web-app/dist/App.js', {read: false})
+		.pipe(clean());
+});
+
+/**
+ * Clean the Vendor File by controlling the callback
+ */
+gulp.task('clean-vendor', function () {
+	console.log('Cleaning previous compiled Vendor.js file.');
+	return gulp.src('web-app/dist/Vendors.js', {read: false})
+		.pipe(clean());
+});
 
 /**
  * Helper method to catch compilation errors

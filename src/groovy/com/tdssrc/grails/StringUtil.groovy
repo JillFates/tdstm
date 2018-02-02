@@ -277,7 +277,21 @@ class StringUtil {
 	 * and then replace all white spaces with a '+'
 	 */
 	 static String sanitizeAndStripSpaces(String str){
-	 	sanitize(str).replaceAll(/\s/, "+")
+		 if (str) {
+			 str = sanitize(str).replaceAll(/\s/, "+")
+		 }
+		 return str
+	 }
+
+   /**
+    * Sanitize the String with StringUtil.sanitize
+    * and then replace all white spaces with a '_'
+    */
+   static String sanitizeAndReplaceSpacesWithUnderscore(String str){
+		 if (str) {
+			 str = sanitize(str).replaceAll(/\s/, "_")
+		 }
+		 return str
 	 }
 
 	/**
@@ -393,5 +407,26 @@ class StringUtil {
 		left = StringUtils.rightPad(left, original.size() - numOfCharsInEdges, character)
 
 		return left + right
+	}
+
+	/**
+	 * Performs a check to determine if the string compareTo is similar to the given string str.
+	 * For instance for compareTo='hello', will return true if str is 'h', 'he', 'hel', 'elo' etc.
+	 * Also checks for nullity and blank of str (returns false).
+	 *
+	 * @param str - the string to compare
+	 * @param compareTo - the string to be compared to
+	 * @param caseInsensitive - flag if true will perform the comparison case insensitive (default true)
+	 * @return True if str is like compareTo.
+	 */
+	static boolean isLike( String str, String compareTo, boolean caseInsensitive=true) {
+		if (isBlank(str) || isBlank(compareTo)) {
+			return false
+		}
+		if (caseInsensitive) {
+			str = str.toUpperCase()
+			compareTo = compareTo.toUpperCase()
+		}
+		return compareTo.contains(str)
 	}
 }

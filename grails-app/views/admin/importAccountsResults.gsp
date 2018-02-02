@@ -248,7 +248,7 @@
 						field: "${propName}",
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
-						<g:if test="${gridOpt.template}">template: ${gridOpt.template},</g:if>
+						<g:if test="${gridOpt.template}">template: ${raw(gridOpt.template)},</g:if>
 						<g:if test="${gridOpt.templateClass}">attributes: { "class": "${gridOpt.templateClass}" },</g:if>
 						lockable: false,
 						width: ${gridOpt.width}

@@ -351,17 +351,15 @@ class PersonController implements ControllerMethods {
 
 		def errMsg
 		def person
-
+		def duplicatePersonId
 		try {
 			person = personService.savePerson(params, companyId, project, true)
 		} catch (DomainUpdateException e) {
 			def exceptionMsg = e.message
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
-			def personId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
-			errMsg = "A person with the same name already exists. Click"
-			errMsg += "<a href=\"javascript:Person.showPersonDialog($personId,'generalInfoShow')\"> here </a>"//e.message
-			errMsg += "to view the person."
+			duplicatePersonId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
+			errMsg = "A person with the same first and last name already exists for this Company."
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = e.message
@@ -373,6 +371,8 @@ class PersonController implements ControllerMethods {
 			render map as JSON
 		} else {
 			if (errMsg) {
+				errMsg += " Click <a href=\"javascript:Person.showPersonDialog($duplicatePersonId,'generalInfoShow')\"> here </a>"//e.message
+				errMsg += "to view the person."
 				flash.message = errMsg
 			} else {
 				// Just add a message for the form submission to know that the person was created
@@ -688,8 +688,6 @@ class PersonController implements ControllerMethods {
 		def currRole = params.role ?: userPreferenceService.getPreference(PREF.STAFFING_ROLE) ?: "0"
 		List projects = personService.getAvailableProjects(securityService.userLoginPerson)
 
-		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
-
 		[project: project, projects: projects, projectId: project.id, roleTypes: roleTypes,
 		 editPermission: securityService.hasPermission(Permission.ProjectStaffEdit), assigned: assigned,
 		 onlyClientStaff: onlyClientStaff, currRole: currRole]
@@ -882,7 +880,7 @@ class PersonController implements ControllerMethods {
 							COALESCE(p.last_name, '')) AS fullName,
 						company.name AS company,
 						pr.role_type_code_to_id AS role,
-						SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team,
+						rt.description AS team,
 						pr2.party_id_to_id IS NOT NULL AS project,
 						IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents,
 						IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates
@@ -945,7 +943,12 @@ class PersonController implements ControllerMethods {
 		Person person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def company = person.company
-		def personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+		def personFunctions = []
+		// <SL>: Find a better solution to determine if the person we are trying to load if not "Automated"
+		// TM-6780
+		if (company) {
+			personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
+		}
 		def availabaleFunctions = partyRelationshipService.getStaffingRoles(false)
 		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.userLoginPerson)
 

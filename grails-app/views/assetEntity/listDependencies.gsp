@@ -33,8 +33,8 @@
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 						{name:'assetType', editable: true},
 						{name:'assetBundle', editable: true},
-						{name:'type', editable: true}, 
-						{name:'dependentName', editable: true,formatter: dependentFormatter,width:'200'},
+						{name:'type', editable: true, formatter: dependencyViewFormatter},
+						{name:'dependentName', editable: true, formatter: dependentFormatter,width:'200'},
 						{name:'dependentType', editable: true},
 						{name:'dependentBundle', editable: true},
 						{name:'${depPref['1']}', editable: true,width:'100'},
@@ -44,6 +44,7 @@
 					caption="listCaption"
 					multiselect="true"
 					loadComplete="initCheck"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					gridComplete="function(){bindResize('dependencyGridId')}"
 					onSelectRow="validateMergeCount"
 					showPager="true">
@@ -67,7 +68,10 @@
 					var value = cellvalue ? cellvalue : ''
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[13]+'\',\''+rowObject[11]+'\')">'+ _.escape(value) +'</a>'
 				}
-				
+				function dependencyViewFormatter(cellvalue, options, rowObject) {
+					var value = cellvalue ? cellvalue : '';
+					return '<a href="javascript:EntityCrud.showAssetDependencyEditView({ id:'+rowObject[10]+' }, { id: '+rowObject[11]+'})">'+ _.escape(value) +'</a>';
+				}
 			})
 		</script>
 	</head>
@@ -88,7 +92,11 @@
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${depPref[key]}" id="coloumnSelector_${depPref[key]}" value="${attribute}" 
 								${depPref[key]==attribute?'checked':'' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Dep_Columns')"/> ${attribute}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Dep_Columns}')"
+								/> 
+								${attribute}	
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>
@@ -100,6 +108,10 @@
 		<script>
 			$(".menu-parent-assets-dependencies-list").addClass('active');
 			$(".menu-parent-assets").addClass('active');
+
+			$(document).on('entityAssetUpdated',function () {
+				$('#dependencyGridId').trigger('click');
+			});
 		</script>
 	</body>
 </html>

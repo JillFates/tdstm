@@ -7,7 +7,6 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetType
-import com.tds.asset.FieldImportance
 import net.transitionmanager.domain.Setting
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -44,6 +43,7 @@ class ProjectService implements ServiceMethods {
 	SequenceService sequenceService
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
+	CustomDomainService customDomainService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -104,6 +104,7 @@ class ProjectService implements ServiceMethods {
 	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
 	 * @param searchParams - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @param userLogin - the user to lookup projects for or null to use the authenticated user
+	 * @param includeDefaultProject - flag signaling if the default project should be included.
 	 * @return list of projects
 	 *
 	 * TODO: <SL> This returns a PagedResultList not a List
@@ -139,6 +140,16 @@ class ProjectService implements ServiceMethods {
 		} else {
 			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
 		}
+
+		boolean hasAccessToDefaultProject = securityService.hasPermission(userLogin.person, Permission.ProjectManageDefaults)
+		// If the user has access to the default project, it should be included in the list.
+		if  (hasAccessToDefaultProject) {
+			Project defaultProject = Project.getDefaultProject()
+			if (defaultProject) {
+				projectIds << defaultProject.id
+			}
+		}
+
 		if (!projectIds) {
 			return []
 		}
@@ -262,66 +273,6 @@ class ProjectService implements ServiceMethods {
 		projectAttributes.findAll { it.attributeCode.contains('custom') }.collect { p ->
 			[id: project[p.attributeCode] ?: p.frontendLabel, label: p.attributeCode]
 		}
-	}
-
-	/**
-	 * Get the config from field importance Table.
-	 * @deprecated
-	 * TM-6617
-	 */
-	@Deprecated
-	def getConfigByEntity(entityType) {
-		throw new RuntimeException('getConfigByEntity no longer used')
-		Project project = securityService.userCurrentProject
-		def parseData
-		def data = FieldImportance.findByProjectAndEntityType(project,entityType)?.config
-		if (data) {
-			parseData = JSON.parse(data)
-		}
-		if (!parseData) {
-			parseData = generateDefaultConfig(entityType)
-		}
-		updateConfigForMissingFields(parseData, entityType)
-	}
-
-	/**
-	 * Create default importance map by assigning normal to all
-	 * @deprecated
-	 * TM-6617
-	 */
-	def generateDefaultConfig(type) {
-		throw new RuntimeException('generateDefaultConfig no longer used')
-		def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
-		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
-		if (data) {
-			return JSON.parse(data)
-		}
-
-		Set<String> phases = ValidationType.listAsMap.keySet()
-		getAttributes(type)*.attributeCode.inject([:]) { Map rmap, String field ->
-			def pmap = phases.inject([:]) { Map map, String item -> map[item] = field.contains('custom') ? "H" : "N"; map }
-			rmap[field] = [phase: pmap]
-			rmap
-		}
-	}
-
-	/**
-	 * Update default importance map for missing fields by assigning normal to all
-	 * TM-6617
-	 */
-	@Deprecated
-	def updateConfigForMissingFields(parseData, String type) {
-		throw new RuntimeException('updateConfigForMissingFields is no longer used')
-		List<EavAttribute> projectAttributes = getAttributes(type)
-		def fields = getFields(type, projectAttributes) + getCustoms(projectAttributes)
-		Set<String> phases = ValidationType.listAsMap.keySet()
-		fields.each { f ->
-			if (!parseData[f.label]) {
-				Map pmap = phases.inject([:]) { Map map, String item -> map[item] = "N"; map }
-				parseData[f.label] = [phase: pmap]
-			}
-		}
-		return parseData
 	}
 
 	/**
@@ -703,7 +654,6 @@ class ProjectService implements ServiceMethods {
 		Room.executeUpdate("delete from Room r where r.project  = $projectInstance.id")
 		Rack.executeUpdate("delete from Rack ra where ra.project  = $projectInstance.id")
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle adb where adb.project = $projectInstance.id")
-		FieldImportance.executeUpdate("delete from FieldImportance fi where fi.project  = $projectInstance.id")
 		KeyValue.executeUpdate("delete from KeyValue kv where kv.project  = $projectInstance.id")
 
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance.id")
@@ -720,11 +670,19 @@ class ProjectService implements ServiceMethods {
 		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
+		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")
+
 		PartyGroup.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 		Party.executeUpdate("delete from Party p where p.id = $projectInstance.id")
 
+		DataScript.executeUpdate("delete from DataScript ds where ds.project.id = :projectId", [projectId: projectInstance.id])
+
+		Credential.executeUpdate("delete from Credential c where c.project.id = :projectId", [projectId: projectInstance.id])
+
+		Provider.executeUpdate("delete from Provider p where p.project.id = :projectId", [projectId: projectInstance.id])
+
 		if (includeProject) {
-			Project.executeUpdate("delete from Project p where p.id = $projectInstance.id")
+			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
 		return message
@@ -736,7 +694,7 @@ class ProjectService implements ServiceMethods {
 	 * @param defaultBundleName name to be given to the default bundle, should it be created.
 	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
-	@Transactional
+	@Transactional()
 	MoveBundle getDefaultBundle(Project project, String defaultBundleName = null) {
 		return project.defaultBundle ?: createDefaultBundle(project, defaultBundleName)
 	}
@@ -747,30 +705,37 @@ class ProjectService implements ServiceMethods {
 	 * @param defaultBundle
 	 * @return project's default move bundle
 	 */
-	@Transactional
-	MoveBundle createDefaultBundle (Project project, String defaultBundleName) {
-		def defaultCode = defaultBundleName?:'TBD'
+	@Transactional()
+	MoveBundle createDefaultBundle(Project project, String defaultBundleName='TBD') {
+		MoveBundle moveBundle
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
-		if(!project.defaultBundle){
-			def moveBundle = MoveBundle.findByNameAndProject(defaultCode, project)
-			if(moveBundle)
-				return moveBundle
-			else
+		if (!project.defaultBundle) {
+			
+			// TM-8319 - the name was being set to null
+			String bundleName = defaultBundleName ?: 'TBD'
+
+			moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
+			if (! moveBundle) {
 				moveBundle = new MoveBundle(
-					name:defaultCode,
-					project:project,
-					useForPlanning:true,
-					workflowCode:project.workflowCode,
+					name: bundleName,
+					project: project,
+					useForPlanning: true,
+					workflowCode: project.workflowCode,
 					startTime: project.startDate,
-					completionTime:project.completionDate
+					completionTime: project.completionDate
 				)
 
-			if (!moveBundle.save(flush:true)){
-				log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
-				return null
+				if (!moveBundle.save(flush: true)) {
+					log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
+					throw new RuntimeException('Unable to create default bundle')
+				}
+				log.info "Default bundle ${moveBundle.name} was created for project $project"
 			}
-			return moveBundle
+			if (moveBundle) {
+				project.defaultBundle = moveBundle
+			}
 		}
+		return moveBundle
 	}
 
 	/**
@@ -1637,5 +1602,24 @@ class ProjectService implements ServiceMethods {
                return projects
        }
 
+	/**
+	 * Helper method to get the PlanMethodologies Values of the Select List in the Project CRUD
+	 * @param project
+	 * @return the list of values or empty list is there is none
+	 */
+	private List<Map<String, String>> getPlanMethodologiesValues(Project project){
+		List<Map> customFields = customDomainService.customFieldsList(
+				project,
+				AssetClass.APPLICATION.toString(),
+				true
+		)
+		List<Map> planMethodologies = customFields.collect {
+			[ field: it.field, label: (it.label ?: it.field) ]
+		}
+		if(planMethodologies){
+			planMethodologies.add(0, [field:'', label:'Select...'])
+		}
 
+		return planMethodologies
+	}
 }

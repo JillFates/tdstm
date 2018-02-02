@@ -25,6 +25,7 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.domain.Party
 import net.transitionmanager.domain.PartyGroup
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -37,7 +38,6 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.FlushMode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -64,7 +64,6 @@ class ImportService implements ServiceMethods {
 			"INSERT INTO data_transfer_value " +
 					"(asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id, field_name, has_error, error_text) VALUES "
 
-	GrailsApplication grailsApplication
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	AssetEntityService assetEntityService
 	DeviceService deviceService
@@ -171,8 +170,8 @@ class ImportService implements ServiceMethods {
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
 
-		// TODO : JPM 1/2017 : The staffList is getting ONLY the staff of the client but should be getting all staff on the project
-		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
+		List<Party> companies = partyRelationshipService.getProjectCompanies(project)
+		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(companies)
 
 		return data
 	}
@@ -1373,8 +1372,11 @@ class ImportService implements ServiceMethods {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
 
 			Long assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass,
-				assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum, fieldSpecs)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(
+				project, userLogin, domainClass,
+				assetEntityId, dataTransferBatch, dtvList,
+				eavAttributeSet, errorCount, errorConflictCount,
+				ignoredAssets, rowNum, fieldSpecs)
 			if (!asset)
 				continue
 
@@ -1794,7 +1796,7 @@ class ImportService implements ServiceMethods {
 		PersonService personService = grailsApplication.mainContext.personService
 
 		// Search across the project staff list for person by name
-		Map map = personService.findPerson(name, project, projectStaff)
+		Map map = personService.findPerson(name, project, projectStaff, false)
 
 		if (map.person) {
 			if (map.isAmbiguous) {
@@ -1968,15 +1970,6 @@ class ImportService implements ServiceMethods {
 			throw new InvalidParamException("Unable to locate Data Import definition for ${params.dataTransferSet}")
 		}
 
-		// Contains map of the custom fields name values to match with the spreadsheet
-		Map projectCustomLabels = [:]
-		for (int i = 1; i<= Project.CUSTOM_FIELD_COUNT; i++) {
-			String pcKey = 'custom' + i
-			if (project[pcKey]) {
-				projectCustomLabels[project[pcKey]] = 'Custom' + i
-			}
-		}
-
 		// create workbook
 		def workbook
 		def titleSheet
@@ -2011,6 +2004,12 @@ class ImportService implements ServiceMethods {
 			titleSheet = workbook.getSheet("Title")
 
 			if (titleSheet != null) {
+				// Validate spreadsheet project Id with current user project Id.
+				String sheetProjectId = WorkbookUtil.getStringCellValue(titleSheet, 1, 3)
+				if (!project.id.toString().equals(sheetProjectId)) {
+					throw new InvalidParamException("The spreadsheet provided project Id does not match current user project.")
+				}
+
 				try {
 					String tzId = WorkbookUtil.getStringCellValue(titleSheet, 1, 8)
 					String dateFormatType = WorkbookUtil.getStringCellValue(titleSheet, 1, 9)
@@ -2048,7 +2047,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Devices"
 				sheetName='Devices'
 				domainClassName = 'AssetEntity'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DEVICE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2062,7 +2061,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Applications"
 				sheetName='Applications'
 				domainClassName = 'Application'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, APPLICATION)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2076,7 +2075,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Databases"
 				sheetName='Databases'
 				domainClassName = 'Database'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, DATABASE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2090,7 +2089,7 @@ class ImportService implements ServiceMethods {
 				log.info "upload() beginning Logical Storage"
 				sheetName='Storage'
 				domainClassName = 'Files'
-				importResults = processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName,
+				importResults = processSheet(project, dataTransferSet, workbook, sheetName,
 						'Id', 'Name', 0, domainClassName, exportTime, sheetConf, STORAGE)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
@@ -2280,7 +2279,8 @@ class ImportService implements ServiceMethods {
 							assetDep = new AssetDependency(createdBy: securityService.loadCurrentPerson())
 							isNew = true
 						} else {
-							String msg = messageSource.getMessage("assetEntity.dependency.warning", [asset.assetName, dependent.assetName], LocaleContextHolder.getLocale())
+							Object[] msgParams = [asset.assetName, dependent.assetName]
+							String msg = messageSource.getMessage("assetEntity.dependency.warning",msgParams , LocaleContextHolder.getLocale())
 							dependencyError "$msg (row $rowNum)"
 							continue
 						}
@@ -2764,7 +2764,7 @@ class ImportService implements ServiceMethods {
 			colNamesOrdinalMap[cellContent] = c
 		}
 
-		List<Map<String, ?>> domainPropertyNameList = customDomainService.allFieldSpecs(project, assetClass.toString())[assetClass.toString()]["fields"]
+		List<Map<String, ?>> domainPropertyNameList = customDomainService.allFieldSpecs(project, assetClass.toString(), true)[assetClass.toString()]["fields"]
 
 		// Make sure that the required columns are in the spreadsheet
 		checkSheetForMissingColumns(sheetName, domainPropertyNameList, colNamesOrdinalMap)
@@ -2832,7 +2832,7 @@ class ImportService implements ServiceMethods {
 	}
 
 	// Method process one of the asset class sheets
-	private Map processSheet(project, projectCustomLabels, dataTransferSet, workbook, sheetName, assetIdColName,
+	private Map processSheet(project, dataTransferSet, workbook, sheetName, assetIdColName,
 							 assetNameColName, headerRowNum, domainName, timeOfExport, sheetConf, AssetClass assetClass) {
 
 		Map results = initializeImportResultsMap()
@@ -2845,7 +2845,7 @@ class ImportService implements ServiceMethods {
 			}
 
 			sheetInfo << sheetConf
-			importSheetValues(results, dataTransferBatch, projectCustomLabels, sheetInfo)
+			importSheetValues(results, dataTransferBatch, sheetInfo)
 			results.dataTransferBatch = dataTransferBatch
 
 			log.debug "processSheet() sheet $sheetName results = $results"
@@ -2861,14 +2861,13 @@ class ImportService implements ServiceMethods {
 	 * Iterates over the spreadsheet rows and loads each of the cells into the DataTransferValue table
 	 * @param results - the map used to track errors, skipped rows and count of what was added
 	 * @param dataTransferBatch - the batch to insert the rows into
-	 * @param projectCustomLabels - the custom label values for the project
 	 * @param sheetInfo - the map of all of the sheet information
 	 * @return a Map containing the following elements
 	 *		List errors - a list of errors
 	 *		List skipped - a list of skipped rows
 	 *		Integer added - a count of rows added
 	 */
-	private Map importSheetValues(Map results, DataTransferBatch dataTransferBatch, Map projectCustomLabels, Map sheetInfo) {
+	private Map importSheetValues(Map results, DataTransferBatch dataTransferBatch, Map sheetInfo) {
 
 		Sheet sheetObject = sheetInfo.sheet
 		Map colNamesOrdinalMap = sheetInfo.colNamesOrdinalMap

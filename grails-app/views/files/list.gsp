@@ -42,10 +42,10 @@
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
-				
+
 				var filter = '${filter}'
 				var event = '${event}'
-				var plannedStatus = '${plannedStatus}' 
+				var plannedStatus = '${plannedStatus}'
 				var validation = '${validation}'
 				var	moveBundleId = '${moveBundleId}'
 				var fileName = '${fileName}'
@@ -56,18 +56,18 @@
 				var sizePref = '${sizePref}'
 				var toValidate = '${toValidate}'
 				var unassigned = '${unassigned}'
-				
+
 				var listCaption ='Storages: <tds:hasPermission permission="${Permission.AssetEdit}"> \
 					<span class="capBtn">\
 						<input type="button" value="Create Storage" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\')"/>\
 					</span></tds:hasPermission>\
 					<tds:hasPermission permission="${Permission.AssetDelete}">\
-						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Files\')" disabled="disabled"/></span>\
+						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Logical Storage\')" disabled="disabled"/></span>\
 					</tds:hasPermission>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
 					<g:if test="${fixedFilter}"><g:link class="mmlink" controller="files" action="list"><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" /></span></g:link>\
 					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'storageId\')"/></g:else></span>'
-				// JqGrid implementations 
+				// JqGrid implementations
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
@@ -75,7 +75,7 @@
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${filesPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${filesPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'${filesPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${filesPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${filesPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${filesPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
@@ -83,11 +83,12 @@
 					sortname="'assetName'"
 					caption="listCaption"
 					rowNum="sizePref"
+					rowList="${ raw(com.tdsops.common.ui.Pagination.optionsAsText()) }"
 					multiselect="true"
 					loadComplete="initCheck"
 					gridComplete="function(){bindResize('storageId');recompileDOM('storageIdWrapper');}"
 					onSelectRow="validateMergeCount"
-					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
+					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName,
 						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size,toValidate:toValidate, unassigned:unassigned}"
 					showPager="true">
 					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>
@@ -101,13 +102,13 @@
 					var filePref= '${filesPref[key]}';
 					$("#storageIdGrid_"+filePref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect(\'"+filePref+"\',\'storage\',\'"+${key}+"\')\">");
 				</g:each>
-				
+
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? _.escape(cellvalue) : ''
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 				}
-				
+
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var actionButton = '';
 					if (${hasPerm}) {
@@ -125,7 +126,7 @@
                     </tds:hasPermission>
                     return actionButton;
 				}
-				
+
 				function populateFilter(){
 					$("#gs_assetName").val('${fileName}')
 					$("#gs_fileFormat").val('${fileFormat}')
@@ -135,7 +136,7 @@
 				}
 			})
 		</script>
-		
+
 	</head>
 	<body>
 		<tds:subHeader title="Logical Storage List${(event)?(' for Move Event '+moveEvent.name):('')}" crumbs="['Assets','Logical Storage List']"/>
@@ -148,11 +149,14 @@
 				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />
-						%{--<g:each var="attribute" in="${attributesList}">--}%
 						<g:each var="attribute" in="${fieldSpecs}">
 							<label><input type="radio" name="coloumnSelector_${filesPref[key]}" id="coloumnSelector_${filesPref[key]}" value="${attribute.attributeCode}"
-								${filesPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','Storage_Columns')"/> ${attribute.frontendLabel}</label><br>
+								${filesPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;"
+								onchange="setColumnAssetPref(this.value,'${key}','${com.tdsops.tm.enums.domain.UserPreferenceEnum.Storage_Columns}')"
+								/> 
+								${attribute.frontendLabel}
+							</label>
+							<br>
 						</g:each>
 					</div>
 				</div>

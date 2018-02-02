@@ -7,7 +7,6 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.EmailDispatch
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -19,7 +18,6 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
  */
 class EmailDispatchService implements ServiceMethods {
 
-	GrailsApplication grailsApplication
 	def mailService
 	Scheduler quartzScheduler
 

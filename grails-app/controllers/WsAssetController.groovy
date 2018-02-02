@@ -2,17 +2,16 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.grails.TimeUtil
+import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.AssetEntityService
-import net.transitionmanager.service.SecurityService
-import org.grails.datastore.mapping.query.api.BuildableCriteria
+import net.transitionmanager.service.*
+
+import java.text.DateFormat
 
 /**
  * Created by @oluna on 4/5/17.
@@ -23,6 +22,12 @@ import org.grails.datastore.mapping.query.api.BuildableCriteria
 class WsAssetController implements ControllerMethods {
 	SecurityService securityService
 	AssetEntityService assetEntityService
+	PageRenderer groovyPageRenderer
+	ControllerService controllerService
+	ApplicationService applicationService
+	DeviceService deviceService
+	StorageService storageService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -100,7 +105,6 @@ class WsAssetController implements ControllerMethods {
 		if(!name){
 			errors << "The new asset name is missing"
 		}
-
 		if(dependencies &&
 				!securityService.hasPermission(Permission.AssetCloneDependencies)
 		){
@@ -109,56 +113,12 @@ class WsAssetController implements ControllerMethods {
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
-
-		AssetEntity clonedAsset
-		if(!errors) {
-			AssetEntity assetToClone = AssetEntity.get(assetId)
-			if(!assetToClone) {
-				errors << "The asset specified to clone was not found"
-
-			}else{
-				//check that the asset is part of the project
-				if(!securityService.isCurrentProjectId(assetToClone.projectId)){
-					log.error(
-							"Security Violation, user {} attempted to access an asset not associated to the project",
-							securityService.getCurrentUsername()
-					)
-					errors << "Asset not found in current project"
-				}
-
-				if(!errors) {
-					clonedAsset = assetToClone.clone([
-							assetName : name,
-							validation: ValidationType.DIS
-					])
-
-					// Cloning assets dependencies if requested
-					if (clonedAsset.save() && dependencies) {
-						for (dependency in assetToClone.supportedDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									dependent: clonedAsset,
-									status   : AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-						for (dependency in assetToClone.requiredDependencies()) {
-							AssetDependency clonedDependency = dependency.clone([
-									asset : clonedAsset,
-									status: AssetDependencyStatus.QUESTIONED
-							])
-
-							clonedDependency.save()
-						}
-					}
-				}
-			}
-		}
-
+		// cloning asset
+		Long clonedAssetId = assetEntityService.clone(assetId, name, dependencies, errors)
 		if(errors){
 			renderFailureJson(errors)
 		}else{
-			renderSuccessJson([assetId : clonedAsset.id])
+			renderSuccessJson([assetId : clonedAssetId])
 		}
 	}
 
@@ -212,30 +172,37 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		def Project currentProject = securityService.getUserCurrentProject()
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
 		def dependencyMap = [
-			"assetA" : [
-					"name": assetA.assetName,
-					"assetClass": assetAClassLabel.value,
-					"environment": assetA.environment,
-					"bundle": assetA.moveBundleName,
-					"planStatus": assetA.planStatus,
-					"dependency": dependencyA,
+			"assetA"          : [
+					"name"           : assetA.assetName,
+					"assetClass"     : assetAClassLabel.value,
+					"environment"    : assetA.environment,
+					"bundle"         : assetA.moveBundleName,
+					"planStatus"     : assetA.planStatus,
+					"dependency"     : dependencyA,
+					"dependencyClass": dependencyA?.dependent?.assetClass,
+					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
+					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
 			],
-			"assetB" : [
-					"name": assetB.assetName,
-					"assetClass":  assetBClassLabel.value,
-					"environment": assetB.environment,
-					"bundle": assetB.moveBundleName,
-					"planStatus": assetB.planStatus,
-					"dependency": dependencyB,
+			"assetB"          : [
+					"name"           : assetB.assetName,
+					"assetClass"     : assetBClassLabel.value,
+					"environment"    : assetB.environment,
+					"bundle"         : assetB.moveBundleName,
+					"planStatus"     : assetB.planStatus,
+					"dependency"     : dependencyB,
+					"dependencyClass": dependencyB?.dependent?.assetClass,
+					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
+					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
 			],
-			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
-			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,
+			"dataFlowFreq"    : AssetDependency.constraints.dataFlowFreq.inList,
+			"dependencyType"  : assetEntityService.entityInfo(currentProject).dependencyType,
 			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
-			"editPermission": securityService.hasPermission(Permission.AssetEdit)
+			"editPermission"  : securityService.hasPermission(Permission.AssetEdit)
 		]
-
 		renderSuccessJson(dependencyMap)
 	}
 
@@ -261,4 +228,97 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+	/**
+	 * Used to retrieve the Angular HTML template used for the show or edit views of an asset
+	 * @param id - the id of the asset to generate the show view for
+	 * @param mode - the mode of the template to render [edit|show]
+	 * @return html template
+	 */
+	@HasPermission(Permission.AssetView)
+	def getTemplate(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode) || id == null ) {
+			sendBadRequest()
+			return
+		}
+
+		// Load the asset and validate that it is part of the project
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (! asset) {
+			sendNotFound()
+			return
+		}
+
+		Map model = [ asset: asset ]
+		String domainName = asset.assetClass.toString()
+		switch (domainName) {
+			case "APPLICATION":
+				model << applicationService.getModelForShow(asset.project, asset, params)
+				break
+			case "DEVICE":
+				model << deviceService.getModelForShow(asset.project, asset, params)
+				break
+			case "STORAGE":
+				model << storageService.getModelForShow(asset.project, asset, params)
+				break
+			default:
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+				break
+		}
+
+		domainName=domainName.toLowerCase()
+
+		try {
+			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+			if (pageHtml) {
+				render pageHtml
+			} else {
+				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
+				sendNotFound()
+			}
+		} catch (e) {
+			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
+			sendNotFound()
+		}
+	}
+
+	/**
+	 * Used to retrieve the model data for the show view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetView)
+	def getModel(Long id, String mode) {
+		final List modes = ['edit','show']
+		if (! modes.contains(mode) || id == null) {
+			sendBadRequest()
+			return
+		}
+
+		AssetEntity asset = fetchDomain(AssetEntity, params)
+		if (asset) {
+			Map model = [
+				asset: asset
+			]
+			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
+			if (mode == 'show') {
+				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
+			} else {
+				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
+			}
+			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
+			renderAsJson(model)
+		}
+	}
+
+	/**
+	 * Used to delete one or more assets for the current project 
+	 * @params ids - a list of asset id numbers
+	 * @return JSON Success response with data.message with results
+	 */
+	@HasPermission(Permission.AssetDelete)
+	def deleteAssets() {
+		String message = assetEntityService.deleteBulkAssets(projectForWs, 'Assets', request.getJSON().ids)
+		renderSuccessJson(message:message)
+	}
 }

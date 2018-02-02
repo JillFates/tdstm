@@ -64,41 +64,41 @@ export default class RestServiceHandler {
             },
             createNewLicenseRequest: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/license/request';
+                this.req.url = '../ws/license/request';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            applyLicense:  (licenseId, data, onSuccess, onError) => {
+            applyLicense: (licenseId, data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/license/' + licenseId + '/load';
+                this.req.url = '../ws/license/' + licenseId + '/load';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            getHashCode:  (licenseId, onSuccess, onError) => {
+            getHashCode: (licenseId, onSuccess, onError) => {
                 this.req.method = 'GET';
-                this.req.url =  '../ws/license/' + licenseId + '/hash';
+                this.req.url = '../ws/license/' + licenseId + '/hash';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
-            getEmailContent:  (licenseId, onSuccess, onError) => {
+            getEmailContent: (licenseId, onSuccess, onError) => {
                 this.req.method = 'GET';
-                this.req.url =  '../ws/license/' + licenseId + '/email/request';
+                this.req.url = '../ws/license/' + licenseId + '/email/request';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             //--------------------------------------------
             resubmitLicenseRequest: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/license/' + licenseId + '/email/request';
+                this.req.url = '../ws/license/' + licenseId + '/email/request';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             emailRequest: (data, callback) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/???';
+                this.req.url = '../ws/???';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http.post('../test/mockupData/LicenseAdmin/licenseAdminList.json', data), callback);
             },
             deleteLicense: (data, onSuccess, onError) => {
                 this.req.method = 'DELETE';
-                this.req.url =  '../ws/license/'+data.id;
+                this.req.url = '../ws/license/' + data.id;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };
@@ -106,9 +106,9 @@ export default class RestServiceHandler {
 
     licenseManagerServiceHandler() {
         return {
-            requestImport:  (data, onSuccess, onError) => {
+            requestImport: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/manager/license/request';
+                this.req.url = '../ws/manager/license/request';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
@@ -121,35 +121,40 @@ export default class RestServiceHandler {
             getEnvironmentDataSource: (onSuccess) => {
                 return new RequestHandler(this.rx).subscribeRequest(this.http.get('../ws/license/environment'), onSuccess);
             },
-            getKeyCode:  (licenseId, onSuccess, onError) => {
+            getKeyCode: (licenseId, onSuccess, onError) => {
                 this.req.method = 'GET';
-                this.req.url =  '../ws/manager/license/' + licenseId + '/key';
+                this.req.url = '../ws/manager/license/' + licenseId + '/key';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             saveLicense: (licenseId, licenseModified, onSuccess, onError) => {
                 this.req.method = 'PUT';
-                this.req.url =  '../ws/manager/license/' + licenseId;
+                this.req.url = '../ws/manager/license/' + licenseId;
                 this.req.data = licenseModified;
+                return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
+            },
+            deleteLicense: (data, onSuccess, onError) => {
+                this.req.method = 'DELETE';
+                this.req.url = '../ws/manager/license/' + data.id + '/delete';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             revokeLicense: (data, onSuccess, onError) => {
                 this.req.method = 'DELETE';
-                this.req.url =  '../ws/manager/license/'+data.id;
+                this.req.url = '../ws/manager/license/' + data.id;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             activateLicense: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/manager/license/' + licenseId + '/activate';
+                this.req.url = '../ws/manager/license/' + licenseId + '/activate';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             getActivityLog: (licenseId, onSuccess, onError) => {
                 this.req.method = 'GET';
-                this.req.url =  '../ws/manager/license/' + licenseId + '/activitylog';
+                this.req.url = '../ws/manager/license/' + licenseId + '/activitylog';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             manuallyRequest: (licenseId, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/manager/license/' + licenseId + '/email/send';
+                this.req.url = '../ws/manager/license/' + licenseId + '/email/send';
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };
@@ -162,19 +167,19 @@ export default class RestServiceHandler {
             },
             createNotice: (data, onSuccess, onError) => {
                 this.req.method = 'POST';
-                this.req.url =  '../ws/notices';
+                this.req.url = '../ws/notices';
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             editNotice: (data, onSuccess, onError) => {
                 this.req.method = 'PUT';
-                this.req.url =  '../ws/notices/'+data.id;
+                this.req.url = '../ws/notices/' + data.id;
                 this.req.data = data;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             },
             deleteNotice: (data, onSuccess, onError) => {
                 this.req.method = 'DELETE';
-                this.req.url =  '../ws/notices/'+data.id;
+                this.req.url = '../ws/notices/' + data.id;
                 return new RequestHandler(this.rx).subscribeRequest(this.http(this.req), onSuccess, onError);
             }
         };

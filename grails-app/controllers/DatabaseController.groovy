@@ -3,6 +3,7 @@ import com.tds.asset.Database
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
@@ -52,7 +53,7 @@ class DatabaseController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
-		def fieldPrefs = assetEntityService.getExistingPref('Database_Columns')
+		def fieldPrefs = assetEntityService.getExistingPref(PREF.Database_Columns)
 
 		[dbFormat: filters?.dbFormatFilter ?: '', dbName: filters?.assetNameFilter ?:'', dbPref: fieldPrefs] +
 		assetEntityService.getDefaultModelForLists(AssetClass.DATABASE, 'Database', project, fieldPrefs, params, filters)
@@ -91,7 +92,7 @@ class DatabaseController implements ControllerMethods {
 			depConflicts: params.depConflicts,
 			event: params.event
 		]
-		def dbPref = assetEntityService.getExistingPref('Database_Columns')
+		def dbPref = assetEntityService.getExistingPref(PREF.Database_Columns)
 
 		// Get the list of fields for the domain
 		Map fieldNameMap = customDomainService.fieldNamesAsMap(project, AssetClass.DATABASE.toString(), true)
@@ -181,31 +182,45 @@ class DatabaseController implements ControllerMethods {
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN ($validUnkownQuestioned)
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 
-		def firstWhere = true
 		def queryParams = [:]
 		def whereConditions = []
 		filterParams.each { key, val ->
 			if (val && val.trim().size()){
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Database)
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						domain: Database,
+						column: key,
+						filter: val,
+						columnAlias: "dbs.${key}"
+
+				])
+
+				SqlUtil.parseParameter(fieldSearchData)
+
+				whereConditions << fieldSearchData.sqlSearchExpression
+				queryParams += fieldSearchData.sqlSearchParameters
 			}
 		}
-		if (whereConditions.size()){
-			query.append(" WHERE dbs.${whereConditions.join(" AND dbs.")}")
-		}
 
-		if (params.moveBundleId){
-			if (params.moveBundleId!='unAssigned'){
+		if (params.moveBundleId) {
+			if (params.moveBundleId != 'unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" WHERE dbs.moveBundle  = '$bundleName' ")
-			}else{
-				query.append(" WHERE dbs.moveBundle IS NULL ")
+				whereConditions.add ' dbs.moveBundle = :bundleName '
+				queryParams.put 'bundleName', bundleName
+			} else {
+				whereConditions.add ' dbs.moveBundle IS NULL '
 			}
 		}
 		if (params.toValidate){
-			query.append(" WHERE dbs.validation='Discovery'")
+			whereConditions.add ' dbs.validation = :validation '
+			queryParams.put 'validation', 'Discovery'
 		}
 		if (params.plannedStatus){
-			query.append(" WHERE dbs.planStatus='$params.plannedStatus'")
+			whereConditions.add ' dbs.planStatus = :planStatus '
+			queryParams.put 'planStatus', params.plannedStatus
+		}
+
+		if (whereConditions) {
+			query.append(" WHERE ${whereConditions.join(" AND ")} ")
 		}
 
 		def dbsList = []
@@ -323,7 +338,6 @@ class DatabaseController implements ControllerMethods {
 		if (database) {
 			def assetName = database.assetName
 			assetEntityService.deleteAsset(database)
-			database.delete()
 
 			flash.message = "Database $assetName deleted"
 			if (params.dstPath == 'dependencyConsole') {
@@ -332,28 +346,9 @@ class DatabaseController implements ControllerMethods {
 			} else {
 				redirect(action:"list")
 			}
-		}
-		else {
+		} else {
 			flash.message = "Database not found with id $params.id"
 			redirect(action:"list")
 		}
-
-	}
-	/**
-	 * Delete multiple database.
-	 */
-	@HasPermission(Permission.AssetDelete)
-	def deleteBulkAsset() {
-		def assetNames = []
-		for (assetId in  params.id.split(',')) {
-			def database = Database.get(assetId)
-			if (database) {
-				assetNames.add(database.assetName)
-				assetEntityService.deleteAsset(database)
-				database.delete()
-			}
-		}
-
-		render "Database ${WebUtil.listAsMultiValueString(assetNames)} deleted"
 	}
 }

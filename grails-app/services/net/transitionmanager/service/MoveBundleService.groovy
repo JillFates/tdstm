@@ -1,14 +1,7 @@
 package net.transitionmanager.service
 
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
+import com.tds.asset.*
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
@@ -16,24 +9,14 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.spreadsheet.SheetWrapper
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventSnapshot
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectAssetMap
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.StepSnapshot
-import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.domain.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -102,6 +85,7 @@ class MoveBundleService implements ServiceMethods {
 		MoveBundle.executeUpdate('UPDATE MoveBundle SET moveEvent=null where moveEvent=:me', [me: moveEvent])
 		for (id in moveBundleIds) {
 			moveEvent.addToMoveBundles(MoveBundle.get(id))
+
 		}
 	}
 
@@ -196,37 +180,39 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 *  Delete Bundle AssetEntitys and its associated records
+	 *  Deletes moveBundle, associated data and AssetEntities related to that bundle.
+	 *  @param : moveBundle
 	 */
-	def deleteBundleAssetsAndAssociates(MoveBundle moveBundle){
-		String message
+	def deleteBundleAndAssets(MoveBundle moveBundle){
 		try{
-			// remove preferences
-			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = $moveBundle.id"
-			UserPreference.executeUpdate("delete from UserPreference up where up.value = $moveBundle.id ")
-			//remove the AssetEntity and associated
-			def assets = AssetEntity.findAllByMoveBundle(moveBundle)
-			if(assets){
-				ApplicationAssetMap.executeUpdate  'delete ApplicationAssetMap where asset       in (:assets)', [assets: assets]
-				AssetComment.executeUpdate         'delete AssetComment        where assetEntity in (:assets)', [assets: assets]
-				AssetEntityVarchar.executeUpdate   'delete AssetEntityVarchar  where assetEntity in (:assets)', [assets: assets]
-				ProjectAssetMap.executeUpdate      'delete ProjectAssetMap     where asset       in (:assets)', [assets: assets]
-				AssetCableMap.executeUpdate        'delete AssetCableMap       where assetFrom   in (:assets)', [assets:assets]
-				AssetCableMap.executeUpdate      '''Update AssetCableMap set cableStatus=:cableStatus, assetTo=null, assetToPort=null
-                                                 where assetTo in (:assets)''', [assets: assets]
-				ProjectTeam.executeUpdate(        'Update ProjectTeam SET latestAsset = null where latestAsset in (:assets)', [assets:assets])
-				AssetDependency.executeUpdate(     'delete AssetDependency where asset in (:assets) or dependent in (:deps)',
-												[assets:assets, deps:assets] )
-				AssetDependencyBundle.executeUpdate('delete AssetDependencyBundle where asset in (:assets)', [assets:assets])
-				AssetEntity.executeUpdate('delete AssetEntity where moveBundle=?', [moveBundle])
-			}
+			//remove assets
+			List assets = AssetEntity.where {
+				moveBundle == moveBundle
+			}.projections{
+				property 'id'
+			}.list()
+			assetEntityService.deleteAssets(assets)
+			Project project = securityService.loadUserCurrentProject()
+			// As a precaution if there are any other AssetEntity types in the database we will want to associate them
+			// with the Default project post the deletes.
+			// Theoretically this isn't necessary but as a safety precaution
+			AssetEntity.where {
+				moveBundle == moveBundle
+			}.updateAll(moveBundle: project.getProjectDefaultBundle())
+
+			//remove bundle and associated data
+			deleteBundle(moveBundle, project)
+		} catch (e) {
+			log.error ExceptionUtil.stackTraceToString('deleting bundle and assets', e, 60)
+			throw new DomainUpdateException('Unable to remove the bundle and assets')
 		}
-		catch (e) {
-			message = "Unable to remove the $moveBundle Assets Error: $e.message"
-		}
-		return message
 	}
 
+	/**
+	 *  Deletes moveBundle and associated data.
+	 *  @param : moveBundle
+	 *  @param : project
+	 */
 	String deleteBundle(MoveBundle moveBundle, Project project) {
 		if (moveBundle.id == project.defaultBundleId) {
 			return 'The project default bundle can not be deleted'
@@ -241,9 +227,16 @@ class MoveBundleService implements ServiceMethods {
 		try {
 			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
 					[project.defaultBundle, moveBundle])
-			deleteMoveBundleAssociates(moveBundle)
+			// remove bundle-associated data
+			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
+			List<MoveEvent> events = MoveEvent.findAll()
+			events.each {
+				if (it.moveBundles.contains(moveBundle)) {
+					it.removeFromMoveBundles(moveBundle)
+				}
+			}
+			// Finally, delete the Bundle
 			moveBundle.delete()
-
 			return "MoveBundle $moveBundle deleted"
 		}
 		catch (e) {
@@ -251,15 +244,6 @@ class MoveBundleService implements ServiceMethods {
 			transactionStatus.setRollbackOnly()
 			return "Unable to delete bundle " + moveBundle.name
 		}
-	}
-
-	/**
-	 *  Delete MoveBundle associated records
-	 */
-	void deleteMoveBundleAssociates(MoveBundle moveBundle) {
-		jdbcTemplate.update('DELETE FROM user_preference WHERE value=?', moveBundle.id.toString())
-		jdbcTemplate.update('DELETE FROM party_relationship where party_id_from_id=? or party_id_to_id=?', moveBundle.id, moveBundle.id)
-		MoveBundleStep.executeUpdate('DELETE MoveBundleStep where moveBundle=?', [moveBundle])
 	}
 
 	/*
@@ -345,6 +329,20 @@ class MoveBundleService implements ServiceMethods {
 		def groups = dependList.dependencyBundle
 		if (dependencyBundle == null) {
 			session.setAttribute('Dep_Groups', (groups as JSON).toString())
+		}
+
+		// TM-8535 Missing Remnants (Group 0)
+		if( dependList && dependList[0].dependencyBundle != 0 ) {
+			dependList.add(0, [
+					  dependencyBundle: 0,
+					  appCount: 0,
+					  serverCount: 0,
+					  vmCount: 0,
+					  dbCount: 0,
+					  storageCount: 0,
+					  statusAssigned: 0,
+					  statusMoved: 0
+			])
 		}
 
 		dependList.each { group ->
@@ -760,7 +758,8 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleText : bundle ids to analyze
 	 */
 	private void addStragglerDepsToGroupZero(projectId, moveBundleText, sqlTime) {
-		jdbcTemplate.execute("""
+
+		def sql = """
 			INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
 			SELECT ae.asset_entity_id, 0, "Straggler", "$sqlTime", ae.project_id
 			FROM asset_entity ae
@@ -768,7 +767,10 @@ class MoveBundleService implements ServiceMethods {
 			WHERE ae.project_id = $projectId # AND ae.dependency_bundle IS NULL
 			AND adb.asset_id IS NULL
 			AND move_bundle_id in ($moveBundleText)
-			AND ae.asset_type in $dependecyBundlingAssetTypesJoined""")
+			AND ae.asset_type in $dependecyBundlingAssetTypesJoined
+		"""
+
+		jdbcTemplate.execute(sql)
 	}
 
 	private String listAsPipeSeparatedString(list) {
@@ -804,5 +806,19 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		return bundles
+	}
+
+	/**
+	 * Returns the bundle with the name associated to the project. If it not exist, a new bundle is created.
+	 * @param bundleName the name of the bundle to check for existence
+	 * @return project the project
+	 */
+	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
+		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
+
+		if (!moveBundle) {
+			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
+		}
+		return moveBundle
 	}
 }

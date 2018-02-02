@@ -35,6 +35,12 @@
 						<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Event:</label></td>
 						<td valign="top" class="value" id="eventName" colspan="3">{{acData.eventName}}</td>
 					</tr>
+					<tr id="actionShowId">
+						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<td valign="top" class="value" id="vmAction" colspan="2">
+              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
+            </td>
+					</tr>
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
 						<td valign="top" class="value" id="categoryTdId" style="width:15%">{{ac.category}}</td>
@@ -100,6 +106,10 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>
+						<td valign="top" class="value" id="taskSpecIdShowId" colspan="1" style="width: 20%">{{acData.taskSpecId}}&nbsp;</td>
 					</tr>
 					<%-- Dependencies Section --%>
 					<tr>

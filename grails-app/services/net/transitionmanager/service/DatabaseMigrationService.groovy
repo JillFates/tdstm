@@ -1,6 +1,10 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import groovy.sql.Sql
+import net.transitionmanager.domain.Project
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DatabaseMigrationService implements ServiceMethods {
 
@@ -116,5 +120,42 @@ class DatabaseMigrationService implements ServiceMethods {
 			sql.execute(RemoveRolesSQL, [permName:item])
 			sql.execute(RemovePermSQL, [permName:item])
 		}
+	}
+
+	/**
+	 * Update a JSON field for a list of domain objects by executing the given script.
+	 * This script must return the transformed JSON so this method can update the corresponding
+	 * field appropriately.
+	 *
+	 * @param domainObjects - list of domain objects
+	 * @param jsonField - name of the field to be updated.
+	 * @param changeScript - the script to be executed.
+	 */
+	void updateJsonObjects(List domainObjects, String jsonField, Closure changeScript) {
+		for (domainObject in domainObjects) {
+			// Parse the given field to a JSON object.
+			JSONObject originalJson = JsonUtil.parseJson(domainObject[jsonField])
+			// Execute the given script using the JSON object.
+			JSONObject transformedJson = changeScript(originalJson)
+			// Assign the result of the script execution to the same field, which may be a different object.
+			domainObject[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
+			// Save the changes or throw an exception.
+			if (!domainObject.save(flush:true)) {
+				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
+			}
+		}
+	}
+    /**
+     *
+     * Adds a new System Dataview defining the id parameter a the Dataview spec in JSON format
+     *
+     * @param sql - the SQL connection from the migration script
+     * @param id - a new Id between 1-1000 to be used in Dataview creation
+     * @param name - the name of the new system Dataview
+     * @param jsonSpec - a json spec for the new Dataview.     */
+	void addSystemView(Sql sql, Long id, String name, String jsonSpec) {
+
+        List params = [id, name, Project.DEFAULT_PROJECT_ID, true, new Date(), jsonSpec]
+        sql.execute 'insert into dataview(id, name, project_id, is_system, date_created, report_schema) values(?,?,?,?,?,?)',  params
 	}
 }

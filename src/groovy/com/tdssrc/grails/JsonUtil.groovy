@@ -1,12 +1,16 @@
 package com.tdssrc.grails
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grails.converters.JSON
 import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import groovy.json.JsonException
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.InvalidParamException
+import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 @CompileStatic
@@ -67,5 +71,61 @@ class JsonUtil {
     static Map<String, ?> convertJsonToMap(String json) {
         Map<String, Object> jsonMap = new ObjectMapper().readValue(json, HashMap.class)
         return jsonMap
+    }
+
+    /**
+     * Convert a JSONElement to map
+     * @param json
+     * @return
+     */
+    static Map<String, ?> convertJsonToMap(JSONElement json) {
+        if (json == null) return null
+        return convertJsonToMap(json.toString())
+    }
+
+    /**
+     * Convert a map to json string
+     * @param map
+     * @return
+     */
+    static String convertMapToJsonString(Map<String, ?> map) {
+        return JsonOutput.toJson(map)
+    }
+
+    /**
+     * Converts an object into a String in the JSON format
+     * @param object - the object to be converted
+     * @return the object as JSON String
+     */
+    static String toJson(Object object) {
+        // new JsonBuilder(object).toString()
+        JsonOutput.toJson(object)
+    }
+
+    /**
+     * Converts an object into a String in the JSON pretty format
+     * @param object - the object to be converted
+     * @return the object as JSON String
+     */
+    static String toPrettyJson(Object object) {
+        JsonOutput.prettyPrint(toJson(object))
+    }
+
+    /**
+     * Parse the given file into an JSONObject instance.
+     * @param fileName
+     * @return
+     */
+    static JSONObject parseFile(String fileName) {
+        return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
+    }
+
+    /**
+     * Parse the given inputStream of text into an JSONObject instance
+     * @param inputStream
+     * @return JSON
+     */
+    static JSONObject parseFile(InputStream inputStream) {
+        return (JSONObject)JSON.parse(inputStream.text)
     }
 }

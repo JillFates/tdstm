@@ -68,8 +68,9 @@
     </servlet-mapping>
 
     <session-config>
-        <!-- 30 minutes -->
-        <session-timeout>30</session-timeout>
+        <!-- 60 minutes -->
+        <!-- TM-7656 Bumped timout from 30 minutes to 60 minutes -->
+        <session-timeout>60</session-timeout>
     </session-config>
 
     <welcome-file-list>

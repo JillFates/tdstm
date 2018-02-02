@@ -12,7 +12,7 @@
 		// Ajax to populate dependency selects in edit pages
 		var assetId = '${databaseInstance.id}'
 		populateDependency(assetId, 'database','edit')
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm">
@@ -62,7 +62,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance?.environment}"/>
 							<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
 								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Seb lect']}" tabindex="32" />
+									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Seb lect']}" tabindex="32" />
 								</tds:tooltipSpan>
 							</td>
 						</tr>
@@ -93,7 +93,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${databaseInstance?.moveBundle}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
+									<g:select class="${standardFieldSpecs.moveBundle.imp?:''}" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>
@@ -105,7 +105,7 @@
 
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
 							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
-					           	<input type="text" class="dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
+					           	<input type="text" class=" ${standardFieldSpecs.maintExpDate.imp?:''} dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
 									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
 					                	value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
 							</td>
@@ -113,7 +113,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
-									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34"/>
+									<g:select class="${standardFieldSpecs.planStatus.imp?:''}" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>
@@ -126,7 +126,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
-									<g:select from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation"
+									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${databaseInstance.constraints.validation.inList}" id="validation" name="validation"
 										   value="${databaseInstance.validation}" tabindex="35"/>
 								</tds:tooltipSpan>
 							</td>

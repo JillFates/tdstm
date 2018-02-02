@@ -9,7 +9,7 @@ QZ = function(opts){
 
   /// Authentication setup ///
   qz.security.setCertificatePromise(function(resolve, reject) {
-    $.ajax(codebase + "/lib/digital-certificate.txt").then(resolve, reject);
+    $.ajax(codebase + "/ws/qzCertificate").then(resolve, reject);
   });
 
   /// Message signature ///

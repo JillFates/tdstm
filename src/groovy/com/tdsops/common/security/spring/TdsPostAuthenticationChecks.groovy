@@ -38,7 +38,7 @@ class TdsPostAuthenticationChecks implements UserDetailsChecker {
 
 		// checkPasswordAge
 
-		int maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays
+		Long maxAgeDays = (int) securityService.userLocalConfig.maxPasswordAgeDays
 		if (!userLogin.passwordNeverExpires && maxAgeDays && userLogin.passwordChangedDate &&
 				userLogin.passwordChangedDate.time + maxAgeDays * MILLIS_IN_ONE_DAY < System.currentTimeMillis()) {
 

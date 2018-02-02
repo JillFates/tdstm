@@ -11,9 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
-/**
- * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
- */
 @CompileStatic
 @Slf4j(value='logger')
 @Transactional(readOnly = true, noRollbackFor = [IllegalArgumentException, UsernameNotFoundException])
@@ -28,7 +25,7 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 
 		UserLogin userLogin = UserLogin.findWhere(username: username)
 		if (!userLogin) {
-			logger.warn 'loadUserByUsername() User not found: {}', username
+			logger.info 'loadUserByUsername() User not found: {}', username
 			throw new NoStackUsernameNotFoundException()
 		}
 
@@ -50,7 +47,7 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 				// String query = 'select permissionItem from Permissions where id in (select permission from RolePermissions where role in (:roleNames))'
 				permissions = (Collection) UserLogin.executeQuery(query, [roleNames: roleNames]).unique().sort()
 			} else {
-				logger.warn 'loadUserByUsername() No security roles found for user: {}', username
+				logger.info 'loadUserByUsername() No security roles found for user: {}', username
 			}
 		}
 

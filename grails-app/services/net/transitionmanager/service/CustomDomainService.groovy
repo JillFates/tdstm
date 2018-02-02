@@ -131,16 +131,21 @@ class CustomDomainService implements ServiceMethods {
 
     /**
      * Retrieve all field specifications as a Map
+     * @param project
      * @param domain
+     * @param showOnly - boolean to ask only for the fields required for export/import and other views.
      * @return
      */
-    Map allFieldSpecs(Project project, String domain){
+    Map allFieldSpecs(Project project, String domain, boolean showOnly = false){
         Map fieldSpec = [:]
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
         for (String assetClassType : assetClassTypes) {
             Map fieldSpecMap = settingService.getAsMap(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType)
             if (fieldSpecMap) {
+                if (showOnly) {
+                    fieldSpecMap.fields = fieldSpecMap.fields.findAll( {field -> field.show == 1} )
+                }
                 fieldSpec["${assetClassType.toUpperCase()}"] = fieldSpecMap
             } else {
                 // If the configuration is missing then this is a serious issue for the application and should bail out
@@ -418,7 +423,7 @@ class CustomDomainService implements ServiceMethods {
         // Split the common fields from the individual ones
         def (commonFields, individualFields) = fields.split {
             AssetEntity.COMMON_FIELD_LIST.contains(it.field) ||
-                BooleanUtils.toBoolean(it.shared) == true
+                    (it.shared && BooleanUtils.toBoolean(it.shared))
         }
 
         def commonFieldNames = commonFields.collect { it.field }

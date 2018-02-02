@@ -13,6 +13,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.codec.net.URLCodec
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.validator.routines.UrlValidator
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
@@ -125,9 +126,10 @@ class CustomTagLib implements InitializingBean {
 	 * @param icon - CSS icon to display in button
 	 * @param id - CSS id to embed into IDs
 	 * @param onclick - Javascript to add to button
+	 * @param tooltipText - text for tooltip on hover to add to Button
 	 */
 	def actionButton = { Map attrs ->
-		out << HtmlUtil.actionButton(attrs.label, attrs.icon, attrs.id, attrs.onclick)
+		out << HtmlUtil.actionButton(attrs.label, attrs.icon, attrs.id, attrs.onclick, attrs.tooltipText)
 	}
 
 	/**
@@ -319,10 +321,21 @@ class CustomTagLib implements InitializingBean {
 	def subHeader = { Map attrs ->
 		String title = attrs.title
 		def crumbs = attrs.crumbs
+		Boolean justPlanningOptIn = BooleanUtils.toBoolean(attrs.justPlanningOptIn as String)
 
 		out << "<!-- Content Header (Page header) -->"
 		out << "<section class=\"content-header\">"
-			out << "<h1> " << title << " </h1>"
+		out << "<h1> " << title
+		if (justPlanningOptIn) {
+			Boolean justPlanning  = BooleanUtils.toBoolean(userPreferenceService.getPreference(PREF.ASSET_JUST_PLANNING))
+			out << " <span style=\"margin-left: 15px; font-size: 15px;\"><input type=\"checkbox\" id=\"justPlanning\" onclick=\"toggleJustPlanning(\$(this))\" "
+			if (justPlanning) {
+				out << "checked=\"checked\""
+			}
+			out << "/><label style=\"font-weight: 600 !important;\" for=\"justPlanning\">&nbsp;Just Planning</label></span>"
+		}
+		out << " </h1>"
+
 		def isLicenseAdminEnabled = licenseCommonService.isAdminEnabled()
 		if(isLicenseAdminEnabled) {
 			def bannerMessage = licenseAdminService.getLicenseBannerMessage()
@@ -355,7 +368,7 @@ class CustomTagLib implements InitializingBean {
 			if(stateMessage) {
 				// Bootstrap converts the html entities into real elements
 				String administerLicenseButtonURL = "onClick=&quot;location.href=&apos;/tdstm/app/license/admin/list&apos;&quot;"
-				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
+				out << "<a class='licensing-error-warning btn' href=\"#\" data-html=\"true\" data-toggle=\"popover\" tabindex=\"0\"  data-trigger=\"focus\" data-content=\" <div class='license-warning-message' style='word-wrap: break-word;'> <p>" << stateMessage << "</p> </div><div class='license-warning-message-button'><button type='button' class='btn btn-primary' " <<  administerLicenseButtonURL << "  >Administer License</button></div> \"><i class=\"fa fa-fw fa-warning licensing-error-warning\"></i></a>"
 			}
 		}
 	}

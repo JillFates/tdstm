@@ -1,0 +1,189 @@
+<div class="modal fade in" id="assetDependency" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">{{'ASSET_EXPLORER.DEPENDENCY_DETAIL'|translate}}</h4>
+            </div>
+            <div class="modal-body comment-dialog-content">
+                <table class="table table-striped" style="border: 0px; margin-bottom: 0px;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Class</th>
+                            <th>Environment</th>
+                            <th>Bundle</th>
+                            <th>Plan Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{assetDependency?.assetA?.name}}</td>
+                            <td>{{assetDependency?.assetA?.assetClass}}</td>
+                            <td>{{assetDependency?.assetA?.environment}}</td>
+                            <td>{{assetDependency?.assetA?.bundle}}</td>
+                            <td>{{assetDependency?.assetA?.planStatus}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="lbl-asset-dependency-direction">
+                                <span *ngIf="assetDependency?.assetA?.dependency?.id && !assetDependency?.assetB?.dependency?.id">
+                                    <i class="fa fa-fw fa-long-arrow-down"></i> Depends On</span>
+                                <span *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id">
+                                    <i class="fa fa-fw fa-arrows-v"></i> Bi-Directional Dependencies</span>
+                                <span *ngIf="!assetDependency?.assetA?.dependency?.id && !assetDependency?.assetB?.dependency?.id" style="color: darkred;">
+                                    <span class="glyphicon glyphicon-remove"></span> Dependency was not found.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{assetDependency?.assetB?.name}}</td>
+                            <td>{{assetDependency?.assetB?.assetClass}}</td>
+                            <td>{{assetDependency?.assetB?.environment}}</td>
+                            <td>{{assetDependency?.assetB?.bundle}}</td>
+                            <td>{{assetDependency?.assetB?.planStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <form class="form-horizontal dependency-edit-fields" *ngIf="assetDependency?.assetA?.dependency?.id || assetDependency?.assetB?.dependency?.id">
+                    <table ng-class="{ 'half-size': !assetDependency.assetB.dependency}">
+                        <tr *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id">
+                            <td></td>
+                            <td class="legend-fields">
+                                {{assetDependency.assetA.name}} <br />
+                                <i style="margin-left: -6px;" class="fa fa-fw fa-long-arrow-down"></i> <span style="color: #D1B9EE;">Depends On</span><br />
+                                {{assetDependency.assetB.name}}
+                            </td>
+                            <td class="legend-fields">
+                                {{assetDependency.assetB.name}} <br />
+                                <i style="margin-left: -6px;" class="fa fa-fw fa-long-arrow-down"></i> <span style="color: #D1B9EE;">Depends On</span><br />
+                                {{assetDependency.assetA.name}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 100px; vertical-align: top;">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">Frequency</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">Type</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">Status</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">Direction</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">C1</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">C2</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">C3</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">C4</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title">Comment</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title" style="width: 100%">Date Created</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title" style="width: 100%">Last Updated</label>
+                                </div>
+
+                                <div class="form-group" *ngIf="actionTypeEdit">
+                                    <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
+                                </div>
+                            </td>
+                            <td style="width: 200px; vertical-align: top;">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.dataFlowFreq}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.type}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.status}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.dataFlowDirection}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.c1}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.c2}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.c3}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.c4}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.comment}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dateCreated}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.lastUpdated}}</label>
+                                </div>
+                            </td>
+                            <td *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id" style="width: 200px; vertical-align: baseline;">
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.dataFlowFreq}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.type}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.status}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.dataFlowDirection}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.c1}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.c2}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.c3}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.c4}}</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.comment}}</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dateCreated}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.lastUpdated}}</label>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <br />
+                </form>
+            </div>
+            <div class="modal-footer form-group-center">
+                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+            </div>
+        </div>
+    </div>
+</div>

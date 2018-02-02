@@ -6,7 +6,6 @@
 				<table style="min-width: 400px;" class="planning-application-table table-responsive">
 					<thead>
 						<tr>
-							<th>Frequency</th>
 							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
@@ -17,9 +16,6 @@
 					<tbody>
 						<g:each in="${supportAssets}" var="support" status="i">
 							<tr onclick="EntityCrud.showAssetDetailView('${support?.asset?.assetClass}', ${support?.asset?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${support.status}">
-									${support?.dataFlowFreq}
-								</td>
 								<td class="dep-${support.status}">
 									${support?.asset?.assetType}
 								</td>
@@ -64,7 +60,6 @@
 				<table style="min-width: 400px;" class="planning-application-table table-responsive">
 					<thead>
 						<tr>
-							<th>Frequency</th>
 							<th>Class</th>
 							<th>Name</th>
 							<th>Bundle</th>
@@ -74,24 +69,21 @@
 					</thead>
 					<tbody>
 						<g:each in="${dependentAssets}" var="dependent" status="i">
-							<tr onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})" class="${i%2? 'odd':'even' }" style="cursor: pointer;">
-								<td class="dep-${dependent.status}">
-									${dependent.dataFlowFreq}
-								</td>
-								<td class="dep-${dependent.status}">
+							<tr class="${i%2? 'odd':'even' }" style="cursor: pointer;">
+								<td class="dep-${dependent.status}" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 									${dependent.dependent?.assetType}
 								</td>
-								<td class="dep-${dependent.status}" style="min-width:80px">
+								<td class="dep-${dependent.status}" style="min-width:80px" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 									${dependent.dependent?.assetName}
 								</td>
 								<g:if test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
-									<td style="background-color: lightpink;position:relative;">
+									<td style="background-color: lightpink;position:relative;" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 										<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
 									</td>
 								</g:if>
 								<g:elseif test="${dependent.dependent?.moveBundle!=assetEntity.moveBundle }" >
-									<td class="dep-${dependent.status}" style="position:relative;">
+									<td class="dep-${dependent.status}" style="position:relative;" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										<b>
 											<div style="padding: 5px 25px 5px 0px;">${dependent.dependent?.moveBundle}</div>
 											<div class="text-center" style="position:absolute;right:5px;top:20%;"><img src="${resource(dir:'icons', file:'error.png')}" width="17" height="18" alt="..." data-toggle="popover" data-trigger="hover"  data-content="The linked assets have conflicting bundles."/></div>
@@ -99,15 +91,15 @@
 									</td>
 								 </g:elseif>
 								 <g:else>
-									<td class="dep-${dependent.status}">
+									<td class="dep-${dependent.status}" onclick="EntityCrud.showAssetDetailView('${dependent.dependent?.assetClass}', ${dependent.dependent?.id})">
 										${dependent.dependent?.moveBundle}
 									</td>
 								 </g:else>
-								<td class="dep-${dependent.status}" nowrap="nowrap">
+								<td class="dep-${dependent.status}" nowrap="nowrap" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
 									${dependent.type}&nbsp;
 									<g:render template="../assetEntity/dependentComment" model= "[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
 								</td>
-								<td class="dep-${dependent.status}">
+								<td class="dep-${dependent.status}" onclick="EntityCrud.showAssetDependencyEditView({ id: '${assetEntity.id}' }, { id: '${dependent.dependent.id}' }, 'view');" >
 									${dependent.status}
 								</td>
 							</tr>

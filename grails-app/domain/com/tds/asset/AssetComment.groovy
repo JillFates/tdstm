@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
@@ -13,9 +14,8 @@ import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.TimeScale.M
@@ -78,9 +78,24 @@ class AssetComment {
 	String instructionsLink
 	Boolean durationLocked = false
 
+	// If present is an API Action that will be invoked when a task goes to Started or Completed or user presses the Invoke
+	ApiAction apiAction
+
+	// The time that the API Action was invoked. Invocation can only occur if this property is null.
+	Date apiActionInvokedAt
+
+	// The time that the API Action invocation completed
+	Date apiActionCompletedAt
+
+	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
+	String apiActionSettings
+
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
-	static belongsTo = [assetEntity: AssetEntity]
+	// The belongsTo would delete both Tasks and Comments when deleting Assets with the delete method. However
+	// when deleting an asset, asset references in Tasks should be nulled and Asset Comments should deleted. This is
+	// handled in the AssetEntityService.deleteAsset appropriately. See TM-6847
+	// static belongsTo = [assetEntity:AssetEntity]
 
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 
@@ -143,6 +158,10 @@ class AssetComment {
 		taskSpec nullable: true
 		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
 		workflowTransition nullable: true
+		apiAction nullable: true
+		apiActionInvokedAt nullable: true
+		apiActionCompletedAt nullable: true
+		apiActionSettings nullable: true
 	}
 
 	static mapping = {
@@ -150,6 +169,7 @@ class AssetComment {
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
 		resolvedBy column: 'resolved_by'
+		// child lazy: false
 		columns {
 			comment sqltype: 'text'
 			displayOption sqltype: 'char', length: 1
@@ -232,6 +252,14 @@ class AssetComment {
 		status == COMPLETED
 	}
 
+	boolean isStarted() {
+		status == STARTED
+	}
+
+	boolean isOnHold() {
+		status == HOLD
+	}
+
 	boolean isRunbookTask() {
 		moveDayCategories.contains(category)
 	}
@@ -239,6 +267,39 @@ class AssetComment {
 	void setDateResolved(Date date) {
 		dateResolved = date
 		isResolved = date ? 1 : 0
+	}
+
+	/**
+	 * Determines if the task is Automatic processed
+	 * @return
+	 */
+	boolean isAutomatic(){
+		AUTOMATIC_ROLE == role
+	}
+
+	/**
+	 * Used to determine if the task has an action associated with it
+	 * @return true if the task has an associated action
+	 */
+	boolean hasAction() {
+		apiAction != null
+	}
+
+	/*
+	 * Used to determine if the task action can be invoked either manually or by the automatic mechanism
+	 *
+	 * Note that a user can Mark a task STARTED OR DONE an the action should be run.
+	 * Automated tasks that turn to READY should invoke the action. If the Action is Async then the status
+	 * will turn to STARTED otherwise marked DONE if successful.
+	 * With both manual/user or automatic tasks, if the invocation fails the status should change to HOLD
+	 *
+	 * @return true if action can be invoked
+	 */
+	boolean isActionInvocable() {
+		apiAction &&
+		! apiActionInvokedAt &&
+		! apiActionCompletedAt &&
+		status in [READY, STARTED]
 	}
 
 	/*
@@ -264,6 +325,12 @@ class AssetComment {
 
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+		// If the API Action changed, clear out related properties
+		if (this.dirtyPropertyNames.contains('apiAction')) {
+			apiActionCompletedAt = null
+			apiActionInvokedAt = null
+		}
+		return true
 	}
 
 	String toString() {
@@ -274,7 +341,7 @@ class AssetComment {
     * isActionable - return indicator that the status of the task is Actionable
     */
 	boolean isActionable() {
-		!(status in [ AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED ])
+		!(status in [ COMPLETED, TERMINATED ])
 	}
 
 	// task Manager column header names and its labels
@@ -285,6 +352,6 @@ class AssetComment {
 		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', lastUpdated: 'Last Updated', sendNotification: 'Send Notification',
 		isResolved: 'Is Resolved', priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
 		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'Instructions Link', bundle: 'Move Bundle'
+		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
 	].asImmutable()
 }

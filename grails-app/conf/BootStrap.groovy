@@ -48,9 +48,6 @@ class BootStrap {
 		//Check required default Config Info
 		checkConfigInfo()
 
-		//initialize License service to use
-		licenseAdminService.initialize()
-
 		//initialize exception logger filter to mute GrailsExceptionResolver
 		initializeExceptionLoggerFilter()
 

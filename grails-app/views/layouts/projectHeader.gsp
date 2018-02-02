@@ -225,9 +225,9 @@ int minPasswordLength = tds.minPasswordLength()
 								</g:link>
 							</li>
 							<li>
-								<g:link class="mmlink" controller="module" ction="assetexplorer" id="views">
+								<g:link class="mmlink" controller="module" action="asset" id="views">
 									<g:img uri="/icons/magnifier.png" width="16" height="16"/>
-									<div>Asset Explorer</div>
+									<div>View Manager</div>
 								</g:link>
 							</li>
 							<li>
@@ -361,7 +361,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</tds:hasPermission>
 
 			<%-- Task Menu --%>
-			<tds:hasPermission permission="${Permission.BundleMenuView}">
+			<tds:hasPermission permission="${Permission.TaskView}">
 			<li id="teamMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#teamMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#teamMegaMenu')">Tasks</a>
 				<div class="megamenu rooms inActive" id="teamMegaMenu" >
 					<table class="mmtable"><tr>

@@ -6,22 +6,10 @@
  * @param from
  */
 function changeStatus(id, status, currentStatus, from){
-	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'}
-	
-	// Disable status change buttons to prevent double-clicking
-
+	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'};
 	var doneCss = $('#done_text_'+id).attr('class');
 	var doneOnClick = $('#done_button_'+id).attr('onclick');
-
-	$('#start_button_'+id).removeAttr('onclick');
-	$('#done_button_'+id).removeAttr('onclick');
-	$('#start_text_'+id).attr('class', 'task_button_disabled');
-	$('#done_text_'+id).attr('class', 'task_button_disabled');
-	
-	$('#showCommentDialog #start_button_'+id).removeAttr('onclick');
-	$('#showCommentDialog #done_button_'+id).removeAttr('onclick');
-	$('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled');
-	$('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled');
+	updateStatus(id);
 
 	if (from == "myTask") {
 		params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }
@@ -66,6 +54,95 @@ function changeStatus(id, status, currentStatus, from){
 			alert("An unexpected error occurred while attempting to update task/comment")
 		}
 	});
+}
+
+/**
+ * Invoke API Action
+ * @param commentId
+ */
+function invokeAction(commentId) {
+    var doneCss = $('#done_text_'+commentId).attr('class');
+    var doneOnClick = $('#done_button_'+commentId).attr('onclick');
+    updateStatus(commentId);
+
+    jQuery.ajax({
+        url:contextPath+'/ws/task/'+commentId+'/invokeAction',
+        data: {},
+        type:'POST',
+        success: function(data) {
+            if (typeof data.error !== 'undefined') {
+                alert(data.error);
+            } else {
+                //alert(data.cssClass)
+                console.log(data);
+                //if (from=="taskManager") {
+					var id = commentId;
+					var status = data.assetComment.status;
+                    var cellId = '#status_' + id;
+                    if ($(cellId).length === 0) {
+                        cellId = '#statusTd_' + id;
+                    }
+                    $(cellId).html(data.assetComment.status)
+                    $(cellId).parent().removeAttr('class').addClass(data.statusCss)
+                    $(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+                    if (status==="Started") {
+                        $('#start_button_'+id).remove();
+                        $('#done_button_'+id).attr('onclick', doneOnClick)
+                        $('#done_text_'+id).attr('class', doneCss)
+                    } else if (status==="Completed") {
+                        $('#done_button_'+id).remove();
+                    }
+                //}
+                $("#showCommentTable #statusShowId").html(data.assetComment.status)
+                $("#showCommentTable #statusShowId").removeAttr('class').addClass(data.statusCss)
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("An unexpected error occurred while attempting to update task/comment")
+        }
+    });
+}
+
+/**
+ * Reset API Action
+ * @param commentId
+ */
+function resetAction(commentId) {
+    updateStatus(commentId);
+    if (confirm("Are you sure you want to reset the action?")) {
+        jQuery.ajax({
+            url: contextPath + '/ws/task/' + commentId + '/resetAction',
+            data: {},
+            type: 'POST',
+            success: function (data) {
+                if (typeof data.error !== 'undefined') {
+                    alert(data.error);
+                } else {
+                    pageSubmit();
+                }
+            } // No error handler, since all errors should be trapped by jquery global interceptor
+        });
+    }
+}
+
+/**
+ * Update status bar to change buttons to prevent double-clicking
+ * @param id
+ */
+function updateStatus(id) {
+    $('#start_button_'+id).removeAttr('onclick');
+    $('#done_button_'+id).removeAttr('onclick');
+    $('#invoke_button_'+id).removeAttr('onclick');
+    $('#reset_button_'+id).removeAttr('onclick');
+    $('#start_text_'+id).attr('class', 'task_button_disabled');
+    $('#done_text_'+id).attr('class', 'task_button_disabled');
+    $('#invoke_text_'+id).attr('class', 'task_button_disabled');
+    $('#reset_text_'+id).attr('class', 'task_button_disabled');
+
+    $('#showCommentDialog #start_button_'+id).removeAttr('onclick');
+    $('#showCommentDialog #done_button_'+id).removeAttr('onclick');
+    $('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled');
+    $('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled');
 }
 
 /**

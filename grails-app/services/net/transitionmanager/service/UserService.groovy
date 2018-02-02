@@ -73,6 +73,13 @@ class UserService implements ServiceMethods {
 			userInfo.email = userInfo.username.contains('@') ? userInfo.username : userInfo.username + '@' + domain.fqdn
 		}
 
+		// TM-7169 Sometimes the name will come in the fullName element which then needs to be parsed apart
+		if (! userInfo.firstName && ! userInfo.lastName && userInfo.fullName) {
+			Map mappedName = personService.parseName(userInfo.fullName)
+			userInfo.firstName = mappedName.first
+			userInfo.lastName = mappedName.last
+		}
+
 		def personIdentifier = "$userInfo.firstName $userInfo.lastName${userInfo.email ? ' <'+userInfo.email+'>' : ''}"
 		log.debug "$mn Attempting to find or provision $personIdentifier"
 

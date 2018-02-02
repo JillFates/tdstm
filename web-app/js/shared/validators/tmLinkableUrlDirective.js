@@ -33,9 +33,11 @@ tds.comments.directive.TmLinkableUrl = function($http, utils) {
             controller: function ($scope) {
               $scope.validateInstructionsLink = function(){
                 var ilValue = $scope.ac.instructionsLink
+                var jsonData = {"linkableUrl": ilValue}
+                var config = {headers: {'Content-Type': 'application/json; charset=utf-8'}}
                 if(ilValue.length > 1){
                   $("#saveAndCloseBId").attr('disabled', true)
-                  $http.get(utils.url.applyRootPath("/common/tmLinkableUrl?linkableUrl=" + ilValue))
+                  $http.post(utils.url.applyRootPath("/common/tmLinkableUrl"), jsonData, config)
                     .success(function(data, status, headers, config) {
                       if(data.status == "error" && data.errors){
                         // Do nothing (Service Results displays the error message to the user).

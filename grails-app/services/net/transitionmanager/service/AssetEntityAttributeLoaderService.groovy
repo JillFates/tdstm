@@ -49,6 +49,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	SecurityService securityService
+	MoveBundleService moveBundleService
 
 	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
 	protected static final Map<String, String> targetTeamType = [MOVE_TECH: 'targetTeamMt', CLEANER: 'targetTeamLog',
@@ -367,24 +368,14 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	 */
 	 private MoveBundle getDtvMoveBundle(def dtv, Project project) {
 		if (dtv.correctedValue && dtv.correctedValue.toUpperCase().trim() != "NULL") {
-			return createBundleIfNotExist(dtv.correctedValue, project)
+			return moveBundleService.createBundleIfNotExist(dtv.correctedValue, project)
 		}
 		if (dtv.importValue && dtv.importValue.toUpperCase().trim() != "NULL") {
-			return createBundleIfNotExist(dtv.importValue, project)
+			return moveBundleService.createBundleIfNotExist(dtv.importValue, project)
 		}
 		if (!dtv.importValue) {
 			return project.getProjectDefaultBundle()
 		}
-	}
-
-	@Transactional
-	MoveBundle createBundleIfNotExist(String bundleName, Project project) {
-		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
-		if (!moveBundle) {
-			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project)
-			save moveBundle
-		}
-		return moveBundle
 	}
 
 	/**
@@ -1151,6 +1142,20 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 					asset.clear()
 					asset = null
 				}
+			}
+		} else {
+
+			// Look for the id property and see if there is an error on it
+			// Map idDtv = dtvList.find { it.fieldName == 'id' }
+//println "findAndValidateAsset() $idDtv"
+//def x=5/0
+			// if (idDtv && idDtv.hasError) {
+			if (dtvList[0].hasError) {
+				errorCount++
+				// ignoredAssets << "${idDtv.errorText} (row $rowNum)".toString()
+				ignoredAssets << "${dtvList[0].errorText} (row $rowNum)".toString()
+				// logger.warn 'findAndValidateAsset() Field validation error for {} (id:{}, assetName:{})', clazzName, asset.id, asset.assetName
+				asset = false
 			}
 		}
 

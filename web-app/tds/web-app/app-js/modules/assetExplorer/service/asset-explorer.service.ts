@@ -4,6 +4,8 @@ import { Response } from '@angular/http';
 import { ViewModel, ViewGroupModel, ViewType } from '../model/view.model';
 import { QuerySpec } from '../model/view-spec.model';
 import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
+import { Permission } from '../../../shared/model/permission.model';
+import { PermissionService } from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -11,29 +13,26 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
-	private assetExplorerUrl = '../ws/assetExplorer/view';
+	private assetExplorerUrl = '../ws/assetExplorer';
+	private assetUrl = '../ws/asset';
+	private FAVORITES_MAX_SIZE = 10;
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
 
 	getReports(): Observable<ViewGroupModel[]> {
-		return this.http.get(`${this.assetExplorerUrl}s`)
+		return this.http.get(`${this.assetExplorerUrl}/views`)
 			.map((res: Response) => {
 				let response = res.json().data;
 				let reportGroupModel: ViewGroupModel[] = Object.keys(response).map(key => {
 					return response[key];
 				});
-				return [
+				let folders = [
 					{
 						name: 'All',
 						items: reportGroupModel,
 						open: true,
 						type: ViewType.ALL
-					}, {
-						name: 'Recent',
-						items: [],
-						open: false,
-						type: ViewType.RECENT
 					}, {
 						name: 'Favorites',
 						items: reportGroupModel.filter(r => r['isFavorite']),
@@ -49,19 +48,23 @@ export class AssetExplorerService {
 						items: reportGroupModel.filter(r => r['isShared']),
 						open: false,
 						type: ViewType.SHARED_VIEWS
-					}, {
+					}
+				];
+				if (this.permissionService.hasPermission(Permission.AssetExplorerSystemList)) {
+					folders.push({
 						name: 'System Views',
 						items: reportGroupModel.filter(r => r['isSystem']),
 						open: false,
 						type: ViewType.SYSTEM_VIEWS
-					}
-				] as any;
+					});
+				}
+				return folders as any;
 			})
 			.catch((error: any) => error.json());
 	}
 
 	getReport(id: number): Observable<ViewModel> {
-		return this.http.get(`${this.assetExplorerUrl}/${id}`)
+		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				if (result && result.status === 'success' && result.data) {
@@ -75,14 +78,14 @@ export class AssetExplorerService {
 
 	saveReport(model: ViewModel): Observable<ViewModel> {
 		if (!model.id) {
-			return this.http.post(this.assetExplorerUrl, JSON.stringify(model))
+			return this.http.post(`${this.assetExplorerUrl}/view`, JSON.stringify(model))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
 				})
 				.catch((error: any) => error.json());
 		} else {
-			return this.http.put(`${this.assetExplorerUrl}/${model.id}`, JSON.stringify(model))
+			return this.http.put(`${this.assetExplorerUrl}/view/${model.id}`, JSON.stringify(model))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data && result.data.dataView;
@@ -91,15 +94,61 @@ export class AssetExplorerService {
 		}
 	}
 
-	queryData(query: QuerySpec): any[] {
-		return [];
-	}
-
 	deleteReport(id: number): Observable<string> {
-		return this.http.delete(`${this.assetExplorerUrl}/${id}`)
+		return this.http.delete(`${this.assetExplorerUrl}/view/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	query(id: number, schema: any): Observable<any[]> {
+		return this.http.post(`${this.assetExplorerUrl}/query/${id}`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	previewQuery(schema: any): Observable<any[]> {
+		return this.http.post(`${this.assetExplorerUrl}/previewQuery`, JSON.stringify(schema))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	saveFavorite(id: number): Observable<any> {
+		return this.http.post(`${this.assetExplorerUrl}/favoriteDataview/${id}`, '')
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteFavorite(id: number): Observable<any> {
+		return this.http.delete(`${this.assetExplorerUrl}/favoriteDataview/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	hasMaximumFavorites(length: number): boolean {
+		console.log(length);
+		return this.FAVORITES_MAX_SIZE < length;
+	}
+
+	deleteAssets(ids: string[]): Observable<any> {
+		return this.http.post(`${this.assetUrl}/deleteAssets`, JSON.stringify({ ids: ids }))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
 			})
 			.catch((error: any) => error.json());
 	}

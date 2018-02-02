@@ -1,8 +1,10 @@
 package com.tdsops.common.lang
+import groovy.transform.CompileStatic
 
 /**
  * A collection of functions useful for working with exceptions
  */
+@CompileStatic
 class ExceptionUtil {
 
 	/**

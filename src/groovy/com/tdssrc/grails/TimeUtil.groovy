@@ -59,6 +59,7 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_23 = "MM/dd/yy"
 	static final String FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
 	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
+	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
 
 	static final String SHORT = 'S'
 	static final String FULL = 'F'
@@ -406,6 +407,43 @@ class TimeUtil {
 	}
 
 	/**
+	 * Used by Import processes to get a string representation for the given date
+	 * (String or Date instance) using the formatter provided.
+	 *
+	 * @param date - string or date instance.
+	 * @param formatter - date or datetime formatter
+	 * @return string representation for the given date properly formatted.
+	 */
+	static String dateToStringFormat(Object date, SimpleDateFormat formatter) {
+		if (date == null) {
+			return ''
+		}
+
+		Date formattedDate = null
+
+		if (date instanceof String) {
+			formattedDate = parseDate(date, formatter)
+			if (! formattedDate) {
+				logger.error ("xfrmDateToString() cannot parse date '{}' using pattern: '{}'",
+						date, formatter.toPattern())
+			}
+
+		} else if (date instanceof Date) {
+			formattedDate = date
+
+		} else {
+			logger.error ("xfrmDateToString() got unexpected data type {}", date.getClass().getName())
+
+		}
+
+		if (formattedDate) {
+			return formatDate(formattedDate, formatter)
+		}
+
+		return date.toString()
+	}
+
+	/**
 	 * Parse a string value to a Date with the user's default format.
 	 * For dates (without time) is not required to applied a timezone.
 	 * @param dateString the date to format
@@ -593,6 +631,9 @@ class TimeUtil {
 				break
 			case FORMAT_DATE_TIME_25:
 				format = isMiddleEndian ? FORMAT_DATE_TIME_25 : "dd/MM/yyyy hh:mm"
+				break
+			case FORMAT_DATE_TIME_26:
+				format = FORMAT_DATE_TIME_26
 				break
 		}
 

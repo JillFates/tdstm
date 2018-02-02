@@ -35,7 +35,7 @@ class ModelController implements ControllerMethods {
 
 	@HasPermission(Permission.ModelList)
 	def list() {
-		Map modelPref = assetEntityService.getExistingPref('Model_Columns')
+		Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
 		Map attributes = Model.getModelFieldsAndlabels()
 		Map columnLabelpref = [:]
 		modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }
@@ -60,7 +60,7 @@ class ModelController implements ControllerMethods {
 			assetsCount: params.assetsCount, sourceTDSVersion: params.sourceTDSVersion, sourceTDS: params.sourceTDS,
 			modelStatus: params.modelStatus]
 		Map<String, Object> attributes = Model.modelFieldsAndlabels
-		def modelPref= assetEntityService.getExistingPref('Model_Columns')
+		def modelPref= assetEntityService.getExistingPref(PREF.Model_Columns)
 		def modelPrefVal = modelPref.collect{it.value}
 		attributes.keySet().each { attribute ->
 			if (attribute in modelPrefVal && attribute!='modelConnectors') {
@@ -210,7 +210,7 @@ class ModelController implements ControllerMethods {
 					otherConnectors << i
 				}
 
-				Map modelPref = assetEntityService.getExistingPref('Model_Columns')
+				Map modelPref = assetEntityService.getExistingPref(PREF.Model_Columns)
 				Map attributes = Model.getModelFieldsAndlabels()
 				Map columnLabelpref = [:]
 				modelPref.each { key, value -> columnLabelpref[key] = attributes[value] }

@@ -108,7 +108,7 @@
 </ul>
 
 <div class="form-group has-feedback">
-	<input type="text" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
+	<input type="password" id="confirmPasswordId" class="form-control passwordField" name="confirmPassword" autocorrect="off" autocapitalize="off" placeholder="Confirm <g:if test="${changingPassword}">new </g:if>password" onkeyup="PasswordValidation.confirmPassword($('#passwordId')[0], this)"/>
 	<span class="glyphicon glyphicon-lock form-control-feedback"></span>
 	<g:hasErrors bean="${userLoginInstance}" field="password">
 		<div class="message">

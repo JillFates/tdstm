@@ -1,7 +1,7 @@
 /**
  * Created by aaferreira on 04/03/2017.
  */
-import {UIBooleanPipe} from '../shared/pipes/types/ui-boolean.pipe';
+import {UIBooleanPipe} from '../shared/pipes/ui-boolean.pipe';
 
 describe('UIBooleanPipe:', () => {
 	let pipe: UIBooleanPipe;

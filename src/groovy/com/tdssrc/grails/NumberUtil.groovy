@@ -1,5 +1,6 @@
 package com.tdssrc.grails
 
+
 /**
  * The NumberUtil class contains a collection of useful number manipulation methods
  */
@@ -106,6 +107,18 @@ class NumberUtil {
 	}
 
 	/**
+	 * Convert various types (String/GString/CharSequence, or other Number type) into a Integer value
+	 *
+	 * @param value - the value to be converted to a Long
+	 * @param defVal - the value to set to if it can't be converted (default null)
+	 * @return the Integer value if valid else the default value or null
+	 */
+	static Integer toPositiveInteger(value, Integer defVal = null) {
+		Long defLong = defVal ? new Long(defVal) : null
+		toPositiveLong(value, defLong)?.toInteger()
+	}
+
+	/**
 	 * Convert various types to TINYINT (0-255)
 	 * @param value - the value to convert
 	 * @param defVal - the value to set to if it can't be converted (default null)
@@ -152,5 +165,27 @@ class NumberUtil {
 	static Collection<Integer> mapToPositiveInteger(Collection values, Integer defValue = null){
 		values = mapToPositiveLong(values, defValue)
 		values*.toInteger()
+	}
+
+	/**
+	 * Convert a value to 0 or 1 .
+	 *
+	 * @param value
+	 * @param defaultValue - value to be used when running into parsing issues or invalid inputs.
+	 * @return 0, 1 or a default value (if original value is something other than 0 or 1).
+	 */
+	static Integer toZeroOrOne(Object value, Integer defaultValue = null) {
+		// The result of the parsing, initialized with the default value in case of exceptions or invalid input.
+		Integer result = defaultValue
+		try {
+			Integer parsedNumber = toPositiveInteger(value)
+			// If value is 0 or 1, assign the result.
+			if (parsedNumber <= 1 ) {
+				result = parsedNumber
+			}
+		} catch (Exception e) {
+			// Nothing to do. The default value has already been assigned.
+		}
+		return result
 	}
 }

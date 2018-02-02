@@ -43,7 +43,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 class PersonService implements ServiceMethods {
 
 	def auditService
-	def grailsApplication
 	def jdbcTemplate
 	def moveEventService
 	def namedParameterJdbcTemplate
@@ -84,11 +83,11 @@ class PersonService implements ServiceMethods {
 		'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
 	]
 
-/* ***************************
+	/* ***************************
 	private static final List<String> notToUpdate = [
 		'beforeDelete', 'beforeInsert', 'beforeUpdate',
 		'blackOutDates', 'firstName', 'id']
-*/
+	*/
 
 	/**
 	 * Returns a properly format person's last name with its suffix
@@ -163,6 +162,11 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException("Invalid nameMap object $nameMap")
 		}
 
+		// TM-7169 Added test to prevent searching if missing the required first name at a minimum
+		if (! nameMap.first) {
+			throw new InvalidParamException('User has no first name associated with account')
+		}
+
 		List persons = []
 		Map queryParams = [companyId: company.id]
 		def (first, middle, last) = [false, false, false]
@@ -201,9 +205,11 @@ class PersonService implements ServiceMethods {
 			query.append(select)
 			query.append(" AND p.first_name=:first AND COALESCE(p.last_name,'') = '' AND COALESCE(p.middle_name,'') = '' ")
 		}
-		List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		// log.debug "findByCompanyAndName() Query = ${query.toString()}"
+		
+		List<Long> pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)*.id
 		if (pIds) {
-			persons = Person.getAll(pIds*.id).findAll()
+			persons = Person.where { id in pIds }.list()
 		}
 
 		return persons
@@ -317,9 +323,9 @@ class PersonService implements ServiceMethods {
 			queryParams.middleName = nameMap.middle ?: ''
 		}
 
+		// If the flag is false, we also need to look for the partners and owner staff.
 		if (!clientStaffOnly) {
-			companies << projectService.getOwner(project)
-			companies.addAll(projectService.getPartners(project))
+			queryParams.companies = partyRelationshipService.getProjectCompanies(project)
 		}
 
 		// Try finding the person with an exact match
@@ -349,7 +355,7 @@ class PersonService implements ServiceMethods {
 			}
 
 			where = ''
-			queryParams = [companies: companies]
+			queryParams = [companies: queryParams.companies]
 			addQueryParam('firstName', nameMap.first)
 			addQueryParam('middleName', nameMap.middle)
 			addQueryParam('lastName', lastName)
@@ -1504,7 +1510,7 @@ class PersonService implements ServiceMethods {
 			// logger.debug 'getAvailableProjects() list 3: {}', projects*.id
 		}
 
-		projects.sort { it.name }
+		return projects
 	}
 
 	/**

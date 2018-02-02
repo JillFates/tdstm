@@ -63,6 +63,49 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/$id" {
+			controller = "wsApiAction"
+			action = [
+			        DELETE: "delete",
+					GET: "fetch",
+					PUT: "update"
+			]
+		}
+
+		"/ws/apiAction" {
+			controller = "wsApiAction"
+			action = [
+					GET: "list",
+					POST: "create"
+			]
+		}
+
+		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/showTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/editTemplate/$id" (controller:'wsAsset', action:'getTemplate', method:'GET') {
+			mode = 'edit'
+		}
+
+		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'show'
+		}
+
+		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
+			mode = 'edit'
+		}
+
+		"/ws/asset/deleteAssets" {
+			controller = "wsAsset"
+			action = [
+			        POST: "deleteAssets"
+			]
+		}		
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -145,6 +188,36 @@ class UrlMappings {
 			action = [GET:"listBundles"]
 		}
 
+
+		/***************************/
+
+		"/ws/assetImport/invokeFetchAction" {
+			controller = 'wsAssetImport'
+			action = [POST: 'invokeFetchAction']
+		}
+
+		"/ws/assetImport/loadData" {
+			controller = 'wsAssetImport'
+			action = [POST: 'loadData']
+		}
+
+		"/ws/assetImport/manualFormOptions" {
+			controller = 'wsAssetImport'
+			action = [GET: 'manualFormOptions']
+		}
+
+		"/ws/assetImport/transformData" {
+			controller = 'wsAssetImport'
+			action = [POST: 'transformData']
+		}
+
+		"/ws/assetImport/viewData" {
+			controller = 'wsAssetImport'
+			action = [GET: 'viewData']
+		}
+
+		/***************************/
+
 		"/ws/event/listEventsAndBundles" {
 			controller = "wsEvent"
 			action = [GET:"listEventsAndBundles"]
@@ -159,6 +232,11 @@ class UrlMappings {
 		"/ws/task/taskCreateDefaults" {
 			controller = "wsTask"
 			action = [GET:"taskCreateDefaults"]
+		}
+
+		"/ws/qzCertificate" {
+			controller = 'wsApplication'
+			action = [GET:'qzCertificate']
 		}
 
 		"/ws/task/generateTasks" {
@@ -199,6 +277,16 @@ class UrlMappings {
 		"/ws/task/$id/tasks" {
 			controller = "wsTask"
 			action = [GET:"retrieveTasksOfTaskBatch"]
+		}
+
+		"/ws/task/$id/invokeAction" {
+			controller = "wsTask"
+			action = [POST:"invokeAction"]
+		}
+
+		"/ws/task/$id/resetAction" {
+			controller = "wsTask"
+			action = [POST:"resetAction"]
 		}
 
 		"/ws/progress/$id" {
@@ -261,7 +349,14 @@ class UrlMappings {
 			action = [PUT:"unlockAccount"]
 		}
 
-		"/admin/restartAppService" {
+		name adminPortal: "/admin/home" {
+			controller = 'admin'
+			action = [
+				GET: "home"
+			]
+		}
+		
+		"/admin/restart" {
 			controller = "admin"
 			action = [
 				GET: "restartAppServiceForm",
@@ -343,6 +438,27 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/fileSystem/uploadText" {
+			controller = "wsFileSystem"
+			action = [
+			        POST: "uploadText"
+			]
+		}
+
+		"/ws/fileSystem/uploadFile" {
+			controller = "wsFileSystem"
+			action = [
+					POST: "uploadFile"
+			]
+		}
+
+		"/ws/fileSystem/delete" {
+			controller = "wsFileSystem"
+			action = [
+					DELETE: "deleteFile"
+			]
+		}
+
 		///// LICENSES Manager API (BackOffice) /////////
 
 		// TODO: OLB 20170124:Can we add Conditional logic to disable the Manager entry points when is not a manager???
@@ -376,6 +492,13 @@ class UrlMappings {
 			controller = "wsLicenseManager"
 			action = [
 					GET: "getLicenseKey"
+			]
+		}
+
+		"/ws/manager/license/${id}/delete" {
+			controller = "wsLicenseManager"
+			action = [
+					DELETE: "deleteLicense"
 			]
 		}
 
@@ -490,11 +613,148 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/previewQuery" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "previewQuery"
+			]
+		}
+
+		"/ws/assetExplorer/query/$id" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "query"
+			]
+		}
+
+		"/ws/assetExplorer/favoriteDataviews" {
+			controller = "wsAssetExplorer"
+			action = [
+					GET: "favoriteDataviews"
+			]
+		}
+
+		"/ws/assetExplorer/favoriteDataview/$id?" {
+			controller = "wsAssetExplorer"
+			action = [
+					POST: "addFavoriteDataview",
+					DELETE: "deleteFavoriteDataview"
+			]
+		}
+
+		"/ws/dataingestion/datascript/list" {
+			controller = "wsDataScript"
+			action = [
+			        GET: "getDataScripts"
+			]
+		}
+
+		"/ws/dataingestion/datascript/" {
+			controller = "wsDataScript"
+			action = [
+					POST: "createDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/$id?" {
+			controller = "wsDataScript"
+			action = [
+					GET: "getDataScript",
+			        PUT: "updateDataScript",
+					DELETE: "deleteDataScript"
+			]
+		}
+
+		"/ws/dataingestion/datascript/validateunique/$name" {
+			controller = "wsDataScript"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
+		"/ws/dataingestion/provider/list" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProviders"
+			]
+		}
+
+		"/ws/dataingestion/provider/" {
+			controller = "wsProvider"
+			action = [
+					POST: "createProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/$id?" {
+			controller = "wsProvider"
+			action = [
+					GET: "getProvider",
+					PUT: "updateProvider",
+					DELETE: "deleteProvider"
+			]
+		}
+
+		"/ws/dataingestion/provider/validateunique/$name" {
+			controller = "wsProvider"
+			action = [
+					POST: "validateUniqueName"
+			]
+		}
+
+		"/ws/apiAction/agent" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentNames"
+			]
+		}
+
+		"/ws/apiAction/agent/$id" {
+			controller = "wsApiAction"
+			action = [
+			        GET: "agentDictionary"
+			]
+		}
+
+		"/ws/apiAction/validateSyntax" {
+			controller = "wsApiAction"
+			action = [
+					POST: "validateSyntax"
+			]
+		}
+
+		"/ws/dataScript/testScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "testScript"
+			]
+		}
+
+		"/ws/dataScript/checkSyntax" {
+			controller = "wsDataScript"
+			action = [
+					POST: "checkSyntax"
+			]
+		}
+
+		"/ws/dataScript/saveScript" {
+			controller = "wsDataScript"
+			action = [
+					POST: "saveScript"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**/*" ( controller: 'singleApp', action: 'index' )
+
+		// Angular Single Page App Named mappings
+		name assetViewShow: "/module/asset/views/$id/show" {
+			controller = 'singleApp'
+			action = 'index'
+		}
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")

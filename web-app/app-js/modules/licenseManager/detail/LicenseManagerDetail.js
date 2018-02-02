@@ -205,6 +205,27 @@ export default class LicenseManagerDetail extends FormValidator{
         });
     }
 
+    deleteLicense() {
+        var modalInstance = this.uibModal.open({
+            animation: true,
+            templateUrl: '../app-js/modules/dialogAction/DialogAction.html',
+            controller: 'DialogAction as dialogAction',
+            size: 'sm',
+            resolve: {
+                params: () => {
+                    return { title: 'Confirmation Required', message: 'You are about to delete the selected license. Are you sure? Click Confirm to delete otherwise press Cancel.'};
+                }
+            }
+        });
+
+        modalInstance.result.then(() => {
+            this.licenseManagerService.deleteLicense(this.licenseModel, (data) => {
+                this.uibModalInstance.close(data);
+            });
+        });
+    }
+
+
     /**
      * If by some reason the License was not applied at first time, this will do a request for it
      */

@@ -1,0 +1,29 @@
+<div class="modal fade in no-background data-script-console-component" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog"
+     [style.top]="consoleSettings.top"
+     [style.left]="consoleSettings.left">
+	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document"
+         [style.width]="consoleSettings.width">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				</button>
+				<h4 class="modal-title">{{'DATA_INGESTION.CONSOLE_TITLE'|translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-12">
+						<textarea id="textAreaLog" class="form-control console" [(ngModel)]="consoleSettings.scriptTestResult.consoleLog" disabled cols="30" rows="10"
+                                  [style.width]="consoleSettings.width"
+                                  [style.height]="consoleSettings.height">
+						</textarea>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer form-group-center">
+				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+			</div>
+		</div>
+	</div>
+</div>

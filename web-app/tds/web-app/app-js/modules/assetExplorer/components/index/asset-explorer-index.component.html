@@ -3,14 +3,17 @@
 		<div class="row">
 			<div class="col-md-2 asset-explorer-index-left-menu">
 				<div class="box box-primary">
-					<div class="box-header with-border">
+                        <div class="box-header with-border">
 						<span class="glyphicon glyphicon-th-list"></span>
 						<h3 class="box-title box-title-folder-list">Saved views</h3>
 					</div>
 					<div class="box-body no-padding">
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
-								<a (click)="selectFolder(folder)" href="javascript:void(0)"><i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder.name}} <span class="label label-primary pull-right">{{folder.items.length}}</span></a>
+								<a (click)="selectFolder(folder)" href="javascript:void(0)">
+									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder.name}}
+									<span class="label label-primary pull-right">{{folder.items.length}}</span>
+								</a>
 							</li>
 						</ul>
 					</div>
@@ -23,6 +26,11 @@
 				<div class="box box-primary">
 					<div class="box-header with-border">
 						<h3 class="box-title box-title-grid-list">{{selectedFolder.name}}</h3>
+                        <div class="box-tools-actions" *ngIf="isCreateVisible() && isCreateAvailable()" style="vertical-align: super;">
+                            <button (click)="onCreateReport()" class="btn btn-primary">
+                                <i class="fa fa-plus-square"></i> {{'GLOBAL.CREATE' | translate}}
+                            </button>
+                        </div>
 						<div class="pull-right">
 							<div class="form-group has-feedback search-filter-text">
 								<input type="text" class="form-control input-sm txt-search" [(ngModel)]="searchText" placeholder="Enter view name to filter">
@@ -34,9 +42,6 @@
 					<!-- /.box-header -->
 					<div class="box-body no-padding">
 						<div class="table-responsive">
-							<div class="box-tools-actions pull-left" *ngIf="isCreateVisible() && isCreateAvailable()">
-								<button (click)="onCreateReport()" class="btn btn-primary"><i class="fa fa-plus-square"></i> Create View</button>
-							</div>
 							<table class="table table-hover table-striped">
 								<thead>
 									<tr>
@@ -57,9 +62,17 @@
 												<span class="fa fa-fw fa-trash"></span>
 											</button>
 										</td>
-										<td class="asset-explorer-td-favorite text-center"><a href="javascript:void(0)"><i class="fa text-yellow" [ngClass]="report.isFavorite? 'fa-star' : 'fa-star-o'" ></i></a></td>
-										<td>{{report.name}}</td>
-										<td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.isShared || report.isSystem"></span></td>
+										<td class="asset-explorer-td-favorite text-center">
+											<a href="javascript:void(0)" (click)="toggleFavorite(report)">
+												<i class="fa text-yellow" [ngClass]="report.isFavorite? 'fa-star' : 'fa-star-o'"></i>
+											</a>
+										</td>
+										<td>
+											<a uiSref="tds.assetexplorer_show" [uiParams]="{id:report.id}">{{report.name}}</a>
+										</td>
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared || report.isSystem"></span>
+										</td>
 										<!-- <td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.subscribe"></span></td> -->
 									</tr>
 								</tbody>

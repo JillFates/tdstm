@@ -564,13 +564,24 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @param projectId - the id of the project to lookup
 	 * @return a list the PartyRelationship records where the partyIdTo and the roleTypeCodeTo indicate the company and relationship
 	 */
-	List<PartyRelationship> getProjectCompanies(long projectId) {
-		PartyRelationship.executeQuery('''
-			from PartyRelationship
-			where partyRelationshipType in (:types)
-			  and partyIdFrom = :projectId
-			  and roleTypeCodeFrom = 'PROJECT'
-			''', [projectId: projectId, types: ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR']])
+	List<Party> getProjectCompanies(Project project) {
+		List<Party> companies
+		if (project) {
+			companies = PartyRelationship.where {
+				partyIdFrom == project
+				roleTypeCodeFrom.id == RoleType.PROJECT
+				partyRelationshipType.id in ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR', 'PROJ_PARTNER']
+			}.projections {property('partyIdTo')}.list()
+
+			// Add the client is not already in the list
+			if (!companies.find{it.id == project.client.id}) {
+				companies << project.client
+			}
+		} else {
+			logger.error("PartyRelationshipService::getProjectCompanies called with no project.")
+		}
+
+		return companies
 	}
 
 	void createBundleTeamMembers(ProjectTeam projectTeam, teamMemberIds) {
@@ -1050,12 +1061,12 @@ class PartyRelationshipService implements ServiceMethods {
 
 	/**
 	 * Used to get a list of Projects that a company owns, is participating as a Partner, or the client
-	 * @param company - the company to find the prjoects for
+	 * @param company - the company to find the projects for
 	 * @param project - used to filter the list to a particular project (optional)
 	 * @param sortOn - the property to sort on (default 'name')
 	 * @return A list of partners for the company
 	 */
-	List<Project> companyProjects(PartyGroup company, Project project = null) {
+	List<Project> companyProjects(PartyGroup company, Project project = null, String sortOn = 'name') {
 		assert company
 
 		def args = [company: company]
@@ -1089,6 +1100,9 @@ class PartyRelationshipService implements ServiceMethods {
 				projects += clientProjects
 				logger.debug 'companyProjects() for company {} : list 3 : projects {}', company, projects*.id
 			}
+		}
+		if (projects && sortOn ) {
+			projects.sort(caseInsensitiveSorterBuilder({ it?.getAt(sortOn) }))
 		}
 
 		return projects

@@ -1,0 +1,135 @@
+/**
+  The purpose of this SASS is to get the support between the old legacy UI and the new.
+  We bring the UI that is being used on the Different Asset Views
+ */
+
+.tds-angular-component-content
+  .modal-body
+    padding: 6px 18px
+  .prop
+    padding: 5px
+  .prop .name
+    text-align: left
+    white-space: nowrap
+    vertical-align: top
+    width: 15%
+  .prop .nameNW
+    text-align: left
+    white-space: nowrap
+    vertical-align: top
+  .prop .value
+    text-align: left
+    vertical-align: top
+    width: 85%
+  .prop .valueNW
+    text-align: left
+    vertical-align: top
+  .prop .bundle
+    text-align: left
+    width: 50%
+  .prop a
+    color: #00E
+  table
+    border-collapse: separate
+    border-spacing: 2px
+    border-collapse: separate
+    padding: 5px 0
+    border: 1px solid #63a242
+    width: 100%
+    th
+      background: #CCCCCC
+      color: #000
+      font-size: 12px
+      font-weight: bold
+      line-height: 16px
+      padding: 2px 6px
+    th, td
+      font-family: helvetica, arial, sans-serif
+      font-size: 12px
+      line-height: 12px
+      padding: 2px 2px
+      text-align: left
+      input
+        border: 1px solid #ccc
+        margin: 2px 0
+        padding: 2px 4px
+    td.sizeScale .select
+      width: 112px
+    td .select
+      width: 120px
+    td.sizeScale input
+      width: 40px
+    td .label
+      background: none repeat scroll 0% 0% #f3f4f6
+      width: 10%
+    div
+      .highField
+        label
+          color: red !important
+          font-weight: 700 !important
+      .label
+        display: table-cell
+        text-align: initial
+        vertical-align: inherit
+        color: inherit
+        font-weight: inherit
+        font-size: 12px
+        label
+          color: #333
+          font-size: 12px
+          font-style: normal
+          font-weight: normal
+      input#assetName
+        width: 100%
+    td[data-for].C,td[data-for].I,td[data-for].H,td[data-for].U,td[data-for].N
+      background-color: #FFF !important
+    /* CRITICAL */
+    td[data-for].C .select2-choice,
+    .C
+      background-color: #F9FF90 !important
+      background-image: none !important
+    /* IMPORTANT */
+    td[data-for].I .select2-choice,
+    .I
+      background-color: #D4F8D4 !important
+      background-image: none !important
+    /* NORMAL */
+    td[data-for].N .select2-choice,
+    .N
+      background-color: #ddd !important
+      background-image: none !important
+    /* UNIMPORTANT */
+    td[data-for].U label, td.U label
+      background-color: #F4F4F4 !important
+      background-image: none !important
+    /* HIDDEN */
+    td[data-for].H .select2-choice,
+    .H
+      background-color: #fff !important
+      background-image: none !important
+  h1
+    color: #214aa0 !important
+    font-weight: normal !important
+    font-size: 16px !important
+    margin: .8em 0 .3em 0 !important
+  #deps, #commentListId
+    table
+      padding: 0px
+      tr
+        &.even 
+          background: #fff
+        &.odd
+          background: #e0e0e0
+        td
+          &.dep-Validated 
+	          background: LightGreen
+          &.dep-Unknown 
+	          background: #F9FF90
+          &.dep-Questioned
+	          background: LightPink
+          &.dep-Not
+	          background: #EEE
+          &.dep-Archived 
+            background: #EEE
+          &.dep-Future 
+	          background: #EEE

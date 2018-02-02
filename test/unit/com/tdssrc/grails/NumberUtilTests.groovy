@@ -53,6 +53,20 @@ class NumberUtilTests extends Specification {
 		NumberUtil.toInteger('') == null
 	}
 
+	void 'Test toPositiveInteger'() {
+		expect:
+			// String
+			1 == NumberUtil.toPositiveInteger('1')
+			// GString
+			1 == NumberUtil.toPositiveInteger("1")
+			// Negative values no default
+			null == NumberUtil.toPositiveInteger('-1')
+			// Negative value with default
+			2 == NumberUtil.toPositiveInteger('-4', 2)
+			// non-numeric
+			5 == NumberUtil.toPositiveInteger('abc', 5)
+	}
+
 	void testToTinyInt() {
 		given:
 		int four = 4

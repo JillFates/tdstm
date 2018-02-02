@@ -20,6 +20,13 @@ import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
+import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ContextType
+import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdsops.tm.enums.domain.TimeConstraintType
+import com.tdsops.tm.enums.domain.TimeScale
+import net.transitionmanager.service.InvalidConfigurationException
+import net.transitionmanager.service.InvalidRequestException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -28,9 +35,22 @@ import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils
+import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveBundleStep
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventStaff
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Recipe
+import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
@@ -53,10 +73,12 @@ import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
  * @author John Martin
  */
 @Transactional
+@Slf4j
 class TaskService implements ServiceMethods {
 
-	def controllerService
-	def cookbookService
+	ApiActionService apiActionService
+	ControllerService controllerService
+	CookbookService cookbookService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	def partyRelationshipService
@@ -65,10 +87,16 @@ class TaskService implements ServiceMethods {
 	Scheduler quartzScheduler
 	def securityService
 	def sequenceService
+    CustomDomainService customDomainService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
+
+	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED, ACS.COMPLETED]
+
+	// The RoleTypes for Staff (populated in init())
+	private static List staffingRoles
 
 	private static final List<String> coreFilterProperties = [
 		'assetName', 'assetTag', 'assetType', 'costCenter', 'department',
@@ -139,7 +167,11 @@ class TaskService implements ServiceMethods {
 			t.duration AS duration,
 			t.duration_scale AS durationScale,
 			t.category,
-			t.instructions_link AS instructionsLink""")
+			t.instructions_link AS instructionsLink,
+			t.api_action_id AS apiActionId,
+			t.api_action_invoked_at AS apiActionInvokedAt,
+			t.api_action_completed_at AS apiActionCompletedAt
+			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if (!countOnly) {
@@ -276,6 +308,7 @@ class TaskService implements ServiceMethods {
 		def minAgoFormat = minAgo.format(format)
 		def todoTasks = allTasks.findAll { task ->
 			task.status == ACS.READY ||
+			(task.status == ACS.HOLD && task.apiActionId != null) ||
 			(task.status == ACS.STARTED && task.assignedTo == personId) ||
 			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
 		}
@@ -334,16 +367,149 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
+	 * Used by routes to update task status/state
+	 * @param whom - the Person that is performing the update (e.g. Automatic Task)
+	 * @param params - a map containing the values that come from the JSON
+	 * @return AssetComement	task that was updated by method
+	 */
+	/*
+	void updateTaskState(Person whom, Map params) {
+		Map statusMap = ['running': ACS.STARTED, 'success': ACS.DONE, 'error': ACS.HOLD]
+		String status = statusMap[params.status]
+		if (!status) {
+			throw new InvalidRequestException("Invalid status ${params.status}, valid values are ${statusMap.keySet()}")
+		}
+
+		boolean isPM = false
+		AssetComment task = AssetComment.get(params.taskId)
+
+		if (!task) {
+			throw new InvalidRequestException("Task id ${params.taskId} not found")
+		}
+
+		if (status == ACS.STARTED && task.)
+		return setTaskStatus(task, status, whom, isPM)
+	}
+	*/
+
+	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
 	 * @param task
 	 * @param status
 	 * @return AssetComement	task that was updated by method
 	 */
-	// Refactor to accept the Person
-	def setTaskStatus(AssetComment task, String status) {
+	AssetComment setTaskStatus(AssetComment task, String status) {
 		def currentPerson = securityService.getUserLoginPerson()
 		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'PROJ_MGR')
 		return setTaskStatus(task, status, currentPerson, isPM)
+	}
+
+	/**
+	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
+	 * plan to set the status to HOLD and add a note to the task.
+	 * @param task - the Task to invoke the method on
+	 * @return The status that the task should be set to
+	 */
+	String invokeAction(AssetComment task, Person whom) {
+		def status = task.status
+		//return status
+		// For tasks that are actionable and has an assigned action, this logic will attempt to invoke and
+		// update the task accordingly.
+		// Actions that are synchronous (future) will fire the action immediately and the task is marked DONE
+		// if successful, otherwise for asynchronous actions the status will be marked STARTED.
+		if (task.hasAction() && ACTIONABLE_STATUSES.contains(status)) {
+			if (task.isActionInvocable()) {
+				String errMsg
+
+				if (task.apiAction.isSync()) {
+					log.error "invokeAction() task has synchronous action that is not supported (taskId=${task.id})"
+					errMsg = 'Task has an synchronous action which are not supported'
+				} else {
+					try {
+						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+						// Kick of the async method and mark the task STARTED
+						apiActionService.invoke(task.apiAction, task)
+
+						// Update the task so that the we track that the action was invoked
+						task.apiActionInvokedAt = new Date()
+
+						// Update the task so that we track the task started at
+						task.actStart = new Date()
+
+						// Log a note that the API Action was called
+						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
+						addNote(task, whom, "Invoked action ${task.apiAction.name}")
+
+						// Make sure that the status is STARTED instead
+						status = AssetCommentStatus.STARTED
+						task.status = status
+
+					} catch (InvalidRequestException e) {
+						errMsg = e.getMessage()
+					} catch (InvalidConfigurationException e) {
+						errMsg = e.getMessage()
+					} catch (e) {
+						errMsg = 'A runtime error occurred while attempting to process the action'
+						log.error ExceptionUtil.stackTraceToString('invokeAction() failed ', e)
+					}
+				}
+
+				if (errMsg) {
+					log.warn "invokeAction() error $errMsg"
+					AssetComment.withNewTransaction {
+						AssetComment taskObj = AssetComment.get(task.id) 
+						addNote(taskObj, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
+						status = ACS.HOLD
+						taskObj.status = status
+						taskObj.save(failOnError:true)
+					}
+				}
+			}
+		}
+		return status
+	}
+
+	/**
+	 * Reset an action so it can be invoked again
+	 * @param task
+	 * @param whom
+	 * @return
+	 */
+	String resetAction(AssetComment task, Person whom) {
+		String status = task.status
+		if (task.hasAction() && !task.isAutomatic() && status == AssetCommentStatus.HOLD) {
+			String errMsg
+			try {
+				// Update the task so it can be invoked again
+				task.apiActionInvokedAt = null
+				task.apiActionCompletedAt = null
+				task.actStart = null
+				task.dateResolved = null
+
+				// Log a note that the API Action was reset
+				addNote(task, whom, "Reset action ${task.apiAction.name}")
+
+				// Make sure that the status is READY instead
+				status = AssetCommentStatus.READY
+				task.status = status
+
+			} catch (InvalidRequestException e) {
+				errMsg = e.getMessage()
+			} catch (InvalidConfigurationException e) {
+				errMsg = e.getMessage()
+			} catch (e) {
+				errMsg = 'A runtime error occurred while attempting to process the action'
+				log.error ExceptionUtil.stackTraceToString('resetAction() failed ', e)
+			}
+
+			if (errMsg) {
+				log.info "resetAction() error $errMsg"
+				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
+				status = ACS.HOLD
+				task.status = status
+			}
+		}
+		return status
 	}
 
 	/**
@@ -354,14 +520,14 @@ class TaskService implements ServiceMethods {
 	 * @return AssetComment the task object that was updated
 	 */
 	// TODO : We should probably refactor this into the AssetComment domain class as setStatus
-	def setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
+	AssetComment setTaskStatus(AssetComment task, String status, Person whom, boolean isPM=false) {
 
 		// If the current task.status or the persisted value equals the new status, then there's nutt'n to do.
 		if (task.status == status || task.getPersistentValue('status') == status) {
-			return
+			return task
 		}
 
-		def now = TimeUtil.nowGMT()
+		Date now = new Date()
 
 		// First thing to do, set the status
 		task.status = status
@@ -370,14 +536,21 @@ class TaskService implements ServiceMethods {
 		task.statusUpdated = now
 
 		def previousStatus = task.getPersistentValue('status')
-		// Determine if the status is being reverted (e.g. going from COMPLETED to READY)
-		def revertStatus = compareStatus(previousStatus, status) > 0
+		// Determine if the status is being reverted (e.g. going from DONE to READY)
+		boolean revertStatus = compareStatus(previousStatus, status) > 0
 
-		log.info "setTaskStatus - task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
+		log.info "setTaskStatus() task(#:$task.taskNumber Id:$task.id) status=$status, previousStatus=$previousStatus, revertStatus=$revertStatus - $whom"
 
 		// Override the whom if this is an automated task being completed
-		if (task.role == AssetComment.AUTOMATIC_ROLE && status == ACS.COMPLETED) {
+		if (task.isAutomatic() && status == ACS.COMPLETED) {
 			whom = getAutomaticPerson()
+
+			if (ACTIONABLE_STATUSES.contains(status) ) {
+				// Attempt to invoke the task action if an ApiAction is set. Depending on the
+				// Action excution method (sync vs async), if async the status will be changed to
+				// STARTED instead of the default to DONE.
+				status = invokeAction(task, whom)
+			}
 		}
 
 		// Setting of AssignedTO:
@@ -399,9 +572,9 @@ class TaskService implements ServiceMethods {
 			}
 			// Clear the actual Start if we're moving back before STARTED
 			if (compareStatus(ACS.STARTED, status) > 0) {
-				if(previousStatus!= ACS.HOLD){
+				if (previousStatus!= ACS.HOLD) {
 					task.actStart = null
-				}else if(!task.actStart){
+				} else if (!task.actStart){
 					task.actStart = now
 				}
 			}
@@ -427,8 +600,14 @@ class TaskService implements ServiceMethods {
 		}
 
 		switch (status) {
+			case ACS.PENDING:
+				// Clear out the ApiAction tracking of invocations for testing
+				task.apiActionInvokedAt = null
+				task.apiActionCompletedAt = null
+				break
+
 			case ACS.HOLD:
-				addNote(task, whom, "Placed task on HOLD, previously was '$previousStatus'")
+				addNote(task, whom, "Placed task on HOLD, previous state was '$previousStatus'")
 				break
 
 			case ACS.STARTED:
@@ -436,23 +615,26 @@ class TaskService implements ServiceMethods {
 				// We don't want to loose the original started time if we are reverting from COMPLETED to STARTED
 				if (! revertStatus) {
 					task.actStart = now
-					if (task.isRunbookTask()) addNote(task, whom, "Task Started")
+					addNote(task, whom, "Task was Started")
 				}
 				break
 
 			case ACS.COMPLETED:
+				// If the task being changed to the DONE state then the system should check all successors
+				// to make them ready appropriately.
 				if (task.isDirty('status') && task.getPersistentValue('status') != status) {
 					triggerUpdateTaskSuccessors(task.id, status, whom, isPM)
 				}
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
-				if (task.isRunbookTask()) addNote(task, whom, "Task Completed")
+				addNote(task, whom, "Task was Completed")
 				break
 
 			case ACS.TERMINATED:
 				task.resolvedBy = assignee
 				task.actFinish = now
+				addNote(task, whom, "Task was Terminated")
 				break
 		}
 
@@ -503,7 +685,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
-	def getCssClassForStatus(status) {
+	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
 
@@ -544,7 +726,6 @@ class TaskService implements ServiceMethods {
 	/**
 	 * Returns a list of tasks paginated and filtered
 	 * @param project - the project object to filter tasks to include
-	 * @param category - a task category to filter on (optional)
 	 * @param taskToIgnore - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	 * @param moveEventId - an optionel move event to filter on
 	 * @param page - page to load
@@ -552,42 +733,34 @@ class TaskService implements ServiceMethods {
 	 * @param searchText - an optional filter to search by either task id or comment
 	 * @return
 	 */
-	def search(Project project, String category, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
+	def search(Project project, AssetComment taskToIgnore, Long moveEventId, Long page=-1, Long pageSize=50, String searchText=null) {
 
 		StringBuilder queryList = new StringBuilder("FROM AssetComment a ")
 		StringBuilder queryCount = new StringBuilder("SELECT count(*) FROM AssetComment a ")
 		StringBuilder query = new StringBuilder("WHERE a.project.id = :projectId AND a.commentType = :commentType ")
 		Map params = [projectId: project.id, commentType: AssetCommentType.TASK]
 
-		if (category) {
-			if (categoryList.contains(category)) {
-				query.append("AND a.category = :category ")
-				params["category"] = category
-			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '${category}'"
-				category = ""
+		if (searchText) {
+			query.append("AND ( ")
+
+			if ( NumberUtils.isDigits(searchText) ) {
+				query.append("cast(a.taskNumber as string) like :searchText OR ")
 			}
-		}
-		if (searchText) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
-			// if searchText is a number, then only using task taskNumber attribute
-			if (searchText ==~ /^[0-9]+$/) {
-				query.append("AND a.taskNumber like '%${searchText}%' ")
-			} else {
-				query.append("AND a.comment like :searchText ")
-				params["searchText"] = "%" + searchText + "%"
-			}
+
+			query.append("a.comment like :searchText )")
+			params["searchText"] = "%" + searchText + "%"
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
 		if (taskToIgnore) {
-			if (!category && taskToIgnore.category) {
-				query.append("AND a.category = :category ")
-				params["category"] = taskToIgnore.category
-			}
 			query.append("AND a.id != :taskId ")
 			params["taskId"] = taskToIgnore.id
 
-			if (taskToIgnore.moveEvent) {
+			// If moveEventId param is given use it as filter, if not then user taskToIgnore.moveEvent (if exists).
+			if (moveEventId) {
+				query.append("AND a.moveEvent.id = :moveEventId ")
+				params["moveEventId"] = moveEventId
+			} else if (taskToIgnore.moveEvent) {
 				query.append("AND a.moveEvent.id = :moveEventId ")
 				params["moveEventId"] = taskToIgnore.moveEvent.id
 			}
@@ -615,8 +788,22 @@ class TaskService implements ServiceMethods {
 		return [list: list, total: resultTotal[0]]
 	}
 
-	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+	/**
+	 * Calculate the index for the task in the task selection drop-down.
+	 *
+	 * @param project
+	 * @param category
+	 * @param task
+	 * @param moveEventId
+	 * @param taskId
+	 * @return 0 if the task doesn't exist, the index if it does.
+	 */
+	int searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
+		// If no task id was given, return 0.
+		if (!taskId) {
+			return 0
+		}
 		def taskIndex = 0
 
 		StringBuffer query = new StringBuffer("""
@@ -630,7 +817,7 @@ class TaskService implements ServiceMethods {
 			if (categoryList.contains(category)) {
 				query.append("AND ac.category='$category' ")
 			} else {
-				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
+				log.warn "unexpected category filter '$category'"
 				category=''
 			}
 		}
@@ -713,6 +900,112 @@ class TaskService implements ServiceMethods {
 
 		task.addToNotes(taskNote)
 		true
+	}
+
+	/**
+	 * Used to add a note to a task by way of using queue / routes
+	 * @param message - a Map containing vital information to process the request
+	 */
+	void addTaskCommentByMessage(Map message) {
+		log.info "addTaskCommentByMessage() received message for task id ${message.taskId}"
+		AssetComment task = AssetComment.get(message.taskId)
+		String comment = message.comment
+		if (task) {
+			Person whom
+			if (message.byWhomId) {
+				whom = Person.get(message.byWhomId)
+				if (!whom) {
+					log.warn "addTaskCommentByMessage() request reference person (${message.byWhomId}) not found for task id ${message.taskId}"
+					comment += " : Unable to find specified user id"
+				}
+			}
+			if (!whom) {
+				whom = getAutomaticPerson()
+			}
+
+			addNote(task, whom, comment, 0)
+
+			boolean isCallback = message.containsKey('callbackMethod')
+			if (isCallback && task.isAutomatic()) {
+				log.debug "addTaskCommentByMessage() called as callback so going to close out the task"
+				// Close out the task
+				task.apiActionCompletedAt = new Date()
+				setTaskStatus(task, ACS.DONE, whom)
+			}
+
+			log.debug "addTaskCommentByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
+			task.save()
+		}
+	}
+
+	/**
+	 * Used to add a note to a task by way of using queue / routes
+	 * @param message - a Map containing vital information to process the request
+	 */
+	void updateTaskStateByMessage(Map message) {
+		log.info "updateTaskStateByMessage() received message for task id ${message.taskId}"
+		AssetComment task = AssetComment.get(message.taskId)
+		String comment = message.comment
+		if (task) {
+			Person whom
+			if (message.byWhomId) {
+				whom = Person.get(message.byWhomId)
+				if (!whom) {
+					log.warn "updateTaskStateByMessage() request reference person (${message.byWhomId}) not found for task id ${message.taskId}"
+					comment += " : Unable to find specified user id"
+				}
+			}
+			if (!whom) {
+				whom = getAutomaticPerson()
+			}
+
+			String note
+			String newStatus = task.status
+			String status = message.status ?: 'invalid'
+
+			switch (status) {
+				case 'success':
+					boolean isCallback = message.containsKey('callbackMethod')
+					// <SL>: What is callBack for and what if task is not automatic but status is success?
+//					if (isCallback && task.isAutomatic()) {
+						task.apiActionCompletedAt = new Date()
+						newStatus = ACS.COMPLETED
+//					}
+					note = 'Task was completed by API notification'
+					break
+
+				case 'error':
+					newStatus = ACS.HOLD
+					note = 'Unable to validate task status due to error: ' + message.cause
+					break
+
+				default:
+					newStatus = ACS.HOLD
+					note = 'Invalid notification format : ' + message.toString()
+					break
+			}
+
+			addNote(task, whom, note, 0)
+			setTaskStatus(task, newStatus, whom)
+
+			log.debug "updateTaskStateByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"
+			task.save()
+		}
+	}
+
+
+	/**
+	 * Used to clear all Task data that are associated to a specified event
+	 * @param moveEventId
+	 */
+	def resetTaskData(MoveEvent moveEvent) {
+		try {
+			def tasksMap = getMoveEventTaskLists(moveEvent.id)
+			return resetTaskDataForTasks(tasksMap)
+		} catch(e) {
+			log.error "An error occurred while trying to Reset tasks for moveEvent $moveEvent on project $moveEvent.project\n$e"
+			throw new RuntimeException("An unexpected error occured")
+		}
 	}
 
 	/**
@@ -1732,7 +2025,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		if (isDebugEnabled) {
 			log.debug '*************************************************************************************'
-			log.debug "**************** generateRunbook() by $whom for MoveEvent $moveEvent ****************"
+			log.debug '**************** generateRunbook() by {} for MoveEvent {} ****************', whom, moveEvent
 			log.debug '*************************************************************************************'
 			// log.debug "projectStaff is $projectStaff"
 		}
@@ -1763,7 +2056,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 
 			// Validate the syntax of the recipe before going any further
-			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode)
+			def recipeErrors = cookbookService.validateSyntax(recipeVersion.sourceCode, project)
 			if (recipeErrors) {
 				msg = 'There appears to be syntax error(s) in the recipe. Please run the Validate Syntax and resolve reported issue before continuing.'
 				log.debug 'Recipe had syntax errors'
@@ -1952,6 +2245,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// List of all available teams.
 				List teamCodeList = partyRelationshipService.getTeamCodes(true)
 
+				ApiAction apiAction = null
+				if (taskSpec.containsKey("invoke")) {
+					Map invokeSpec = taskSpec["invoke"]
+					if (invokeSpec.containsKey("method")) {
+						String apiActionName = invokeSpec["method"].trim()
+						apiAction = ApiAction.findByName(apiActionName)
+					}
+
+				}
+
 				// Collection of the task settings passed around to functions more conveniently
 				settings = [
 					type:stepType,
@@ -1963,7 +2266,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					clientId:project.client.id,
 					taskBatch:taskBatch,
 					publishTasks:publishTasks,
-					teamCodes: teamCodeList
+					apiAction:apiAction,
+					teamCodes: teamCodeList,
+					apiAction:apiAction
 				]
 				log.debug "##### settings: $settings"
 
@@ -2366,7 +2671,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 					// Update the status of completion
 					percComplete += percIncrHalf
-					progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Creating dependencies for task spec $taskSpec.id")
+					progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Creating predecessors for task spec $taskSpec.id")
 
 
 					// ------------------------------------------------------------------------------------
@@ -3259,7 +3564,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			displayOption: 'U',
 			autoGenerated: true,
 			recipe: recipeId,
-			taskSpec: taskSpec.id)
+			taskSpec: taskSpec.id,
+			apiAction: settings.apiAction)
 
 		def msg
 		def errMsg
@@ -3867,6 +4173,27 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 			// log.info "bundleIds=[$bundleIds]"
 
+            /**
+             * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
+             * WHERE expressions based on the properties passed in the filter
+             * @param String[] - list of the properties FROM fieldSpecs of project asset domain to examine
+             */
+            def addWhereConditionsForFieldSpecs = { fieldSpecs ->
+                fieldSpecs.each { customField ->
+                    if (filter?.asset?.containsKey(customField.label)) {
+                        sm = SqlUtil.whereExpression('a.' + customField.field, filter.asset[customField.label], customField.field)
+                        if (sm) {
+                            where = SqlUtil.appendToWhere(where, sm.sql)
+                            if (sm.param) {
+                                map[customField.field] = sm.param
+                            }
+                        } else {
+                            log.error "SqlUtil.whereExpression unable to resolve $customField.field expression [${filter.asset[customField.field]}]"
+                        }
+                    }
+                }
+            }
+
 			/**
 			 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
 			 * WHERE expressions based on the properties passed in the filter
@@ -3913,6 +4240,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
+            if (filter?.asset && contextObject.project) {
+                def fieldSpecs = customDomainService.fieldSpecs(contextObject.project, queryOn, CustomDomainService.ALL_FIELDS,['field', 'label'])
+                if (fieldSpecs) {
+                    // Add WHERE clauses based on the field specs (custom fields) configured by project asset.
+                    addWhereConditionsForFieldSpecs(fieldSpecs)
+                }
+            }
 			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
 			addWhereConditions(commonFilterProperties)
 
@@ -4386,7 +4720,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param category
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	private def createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings) {
+	private List createRollcallTasks(moveEvent, whom, recipeId, taskSpec, settings) {
 
 		def taskList = []
 		def staffList = MoveEventStaff.findAllByMoveEvent(moveEvent, [sort:'person'])
@@ -4421,6 +4755,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				assignedTo: lastPerson,
 				recipe: recipeId,
 				taskSpec: taskSpec.id,
+				apiAction:settings.apiAction,
 				durationLocked: durationLocked)
 
 			// Handle the various settings from the taskSpec

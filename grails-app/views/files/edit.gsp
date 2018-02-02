@@ -14,7 +14,7 @@
 		var assetId = '${fileInstance.id}'
 		populateDependency(assetId,'files','edit')
 
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${raw(escapedName)}');
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm">
@@ -61,7 +61,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
+									<g:select class="${standardFieldSpecs.moveBundle.imp?:''}" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
 								</tds:tooltipSpan>
 							</td>
 						</tr>
@@ -75,7 +75,7 @@
 							<td nowrap="nowrap" class="sizeScale">
 								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
 								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13"
+									<g:select class="${standardFieldSpecs.scale.imp?:''}" from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13"
 											  value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
 								</tds:tooltipSpan>
 							</td>
@@ -85,7 +85,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select id="environment" name="environment" from="${environmentOptions}"
+									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}"
 											  value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
 								</tds:tooltipSpan>
 							</td>
@@ -93,7 +93,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
-									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
+									<g:select class="${standardFieldSpecs.planStatus.imp?:''}" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>
@@ -111,7 +111,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
 							<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
+									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
 								</tds:tooltipSpan>
 							</td>
 						</tr>

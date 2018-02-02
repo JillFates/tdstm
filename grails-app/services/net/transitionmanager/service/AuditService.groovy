@@ -4,7 +4,6 @@ import com.tdssrc.grails.HtmlUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.UserAudit
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.springframework.beans.factory.InitializingBean
 
 /**
@@ -29,7 +28,6 @@ class AuditService implements InitializingBean, ServiceMethods {
 	private static final Map AUDITED_PARAMS = [username: true, id: true, _action_Delete: true, moveBundleId: true,
 	                                           assetEntityId: true, moveEventId: true]
 
-	GrailsApplication grailsApplication
 	SecurityService securityService
 
 	void afterPropertiesSet() {
@@ -52,9 +50,8 @@ class AuditService implements InitializingBean, ServiceMethods {
 			String paramsMsg = params.size() ? params.toString() + ' :' : ''
 			String user = securityService.currentUsername ?: 'ANONYMOUS_USER'
 			String remoteIp = HtmlUtil.getRemoteIp(request)
-			//       'USER_ACTIVITY: $user invoked $request.method $auditUri $paramsMsg$remoteIp'
-			logger.info 'USER_ACTIVITY: {} invoked {} {} {}{}', user, request.method, auditUri,
-					request.method, remoteIp
+			logger.info 'USER_ACTIVITY: {} invoked {} {} {}', 
+				user, request.method, auditUri, remoteIp
 		}
 	}
 

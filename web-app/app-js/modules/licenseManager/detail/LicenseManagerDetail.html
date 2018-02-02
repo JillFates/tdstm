@@ -218,6 +218,7 @@
         <button ng-if="licenseManagerDetail.activeShowMode" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.modifyLicense()"><span class="glyphicon glyphicon-pencil"></span> Modify License</button>
         <button ng-if="licenseManagerDetail.activeShowMode" type="submit" class="btn btn-primary pull-left" ng-click="licenseManagerDetail.manuallyRequest()"><i class="fa fa-fw fa-envelope"></i> Email License</button>
         <button ng-if="licenseManagerDetail.activeShowMode || licenseManagerDetail.pendingLicense || licenseManagerDetail.licenseModel.statusId === 'CORRUPT'" type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseManagerDetail.licenseModel.applied}" ng-click="licenseManagerDetail.revokeLicense()"><span class="glyphicon glyphicon-remove"></span> Revoke License</button>
+        <button ng-click="licenseManagerDetail.deleteLicense()" type="submit" class="btn btn-danger" ng-class="{'pull-left': licenseManagerDetail.licenseModel.applied}"><span class="glyphicon glyphicon-trash"></span> Delete License</button>
         <button ng-click="licenseManagerDetail.cancelCloseDialog()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> {{((licenseManagerDetail.editMode)? 'Cancel' : 'Close')}}</button>
     </div>
 </div>

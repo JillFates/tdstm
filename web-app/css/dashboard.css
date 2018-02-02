@@ -392,6 +392,7 @@ line-height:28px;
 	background-repeat:no-repeat;
 	margin-right:5px;
 	font-weight:bold;
+    min-height: 31px;
 }
 
 #btmarrow{
@@ -477,6 +478,10 @@ padding:1px;
 width:auto;
 text-align: center;
 list-style-type:none;
+}
+
+.bdetails li {
+	min-height: 30px
 }
 
 .bdetails li.heading{
@@ -624,14 +629,35 @@ list-style-type:none;
 	display:block;
 	font-size:11px;
 }
-	
-.bdetails li.actstart{
+/* GREEN common shared styles */
+.bdetails li.actstart, .bdetails li.actfinish {
+    padding:2px;
 	color:#07ae53;
 	background-color:#d3d7dc;
-	line-height:32px;
-	margin-top:1px;
+	line-height:20px;
 	display:block;
 	font-size:11px;
+    text-align:center;
+}
+/* RED common shared styles */
+.bdetails li.actstart_red, .bdetails li.actfinish_red{
+    padding:2px;
+	color:#FF0000;
+	background-color:#d3d7dc;
+	line-height: 20px;
+	display:block;
+	font-size:11px;
+    text-align:center;
+}
+.bdetails li.actstart, .bdetails li.actstart_red {
+    margin-top:1px;
+}
+.bdetails li.actstart div, .bdetails li.actfinish div,
+.bdetails li.actstart_red div, .bdetails li.actfinish_red div {
+    white-space: nowrap;
+    width: 99%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .bdetails li.tasks {
     background-color: #D3D7DC;
@@ -641,33 +667,6 @@ list-style-type:none;
     line-height: 24px;
     margin-top: 1px;
 }
-.bdetails li.actstart_red{
-	color:#FF0000;
-	background-color:#d3d7dc;
-	line-height:32px;
-	margin-top:1px;
-	display:block;
-	font-size:11px;
-}
-
-.bdetails li.actfinish{
-	padding:2px;
-	background-color:#d3d7dc;
-	display:block;
-	text-align:center;
-	font-size:11px;
-	height:32px;
-	color: #07ae53;
-}
-.bdetails li.actfinish_red{
-	padding:2px;
-	background-color:#d3d7dc;
-	display:block;
-	text-align:center;
-	font-size:11px;
-	height:32px;
-	color: #FF0000;
-}	
 #databox{
 	border:1px solid #9f9f9f;
 	width:95px;

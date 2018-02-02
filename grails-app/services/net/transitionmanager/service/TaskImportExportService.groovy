@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -15,10 +16,12 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.slf4j.LoggerFactory
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import javax.servlet.http.HttpServletRequest
+import java.text.SimpleDateFormat
 
 class TaskImportExportService implements ServiceMethods {
 
@@ -44,7 +47,7 @@ class TaskImportExportService implements ServiceMethods {
 
 	static final xfrmInteger = {val, options -> return NumberUtil.toInteger(val)}
 	// Transform a string, changing null to blank
-	static final xfrmString = { val, options -> val ?: '' }
+	static final xfrmString = { val, options -> val ? val.toString(): '' }
 
 	// Transforms a List to a comma separated list
 	// @IntegrationTest
@@ -55,14 +58,7 @@ class TaskImportExportService implements ServiceMethods {
 	static final xfrmListToPipedString = { List list, options -> list?.join('|') ?: '' }
 
 	static final xfrmDateToString = { val, options ->
-		if (val == null) return ''
-
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateFormatter)
-		}
-
-		log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
-		val?.toString()
+		return TimeUtil.dateToStringFormat( val, options.dateFormatter )
 	}
 
 	/**
@@ -84,14 +80,24 @@ class TaskImportExportService implements ServiceMethods {
 
 	// Transformer that is used to populate the spreadsheet using the user's TZ
 	static final xfrmDateTimeToString = { val, options ->
-		if (val == null) return ''
+		return TimeUtil.dateToStringFormat( val, options.dateTimeFormatter )
+	}
 
-		if (val instanceof Date) {
-			return TimeUtil.formatDate(val, options.dateTimeFormatter)
+	// Transformer that is used for getting a string representation TimeScale enums
+	static final xfrmTimeScaleToString = { val, options ->
+		if (val == null) {
+			return ""
 		}
 
-		log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
-		val?.toString()
+		if (val instanceof String) {
+			return val
+		}
+
+		if (val instanceof TimeScale) {
+			return val.toString()
+		}
+		log.error "xfrmTimeScaleToString() got unexpected data type ${val?.getClass()?.getName()}"
+		return val?.toString()
 	}
 
 	// ------------------------------------------------------------------------
@@ -132,6 +138,9 @@ class TaskImportExportService implements ServiceMethods {
 		comment					: [type: 'string', ssPos:1, formPos:2, domain: 'C', width:120, locked:true,
 										label: 'Task Description', template:changeTmpl('comment'), modifiable:true],
 
+		errors                 : [type:'list',    ssPos:null, formPos:2,  domain:'T', width:240, locked:false, label:'Errors',
+								  template:errorListTmpl, templateClass:'error', transform:xfrmListToPipedString ],
+
 		assetEntity				: [type: 'string', ssPos:2, formPos:3, domain: 'A', width:120, locked:false,
 										label: 'Related Asset', template:changeTmpl('assetEntity'), transform:xfrmString],
 
@@ -162,10 +171,10 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Date Planned', template:changeTmpl('datePlanned'), transform:xfrmDateTimeToString],
 
 		outstanding				: [type: 'string', ssPos:11, formPos:12, domain: 'C', width:120, locked:false,
-										label: 'Oustanding', template:changeTmpl('outstanding'), transform:xfrmString],
+										label: 'Outstanding', template:changeTmpl('outstanding'), transform:xfrmString],
 
 		dateRequired			: [type: 'date', ssPos:12, formPos:13, domain: 'C', width:120, locked:false,
-										label: 'Date Required', template:changeTmpl('dateRequired'), transform:xfrmDateToString],
+										label: 'Date Required', template:changeTmpl('dateRequired'), transform: xfrmDateToString],
 
 		comments				: [type: 'string', ssPos:13, formPos:14, domain: 'C', width:120, locked:false,
 										label: 'Comments', template:changeTmpl('comments'), transform:xfrmString],
@@ -176,8 +185,8 @@ class TaskImportExportService implements ServiceMethods {
 		durationLocked			: [type: 'string', ssPos:15, formPos:16, domain: 'C', width:120, locked:false,
 										label: 'Duration Locked', transform:xfrmString],
 
-		durationScale			: [type: 'string', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
-										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmString],
+		durationScale			: [type: 'timescale', ssPos:16, formPos:17, domain: 'C', width:120, locked:false, modifiable:true,
+										label: 'Duration Scale', template:changeTmpl('durationScale'), transform:xfrmTimeScaleToString],
 
 		estStart			: [type: 'datetime', ssPos:17, formPos:18, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Estimated Start', template:changeTmpl('estStart'), transform:xfrmDateTimeToString],
@@ -213,6 +222,8 @@ class TaskImportExportService implements ServiceMethods {
 										label: 'Batch Id', transform:xfrmString, template:changeTmpl('batchId')],
 	]
 
+	// Map of properties that can be modified by the user
+	static final Map modifiableProperties = taskSpreadsheetColumnMap.findAll{ p, k -> k.modifiable}
 	// The map of the location for the properties on the Title sheet.
 	static final Map TitlePropMap = [
 		 clientName: [1,2, 'String'],
@@ -522,6 +533,18 @@ class TaskImportExportService implements ServiceMethods {
 							}
 							break
 
+						case 'timescale':
+							value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
+							if (value) {
+								TimeScale ts = TimeScale.asEnum(value)
+								if (ts == null) {
+									task[prop] = value
+									setErrorValue(task, prop, "Invalid Duration Scale value")
+								} else {
+									value = ts
+								}
+							}
+							break
 						case 'boolean':
 							value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
 							if (value?.size()>0) {
@@ -806,9 +829,8 @@ class TaskImportExportService implements ServiceMethods {
 				Map personInfo = personService.findPersonByFullName(task.assignedTo)
 				if (personInfo.isAmbiguous) {
 					task.errors << 'Found multiple people by name'
-				}else{
-					task["_assignedTo"] = personInfo.person
 				}
+				task["_assignedTo"] = personInfo.person
 			}
 			if (!StringUtil.isBlank(task.role)){
 				String team = allTeamCodes.find { it == task.role }
@@ -825,6 +847,10 @@ class TaskImportExportService implements ServiceMethods {
 					task.errors << "Move Event doesn't exist."
 				}
 			}
+
+			AssetComment assetComment = AssetComment.findByTaskNumberAndProject(task.taskNumber, project)
+			applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
+			assetComment.discard()
 		}
 
 		setIconsOnTasks(tasks)
@@ -979,7 +1005,6 @@ class TaskImportExportService implements ServiceMethods {
 				tasks[i].errors << ["Row ${i+2} $error"]
 				results.taskError++
 			}
-
 			// Add the task to the new updatedTasks to be displayed on the results page
 			if (tasks[i].errors || taskChanged) {
 
@@ -1054,7 +1079,7 @@ class TaskImportExportService implements ServiceMethods {
 	}
 
 
-	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, Map modifiableProperties, boolean setDefaults=false) {
+	private void applyChangesToDomainObject(AssetComment assetComment, Map task, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
 
 		boolean unplannedChange = false
 		String unChgdLabel='Unplanned change'
@@ -1077,17 +1102,18 @@ class TaskImportExportService implements ServiceMethods {
 				origValue.clearTime()
 			}
 
+			def origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
+			def chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
+
 			// Check if it's a FK reference
 			if(info["foreignKey"]){
 				def reference = task["_${prop}"]
-				if(reference && reference.id != assetComment[prop]?.id){
+				if (origValueTransformed != chgValueTransformed) {
 					assetComment[prop] = reference
+					setOriginalValue(task, prop, origValueTransformed)
 				}
 
 			} else {
-				def origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
-				def chgValueTransformed = transformProperty(prop, task[prop], sheetInfoOpts)
-
 				boolean valuesEqual = origValueTransformed == chgValueTransformed
 				boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed.toString())
 				boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed.toString())
@@ -1110,10 +1136,6 @@ class TaskImportExportService implements ServiceMethods {
 					}
 				}
 
-			}
-
-			if (propertyHasError(task, prop)) {
-				task.errors << "Unplanned change(s) for task."
 			}
 		}
 
@@ -1141,17 +1163,17 @@ class TaskImportExportService implements ServiceMethods {
 	private List applyTaskChanges( Map task, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed = false
-		Map modifiableProperties = taskSpreadsheetColumnMap.findAll{ p, k -> k.modifiable}
+		Project project = sheetInfoOpts.project
 
 		// Ignore comments
 		if(NumberUtil.isPositiveLong(task.taskNumber)){
 
-			AssetComment assetComment = AssetComment.findByTaskNumber(task.taskNumber)
+			AssetComment assetComment = AssetComment.findByTaskNumberAndProject(task.taskNumber, project)
 			if (assetComment) {
 				log.debug "applyTaskChanges() About to apply changes to $assetComment"
 
 				// Update the person with the values passed in
-				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, modifiableProperties, true )
+				applyChangesToDomainObject(assetComment, task, sheetInfoOpts, true, true )
 
 				changed = assetComment.dirtyPropertyNames
 

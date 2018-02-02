@@ -1,3 +1,4 @@
+<%@ page import="net.transitionmanager.security.Permission" %>
 <div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 1000px" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Task':'Create Task'}}</span>
@@ -40,6 +41,32 @@
 						<td valign="top">
 							<tds:select ng-model="ac.moveEvent" ng-disabled="!enableMoveEvent" datasource="ds.moveEvents" id="moveEvent" name="moveEvent"  from="${tds.currentProjectMoveEvents()}"
 							optionKey='id' optionValue="name" noSelection="['':'please select']" />
+						</td>
+					</tr>
+					<tr id="actionShowId">
+						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+						<td valign="top" class="value" id="vmAction" colspan="2">
+							<g:set var="canAssign" value="${false}"/>
+							<tds:hasPermission permission="${Permission.ActionAssignment}">
+								<g:set var="canAssign" value="${true}"/>
+							</tds:hasPermission>
+							<g:if test="${canAssign}">
+							<!-- default to NONE -->
+								<select ng-model="acData.apiAction.id">
+									<option value="null"></option>
+									<g:each var="apiAction" in="${apiActionList}">
+										<option value="${apiAction.id}">${apiAction.name}</option>
+									</g:each>
+								</select>
+							</g:if>
+							<g:else>
+								<select ng-model="acData.apiAction.id" ng-if="acData.apiAction != null" ng-disabled="acData.apiAction == null || <%= !canAssign %>">
+									<option value="null"></option>
+									<g:each var="apiAction" in="${apiActionList}">
+										<option value="${apiAction.id}">${apiAction.name}</option>
+									</g:each>
+								</select>
+							</g:else>
 						</td>
 					</tr>
 					<tr class="prop">
@@ -122,6 +149,10 @@
 						<td>
 							<status-select comment-id='ac.commentId' ng-model='ac.status'></status-select>
 						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>
+						<td valign="top" class="value" id="taskSpecIdShowId" colspan="1" style="width: 20%">{{acData.taskSpecId}}&nbsp;</td>
 					</tr>
 					<%-- Dependencies section --%>
 					<tr class="prop">

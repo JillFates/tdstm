@@ -203,7 +203,7 @@
 
                <tr class="prop">
                 <td valign="top" class="name"><label for="useForPlanning">Use for Planning:</label></td>
-               <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" checked="checked"/></td>
+               <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked"/></td>
               </tr>
             </tbody>
           </table>

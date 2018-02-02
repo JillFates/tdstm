@@ -455,7 +455,7 @@ setFocus();
 
 
 		QZ({
-			codebase: "${resource(dir:'js/qz-tray')}",
+			codebase: "${resource(dir:'.')}",
 			signaturePath:  "${createLink(mapping:'qzSignLink')}",
 			onSuccess: function () {
 				$(".printView").show();

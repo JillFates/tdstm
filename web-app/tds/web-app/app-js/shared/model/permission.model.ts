@@ -1,4 +1,8 @@
 export class Permission {
+	static ActionAssignment = 'ActionAssignment';
+	static ActionCreate = 'ActionCreate';
+	static ActionDelete = 'ActionDelete';
+	static ActionEdit = 'ActionEdit';
 	static AdminMenuView = 'AdminMenuView';
 	static AdminUtilitiesAccess = 'AdminUtilitiesAccess';
 	static ApplicationRestart = 'ApplicationRestart';
@@ -16,6 +20,7 @@ export class Permission {
 	static AssetExplorerSystemDelete = 'AssetExplorerSystemDelete';
 	static AssetExplorerSystemEdit = 'AssetExplorerSystemEdit';
 	static AssetExplorerSystemSaveAs = 'AssetExplorerSystemSaveAs';
+	static AssetExplorerSystemList = 'AssetExplorerSystemList';
 	static AssetExplorerPublish = 'AssetExplorerPublish';
 	static AssetExplorerUnPublish = 'AssetExplorerUnPublish';
 	static AssetImport = 'AssetImport';

@@ -59,7 +59,11 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 		scope.controller.editComment(commentTO);
 	});
 
-	scope.$on('showAssetDetails', function (evt, redirectTo, type, value) {
+	scope.$on('lookUpAction', function(evt, commentId, apiActionId) {
+		scope.controller.lookUpAction(commentId, apiActionId);
+	});
+
+	scope.$on('showAssetDetails', function(evt, redirectTo, type, value) {
 		scope.$broadcast('forceDialogClose', ['crud', 'list']);
 		EntityCrud.showAssetDetailView(type, value);
 	});
@@ -147,6 +151,7 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 	}
 
 	this.showComment = function (commentTO, action) {
+        //console.log("showComment()", commentTO, action);
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/showComment' : '/task/showTask';
 		modal.open({
@@ -220,6 +225,32 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 			$('.daterangepicker').hide();
 		}, function (result) {
 			$('.daterangepicker').hide()
+		});
+	}
+
+	this.lookUpAction = function(commentId, apiActionId) {
+		console.log("lookUpAction(commentTO) ", commentId);
+		console.log("lookUpAction(apiAction) ", apiActionId);
+
+		var view = '/task/actionLookUp?apiActionId=' + apiActionId + '&commentId=' + commentId;
+
+		var modalInstance = modal.open({
+			templateUrl: utils.url.applyRootPath(view),
+			controller: tds.comments.controller.ActionLookUpDialogController,
+			scope: scope,
+			keyboard: false,
+			backdrop : 'static',
+			resolve: {
+				apiAction: function() {
+					return apiActionId;
+				}
+			}
+		});
+
+		modalInstance.result.then(function() {
+
+		}, function (result) {
+
 		});
 	}
 
@@ -399,7 +430,23 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 	$scope.editComment = function () {
 		$scope.close();
 		$scope.$emit("editComment", commentTO);
-	}
+	};
+
+	$scope.lookUpAction = function() {
+		$scope.$emit("lookUpAction", $scope.acData.assetComment.id, $scope.acData.apiAction.id);
+	};
+
+	$scope.invokeAction = function() {
+        commentService.invokeAction($scope.acData.assetComment.id).then(
+            function (data) {
+                //showAssetCommentDialog(data)
+				refreshView();
+            },
+            function (data) {
+                alerts.showGenericMsg();
+            }
+        );
+	};
 
 	$scope.deleteComment = function () {
 		commentUtils.validateDelete($scope.ac.commentId, $scope.ac.assetEntity, commentService.deleteComment).then(
@@ -419,6 +466,7 @@ tds.comments.controller.ShowCommentDialogController = function ($window, $scope,
 	}
 
 	function showAssetCommentDialog(data) {
+        //console.log("showAssetCommentDialog()", data);
 		if (typeof timerBar !== 'undefined')
 			timerBar.Pause();
 
@@ -460,6 +508,8 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	$scope.isDirty = false;
 	// Edit/View Mode
 	$scope.actionTypeEdit = (action === 'edit');
+	//
+	$scope.dataFlowDirection = ['Unknown', 'bi-directional', 'incoming', 'outgoing'];
 
 	/**
 	 * Broadcast that the model has been opened
@@ -496,27 +546,43 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	 * Execute the Delete of the Dependencies
 	 * @param asset
 	 */
-	$scope.deleteDependency = function(asset) {
+	$scope.deleteDependency = function(asset, toClose) {
 		if($scope.assetDependency[asset].dependency) {
 			var assetDependency = {
 				assetId: $scope.assetDependency[asset].dependency.asset.id,
-				dependencyId:  $scope.assetDependency[asset].dependency.id
+				dependencyId: $scope.assetDependency[asset].dependency.id
 			};
-			commentService.deleteDependency(assetDependency);
+
+			// To not recall the server, we just delete the dependency
+			delete $scope.assetDependency[asset].dependency;
+
+			if(asset === 'assetA') {
+				$scope.assetDependency['assetA'].dependency = $scope.assetDependency['assetB'].dependency;
+				delete $scope.assetDependency['assetB'].dependency;
+			}
+
+			commentService.deleteDependency(assetDependency).then(function(){
+				warningChangeGraph($scope.assetDependency[asset]);
+				if(toClose) {
+					$scope.close();
+				}
+			});
 		}
+	};
+
+	/**
+	 * Open the Dependency Show view
+	 */
+	$scope.openDependencyView = function(asset){
+		EntityCrud.showAssetDetailView(asset.dependencyClass.name, asset.dependency.dependent.id);
+		$scope.close();
 	};
 
 	/**
 	 * Listener to catch the Update from the Dialog
 	 */
 	$scope.onClickUpdate = function() {
-		if(($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete)
-		|| ($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete)) {
-			var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
-			$scope.warningConfirmationDialog(confirmMessage, $scope.updateDependencies);
-		} else {
-			$scope.updateDependencies();
-		}
+		$scope.updateDependencies();
 	};
 
 	/**
@@ -525,67 +591,35 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 	$scope.updateDependencies = function() {
 		var qPromises = [];
 
-		if($scope.assetDependency.assetA && $scope.assetDependency.assetA.delete) {
-			qPromises.push(commentService.deleteDependency({
-				assetId: $scope.assetDependency.assetA.dependency.asset.id,
-				dependencyId:  $scope.assetDependency.assetA.dependency.id
-			}));
-		} else if($scope.assetDependency.assetA.dependency) {
+	    if($scope.assetDependency.assetA.dependency) {
 			qPromises.push(commentService.updateDependencies({
 				dependency: $scope.assetDependency.assetA.dependency
 			}));
 		}
 
-		if($scope.assetDependency.assetB && $scope.assetDependency.assetB.delete) {
-			qPromises.push(commentService.deleteDependency({
-				assetId: $scope.assetDependency.assetB.dependency.asset.id,
-				dependencyId:  $scope.assetDependency.assetB.dependency.id
-			}));
-		} else if($scope.assetDependency.assetB.dependency) {
+		if($scope.assetDependency.assetB.dependency) {
 			qPromises.push(commentService.updateDependencies({
 				dependency: $scope.assetDependency.assetB.dependency
 			}));
 		}
 
 		$q.all(qPromises).then(function(){
-			reloadGraph();
+			warningChangeGraph($scope.assetDependency.assetA);
 			$scope.close();
 		});
-	};
-
-	function reloadGraph() {
-		setTimeout(function(){
-			// Update the Grap after a change has been reflected
-			$(document).trigger('entityAssetUpdated', {});
-		}, 700);
-	}
-
-	/**
-	 * Mark a Dependency as deletable
-	 * @param asset
-	 * @param toDelete
-	 */
-	$scope.toDeleteDependency = function(asset, toDelete) {
-		if(toDelete){
-			asset.delete = toDelete;
-		} else {
-			delete asset.delete;
-		}
-		$scope.changeData();
 	};
 
 	/**
 	 * On delete invoke the Confirmation Modal
+	 * @param asset
 	 */
-	$scope.onDeleteDependency = function() {
-		var confirmMessage = 'Are you sure you would like to delete ' + (($scope.assetDependency.assetA.dependency && $scope.assetDependency.assetB.dependency)? 'both dependencies?' : 'the dependency?');
+	$scope.toDeleteDependency = function(asset, toClose) {
+		var confirmMessage = 'Are you sure you would like to delete the dependency?';
 		$scope.warningConfirmationDialog(confirmMessage, function(){
-			$scope.deleteDependency('assetA');
-			$scope.deleteDependency('assetB');
-			reloadGraph();
-			$scope.close();
+			$scope.deleteDependency(asset, toClose);
 		});
 	};
+
 
 	/**
 	 * Inline controller of a Confirmation Model
@@ -629,6 +663,13 @@ tds.comments.controller.viewAssetDependencyDialogController = function ($scope, 
 		}
 	};
 
+	/**
+	 * Let the user know that something has change
+	 */
+	function warningChangeGraph(asset) {
+		$(document).trigger('entityAssetUpdated', { asset: { assetName: asset.name }});
+	}
+
 };
 
 
@@ -656,9 +697,13 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
         commentService.getLastCreatedTaskSessionParams().then(
             function (result) {
             	if(result.status) {
-					$scope.ac.moveEvent = result.data.preferences.TASK_CREATE_EVENT;
-					$scope.ac.category = result.data.preferences.TASK_CREATE_CATEGORY;
-					$scope.ac.status = result.data.preferences.TASK_CREATE_STATUS;
+            		var preferencesEvent = result.data.preferences.TASK_CREATE_EVENT;
+            		// Assign the event from the preferences only if there's any.
+            		if (preferencesEvent && preferencesEvent != 'null') {
+                        $scope.ac.moveEvent = preferencesEvent;
+            		}
+            		$scope.ac.category = result.data.preferences.TASK_CREATE_CATEGORY;
+            		$scope.ac.status = result.data.preferences.TASK_CREATE_STATUS;
                 }
             }
         );
@@ -779,7 +824,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		var startDate = utils.date.createDateTimeFromString($scope.ac.estStart);
 		var endDate = utils.date.createDateTimeFromString($scope.ac.estFinish);
 		if (startDate.isValid() && endDate.isValid()) {
-			// b - a > 0	
+			// b - a > 0
 			var diff = endDate.diff(startDate);
 			$scope.acData.durationTime = diff;
 		}
@@ -857,7 +902,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				// sometimes the duration property has and old value that does not
 				// represent the correct diff between estStart/estFinish causing
 				// an infinite loop of changes between the properties
-				// the following if statement will always consider the diff 
+				// the following if statement will always consider the diff
 				// between estStart/estFinish as the duration value
 				if (ac.estStart && ac.estFinish) {
 					var startDate = utils.date.createDateTimeFromString(ac.estStart);
@@ -926,6 +971,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 				$scope.ac.dueDate = moment($scope.ac.dueDate).format(utils.date.defaultDateFormat());
 			}
 			$scope.ac.id = $scope.ac.commentId;
+			$scope.ac.apiActionId = (($scope.acData.apiAction && $scope.acData.apiAction.id)? parseInt($scope.acData.apiAction.id): 0);
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
 
 			if (commentService.validDependencies($scope.dependencies)) {
@@ -973,6 +1019,22 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 		}
 	}
 };
+
+
+/**
+ * Controller use to show the action lookup information
+ */
+
+tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, apiAction, appCommonData, utils, commentUtils) {
+
+
+	$scope.apiAction = apiAction;
+
+	$scope.close = function() {
+		commentUtils.closePopup($scope, 'actionLookUp');
+	};
+};
+
 
 /************************
  * SERVICES
@@ -1230,6 +1292,30 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		return deferred.promise;
 	};
 
+	var invokeAction = function (commentId) {
+		var deferred = q.defer();
+		http.post(utils.url.applyRootPath('/ws/task/'+commentId+'/invokeAction')).
+			success(function (data, status, headers, config) {
+				deferred.resolve(data);
+			}).
+			error(function (data, status, headers, config) {
+				deferred.reject(data);
+			});
+		return deferred.promise;
+	};
+
+	var resetAction = function (commentId) {
+		var deferred = q.defer();
+            if (confirm("Are you sure you want to reset the action?")) {
+                http.post(utils.url.applyRootPath('/ws/task/' + commentId + '/resetAction')).success(function (data, status, headers, config) {
+                    deferred.resolve(data);
+                }).error(function (data, status, headers, config) {
+                    deferred.reject(data);
+                });
+            }
+		return deferred.promise;
+	};
+
 	var getActionBarButtons = function (commentId, includeDetails) {
 		var params = $.param({
 			'id': commentId,
@@ -1462,6 +1548,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
 		updateComment: updateComment,
 		searchComments: searchComments,
 		getComment: getComment,
+		invokeAction: invokeAction,
+		resetAction: resetAction,
 		getActionBarButtons: getActionBarButtons,
 		predecessorTableHtml: predecessorTableHtml,
 		successorTableHtml: successorTableHtml,
@@ -1535,6 +1623,9 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 			assetType: assetData.assetType,
 			assignedTo: appCommonData.getLoginPerson().id.toString(),
 			category: 'general',
+			apiAction: assetData.apiAction,
+			actionInvocable: assetData.actionInvocable,
+			actionMode: assetData.actionMode,
 			comment: '',
 			commentFromId: '',
 			commentId: "",
@@ -1577,7 +1668,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 	var commentTemplateFromCreateResponse = function (response, assetId, assetType) {
 		var temp = commentTemplate(assetTO(assetId, assetType));
 		var ac = response.assetComment;
-		temp.assignedTo = ac.assignedTo ? ac.assignedTo.id.toString() : '';
+		temp.assignedTo = (ac.assignedTo === '' || ac.assignedTo === null) ? '0' : ac.assignedTo.id.toString();
 		temp.assetClass = response.assetClass;
 		temp.category = ac.category;
 		temp.comment = ac.comment;
@@ -2012,7 +2103,7 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
 					autoWidth: true,
 					dataSource: {
 						transport: {
-							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
+							read: utils.url.applyRootPath('/assetEntity/tasksSearch?commentId=' + scope.commentId  + '&moveEvent=' + scope.moveEvent),
 							type: "get",
 							dataType: "json",
 							cache: true
@@ -2111,23 +2202,13 @@ tds.comments.directive.TaskDependencies = function (commentService, alerts, util
 				remoteDataSource.read();
 			}
 
-			scope.updateDependencyList = function (dependency, onPreload) {
-				if (!onPreload) {
-					createNewDataSource(dependency);
-				}
-				dependency.dropdown.list.css("white-space", "nowrap");
-			};
 			scope.deleteRow = function (index) {
 				if (scope.ngModel[index].id) {
 					scope.deleted[scope.ngModel[index].id] = scope.ngModel[index].id;
 				}
 				scope.ngModel.splice(index, 1);
 			};
-			scope.$watch('moveEvent', function (nValue, oValue) {
-				angular.forEach(scope.ngModel, function (dependency) {
-					scope.updateDependencyList(dependency, true);
-				});
-			});
+
 			scope.internalControl = scope.control || {};
 			scope.$on('addDependency', function (evt, evtName) {
 				if (evtName == scope.eventName) {
@@ -2203,6 +2284,12 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 					case "showNeighborhood":
 						action = scope.showNeighborhood;
 						break;
+					case "invokeAction":
+						action = scope.invokeAction;
+						break;
+					case "resetAction":
+						action = scope.resetAction;
+						break;
 				}
 				if (action != null) {
 					action(button);
@@ -2266,6 +2353,32 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 				window.open(utils.url.applyRootPath('/task/taskGraph?neighborhoodTaskId=' + scope.comment.commentId), '_blank');
 			};
 
+			scope.invokeAction = function(button) {
+                updateStatus(true);
+                commentService.invokeAction(scope.comment.commentId).then(
+                    function (data) {
+                    	postAction(button, data);
+                    },
+                    function (data) {
+                        updateStatus(false);
+                        alerts.showGenericMsg();
+                    }
+                );
+            };
+
+			scope.resetAction = function(button) {
+                updateStatus(true);
+                commentService.resetAction(scope.comment.commentId).then(
+                    function (data) {
+                    	postAction(button, data);
+                    },
+                    function (data) {
+                        updateStatus(false);
+                        alerts.showGenericMsg();
+                    }
+                );
+            };
+
 			var postAction = function (button, data) {
 				button.disabled = true;
 				updateStatus(false);
@@ -2277,6 +2390,8 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 						alerts.addAlertMsg(data.error);
 					} else {
 						switch (button.actionType) {
+							case "invokeAction":
+							case "resetAction":
 							case "changeStatus":
 								var cell = angular.element('#status_' + id);
 								if (cell.length == 0) {
@@ -2288,6 +2403,7 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 									cell.removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 								}
 								updateColumn('assignedTo', id, data.assignedToName);
+								updateColumn('actStart', id, data.assetComment.actStart);
 								break;
 							case "assignTask":
 								updateColumn('assignedTo', id, data.assignedToName);
@@ -2296,7 +2412,8 @@ tds.comments.directive.ActionBar = function (commentService, alerts, utils, comm
 								updateColumn('estStart', id, data.estStart);
 								updateColumn('estFinish', id, data.estFinish);
 								break;
-
+							default:
+								console.log('Unhandled action type.', button, data)
 						}
 					}
 				}
@@ -2427,6 +2544,9 @@ tds.comments.directive.ActionBarCell = function (commentService, alerts, utils, 
 						}
 						scope.loading = false;
                     }
+                    setTimeout(function(){
+                        $('[data-toggle="popover"]').popover();
+                    }, 600);
                 });
 
 			}

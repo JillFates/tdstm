@@ -14,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -48,6 +49,7 @@ class CommentService implements ServiceMethods {
 
 	def mailService					// SendMail MailService class
 	AssetEntityService assetEntityService
+	ApiActionService apiActionService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	Scheduler quartzScheduler
@@ -277,7 +279,7 @@ class CommentService implements ServiceMethods {
 			if(params.durationLocked) assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.durationScale) {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
-				log.debug "saveUpdateCommentAndNotes - TimeScale=$assetComment.durationScale"
+				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
 			}
 
 			// Issues (aka tasks) have a number of additional properties to be managed
@@ -331,6 +333,17 @@ class CommentService implements ServiceMethods {
 					// log.info "saveUpdateCommentAndNotes: dueDate=[$params.dueDate]"
 					assetComment.dueDate = TimeUtil.parseDate(params.dueDate)
 				}
+			}
+
+			// Assign ApiAction to task
+			if(params.containsKey("apiActionId")){
+				Long id = NumberUtil.toLong(params.apiActionId)
+				ApiAction apiAction = null
+				if (id) {
+					apiAction = apiActionService.find(id, assetComment.project)
+				}
+				assetComment.apiAction = apiAction
+
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This
@@ -407,11 +420,11 @@ class CommentService implements ServiceMethods {
 				boolean status = assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0
 
 				map = [
-						assetComment: assetComment,
+					assetComment: assetComment,
 					status: status,
-						cssClass: css,
-						statusCss: taskService.getCssClassForStatus(assetComment.status),
-						assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
+					cssClass: css,
+					statusCss: taskService.getCssClassForStatus(assetComment.status),
+					assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
 					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13)
 				]
 
@@ -448,11 +461,11 @@ class CommentService implements ServiceMethods {
 	 */
 	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
 		boolean shouldNotify = (
-				task.commentType == AssetCommentType.TASK &&
-						task.sendNotification &&
-						task.isPublished &&
-						(task.status == AssetCommentStatus.READY || task.status == AssetCommentStatus.STARTED) &&
-			task.assignedTo && task.assignedTo.id != triggeredByWhom.id
+			task.commentType == AssetCommentType.TASK
+			&& task.sendNotification
+			&& task.isPublished
+			&& task.status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED]
+			&& task.assignedTo && task.assignedTo.id != triggeredByWhom.id
 		)
 
 		// Now refine if the task should be sent based on it being new or updated
@@ -578,7 +591,7 @@ class CommentService implements ServiceMethods {
 
 		[assetComment: assetComment, assetName: assetName, moveEvent: assetComment.moveEvent, createdBy: createdBy,
 		 dtCreated: dtCreated, dtResolved: dtResolved, dueDate: dueDate, resolvedBy: resolvedBy,
-		 assignedTo: assetComment.assignedTo, dateFormat: userDTFormat, notes: notes]
+		 assignedTo: assetComment.assignedTo, dateFormat: userDTFormat, notes: notes, projectName: assetComment?.project?.projectCode]
 	}
 
 	// TODO : move the leftString and getLine methods into a reusable class - perhaps extending string with @Delegate

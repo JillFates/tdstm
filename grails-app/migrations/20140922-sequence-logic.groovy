@@ -21,12 +21,15 @@ databaseChangeLog = {
 			""")
 	}
 
-	// This caused an error when deploying to production (see TM-2548)
-	// We need to move this migration to a new migration script once we update production and resolve this issue
-	// We also need to do a DROP function first for systems that did get the function
-	
-	changeSet(author: "eluna", id: "20140922 TM-2899-2") {
-		comment('Add the SP')
+	/*
+	 * This caused an error when deploying to production (see TM-2548)
+	 * We need to move this migration to a new migration script once we update production and resolve this issue
+	 * We also need to do a DROP function first for systems that did get the function
+	 * 2017-11-17 oluna : Script as been modified to run every time the Application is started, first checking if the Procedure is available
+	 * if it's not it's created.
+	 */
+	changeSet(author: "eluna", id: "20140922 TM-2899-2", runAlways:'true') {
+		comment('Add the tdstm_sequencer Procedure to the database')
 		
 		preConditions(onFail:'MARK_RAN') {
 			sqlCheck(expectedResult:'0', """SELECT count(*) 

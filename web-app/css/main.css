@@ -370,11 +370,10 @@ tr#applicationDependentId td.class-wrap-depend {
 }
 
 .dashboard_stat_exec_tdmc_title {
-	max-width: 60px;
-	white-space: normal;
-	overflow: hidden;
-	text-overflow: ellipsis;
-    padding: 0px 10px 10px 0px !important;
+    background-color: transparent;
+}
+div.dashboard_stat_exec_tdmc_title {
+    min-height: 45px;
 }
 
 /* ACTION BUTTONS */
@@ -582,16 +581,14 @@ td[data-for].I .select2-choice,
 	background-image: none !important;
 }
 /* NORMAL */
-td[data-for].N .select2-choice,
-.N{
+td[data-for].N.label, td.N.label {
 	background-color: #ddd !important;
 	background-image: none !important;
 }
 /* UNIMPORTANT */
-td[data-for].U .select2-choice,
-.U{
-	background-color: #F4F4F4 !important;
-	background-image: none !important;
+td[data-for].U label, td.U label{
+    background-color: #F4F4F4 !important;
+    background-image: none !important;
 }
 /* HIDDEN */
 td[data-for].H .select2-choice,
@@ -1118,4 +1115,8 @@ div.dialog input#description {
 
 #dependencyTableId .labelColumn {
 	position: static !important;
+}
+
+.k-grid-content tr td {
+	padding: 2px 6px;
 }

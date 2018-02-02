@@ -33,6 +33,7 @@ import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -64,6 +65,7 @@ class MoveBundleController implements ControllerMethods {
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
+    CustomDomainService customDomainService
 
 	@HasPermission(Permission.BundleView)
 	def list() {}
@@ -154,23 +156,17 @@ class MoveBundleController implements ControllerMethods {
 	def deleteBundleAndAssets() {
 		MoveBundle moveBundle = MoveBundle.get(params.id)
 		if (moveBundle) {
-			AssetEntity.withTransaction { status ->
-				try{
-					moveBundleService.deleteBundleAssetsAndAssociates(moveBundle)
-					moveBundleService.deleteMoveBundleAssociates(moveBundle)
-					moveBundle.delete()
-					flash.message = "MoveBundle $moveBundle deleted"
-				}
-				catch (e) {
-					status.setRollbackOnly()
-					flash.message = "Unable to Delete MoveBundle Assosiated with Teams: $e.message"
-				}
+			try{
+				moveBundleService.deleteBundleAndAssets(moveBundle)
+				flash.message = "MoveBundle $moveBundle deleted"
+			}
+			catch (e) {
+				flash.message = "Unable to Delete MoveBundle and Assets: $e.message"
 			}
 		}
 		else {
 			flash.message = "MoveBundle not found with id $params.id"
 		}
-
 		redirect(action: 'list')
 	}
 
@@ -312,7 +308,7 @@ class MoveBundleController implements ControllerMethods {
 		def projectManager = params.projectManager
 		def moveManager = params.moveManager
 
-		moveBundle.useForPlanning = params.useForPlanning as Boolean
+		moveBundle.useForPlanning = params.useForPlanning == 'true'
 
 		if (!moveBundle.hasErrors() && moveBundle.save()) {
 			if (projectManager){
@@ -626,7 +622,7 @@ class MoveBundleController implements ControllerMethods {
 		// TODO : JPM 12/2015 TM-4332 : We're including the Network Devices in the Other count for the time being
 		def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount
 		def unassignedOtherCount = unassignedAllDeviceCount - unassignedPhysicalServerCount - unassignedVirtualServerCount -
-				unAssignedPhyStorageCount - unAssignedPhyNetworkCount
+				unAssignedPhyStorageCount
 
 		// Application Plan Methodology
 		def customField = project.planMethodology ?: "''"
@@ -648,6 +644,24 @@ class MoveBundleController implements ControllerMethods {
 
 			groups
 		}
+
+		// sort values based on custom field setting configuration
+		def customFieldSetting = customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+			it.field == customField
+		}
+
+		if (customFieldSetting?.constraints?.values) {
+			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
+				if ( ! it ) {
+					result[Application.UNKNOWN] = 0
+				} else if (groupPlanMethodologyCount[it]) {
+					result[it] = 0
+				}
+				result
+			}
+			groupPlanMethodologyCount = sortedMap + groupPlanMethodologyCount;
+		}
+
 /*
 		// TODO - this is unnecessary and could just load the map
 
@@ -783,6 +797,37 @@ class MoveBundleController implements ControllerMethods {
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 
+		// Query to obtain the count of Servers in 'Moved' Plan Status
+		def serversCountsQuery = """SELECT
+				assetClass,
+				COUNT(ae) AS all,
+				SUM(CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END) AS allMoved
+			FROM AssetEntity ae
+			WHERE ae.project=:project 
+			AND ae.assetClass = :deviceAssetClass
+			AND ae.assetType IN (:allServers)
+			AND ae.moveBundle IN (:moveBundles)
+			GROUP BY ae.assetClass"""
+
+		def serversCountsQueryParams = [
+				project: project,
+				moveBundles: moveBundleList,
+				movedStatus: AssetEntityPlanStatus.MOVED,
+				deviceAssetClass: AssetClass.DEVICE,
+				allServers: AssetType.allServerTypes]
+
+		def serversCompletedPercentage = 0
+		def serversCountsQueryResults = AssetEntity.executeQuery(serversCountsQuery, serversCountsQueryParams)
+		// Make sure this does not return null while getting [0] element.
+		if (serversCountsQueryResults.size() > 0) {
+			serversCountsQueryResults = serversCountsQueryResults[0]
+			def totalServersCount = serversCountsQueryResults[1].intValue()
+			// Make sure to prevent Division by zero error while calling countAppPercentage method.
+			if (totalServersCount > 0) {
+				serversCompletedPercentage = countAppPercentage(totalServersCount, serversCountsQueryResults[2].intValue())
+			}
+		}
+
 		return [
 			appList:appList,
 			applicationCount:applicationCount,
@@ -790,6 +835,7 @@ class MoveBundleController implements ControllerMethods {
 			assignedAppPerc: assignedAppPerc,
 			confirmedAppPerc: confirmedAppPerc,
 			movedAppPerc: movedAppPerc,
+			movedServersPerc: serversCompletedPercentage,
 			appToValidate:appToValidate,
 			unassignedServerCount: unassignedServerCount,
 			unassignedPhysicalServerCount:unassignedPhysicalServerCount,

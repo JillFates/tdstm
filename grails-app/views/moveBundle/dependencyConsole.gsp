@@ -30,8 +30,7 @@
 		<tds:subHeader title="Dependency Analyzer" crumbs="['Assets','Dependency Analyzer']"/>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
-
+		<div id="DependencyGroupsTableId">
 			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 				<div id="checkBoxDivId">
 					<g:form name="checkBoxForm">
@@ -203,10 +202,13 @@
 			var currentValue,currentdependencyBundle;
 
 			$(document).on('entityAssetUpdated',function (e,obj) {
-				getList(currentValue,currentdependencyBundle);
+				$('#refreshButtonId').prop('title', 'Refresh to reflect pending changes');
+				$('#refreshButtonId').addClass('warning-change');
 			});
 
 			function getList(value,dependencyBundle, force, distance, labels) {
+				$('#refreshButtonId').removeClass('warning-change');
+				$('#refreshButtonId').prop('title','Refreshes the graph');
 				$('#moveBundleSelectId').dialog("close")
 				var id = 'all'
 				if(dependencyBundle != null) id = dependencyBundle
