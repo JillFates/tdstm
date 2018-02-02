@@ -36,6 +36,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	static final String FINDINGS_VARNAME = 'FINDINGS'
 	/**
+	 * Static variable name definition for NOW script variable
+	 */
+	static final String NOW_VARNAME = 'NOW'
+	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -221,6 +225,7 @@ class ETLProcessor implements RangeChecker {
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
+			binding.addDynamicVariable(NOW_VARNAME, new Date())
 
 			closure(addCrudRowData(currentRowIndex, row))
 
@@ -468,7 +473,7 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 *		whenFound asset create {
+	 *		whenNotFound asset create {
 	 *			assetClass: Application
 	 *			assetName: primaryName
 	 *			assetType: primaryType
@@ -478,18 +483,32 @@ class ETLProcessor implements RangeChecker {
 	 * @param dependentId
 	 * @return the current find Element
 	 */
-	def whenFound(final String dependentId) {
-		if(!currentFindElement || !currentFindElement.hasDependentId(dependentId)){
-			throw ETLProcessorException.notCurrentFindElement()
-		}
+	def whenNotFound(final String dependentId) {
 
-		[
-			create: { closure ->
-				new FoundElement(currentFindElement).whenFoundUpdate(closure)
-			}
+		return [
+				create: { closure ->
+					result.addFoundElement(new FoundElement(dependentId).create(closure))
+				}
 		]
 	}
 
+	/**
+	 * WhenNotFound ETL command. It defines what should based on find command results
+	 * <pre>
+	 *		whenFound asset update {
+	 *			"TN Last Seen": NOW
+	 *		}
+	 * </pre>
+	 * @param dependentId
+	 * @return the current find Element
+	 */
+	def whenFound(final String dependentId) {
+		return [
+				update: { closure ->
+					result.addFoundElement(new FoundElement(dependentId).create(closure))
+				}
+		]
+	}
 
 	/**
 	 * Add a message in console for an element from dataSource by its index in the row
@@ -641,6 +660,7 @@ class ETLProcessor implements RangeChecker {
 	void addFindElement(ETLFindElement findElement) {
 		result.addFindElement(findElement)
 	}
+
 	/**
 	 * Adds a warn message in the current result
 	 * @param findElement
@@ -648,6 +668,7 @@ class ETLProcessor implements RangeChecker {
 	void addFindWarnMessage(ETLFindElement findElement) {
 		result.addFindWarnMessage(findElement)
 	}
+
 	/**
 	 * Applies a global transformation for a given element
 	 * @param element

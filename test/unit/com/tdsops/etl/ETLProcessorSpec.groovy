@@ -5,7 +5,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -15,7 +14,6 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.json.JsonOutput
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService

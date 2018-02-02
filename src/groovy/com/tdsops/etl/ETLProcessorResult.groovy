@@ -123,6 +123,29 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Add a FoundElement in the result based on its dependentId
+	 * <pre>
+	 *		whenFound asset create {
+	 *			assetClass Application
+	 *			assetName primaryName
+	 *			assetType primaryType
+	 *			"SN Last Seen": NOW
+	 *		}
+	 * </pre>
+	 * @param foundElement
+	 */
+	void addFoundElement(FoundElement foundElement){
+
+		Map<String, ?> data = reference.data.last()
+		if(!data.fields[foundElement.dependentId]){
+			throw ETLProcessorException.notCurrentFindElement()
+		}
+
+		Map<String, ?> field = data.fields[foundElement.dependentId]
+		field[foundElement.action] = foundElement.propertiesMap
+	}
+
+	/**
 	 * Appends a loaded element in the results.
 	 * First It adds a new element.field.name in the current domain fields list
 	 * After that, It saves the new element in the data results.
