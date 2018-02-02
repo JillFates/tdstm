@@ -1,6 +1,6 @@
 import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
@@ -12,7 +12,7 @@ import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS, DATA_TYPES, KEYSTROKE} from '../../../../shared/model/constants';
+import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
 import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
 import {DataScriptModel} from '../../model/data-script.model';
 import {NgForm} from '@angular/forms';
@@ -79,7 +79,6 @@ export class APIActionViewEditComponent implements OnInit {
 	public selectedInterval = {value: 0, interval: ''};
 	public selectedLapsed = {value: 0, interval: ''};
 	public selectedStalled = {value: 0, interval: ''};
-	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
 	public assetClassesForParameters = [
@@ -113,10 +112,7 @@ export class APIActionViewEditComponent implements OnInit {
 		cols: 4
 	};
 	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}]
+		sort: []
 	};
 	public validInfoForm = false;
 	public invalidScriptSyntax = false;
@@ -128,8 +124,7 @@ export class APIActionViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private customDomainService: CustomDomainService,
-		private dialogService: UIDialogService) {
+		private customDomainService: CustomDomainService) {
 
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
@@ -139,12 +134,12 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 
 		this.dataSignature = JSON.stringify(this.apiActionModel);
+		this.parameterList = process([], this.state);
 
 		this.getProviders();
 		this.getAgents();
 		this.getCredentials();
 		this.getDataScripts();
-		this.getParameters();
 		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 	}
@@ -248,10 +243,10 @@ export class APIActionViewEditComponent implements OnInit {
 	getParameters(): void {
 		this.dataIngestionService.getParameters().subscribe(
 			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
-					this.parameterList = process([], this.state);
-				}
 				this.parameterList = process(result, this.state);
+				this.parameterList.data.forEach((parameter) => {
+					this.onContextValueChange(parameter);
+				});
 			},
 			(err) => console.log(err));
 	}
@@ -263,6 +258,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.customDomainService.getCommonFieldSpecs().subscribe(
 			(result: any) => {
 				this.commonFieldSpecs = result;
+				if (this.modalType !== ActionType.CREATE) {
+					this.getParameters();
+				}
 			},
 			(err) => console.log(err));
 	}
@@ -503,7 +501,6 @@ export class APIActionViewEditComponent implements OnInit {
 			id: 0,
 			name: '',
 			description: '',
-			dataType: '',
 			context: {
 				value: '',
 				assetClass: ''
@@ -525,6 +522,9 @@ export class APIActionViewEditComponent implements OnInit {
 		});
 		if (fieldSpecs) {
 			dataItem.currentFieldList = fieldSpecs.fields;
+			dataItem.field = dataItem.currentFieldList.find((field) => {
+				return field.field === dataItem.value;
+			});
 		}
 	}
 
@@ -532,7 +532,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Delete from the paramaters the argument passed.
 	 * @param dataItem
 	 */
-	onDelete(dataItem: APIActionParameterModel): void {
+	onDeleteParameter(dataItem: APIActionParameterModel): void {
 		let parameterIndex = this.parameterList.data.indexOf(dataItem);
 		if (parameterIndex >= 0) {
 			this.parameterList.data.splice(parameterIndex, 1);

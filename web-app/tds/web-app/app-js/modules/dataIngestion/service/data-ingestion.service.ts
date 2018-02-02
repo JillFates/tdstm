@@ -41,12 +41,11 @@ export class DataIngestionService {
 			id: 1,
 			name: 'sys_id',
 			description: 'The Unique ID used by ServiceNow (sysid)',
-			dataType: 'String',
 			context: {
 				value: 'Application',
 				assetClass: 'APPLICATION'
 			},
-			value: 'externalRelId'
+			value: 'appOwner'
 		}
 	];
 
