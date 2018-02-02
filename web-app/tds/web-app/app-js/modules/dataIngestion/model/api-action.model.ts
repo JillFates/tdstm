@@ -74,11 +74,6 @@ export class APIActionParameterColumnModel {
 				type: 'text',
 				width: 180
 			}, {
-				label: 'Data Type',
-				property: 'dataType',
-				type: 'text',
-				width: 110
-			}, {
 				label: 'Context',
 				property: 'context.value',
 				type: 'text',

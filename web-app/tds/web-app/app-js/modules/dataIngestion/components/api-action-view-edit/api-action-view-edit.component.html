@@ -18,9 +18,6 @@
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(2)}">
 						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
 					</li>
-					<!-- <li role="presentation" [ngClass]="{'active':isCurrentTab(3)}">
-						<a href="#tab_4" (click)="setCurrentTab(3)" data-toggle="tab">Test</a>
-					</li> -->
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(1)}">
 					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
@@ -286,13 +283,6 @@
 										<ng-template kendoGridCellTemplate *ngIf='isEditing' let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'name'">
 												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'dataType'">
-												<kendo-dropdownlist
-														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-														[data]="dataTypes"
-														[(ngModel)]="dataItem.dataType">
-												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
