@@ -1,7 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.TimeUtil
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 enum IngestionOperation {
     ADD('Add'),
@@ -116,5 +115,12 @@ class DataScript {
 
         return dataMap
     }
+
+
+    static final List<Map> domainReferences = [
+            [domain: ImportBatch, delete: "null", property: "dataScript", domainLabel: "Import Batch"],
+            [domain: ApiAction, delete: "null", property: "defaultDataScript", domainLabel: "API Action"]
+
+    ]
 
 }
