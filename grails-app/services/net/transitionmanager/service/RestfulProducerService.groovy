@@ -118,7 +118,7 @@ class RestfulProducerService {
 
         if (apiActionResponse.successful) {
             try {
-                Map<String, ?> statusResult = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, statusScript, actionRequest, apiActionResponse, taskFacade, null, null)
+                Map<String, ?> statusResult = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, statusScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                 log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, statusResult.result)
                 if (statusResult.result == ReactionScriptCode.SUCCESS) {
                     try {

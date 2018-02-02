@@ -1,16 +1,39 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdssrc.grails.*
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.ThreadLocalUtil
+import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.agent.*
+import net.transitionmanager.agent.AbstractAgent
+import net.transitionmanager.agent.AgentClass
+import net.transitionmanager.agent.AwsAgent
+import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.agent.DictionaryItem
+import net.transitionmanager.agent.RestfulAgent
+import net.transitionmanager.agent.RiverMeadowAgent
+import net.transitionmanager.agent.ServiceNowAgent
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.integration.*
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptBinding
+import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.apache.camel.Exchange
 import org.codehaus.groovy.control.ErrorCollector
@@ -204,7 +227,7 @@ class ApiActionService implements ServiceMethods {
 				// execute PRE script if present
 				if (preScript) {
 					try {
-						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, null, taskFacade, null, null)
+						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
 					} catch (ApiActionException preScriptException) {
 						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
@@ -490,16 +513,15 @@ class ApiActionService implements ServiceMethods {
 			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBindingBuilder apiActionScriptBindingBuilder = grailsApplication.mainContext.getBean(
-				ApiActionScriptBindingBuilder.class,
-				request,
-				response,
-				asset,
-				task,
-				job
-		)
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(
+				ApiActionScriptBindingBuilder.class)
+			.with(request)
+			.with(response)
+			.with(asset)
+			.with(task)
+			.with(job)
+			.build(code)
 
-		ApiActionScriptBinding scriptBinding = apiActionScriptBindingBuilder.build(code)
 		def result = new GroovyShell(this.class.classLoader, scriptBinding)
 				.evaluate(script, ApiActionScriptBinding.class.name)
 
@@ -529,8 +551,8 @@ class ApiActionService implements ServiceMethods {
 			String script,
 			ActionRequest request,
 			ApiActionResponse response,
-			ReactionTaskFacade task,
-			ReactionAssetFacade asset,
+			TaskFacade task,
+			AssetFacade asset,
 			ApiActionJob job) {
 
 		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
@@ -590,8 +612,8 @@ class ApiActionService implements ServiceMethods {
 						scriptBindingCommand.script,
 						new ActionRequest(),
 						new ApiActionResponse(),
-						new ReactionTaskFacade(),
-						new ReactionAssetFacade(),
+						new TaskFacade(),
+						new AssetFacade(new AssetEntity(), [:], true),
 						new ApiActionJob()
 				)
 

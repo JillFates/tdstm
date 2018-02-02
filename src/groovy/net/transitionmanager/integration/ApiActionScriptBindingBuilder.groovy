@@ -1,15 +1,10 @@
 package net.transitionmanager.integration
 
-import com.tdssrc.grails.GormUtil
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.task.TaskFacade
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSource
-import org.springframework.context.annotation.Scope
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.stereotype.Component
 
 /**
  * Fluent API for Builder pattern.
@@ -24,8 +19,6 @@ import org.springframework.stereotype.Component
  *                  .build(ReactionScriptCode.FINAL)
  * </code>
  */
-//@Component
-//@Scope("prototype")
 class ApiActionScriptBindingBuilder {
 
 	MessageSourceService messageSourceService
@@ -36,14 +29,6 @@ class ApiActionScriptBindingBuilder {
 	TaskFacade task
 	ApiActionJob job
 
-	@Autowired
-	ApiActionScriptBindingBuilder(ActionRequest request, ApiActionResponse response, AssetFacade asset, TaskFacade task, ApiActionJob job) {
-		this.request = request
-		this.response = response
-		this.asset = asset
-		this.task = task
-		this.job = job
-	}
 
 	ApiActionScriptBindingBuilder with(ActionRequest request) {
 		this.request = request
@@ -101,8 +86,7 @@ class ApiActionScriptBindingBuilder {
 
 		switch (code) {
 			case ReactionScriptCode.PRE:
-				//checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
-				checkParams(ReactionScriptCode.PRE, ['request', 'task'])
+				checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
 				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request: request,
