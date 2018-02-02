@@ -72,22 +72,22 @@ export class APIActionParameterColumnModel {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
-				width: 180
+				width: 210
 			}, {
 				label: 'Context',
 				property: 'context.value',
 				type: 'text',
-				width: 140
+				width: 160
 			}, {
-				label: 'value',
+				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 240
+				width: 265
 			}, {
 				label: 'Description',
 				property: 'description',
 				type: 'text',
-				width: 277
+				width: 310
 			}
 		];
 	}

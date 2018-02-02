@@ -267,20 +267,21 @@
 										[pageSize]="25"
 										[height]="430"
 										(sortChange)="sortChange($event)">
-									<ng-template kendoGridToolbarTemplate [position]="'top'">
-										<button class="btn btn-default mar-left-15" id="btnEditParameters" type="button" (click)="onEditParameters()"><i class="fa fa-fw fa-list-ul"></i> {{ 'GLOBAL.EDIT' | translate }}</button>
-										<button *ngIf="isEditing" class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_ARGUMENT' | translate }}</button>
+									<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
+										<button class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_ARGUMENT' | translate }}</button>
 									</ng-template>
-									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index" field="{{column.property}}" [locked]="column.locked" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-										<ng-template kendoGridHeaderTemplate>
-											<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
+													   field="{{column.property}}"
+													   [locked]="column.locked"
+													   format="{{column.format}}"
+                                                       title="{{column.label}}"
+													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
 												<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf='isEditing' let-dataItem let-rowIndex="rowIndex">
+										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'name'">
 												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
 											</div>

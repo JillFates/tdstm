@@ -97,17 +97,13 @@ export class APIActionViewEditComponent implements OnInit {
 			value: 'Device'
 		}, {
 			assetClass: 'STORAGE',
-			value: 'Logical Storage'
-		}, {
-			assetClass: 'TASK',
-			value: 'Task'
+			value: 'Storage'
 		}, {
 			assetClass: 'USER_DEFINED',
 			value: 'User Defined'
 		}
 	];
 	private currentTab = 0;
-	public isEditing = false;
 	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
@@ -497,10 +493,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	openCloseCodeMirror(eventReaction: EventReaction): void {
 		eventReaction.open = !eventReaction.open;
-	}
-
-	onEditParameters(): void {
-		this.isEditing = true;
 	}
 
 	/**
