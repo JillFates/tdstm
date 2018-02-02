@@ -1,20 +1,16 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.grails.ApplicationContextHolder
-
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.UserPreferenceService
-
 import org.springframework.util.Assert
-import org.springframework.util.StringUtils
 
+import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import javax.servlet.http.HttpSession
-
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods
  */
@@ -686,7 +682,7 @@ class TimeUtil {
 	 * @param toTZ -  the timezone that the date will be adjusted to
 	 * @return the adjusted date
 	 */
-	private static Date moveDateFromGMTToTZ(Date date, String toTZ) {
+	public static Date moveDateFromGMTToTZ(Date date, String toTZ) {
 		if (toTZ == defaultTimeZone) {
 			date
 		}
