@@ -232,7 +232,7 @@ class AssetEntity extends EavEntity {
 		Map nullableTrue = Collections.singletonMap('nullable', true)
 		(1..96).each { "custom$it"(nullableTrue) }
 
-		project nullable: true
+		project nullable: false
 
 		serialNumber nullable: true
 		assetTag nullable: true
