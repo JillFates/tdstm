@@ -50,6 +50,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
+	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
 	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
@@ -115,6 +116,7 @@ export class APIActionViewEditComponent implements OnInit {
 		sort: []
 	};
 	public validInfoForm = false;
+	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
 	constructor(
@@ -292,7 +294,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
+		if (this.isDirty() || !this.validParametersForm) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
@@ -383,6 +385,10 @@ export class APIActionViewEditComponent implements OnInit {
 				}
 			}
 			this.initFormLoad = false;
+		}
+
+		if (this.apiActionParametersForm) {
+			this.validParametersForm = this.apiActionParametersForm.valid;
 		}
 	}
 
@@ -526,6 +532,8 @@ export class APIActionViewEditComponent implements OnInit {
 				return field.field === dataItem.value;
 			});
 		}
+
+		this.verifyIsValidForm();
 	}
 
 	/**
@@ -605,6 +613,10 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	public refreshParametersList(): void {
 		this.parameterList = process(this.parameterList.data, this.state);
+		// Wait 500 after the Grid has fully process the new params
+		setTimeout(() => {
+			this.verifyIsValidForm();
+		}, 100);
 	}
 
 	/**

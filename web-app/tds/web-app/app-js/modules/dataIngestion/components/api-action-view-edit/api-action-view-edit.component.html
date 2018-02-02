@@ -283,7 +283,7 @@
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'name'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.name" style="width: 100%; height: 30px;" required [ngClass]="{'has-error': dataItem.name.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
@@ -292,22 +292,27 @@
 														[textField]="'value'"
 														[valueField]="'value'"
 														(valueChange)="onContextValueChange(dataItem)"
-														[(ngModel)]="dataItem.context">
+														[(ngModel)]="dataItem.context"
+														required
+														[ngClass]="{'has-error': !dataItem.context || dataItem.context.value === ''}" >
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.value" style="width: 100%;" />
+												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" style="width: 100%; height: 30px;" />
 												<kendo-combobox *ngIf="dataItem.context.assetClass !== 'USER_DEFINED'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
 																[textField]="'field'"
 																[valueField]="'field'"
-																[(ngModel)]="dataItem.field">
+																[(ngModel)]="dataItem.field"
+																(valueChange)="verifyIsValidForm()"
+																required
+																[ngClass]="{'has-error': !dataItem.field}" >
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'description'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.description" style="width: 100%;" />
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.description" style="width: 100%; height: 30px;" />
 											</div>
 										</ng-template>
 									</kendo-grid-column>
@@ -583,7 +588,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || invalidScriptSyntax">
+		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm || invalidScriptSyntax ">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>
