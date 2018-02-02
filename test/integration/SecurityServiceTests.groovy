@@ -459,40 +459,40 @@ class SecurityServiceTests extends Specification {
 			list.size() <= initialNumOfPending
 	}
 
-	def '16. Calling currentUserPermissionAsMap as an unauthenticated user' () {
-		given:'a user whom is NOT authenticated'
-			securityService.logoutCurrentUser()
-		when:'the securityService.currentUserPermissionAsMap method is called'
-			Map permissions = securityService.currentUserPermissionMap()
-		then:'an empty map should be returned.'
-			permissions.isEmpty()
-	}
+    def '16. Calling currentUserPermissionAsMap as an unauthenticated user' () {
+        given:'a user whom is NOT authenticated'
+        	securityService.logoutCurrentUser()
+        when:'the securityService.currentUserPermissionAsMap method is called'
+        	Map permissions = securityService.currentUserPermissionMap()
+        then:'an empty map should be returned.'
+        	permissions.isEmpty()
+    }
 
-	def '17. Calling currentUserPermissionAsMap as an authenticated and under privileged user' () {
-		given:'a user whom is authenticated and has only been assigned the User role'
-			createUserAccount()
-			securityService.assumeUserIdentity(userRoleUser.username, false)
-		when:'the securityService.currentUserPermissionAsMap method is called'
-			Map permissions = securityService.currentUserPermissionMap()
+    def '17. Calling currentUserPermissionAsMap as an authenticated and under privileged user' () {
+        given:'a user whom is authenticated and has only been assigned the User role'
+        	createUserAccount()
+        	securityService.assumeUserIdentity(userRoleUser.username, false)
+        when:'the securityService.currentUserPermissionAsMap method is called'
+        	Map permissions = securityService.currentUserPermissionMap()
 		then:'a map should be returned containing multiple elements'
-			!permissions.isEmpty()
-		and:'the map should contain the Permission.UserGeneralAccess permission'
-			permissions.containsKey(Permission.UserGeneralAccess)
-		and:'the map should NOT contain the Permission.UserDelete permission'
-			!permissions.containsKey(Permission.UserDelete)
-	}
+        	!permissions.isEmpty()
+        and:'the map should contain the Permission.UserGeneralAccess permission'
+        	permissions.containsKey(Permission.UserGeneralAccess)
+        and:'the map should NOT contain the Permission.UserDelete permission'
+        	!permissions.containsKey(Permission.UserDelete)
+    }
 
-	def '18. Calling currentUserPermissionAsMap as an authenticated and privileged user' () {
+    def '18. Calling currentUserPermissionAsMap as an authenticated and privileged user' () {
 		given:'a user whom is authenticated has been assigned the ADMIN role'
-		createPrivAccount()
-		securityService.assumeUserIdentity(privUser.username, false)
-		when:'the securityService.currentUserPermissionAsMap method is called'
-			Map permissions = securityService.currentUserPermissionMap()
-		then:'a map should be returned containing multiple elements'
-			!permissions.isEmpty()
-		and:'the map should contain the Permission.UserGeneralAccess permission'
-			permissions.containsKey(Permission.UserGeneralAccess)
-		and:'the map should also contain the Permission.UserDelete permission'
-			permissions.containsKey(Permission.UserDelete)
-	}
+        	createPrivAccount()
+        	securityService.assumeUserIdentity(privUser.username, false)
+        when:'the securityService.currentUserPermissionAsMap method is called'
+        	Map permissions = securityService.currentUserPermissionMap()
+        then:'a map should be returned containing multiple elements'
+        	!permissions.isEmpty()
+        and:'the map should contain the Permission.UserGeneralAccess permission'
+        	permissions.containsKey(Permission.UserGeneralAccess)
+        and:'the map should also contain the Permission.UserDelete permission'
+        	permissions.containsKey(Permission.UserDelete)
+    }
 }

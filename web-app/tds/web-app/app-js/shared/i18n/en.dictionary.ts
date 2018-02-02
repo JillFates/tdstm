@@ -34,7 +34,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
-		'ETL_BUILDER_TITLE': 'ETL Designer',
+		'ETL_BUILDER_TITLE': 'DataScript Designer',
 		'CONSOLE_TITLE': 'ETL Console',
 		'ETL_BUILDER': {
 			'TEST': 'Test',
