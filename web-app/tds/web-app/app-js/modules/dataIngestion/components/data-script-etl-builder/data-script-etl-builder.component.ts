@@ -1,13 +1,14 @@
-import { Component, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import {Component, Output, EventEmitter, AfterViewInit, ViewChild} from '@angular/core';
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
 import {DataScriptModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {AlertType} from '../../../../shared/model/alert.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -15,6 +16,7 @@ import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxRes
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 
+	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	private collapsed = {
 		code: true,
 		sample: false
@@ -23,8 +25,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private filename: string;
 	private operationStatus = {
 		save: undefined,
-		test: undefined,
-		syntax: undefined,
+		test: new OperationStatusModel(),
+		syntax: new OperationStatusModel(),
 	};
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
@@ -57,11 +59,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * On Test Script button.
 	 */
 	private onTestScript(): void {
-		this.operationStatus.test = 'progress';
 		this.clearLogVariables('test');
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
 			this.scriptTestResult = result.data;
-			this.operationStatus.test = this.scriptTestResult.isValid ? 'success' : 'fail';
+			this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
 			for (let domain of this.scriptTestResult.domains) {
 				this.collapsed[domain] = false;
 			}
@@ -73,11 +74,19 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * On Check Script Syntax button.
 	 */
 	private onCheckScriptSyntax(): void {
-		this.operationStatus.syntax = 'progress';
 		this.clearLogVariables('syntax');
 		this.dataIngestionService.checkSyntax(this.script, this.filename).subscribe( result => {
 			this.scriptValidSyntaxResult = result.data;
-			this.operationStatus.syntax = this.scriptValidSyntaxResult.validSyntax ? 'success' : 'fail';
+			this.operationStatus.syntax.state = this.scriptValidSyntaxResult.validSyntax ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
+			// mark on code mirror error syntax if present.
+			const errorLines: Array<number> = this.scriptValidSyntaxResult.errors.map( error => {
+				return error.startLine - 1;
+			});
+			if (errorLines.length > 0) {
+				this.codeMirrorComponent.addSyntaxErrors(errorLines);
+			} else {
+				this.codeMirrorComponent.clearSyntaxErrors();
+			}
 		});
 	}
 
@@ -125,11 +134,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	private onScriptChange(event: { newValue: string, oldValue: string }) {
-		// this.scriptChanged = true;
-		// this.scriptTestResult = new ScriptTestResultModel();
-		// this.consoleSettings.scriptTestResult = new ScriptTestResultModel();
-		// this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
-		this.operationStatus.save = this.operationStatus.syntax = this.operationStatus.test = undefined;
+		this.operationStatus.save = undefined;
+		this.operationStatus.syntax.value = event.newValue;
+		this.operationStatus.test.value = event.newValue;
 	}
 
 	protected toggleSection(section: string) {
@@ -188,8 +195,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		if (operation === 'test') {
 			this.scriptTestResult = new ScriptTestResultModel();
 			this.consoleSettings.scriptTestResult = new ScriptTestResultModel();
+			// also clean syntax results
+			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 		if (operation === 'syntax') {
+			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
+			// also clean test results
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 	}
