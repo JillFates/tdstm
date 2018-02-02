@@ -30,7 +30,7 @@ export class PermissionService {
 		if (this.permissions) {
 			return this.permissions[value] as boolean;
 		} else {
-			console.log('ERROR: permissions isnt defined');
+			console.log('ERROR: permissions is not defined');
 			return false;
 		}
 	}
