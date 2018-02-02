@@ -158,6 +158,15 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">Comment</label>
                             </div>
+
+                            <div class="form-group" style="margin-top:20px">
+                                <label class="col-sm-4 control-label control-label-title" style="width: 100%">Date Created</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label control-label-title" style="width: 100%">Last Updated</label>
+                            </div>
+
                             <div class="form-group" ng-if="actionTypeEdit">
                                 <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                             </div>
@@ -199,6 +208,15 @@
                                 <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetA.dependency.comment}}</label>
                                 <textarea style="width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetA.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetA.dependency.comment"></textarea>
                             </div>
+
+                            <div class="form-group" style="margin-top:20px">
+                               <label class="col-sm-12 control-label">{{assetDependency.assetA.dateCreated}}</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-12 control-label">{{assetDependency.assetA.lastUpdated}}</label>
+                            </div>
+
                             <div class="form-group" ng-if="!actionTypeEdit && (assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id) && assetDependency.editPermission">
                                 <button type="button" style="margin-top: 25px;" ng-click="toDeleteDependency('assetA', false)" class="btn btn-default"><img src="../icons/database_delete.png" border="0px"> Delete</button>
                             </div>
@@ -241,6 +259,15 @@
                                 <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetB.dependency.comment}}</label>
                                 <textarea style="width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetB.dependency.comment"></textarea>
                             </div>
+
+                            <div class="form-group" style="margin-top:20px">
+                                <label class="col-sm-12 control-label">{{assetDependency.assetB.dateCreated}}</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-12 control-label">{{assetDependency.assetB.lastUpdated}}</label>
+                            </div>
+
                             <div class="form-group" ng-if="!actionTypeEdit && assetDependency.editPermission">
                                 <button type="button" style="margin-top: 25px;" ng-click="toDeleteDependency('assetB', false)" class="btn btn-default"><img src="../icons/database_delete.png" border="0px"> Delete</button>
                             </div>
