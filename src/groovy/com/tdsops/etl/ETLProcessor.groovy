@@ -452,7 +452,7 @@ class ETLProcessor implements RangeChecker {
 	 * Adds another find results in the current find element
 	 * @param domain
 	 */
-	def elseFind(String domain) {
+	ETLFindElement elseFind(String domain) {
 		ETLDomain findDomain = ETLDomain.lookup(domain)
 		if (findDomain == null) {
 			throw ETLProcessorException.invalidDomain(findDomain)
@@ -464,6 +464,32 @@ class ETLProcessor implements RangeChecker {
 
 		return currentFindElement.elseFind(findDomain)
 	}
+
+	/**
+	 * WhenFound ETL command. It defines what should based on find command results
+	 * <pre>
+	 *		whenFound asset create {
+	 *			assetClass: Application
+	 *			assetName: primaryName
+	 *			assetType: primaryType
+	 *			"SN Last Seen": NOW
+	 *		}
+	 * </pre>
+	 * @param dependentId
+	 * @return the current find Element
+	 */
+	def whenFound(final String dependentId) {
+		if(!currentFindElement || !currentFindElement.hasDependentId(dependentId)){
+			throw ETLProcessorException.notCurrentFindElement()
+		}
+
+		[
+			create: { closure ->
+				new FoundElement(currentFindElement).whenFoundUpdate(closure)
+			}
+		]
+	}
+
 
 	/**
 	 * Add a message in console for an element from dataSource by its index in the row

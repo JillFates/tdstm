@@ -20,7 +20,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException notCurrentFindElement() {
-        new ETLProcessorException('There is a find element previously executed')
+        new ETLProcessorException('You need to define a find element first')
     }
 
     static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain) {

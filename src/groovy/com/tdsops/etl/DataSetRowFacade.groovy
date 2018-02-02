@@ -17,9 +17,9 @@ class DataSetRowFacade {
 
 	Object getProperty(String name) {
 
-		if(!row.containsKey(name)) {
+		if(!row.containsKey(name.toLowerCase())) {
 			throw ETLProcessorException.unknownDataSetProperty(name)
 		}
-		return new SourceField(row[name])
+		return new SourceField(row[name.toLowerCase()])
 	}
 }

@@ -167,6 +167,17 @@ class ETLFindElement {
 	}
 
 	/**
+	 * Returns {@code true} if, and only if, {@link #currentFind} has a dependentId as {@code dependentId}.
+	 * @return {@code true} if {@link #currentFind} has dependentId as {@code dependentId}, otherwise
+	 * {@code false}
+	 */
+	boolean hasDependentId(String dependentId){
+		return this.currentFind.dependentId == dependentId
+
+	}
+
+
+	/**
 	 * Checks a fieldSpec based on asset field name
 	 * using the selected domain in the current script
 	 * @param fieldName an asset field name

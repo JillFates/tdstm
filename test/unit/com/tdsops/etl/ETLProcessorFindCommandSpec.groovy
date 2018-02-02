@@ -272,20 +272,20 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			TMDEMO.getId() >> 125612l
 
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -441,20 +441,20 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			TMDEMO.getId() >> 125612l
 
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -462,7 +462,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
 				mock.getEnvironment() >> it.environment
-				mock.getBundle() >> it.bundle
+				mock.getMoveBundle() >> it.moveBundle
 				mock.getProject() >> it.project
 				mock
 			}
@@ -537,9 +537,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetType set primaryType
     
 							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.'assetname', primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.'dependentname'
-    						elseFind Asset 'for' asset by assetName with SOURCE.'dependentname' warn 'found with wrong asset class'
+   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
+    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
 						}
 						""".stripIndent(),
@@ -569,7 +569,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					}
 				}
 
-				// Validates command: elseFind Application 'for' asset by assetName, assetType with SOURCE.'assetname', primaryType
+				// Validates command: elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
 				with(data[0].fields.asset.find) {
 					query.size() == 4
 					with(query[0]) {
@@ -633,20 +633,20 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			TMDEMO.getId() >> 125612l
 
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -1042,6 +1042,370 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					fields.id.warnMsg == 'found without asset id field'
 				}
 			}
+	}
+
+	void 'test can compile a domain creation command when not found a instance with find command'() {
+
+		given:
+			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> assetEntities = [
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.moveBundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						it.getId() == 152402l
+					}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			GroovySpy(AssetDependency, global: true)
+			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
+			}
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.parse("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+						
+							extract AssetDependencyId load id
+							find Dependency 'for' id by id with DOMAIN.id
+							
+							// Process the PRIMARY asset in the dependency
+    						extract AssetId load asset
+							
+							// Set some local variables to be reused
+							extract AssetName set primaryName
+							extract AssetType set primaryType
+    
+							find Application 'for' asset by id with DOMAIN.asset 
+   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
+    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+    						
+    						whenFound asset create {
+    							assetClass: Application
+    							assetName: primaryName
+    							assetType: primaryType
+    							SNLastSeen: NOW
+    						}
+    					}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+				fields == ['id', 'asset'] as Set
+				data.size() == 14
+				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+
+				data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+				]
+
+				// Validates command: find Application 'for' asset by id with DOMAIN.asset
+				(1..14).eachWithIndex { int value, int index ->
+					with(data[index].fields.id.find) {
+						query.size() == 1
+						with(query[0]) {
+							domain == ETLDomain.Dependency.name()
+							kv.id == value.toString()
+						}
+					}
+				}
+
+				// Validates command: elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+				with(data[0].fields.asset.find) {
+					query.size() == 4
+					with(query[0]) {
+						domain == ETLDomain.Application.name()
+						kv.id == '151954'
+					}
+
+					with(query[1]) {
+						domain == ETLDomain.Application.name()
+						kv.assetName == 'ACMEVMPROD01'
+						kv.assetType == 'VM'
+					}
+
+					with(query[2]) {
+						domain == ETLDomain.Application.name()
+						kv.assetName == 'VMWare Vcenter'
+					}
+
+					with(query[3]) {
+						domain == ETLDomain.Asset.name()
+						kv.assetName == 'VMWare Vcenter'
+					}
+				}
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can create a domain when not found a instance with find command'() {
+
+		given:
+			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> assetEntities = [
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.moveBundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					new DebugConsole(buffer: new StringBuffer()),
+					validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+							
+							extract AssetDependencyId load id
+    						extract AssetId load asset
+							extract AssetName set primaryName
+							extract AssetType set primaryType
+    
+							find Application 'for' asset by id with DOMAIN.asset 
+   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
+    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+    						
+    						whenFound asset create {
+    							assetClass Application
+    							assetName primaryName
+    							assetType primaryType
+    						}
+						}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+				fields == ['id', 'asset'] as Set
+				data.size() == 14
+				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+
+				data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+				]
+
+				// Validates command: find Application 'for' asset by id with DOMAIN.asset
+				(1..14).eachWithIndex { int value, int index ->
+					with(data[index].fields.id.find) {
+						query.size() == 1
+						with(query[0]) {
+							domain == ETLDomain.Dependency.name()
+							kv.id == value.toString()
+						}
+					}
+				}
+
+				// Validates command: elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+				with(data[0].fields.asset.find) {
+					query.size() == 4
+					with(query[0]) {
+						domain == ETLDomain.Application.name()
+						kv.id == '151954'
+					}
+
+					with(query[1]) {
+						domain == ETLDomain.Application.name()
+						kv.assetName == 'ACMEVMPROD01'
+						kv.assetType == 'VM'
+					}
+
+					with(query[2]) {
+						domain == ETLDomain.Application.name()
+						kv.assetName == 'VMWare Vcenter'
+					}
+
+					with(query[3]) {
+						domain == ETLDomain.Asset.name()
+						kv.assetName == 'VMWare Vcenter'
+					}
+				}
+			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
 	}
 
 	/**
