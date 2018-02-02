@@ -1,8 +1,11 @@
 package net.transitionmanager.integration
 
 import com.tdssrc.grails.GormUtil
+import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
+import net.transitionmanager.task.TaskFacade
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.context.annotation.Scope
 import org.springframework.context.i18n.LocaleContextHolder
@@ -29,9 +32,18 @@ class ApiActionScriptBindingBuilder {
 
 	ActionRequest request
 	ApiActionResponse response
-	ReactionAssetFacade asset
-	ReactionTaskFacade task
+	AssetFacade asset
+	TaskFacade task
 	ApiActionJob job
+
+	@Autowired
+	ApiActionScriptBindingBuilder(ActionRequest request, ApiActionResponse response, AssetFacade asset, TaskFacade task, ApiActionJob job) {
+		this.request = request
+		this.response = response
+		this.asset = asset
+		this.task = task
+		this.job = job
+	}
 
 	ApiActionScriptBindingBuilder with(ActionRequest request) {
 		this.request = request
@@ -43,12 +55,12 @@ class ApiActionScriptBindingBuilder {
 		this
 	}
 
-	ApiActionScriptBindingBuilder with(ReactionAssetFacade asset) {
+	ApiActionScriptBindingBuilder with(AssetFacade asset) {
 		this.asset = asset
 		this
 	}
 
-	ApiActionScriptBindingBuilder with(ReactionTaskFacade task) {
+	ApiActionScriptBindingBuilder with(TaskFacade task) {
 		this.task = task
 		this
 	}
@@ -57,6 +69,7 @@ class ApiActionScriptBindingBuilder {
 		this.job = job
 		this
 	}
+
 	/**
 	 * Check if all the params where defined to build an instance of ApiActionScriptBinding
 	 * to be used for ReactionScriptCode code Script
@@ -88,7 +101,8 @@ class ApiActionScriptBindingBuilder {
 
 		switch (code) {
 			case ReactionScriptCode.PRE:
-				checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
+				//checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
+				checkParams(ReactionScriptCode.PRE, ['request', 'task'])
 				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request: request,

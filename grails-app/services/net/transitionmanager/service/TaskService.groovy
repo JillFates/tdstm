@@ -1,14 +1,6 @@
 package net.transitionmanager.service
 
-import com.tds.asset.Application
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetType
-import com.tds.asset.CommentNote
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tds.asset.TaskDependency
+import com.tds.asset.*
 import com.tdsops.common.exceptions.RecipeException
 import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
@@ -20,13 +12,6 @@ import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.*
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.ContextType
-import com.tdsops.tm.enums.domain.RoleTypeGroup
-import com.tdsops.tm.enums.domain.TimeConstraintType
-import com.tdsops.tm.enums.domain.TimeScale
-import net.transitionmanager.service.InvalidConfigurationException
-import net.transitionmanager.service.InvalidRequestException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
@@ -36,21 +21,8 @@ import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.*
 import net.transitionmanager.security.Permission
-import org.apache.commons.lang.StringEscapeUtils
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveBundleStep
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventStaff
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Recipe
-import net.transitionmanager.domain.RecipeVersion
-import net.transitionmanager.domain.TaskBatch
-import net.transitionmanager.domain.WorkflowTransition
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
@@ -427,8 +399,6 @@ class TaskService implements ServiceMethods {
 				} else {
 					try {
 						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
-						// Kick of the async method and mark the task STARTED
-						apiActionService.invoke(task.apiAction, task)
 
 						// Update the task so that the we track that the action was invoked
 						task.apiActionInvokedAt = new Date()
@@ -443,6 +413,10 @@ class TaskService implements ServiceMethods {
 						// Make sure that the status is STARTED instead
 						status = AssetCommentStatus.STARTED
 						task.status = status
+						task.save(flush: true)
+
+						// Kick of the async method and mark the task STARTED
+						apiActionService.invoke(task.apiAction, task)
 
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
@@ -457,7 +431,7 @@ class TaskService implements ServiceMethods {
 				if (errMsg) {
 					log.warn "invokeAction() error $errMsg"
 					AssetComment.withNewTransaction {
-						AssetComment taskObj = AssetComment.get(task.id) 
+						AssetComment taskObj = AssetComment.get(task.id)
 						addNote(taskObj, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
 						status = ACS.HOLD
 						taskObj.status = status
@@ -638,6 +612,7 @@ class TaskService implements ServiceMethods {
 				break
 		}
 
+		task.save(flush: true)
 		return task
 	}
 
@@ -930,7 +905,7 @@ class TaskService implements ServiceMethods {
 				log.debug "addTaskCommentByMessage() called as callback so going to close out the task"
 				// Close out the task
 				task.apiActionCompletedAt = new Date()
-				setTaskStatus(task, ACS.DONE, whom)
+				setTaskStatus(task, ACS.COMPLETED, whom)
 			}
 
 			log.debug "addTaskCommentByMessage() dirtyProps=${task.dirtyPropertyNames}, status=${task.status}, apiActionCompletedAt=${task.apiActionCompletedAt}"

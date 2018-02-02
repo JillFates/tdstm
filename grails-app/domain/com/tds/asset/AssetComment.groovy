@@ -296,10 +296,7 @@ class AssetComment {
 	 * @return true if action can be invoked
 	 */
 	boolean isActionInvocable() {
-		apiAction &&
-		! apiActionInvokedAt &&
-		! apiActionCompletedAt &&
-		status in [READY, STARTED]
+		apiAction && !apiActionCompletedAt && status in [READY, STARTED]
 	}
 
 	/*
