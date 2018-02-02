@@ -75,8 +75,6 @@ describe('SelectListConfigurationPopupComponent:', () => {
 
 	it('should add new item to list', () => {
 		fixture.detectChanges();
-		comp.onToggle();
-		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
 		comp.newItem = 'Foo';
@@ -87,8 +85,6 @@ describe('SelectListConfigurationPopupComponent:', () => {
 	});
 
 	it('should add & remove existing item from list', () => {
-		fixture.detectChanges();
-		comp.onToggle();
 		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
@@ -105,8 +101,6 @@ describe('SelectListConfigurationPopupComponent:', () => {
 
 	it('should save list', () => {
 		fixture.detectChanges();
-		comp.onToggle();
-		fixture.detectChanges();
 		let addButton: DebugElement;
 		addButton = fixture.debugElement.query(By.css('button[name=addButton]'));
 		comp.newItem = 'Foo';
@@ -122,7 +116,6 @@ describe('SelectListConfigurationPopupComponent:', () => {
 	});
 
 	it('should order the items', () => {
-		comp.onToggle();
 		fixture.detectChanges();
 		comp.items = [
 			{deletable: true, value: 'Z'},

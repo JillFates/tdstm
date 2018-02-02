@@ -132,8 +132,9 @@
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <span *ngIf="!toBeDeleted(dataItem)">
-                    <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
-                    <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
+                    <div (click)="openFieldSettingsPopup(dataItem)" class="open-close-dropdown-container text-center">
+                        <i class="open-close-dropdown-icon fa fa-gear"></i>
+                    </div>
                 </span>
             </div>
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>
