@@ -198,6 +198,7 @@ trait ControllerMethods {
 	 * Ajax calls by forwarding to certain pages or returning the standard error response JSON structure
 	 * with the appropriate message(s).
 	 */
+	// TODO : JPM : 2/2018 : TM-9204 Replace messages with i18N
 	def accessDeniedExceptionHandler(AccessDeniedException e) {
 		String msg = 'You do not have permission to perform this action'
 		handleException(e, 'forbidden', msg)
