@@ -4,8 +4,10 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.service.*
+import net.transitionmanager.service.InvalidConfigurationException
 import com.tdsops.common.exceptions.InvalidLicenseException
-import java.lang.RuntimeException
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.acls.model.NotFoundException
 
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
@@ -72,11 +74,15 @@ class ErrorHandlerController implements ControllerMethods {
 			case 'UnauthorizedException':
 				ex = new UnauthorizedException(message)
 				break
-			case 'RuntimeException':
-				ex = new RuntimeException(message)
-				break
 			default:
-			 	ex = new RuntimeException("Exception $exceptionName is not implemented in testError method")
+				try {
+					// Note that for some reason the TDS exception classes can not be constructed this way as the 
+					// classes are not found. Not sure why unless they need to be Java classes? 
+					Class ec = (exceptionName as Class)
+					ex =  ec.newInstance(message)
+				} catch (e) {
+			 		ex = new RuntimeException("Exception $exceptionName is not implemented in testError method : ${e.message}")
+				}
 				break
 		}
 		throw ex

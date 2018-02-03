@@ -41,10 +41,6 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskPublish)
 	def unpublish() {
 		renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
-<<<<<<< HEAD
-=======
-
->>>>>>> 80dd16ebc204ba55883d8bbbede65cb20d7e639f
 	}
 
 	/**
@@ -62,14 +58,8 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
 		def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
-<<<<<<< HEAD
 			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
 		renderSuccessJson(jobId: result.jobId)
-=======
-				params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
-		renderSuccessJson(jobId: result.jobId)
-
->>>>>>> 80dd16ebc204ba55883d8bbbede65cb20d7e639f
 	}
 
 	/**
@@ -161,8 +151,4 @@ class WsTaskController implements ControllerMethods {
 			renderErrorJson([errorMsg])
 		}
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 80dd16ebc204ba55883d8bbbede65cb20d7e639f
