@@ -1,5 +1,4 @@
 databaseChangeLog = {
-	/*
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
 	include file: '20140131-add-missing-version.groovy'
@@ -208,10 +207,10 @@ databaseChangeLog = {
 	include file: '20171110-create-new-permission-asset-explorer-system-list.groovy'
 	include file: '20171205-add-action-reset-permission.groovy'
 	include file: '20171221-change-asset-dependency-comment-type.groovy'
-    include file: '20171221-add-credential-and-agentclass-to-apiaction.groovy'
+	include file: '20171221-add-credential-and-agentclass-to-apiaction.groovy'
 	include file: '20171227-rename-all-assets-view.groovy'
-    include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
+	include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
 	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
 	include file: '20180123-api-action-make-description-nullable.groovy'
-	*/
+	include file: '20180201-set-asset_entity-project_id-mandatory.groovy'
 }

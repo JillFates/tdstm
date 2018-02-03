@@ -3,6 +3,7 @@
 *.iml
 *.ipr
 *.iws
+*.log
 target/
 plugins/
 run.sh
@@ -17,3 +18,4 @@ web-app/tds/web-app/dist/app.js
 web-app/tds/web-app/dist/app.js.map
 web-app/tds/web-app/dist/vendor.js
 web-app/tds/web-app/css/style.css
+test/e2e/build

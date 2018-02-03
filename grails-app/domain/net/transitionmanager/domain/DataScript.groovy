@@ -1,7 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.TimeUtil
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 enum IngestionOperation {
     ADD('Add'),
@@ -72,7 +71,7 @@ class DataScript {
     static belongsTo = [ project: Project, provider: Provider ]
 
     static constraints = {
-        name size: 1..255, unique: 'provider'
+        name blank: false, size: 1..255, unique: 'provider'
         description size: 0..255, nullable: true
         target size: 0..255, nullable: true
         lastModifiedBy nullable: true

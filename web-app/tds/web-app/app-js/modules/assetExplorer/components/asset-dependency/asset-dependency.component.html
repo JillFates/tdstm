@@ -90,6 +90,15 @@
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label control-label-title">Comment</label>
                                 </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title" style="width: 100%">Date Created</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label control-label-title" style="width: 100%">Last Updated</label>
+                                </div>
+
                                 <div class="form-group" *ngIf="actionTypeEdit">
                                     <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                                 </div>
@@ -122,6 +131,12 @@
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dependency?.comment}}</label>
                                 </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.dateCreated}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetA?.lastUpdated}}</label>
+                                </div>
                             </td>
                             <td *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id" style="width: 200px; vertical-align: baseline;">
                                 <div class="form-group">
@@ -151,6 +166,13 @@
 
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dependency?.comment}}</label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.dateCreated}}</label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label">{{assetDependency?.assetB?.lastUpdated}}</label>
                                 </div>
                             </td>
                         </tr>

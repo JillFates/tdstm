@@ -157,7 +157,7 @@ export class ProviderListComponent {
 		this.dataIngestionService.getProviders().subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.gridData.data = filterBy(this.resultSet, this.filter);
+				this.loadPageData();
 			},
 			(err) => console.log(err));
 	}

@@ -70,7 +70,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	private onPageLoad(): void {
 		this.csv.selected = this.csv.options[0];
-		this.OPTIONS.selected = this.OPTIONS.CSV;
+		this.OPTIONS.selected = this.OPTIONS.FILE;
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
 			if (result.actions && result.actions.length > 0) {
 				this.webService.options = result.actions;

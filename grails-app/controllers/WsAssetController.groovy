@@ -2,13 +2,12 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.grails.TimeUtil
+import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
@@ -18,7 +17,7 @@ import net.transitionmanager.service.StorageService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import grails.gsp.PageRenderer
 
-import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
+import java.text.DateFormat
 
 /**
  * Created by @oluna on 4/5/17.
@@ -27,12 +26,16 @@ import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 @Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
-	AssetEntityService assetEntityService
-	PageRenderer groovyPageRenderer
-	ControllerService controllerService
+
 	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	ControllerService controllerService
+	DatabaseService databaseService
 	DeviceService deviceService
+	PageRenderer groovyPageRenderer
+	SecurityService securityService
 	StorageService storageService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Check for uniqueness of the asset name, it can be checked against the AssetClass of another asset
@@ -177,32 +180,37 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		def Project currentProject = securityService.getUserCurrentProject()
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
 		def dependencyMap = [
-			"assetA" : [
-					"name": assetA.assetName,
-					"assetClass": assetAClassLabel.value,
-					"environment": assetA.environment,
-					"bundle": assetA.moveBundleName,
-					"planStatus": assetA.planStatus,
-					"dependency": dependencyA,
-					"dependencyClass": dependencyA?.dependent?.assetClass
+			"assetA"          : [
+					"name"           : assetA.assetName,
+					"assetClass"     : assetAClassLabel.value,
+					"environment"    : assetA.environment,
+					"bundle"         : assetA.moveBundleName,
+					"planStatus"     : assetA.planStatus,
+					"dependency"     : dependencyA,
+					"dependencyClass": dependencyA?.dependent?.assetClass,
+					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
+					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
 			],
-			"assetB" : [
-					"name": assetB.assetName,
-					"assetClass": assetBClassLabel.value,
-					"environment": assetB.environment,
-					"bundle": assetB.moveBundleName,
-					"planStatus": assetB.planStatus,
-					"dependency": dependencyB,
-					"dependencyClass": dependencyB?.dependent?.assetClass
+			"assetB"          : [
+					"name"           : assetB.assetName,
+					"assetClass"     : assetBClassLabel.value,
+					"environment"    : assetB.environment,
+					"bundle"         : assetB.moveBundleName,
+					"planStatus"     : assetB.planStatus,
+					"dependency"     : dependencyB,
+					"dependencyClass": dependencyB?.dependent?.assetClass,
+					dateCreated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
+					lastUpdated      : TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
 			],
-			"dataFlowFreq": AssetDependency.constraints.dataFlowFreq.inList,
-			"dependencyType": assetEntityService.entityInfo(currentProject).dependencyType,
+			"dataFlowFreq"    : AssetDependency.constraints.dataFlowFreq.inList,
+			"dependencyType"  : assetEntityService.entityInfo(currentProject).dependencyType,
 			"dependencyStatus": assetEntityService.entityInfo(currentProject).dependencyStatus,
-			"editPermission": securityService.hasPermission(Permission.AssetEdit)
+			"editPermission"  : securityService.hasPermission(Permission.AssetEdit)
 		]
-
 		renderSuccessJson(dependencyMap)
 	}
 
@@ -260,6 +268,9 @@ class WsAssetController implements ControllerMethods {
 				break
 			case "STORAGE":
 				model << storageService.getModelForShow(asset.project, asset, params)
+				break
+			case "DATABASE":
+				model << databaseService.getModelForShow(asset.project, asset, params)
 				break
 			default:
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)

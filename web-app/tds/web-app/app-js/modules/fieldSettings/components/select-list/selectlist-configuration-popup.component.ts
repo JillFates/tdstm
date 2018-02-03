@@ -1,10 +1,11 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
+import {Component, Inject, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import { SortableComponent } from '@progress/kendo-angular-sortable';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 declare var jQuery: any;
 /**
@@ -20,20 +21,7 @@ declare var jQuery: any;
 	]
 })
 
-/**
- *
- */
-export class SelectListConfigurationPopupComponent {
-
-	/**
-	 * Asset type: DB, Application, etc..
-	 */
-	@Input() domain: string;
-	/**
-	 * Custom Field to edit.
-	 */
-	@Input() field: FieldSettingsModel;
-	@ViewChild('kendoSortableInstance') kendoSortableInstance: SortableComponent;
+export class SelectListConfigurationPopupComponent implements OnInit {
 
 	public items: any[] = [];
 	public newItem = '';
@@ -47,7 +35,16 @@ export class SelectListConfigurationPopupComponent {
 	 * Class constructor.
 	 * @param customService Service to obtain distinct values.
 	 */
-	constructor(private customService: CustomDomainService) { }
+	constructor(
+		public field: FieldSettingsModel,
+		@Inject('domain') public domain: string,
+		private customService: CustomDomainService,
+		private activeDialog: UIActiveDialogService) {
+	}
+
+	ngOnInit() {
+		this.load();
+	}
 
 	/**
 	 * Intializes current component based on the @field input parameter.
@@ -145,7 +142,7 @@ export class SelectListConfigurationPopupComponent {
 					if (this.defaultValue != null) {
 						this.field.default = this.defaultValue;
 					}
-					this.onToggle();
+					this.activeDialog.dismiss();
 				}
 			});
 
@@ -164,6 +161,9 @@ export class SelectListConfigurationPopupComponent {
 		this.sortItems();
 	}
 
+	/**
+	 * Sort items by type.
+	 */
 	private sortItems(): void {
 		this.items.sort(this.sortType === this.ASCENDING_ORDER ? ascendingSort : descendingSort);
 
@@ -189,15 +189,10 @@ export class SelectListConfigurationPopupComponent {
 	}
 
 	/**
-	 * Function to handle onclick open/close gear icon button event.
-	 * If it's open event, it preloads and initializes local variables.
+	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public onToggle(): void {
-		this.show = !this.show;
-		if (this.show) {
-			this.load();
-		} else {
-			this.items = [];
-		}
+	protected cancelCloseDialog(): void {
+		this.items = [];
+		this.activeDialog.dismiss();
 	}
 }
