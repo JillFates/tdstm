@@ -4,6 +4,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.service.*
+import com.tdsops.common.exceptions.InvalidLicenseException
+import java.lang.RuntimeException
 
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
@@ -15,8 +17,6 @@ import net.transitionmanager.service.*
 class ErrorHandlerController implements ControllerMethods {
 
 	CoreService coreService
-	ErrorHandlerService errorHandlerService
-	SecurityService securityService
 	LicenseAdminService licenseAdminService
 
 	static final String SESSION_ATTR_ERROR = 'ErrorHandlerController.error'
@@ -31,8 +31,55 @@ class ErrorHandlerController implements ControllerMethods {
 		forward action:'unauthorized'
 	}
 
-	def testError() {
-		5/0
+	def testError(String exceptionName, String message) {
+		if (! exceptionName) {
+			exceptionName = 'RuntimeException'
+		}
+		if (! message) {
+			message = 'no message provided'
+		}
+
+		Exception ex
+
+		switch (exceptionName) {
+			case 'DomainUpdateException':
+				ex = new DomainUpdateException(message)
+				break
+			case 'EmptyResultException':
+				ex = new EmptyResultException(message)
+				break
+			case 'InvalidConfigurationException':
+				ex = new InvalidConfigurationException(message)
+				break
+			case 'InvalidConfigurationException':
+				ex = new InvalidConfigurationException(message)
+				break
+			case 'InvalidLicenseException':
+				ex = new InvalidLicenseException(message)
+				break
+			case 'InvalidParamExceptioneException':
+				ex = new InvalidParamException(message)
+				break
+			case 'InvalidRequestException':
+				ex = new InvalidRequestException(message)
+				break
+			case 'InvalidSyntaxException':
+				ex = new InvalidSyntaxException(message)
+				break
+			case 'LogicException':
+				ex = new LogicException(message)
+				break
+			case 'UnauthorizedException':
+				ex = new UnauthorizedException(message)
+				break
+			case 'RuntimeException':
+				ex = new RuntimeException(message)
+				break
+			default:
+			 	ex = new RuntimeException("Exception $exceptionName is not implemented in testError method")
+				break
+		}
+		throw ex
 	}
 
 	// ------------
@@ -88,7 +135,7 @@ class ErrorHandlerController implements ControllerMethods {
 		if (WebUtil.isAjax(request)){
 			response.status = 403
 			String message = response.getHeader("errorMessage")
-			ServiceResults.respondWithError(response,message)
+			ServiceResults.respondWithError(response, message)
 		} else {
 			response.status = 200
 			Map model = fetchModel()
@@ -145,10 +192,6 @@ class ErrorHandlerController implements ControllerMethods {
 
 		// Handle Ajax error messages
 		if (WebUtil.isAjax(request)) {
-			response.status = 200
-			if (model.exception) {
-				handleException(model.exception, log)
-			}
 			renderErrorJson('An unresolved error occurred')
 			return
 		}

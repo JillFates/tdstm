@@ -23,7 +23,6 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringEscapeUtils
@@ -47,7 +46,6 @@ class ApplicationController implements ControllerMethods {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AssetService assetService

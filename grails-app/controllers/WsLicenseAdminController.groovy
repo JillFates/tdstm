@@ -11,7 +11,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.LicenseAdminService
 
@@ -26,7 +25,6 @@ class WsLicenseAdminController implements ControllerMethods {
 	LicenseCommonService licenseCommonService
 	LicenseAdminService licenseAdminService
 	ProjectService projectService
-	SecurityService securityService
 
 	def managerActive(){
 		renderSuccessJson(licenseCommonService.isManagerEnabled())
@@ -85,13 +83,13 @@ class WsLicenseAdminController implements ControllerMethods {
 	def getLicense(){
 		Long id = params.id
 		License lic
-		if(id) {
+		if (id) {
 			lic = License.get(id)
 		}
 
-		if(lic) {
+		if (lic) {
 			renderSuccessJson(lic.toJsonMap())
-		}else{
+		} else {
 			//TODO: OLB 20170124 Change this to the AJax Approach
 			response.status = 404 //Not Found
 			render "${id} not found."
@@ -110,9 +108,9 @@ class WsLicenseAdminController implements ControllerMethods {
 
 		String hash = licenseAdminService.getLicenseRequestBody(id)
 
-		if(hash) {
+		if (hash) {
 			renderSuccessJson(hash)
-		}else{
+		} else {
 			response.status = 404 //Not Found
 			render "${id} not found."
 		}
@@ -125,9 +123,9 @@ class WsLicenseAdminController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.LicenseDelete)
     def deleteLicense(String id){
-        if(licenseAdminService.deleteLicense(id)) {
+        if (licenseAdminService.deleteLicense(id)) {
             renderSuccessJson("Successful Deleted")
-        }else{
+        } else {
             sendNotFound()
         }
     }
@@ -138,29 +136,17 @@ class WsLicenseAdminController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.LicenseAdministration)
     def generateRequest() {
+		def json = request.JSON
 
-        try {
+		String licenseUid = json.id
+		def owner = securityService.loadCurrentPerson().company
+		def email = json.email
+		String environment = json.environment
+		def projectId = json.projectId  // Can be a numeric id or "all", for all projects
+		String requestNote = json.requestNote
 
-            def json = request.JSON
-
-            String licenseUid = json.id
-            def owner = securityService.loadCurrentPerson().company
-            def email = json.email
-            String environment = json.environment
-            def projectId = json.projectId  // Can be a numeric id or "all", for all projects
-            String requestNote = json.requestNote
-
-            License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environment, projectId, requestNote)
-
-            if (lic) {
-                renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
-            }
-
-        } catch (e) {
-            log.error("Error", e)
-            handleException e, log
-        }
-
+		License lic = licenseAdminService.generateRequest(licenseUid, owner, email, environment, projectId, requestNote)
+		renderSuccessJson(id:lic.id, body:lic.toEncodedMessage())
     }
 
 	/**
@@ -169,25 +155,20 @@ class WsLicenseAdminController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.LicenseAdministration)
 	def loadLicense(){ // Apply license
-		try{
-			def json = request.JSON
-			License lic = License.get(params.id)
+		def json = request.JSON
+		License lic = License.get(params.id)
 
-			if(lic){
-				lic.hash = json.hash
+		if (lic) {
+			lic.hash = json.hash
 
-				if (licenseAdminService.load(lic)) {
-					renderSuccessJson("Ok")
-				} else {
-					throw new Exception("Error while loading the license")
-				}
-			}else{
-				response.status = 404 //Not Found
-				render "${params.id} not found."
+			if (licenseAdminService.load(lic)) {
+				renderSuccessJson("Ok")
+			} else {
+				throw new Exception("Error while loading the license")
 			}
-		} catch (e) {
-			log.error(e.message)
-			renderErrorJson(e.message)
+		} else {
+			response.status = 404 //Not Found
+			render "${params.id} not found."
 		}
 	}
 
@@ -213,46 +194,11 @@ class WsLicenseAdminController implements ControllerMethods {
 	@HasPermission(Permission.LicenseAdministration)
 	def emailRequestData(String id){
 		LicenseAdminService.EmailHolder emailData = licenseAdminService.emailRequestData(id)
-		if(emailData){
+		if (emailData) {
 			renderSuccessJson(emailData)
-		}else{
+		} else {
 			renderFailureJson("Could not get Email Data")
 		}
 	}
 
-
-	/*** HELPER *************************/
-	/* I believe that this should be on the trait  ¬¬ */
-	private void preHandleException(Exception e, boolean includeException = false) { // TODO move to super class
-		if (e instanceof UnauthorizedException) {
-			if (includeException) {
-				ServiceResults.forbidden(response, e)
-			}
-			else {
-				ServiceResults.forbidden(response)
-			}
-		}
-		else if (e instanceof IllegalArgumentException) {
-			if (includeException) {
-				ServiceResults.internalError(response, logger, e)
-			}
-			else {
-				ServiceResults.forbidden(response)
-			}
-		}
-		else if (e instanceof EmptyResultException) {
-			if (includeException) {
-				ServiceResults.internalError(response, logger, e)
-			}
-			else {
-				ServiceResults.methodFailure(response)
-			}
-		}
-		else if (e instanceof ValidationException) {
-			render(ServiceResults.errorsInValidation(e.errors) as JSON)
-		}
-		else {
-			ServiceResults.internalError(response, logger, e)
-		}
-	}
 }

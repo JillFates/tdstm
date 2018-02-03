@@ -1,4 +1,5 @@
 databaseChangeLog = {
+	/*
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
 	include file: '20140131-add-missing-version.groovy'
@@ -212,4 +213,5 @@ databaseChangeLog = {
     include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
 	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
 	include file: '20180123-api-action-make-description-nullable.groovy'
+	*/
 }

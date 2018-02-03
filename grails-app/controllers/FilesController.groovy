@@ -20,7 +20,6 @@ import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
@@ -39,7 +38,6 @@ class FilesController implements ControllerMethods {
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	ProjectService projectService
-	SecurityService securityService
 	StorageService storageService
 	TaskService taskService
 	UserPreferenceService userPreferenceService

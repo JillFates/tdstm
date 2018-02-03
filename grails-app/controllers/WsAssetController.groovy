@@ -14,7 +14,6 @@ import net.transitionmanager.service.ApplicationService
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import grails.gsp.PageRenderer
@@ -28,7 +27,6 @@ import static com.tdsops.tm.enums.domain.AssetClass.APPLICATION
 @Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
-	SecurityService securityService
 	AssetEntityService assetEntityService
 	PageRenderer groovyPageRenderer
 	ControllerService controllerService
