@@ -196,26 +196,27 @@ class ErrorHandlerController implements ControllerMethods {
 			return
 		}
 
-		if (model.exception) {
-			switch (model.exception) {
-				case UnauthorizedException:
-					forward action:'forbidden'
-					return
-					break
-
-				case IllegalArgumentException:
-					// This case handles invalid controller names which is the equivalant of a 404 Not Found
-					if (model.exceptionMsg =~ /^Secure object invocation FilterInvocation.*/) {
-						forward action:'notFound'
-						return
-					}
-					// Drop into the default if it wasn't as suspected
-
-				default:
-					log.warn ExceptionUtil.stackTraceToString('Unhandled Exception', model.exception)
-					// drop down into the standard error handler
-			}
-		}
+		// JM : 2/2018 : Change made for TM-8782 - don't believe this is needed any longer. Delete in a few months.
+		// if (model.exception) {
+		// 	switch (model.exception) {
+		// 		case UnauthorizedException:
+		// 			forward action:'forbidden'
+		// 			return
+		// 			break
+		//
+		// 		case IllegalArgumentException:
+		// 			// This case handles invalid controller names which is the equivalant of a 404 Not Found
+		// 			if (model.exceptionMsg =~ /^Secure object invocation FilterInvocation.*/) {
+		// 				forward action:'notFound'
+		// 				return
+		// 			}
+		// 			// Drop into the default if it wasn't as suspected
+		//
+		// 		default:
+		// 			log.warn ExceptionUtil.stackTraceToString('Unhandled Exception', model.exception)
+		// 			// drop down into the standard error handler
+		// 	}
+		// }
 
 		// Set the status back to 200 so that it doesn't appear as a real error (TBD if this is the proper thing to do)
 		response.status = 200
