@@ -14,6 +14,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.LicenseAdminService
+import com.tdsops.tm.enums.domain.ProjectStatus
 
 import net.transitionmanager.controller.ServiceResults
 
@@ -40,7 +41,7 @@ class WsLicenseAdminController implements ControllerMethods {
 	def fetchProjects(){
 		def searchParams = [:]
 		searchParams.sortOn = 'name'
-		List<Project> projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), null, searchParams)
+		List<Project> projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE, searchParams)
 
 		List<Map> initialData = [[id:"all", name:"-- Multiple Projects --", client:[id:'', name:'']]]
 
