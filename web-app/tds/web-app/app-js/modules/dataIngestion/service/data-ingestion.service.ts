@@ -1,16 +1,17 @@
+import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
-import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
-import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
+import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
+import {AgentModel, AgentMethodModel} from '../model/agent.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
+import {HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -24,15 +25,79 @@ export class DataIngestionService {
 	mockData: CredentialModel[] = [
 		{
 			id: 1,
-			name: 'Credential 1'
+			name: 'ServiceNow',
+			description: 'ServiceNOW CMDB datasource',
+			provider: {
+				id: 1,
+				name: 'ServiceNow'
+			},
+			credentialType: {
+				id: 1,
+				name: 'Production'
+			},
+			status: 'Active',
+			authMethod: {
+				id: 1,
+				name: 'HTTP_BASIC'
+			},
+			dateCreated: new Date()
 		},
 		{
 			id: 2,
-			name: 'Credential 2'
+			name: 'AWS SNS',
+			description: 'Aut Method USESAST1 SNS Service',
+			provider: {
+				id: 1,
+				name: 'ServiceNow'
+			},
+			credentialType: {
+				id: 1,
+				name: 'Production'
+			},
+			status: 'Active',
+			authMethod: {
+				id: 1,
+				name: 'HTTP_BASIC'
+			},
+			dateCreated: new Date()
 		},
 		{
 			id: 3,
-			name: 'Credential 3'
+			name: 'BMC Atrium',
+			description: 'Legacy CMDB datasource',
+			provider: {
+				id: 1,
+				name: 'ServiceNow'
+			},
+			credentialType: {
+				id: 1,
+				name: 'Production'
+			},
+			status: 'Inactive',
+			authMethod: {
+				id: 1,
+				name: 'HTTP_BASIC'
+			},
+			dateCreated: new Date()
+		},
+		{
+			id: 4,
+			name: 'CloudScape',
+			description: 'Auto Discovery datasource',
+			provider: {
+				id: 1,
+				name: 'ServiceNow'
+			},
+			credentialType: {
+				id: 1,
+				name: 'Production'
+			},
+			status: 'Active',
+			authMethod: {
+				id: 1,
+				name: 'HTTP_BASIC'
+			},
+			dateCreated: new Date()
 		}
 	];
 
@@ -124,7 +189,7 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	getCredentials(): Observable<AgentModel[]> {
+	getCredentials(): Observable<CredentialModel[]> {
 		return Observable.from(this.mockData).bufferCount(this.mockData.length);
 	}
 
@@ -251,6 +316,31 @@ export class DataIngestionService {
 		}
 	}
 
+	saveCredential(model: CredentialModel): Observable<CredentialModel> {
+		let postRequest = {
+			name: model.name,
+			description: model.description,
+			provider: model.provider.id
+		};
+
+		if (!model.id) {
+			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					let dataItem = (result && result.status === 'success' && result.data);
+					return dataItem;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
+	}
+
 	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
 		let postRequest = {
 			providerId: model.provider.id
@@ -322,6 +412,15 @@ export class DataIngestionService {
 	}
 
 	deleteAPIAction(id: number): Observable<string> {
+		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteCredential(id: number): Observable<string> {
 		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
