@@ -118,7 +118,6 @@ class DataScript {
 
 
     static final List<Map> domainReferences = [
-            [domain: ImportBatch, delete: "null", property: "dataScript", domainLabel: "Import Batch"],
             [domain: ApiAction, delete: "null", property: "defaultDataScript", domainLabel: "API Action"]
 
     ]

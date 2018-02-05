@@ -143,16 +143,36 @@ export class DataScriptListComponent {
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(dataItem: any): void {
-		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
-						(result) => {
-							this.reloadDataScripts();
-						},
-						(err) => console.log(err));
+		this.dataIngestionService.validateDeleteScript(dataItem.id).subscribe(
+			(result) => {
+				if (result && result['canDelete']) {
+					this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
+						.then((res) => {
+							if (res) {
+								this.deleteDataScript(dataItem);
+							}
+						});
+				} else {
+					this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?', 'Yes', 'No')
+						.then((res) => {
+							if (res) {
+								this.deleteDataScript(dataItem);
+							}
+						});
 				}
-			});
+			},
+			(err) => console.log(err));
+	}
+
+	/**
+	 * Execute the Service to delete the DataScript
+	 */
+	private deleteDataScript(dataItem: any): void {
+		this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+			(result) => {
+				this.reloadDataScripts();
+			},
+			(err) => console.log(err));
 	}
 
 	/**

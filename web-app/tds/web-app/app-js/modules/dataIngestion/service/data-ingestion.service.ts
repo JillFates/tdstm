@@ -303,6 +303,20 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Validate if the current DataScript is being or not used somewhere
+	 * @param {number} id
+	 * @returns {Observable<string>}
+	 */
+	validateDeleteScript(id: number): Observable<string> {
+		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
 	deleteDataScript(id: number): Observable<string> {
 		return this.http.delete(`${this.dataIngestionUrl}/datascript/${id}`)
 			.map((res: Response) => {
