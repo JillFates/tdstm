@@ -147,42 +147,11 @@ export class APIActionListComponent {
 		}
 	}
 
+	/**
+	 * Create a new API Action
+	 */
 	protected onCreate(): void {
-		let apiActionModel: APIActionModel = {
-			name: '',
-			description: '',
-			provider: { id: null, name: '' },
-			agentClass: { id: null, name: '' },
-			agentMethod: { id: null, name: ''},
-			eventReactions: [],
-			pollingInterval: false,
-			producesData: false,
-			polling: {
-				frequency: {
-					value: 0,
-					interval: this.interval.SECONDS
-				},
-				lapsedAfter: {
-					value: 0,
-					interval: this.interval.MINUTES
-				},
-				stalledAfter: {
-					value: 0,
-					interval: this.interval.MINUTES
-				}
-			}
-		};
-
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.TIMEDOUT, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE_API_CALL, false, ''));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINALIZED_API_CALL, false, ''));
+		let apiActionModel = new APIActionModel();
 		this.openAPIActionDialogViewEdit(apiActionModel, ActionType.CREATE);
 	}
 

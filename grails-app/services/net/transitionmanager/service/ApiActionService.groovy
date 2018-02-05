@@ -493,6 +493,7 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		return [
+				code: code.name(),
 				validSyntax: errors.isEmpty(),
 				errors     : errorsMap
 		]
@@ -508,7 +509,7 @@ class ApiActionService implements ServiceMethods {
 
 		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
 
-			Map<String, ?> scriptResults = [code: scriptBindingCommand.code.name()]
+			Map<String, ?> scriptResults = [:]
 			try {
 
 				scriptResults = compileReactionScript(

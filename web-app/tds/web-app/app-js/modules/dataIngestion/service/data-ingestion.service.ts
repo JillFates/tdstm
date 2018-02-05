@@ -1,15 +1,16 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
-import {Response} from '@angular/http';
+import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
-import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
+import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
 import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
 import {INTERVAL} from '../../../shared/model/constants';
-
+import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -17,6 +18,8 @@ export class DataIngestionService {
 	private dataDefaultUrl = '../ws';
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
+	private dataScriptUrl = '../ws/dataScript';
+	private fileSystemUrl = '../ws/fileSystem';
 
 	mockData: CredentialModel[] = [
 		{
@@ -89,21 +92,22 @@ export class DataIngestionService {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
 					r.producesData = (r.producesData === 1);
-					r.pollingInterval = (r.pollingInterval === 1);
 					r.polling = {
 						frequency: {
-							value: 0,
+							value: r.pollingInterval,
 							interval: INTERVAL.SECONDS
 						},
 						lapsedAfter: {
-							value: 0,
+							value: DateUtils.convertInterval({ value: r.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						},
 						stalledAfter: {
-							value: 0,
+							value: DateUtils.convertInterval({ value: r.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
 							interval: INTERVAL.MINUTES
 						}
 					};
+					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
+					APIActionModel.createReactions(r, r.reactionScripts);
 				});
 				return dataScriptModels;
 			})
@@ -201,16 +205,33 @@ export class DataIngestionService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			providerId: model.provider.id,
+			provider: model.provider.id,
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
+			endpointUrl: model.endpointUrl,
+			endpointPath: model.endpointPath,
 			producesData: (model.producesData) ? 1 : 0,
-			pollingInterval: (model.pollingInterval) ? 1 : 0
+			isPolling: (model.isPolling) ? 1 : 0,
+			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
+			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
+			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
 		};
 
-		if (postRequest.producesData === 1) {
-			postRequest['defaultDataScriptId'] = model.defaultDataScript.id;
-		}
+		let reaction = {
+			'STATUS': model.eventReactions[0].value,
+			'SUCCESS': model.eventReactions[1].value,
+			'DEFAULT': model.eventReactions[2].value,
+			'ERROR': model.eventReactions[3].value,
+			'FAILED': model.eventReactions[4].value,
+			'LAPSED': model.eventReactions[5].value,
+			'STALLED': model.eventReactions[6].value,
+			'PRE': model.eventReactions[7].value,
+			'FINAL': model.eventReactions[8].value
+		};
+
+		postRequest['reactionScripts'] = JSON.stringify(reaction);
+
+		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
@@ -273,8 +294,8 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	validateCode(): Observable<any> {
-		return this.http.post(`${this.dataIngestionUrl}/`, null)
+	validateCode(scripts: any): Observable<any> {
+		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -305,6 +326,87 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	saveScript(id: number, script: string): Observable<any> {
+		let postRequest = {
+			id: id,
+			script: script
+		};
+		return this.http.post(`${this.dataScriptUrl}/saveScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success';
+			})
+			.catch((error: any) => error.json());
+	}
+
+	testScript(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let response = res.json();
+				response.data.domains = [];
+				for (let domain of Object.keys(response.data.data)) {
+					response.data.domains.push(domain);
+				}
+				return response;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	checkSyntax(script: string, filename: string): Observable<any> {
+		let postRequest = {
+			script: script,
+			fileName: filename
+		};
+		return this.http.post(`${this.dataScriptUrl}/checkSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadText(content: string, extension: string): Observable<any> {
+		let postRequest = {
+			content: content,
+			extension: extension
+		};
+		return this.http.post(`${this.fileSystemUrl}/uploadText`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	uploadFile(formdata: any): Observable<any | HttpResponse<any>> {
+		const headers = new Headers({});
+		const options = new RequestOptions({ headers: headers });
+		return this.http.post(`${this.fileSystemUrl}/uploadFile`, formdata, options)
+			.map((res: Response) => {
+				let response = res.json().data;
+				return new HttpResponse({status: 200, body: { data : response } });
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteFile(filename: string): Observable<any | HttpResponse<any>> {
+		let body = JSON.stringify({filename: filename} );
+		let headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(`${this.fileSystemUrl}/delete`, options)
+			.map((res: Response) => {
+				let response = res.json();
+				response.operation = 'delete';
+				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());
 	}

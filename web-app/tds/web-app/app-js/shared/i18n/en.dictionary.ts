@@ -34,7 +34,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
 		'SAMPLE_DATA_TITLE': 'Sample Data',
-		'ETL_BUILDER_TITLE': 'ETL Designer',
+		'ETL_BUILDER_TITLE': 'DataScript Designer',
 		'CONSOLE_TITLE': 'ETL Console',
 		'ETL_BUILDER': {
 			'TEST': 'Test',
@@ -94,7 +94,8 @@ export const en_DICTIONARY: Object = {
 		'CLEAR_FILTERS': 'Clear filters',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
-		'PLEASE_SELECT': 'Please Select..'
+		'PLEASE_SELECT': 'Please Select..',
+		'CONTINUE': 'Continue',
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

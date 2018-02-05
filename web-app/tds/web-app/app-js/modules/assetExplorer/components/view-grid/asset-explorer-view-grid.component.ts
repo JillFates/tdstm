@@ -205,6 +205,11 @@ export class AssetExplorerViewGridComponent {
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
 		if (state.sort[0]) {
+			// Invert the Order to remove the Natural/Default from the UI (no arrow)
+			if (!state.sort[0].dir) {
+				state.sort[0].dir = (this.model.sort.order === 'a' ? 'desc' : 'asc');
+			}
+
 			let field = state.sort[0].field.split('_');
 			this.model.sort.domain = field[0];
 			this.model.sort.property = field[1];

@@ -25,9 +25,15 @@ import { GridModule } from '@progress/kendo-angular-grid';
 import { DateInputsModule,  } from '@progress/kendo-angular-dateinputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { PopupModule } from '@progress/kendo-angular-popup';
+import { InputsModule } from '@progress/kendo-angular-inputs';
+import { LayoutModule } from '@progress/kendo-angular-layout';
 import { NumericTextBoxModule } from '@progress/kendo-angular-inputs';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
+import {UploadModule} from '@progress/kendo-angular-upload';
+import {FileUploadInterceptor} from './components/data-script-sample-data/file-upload.interceptor';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {ImportAssetsService} from '../importAssets/service/import-assets.service';
 
 @NgModule({
 	imports: [
@@ -40,6 +46,10 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		SortableModule,
 		PopupModule,
 		NumericTextBoxModule,
+		HttpClientModule,
+		UploadModule,
+		InputsModule,
+		LayoutModule,
 		AssetExplorerModule, // So we can use Shared components that belongs to this module
 		UIRouterModule.forChild({ states: DATA_INGESTION_STATES })
 	],
@@ -56,7 +66,12 @@ import { DataIngestionService } from './service/data-ingestion.service';
 		PopupPollingComponent,
 		PopupProvidesDataComponent
 	],
-	providers: [DataIngestionService],
+	providers: [DataIngestionService,
+		ImportAssetsService, {
+		provide: HTTP_INTERCEPTORS,
+		useClass: FileUploadInterceptor,
+		multi: true
+	}],
 	exports: [
 		DataScriptListComponent,
 		DataScriptViewEditComponent,
