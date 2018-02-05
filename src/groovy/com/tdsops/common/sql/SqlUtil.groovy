@@ -1,6 +1,6 @@
 package com.tdsops.common.sql
 
-import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils

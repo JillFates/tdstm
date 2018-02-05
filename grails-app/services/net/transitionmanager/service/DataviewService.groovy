@@ -6,7 +6,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.*

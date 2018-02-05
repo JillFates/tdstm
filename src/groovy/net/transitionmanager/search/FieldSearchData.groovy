@@ -1,4 +1,4 @@
-package com.tdsops.tm.search
+package net.transitionmanager.search
 
 /**
  * Class that contain the information required for constructing a
