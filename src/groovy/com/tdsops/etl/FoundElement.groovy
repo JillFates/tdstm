@@ -70,6 +70,23 @@ abstract class FoundElement {
 	}
 
 	/**
+	 * Defines an assetClass for the current Found element.
+	 * If the assetClass parameters is not a ETLDomain it throws an ETLProcessorException
+	 * @param assetClass a String with a domain class
+	 * @return the current found element
+	 * @trows ETLProcessorException if assetClass parameter is not an ETLDomain
+	 * @see ETLDomain
+	 */
+	FoundElement assetClass(String assetClass){
+		ETLDomain domain = ETLDomain.lookup(assetClass)
+		if(!domain){
+			throw ETLProcessorException.invalidDomain(assetClass)
+		}
+		this.propertiesMap.assetClass = domain.name()
+		this
+	}
+
+	/**
 	 * Overriding methodMissing this class collects
 	 * method names as properties keys
 	 * and args as a value
