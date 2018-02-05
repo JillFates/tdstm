@@ -36,10 +36,7 @@ export class DataIngestionService {
 				name: 'Production'
 			},
 			status: 'Active',
-			authMethod: {
-				id: 1,
-				name: 'HTTP_BASIC'
-			},
+			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
 		},
 		{
@@ -55,10 +52,7 @@ export class DataIngestionService {
 				name: 'Production'
 			},
 			status: 'Active',
-			authMethod: {
-				id: 1,
-				name: 'HTTP_BASIC'
-			},
+			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
 		},
 		{
@@ -74,10 +68,7 @@ export class DataIngestionService {
 				name: 'Production'
 			},
 			status: 'Inactive',
-			authMethod: {
-				id: 1,
-				name: 'HTTP_BASIC'
-			},
+			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
 		},
 		{
@@ -93,10 +84,7 @@ export class DataIngestionService {
 				name: 'Production'
 			},
 			status: 'Active',
-			authMethod: {
-				id: 1,
-				name: 'HTTP_BASIC'
-			},
+			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
 		}
 	];

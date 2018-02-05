@@ -1,6 +1,3 @@
-import { INTERVAL } from '../../../shared/model/constants';
-import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
-
 export class CredentialColumnModel {
 	columns: any[];
 
@@ -65,10 +62,7 @@ export class CredentialModel {
 		name?: string
 	};
 	status?: string;
-	authMethod?: {
-		id?: number,
-		name?: string
-	};
+	authMethod?: string;
 	dateCreated?: Date;
 
 	constructor() {
@@ -77,3 +71,5 @@ export class CredentialModel {
 		this.provider = { id: null, name: '' };
 	}
 }
+
+export const AUTH_METHODS = ['HTTP_BASIC', 'HTTP_COOKIE', 'JWT_TOKEN', 'OAUTH'];

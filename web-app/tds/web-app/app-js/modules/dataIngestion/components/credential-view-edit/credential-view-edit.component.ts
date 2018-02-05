@@ -1,23 +1,18 @@
 import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {CredentialModel} from '../../model/credential.model';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {CredentialModel, AUTH_METHODS} from '../../model/credential.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS, DATA_TYPES, KEYSTROKE} from '../../../../shared/model/constants';
-import {AgentModel, AgentMethodModel} from '../../model/agent.model';
+import {ACTIVE_INACTIVE, KEYSTROKE} from '../../../../shared/model/constants';
 import {NgForm} from '@angular/forms';
-import {process, State} from '@progress/kendo-data-query';
+import {State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
-import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Observable';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 
 declare var jQuery: any;
@@ -46,7 +41,7 @@ export class CredentialViewEditComponent {
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
 	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
-	@ViewChild('apiActionAgent', { read: DropDownListComponent }) apiActionAgent: DropDownListComponent;
+	@ViewChild('credentialStatus', { read: DropDownListComponent }) credentialStatus: DropDownListComponent;
 	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent }) apiActionAgentMethod: DropDownListComponent;
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
@@ -56,19 +51,12 @@ export class CredentialViewEditComponent {
 
 	public credentialModel: CredentialModel;
 	public providerList = new Array<ProviderModel>();
-	public agentList = new Array<AgentModel>();
-	public agentMethodList = new Array<AgentMethodModel>();
-	public agentCredentialList = new Array<CredentialModel>();
+	public statusList = new Array<any>();
+	public authMethodList = new Array<any>();
 	public parameterList: GridDataResult;
 	public modalTitle: string;
 	public actionTypes = ActionType;
 	private dataSignature: string;
-	private intervals = INTERVALS;
-	public interval = INTERVAL;
-	public selectedInterval = {value: 0, interval: ''};
-	public selectedLapsed = {value: 0, interval: ''};
-	public selectedStalled = {value: 0, interval: ''};
-	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	private currentTab = 0;
 	public isEditing = false;
@@ -87,7 +75,6 @@ export class CredentialViewEditComponent {
 		}]
 	};
 	public validInfoForm = false;
-	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
 	constructor(
 		public originalModel: CredentialModel,
@@ -95,9 +82,7 @@ export class CredentialViewEditComponent {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService,
-		private customDomainService: CustomDomainService,
-		private dialogService: UIDialogService) {
+		private dataIngestionService: DataIngestionService) {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
@@ -105,7 +90,9 @@ export class CredentialViewEditComponent {
 		this.dataSignature = JSON.stringify(this.credentialModel);
 
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
+		this.getStatus();
+		this.getAuthMethods();
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Credential' : (this.modalType === ActionType.EDIT ? 'Credential Edit' : 'Credential Detail');
 	}
 
 	/**
@@ -125,9 +112,29 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
+	 * Set the possible Status for the Credential
+	 */
+	getStatus(): void {
+		this.statusList = ACTIVE_INACTIVE;
+		if (this.modalType === ActionType.CREATE) {
+			this.credentialModel.status = this.statusList[0];
+		}
+	}
+
+	/**
+	 * Set the possible Status for the Credential
+	 */
+	getAuthMethods(): void {
+		this.authMethodList = AUTH_METHODS;
+		if (this.modalType === ActionType.CREATE) {
+			this.credentialModel.authMethod = this.authMethodList[0];
+		}
+	}
+
+	/**
 	 * Create a new DataScript
 	 */
-	protected onSaveApiAction(): void {
+	protected onSaveCredential(): void {
 		this.dataIngestionService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
@@ -175,7 +182,7 @@ export class CredentialViewEditComponent {
 	/**
 	 * Change the View Mode to Edit Mode
 	 */
-	protected changeToEditApiAction(): void {
+	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
 	}
 
@@ -183,7 +190,7 @@ export class CredentialViewEditComponent {
 	 * Delete the selected Data Script
 	 * @param dataItem
 	 */
-	protected onDeleteApiAction(): void {
+	protected onDeleteCredential(): void {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
