@@ -319,6 +319,18 @@
 				</div></td>
 		</tr>
 
+		<tr>
+			<td colspan="2">
+				<table class="dates-info" >
+					<tr>
+						<td class="date-created">Date created: ${applicationInstance.dateCreated}</td>
+						<td class="last-updated">Last updated: ${applicationInstance.lastUpdated}</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+
+
 		<%-- Dependency Edit Block --%>
 		<tr id="applicationDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>

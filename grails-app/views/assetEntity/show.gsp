@@ -220,6 +220,16 @@
 				</div>
 			</td>
 		</tr>
+		<tr>
+			<td colspan="2">
+				<table class="dates-info" >
+					<tr>
+						<td class="date-created">Date created: ${assetEntity.dateCreated}</td>
+						<td class="last-updated">Last updated: ${assetEntity.lastUpdated}</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
 		<tr id="deps">
 			<g:render template="dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
 		</tr>

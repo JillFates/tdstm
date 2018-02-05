@@ -434,7 +434,19 @@
 						</tbody>
 						</tbody>
 					</table>
-				</div></td>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td colspan="2">
+				<table class="dates-info" >
+					<tr>
+						<td class="date-created">Date created: ${assetEntityInstance.dateCreated}</td>
+						<td class="last-updated">Last updated: ${assetEntityInstance.lastUpdated}</td>
+					</tr>
+				</table>
+			</td>
 		</tr>
 
 		<g:if test="${action == 'save'}">

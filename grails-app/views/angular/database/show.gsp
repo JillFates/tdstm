@@ -99,6 +99,18 @@
                         </div>
                     </td>
                 </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <table class="dates-info">
+                            <tr>
+                                <td class="date-created">Date created: ${asset.dateCreated}</td>
+                                <td class="last-updated">Last updated: ${asset.lastUpdated}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
                 <tr id="deps">
                     <g:render template="/angular/common/dependentShow" model="[asset:asset]" ></g:render>
                 </tr>
