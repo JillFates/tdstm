@@ -483,14 +483,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param dependentId
 	 * @return the current find Element
 	 */
-	def whenNotFound(final String dependentId) {
-		return [
-				create: { closure ->
-					result.addFoundElement(new FoundElement(dependentId).create(closure))
-				}
-		].withDefault {
-			ETLProcessorException.invalidWhenNotFoundCommand(dependentId)
-		}
+	FoundElement whenNotFound(final String dependentId) {
+		return new WhenNotFoundElement(dependentId, result)
 	}
 
 	/**
@@ -503,14 +497,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param dependentId
 	 * @return the current find Element
 	 */
-	def whenFound(final String dependentId) {
-		return [
-				update: { closure ->
-					result.addFoundElement(new FoundElement(dependentId).update(closure))
-				}
-		].withDefault {
-			ETLProcessorException.invalidWhenFoundCommand(dependentId)
-		}
+	FoundElement whenFound(final String dependentId) {
+		return new WhenFoundElement(dependentId, result)
 	}
 
 	/**

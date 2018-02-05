@@ -1,7 +1,12 @@
 package com.tdsops.etl
 
-
-class FoundElement {
+/**
+ * Abstract implementation for whenFound and whenNotFound ETL command.
+ * It manages common behaviour between both commands.
+ * @see WhenNotFoundElement
+ * @see WhenFoundElement
+ */
+abstract class FoundElement {
 
 	String dependentId
 	/**
@@ -9,42 +14,44 @@ class FoundElement {
 	 * is 'update' or 'create'
 	 */
 	private String action
+	ETLProcessorResult result
 	private Map<String, ?> propertiesMap
 
-	FoundElement(String dependentId) {
+	FoundElement(String dependentId, ETLProcessorResult result) {
 		this.dependentId = dependentId
+		this.result = result
 		this.action = 'unknown'
 		propertiesMap = [:]
 	}
 
 	/**
-	 * WhenFound create ETL command. It defines what should based on find command results
+	 * Validates WhenNotFound create ETL command used incorrectly
 	 * <pre>
-	 *		whenFound asset create {
-	 *			assetClass Application
-	 *			assetName primaryName
-	 *			assetType primaryType
-	 *			"SN Last Seen": NOW
+	 *     // Invalid use of whenNotFound  command
+	 *		whenNotFound asset update {
+	 *			......
 	 *		}
 	 * </pre>
-	 * @param dependentId
+	 * @param closure
 	 * @return the current find Element
 	 */
 	FoundElement create(Closure closure) {
-		return action('create', closure)
+		throw ETLProcessorException.invalidWhenFoundCommand(dependentId)
 	}
+
 	/**
-	 * WhenNotFound update ETL command. It defines what should based on find command results
+	 * Validates WhenFound create ETL command used incorrectly
 	 * <pre>
-	 *		whenFound asset update {
-	 *			"TM Last Seen" NOW
+	 *     // Invalid use of WhenFound  command
+	 *		whenFound asset create {
+	 *			....
 	 *		}
 	 * </pre>
-	 * @param dependentId
+	 * @param closure
 	 * @return the current find Element
 	 */
 	FoundElement update(Closure closure) {
-		return action('update', closure)
+		throw ETLProcessorException.invalidWhenNotFoundCommand(dependentId)
 	}
 
 	/**
@@ -58,6 +65,7 @@ class FoundElement {
 		closure.resolveStrategy = Closure.DELEGATE_FIRST
 		closure.delegate = this
 		closure()
+		result.addFoundElement(this)
 		return this
 	}
 
@@ -121,6 +129,21 @@ class FoundElement {
 		}
 
 		return fieldValue
+	}
 
+	String getDependentId() {
+		return dependentId
+	}
+
+	String getAction() {
+		return action
+	}
+
+	ETLProcessorResult getResult() {
+		return result
+	}
+
+	Map<String, ?> getPropertiesMap() {
+		return propertiesMap
 	}
 }
