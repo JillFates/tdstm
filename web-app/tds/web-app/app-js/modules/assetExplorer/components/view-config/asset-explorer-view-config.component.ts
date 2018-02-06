@@ -141,6 +141,9 @@ export class AssetExplorerViewConfigComponent {
 		this.columnIndex = 0;
 		this.rowIndex = 0;
 		this.position = this.fields.map(x => this.fieldStyle(x['isTitle']));
+		setTimeout(() => {
+			jQuery('[data-toggle="popover"]').popover();
+		}, 200);
 	}
 
 	protected applyAssetSelectFilter(): void {
