@@ -745,9 +745,9 @@ class UrlMappings {
 		}
 
      "/ws/filename" {
-        controller = "wsFilename"
+        controller = "wsAsset"
         action = [
-                POST: "viewExportFilename"
+                POST: "exportFilename"
         ]
      }
 

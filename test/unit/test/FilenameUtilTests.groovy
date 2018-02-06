@@ -149,4 +149,37 @@ class FilenameUtilTests extends AbstractUnitSpec {
 			expect: 'the resulting file name match the expected file naming scheme'
 			'Big_Move-My_Applications' == FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params)
 		}
+
+	def '12. Test sanitation for safeFilename method'() {
+		// while not touching the ASCII printible characters. This will remove the typical CR, LF, BS
+		// along with Unicode Control characters, Line and Paragraph separators, etc {
+
+		expect:
+		FilenameUtil.safeFilename(value) == result
+
+		where:
+		value               | result
+		" abcdefghijklm "   | 'abcdefghijklm'
+		" nopqrstuvwxyz "   | 'nopqrstuvwxyz'
+		" ABCDEFGHIJKLM "   | 'ABCDEFGHIJKLM'
+		" NOPQRSTUVWXYZ "   | 'NOPQRSTUVWXYZ'
+		" 01234567890 "     | '01234567890'
+		"!@#\$%^&*()-_=+`~" | '!@#$%^&*()-_=+`~'
+		"',.<>/?\\"         | '\',.<>/?\\'
+		" CR\r. "           | 'CR+.'
+		" LF\n. "           | 'LF+.'
+		" FF\f. "           | 'FF+.'
+		" TAB\t. "          | 'TAB+.'
+		" DQuote\". "       | 'DQuote".'
+		' SQuote\'. '       | 'SQuote\'.'
+		" \t White\t. \t "  | 'White+.'
+		" .\bBACKSPACE. "   | '.~BACKSPACE.'
+		" .\u2028LineSep"   | '.~LineSep'
+		" .\u2029ParaSep"   | '.~ParaSep'
+		" .\u00000000. "    | '.~0000.'
+		" .\u00090009. "    | '.+0009.'
+		" .\u00850085. "    | '.~0085.'
+		" [\u007f007f] "    | '[~007f]'
+		" [\u008f008f] "    | '[~008f]'
+	}
 }
