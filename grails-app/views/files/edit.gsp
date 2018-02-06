@@ -124,16 +124,7 @@
 			</td>
 		</tr>
 
-		<tr>
-			<td colspan="2">
-				<table class="dates-info" >
-					<tr>
-						<td class="date-created">Date created: ${fileInstance.dateCreated}</td>
-						<td class="last-updated">Last updated: ${fileInstance.lastUpdated}</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
+
 
 		<tr id="filesDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>

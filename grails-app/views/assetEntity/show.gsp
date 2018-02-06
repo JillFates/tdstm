@@ -224,8 +224,8 @@
 			<td colspan="2">
 				<table class="dates-info" >
 					<tr>
-						<td class="date-created">Date created: ${assetEntity.dateCreated}</td>
-						<td class="last-updated">Last updated: ${assetEntity.lastUpdated}</td>
+						<td class="date-created">Date created: ${dateCreated}</td>
+						<td class="last-updated">Last updated: ${lastUpdated}</td>
 					</tr>
 				</table>
 			</td>
