@@ -10,7 +10,8 @@ class WhenFoundElement extends FoundElement {
 	}
 
 	/**
-	 * WhenNotFound update ETL command. It defines what should based on find command results
+	 * WhenNotFound update ETL command.
+	 * It defines what should updated if find command found a result
 	 * <pre>
 	 *		whenFound asset update {
 	 *			"TM Last Seen" NOW
@@ -22,6 +23,4 @@ class WhenFoundElement extends FoundElement {
 	FoundElement update(Closure closure) {
 		return action('update', closure)
 	}
-
-
 }

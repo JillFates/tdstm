@@ -8,43 +8,25 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
-import getl.json.JSONConnection
-import getl.json.JSONDataset
-import getl.proc.Flow
-import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.json.JsonOutput
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
 class ETLProcessorFindCommandSpec extends Specification {
 
-	@Shared
-	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
+	String assetDependencyDataSetContent
+	String applicationDataSetContent
+	Project GMDEMO
+	Project TMDEMO
 
-	@Shared
-	CSVConnection csvConnection
-
-	@Shared
-	JSONConnection jsonConnection
-
-	DataSetFacade simpleDataSet
-	DataSetFacade jsonDataSet
-	DataSetFacade environmentDataSet
-	DataSetFacade applicationDataSet
-	DataSetFacade nonSanitizedDataSet
-	DataSetFacade sixRowsDataSet
-	DebugConsole debugConsole
-	ETLFieldsValidator applicationFieldsValidator
-
+	ETLFieldsValidator validator
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -57,110 +39,53 @@ class ETLProcessorFindCommandSpec extends Specification {
 	}
 
 	def setupSpec() {
-		csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
-		jsonConnection = new JSONConnection(config: 'json')
-		FileUtils.ValidPath(conParams.path)
 		String.mixin StringAppendElement
-	}
-
-	def cleanupSpec() {
-		new File(conParams.path).deleteOnExit()
 	}
 
 	def setup() {
 
-		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
+		assetDependencyDataSetContent = """
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent()
 
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		applicationDataSetContent = """
+application id,vendor name,technology,location
+152254,Microsoft,(xlsx updated),ACME Data Center
+152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
-		new Flow().writeTo(dest: simpleDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
-		}
+		GMDEMO = Mock(Project)
+		GMDEMO.getId() >> 125612l
 
-		File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
-		jsonFile << """[
-				{ "device id": "152254", "model name": "SRW24G1", "manufacturer name": "LINKSYS"},
-				{ "device id": "152255", "model name": "ZPHA MODULE", "manufacturer name": "TippingPoint"},
-				{ "device id": "152256", "model name": "Slideaway", "manufacturer name": "ATEN"}
-		]""".stripIndent()
+		TMDEMO = Mock(Project)
+		TMDEMO.getId() >> 125612l
 
-		jsonDataSet = new DataSetFacade(new JSONDataset(connection: jsonConnection, fileName: jsonFile.path, rootNode: ".", convertToList: true))
-		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
+		validator = new ETLAssetClassFieldsValidator()
+		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 
-		environmentDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING")
-
-		new Flow().writeTo(dest: environmentDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'environment': 'Prod'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'environment': 'Prod'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'environment': 'Dev'])
-		}
-
-		sixRowsDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
-
-		new Flow().writeTo(dest: sixRowsDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
-		}
-
-		applicationDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
-
-		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
-		}
-
-		debugConsole = new DebugConsole(buffer: new StringBuffer())
-
-		applicationFieldsValidator = new ETLAssetClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
-
-		new Flow().writeTo(dest: nonSanitizedDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
-		}
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> applications = [
 					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
 					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
@@ -183,7 +108,7 @@ class ETLProcessorFindCommandSpec extends Specification {
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
-					applicationDataSet,
+					dataSet,
 					new DebugConsole(buffer: new StringBuffer()),
 					validator)
 
@@ -237,41 +162,17 @@ class ETLProcessorFindCommandSpec extends Specification {
 					}
 				}
 			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with DOMAIN bound instance'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -411,36 +312,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -603,36 +477,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -759,18 +606,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> applications = [
 					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
 					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
@@ -805,7 +643,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
-					applicationDataSet,
+					dataSet,
 					new DebugConsole(buffer: new StringBuffer()),
 					validator)
 
@@ -838,22 +676,17 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					value == '152255'
 				}
 			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> applications = [
 					[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
 					[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
@@ -888,7 +721,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
-					applicationDataSet,
+					dataSet,
 					new DebugConsole(buffer: new StringBuffer()),
 					validator)
 
@@ -909,20 +742,17 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Project not defined.'
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
 		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<Application> applications = [
 					[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
 					[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
@@ -963,7 +793,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
-					applicationDataSet,
+					dataSet,
 					new DebugConsole(buffer: new StringBuffer()),
 					validator)
 
@@ -1042,41 +872,17 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					fields.id.warnMsg == 'found without asset id field'
 				}
 			}
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can create a domain when not found a instance with find command'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -1209,36 +1015,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can throw an Exception if whenNotFound command defines an update action'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -1330,36 +1109,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can throw an Exception if whenFound command defines a create action'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -1448,36 +1200,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
@@ -1570,36 +1295,9 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 	void 'test can update a domain when found a instance with find command'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
-
-		and:
-			Project GMDEMO = Mock(Project)
-			GMDEMO.getId() >> 125612l
-
-			Project TMDEMO = Mock(Project)
-			TMDEMO.getId() >> 125612l
-
 			List<AssetEntity> assetEntities = [
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],

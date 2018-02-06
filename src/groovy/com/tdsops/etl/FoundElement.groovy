@@ -14,8 +14,16 @@ abstract class FoundElement {
 	 * is 'update' or 'create'
 	 */
 	private String action
-	ETLProcessorResult result
+	/**
+	 * Map that collects properties to be added in the ETLProcessorResult
+	 * @see FoundElement#result
+	 */
 	private Map<String, ?> propertiesMap
+	/**
+	 * Result add the result of this ETL command invokation
+	 * @see ETLProcessorResult#addFoundElement(com.tdsops.etl.FoundElement)
+	 */
+	private ETLProcessorResult result
 
 	FoundElement(String dependentId, ETLProcessorResult result) {
 		this.dependentId = dependentId
