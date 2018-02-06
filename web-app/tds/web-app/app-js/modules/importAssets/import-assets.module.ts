@@ -13,6 +13,9 @@ import { LayoutModule } from '@progress/kendo-angular-layout';
 import { ManualImportComponent } from './components/manual-import/manual-import.component';
 // Services
 import { ImportAssetsService } from './service/import-assets.service';
+import {UploadModule} from '@progress/kendo-angular-upload';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import {FileUploadInterceptor} from '../dataIngestion/components/data-script-sample-data/file-upload.interceptor';
 
 @NgModule({
 	imports: [
@@ -22,13 +25,19 @@ import { ImportAssetsService } from './service/import-assets.service';
 		BrowserModule,
 		BrowserAnimationsModule,
 		LayoutModule,
+		UploadModule,
 		UIRouterModule.forChild({ states: IMPORT_ASSETS_STATES }),
 	],
 	declarations: [
 		ManualImportComponent
 	],
 	providers: [
-		ImportAssetsService
+		ImportAssetsService,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: FileUploadInterceptor,
+			multi: true
+		}
 	],
 	exports: [
 		ManualImportComponent

@@ -6,10 +6,16 @@
                     <div class="box-header">
                     </div>
                     <div class="box-body" style="margin-top: 30px;">
-                        <div class="form-group row">
-                            <label class="col-sm-3 control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
-                            <div class="col-sm-2">
-                                <select [(ngModel)]="selectedActionOption" (ngModelChange)="onActionScriptChange($event)" name="fetch" id="fetch" class="form-control pd-top-5" >
+
+                        <!-- Fetch(Dropdown action) Row -->
+                        <div class="form-group row" style="margin-bottom: 5px;">
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
+                            <div class="col-sm-{{uiConfig.inputColSize}}">
+                                <select [(ngModel)]="selectedActionOption"
+                                        (ngModelChange)="onActionScriptChange($event)"
+                                        name="fetch"
+                                        id="fetch"
+                                        class="form-control pd-top-5" >
                                     <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>
@@ -18,79 +24,117 @@
                             <button class="btn btn-default col-sm-1" (click)="onFetch()" [disabled]="!selectedActionOption || selectedActionOption == -1">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}
                                 <i *ngIf="fetchInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="fetchResult?.status === 'success' " class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="fetchResult?.status === 'error' " class="glyphicon glyphicon-remove"></i>
+                                <i *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action' " class="glyphicon glyphicon-ok"></i>
+                                <i *ngIf="fetchResult?.status === 'error' && fetchInputUsed === 'action' " class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success'" (click)="onViewData('FETCH')" class="control-label col-md-1">
+                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action' " (click)="onViewData('FETCH')" class="control-label col-md-1">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
+                            </a>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 5px;">
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">or</label>
+                        </div>
+                        <!-- Fetch(File Upload) Row -->
+                        <div class="form-group row">
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">Fetch with File Upload:</label>
+                            <div class="col-sm-{{ (uiConfig.inputColSize + uiConfig.buttonColSize) }}" style="padding-right: 0;">
+                                <kendo-upload
+                                        #kendoUploadInstance="kendoUpload"
+                                        [autoUpload]="file.autoUpload"
+                                        [saveUrl]="file.uploadSaveUrl"
+                                        [removeUrl]="file.uploadDeleteUrl"
+                                        [saveField]="'file'"
+                                        [removeField]="'filename'"
+                                        [disabled]="false"
+                                        [multiple]="false"
+                                        (select)="onSelectFile($event)"
+                                        (upload)="onUploadFile($event)"
+                                        (remove)="onRemoveFile($event)"
+                                        (success)="completeEventHandler($event)">
+                                    <kendo-upload-messages select="Please Select.."></kendo-upload-messages>
+                                </kendo-upload><!---->
+                            </div>
+                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'" (click)="onViewData('FETCH')" class="control-label col-md-1">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
                             </a>
 
                         </div>
 
+                        <!-- Transform Datascript Row -->
                         <div class="form-group row">
-                           <label class="col-sm-3 control-label" for="transform">
+                           <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="transform">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_DATA_SCRIPT' | translate}}
                            </label>
-                           <div class="col-sm-2">
+                           <div class="col-sm-{{uiConfig.inputColSize}}">
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
                                    <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                    <option *ngFor="let option of dataScriptOptions"
                                            [ngValue]="option">{{option.name}}</option>
                                </select>
                             </div>
-                            <button [disabled]="!selectedScriptOption || selectedScriptOption == -1 || !fetchResult || fetchResult?.status === 'error'" (click)="onTransform()" class="btn btn-default col-sm-1">
+                            <button [disabled]="disableTransformButton()"
+                                    (click)="onTransform()"
+                                    class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM' | translate}}
                                 <i *ngIf="transformInProcess" class="fa fa-fw fa-spinner"></i>
                                 <i *ngIf="transformResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
                                 <i *ngIf="transformResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);" (click)="onViewData('TRANSFORM')" class="control-label col-sm-1">
+                            <a *ngIf="transformResult?.status === 'success'" href="javascript:void(0);"
+                               (click)="onViewData('TRANSFORM')"
+                               class="control-label col-sm-{{uiConfig.urlColSize}}">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
                             </a>
                         </div>
 
-                            <div class="form-group row" style="margin-bottom: 20px;">
-                            <label class="col-sm-3 control-label">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_DATA_INTO_IMPORT' | translate}}
-                            </label>
-                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'" (click)="onImport()"
-                                    class="btn btn-default col-md-offset-2 col-sm-1">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}
-                                <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
-                                <i *ngIf="importResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
-                                <i *ngIf="importResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
-                            </button>
-                            <a href="../dataTransferBatch/list" class="control-label col-sm-2">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_IMPORT_BATCHES' | translate}}
-                            </a>
+                        <!-- Load Data Row -->
+                        <div class="form-group row" style="margin-bottom: 20px;">
+                           <label class="col-sm-{{uiConfig.labelColSize}} control-label">
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_DATA_INTO_IMPORT' | translate}}
+                           </label>
+                           <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
+                                   (click)="onImport()"
+                                   class="btn btn-default col-md-offset-{{uiConfig.inputColSize}} col-sm-{{uiConfig.buttonColSize}}">
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT' | translate}}
+                               <i *ngIf="importInProcess" class="fa fa-fw fa-spinner"></i>
+                               <i *ngIf="importResult?.status === 'success'" class="glyphicon glyphicon-ok"></i>
+                               <i *ngIf="importResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
+                           </button>
+                           <a href="../dataTransferBatch/list" class="control-label col-sm-{{uiConfig.urlColSize}}">
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_IMPORT_BATCHES' | translate}}
+                           </a>
                         </div>
 
+                        <!-- Clear Button Row -->
                         <div class="form-group row">
-                            <button (click)="onClear()" class="btn btn-default col-md-offset-5 col-sm-1">
-                                {{'GLOBAL.CLEAR' | translate}}
-                            </button>
-                        </div>
-
-                       <div class="form-group row">
-                           <div class="col-sm-offset-1 col-sm-6" >
-                               <a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
-                                  href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">
-                                   {{'GLOBAL.CLOSE' | translate}}
-                               </a>
-                               <kendo-tabstrip>
-                                   <kendo-tabstrip-tab [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
-                                       <ng-template kendoTabContent>
-                                           <div>{{getFetchFileContentValue()}}</div>
-                                       </ng-template>
-                                   </kendo-tabstrip-tab>
-                                   <kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'" *ngIf="transformFileContent">
-                                       <ng-template kendoTabContent>
-                                           <div>{{getTransformFileContentValue()}}</div>
-                                       </ng-template>
-                                   </kendo-tabstrip-tab>
-                               </kendo-tabstrip>
-                           </div>
+                           <button (click)="onClear()"
+                                   class="btn btn-default col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
+                               {{'GLOBAL.CLEAR' | translate}}
+                           </button>
                        </div>
+
+                        <!-- View Content Tabbed Panel Row -->
+                        <div class="form-group row">
+                          <div class="col-sm-offset-1 col-sm-{{(uiConfig.labelColSize + uiConfig.inputColSize + uiConfig.urlColSize)}}" >
+                              <a (click)="onCloseFileContents()" *ngIf="fetchFileContent || transformFileContent"
+                                 href="javascript: void(0);" class="control-label pull-right" style="margin-right: 9%">
+                                  {{'GLOBAL.CLOSE' | translate}}
+                              </a>
+                              <kendo-tabstrip>
+                                  <kendo-tabstrip-tab [title]="'Fetch Data'" [selected]="viewDataType === 'FETCH'" *ngIf="fetchFileContent">
+                                      <ng-template kendoTabContent>
+                                          <div>{{getFetchFileContentValue()}}</div>
+                                      </ng-template>
+                                  </kendo-tabstrip-tab>
+                                  <kendo-tabstrip-tab [title]="'Transform Data'" [selected]="viewDataType === 'TRANSFORM'" *ngIf="transformFileContent">
+                                      <ng-template kendoTabContent>
+                                          <div>{{getTransformFileContentValue()}}</div>
+                                      </ng-template>
+                                  </kendo-tabstrip-tab>
+                              </kendo-tabstrip>
+                          </div>
+                      </div>
+
                     </div>
                 </div>
             </form>
