@@ -57,8 +57,8 @@
 	 [minResizableWidth]="VIEW_COLUMN_MIN_WIDTH" [width]="column.width" [class]="column.domain">
 		<ng-template kendoGridHeaderTemplate>
 			<div style="width:95%;float:left;">
-				<div>
-					<label for=""> {{getPropertyLabel(column)}}</label>
+				<div [ngClass]="{'field-not-found': getPropertyLabel(column) === fieldNotFound }">
+					<label for=""> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" data-content="Field not longer exist, please modify the view to avoid unexpected errors" data-toggle="popover" data-trigger="hover"></i> </label>
 				</div>
 			</div>
 		</ng-template>

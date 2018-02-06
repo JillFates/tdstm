@@ -19,6 +19,7 @@ import { AssetQueryParams } from '../../model/asset-query-params';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { AssetExportModel } from '../../model/asset-export-model';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-view-show',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-show/asset-explorer-view-show.component.html'
@@ -75,6 +76,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		}
 		this.assetService.query(this.model.id, params).subscribe(result => {
 			this.grid.apply(result);
+			jQuery('[data-toggle="popover"]').popover();
 		}, err => console.log(err));
 	}
 
