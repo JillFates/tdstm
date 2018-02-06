@@ -152,7 +152,7 @@
 
 <table class="dates-info" >
 	<tr>
-		<td class="date-created">Date created: ${applicationInstance.dateCreated}</td>
-		<td class="last-updated">Last updated: ${applicationInstance.lastUpdated}</td>
+		<td class="date-created">Date created: ${dateCreated}</td>
+		<td class="last-updated">Last updated: ${lastUpdated}</td>
 	</tr>
 </table>

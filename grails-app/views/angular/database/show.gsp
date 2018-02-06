@@ -104,8 +104,8 @@
                     <td colspan="2">
                         <table class="dates-info">
                             <tr>
-                                <td class="date-created">Date created: ${asset.dateCreated}</td>
-                                <td class="last-updated">Last updated: ${asset.lastUpdated}</td>
+                                <td class="date-created">Date created: ${dateCreated}</td>
+                                <td class="last-updated">Last updated: ${lastUpdated}</td>
                             </tr>
                         </table>
                     </td>

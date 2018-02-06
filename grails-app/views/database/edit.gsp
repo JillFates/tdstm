@@ -140,16 +140,7 @@
 		</td>
 	</tr>
 
-	<tr>
-		<td colspan="2">
-			<table class="dates-info" >
-				<tr>
-					<td class="date-created">Date created: ${databaseInstance.dateCreated}</td>
-					<td class="last-updated">Last updated: ${databaseInstance.lastUpdated}</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+
 
 	<tr id="databaseDependentId" class="assetDependent">
 		<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>

@@ -1125,6 +1125,7 @@ div.dialog input#description {
 .dates-info {
 	border: none;
 	font-size: 10px;
+	padding-top: 0!important;
 }
 
 	.dates-info .date-created {
