@@ -27,26 +27,33 @@
                                 <i *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action' " class="glyphicon glyphicon-ok"></i>
                                 <i *ngIf="fetchResult?.status === 'error' && fetchInputUsed === 'action' " class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action' " (click)="onViewData('FETCH')" class="control-label col-md-1">
+                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
+                                  class="control-label col-md-{{uiConfig.urlColSize}}">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_USING' | translate}}
+                                <br>
+                                <a href="javascript:void(0);"
+                                   (click)="onViewData('FETCH')" >
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                            </a>
+                                </a>
+                            </span>
+
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">or</label>
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_OR' | translate}}</label>
                         </div>
                         <!-- Fetch(File Upload) Row -->
                         <div class="form-group row">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">Fetch with File Upload:</label>
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_FILE' | translate}}</label>
                             <div class="col-sm-{{ (uiConfig.inputColSize + uiConfig.buttonColSize) }}" style="padding-right: 0;">
                                 <kendo-upload
                                         #kendoUploadInstance="kendoUpload"
                                         [autoUpload]="file.autoUpload"
                                         [saveUrl]="file.uploadSaveUrl"
                                         [removeUrl]="file.uploadDeleteUrl"
-                                        [saveField]="'file'"
-                                        [removeField]="'filename'"
+                                        [saveField]="file.saveField"
+                                        [removeField]="file.removeField"
+                                        [multiple]="file.multiple"
                                         [disabled]="false"
-                                        [multiple]="false"
                                         (select)="onSelectFile($event)"
                                         (upload)="onUploadFile($event)"
                                         (remove)="onRemoveFile($event)"
@@ -54,9 +61,16 @@
                                     <kendo-upload-messages select="Please Select.."></kendo-upload-messages>
                                 </kendo-upload><!---->
                             </div>
-                            <a href="javascript:void(0);" *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'" (click)="onViewData('FETCH')" class="control-label col-md-1">
+                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
+                                  class="control-label col-md-{{uiConfig.urlColSize}}">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_USING' | translate}}
+                                <br>
+                                <a href="javascript:void(0);"
+                                   (click)="onViewData('FETCH')">
                                 {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                            </a>
+                                </a>
+                            </span>
+
 
                         </div>
 

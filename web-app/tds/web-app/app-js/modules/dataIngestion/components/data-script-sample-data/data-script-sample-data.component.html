@@ -61,14 +61,14 @@
                                     [autoUpload]="file.autoUpload"
                                     [saveUrl]="file.uploadSaveUrl"
                                     [removeUrl]="file.uploadDeleteUrl"
-                                    [saveField]="'file'"
-                                    [removeField]="'filename'"
-                                    [multiple]="false"
+                                    [saveField]="file.saveField"
+                                    [removeField]="file.removeField"
+                                    [multiple]="file.multiple"
                                     (select)="clearFilename($event)"
                                     (upload)="clearFilename($event)"
                                     (remove)="onRemoveFile($event)"
                                     (success)="completeEventHandler($event)">
-                            </kendo-upload><!---->
+                            </kendo-upload>
                         </div>
 
                         <!-- web service -->

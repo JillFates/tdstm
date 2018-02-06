@@ -15,7 +15,7 @@ import { ManualImportComponent } from './components/manual-import/manual-import.
 import { ImportAssetsService } from './service/import-assets.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {FileUploadInterceptor} from '../dataIngestion/components/data-script-sample-data/file-upload.interceptor';
+import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 
 @NgModule({
 	imports: [
@@ -35,7 +35,7 @@ import {FileUploadInterceptor} from '../dataIngestion/components/data-script-sam
 		ImportAssetsService,
 		{
 			provide: HTTP_INTERCEPTORS,
-			useClass: FileUploadInterceptor,
+			useClass: KendoFileUploadInterceptor,
 			multi: true
 		}
 	],

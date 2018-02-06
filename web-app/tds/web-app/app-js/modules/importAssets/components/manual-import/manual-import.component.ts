@@ -3,6 +3,7 @@ import {ImportAssetsService} from '../../service/import-assets.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 
 @Component({
 	selector: 'manual-import',
@@ -11,6 +12,7 @@ import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angula
 export class ManualImportComponent implements OnInit {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	private actionOptions = [];
 	private dataScriptOptions = [];
 	private selectedActionOption = -1;
@@ -25,14 +27,6 @@ export class ManualImportComponent implements OnInit {
 	private fetchFileContent: any;
 	private transformFileContent: any;
 	private viewDataType: string;
-	private file: any = {
-		uploadRestrictions : { allowedExtensions: ['csv', 'txt', 'xml', 'json', '.xlxs', 'xls'] },
-		uploadSaveUrl : 'saveUrl',
-		uploadDeleteUrl : 'removeUrl',
-		autoUpload: false,
-		checked: false,
-		fileUID: null
-	};
 	private uiConfig: any = {
 		labelColSize: 3,
 		inputColSize: 3,
@@ -40,7 +34,9 @@ export class ManualImportComponent implements OnInit {
 		urlColSize: 2
 	};
 
-	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) { }
+	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
+		this.file.fileUID = null;
+	}
 
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
@@ -195,7 +191,6 @@ export class ManualImportComponent implements OnInit {
 	private clearFilename(e?: any) {
 		this.fetchResult = null;
 		this.fetchFileContent = null;
-		this.file.fileUID = null;
 	}
 
 	private onSelectFile(e?: any): void {
@@ -203,6 +198,9 @@ export class ManualImportComponent implements OnInit {
 	}
 
 	private onRemoveFile(e: RemoveEvent): void {
+		if (!this.fetchResult || !this.fetchResult.filename) {
+			return;
+		}
 		e.data = { filename: this.fetchResult.filename };
 	}
 
@@ -221,6 +219,7 @@ export class ManualImportComponent implements OnInit {
 		if (response.operation === 'delete') { // file deleted successfully
 			// console.log(response.data);
 			this.clearFilename();
+			this.file.fileUID = null;
 		} else if (response.filename) { // file uploaded successfully
 			let filename = response.filename;
 			this.fetchResult = { status: 'success', filename: filename };

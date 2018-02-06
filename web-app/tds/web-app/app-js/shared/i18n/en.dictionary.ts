@@ -60,6 +60,9 @@ export const en_DICTIONARY: Object = {
 		'MANUAL_IMPORT': {
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
 			'FETCH_DATA_ACTION': 'Fetch with Data Action:',
+			'FETCH_DATA_ACTION_FILE': 'Fetch with File Upload:',
+			'FETCH_DATA_ACTION_USING': 'Currently used',
+			'FETCH_DATA_ACTION_OR': 'or',
 			'TRANSFORM_DATA_SCRIPT': 'Transform with Data Script:',
 			'LOAD_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
 			'GOTO_IMPORT_BATCHES': 'Go to Manage Import Batches',
