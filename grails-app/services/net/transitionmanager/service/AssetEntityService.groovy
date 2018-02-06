@@ -58,6 +58,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 import javax.servlet.http.HttpSession
+import java.text.DateFormat
 import java.util.regex.Matcher
 
 @Transactional
@@ -1398,8 +1399,7 @@ class AssetEntityService implements ServiceMethods {
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
 		String userTzId = userPreferenceService.timeZone
-		Date createdDate = TimeUtil.moveDateFromGMTToTZ(assetEntity.dateCreated, userTzId)
-		Date lastUpdated = TimeUtil.moveDateFromGMTToTZ(assetEntity.lastUpdated, userTzId)
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
@@ -1434,8 +1434,8 @@ class AssetEntityService implements ServiceMethods {
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			customs: customFields,
-			dateCreated: createdDate,
-			lastUpdated: lastUpdated,
+			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
+			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
 			standardFieldSpecs: standardFieldSpecs
 		]
 	}
