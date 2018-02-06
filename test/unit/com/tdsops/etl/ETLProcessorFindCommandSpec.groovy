@@ -25,7 +25,7 @@ class ETLProcessorFindCommandSpec extends Specification {
 	String applicationDataSetContent
 	Project GMDEMO
 	Project TMDEMO
-
+	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
 	static doWithSpring = {
@@ -78,6 +78,7 @@ application id,vendor name,technology,location
 		validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 
+		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value'() {
@@ -109,7 +110,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -242,7 +243,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -390,7 +391,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -550,7 +551,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -644,7 +645,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -722,7 +723,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -794,7 +795,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -932,7 +933,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -1067,7 +1068,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -1161,7 +1162,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -1252,7 +1253,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
@@ -1347,7 +1348,7 @@ application id,vendor name,technology,location
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
+					debugConsole,
 					validator)
 
 		when: 'The ETL script is evaluated'
