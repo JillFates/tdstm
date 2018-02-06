@@ -116,4 +116,10 @@ class DataScript {
         return dataMap
     }
 
+
+    static final List<Map> domainReferences = [
+            [domain: ApiAction, delete: "null", property: "defaultDataScript", domainLabel: "API Action"]
+
+    ]
+
 }
