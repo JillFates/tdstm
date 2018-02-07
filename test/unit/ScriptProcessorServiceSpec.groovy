@@ -1,7 +1,10 @@
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.*
@@ -13,7 +16,7 @@ import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import spock.lang.Specification
 
 @TestFor(ScriptProcessorService)
-@Mock([DataScript, Project, Database, AssetEntity, Setting])
+@Mock([DataScript, Project, Database, AssetEntity, Setting, Application, Database])
 class ScriptProcessorServiceSpec extends Specification {
 
     String sixRowsDataSetFileName
@@ -146,7 +149,19 @@ class ScriptProcessorServiceSpec extends Specification {
         and:
             GroovyMock(AssetEntity, global: true)
             AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-                applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
+                applications.findAll { it.id == args.id && it.project.id == args.project.id }
+            }
+
+        and:
+            GroovyMock(GormUtil, global: true)
+            GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+                true
+            }
+            GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+                propertyName == 'id'
+            }
+            GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+                true
             }
 
         and:
@@ -155,9 +170,10 @@ class ScriptProcessorServiceSpec extends Specification {
                 read labels
                 iterate {
                     domain Application
+                    extract 'application id' load id
+                    extract 'vendor name' load Vendor
                     set environment with Production
-                    extract 'location' load Vendor
-                    reference assetName with Vendor
+                    find Application 'for' id by id with DOMAIN.id
                 }
             """.stripIndent()
 
@@ -168,40 +184,56 @@ class ScriptProcessorServiceSpec extends Specification {
             with(result) {
                 isValid
                 consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
-                with(data.get(ETLDomain.Application)[0]) {
+                data.domains.size() == 1
+                with(data.domains[0]) {
+                    domain == ETLDomain.Application.name()
+                    fields == ['id', 'appVendor', 'environment'] as Set
 
-                    with(elements[0]) {
-                        originalValue == "Production"
-                        value == "Production"
-                        field.name == "environment"
+                    with(data[0].fields.id) {
+                        value == '152254'
+                        originalValue == '152254'
+                        find.size == 1
+                        find.results == [ 152254 ]
+                        find.matchOn == 1
+                        find.query.size() == 1
+                        find.query[0].domain == ETLDomain.Application.name()
+                        find.query[0].kv.id == '152254'
                     }
 
-                    with(elements[1]) {
-                        originalValue == "ACME Data Center"
-                        value == "ACME Data Center"
-                        field.name == "Vendor"
-                        field.label == "Vendor"
+                    with(data[1].fields.id) {
+                        value == '152255'
+                        originalValue == '152255'
+                        find.size == 1
+                        find.results == [ 152255 ]
+                        find.matchOn == 1
+                        find.query.size() == 1
+                        find.query[0].domain == ETLDomain.Application.name()
+                        find.query[0].kv.id == '152255'
                     }
 
-                    reference == [152254, 152255]
-                }
-
-                with(data.get(ETLDomain.Application)[1]) {
-
-                    with(elements[0]) {
-                        originalValue == "Production"
-                        value == "Production"
-                        field.name == "environment"
+                    with(data[0].fields.appVendor) {
+                        value == 'Microsoft'
+                        originalValue == 'Microsoft'
+                        !find.query
                     }
 
-                    with(elements[1]) {
-                        originalValue == "ACME Data Center"
-                        value == "ACME Data Center"
-                        field.name == "Vendor"
-                        field.label == "Vendor"
+                    with(data[1].fields.appVendor) {
+                        value == 'Mozilla'
+                        originalValue == 'Mozilla'
+                        !find.query
                     }
 
-                    reference == [152254, 152255]
+                    with(data[0].fields.environment) {
+                        value == 'Production'
+                        originalValue == 'Production'
+                        !find.query
+                    }
+
+                    with(data[1].fields.environment) {
+                        value == 'Production'
+                        originalValue == 'Production'
+                        !find.query
+                    }
                 }
             }
     }
@@ -253,9 +285,9 @@ class ScriptProcessorServiceSpec extends Specification {
         then: 'Service result has validSyntax equals false and a list of errors'
             with(result) {
                 !isValid
-                error == 'Invalid domain: \'Unknown\'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment]'
+                error == 'Invalid domain: \'Unknown\'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency]'
                 consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
-                !data
+                !data.domains
             }
     }
 
