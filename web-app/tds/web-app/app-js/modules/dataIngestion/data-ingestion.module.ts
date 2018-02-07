@@ -31,7 +31,7 @@ import { NumericTextBoxModule } from '@progress/kendo-angular-inputs';
 // Services
 import { DataIngestionService } from './service/data-ingestion.service';
 import {UploadModule} from '@progress/kendo-angular-upload';
-import {FileUploadInterceptor} from './components/data-script-sample-data/file-upload.interceptor';
+import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {ImportAssetsService} from '../importAssets/service/import-assets.service';
 
@@ -69,7 +69,7 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 	providers: [DataIngestionService,
 		ImportAssetsService, {
 		provide: HTTP_INTERCEPTORS,
-		useClass: FileUploadInterceptor,
+		useClass: KendoFileUploadInterceptor,
 		multi: true
 	}],
 	exports: [
