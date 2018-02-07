@@ -58,7 +58,7 @@
 					<tr id="assetShowId" class="prop">
 						<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 						<td valign="top" class="value" id="assetShowValueId" colspan="3">
-							<a ng-click="getEntityDetails();">{{acData.assetName}}</a>
+							<span class="clickableText" ng-click="getEntityDetails();">{{acData.assetName}}</span>
 						</td>
 					</tr>
 					<tr>

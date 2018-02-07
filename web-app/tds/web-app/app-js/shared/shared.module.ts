@@ -17,6 +17,7 @@ import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
+import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -37,6 +38,7 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
+import { DynamicComponent } from './components/dynamic.component';
 import { DictionaryService } from './services/dictionary.service';
 
 @NgModule({
@@ -57,6 +59,7 @@ import { DictionaryService } from './services/dictionary.service';
 		FormlyInputHorizontal,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		ErrorPageComponent,
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
@@ -77,6 +80,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIActiveDialogService,
 		UIPromptService,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		DictionaryService,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
@@ -85,6 +89,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIDialogDirective,
 		UIBooleanPipe,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		TranslatePipe,
 		FilterPipe,
 		HeaderComponent,

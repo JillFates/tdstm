@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -34,6 +34,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
+	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	private state: State = {
@@ -55,6 +57,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
+	private gridDomElement: any;
 
 	private availableControls = [
 		{ text: 'List', value: 'List' },
@@ -63,7 +66,9 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor(private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) { }
+	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private el: ElementRef, private dialogService: UIDialogService) {
+		this.gridDomElement = this.el.nativeElement;
+	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -238,10 +243,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
-	protected onControlChange(
-		dataItem: FieldSettingsModel,
-		selectList: SelectListConfigurationPopupComponent,
-		minMax: MinMaxConfigurationPopupComponent): void {
+	protected onControlChange(dataItem: FieldSettingsModel): void {
 		switch (dataItem.control) {
 			case 'List':
 
@@ -254,7 +256,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					dataItem.constraints.values.length === 0) {
 					// selectList.onToggle();
 				} else {
-					selectList.show = false;
+					this.selectList.show = false;
 				}
 				break;
 			case 'String':
@@ -263,7 +265,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					!dataItem.constraints.maxSize) {
 					// minMax.onToggle();
 				} else {
-					minMax.show = false;
+					this.minMax.show = false;
 				}
 				break;
 			case 'YesNo':
@@ -343,6 +345,25 @@ export class FieldSettingsGridComponent implements OnInit {
 			}).catch(result => {
 				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
 			});
+		}
+	}
+
+	/**
+	 * Fix for config popup shown inside kendo grid:
+	 * This is called when any field control configuration popup is shown.
+	 * It grabs event emitter of control configuration component, and scrolls grid where the popup appears.
+	 */
+	private onControlConfigPopupShown(): void {
+		let gridVirtualSection: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
+		let dialogWrapper: any = gridVirtualSection.querySelector('kendo-dialog.k-dialog-wrapper');
+		let dialogBackgroundWrapper: any = gridVirtualSection.querySelector('div.k-overlay');
+		let dialogDiv: any = gridVirtualSection.querySelector('div.k-widget.k-window.k-dialog');
+		if (dialogWrapper && dialogBackgroundWrapper) {
+			dialogWrapper.style.height = (dialogDiv.offsetHeight + 20).toString() + 'px';
+			if (dialogBackgroundWrapper.offsetHeight < gridVirtualSection.offsetHeight) {
+				dialogBackgroundWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
+			}
+			gridVirtualSection.scrollTop = 0;
 		}
 	}
 

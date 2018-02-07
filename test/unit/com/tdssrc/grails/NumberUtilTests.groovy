@@ -130,4 +130,14 @@ class NumberUtilTests extends Specification {
 				assert it instanceof Long
 			}
 	}
+
+   void testToPositiveLongList(){
+      List<String> listOfStrings = ["1", "2", "nada", null, "3", "-4"]
+      expect:
+      [1L,2L,3L] == NumberUtil.toPositiveLongList(listOfStrings)
+
+      NumberUtil.toPositiveLongList(listOfStrings).each {
+         assert it instanceof Long
+      }
+   }
 }

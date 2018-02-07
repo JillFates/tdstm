@@ -169,7 +169,7 @@ class RoomService implements ServiceMethods {
 	/**
 	 * Used to retrieve an existing room or create it on demand. Here are a few rules:
 	 *    1. If the location, roomName and rackName are blank then nothing is done
-	 *    2. If the any of the parameters are not blank then a Room will be created
+	 *    2. If any of the parameters are not blank then a Room will be created
 	 *    3. If either location or roomName is blank then they will default to 'TBD'
 	 * @param project - the project that the room is associated with
 	 * @param location - the location name

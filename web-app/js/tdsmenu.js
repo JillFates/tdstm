@@ -143,6 +143,7 @@ function updateWelcome( e ) {
 		window.location.reload()
 	}
 }
+
 function setUserTimeZone( tz ){
 	new Ajax.Request('/tdstm/project/setUserTimeZone',{asynchronous:true,evalScripts:true,onComplete:function(e){updateTimeZone(e)},parameters:'tz=' + tz });
 }

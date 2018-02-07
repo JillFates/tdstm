@@ -11,6 +11,12 @@ import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 import { PreferenceService } from '../../shared/services/preference.service';
 
+/**
+ * Top menu parent section class for all Assets Explorer module.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
+
 const assetsListSizeResolve = {
 	token: 'preferences',
 	policy: { async: 'RXWAIT', when: 'EAGER' },
@@ -67,7 +73,8 @@ export const assetExplorerReportSelectorState: Ng2StateDeclaration = <Ng2StateDe
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER']
+			menu: ['ASSETS.ASSETS', 'ASSET_EXPLORER.ASSET_EXPLORER'],
+			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-manager'}
 		},
 		requiresAuth: true,
 		// requiresPermission: 'AssetExplorerSelection'
@@ -167,7 +174,8 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 		page: {
 			title: 'ASSET_EXPLORER.ASSET_EXPLORER',
 			instruction: '',
-			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW']
+			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW'],
+			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer'}
 		},
 		requiresAuth: true,
 		hasPendingChanges: false

@@ -28,6 +28,15 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 		}
 	}
 
+	public onToggle(): void {
+		this.show = !this.show;
+		if (this.show) {
+			setTimeout( () => {
+				this.onShowPopupEmitter.emit();
+			}, 200);
+		}
+	}
+
 	/**
 	 * Validates the form
 	 */

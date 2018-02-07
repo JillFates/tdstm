@@ -22,6 +22,14 @@ export const en_DICTIONARY: Object = {
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		},
 		'DEPENDENCY_DETAIL': 'Dependency Detail',
+		'INDEX': {
+			'SAVED_VIEWS': 'Saved Views',
+			'ACTION': 'Action',
+			'FAVORITE': 'Favorite',
+			'NAME': 'Name',
+			'CREATED_BY': 'Created By',
+			'SHARED': 'Shared',
+		},
 		'SYSTEM_VIEW': 'System View'
 	},
 	'DATA_INGESTION': {

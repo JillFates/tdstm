@@ -67,6 +67,7 @@ export class AssetExplorerViewGridComponent {
 	showMessage = true;
 	typingTimeout: any;
 	// Pagination Configuration
+	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = MAX_DEFAULT;
 	private maxOptions = MAX_OPTIONS;
 
@@ -164,14 +165,14 @@ export class AssetExplorerViewGridComponent {
 		}
 		if (e.code === KEYSTROKE.ENTER) {
 			this.onFilter();
-		} else if (e.code !== KEYSTROKE.TAB && e.code !== KEYSTROKE.SHIFT_RIGHT && e.code !== KEYSTROKE.SHIFT_LEFT) {
+		} else if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
-		if (e.code !== 'Tab') {
+		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
 	}
@@ -188,6 +189,9 @@ export class AssetExplorerViewGridComponent {
 			total: data.pagination.total
 		};
 		this.showMessage = data.pagination.total === 0;
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
 	}
 
 	clear(): void {

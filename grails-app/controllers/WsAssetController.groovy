@@ -10,6 +10,14 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.*
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DeviceService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.StorageService
+import grails.gsp.PageRenderer
+import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 import java.text.DateFormat
 
@@ -23,6 +31,7 @@ class WsAssetController implements ControllerMethods {
 
 	ApplicationService applicationService
 	AssetEntityService assetEntityService
+	AssetService assetService
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
@@ -219,6 +228,16 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+   /**
+    * Delete multiple Asset Dependencies.
+    * @param : dependencyIds[]  : list of ids for which assets are requested to be deleted
+    */
+   @HasPermission(Permission.AssetEdit)
+   def bulkDeleteDependencies(){
+      Project project = projectForWs
+      renderAsJson(resp: assetService.bulkDeleteDependencies(project, params.list("dependencyIds[]")))
+   }
+
 	/**
 	 * Update Asset Dependency Fields
 	 * @return
@@ -272,7 +291,6 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		domainName=domainName.toLowerCase()
-
 		try {
 			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
 			if (pageHtml) {

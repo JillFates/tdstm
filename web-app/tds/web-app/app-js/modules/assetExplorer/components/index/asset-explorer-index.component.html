@@ -5,7 +5,7 @@
 				<div class="box box-primary">
                         <div class="box-header with-border">
 						<span class="glyphicon glyphicon-th-list"></span>
-						<h3 class="box-title box-title-folder-list">Saved views</h3>
+						<h3 class="box-title box-title-folder-list">{{'ASSET_EXPLORER.INDEX.SAVED_VIEWS' | translate}}</h3>
 					</div>
 					<div class="box-body no-padding">
 						<ul class="nav nav-pills nav-stacked">
@@ -42,13 +42,18 @@
 					<!-- /.box-header -->
 					<div class="box-body no-padding">
 						<div class="table-responsive">
+							<div class="box-tools-actions pull-left" *ngIf="isCreateVisible() && isCreateAvailable()">
+								<button (click)="onCreateReport()" class="btn btn-primary">
+									<i class="fa fa-plus-square"></i> {{'ASSET_EXPLORER.CREATE' | translate}}</button>
+							</div>
 							<table class="table table-hover table-striped">
 								<thead>
 									<tr>
-										<th class="text-center">Action</th>
-										<th class="text-center">Favorite</th>
-										<th>Name</th>
-										<th class="text-center">Shared</th>
+										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
+										<th class="text-center">{{'ASSET_EXPLORER.INDEX.FAVORITE' | translate}}</th>
+										<th>{{'ASSET_EXPLORER.INDEX.NAME' | translate}}</th>
+                                        <th>{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}</th>
+										<th class="text-center">{{'ASSET_EXPLORER.INDEX.SHARED' | translate}}</th>
 										<!-- <th class="text-center">Subscribe</th> -->
 									</tr>
 								</thead>
@@ -70,6 +75,9 @@
 										<td>
 											<a uiSref="tds.assetexplorer_show" [uiParams]="{id:report.id}">{{report.name}}</a>
 										</td>
+                                        <td>
+                                            {{report.createdBy}}
+                                        </td>
 										<td class="text-center">
 											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared || report.isSystem"></span>
 										</td>

@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -44,7 +44,7 @@ import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 		}
 	`]
 })
-export class AssetExplorerViewConfigComponent {
+export class AssetExplorerViewConfigComponent implements OnInit {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
@@ -99,6 +99,13 @@ export class AssetExplorerViewConfigComponent {
 				this.draggableColumns = this.model.schema.columns.slice();
 			}
 		}, (err) => console.log(err));
+	}
+
+	ngOnInit(): void {
+		if (this.model.id) {
+			this.previewButtonClicked = true;
+			this.onPreview();
+		}
 	}
 
 	protected updateFilterbyModel() {
@@ -383,12 +390,30 @@ export class AssetExplorerViewConfigComponent {
 		this.previewButtonClicked = false;
 	}
 
+	/**
+	 * This method allows to modify the signature to allow to change favorite without affect the model.
+	 * TODO: It could be moved into a Signature Class Utility to not have all this logic spread on sereval components
+	 * @param {boolean} isFavorite
+	 */
+	private modifyFavoriteSignature(isFavorite: boolean): void {
+		let signature = JSON.parse(this.dataSignature);
+		signature.isFavorite = isFavorite;
+		this.dataSignature = JSON.stringify(signature);
+	}
+
 	protected onFavorite() {
 		if (this.model.isFavorite) {
-			this.model.isFavorite = false;
 			if (this.model.id) {
-				this.select.loadData();
+				this.assetExpService.deleteFavorite(this.model.id)
+					.subscribe(d => {
+						this.model.isFavorite = false;
+						this.modifyFavoriteSignature(this.model.isFavorite);
+						this.select.loadData();
+					});
+			} else {
+				this.model.isFavorite = false;
 			}
+
 		} else {
 			if (this.assetExpService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
@@ -396,10 +421,18 @@ export class AssetExplorerViewConfigComponent {
 					message: 'Maximum number of favorite data views reached.'
 				});
 			} else {
-				this.model.isFavorite = true;
+				if (this.model.id) {
+					this.assetExpService.saveFavorite(this.model.id)
+						.subscribe(d => {
+							this.model.isFavorite = true;
+							this.modifyFavoriteSignature(this.model.isFavorite);
+							this.select.loadData();
+						});
+				} else {
+					this.model.isFavorite = true;
+				}
 			}
 		}
-
 	}
 
 	protected onPreview(): void {
@@ -412,6 +445,11 @@ export class AssetExplorerViewConfigComponent {
 		} else {
 			this.grid.gridData = null;
 		}
+	}
+
+	private freezeColumn(item: ViewColumn): void {
+		item.locked = !item.locked;
+		this.onLockedColumn(item);
 	}
 
 	protected onLockedColumn(item: ViewColumn): void {
@@ -452,6 +490,11 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
+		setTimeout(() => {
+			this.notifier.broadcast({
+				name: 'grid.header.position.change'
+			});
+		}, 1200);
 	}
 
 	protected onToggleSelectedColumnsPreview(): void {
