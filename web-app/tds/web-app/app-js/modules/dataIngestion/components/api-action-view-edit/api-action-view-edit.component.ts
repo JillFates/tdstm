@@ -44,6 +44,20 @@ declare var jQuery: any;
 		.script-error {
 			margin-bottom: 18px;
 		}
+        .aligned-label {
+            padding-left: 15px;
+            text-indent: -15px;
+        }
+        .aligned-checkbox {
+            width: 13px;
+            height: 13px;
+            padding: 0;
+            margin:0 4px 0;
+            vertical-align: bottom;
+            position: relative;
+            top: -1px;
+            *overflow: hidden;
+        }
 	`]
 })
 export class APIActionViewEditComponent implements OnInit {
