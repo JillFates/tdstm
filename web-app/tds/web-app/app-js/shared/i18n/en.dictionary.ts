@@ -33,14 +33,24 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATA_SCRIPT': 'Create Data Script',
 		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
-		'SAMPLE_DATA_TITLE': 'Sample Data',
-		'ETL_BUILDER_TITLE': 'DataScript Designer',
-		'CONSOLE_TITLE': 'ETL Console',
-		'ETL_BUILDER': {
-			'TEST': 'Test',
-			'CHECK_SYNTAX': 'Check Syntax',
-			'LOAD_SAMPLE_DATA': 'Load Sample Data',
-			'VIEW_CONSOLE': 'View Console'
+		'DATASCRIPT': {
+			'DESIGNER': {
+				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',
+				'TRANSFORMED_DATA_PREVIEW': 'Transformed Data Preview',
+				'SYNTAX_ERRORS': 'Syntax Errors',
+				'ETL_BUILDER_TITLE': 'DataScript Designer',
+				'CONSOLE_TITLE': 'ETL Console',
+				'SAMPLE_DATA_TITLE': 'Sample Data',
+				'TEST': 'Test',
+				'CHECK_SYNTAX': 'Check Syntax',
+				'LOAD_SAMPLE_DATA': 'Load Sample Data',
+				'VIEW_CONSOLE': 'View Console',
+				'FILE_EXTENSION': 'File Extension',
+				'PASTE_CONTENT': 'Paste content (CSV, TXT, JSON, XML)',
+				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON, XML)',
+				'FETCH_DATA_FROM_WEBSERVICE': 'Fetch data from web service',
+				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.'
+			}
 		}
 	},
 	'FIELD_SETTINGS': {
@@ -96,6 +106,8 @@ export const en_DICTIONARY: Object = {
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
+		'UPLOAD': 'Upload',
+		'FETCH': 'Fetch'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
