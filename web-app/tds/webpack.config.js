@@ -42,7 +42,7 @@ module.exports = function (env, argv) {
 			}),
 			new webpack.optimize.UglifyJsPlugin({
 				comments: false,
-				sourceMap: devEnv,
+				sourceMap: true,
 				exclude: [/\.min\.js$/gi] // skip pre-minified libs
 			}),
 			new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
@@ -53,7 +53,7 @@ module.exports = function (env, argv) {
 		],
 		cache: true,
 		context: __dirname,
-		watch: devEnv,
+		watch: false,
 		watchOptions: {
 			ignored: /node_modules/,
 			aggregateTimeout: 300,
