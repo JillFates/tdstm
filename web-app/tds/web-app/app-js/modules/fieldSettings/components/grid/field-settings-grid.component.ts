@@ -57,7 +57,6 @@ export class FieldSettingsGridComponent implements OnInit {
 	private isFilterDisabled = false;
 	private sortable: boolean | object = { mode: 'single' };
 	private fieldsToDelete = [];
-	private gridDomElement: any;
 
 	private availableControls = [
 		{ text: 'List', value: 'List' },
@@ -66,8 +65,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private el: ElementRef, private dialogService: UIDialogService) {
-		this.gridDomElement = this.el.nativeElement;
+	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) {
 	}
 
 	ngOnInit(): void {
@@ -243,7 +241,10 @@ export class FieldSettingsGridComponent implements OnInit {
 		this.gridData = process(this.fieldsSettings, this.state);
 	}
 
-	protected onControlChange(dataItem: FieldSettingsModel): void {
+	protected onControlChange(
+		dataItem: FieldSettingsModel,
+		selectList: SelectListConfigurationPopupComponent,
+		minMax: MinMaxConfigurationPopupComponent): void {
 		switch (dataItem.control) {
 			case 'List':
 
@@ -345,25 +346,6 @@ export class FieldSettingsGridComponent implements OnInit {
 			}).catch(result => {
 				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
 			});
-		}
-	}
-
-	/**
-	 * Fix for config popup shown inside kendo grid:
-	 * This is called when any field control configuration popup is shown.
-	 * It grabs event emitter of control configuration component, and scrolls grid where the popup appears.
-	 */
-	private onControlConfigPopupShown(): void {
-		let gridVirtualSection: any = this.gridDomElement.getElementsByClassName('k-grid-content k-virtual-content')[0];
-		let dialogWrapper: any = gridVirtualSection.querySelector('kendo-dialog.k-dialog-wrapper');
-		let dialogBackgroundWrapper: any = gridVirtualSection.querySelector('div.k-overlay');
-		let dialogDiv: any = gridVirtualSection.querySelector('div.k-widget.k-window.k-dialog');
-		if (dialogWrapper && dialogBackgroundWrapper) {
-			dialogWrapper.style.height = (dialogDiv.offsetHeight + 20).toString() + 'px';
-			if (dialogBackgroundWrapper.offsetHeight < gridVirtualSection.offsetHeight) {
-				dialogBackgroundWrapper.style.height = gridVirtualSection.offsetHeight.toString() + 'px';
-			}
-			gridVirtualSection.scrollTop = 0;
 		}
 	}
 

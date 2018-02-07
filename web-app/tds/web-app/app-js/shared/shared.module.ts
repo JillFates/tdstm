@@ -38,7 +38,6 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 // Routing Logic
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
-import { DynamicComponent } from './components/dynamic.component';
 import { DictionaryService } from './services/dictionary.service';
 
 @NgModule({

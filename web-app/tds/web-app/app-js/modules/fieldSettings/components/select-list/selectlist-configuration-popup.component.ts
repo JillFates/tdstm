@@ -1,13 +1,12 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import {Component, Inject, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import { SortableComponent } from '@progress/kendo-angular-sortable';
+import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
-declare var jQuery: any;
 /**
  *
  */
@@ -114,9 +113,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 			if (this.sortType) {
 				this.sortItems();
 			}
-			setTimeout(function () {
-				jQuery('#newItem').focus();
-			});
 		}
 	}
 
