@@ -9,7 +9,7 @@
 
                         <!-- Fetch(Dropdown action) Row -->
                         <div class="form-group row" style="margin-bottom: 5px;">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION' | translate}}</label>
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetch">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_DATA_ACTION' | translate}}</label>
                             <div class="col-sm-{{uiConfig.inputColSize}}">
                                 <select [(ngModel)]="selectedActionOption"
                                         (ngModelChange)="onActionScriptChange($event)"
@@ -29,7 +29,7 @@
                             </button>
                             <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
                                   class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_USING' | translate}}
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
                                 <br>
                                 <a href="javascript:void(0);"
                                    (click)="onViewData('FETCH')" >
@@ -39,11 +39,11 @@
 
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_OR' | translate}}</label>
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" style="padding-right: 5%">{{'IMPORT_ASSETS.MANUAL_IMPORT.OR' | translate}}</label>
                         </div>
                         <!-- Fetch(File Upload) Row -->
                         <div class="form-group row">
-                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_FILE' | translate}}</label>
+                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="fetchWithFile">{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_WITH_FILE_UPLOAD' | translate}}</label>
                             <div class="col-sm-{{ (uiConfig.inputColSize + uiConfig.buttonColSize) }}" style="padding-right: 0;">
                                 <kendo-upload
                                         #kendoUploadInstance="kendoUpload"
@@ -63,7 +63,7 @@
                             </div>
                             <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
                                   class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH_DATA_ACTION_USING' | translate}}
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
                                 <br>
                                 <a href="javascript:void(0);"
                                    (click)="onViewData('FETCH')">
@@ -77,7 +77,7 @@
                         <!-- Transform Datascript Row -->
                         <div class="form-group row">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label" for="transform">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_DATA_SCRIPT' | translate}}
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM_WITH_DATA_SCRIPT' | translate}}
                            </label>
                            <div class="col-sm-{{uiConfig.inputColSize}}">
                                <select [(ngModel)]="selectedScriptOption" name="transform" id="transform" class="form-control pd-top-5">
@@ -104,7 +104,7 @@
                         <!-- Load Data Row -->
                         <div class="form-group row" style="margin-bottom: 20px;">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_DATA_INTO_IMPORT' | translate}}
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
                            <button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
@@ -115,7 +115,7 @@
                                <i *ngIf="importResult?.status === 'error'" class="glyphicon glyphicon-remove"></i>
                            </button>
                            <a href="../dataTransferBatch/list" class="control-label col-sm-{{uiConfig.urlColSize}}">
-                               {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_IMPORT_BATCHES' | translate}}
+                               {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_IMPORT_BATCHES' | translate}}
                            </a>
                         </div>
 
