@@ -76,6 +76,16 @@
 			</div>
 		</td>
 	</tr>
+	<tr>
+		<td colspan="2">
+			<table class="dates-info" >
+				<tr>
+					<td class="date-created">Date created: ${dateCreated}</td>
+					<td class="last-updated">Last updated: ${lastUpdated}</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 	<tr id="deps">
 		<g:render template="../assetEntity/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 	</tr>

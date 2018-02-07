@@ -434,8 +434,11 @@
 						</tbody>
 						</tbody>
 					</table>
-				</div></td>
+				</div>
+			</td>
 		</tr>
+
+
 
 		<g:if test="${action == 'save'}">
 			<tr>

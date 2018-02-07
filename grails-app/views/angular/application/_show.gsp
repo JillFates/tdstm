@@ -149,3 +149,10 @@
 		<g:render template="assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
 	</tbody>
 </table>
+
+<table class="dates-info" >
+	<tr>
+		<td class="date-created">Date created: ${dateCreated}</td>
+		<td class="last-updated">Last updated: ${lastUpdated}</td>
+	</tr>
+</table>
