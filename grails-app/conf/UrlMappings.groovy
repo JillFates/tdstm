@@ -751,6 +751,13 @@ class UrlMappings {
 			]
 		}
 
+     "/ws/filename" {
+        controller = "wsAsset"
+        action = [
+                POST: "exportFilename"
+        ]
+     }
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version
