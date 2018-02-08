@@ -14,6 +14,14 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		/**
+		 * View Controller
+		 */
+		"/moveBundle/dependencyConsole/$groupId?/map?" {
+			controller = "moveBundle"
+			action = [GET:"dependencyConsole"]
+		}
+
 		/*
 		TM-5299 Commenting out the line below because it's interfering
 		with requests that pass a 'format' parameter.

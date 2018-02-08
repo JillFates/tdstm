@@ -387,6 +387,12 @@
 			$(document).ready(function () {
 				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
+				var showMap = '${showMap}';
+				if(showMap == "true") {
+				    // TM-8842, show the Dependency Analyzer Map, drilled-in from the group Id
+				    getList("apps", '${groupId}');
+            getList("graph", '${groupId}');
+        }
 			});
 
 		</script>

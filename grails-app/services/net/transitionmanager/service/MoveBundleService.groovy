@@ -252,7 +252,7 @@ class MoveBundleService implements ServiceMethods {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties
 	 */
-	def dependencyConsoleMap(Project project, moveBundleId, String isAssigned, dependencyBundle, boolean graph = false) {
+	def dependencyConsoleMap(Project project, moveBundleId, String isAssigned, dependencyBundle, boolean graph = false, groupId =  null) {
 		Date startAll = new Date()
 		def dependencyConsoleList = []
 
@@ -394,6 +394,9 @@ class MoveBundleService implements ServiceMethods {
 			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone"}
 		}
 
+		boolean showMap = groupId != null
+
+
 		def entities = assetEntityService.entityInfo(project)
 
 		// Used by the Assignment Dialog
@@ -443,7 +446,9 @@ class MoveBundleService implements ServiceMethods {
 			isAssigned:isAssigned,
 			moveBundleList:allMoveBundles,
 			depGrpCrt:depGrpCrt,
-			compactPref: compactPref]
+			compactPref: compactPref,
+			showMap:showMap,
+			groupId:groupId]
 
 		logger.info 'dependencyConsoleMap() : OVERALL took {}', TimeUtil.elapsed(startAll)
 
