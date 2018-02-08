@@ -41,12 +41,7 @@ class WsUserController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def savePreference() {
-		try {
-			userPreferenceService.setPreference(params.code?.toString() ?: '', params.value ?: '')
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		userPreferenceService.setPreference(params.code?.toString() ?: '', params.value ?: '')
+		renderSuccessJson()
 	}
 }

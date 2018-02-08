@@ -29,7 +29,6 @@ import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
@@ -48,7 +47,6 @@ class PersonController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
@@ -224,17 +222,12 @@ class PersonController implements ControllerMethods {
 		// Convert from Ljava.lang.String or String to a list
 		List idsToDelete = (ids instanceof String) ? [ids] : ids
 
-		try {
-			Person byWhom = securityService.getUserLoginPerson()
-			controllerService.checkPermissionForWS(Permission.PersonBulkDelete)
+		Person byWhom = securityService.getUserLoginPerson()
+		controllerService.checkPermissionForWS(Permission.PersonBulkDelete)
 
-			boolean deleteIfAssocWithAssets = (params.deleteIfAssocWithAssets == 'true')
-			Map results = personService.bulkDelete(byWhom, idsToDelete, deleteIfAssocWithAssets)
-			renderSuccessJson(results)
-		}
-		catch (e) {
-			handleException e, log
-		}
+		boolean deleteIfAssocWithAssets = (params.deleteIfAssocWithAssets == 'true')
+		Map results = personService.bulkDelete(byWhom, idsToDelete, deleteIfAssocWithAssets)
+		renderSuccessJson(results)
 	}
 
 	/**
@@ -470,7 +463,7 @@ class PersonController implements ControllerMethods {
 		def projectId = securityService.userCurrentProjectId
 		def submit = params.submit
 		def projectStaff = partyRelationshipService.getProjectStaff(projectId)
-		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'')
+		def companiesStaff = partyRelationshipService.getProjectCompaniesStaff(projectId,'', true)
 		def projectCompanies = partyRelationshipService.getProjectCompanies(projectId)
 		[projectStaff: projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies,
 		 projectId: projectId, submit: submit, personHasPermission: securityService.hasPermission(Permission.AddPerson)]
@@ -505,12 +498,7 @@ class PersonController implements ControllerMethods {
 			flag = message.size() == 0
 		}
 
-		try{
-			renderSuccessJson(flag: flag, message: message)
-		}
-		catch (e) {
-			handleException e, log
-		}
+		renderSuccessJson(flag: flag, message: message)
 	}
 	/*
 	 * Method to save person details and create party relation with Project as well
@@ -999,15 +987,10 @@ class PersonController implements ControllerMethods {
 	@HasPermission(Permission.ProjectStaffEdit)
 	def saveEventStaff() {
 		// Security is checked in the service method
-		try {
-			Map json = request.JSON
-			String message = personService.assignToProjectEvent(json.personId, json.eventId,
-					json.roleType, NumberUtil.toInteger(json.val))
-			renderSuccessJson(flag: message.size() == 0, message: message)
-		}
-		catch (e) {
-			handleException e, log
-		}
+		Map json = request.JSON
+		String message = personService.assignToProjectEvent(json.personId, json.eventId,
+				json.roleType, NumberUtil.toInteger(json.val))
+		renderSuccessJson(flag: message.size() == 0, message: message)
 	}
 
 	/**

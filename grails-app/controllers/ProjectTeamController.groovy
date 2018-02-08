@@ -6,7 +6,6 @@ import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.SecurityService
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -16,7 +15,6 @@ class ProjectTeamController implements ControllerMethods {
 	static defaultAction = 'list'
 
 	PartyRelationshipService partyRelationshipService
-	SecurityService securityService
 
 	@HasPermission(Permission.ProjectTeamView)
 	def list(Long bundleId) {

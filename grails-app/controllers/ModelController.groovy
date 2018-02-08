@@ -30,7 +30,6 @@ class ModelController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	JdbcTemplate jdbcTemplate
 	ModelService modelService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.ModelList)

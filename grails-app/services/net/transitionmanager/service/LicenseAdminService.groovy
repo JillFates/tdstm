@@ -525,7 +525,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
      * @param requestNote - The note attached to the License Request
      *
      */
-    def DomainLicense generateRequest(String uuid, PartyGroup owner, String email, String environment, def projectId, String requestNote ){
+    DomainLicense generateRequest(String uuid, PartyGroup owner, String email, String environment, def projectId, String requestNote ){
 		DomainLicense lic
 
 		if (uuid != null && !uuid.isNumber()) {

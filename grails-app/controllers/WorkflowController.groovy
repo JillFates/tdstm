@@ -16,7 +16,6 @@ import net.transitionmanager.domain.WorkflowTransitionMap
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -36,7 +35,6 @@ class WorkflowController implements ControllerMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	StateEngineService stateEngineService
 
 	static defaultAction = 'home'

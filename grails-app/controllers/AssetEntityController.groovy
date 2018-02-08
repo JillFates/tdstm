@@ -64,7 +64,6 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProgressService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskImportExportService
 import net.transitionmanager.service.TaskService
@@ -137,7 +136,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	ProgressService progressService
 	ProjectService projectService
 	Scheduler quartzScheduler
-	SecurityService securityService
 	StateEngineService stateEngineService
 	TaskImportExportService taskImportExportService
 	TaskService taskService
@@ -2915,39 +2913,34 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def assetType = params.assetType
 
-		try {
-			if (assetType == 'Other') {
-				assetType = AssetType.NETWORK.toString()
-			}
-			def groups = [assetType]
-			def info = assetEntityService.entityInfo(project, groups)
-			def assets = []
-			switch (assetType) {
-				case AssetType.SERVER.toString():
-					assets = info.servers
-					break
-				case AssetType.APPLICATION.toString():
-					assets = info.applications
-					break
-				case AssetType.DATABASE.toString():
-					assets = info.dbs
-					break
-				case AssetType.STORAGE.toString():
-					assets = info.files
-					break
-				case AssetType.NETWORK.toString():
-					assets = info.networks
-					break
-			}
-			def result = [list: [], type: assetType]
-			assets.each {
-				result.list << [id:it[0], name: it[1]]
-			}
-			renderSuccessJson(result)
+		if (assetType == 'Other') {
+			assetType = AssetType.NETWORK.toString()
 		}
-		catch (e) {
-			handleException e, log
+		def groups = [assetType]
+		def info = assetEntityService.entityInfo(project, groups)
+		def assets = []
+		switch (assetType) {
+			case AssetType.SERVER.toString():
+				assets = info.servers
+				break
+			case AssetType.APPLICATION.toString():
+				assets = info.applications
+				break
+			case AssetType.DATABASE.toString():
+				assets = info.dbs
+				break
+			case AssetType.STORAGE.toString():
+				assets = info.files
+				break
+			case AssetType.NETWORK.toString():
+				assets = info.networks
+				break
 		}
+		def result = [list: [], type: assetType]
+		assets.each {
+			result.list << [id:it[0], name: it[1]]
+		}
+		renderSuccessJson(result)
 	}
 
 	/**
@@ -3180,13 +3173,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ModelView)
 	def modelsOf() {
-		try {
-			def models = assetEntityService.modelsOf(params.manufacturerId, params.assetType, params.term)
-			renderSuccessJson(models: models)
-		}
-		catch (e) {
-			handleException e, log
-		}
+		def models = assetEntityService.modelsOf(params.manufacturerId, params.assetType, params.term)
+		renderSuccessJson(models: models)
 	}
 
 	/**
@@ -3194,12 +3182,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ManufacturerView)
 	def manufacturer() {
-		try {
-			renderSuccessJson(manufacturers: assetEntityService.manufacturersOf(params.assetType, params.term))
-		}
-		catch (e) {
-			handleException e, log
-		}
+		renderSuccessJson(manufacturers: assetEntityService.manufacturersOf(params.assetType, params.term))
 	}
 
 	/**
@@ -3207,12 +3190,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def assetTypesOf() {
-		try {
-			renderSuccessJson(assetTypes: assetEntityService.assetTypesOf(params.manufacturerId, params.term))
-		}
-		catch (e) {
-			handleException e, log
-		}
+		renderSuccessJson(assetTypes: assetEntityService.assetTypesOf(params.manufacturerId, params.term))
 	}
 
 	@HasPermission(Permission.ArchitectureView)
@@ -3254,173 +3232,170 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ArchitectureView)
 	def applicationArchitectureGraph() {
-		try {
-			Project project = securityService.userCurrentProject
-			def assetId = NumberUtils.toInt(params.assetId)
-			def asset = AssetEntity.get(assetId)
-			def levelsUp = NumberUtils.toInt(params.levelsUp)
-			def levelsDown = NumberUtils.toInt(params.levelsDown)
-			def deps = []
-			def sups = []
-			def assetsList = []
-			def dependencyList = []
+		Project project = securityService.userCurrentProject
+		def assetId = NumberUtils.toInt(params.assetId)
+		def asset = AssetEntity.get(assetId)
+		def levelsUp = NumberUtils.toInt(params.levelsUp)
+		def levelsDown = NumberUtils.toInt(params.levelsDown)
+		def deps = []
+		def sups = []
+		def assetsList = []
+		def dependencyList = []
 
-			// maps asset type names to simpler versions
-			def assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
+		// maps asset type names to simpler versions
+		def assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
 
-			// Check if the parameters are null
-			if ((assetId == null || assetId == -1) || (params.levelsUp == null || params.levelsDown == null)) {
-				def model = [nodes: [] as JSON, links: [] as JSON, assetId: params.assetId, levelsUp: params.levelsUp,
-				             levelsDown: params.levelsDown, assetTypes: assetTypes, assetTypesJson: assetTypes as JSON,
-				             environment: Environment.current.name]
-				render(view: '_applicationArchitectureGraph', model: model)
-				return
-			}
-
-			if (asset.project != project) {
-				throw new UnauthorizedException()
-			}
-
-			// build the graph based on a specific asset
-			if (params.mode == "assetId") {
-
-				// recursively get all the nodes and links that depend on the asset
-				def stack = []
-				def constructDeps
-				constructDeps = { a, l ->
-					deps.push(a)
-					if (! (a in assetsList)) {
-						assetsList.push(a)
-					}
-					if (l > 0) {
-						def dependent = AssetDependency.findAllByAsset(a)
-						dependent.each {
-							if (! (it in dependencyList)) {
-								dependencyList.push(it)
-							}
-							constructDeps(it.dependent, l-1)
-						}
-					}
-				}
-				constructDeps(asset, levelsDown)
-
-				// recursively get all the nodes and links that support the asset
-				stack = []
-				def constructSups
-				constructSups = { a, l ->
-					sups.push(a)
-					if (! (a in assetsList)) {
-						assetsList.push(a)
-					}
-					if (l > 0) {
-						def supports = AssetDependency.findAllByDependent(a)
-						supports.each {
-							if (! (it in dependencyList)) {
-								dependencyList.push(it)
-							}
-							constructSups(it.asset, l-1)
-						}
-					}
-				}
-				constructSups(asset, levelsUp)
-
-			// this mode hasn't been implemented yet
-			} else if (params.mode == "dependencyBundle") {
-				def bundle = params.dependencyBundle
-				def assets = assetDependencyBundle.findAllWhere(project:project, dependencyBundle:bundle)
-			}
-
-			// find any links between assets that weren't found with the DFS
-			def assetIds = assetsList.id
-			def extraDependencies = []
-			assetsList.each { a ->
-				AssetDependency.findAllByAssetAndDependentInList(a, assetsList).each { dep ->
-					if (!(dep in dependencyList)) {
-						extraDependencies.push(dep)
-					}
-				}
-			}
-
-			// add in any extra dependencies that were found
-			dependencyList.addAll extraDependencies
-
-			def serverTypes = AssetType.allServerTypes
-
-			// Create the Nodes
-			def graphNodes = []
-			String name = ''
-			def shape = 'circle'
-			def size = 150
-			String title = ''
-			String color = ''
-			String type = ''
-			String assetType = ''
-			String assetClass = ''
-			Map criticalitySizes = [Minor: 150, Important: 200, Major: 325, Critical: 500]
-
-			// create a node for each asset
-			assetsList.each {
-
-				// get the type used to determine the icon used for this asset's node
-				assetType = it.model?.assetType ?: it.assetType
-				assetClass = it.assetClass?.toString() ?: ''
-				size = 150
-
-				type = getImageName(assetClass, assetType)
-				if (type == AssetType.APPLICATION.toString()) {
-					size = it.criticality ? criticalitySizes[it.criticality] : 200
-				}
-
-				graphNodes << [
-					id:it.id,
-					name: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
-					type:type, assetClass:it.assetClass.toString(),
-					shape:shape, size:size,
-					title: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
-					color: it == asset ? 'red' : 'grey',
-					parents:[], children:[], checked:false, siblings:[]
-				]
-			}
-
-			// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
-			def nodeIds = graphNodes*.id
-			def defaults = moveBundleService.getMapDefaults(graphNodes.size())
-
-			// Create the links
-			def graphLinks = []
-			def i = 0
-			def opacity = 1
-			def statusColor = 'grey'
-			dependencyList.each {
-				boolean notApplicable = !(it.status in [AssetDependencyStatus.ARCHIVED, AssetDependencyStatus.NA, AssetDependencyStatus.TESTING])
-				def future = it.isFuture
-				def unresolved = !it.isStatusResolved
-				def sourceIndex = nodeIds.indexOf(it.asset.id)
-				def targetIndex = nodeIds.indexOf(it.dependent.id)
-				if (sourceIndex != -1 && targetIndex != -1) {
-					graphLinks << [id: i, parentId: it.asset.id, childId: it.dependent.id, child: targetIndex,
-					               parent: sourceIndex, value: 2, opacity: opacity, redundant: false, mutual: null,
-					               notApplicable: notApplicable, future: future, unresolved: unresolved]
-					++i
-				}
-			}
-
-			// Set the dependency properties of the nodes
-			graphLinks.each {
-				if (!it.cyclical) {
-					graphNodes[it.child].parents.add(it.id)
-					graphNodes[it.parent].children.add(it.id)
-				}
-			}
-
-			render(view:'_applicationArchitectureGraph',
-			       model: [nodes: graphNodes as JSON, links: graphLinks as JSON, assetId: params.assetId,
-			               levelsUp: params.levelsUp, levelsDown: params.levelsDown, assetTypes: assetTypes,
-			               assetTypesJson: assetTypes as JSON, environment: Environment.current.name])
+		// Check if the parameters are null
+		if ((assetId == null || assetId == -1) || (params.levelsUp == null || params.levelsDown == null)) {
+			Map model = [
+				nodes: [] as JSON, links: [] as JSON, assetId: params.assetId, levelsUp: params.levelsUp,
+				levelsDown: params.levelsDown, assetTypes: assetTypes, assetTypesJson: assetTypes as JSON,
+				environment: Environment.current.name
+			]
+			render(view: '_applicationArchitectureGraph', model: model)
+			return
 		}
-		catch (e) {
-			handleException e, log
+
+		if (asset.project != project) {
+			throw new UnauthorizedException()
 		}
+
+		// build the graph based on a specific asset
+		if (params.mode == "assetId") {
+
+			// recursively get all the nodes and links that depend on the asset
+			def stack = []
+			def constructDeps
+			constructDeps = { a, l ->
+				deps.push(a)
+				if (! (a in assetsList)) {
+					assetsList.push(a)
+				}
+				if (l > 0) {
+					def dependent = AssetDependency.findAllByAsset(a)
+					dependent.each {
+						if (! (it in dependencyList)) {
+							dependencyList.push(it)
+						}
+						constructDeps(it.dependent, l-1)
+					}
+				}
+			}
+			constructDeps(asset, levelsDown)
+
+			// recursively get all the nodes and links that support the asset
+			stack = []
+			def constructSups
+			constructSups = { a, l ->
+				sups.push(a)
+				if (! (a in assetsList)) {
+					assetsList.push(a)
+				}
+				if (l > 0) {
+					def supports = AssetDependency.findAllByDependent(a)
+					supports.each {
+						if (! (it in dependencyList)) {
+							dependencyList.push(it)
+						}
+						constructSups(it.asset, l-1)
+					}
+				}
+			}
+			constructSups(asset, levelsUp)
+
+		// this mode hasn't been implemented yet
+		} else if (params.mode == "dependencyBundle") {
+			def bundle = params.dependencyBundle
+			def assets = assetDependencyBundle.findAllWhere(project:project, dependencyBundle:bundle)
+		}
+
+		// find any links between assets that weren't found with the DFS
+		def assetIds = assetsList.id
+		def extraDependencies = []
+		assetsList.each { a ->
+			AssetDependency.findAllByAssetAndDependentInList(a, assetsList).each { dep ->
+				if (!(dep in dependencyList)) {
+					extraDependencies.push(dep)
+				}
+			}
+		}
+
+		// add in any extra dependencies that were found
+		dependencyList.addAll extraDependencies
+
+		def serverTypes = AssetType.allServerTypes
+
+		// Create the Nodes
+		def graphNodes = []
+		String name = ''
+		def shape = 'circle'
+		def size = 150
+		String title = ''
+		String color = ''
+		String type = ''
+		String assetType = ''
+		String assetClass = ''
+		Map criticalitySizes = [Minor: 150, Important: 200, Major: 325, Critical: 500]
+
+		// create a node for each asset
+		assetsList.each {
+
+			// get the type used to determine the icon used for this asset's node
+			assetType = it.model?.assetType ?: it.assetType
+			assetClass = it.assetClass?.toString() ?: ''
+			size = 150
+
+			type = getImageName(assetClass, assetType)
+			if (type == AssetType.APPLICATION.toString()) {
+				size = it.criticality ? criticalitySizes[it.criticality] : 200
+			}
+
+			graphNodes << [
+				id:it.id,
+				name: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				type:type, assetClass:it.assetClass.toString(),
+				shape:shape, size:size,
+				title: SEU.escapeHtml(SEU.escapeJavaScript(it.assetName)),
+				color: it == asset ? 'red' : 'grey',
+				parents:[], children:[], checked:false, siblings:[]
+			]
+		}
+
+		// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
+		def nodeIds = graphNodes*.id
+		def defaults = moveBundleService.getMapDefaults(graphNodes.size())
+
+		// Create the links
+		def graphLinks = []
+		def i = 0
+		def opacity = 1
+		def statusColor = 'grey'
+		dependencyList.each {
+			boolean notApplicable = !(it.status in [AssetDependencyStatus.ARCHIVED, AssetDependencyStatus.NA, AssetDependencyStatus.TESTING])
+			def future = it.isFuture
+			def unresolved = !it.isStatusResolved
+			def sourceIndex = nodeIds.indexOf(it.asset.id)
+			def targetIndex = nodeIds.indexOf(it.dependent.id)
+			if (sourceIndex != -1 && targetIndex != -1) {
+				graphLinks << [id: i, parentId: it.asset.id, childId: it.dependent.id, child: targetIndex,
+								parent: sourceIndex, value: 2, opacity: opacity, redundant: false, mutual: null,
+								notApplicable: notApplicable, future: future, unresolved: unresolved]
+				++i
+			}
+		}
+
+		// Set the dependency properties of the nodes
+		graphLinks.each {
+			if (!it.cyclical) {
+				graphNodes[it.child].parents.add(it.id)
+				graphNodes[it.parent].children.add(it.id)
+			}
+		}
+
+		render(view:'_applicationArchitectureGraph',
+				model: [nodes: graphNodes as JSON, links: graphLinks as JSON, assetId: params.assetId,
+						levelsUp: params.levelsUp, levelsDown: params.levelsDown, assetTypes: assetTypes,
+						assetTypesJson: assetTypes as JSON, environment: Environment.current.name])
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)

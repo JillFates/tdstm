@@ -17,14 +17,12 @@ import net.transitionmanager.integration.ReactionAssetFacade
 import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.SecurityService
 
 @Secured('isAuthenticated()')
 @Slf4j
 class WsApiActionController implements ControllerMethods {
 
     ApiActionService apiActionService
-    SecurityService securityService
 
     /**
      * Get a list of agent names
@@ -97,9 +95,8 @@ class WsApiActionController implements ControllerMethods {
 
 	@HasPermission(Permission.ActionInvoke)
 	def validateSyntax(ApiActionValidateScriptCommand command) {
-
 		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
-			renderAsJson errorsInValidation([command.errors] + command.scripts.collect {it.errors})
+			renderErrorJson( errorsInValidation([command.errors] + command.scripts.collect {it.errors}) )
 		} else {
 			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
 		}

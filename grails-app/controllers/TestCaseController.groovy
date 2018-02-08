@@ -18,7 +18,6 @@ import net.transitionmanager.service.AwsService
 import net.transitionmanager.service.AccountImportExportService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
@@ -31,6 +30,16 @@ import static net.transitionmanager.domain.Permissions.Roles.CLIENT_MGR
 import static net.transitionmanager.domain.Permissions.Roles.SUPERVISOR
 import static net.transitionmanager.domain.Permissions.Roles.USER
 
+// Exception classes
+import grails.validation.ValidationException
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.UnauthorizedException
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.acls.model.NotFoundException
+
 /*
  * This controller just allows us to do some testing of things until we can move them into an integrated testcase
  */
@@ -42,13 +51,16 @@ class TestCaseController implements ControllerMethods {
 	AccountImportExportService accountImportExportService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService
 	ApiActionService apiActionService
 
 	AwsService awsService
+
+	def ex() {
+		throw new EmptyResultException('could not find what you are looking for')
+	}
 
 	def agents() {
 		renderAsJson(apiActionService.agentNamesList())

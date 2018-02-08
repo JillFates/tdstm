@@ -9,7 +9,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.ProgressService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.quartz.ObjectAlreadyExistsException
 import org.quartz.Scheduler
@@ -24,7 +23,6 @@ class ImportController implements ControllerMethods {
 	ImportService importService
 	ProgressService progressService
 	Scheduler quartzScheduler
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.AssetImport)

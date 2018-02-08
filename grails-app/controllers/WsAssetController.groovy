@@ -9,7 +9,15 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.*
+import net.transitionmanager.service.ApplicationService
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DatabaseService
+import net.transitionmanager.service.DeviceService
+import net.transitionmanager.service.StorageService
+import net.transitionmanager.service.UserPreferenceService
+import org.grails.datastore.mapping.query.api.BuildableCriteria
+import grails.gsp.PageRenderer
 
 import java.text.DateFormat
 
@@ -27,7 +35,6 @@ class WsAssetController implements ControllerMethods {
 	DatabaseService databaseService
 	DeviceService deviceService
 	PageRenderer groovyPageRenderer
-	SecurityService securityService
 	StorageService storageService
 	UserPreferenceService userPreferenceService
 
