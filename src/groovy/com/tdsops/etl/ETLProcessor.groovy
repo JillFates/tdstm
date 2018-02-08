@@ -544,7 +544,7 @@ class ETLProcessor implements RangeChecker {
 		if (ETLDomain.External != domain) {
 
 			if (!fieldsValidator.hasSpecs(domain, field)) {
-				throw ETLProcessorException.unknownDomainFieldsSpec(domain)
+				throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
 			}
 
 			fieldSpec = fieldsValidator.lookup(selectedDomain, field)

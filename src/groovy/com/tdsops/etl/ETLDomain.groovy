@@ -2,7 +2,7 @@ package com.tdsops.etl
 
 enum ETLDomain {
 
-	Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency
+	Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency, Rack, Bundle, Room
 
 	/**
 	 * Lookup for ETLDomain from a String.
@@ -58,6 +58,18 @@ enum ETLDomain {
 				break
 			case Dependency:
 				domainClass = com.tds.asset.AssetDependency
+				break
+			case Rack:
+				domainClass = net.transitionmanager.domain.Rack
+				break
+			case Room:
+				domainClass = net.transitionmanager.domain.Room
+				break
+			case Manufacturer:
+				domainClass = net.transitionmanager.domain.Manufacturer
+				break
+			case Bundle:
+				domainClass = net.transitionmanager.domain.MoveBundle
 				break
 			default:
 				domainClass = com.tds.asset.AssetEntity

@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -15,19 +16,26 @@ import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
+import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
+@Mock([Project, DataScript, AssetDependency, AssetEntity, Application, Database, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLProcessorSpec extends Specification {
 
 	@Shared
@@ -47,8 +55,7 @@ class ETLProcessorSpec extends Specification {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
-
-
+	Project GMDEMO
 	static doWithSpring = {
 		coreService(CoreService) {
 			grailsApplication = ref('grailsApplication')
@@ -71,6 +78,9 @@ class ETLProcessorSpec extends Specification {
 	}
 
 	def setup() {
+
+		GMDEMO = Mock(Project)
+		GMDEMO.getId() >> 125612l
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -145,7 +155,7 @@ class ETLProcessorSpec extends Specification {
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
 		new Flow().writeTo(dest: nonSanitizedDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+			updater(['application id': '152254', 'vendor name': '\r\n,Microsoft\b\nInc\r\n,', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 	}
@@ -1355,7 +1365,6 @@ class ETLProcessorSpec extends Specification {
 			}
 	}
 
-
 	void 'test can create new results loading values without extract previously'() {
 
 		given:
@@ -1447,10 +1456,6 @@ class ETLProcessorSpec extends Specification {
 			}
 	}
 
-
-
-
-
 	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
 
 		given:
@@ -1529,7 +1534,191 @@ class ETLProcessorSpec extends Specification {
 
 	}
 
+	void 'test can load Room domain instances'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
+673,DC1,ACME Data Center,26,00,40,00,Source,112 Main St ,Cumberland,,IA,50843
+674,ACME Room 1,New Colo Provider,40,00,42,00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
+
+		and:
+			List<Room> rooms = buildRooms([
+					[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+					[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			DomainFieldsValidator validator = new DomainFieldsValidator()
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				return new DefaultGrailsDomainClass(domainObject.getClass()).
+						hasPersistentProperty(propertyName)
+			}
+
+			GormUtil.getDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				return new DefaultGrailsDomainClass(domainObject.getClass()).
+						getPersistentProperty(domainObject.getClass(), propertyName)
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Room
+							extract roomId load id 
+							extract Name load name
+						}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Room domain results associated'
+			etlProcessor.result.domains.size() == 1
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can load Rack domain instances'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			List<Room> rooms = buildRooms([
+					[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+					[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			List<Rack> racks = buildRacks([
+					[13144, GMDEMO, 673, -1, -1, 'ACME Data Center', 'R', 'Source', 500, 235, 3300, 3300, 0, 'Rack'],
+					[13167, GMDEMO, 673, -1, -1, 'ACME Data Center', 'L', 'Source', 160, 0, 1430, 1430, 0, 'Rack'],
+					[13358, GMDEMO, -1, -1, -1, 'New Colo Provider', 'L', 'Source', 41, 42, 0, 0, 0, 'block3x5']
+			],
+					rooms)
+
+		and:
+			GroovyMock(Rack, global: true)
+			Rack.executeQuery(_, _) >> { String query, Map args ->
+				racks.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			DomainFieldsValidator validator = new DomainFieldsValidator()
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				return new DefaultGrailsDomainClass(domainObject.getClass()).
+						hasPersistentProperty(propertyName)
+			}
+
+			GormUtil.getDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				return new DefaultGrailsDomainClass(domainObject.getClass()).
+						getPersistentProperty(domainObject.getClass(), propertyName)
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Room
+							extract rackId load id 
+							extract Location load location
+						}
+						""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Results should contain Rack domain results associated'
+			etlProcessor.result.domains.size() == 1
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
 	/**
+	 * Builds a list of Mock Room using this fields order
+	 * ['id', 'project', 'roomName', 'location', 'roomDepth', 'roomWidth', 'address', 'city', 'stateProv', 'postalCode']
+	 * @param valuesList
+	 * @return a list of Mock(Room)
+	 */
+	List<Room> buildRooms(List<List<?>> valuesList) {
+		return valuesList.collect { List<?> values ->
+			Room room = Mock()
+			room.getId() >> values[0]
+			room.getProject() >> values[1]
+			room.getRoomName() >> values[2]
+			room.getLocation() >> values[3]
+			room.getRoomDepth() >> values[4]
+			room.getRoomWidth() >> values[5]
+			room.getAddress() >> values[6]
+			room.getCity() >> values[7]
+			room.getStateProv() >> values[8]
+			room.getPostalCode() >> values[9]
+			room
+		}
+	}
+
+	/**
+	 * Builds a list of Mock Room using this fields order
+	 * ['id', 'project', 'modelId', 'manufacturerId', 'roomId', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
+	 * @param valuesList
+	 * @return a list of Mock(Rack)
+	 */
+	List<Rack> buildRacks(List<List<?>> valuesList, List<Room> rooms, List<Model> models = [], List<Manufacturer> manufacturers = []) {
+		return valuesList.collect { List<?> values ->
+			Rack rack = Mock()
+			rack.getId() >> values[0]
+			rack.getProject() >> values[1]
+			rack.getModel() >> models.find { it.getId() == values[2] }
+			rack.getManufacturer() >> manufacturers.find { it.getId() == values[3] }
+			rack.getRoom() >> rooms.find { it.getId() == values[4] }
+			rack.getLocation() >> values[5]
+			rack.getFront() >> values[6]
+			rack.getSource() >> values[7]
+			rack.getRoomX() >> values[8]
+			rack.getRoomY() >> values[9]
+			rack.getPowerA() >> values[10]
+			rack.getPowerB() >> values[11]
+			rack.getPowerC() >> values[12]
+			rack.getRackType() >> values[13]
+			rack
+		}
+	}
+
+/**
 	 * Helper method to create Fields Specs based on Asset definition
 	 * @param asset
 	 * @return
@@ -1624,4 +1813,74 @@ class ETLProcessorSpec extends Specification {
 
 		return [fileName, new DataSetFacade(dataSet)]
 	}
+
+	/**
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	Map<String, ?> domainProperties(Class<?> clazz) {
+		Map<String, ?> fields = []
+
+		switch (clazz) {
+			case net.transitionmanager.domain.Person:
+				fields = [
+				]
+				break
+			case net.transitionmanager.domain.Rack:
+				fields = [
+						['name': 'front', 'type': java.lang.String, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'location', 'type': java.lang.String, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'manufacturer', 'type': net.transitionmanager.domain.Manufacturer, 'persistent': true, 'optional': true, 'association': true, 'bidirectional': true],
+						['name': 'model', 'type': net.transitionmanager.domain.Model, 'persistent': true, 'optional': true, 'association': true, 'bidirectional': true],
+						['name': 'powerA', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'powerB', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'powerC', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'project', 'type': net.transitionmanager.domain.Project, 'persistent': true, 'optional': false, 'association': true, 'bidirectional': false],
+						['name': 'rackType', 'type': java.lang.String, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'room', 'type': net.transitionmanager.domain.Room, 'persistent': true, 'optional': true, 'association': true, 'bidirectional': true],
+						['name': 'roomX', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'roomY', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'source', 'type': java.lang.Integer, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'sourceAssets', 'type': java.util.Set, 'persistent': true, 'optional': true, 'association': true, 'bidirectional': true],
+						['name': 'tag', 'type': java.lang.String, 'persistent': true, 'optional': true, 'association': false, 'bidirectional': false],
+						['name': 'targetAssets', 'type': java.util.Set, 'persistent': true, 'optional': true, 'association': true, 'bidirectional': true]
+				]
+				break
+			case net.transitionmanager.domain.MoveBundle:
+				fields = [
+				]
+				break
+			case net.transitionmanager.domain.Manufacturer:
+				fields = [
+				]
+				break
+			case net.transitionmanager.domain.Room:
+				fields = [
+				]
+				break
+
+		}
+
+		return fields
+	}
+
+	/**
+	 * Builds a Mock instance for GrailsDomainClassProperty class
+	 * @param name
+	 * @param fieldName
+	 * @param isAssociation
+	 * @return
+	 */
+	GrailsDomainClassProperty buildDomainPropertyFor(Map<String, ?> valuesMap) {
+		GrailsDomainClassProperty grailsDomainClassProperty = Mock()
+		grailsDomainClassProperty.getName() >> valuesMap.name
+		grailsDomainClassProperty.getType() >> valuesMap.type
+		grailsDomainClassProperty.isPersistent() >> valuesMap.persistent
+		grailsDomainClassProperty.isAssociation() >> valuesMap.association
+		grailsDomainClassProperty.isBidirectional() >> valuesMap.bidirectional
+
+		return grailsDomainClassProperty
+	}
+
 }
