@@ -10,7 +10,7 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
@@ -23,6 +23,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-View-config',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html',
@@ -140,6 +141,9 @@ export class AssetExplorerViewConfigComponent {
 		this.columnIndex = 0;
 		this.rowIndex = 0;
 		this.position = this.fields.map(x => this.fieldStyle(x['isTitle']));
+		setTimeout(() => {
+			jQuery('[data-toggle="popover"]').popover();
+		}, 200);
 	}
 
 	protected applyAssetSelectFilter(): void {
@@ -409,6 +413,7 @@ export class AssetExplorerViewConfigComponent {
 			this.assetExpService.previewQuery(params)
 				.subscribe(result => {
 					this.grid.apply(result);
+					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
 			this.grid.gridData = null;
