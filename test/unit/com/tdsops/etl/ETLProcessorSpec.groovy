@@ -1538,8 +1538,8 @@ class ETLProcessorSpec extends Specification {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
-673,DC1,ACME Data Center,26,00,40,00,Source,112 Main St ,Cumberland,,IA,50843
-674,ACME Room 1,New Colo Provider,40,00,42,00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
+673,DC1,ACME Data Center,26,40,Source,112 Main St ,Cumberland,,IA,50843
+674,ACME Room 1,New Colo Provider,40,42,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
 
 		and:
 			List<Room> rooms = buildRooms([
