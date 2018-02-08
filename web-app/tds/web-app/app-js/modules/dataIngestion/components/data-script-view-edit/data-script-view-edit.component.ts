@@ -15,10 +15,6 @@ import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-s
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
-		.radio-aligned {
-			margin: 4px 4px 0;
-			vertical-align: top;
-		}
 	`]
 })
 export class DataScriptViewEditComponent implements OnInit {
