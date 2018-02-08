@@ -1,4 +1,4 @@
-package com.tdsops.tm.search
+package net.transitionmanager.search
 
 /**
  * Class that contain the information required for constructing a
@@ -9,6 +9,10 @@ class FieldSearchData {
     private Map searchInfo = [:]
 
     private Map parsedInfo = [:]
+
+    boolean mixed = false
+
+    String mixedSqlExpression
 
     private static final REQUIRED_FIELDS = ["domain", "column", "filter"]
 
@@ -113,7 +117,11 @@ class FieldSearchData {
     }
 
     String getSqlSearchExpression() {
-        return parsedInfo.searchExpression
+        String expression = parsedInfo.searchExpression
+        if (isMixed()) {
+            expression = "($mixedSqlExpression) OR ${expression})"
+        }
+        return expression
     }
 
     void addSqlSearchParameter(String param, Object value) {
@@ -126,5 +134,17 @@ class FieldSearchData {
 
     Map getSqlSearchParameters() {
         return parsedInfo.parameters
+    }
+
+    boolean isMixed() {
+        return mixed
+    }
+
+    void setMixed(boolean mixed) {
+        this.mixed = mixed
+    }
+
+    void setMixedSqlExpression(expression) {
+        mixedSqlExpression = expression
     }
 }

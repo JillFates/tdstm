@@ -7,8 +7,9 @@ import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetType
-import net.transitionmanager.domain.Setting
+import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.CollectionUtils
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.PasswordResetType
@@ -18,18 +19,50 @@ import com.tdsops.tm.enums.domain.SettingType
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.common.exceptions.ConfigurationException
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.ProjectDailyMetric
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.DataTransferBatch
+import net.transitionmanager.domain.DataTransferComment
+import net.transitionmanager.domain.DataTransferValue
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.KeyValue
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelSync
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.MoveBundleStep
+import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.MoveEventNews
+import net.transitionmanager.domain.MoveEventSnapshot
+import net.transitionmanager.domain.MoveEventStaff
+import net.transitionmanager.domain.Party
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyRelationship
+import net.transitionmanager.domain.PartyRelationshipType
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.ProjectAssetMap
+import net.transitionmanager.domain.ProjectLogo
+import net.transitionmanager.domain.ProjectTeam
+import net.transitionmanager.domain.Provider
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Recipe
+import net.transitionmanager.domain.RecipeVersion
+import net.transitionmanager.domain.RoleType
+import net.transitionmanager.domain.Room
+import net.transitionmanager.domain.Setting
+import net.transitionmanager.domain.StepSnapshot
+import net.transitionmanager.domain.TaskBatch
+import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
@@ -1027,6 +1060,135 @@ class ProjectService implements ServiceMethods {
 			  and pr.partyIdFrom = :project
 		''', [project: project])
 	}
+
+	/**
+	 * Used to retrieve the list of partner IDs that are associated to a project
+	 * @param project - the Project object to find the partners of
+	 * @return the list if IDs of partners
+	 */
+	List<Long> getPartnerIds(Project project) {
+		getPartnerIds(project?.id)
+	}
+
+	/**
+	 * Used to retrieve the list of partner IDs that are associated to a project
+	 * @param projectId - the ID of the Project to find the partners of
+	 * @return the list if IDs of partners
+	 */
+	List<Long> getPartnerIds(Long projectId) {
+		PartyRelationship.where {
+			partyRelationshipType.id == 'PROJ_PARTNER'
+			roleTypeCodeFrom.id == 'PROJECT'
+			roleTypeCodeTo.id == 'PARTNER'
+			partyIdFrom.id == projectId
+		}
+		.projections { property 'partyIdTo.id' }
+				.list()
+	}
+
+	/**
+	 * Used to retrieve the list of staff IDs that are associated to a PartyGroup (company) by object reference
+	 * @param partyGroup - the PartyGroup object to find staff of object
+	 * @return the list if IDs of partners
+	 */
+	List<Long> getCompanyStaffIds(PartyGroup partyGroup) {
+		getCompanyStaffIds(partyGroup?.id)
+	}
+
+	/**
+	 * Used to retrieve the list of staff IDs that are associated to a single PartyGroup (company) by ID
+	 * @param partyGroupId - the PartyGroup ID to use to find staff of PartyGroup
+	 * @return the list if IDs of partners
+	 */
+	List<Long> getCompanyStaffIds(Long partyGroupId) {
+		getCompanyStaffIds([partyGroupId])
+	}
+
+	/**
+	 * Used to retrieve the list of staff IDs that are associated to one or more PartyGroups (company)
+	 * @param partyGroupIds - A list of the PartyGroup Ids to use to find staff of those PartyGroups
+	 * @return the list if IDs of partners
+	 */
+	List<Long> getCompanyStaffIds(List<Long> partyGroupIds) {
+		PartyRelationship.where {
+			partyRelationshipType.id == 'STAFF'
+			roleTypeCodeFrom.id == 'COMPANY'
+			roleTypeCodeTo.id == 'STAFF'
+			partyIdFrom.id in partyGroupIds
+		}
+		.projections { property 'partyIdTo.id' }
+				.list()
+	}
+
+	/**
+	 * Used to retrieve the IDs of all of the Staff that are associated to a project. This will include the
+	 * following:
+	 *     - ALL of the staff of the project's client company
+	 *     - Staff of the project owner company that are directly assigned to the project
+	 *     - Staff of the project partner companies that are directly assigned to the project
+	 */
+	List<Long> getAssociatedStaffIds(Project project) {
+
+		// Get the list of staff ids of the project owner and partners of the project
+		PartyGroup owner = project.owner
+		List<Long> companyIds = getPartnerIds(project)
+		companyIds << owner.id
+		List<Long> nonClientStaffIds = getCompanyStaffIds(companyIds)
+
+		// Now get the list of the nonClientStaffIds that are associated with the project
+		List<Long> staffIds = PartyRelationship.where {
+			partyRelationshipType.id == 'PROJ_STAFF'
+			roleTypeCodeFrom.id == 'PROJECT'
+			roleTypeCodeTo.id == 'STAFF'
+			partyIdFrom.id == project.id
+			partyIdTo.id in nonClientStaffIds
+		}
+		.projections { property 'partyIdTo.id' }
+				.list()
+
+		// Add to the staffIds list all of the staff of the project client as they're all fair game
+		PartyGroup client = project.client
+		List<Long> clientStaffIds = getCompanyStaffIds(client)
+		staffIds.addAll(clientStaffIds)
+
+		return staffIds
+	}
+
+	/**
+	 * Using the same filtering capabilities available for assets, this method looks up
+	 * the staff associated with this project (Owner, Client, partners) whose name matches
+	 * the filter provided.
+	 *
+	 * @param project
+	 * @param nameFilter
+	 * @return
+	 */
+	List<Person> getAssociatedStaffByName(Project project, String nameFilter) {
+		// Fetch the ids of the staff associated with the project
+		List<Long> staffIds = getAssociatedStaffIds(project)
+
+		// Query that should retrieve all the invidividuals for this project matching the filter, if any.
+		String hqlQuery = "FROM Person p where id in (:staffIds)"
+
+		Map params = [staffIds: staffIds]
+		if (nameFilter && nameFilter.trim()) {
+			FieldSearchData fieldSearchData = new FieldSearchData([
+					column     : SqlUtil.personFullName(),
+					columnAlias: "personName",
+					domain     : Person,
+					filter     : nameFilter
+			])
+
+			SqlUtil.parseParameter(fieldSearchData)
+
+			String nameCondition = fieldSearchData.sqlSearchExpression
+			params.putAll(fieldSearchData.sqlSearchParameters)
+			hqlQuery += " AND $nameCondition"
+		}
+
+		return Person.executeQuery ( hqlQuery, params )
+	}
+
 
 	/**
 	 * Access the company that owns the project.

@@ -17,6 +17,16 @@ export class DateUtils {
 
 	}
 
+
+	public static getTimestamp(): String {
+		let time = new Date();
+		return time.getFullYear().toString() +
+				(time.getMonth() + 1 < 10 ? ('0' + (time.getMonth() + 1)) : time.getMonth() + 1) +
+				(time.getDate() + 1 < 10 ? ('0' + (time.getDate())) : time.getDate()) + '_' +
+				time.getHours() +
+				time.getMinutes();
+	}
+
 	/**
 	 * Convert a interval from one to another.
 	 * @param intervalBase

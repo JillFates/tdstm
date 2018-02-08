@@ -332,7 +332,8 @@ export class AssetExplorerViewConfigComponent {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains: this.domains
+			domains: this.domains,
+			viewName: this.model.name
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [

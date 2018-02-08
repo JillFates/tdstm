@@ -754,6 +754,13 @@ class UrlMappings {
 			]
 		}
 
+     "/ws/filename" {
+        controller = "wsAsset"
+        action = [
+                POST: "exportFilename"
+        ]
+     }
+
 		// List all Import Batches | Bulk Delete Import Batches
 		"/ws/import/batch" {
 			controller = "wsImportBatch"
@@ -839,9 +846,10 @@ class UrlMappings {
 		"401" ( controller: 'errorHandler', action: 'unauthorized' )
 		"403" ( controller: 'errorHandler', action: 'forbidden' )
 		"404" ( controller: 'errorHandler', action: 'notFound' )
-		"500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
-		"500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
-		"500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
+		// These were commented out as part of TM-8782 - the exceptions in ControllerMethods should catch these now
+		// "500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
+		// "500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
+		// "500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
 		"500" ( controller: 'errorHandler', action: 'error' )
 
 	}

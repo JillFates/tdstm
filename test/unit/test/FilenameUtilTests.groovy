@@ -130,4 +130,56 @@ class FilenameUtilTests extends AbstractUnitSpec {
 			expect: 'the resulting file name match the expected file naming scheme, with just the number of bundles for the PROJECT_BUNDLE part'
 				'ABC_Company-Big_Move-2_bundles-20141020_2215.xlsx'== FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, params, fileExtension, date)
 		}
+
+		@See('TM-7872')
+		def '10. Test file name for PROJECT_VIEW_DATE format'() {
+			given: 'a Project and View Name with the corresponding values'
+				def viewName = 'My Applications'
+				aDate = TimeUtil.parseDateTime('10/20/2014 10:15 PM')
+				def params = [project:completeProject, viewName: viewName]
+			expect: 'the resulting file name match the expected file naming scheme'
+				'Big_Move-My_Applications-20141020_2215.xlsx' == FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params, fileExtension, aDate)
+		}
+
+		@See('TM-7872')
+		def '11. Test file name for PROJECT_VIEW_DATE format, without date and extension'() {
+			given: 'a Project and View Name with the corresponding values, and we use the excludeDate param'
+			def viewName = 'My Applications'
+			def params = [project:completeProject, viewName: viewName, excludeDate: true]
+			expect: 'the resulting file name match the expected file naming scheme'
+			'Big_Move-My_Applications' == FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params)
+		}
+
+	def '12. Test sanitation for safeFilename method'() {
+		// while not touching the ASCII printible characters. This will remove the typical CR, LF, BS
+		// along with Unicode Control characters, Line and Paragraph separators, etc {
+
+		expect:
+		FilenameUtil.safeFilename(value) == result
+
+		where:
+		value               | result
+		" abcdefghijklm "   | 'abcdefghijklm'
+		" nopqrstuvwxyz "   | 'nopqrstuvwxyz'
+		" ABCDEFGHIJKLM "   | 'ABCDEFGHIJKLM'
+		" NOPQRSTUVWXYZ "   | 'NOPQRSTUVWXYZ'
+		" 01234567890 "     | '01234567890'
+		"!@#\$%^&*()-_=+`~" | '!@#$%^&*()-_=+`~'
+		"',.<>/?\\"         | '\',.<>/?\\'
+		" CR\r. "           | 'CR+.'
+		" LF\n. "           | 'LF+.'
+		" FF\f. "           | 'FF+.'
+		" TAB\t. "          | 'TAB+.'
+		" DQuote\". "       | 'DQuote".'
+		' SQuote\'. '       | 'SQuote\'.'
+		" \t White\t. \t "  | 'White+.'
+		" .\bBACKSPACE. "   | '.~BACKSPACE.'
+		" .\u2028LineSep"   | '.~LineSep'
+		" .\u2029ParaSep"   | '.~ParaSep'
+		" .\u00000000. "    | '.~0000.'
+		" .\u00090009. "    | '.+0009.'
+		" .\u00850085. "    | '.~0085.'
+		" [\u007f007f] "    | '[~007f]'
+		" [\u008f008f] "    | '[~008f]'
+	}
 }
