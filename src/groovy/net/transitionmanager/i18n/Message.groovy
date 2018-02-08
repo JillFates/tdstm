@@ -19,7 +19,12 @@ interface Message {
 			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
 			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
 			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
-			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension'
+			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
+			ImportBatchBulkDelete               = 'importBatch.bulkDelete.exception',
+			ImportBatchBulkUpdate               = 'importBatch.bulkUpdate.exception',
+			ImportBatchDoesntExist              = 'importBatch.batch.notexists',
+			ImportBatchRunning                  = 'importBatch.batch.running',
+			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop'
 
 	/*
 		i18N messages for working with API Action endpoints.

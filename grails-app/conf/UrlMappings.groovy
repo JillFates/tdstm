@@ -291,7 +291,10 @@ class UrlMappings {
 
 		"/ws/progress/$id" {
 			controller = "wsProgress"
-			action = [GET:"retrieveStatus"]
+			action = [
+					GET:"retrieveStatus",
+					DELETE: "interruptJob"
+			]
 		}
 
 		"/ws/progress/demo" {
@@ -748,6 +751,56 @@ class UrlMappings {
 			controller = "wsDataScript"
 			action = [
 					POST: "saveScript"
+			]
+		}
+
+		// List all Import Batches | Bulk Delete Import Batches
+		"/ws/import/batch" {
+			controller = "wsImportBatch"
+			action = [
+			        GET: "listImportBatches",
+					DELETE: "bulkDeleteImportBatches"
+			]
+		}
+
+		// Find | Delete a single import batch
+		"/ws/import/batch/$id" {
+			controller = "wsImportBatch"
+			action = [
+					GET: "fetchImportBatch",
+					DELETE: "deleteImportBatch"
+			]
+		}
+
+		// Archive a single Import Batch
+		"/ws/import/batch/archive/$id" {
+			controller = "wsImportBatch"
+			action = [
+					POST: "archiveImportBatch"
+			]
+		}
+
+		// Unarchive a single Import Batch
+		"/ws/import/batch/unarchive/$id" {
+			controller = "wsImportBatch"
+			action = [
+					POST: "unArchiveImportBatch"
+			]
+		}
+
+		// Bulk Unarchive Import Batches
+		"/ws/import/batch/unarchive" {
+			controller = "wsImportBatch"
+			action = [
+					POST: "bulkUnArchiveImportBatches"
+			]
+		}
+
+		// Bulk Archive Import Batches
+		"/ws/import/batch/archive" {
+			controller = "wsImportBatch"
+			action = [
+					POST: "bulkArchiveImportBatches"
 			]
 		}
 

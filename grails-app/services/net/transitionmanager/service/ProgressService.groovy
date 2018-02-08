@@ -4,6 +4,10 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeDuration
+import net.transitionmanager.i18n.Message
+import org.quartz.Scheduler
+import org.quartz.UnableToInterruptJobException
+import org.quartz.impl.StdSchedulerFactory
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -230,5 +234,30 @@ class ProgressService implements ServiceMethods {
 			}
 		})
 		return [key: key]
+	}
+
+	/**
+	 * Given a Quartz Job key, this method will try to locate and interrupt
+	 * the corresponding job, updating also the progress info cache.
+	 * 
+	 * Bear in mind that, in order to be interrupted, jobs must implements
+	 * the InterruptableJob interface.
+	 * @param jobKey
+	 */
+	void interruptJob(String jobKey) {
+		// Check the key corresponds to a scheduled job
+		if (progressInfo.get(jobKey)) {
+			 Scheduler scheduler = new StdSchedulerFactory().getScheduler()
+			try {
+				boolean stopped = scheduler.interrupt(jobKey)
+				// If the job was successfully stopped, update the progress info for this job.
+				if (stopped) {
+					fail(jobKey)
+				}
+			} catch (UnableToInterruptJobException e) {
+				// Throw an exception that ControllerMethods can handle.
+				throw new RuntimeException(Message.ProgressInfoUnableToStopRunningJob)
+			}
+		}
 	}
 }

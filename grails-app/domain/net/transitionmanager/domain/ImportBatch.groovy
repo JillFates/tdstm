@@ -2,6 +2,7 @@ package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 /**
  * ImportBatch
@@ -119,6 +120,56 @@ class ImportBatch {
 			isDomain = false
 		}
 		return isDomain
+	}
+
+	/**
+	 * Return the list of fields as a list.
+	 * @return
+	 */
+	List fieldNameListAsList() {
+		return JsonUtil.parseJsonList(fieldNameList)
+	}
+
+	/**
+	 * Return a map representation for this Import Batch.
+	 * @param minimalInfo: if set to true only the id, status and domainClassName will be returned.
+	 * @return
+	 */
+	Map toMap(boolean minimalInfo = false) {
+		Map providerMap = provider ? provider.toMap(true) : null
+		Map dataScriptMap = dataScript ? dataScript.toMap(true) : null
+		Map dataMap = [
+			id: id,
+			status: status.name(),
+			domainClassName: domainClassName
+		]
+		if (! minimalInfo) {
+			Map additionalFields = [
+				project: [
+						id: project.id,
+						name: project.projectCode
+				],
+				provider: providerMap,
+				dataScript: dataScriptMap,
+				createdBy: createdBy? createdBy.toString() : null,
+				archived: archived,
+				timezone: timezone,
+				dateFormat: dateFormat,
+				progressInfoJob: progressInfoJob,
+				originalFilename: originalFilename,
+				nullIndicator: nullIndicator,
+				overwriteWithBlanks: overwriteWithBlanks,
+				autoProcess: autoProcess,
+				warnOnChangesAfter: warnOnChangesAfter,
+				fieldNameList: fieldNameListAsList(),
+				dateCreated: dateCreated,
+				lastUpdated: lastUpdated
+			]
+
+			dataMap.putAll(additionalFields)
+		}
+
+		return dataMap
 	}
 
 }

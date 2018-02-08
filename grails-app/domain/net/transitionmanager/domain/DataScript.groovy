@@ -98,12 +98,17 @@ class DataScript {
 
     /**
      * Return a map representation of the DataScript instance.
+     * @param minimalInfo: if set to true only the id and name will be returned.
      * @return
      */
-    Map toMap() {
+    Map toMap(boolean minimalInfo = false) {
         Map dataMap = [
-                id: id,
-                name: name,
+            id: id,
+            name: name
+        ]
+
+        if (! minimalInfo) {
+            Map additionalFields = [
                 description: description,
                 target: target,
                 mode: mode.toString(),
@@ -111,7 +116,9 @@ class DataScript {
                 provider: [id: provider.id, name: provider.name],
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated
-        ]
+            ]
+            dataMap.putAll(additionalFields)
+        }
 
         return dataMap
     }
