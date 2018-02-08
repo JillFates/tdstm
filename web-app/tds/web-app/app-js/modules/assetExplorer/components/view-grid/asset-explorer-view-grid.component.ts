@@ -113,7 +113,8 @@ export class AssetExplorerViewGridComponent {
 		if (field) {
 			return field.label;
 		}
-		return FIELD_NOT_FOUND;
+		column.notFound = true;
+		return column.label;
 	}
 
 	rowCallbackClass(context: RowClassArgs) {
