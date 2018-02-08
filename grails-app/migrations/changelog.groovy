@@ -213,4 +213,5 @@ databaseChangeLog = {
 	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
 	include file: '20180123-api-action-make-description-nullable.groovy'
 	include file: '20180201-set-asset_entity-project_id-mandatory.groovy'
+	include file: '20180129-create-import-batch-tables.groovy'
 }
