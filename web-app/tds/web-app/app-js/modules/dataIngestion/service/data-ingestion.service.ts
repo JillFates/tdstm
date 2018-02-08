@@ -107,7 +107,11 @@ export class DataIngestionService {
 						}
 					};
 					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					APIActionModel.createReactions(r, r.reactionScripts);
+					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
+						APIActionModel.createReactions(r, r.reactionScripts);
+					} else {
+						APIActionModel.createBasicReactions(r);
+					}
 				});
 				return dataScriptModels;
 			})
