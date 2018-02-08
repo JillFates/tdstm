@@ -1,11 +1,11 @@
 <div class="modal fade in" id="loadSampleData" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content">
+		<div class="modal-content" style="width: 650px;">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
-				<h4 class="modal-title">{{'DATA_INGESTION.SAMPLE_DATA_TITLE'|translate}}</h4>
+				<h4 class="modal-title">{{'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_TITLE'|translate}}</h4>
 			</div>
 			<div class="modal-body">
 
@@ -15,13 +15,17 @@
                         <div class="col-md-12">
                             <div class="radio">
                                 <label>
-                                    <input type="radio" selected value="{{OPTIONS.CSV}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Paste content (CSV, JSON, XML)
+                                    <input type="radio" selected value="{{OPTIONS.CSV}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT' | translate }}
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="{{OPTIONS.FILE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Upload file (Excel, CSV, JSON, XML)
+                                    <input type="radio" value="{{OPTIONS.FILE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE' | translate }}
                                 </label>
                                 <label style="margin-left: 10px;">
-                                    <input type="radio" value="{{OPTIONS.SERVICE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">Fetch data from web service</label>
+                                    <input type="radio" value="{{OPTIONS.SERVICE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE' | translate }}
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -30,7 +34,9 @@
                         <!-- csv -->
                         <div *ngIf="OPTIONS.selected === OPTIONS.CSV" class="col-md-12">
                             <div class="form-group" style="margin-bottom: 0px;">
-                                <label for="fileExtension" class="col-sm-12 control-label">File extension:</label>
+                                <label for="fileExtension" class="col-sm-12 control-label">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FILE_EXTENSION' | translate }}
+                                </label>
                                 <div class="col-sm-12">
                                     <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
                                                         [(ngModel)]="csv.selected" (ngModelChange)="csv.state = 'dirty'"
@@ -46,7 +52,7 @@
                                 <div class="col-sm-12">
                                     <button [disabled]="csv.fileContent.length < 1 || csv.state === 'success' || csv.selected.value === -1" (click)="onUploadFileText()"
                                             type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
-                                        Upload
+                                        {{ 'GLOBAL.UPLOAD' | translate }}
                                         <input *ngIf="csv.state === 'success'" [(ngModel)]="csv.checked" (change)="onSelectFilename(OPTIONS.CSV)"
                                                name="csvchecked" type="checkbox" style="margin-left: 5px;" >
                                     </button>
@@ -76,7 +82,7 @@
 
                             <div *ngIf="webService.options.length === 0" style="margin: 30px 0px 30px 0px; text-align: center;">
                                 <span *ngIf="webService.options.length === 0">
-                                    <i>Presently there are no data source actions defined.</i>
+                                    <i>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PRESENTLY_THERE_ARE_NO_DATASOURCES' | translate }}</i>
                                 </span>
                             </div>
 
@@ -93,7 +99,7 @@
                                 <div class="col-sm-12">
                                     <button [disabled]="!webService.selected || webService.selected.id === -1" (click)="onFetch()"
                                             type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
-                                        Fetch
+                                        {{ 'GLOBAL.FETCH' | translate }}
                                         <input *ngIf="webService.state === 'success'" [(ngModel)]="webService.checked" (change)="onSelectFilename(OPTIONS.SERVICE)"
                                                name="webservicecheck" type="checkbox" style="margin-left: 5px;" >
                                     </button>

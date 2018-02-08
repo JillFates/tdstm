@@ -5,7 +5,7 @@
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
-				<h4 class="modal-title">{{ 'DATA_INGESTION.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
+				<h4 class="modal-title">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
 			</div>
 			<div class="modal-body" style="height: 600px; overflow: auto;">
                 <div class="modal-body-container">
@@ -23,8 +23,12 @@
                                     (onClick)="onCheckScriptSyntax()"
                                     [(model)]="operationStatus.syntax">
                             </tds-check-action>
-                            <button type="button" (click)="onLoadSampleData()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.LOAD_SAMPLE_DATA' | translate}}</button>
-                            <button type="button" [disabled]="!scriptTestResult.consoleLog" (click)="onViewConsole()" class="btn btn-default">{{ 'DATA_INGESTION.ETL_BUILDER.VIEW_CONSOLE' | translate}}</button>
+                            <button type="button" (click)="onLoadSampleData()" class="btn btn-default">
+                                {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.LOAD_SAMPLE_DATA' | translate}}
+                            </button>
+                            <button type="button" [disabled]="!scriptTestResult.consoleLog" (click)="onViewConsole()" class="btn btn-default">
+                                {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE' | translate}}
+                            </button>
                             <button class="pull-right btn btn-default" (click)="toggleSection('code')">
                                 <i class="fa " [ngClass]="{'fa-angle-double-down':!collapsed.code,'fa-angle-double-up':collapsed.code}" style="padding-right:0px"></i>
                             </button>
@@ -51,7 +55,7 @@
                     <!-- -->
                     <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
-                            <span class="pull-left" style="color: #a94442;"><b>Syntax Errors</b></span>
+                            <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
                             <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
                                 <button aria-label="Close" class="close" type="button" style="margin-right: 5px; opacity: unset;">
 					                <span aria-hidden="true">×</span>
@@ -71,7 +75,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <h4 class="pull-left">Sample Data Preview</h4>
+                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
                             <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
                                 <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-up':collapsed.sample}" style="padding-right:0px"></i>
                             </button>
@@ -83,7 +87,7 @@
                     <hr>
                     <div class="row" *ngIf="scriptTestResult.domains.length > 0">
                         <div class="col-md-12">
-                            <h4 class="pull-left">Transformed Data Review</h4>
+                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
                         </div>
                         <div class="col-md-12">
                             <kendo-tabstrip>
