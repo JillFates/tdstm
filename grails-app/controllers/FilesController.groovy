@@ -4,7 +4,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
