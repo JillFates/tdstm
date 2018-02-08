@@ -3,3 +3,13 @@ export enum CHECK_ACTION {
 	UNKNOWN = 1,
 	INVALID = 2
 };
+
+export class OperationStatusModel {
+	state: CHECK_ACTION;
+	value: any;
+
+	constructor() {
+		this.state = CHECK_ACTION.UNKNOWN;
+		this.value = null;
+	}
+}

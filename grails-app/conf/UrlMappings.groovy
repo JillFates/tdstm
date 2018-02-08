@@ -665,6 +665,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/datascript/validateDelete/$id?" {
+			controller = "wsDataScript"
+			action = [
+					GET: "validateDelete",
+			]
+		}
+
 		"/ws/dataingestion/datascript/validateunique/$name" {
 			controller = "wsDataScript"
 			action = [

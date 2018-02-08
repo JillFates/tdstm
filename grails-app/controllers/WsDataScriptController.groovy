@@ -128,6 +128,17 @@ class WsDataScriptController implements ControllerMethods {
     }
 
     /**
+     * Determine if the given DataScript can be safely deleted.
+     * @param id
+     * @return
+     */
+    @HasPermission(Permission.DataScriptDelete)
+    def validateDelete(Long id) {
+        renderSuccessJson(dataScriptService.checkDataScriptReferences(id))
+    }
+
+
+    /**
      * Runs the script against the data provided and returns resulting transformed data
      * @return
      */
