@@ -28,7 +28,7 @@ databaseChangeLog = {
 				constraints(
 						foreignKeyName: "import_batch_provider",
 						references: "provider(provider_id)",
-						deleteCascade: true
+						deleteCascade: false
 				)
 			}
 
@@ -36,7 +36,7 @@ databaseChangeLog = {
 				constraints(
 						foreignKeyName: "import_batch_data_script",
 						references: "data_script(data_script_id)",
-						deleteCascade: true
+						deleteCascade: false
 				)
 
 			}
@@ -84,7 +84,9 @@ databaseChangeLog = {
 				constraints(nullable: false)
 			}
 
-			column(name: "date_created", type: "DATETIME")
+			column(name: "date_created", type: "DATETIME", defaultValueComputed="CURRENT_TIMESTAMP"){
+				constraints(nullable: false)
+			}
 
 			column(name: "last_updated", type: "DATETIME")
 
@@ -158,6 +160,8 @@ databaseChangeLog = {
 			column(name: "fields_info", type: "MEDIUMTEXT") {
 				constraints(nullable: false)
 			}
+
+			column(name: "last_updated", type: "DATETIME")
 
 			column(name: "version", type: "INT(11)")
 		}

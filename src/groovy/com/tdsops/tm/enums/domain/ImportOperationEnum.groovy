@@ -12,4 +12,13 @@ enum ImportOperationEnum {
 	private ImportOperationEnum(String value) {
 		name = value
 	}
+
+	/**
+	 * Safely return the corresponding Enum constant.
+	 * @param value
+	 * @return
+	 */
+	static ImportOperationEnum lookup(String value) {
+		return ImportOperationEnum.enumConstantDirectory().get(value)
+	}
 }
