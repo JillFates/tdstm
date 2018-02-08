@@ -2,8 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
-import com.tdsops.tm.search.FieldSearchData
-import net.transitionmanager.domain.AppMoveEvent
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -33,7 +31,10 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
+import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.KeyValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -51,14 +52,10 @@ import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import grails.converters.JSON
-import grails.transaction.Transactional
 import javax.servlet.http.HttpSession
 import java.util.regex.Matcher
 

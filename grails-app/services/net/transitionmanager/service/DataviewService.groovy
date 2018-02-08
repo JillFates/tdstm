@@ -6,20 +6,24 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
-import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.FavoriteDataview
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
+
 /**
  * Service class with main database operations for Dataview.
- * @see Dataview
+ * @see net.transitionmanager.domain.Dataview
  */
 class DataviewService implements ServiceMethods {
 
-	static PartyRelationshipService partyRelationshipService
+	static ProjectService projectService
 
 	SecurityService securityService
 
@@ -810,7 +814,7 @@ class DataviewService implements ServiceMethods {
 
 		// Check if the query needs to be executed
 		if (!results) {
-			List<Person> individuals = partyRelationshipService.getAssociatedStaffByName(project, filter)
+			List<Person> individuals = projectService.getAssociatedStaffByName(project, filter)
 			for (Person person : individuals) {
 				results[person.id.toString()] = person.toString()
 			}
