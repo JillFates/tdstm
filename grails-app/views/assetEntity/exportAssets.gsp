@@ -29,6 +29,16 @@
 		        return false;
 		    });
 		});
+
+        $(document).on('change','#bundleId',function(event){
+            var disabled = false;
+
+            if(!$("#bundleId").val()) {
+                disabled = true;
+			}
+
+            $("#exportButton").prop('disabled', disabled);
+        });
 	</script>
 	<style>
 	  /*TODO: REMOVE ON COMPLETE MIGRATION */
@@ -146,7 +156,7 @@
 								<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
 							</div>
 							<div class="">
-								<button type="submit" class="btn btn-primary">Export Excel&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
+								<button type="submit" id="exportButton" class="btn btn-primary">Export Excel&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
 							</div>
 						</div><!-- /.box-body -->
 					</g:form>
