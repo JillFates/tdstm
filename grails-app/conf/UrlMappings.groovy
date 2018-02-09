@@ -15,7 +15,7 @@ class UrlMappings {
 		}
 
 		/**
-		 * View Controller
+		 * TM-8842  Dependency Analyzer drill-in from Asset Show Detail
 		 */
 		name dependencyConsoleMap: "/moveBundle/dependencyConsole/$groupId/map" {
 			controller = "moveBundle"

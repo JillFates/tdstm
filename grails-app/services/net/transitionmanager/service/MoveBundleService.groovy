@@ -396,7 +396,6 @@ class MoveBundleService implements ServiceMethods {
 
 		boolean showMap = groupId != null
 
-
 		def entities = assetEntityService.entityInfo(project)
 
 		// Used by the Assignment Dialog
