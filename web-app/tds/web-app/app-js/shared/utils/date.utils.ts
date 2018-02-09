@@ -17,6 +17,7 @@ export class DateUtils {
 
 	}
 
+
 	public static getTimestamp(): String {
 		let time = new Date();
 		return time.getFullYear().toString() +
