@@ -9,7 +9,7 @@ package com.tdsops.etl
  */
 class DomainFacade {
 
-	ETLProcessorResult result
+	private ETLProcessorResult result
 
 	DomainFacade(ETLProcessorResult result) {
 		this.result = result

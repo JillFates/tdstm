@@ -41,14 +41,14 @@ iterate {
     extract 3 transform with uppercase() load description
     
     set environment with 'Production'
-    find Application 'for' id with id
+    find Application 'for' id by id with SOURCE.'device id'
 
     domain Device
     
     extract 1 load id
     extract 'model name' transform with uppercase() load Name
-}
-""".stripIndent()
+    find Device 'for' id by id with SOURCE.'device id'
+}""".stripIndent()
 
 
     def index () {
@@ -87,7 +87,7 @@ iterate {
             os << dataSet
             os.close()
 
-            etlProcessor = scriptProcessorService.process(project, script, fileSystemService.getTemporaryFullFilename(fileName))
+            etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
 
             fileSystemService.deleteTemporaryFile(fileName)
 

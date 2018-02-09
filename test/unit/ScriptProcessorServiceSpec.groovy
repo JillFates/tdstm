@@ -148,6 +148,9 @@ class ScriptProcessorServiceSpec extends Specification {
 
         and:
             GroovyMock(AssetEntity, global: true)
+            AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+                return true
+            }
             AssetEntity.executeQuery(_, _) >> { String query, Map args ->
                 applications.findAll { it.id == args.id && it.project.id == args.project.id }
             }
@@ -263,6 +266,9 @@ class ScriptProcessorServiceSpec extends Specification {
 
         and:
             GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
             AssetEntity.executeQuery(_, _) >> { String query, Map args ->
                 applications.findAll { it.assetName == args.assetName && it.project.id == args.project.id }
             }
@@ -285,7 +291,7 @@ class ScriptProcessorServiceSpec extends Specification {
         then: 'Service result has validSyntax equals false and a list of errors'
             with(result) {
                 !isValid
-                error == 'Invalid domain: \'Unknown\'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency]'
+                error == 'Invalid domain: \'Unknown\'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency, Rack, Bundle, Room, Files]'
                 consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
                 !data.domains
             }

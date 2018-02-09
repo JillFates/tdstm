@@ -181,7 +181,7 @@ class ETLFindElement {
 	 */
 	void checkAssetFieldReference(String fieldName){
 
-		Class<?> clazz = ETLDomain.lookupDomainClass(currentDomain)
+		Class<?> clazz = currentDomain.getClazz()
 
 		if(!GormUtil.isDomainProperty(clazz.newInstance(), fieldName)) {
 			throw ETLProcessorException.invalidDomainPropertyName(currentDomain, fieldName)
@@ -220,5 +220,14 @@ class ETLFindElement {
 	 */
 	int resultSize() {
 		return hasResults() ? results.objects.size(): 0
+	}
+
+	/**
+	 * Returns the unique result in the objects list.
+	 * @return a an instance of the results saved
+	 * 			as a consequence of a ETL find command
+	 */
+	Object firstResult() {
+		return results.objects[0]
 	}
 }
