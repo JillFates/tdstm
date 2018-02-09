@@ -123,10 +123,12 @@ class DataScript {
         return dataMap
     }
 
-
+    /**
+     * List of domain references for DataScripts.
+     */
     static final List<Map> domainReferences = [
-            [domain: ApiAction, delete: "null", property: "defaultDataScript", domainLabel: "API Action"]
-
+            [domain: ApiAction, delete: "null", property: "defaultDataScript", domainLabel: "API Action"],
+            [domain: ImportBatch, delete: "null", property: "dataScript", domainLabel: "Import Batch"]
     ]
 
 }
