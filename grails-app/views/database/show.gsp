@@ -55,15 +55,16 @@
 							</td>
 							<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
 								<g:if test="${dependencyBundleNumber}">
-									<span data-toggle="popover" data-trigger="hover" data-content="Jump to the Dependency Analyzer Map">
 									<g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
-										${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+										${databaseInstance?.moveBundle} :
+										<span data-toggle="popover" data-trigger="hover" data-content="Click to view group in Dependency Analyzer">
+											${dependencyBundleNumber}
+										</span>
 									</g:link>
-									</span>
 								</g:if>
 								<g:else>
 									<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-										${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+										${databaseInstance?.moveBundle}
 									</tds:tooltipSpan>
 								</g:else>
 							</td>
