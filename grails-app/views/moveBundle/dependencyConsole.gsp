@@ -389,10 +389,10 @@
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
 				var showMap = '${showMap}';
 				if(showMap == "true") {
-				    // TM-8842, show the Dependency Analyzer Map, drilled-in from the group Id
-				    getList("apps", '${groupId}');
-            getList("graph", '${groupId}');
-        }
+						// TM-8842, show the Dependency Analyzer Map, drilled-in from the group Id
+						getList("apps", '${groupId}');
+						getList("graph", '${groupId}');
+				}
 			});
 
 		</script>

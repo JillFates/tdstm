@@ -9,7 +9,7 @@
 			<div class="dialog" <tds:hasPermission permission="${Permission.AssetEdit}"> ondblclick="EntityCrud.showAssetEditView('${databaseInstance.assetClass}',${databaseInstance?.id})" </tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
-			    </g:if>
+					</g:if>
 				<table>
 					<tbody>
 						<tr class="prop">
@@ -54,18 +54,18 @@
 								</label>
 							</td>
 							<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
-                <g:if test="${dependencyBundleNumber}">
-                  <span data-toggle="popover" data-trigger="hover" data-content="Jump to the Dependency Analyzer Map">
-                  <g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
-                    ${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
-                  </g:link>
-                  </span>
-                </g:if>
-                <g:else>
-                  <tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-                    ${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
-                  </tds:tooltipSpan>
-                </g:else>
+								<g:if test="${dependencyBundleNumber}">
+									<span data-toggle="popover" data-trigger="hover" data-content="Jump to the Dependency Analyzer Map">
+									<g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
+										${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+									</g:link>
+									</span>
+								</g:if>
+								<g:else>
+									<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+										${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+									</tds:tooltipSpan>
+								</g:else>
 							</td>
 						</tr>
 						<tr class="prop">
