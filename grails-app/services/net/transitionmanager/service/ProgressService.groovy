@@ -4,15 +4,10 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeDuration
-import net.transitionmanager.i18n.Message
-import org.quartz.Scheduler
-import org.quartz.UnableToInterruptJobException
-import org.quartz.impl.StdSchedulerFactory
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-
 /**
  * Handles the logic for holding the status of async tasks
  *
@@ -245,7 +240,14 @@ class ProgressService implements ServiceMethods {
 	 * @param jobKey
 	 */
 	void interruptJob(String jobKey) {
-		// Check the key corresponds to a scheduled job
+
+		throw new RuntimeException("Need to review implementation before this will work.")
+
+		/* Although we still need to define what needs to be done here, I'm commenting out my first approach,
+		in case that in comes in handy in the future.
+		 */
+
+		/*// Check the key corresponds to a scheduled job
 		if (progressInfo.get(jobKey)) {
 			 Scheduler scheduler = new StdSchedulerFactory().getScheduler()
 			try {
@@ -258,6 +260,6 @@ class ProgressService implements ServiceMethods {
 				// Throw an exception that ControllerMethods can handle.
 				throw new RuntimeException(Message.ProgressInfoUnableToStopRunningJob)
 			}
-		}
+		}*/
 	}
 }

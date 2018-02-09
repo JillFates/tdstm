@@ -1,7 +1,3 @@
-import com.tdsops.common.exceptions.InvalidLicenseException
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
-
 class UrlMappings {
 
 	static mappings = {
@@ -771,7 +767,7 @@ class UrlMappings {
 		}
 
 		// Find | Delete a single import batch
-		"/ws/import/batch/$id" {
+		"/ws/import/batch/$ids" {
 			controller = "wsImportBatch"
 			action = [
 					GET: "fetchImportBatch",
@@ -780,7 +776,7 @@ class UrlMappings {
 		}
 
 		// Archive a single Import Batch
-		"/ws/import/batch/archive/$id" {
+		"/ws/import/batch/archive/$ids" {
 			controller = "wsImportBatch"
 			action = [
 					POST: "archiveImportBatch"
@@ -788,7 +784,7 @@ class UrlMappings {
 		}
 
 		// Unarchive a single Import Batch
-		"/ws/import/batch/unarchive/$id" {
+		"/ws/import/batch/unarchive/$ids" {
 			controller = "wsImportBatch"
 			action = [
 					POST: "unArchiveImportBatch"

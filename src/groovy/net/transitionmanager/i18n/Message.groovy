@@ -22,9 +22,8 @@ interface Message {
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
 			ImportBatchBulkDelete               = 'importBatch.bulkDelete.exception',
 			ImportBatchBulkUpdate               = 'importBatch.bulkUpdate.exception',
-			ImportBatchDoesntExist              = 'importBatch.batch.notexists',
-			ImportBatchRunning                  = 'importBatch.batch.running',
-			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop'
+			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
+			RequestMissingIds                   = 'request.missing.ids'
 
 	/*
 		i18N messages for working with API Action endpoints.
