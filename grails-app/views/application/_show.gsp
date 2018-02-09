@@ -73,7 +73,25 @@
 				</span>
 			</td>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber?:''}"/>
+      <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+        <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+          ${standardFieldSpecs.moveBundle.label} : Dep. Group
+        </label>
+      </td>
+      <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
+        <g:if test="${dependencyBundleNumber}">
+          <span data-toggle="popover" data-trigger="hover" data-content="Jump to the Dependency Analyzer Map">
+            <g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
+              ${applicationInstance?.moveBundle} : ${dependencyBundleNumber}
+            </g:link>
+          </span>
+        </g:if>
+        <g:else>
+          <tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+            ${applicationInstance?.moveBundle} : ${dependencyBundleNumber}
+          </tds:tooltipSpan>
+        </g:else>
+      </td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
 

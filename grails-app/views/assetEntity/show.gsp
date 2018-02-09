@@ -168,7 +168,29 @@
 							<tds:convertDate date="${assetEntity?.retireDate}" />
 						</tds:tooltipSpan>
 						</td>
-                        <tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${assetEntity.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber?:''}"/>
+
+
+
+
+            <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+              <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?: standardFieldSpecs.moveBundle.label}">
+                ${standardFieldSpecs.moveBundle.label} : Dep. Group
+              </label>
+            </td>
+          <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+              <g:if test="${dependencyBundleNumber}">
+                <span data-toggle="popover" data-trigger="hover" data-content="Jump to the Dependency Analyzer Map">
+                  <g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
+                      ${assetEntity?.moveBundle} : ${dependencyBundleNumber}
+                  </g:link>
+                </span>
+          </g:if>
+            <g:else>
+              <tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.moveBundle}">
+                ${assetEntity?.moveBundle} : ${dependencyBundleNumber}
+              </tds:tooltipSpan>
+            </g:else>
+          </td>
 
 						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
 							<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
