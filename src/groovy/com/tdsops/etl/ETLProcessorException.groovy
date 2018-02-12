@@ -104,7 +104,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidDomainReference (ETLDomain domain, String fieldName) {
-		new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
+        new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
     }
 
     static ETLProcessorException invalidWhenFoundCommand(String fieldName) {
@@ -114,4 +114,13 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException invalidWhenNotFoundCommand(String fieldName) {
         new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }".toString())
     }
+
+    static ETLProcessorException incorrectDomain (ETLDomain domain) {
+        new ETLProcessorException("Cannot create a query for domain ${domain.name()}".toString())
+    }
+
+	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
+		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
+	}
 }
+

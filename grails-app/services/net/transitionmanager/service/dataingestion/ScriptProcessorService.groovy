@@ -20,25 +20,14 @@ class ScriptProcessorService {
     CustomDomainService customDomainService
 
     /**
-     *
-     * @param project
-     * @param scriptContent
-     * @param fileName
-     * @return
-     */
-    ETLProcessorResult execute (Project project, String scriptContent, String fileName) {
-        return process(project, scriptContent, fileName).result
-    }
-
-    /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
      * and a file as an input of the ETL content data
      * @param project
      * @param scriptContent
      * @param fileName
-     * @return and instance of ETLProcessor used to process the scriptContent
+     * @return and instance of ETLProcessor used to execute the scriptContent
      */
-    ETLProcessor process (Project project, String scriptContent, String fileName) {
+    ETLProcessor execute (Project project, String scriptContent, String fileName) {
 
         CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
         CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)

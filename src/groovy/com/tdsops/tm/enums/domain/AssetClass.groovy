@@ -137,4 +137,27 @@ enum AssetClass {
 		}
 		return domain	
 	}
+
+	/**
+	 * Prepares an static Map for look up AssetClass by Domain Class
+	 */
+	private static final Map<Class<? extends AssetEntity>, AssetClass> assetClassByDomainClassMap = [:]
+
+	/**
+	 * Initialize Map.
+	 */
+	static {
+		AssetClass.values().each { AssetClass clazz ->
+			assetClassByDomainClassMap[clazz.domainClass] = clazz
+		}
+	}
+
+	/**
+	 * Lookups an AssetClass by its domain class
+	 * @param clazz a Class in the AssetEntity Hierarchy
+	 * @return an AssetClass instance or null if there is not a class mapped
+	 */
+	static lookup(Class<? extends AssetEntity> clazz){
+		return assetClassByDomainClassMap[clazz]
+	}
 }

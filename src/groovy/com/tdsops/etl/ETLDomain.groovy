@@ -1,8 +1,34 @@
 package com.tdsops.etl
 
+
 enum ETLDomain {
 
-	Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency, Rack, Bundle, Room
+	Application(com.tds.asset.Application),
+	Device(com.tds.asset.AssetEntity),
+	Database(com.tds.asset.Database),
+	Storage(com.tds.asset.AssetEntity),
+	External(com.tds.asset.AssetEntity),
+	Task(com.tds.asset.AssetComment),
+	Person(net.transitionmanager.domain.Person),
+	Comment(com.tds.asset.AssetComment),
+	Asset(com.tds.asset.AssetEntity),
+	Manufacturer(net.transitionmanager.domain.Manufacturer),
+	Model(net.transitionmanager.domain.Model),
+	Dependency(com.tds.asset.AssetDependency),
+	Rack(net.transitionmanager.domain.Rack),
+	Bundle(net.transitionmanager.domain.MoveBundle),
+	Room(net.transitionmanager.domain.Room),
+	Files(com.tds.asset.Files)
+
+	private Class<?> clazz
+
+	private ETLDomain(Class<?> clazz) {
+		this.clazz = clazz
+	}
+
+	Class<?> getClazz() {
+		return clazz
+	}
 
 	/**
 	 * Lookup for ETLDomain from a String.
@@ -17,64 +43,5 @@ enum ETLDomain {
 	 */
 	static ETLDomain lookup(String code) {
 		return ETLDomain.enumConstantDirectory().get(code)
-	}
-
-	/**
-	 * Lookup the correct asset domain class base on an instance of ETLDomain
-	 * @param domain an instance of ETLDomain
-	 * @return The correct class implementation of Asset domain class
-	 * 			based on an instance of ETLDomain
-	 */
-	static Class<?> lookupDomainClass(ETLDomain domain) {
-
-		Class<?> domainClass
-		switch (domain) {
-			case Application:
-				domainClass = com.tds.asset.Application
-				break
-			case Database:
-				domainClass = com.tds.asset.Database
-				break
-			case Device:
-				domainClass = com.tds.asset.AssetEntity
-				break
-			case Storage:
-				domainClass = com.tds.asset.AssetEntity
-				break
-			case External:
-				domainClass = com.tds.asset.AssetEntity
-				break
-			case Task:
-				domainClass = com.tds.asset.AssetComment
-				break
-			case Person:
-				domainClass = net.transitionmanager.domain.Person
-				break
-			case Comment:
-				domainClass = com.tds.asset.AssetComment
-				break
-			case Asset:
-				domainClass = com.tds.asset.AssetEntity
-				break
-			case Dependency:
-				domainClass = com.tds.asset.AssetDependency
-				break
-			case Rack:
-				domainClass = net.transitionmanager.domain.Rack
-				break
-			case Room:
-				domainClass = net.transitionmanager.domain.Room
-				break
-			case Manufacturer:
-				domainClass = net.transitionmanager.domain.Manufacturer
-				break
-			case Bundle:
-				domainClass = net.transitionmanager.domain.MoveBundle
-				break
-			default:
-				domainClass = com.tds.asset.AssetEntity
-				break
-		}
-		return domainClass
 	}
 }

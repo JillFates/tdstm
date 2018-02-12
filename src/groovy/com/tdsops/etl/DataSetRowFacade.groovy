@@ -9,14 +9,14 @@ package com.tdsops.etl
  */
 class DataSetRowFacade {
 
-	Map row
+	private Map row
 
 	DataSetRowFacade(Map row) {
 		this.row = row
 	}
 
 	Object getProperty(String name) {
-
+		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
 		if(!row.containsKey(name.toLowerCase())) {
 			throw ETLProcessorException.unknownDataSetProperty(name)
 		}

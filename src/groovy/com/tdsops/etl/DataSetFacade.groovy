@@ -5,7 +5,7 @@ import getl.data.Field
 
 class DataSetFacade {
 
-	Dataset dataSet
+	private Dataset dataSet
 
 	DataSetFacade(Dataset dataSet) {
 		this.dataSet = dataSet
@@ -40,5 +40,9 @@ class DataSetFacade {
 	 */
 	String fileName(){
 		return dataSet.params.fileName
+	}
+
+	Dataset getDataSet() {
+		return dataSet
 	}
 }
