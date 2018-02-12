@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.domain.Project
 
 /**
@@ -28,27 +29,21 @@ class AssetClassQueryHelper {
 	 * @param project a project instance used as a param in the HQL query
 	 * @param fieldsSpec a map with params to be used in the HQL query
 	 * @return a list of assets returned by an HQL query
+	 * @trows an exception if domain is not correctly
 	 */
 	static List where(ETLDomain domain, Project project, Map<String, ?> fieldsSpec) {
 
-		List assets = []
+		List assets
 
-		switch (domain) {
-			case ETLDomain.Application:
-				assets = assetEntities(project, fieldsSpec)
+		switch(domain.clazz){
+			case { AssetEntity.isAssignableFrom(it) }:
+				assets = assetEntities(domain.clazz, project, fieldsSpec)
 				break
-			case ETLDomain.Device:
-				assets = assetEntities(project, fieldsSpec)
-				break
-			case ETLDomain.Database:
-				assets = assetEntities(project, fieldsSpec)
-				break
-			case ETLDomain.Storage:
-				assets = assetEntities(project, fieldsSpec)
-				break
-			case ETLDomain.Dependency:
+			case { AssetDependency.isAssignableFrom(it) }:
 				assets = assetDependencies(fieldsSpec)
 				break
+			default:
+				throw ETLProcessorException.incorrectDomain(domain)
 		}
 
 		return assets
@@ -59,17 +54,18 @@ class AssetClassQueryHelper {
 	 * @param fieldsSpec a map with params to be used in the HQL query
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List<? extends AssetEntity> assetEntities(Project project, Map<String, ?> fieldsSpec) {
+	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> fieldsSpec) {
 
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select count(*)
+            select AE
               from AssetEntity AE
-             where  AE.project = :project and $hqlWhere  
-        """.stripIndent()
+             where AE.project = :project
+               and AE.assetClass = :assetClass
+			   and $hqlWhere """.stripIndent()
 
-		return AssetEntity.executeQuery(hql, [project: project] + hqlParams(fieldsSpec))
+		return AssetEntity.executeQuery(hql, [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec))
 	}
 
 	/**
@@ -82,7 +78,7 @@ class AssetClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select count(*)
+            select AE
               from AssetDependency AE
              where $hqlWhere  
         """.stripIndent()
@@ -98,7 +94,8 @@ class AssetClassQueryHelper {
 	 */
 	static String hqlWhere(Map<String, ?> fieldsSpec) {
 		fieldsSpec.keySet().collect { String field ->
-			" ${assetEntityTransformations[field].property} = :${assetEntityTransformations[field].namedParamter}\n".toString()
+			" ${assetEntityTransformations[field].property} = :${assetEntityTransformations[field].namedParamter}\n".
+				toString()
 		}.join(' and ')
 	}
 
@@ -110,66 +107,67 @@ class AssetClassQueryHelper {
 	 */
 	static Map<String, ?> hqlParams(Map<String, ?> fieldsSpec) {
 		fieldsSpec.collectEntries { String key, def value ->
-			[("${assetEntityTransformations[key].namedParamter}".toString()): assetEntityTransformations[key].transform(value?.toString())]
+			[("${assetEntityTransformations[key].namedParamter}".toString()): assetEntityTransformations[key].transform(value?.
+				toString())]
 		}
 	}
 
 	//TODO: Review this with John. Where I can put those commons configurations?
 	private static final Map<String, Map> assetEntityTransformations = [
-			"id"          : [
-					property     : "AE.id",
-					namedParamter: "id",
-					join         : "",
-					transform    : { String value -> Long.parseLong(value) }
-			],
-			"moveBundle"  : [
-					property     : "AE.moveBundle.name",
-					namedParamter: "moveBundleName",
-					join         : "left outer join AE.moveBundle",
-					transform    : { String value -> value?.trim() }
-			],
-			"project"     : [
-					property     : "AE.project.description",
-					namedParamter: "projectDescription",
-					join         : "left outer join AE.project",
-					transform    : { String value -> value?.trim() }
-			],
-			"manufacturer": [
-					property     : "AE.manufacturer.name",
-					namedParamter: "manufacturerName",
-					join         : "left outer join AE.manufacturer",
-					transform    : { String value -> value?.trim() }
-			],
-			"sme"         : [
-					property     : "AE.sme.firstName",
-					namedParamter: "smeFirstName",
-					join         : "left outer join AE.sme",
-					transform    : { String value -> value?.trim() }
-			],
-			"sme2"        : [
-					property     : "AE.sme2.firstName",
-					namedParamter: "sme2FirstName",
-					join         : "left outer join AE.sme2",
-					transform    : { String value -> value?.trim() }
-			],
-			"model"       : [
-					property     : "AE.model.modelName",
-					namedParamter: "modelModelName",
-					join         : "left outer join AE.model",
-					transform    : { String value -> value?.trim() }
-			],
-			"appOwner"    : [
-					property     : "AE.appOwner.firstName",
-					namedParamter: "appOwnerFirstName",
-					join         : "left outer join AE.appOwner",
-					transform    : { String value -> value?.trim() }
-			]
+		"id": [
+			property: "AE.id",
+			namedParamter: "id",
+			join: "",
+			transform: { String value -> Long.parseLong(value) }
+		],
+		"moveBundle": [
+			property: "AE.moveBundle.name",
+			namedParamter: "moveBundleName",
+			join: "left outer join AE.moveBundle",
+			transform: { String value -> value?.trim() }
+		],
+		"project": [
+			property: "AE.project.description",
+			namedParamter: "projectDescription",
+			join: "left outer join AE.project",
+			transform: { String value -> value?.trim() }
+		],
+		"manufacturer": [
+			property: "AE.manufacturer.name",
+			namedParamter: "manufacturerName",
+			join: "left outer join AE.manufacturer",
+			transform: { String value -> value?.trim() }
+		],
+		"sme": [
+			property: "AE.sme.firstName",
+			namedParamter: "smeFirstName",
+			join: "left outer join AE.sme",
+			transform: { String value -> value?.trim() }
+		],
+		"sme2": [
+			property: "AE.sme2.firstName",
+			namedParamter: "sme2FirstName",
+			join: "left outer join AE.sme2",
+			transform: { String value -> value?.trim() }
+		],
+		"model": [
+			property: "AE.model.modelName",
+			namedParamter: "modelModelName",
+			join: "left outer join AE.model",
+			transform: { String value -> value?.trim() }
+		],
+		"appOwner": [
+			property: "AE.appOwner.firstName",
+			namedParamter: "appOwnerFirstName",
+			join: "left outer join AE.appOwner",
+			transform: { String value -> value?.trim() }
+		]
 	].withDefault { String key ->
 		[
-				property     : "AE." + key,
-				namedParamter: key,
-				join         : "",
-				transform    : { String value -> value?.trim() }]
+			property: "AE." + key,
+			namedParamter: key,
+			join: "",
+			transform: { String value -> value?.trim() }]
 	}
 
 

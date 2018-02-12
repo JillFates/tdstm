@@ -2,8 +2,15 @@ package com.tdsops.etl
 
 /**
  * Results collected from an ETL Processor instance processing an ETL script.
- * <code>
+ * It prepares the results used in the import process or for rendering results in the UI.
+ * <br>
+ * Every part of the results are covered in formatter functions.
  *
+ * @see ETLProcessorResult#initialRowDataMap()
+ * @see ETLProcessorResult#initialFieldDataMap(com.tdsops.etl.Element)
+ * @see ETLProcessorResult#queryDataMap(com.tdsops.etl.ETLFindElement)
+ * @see ETLProcessorResult#addWarnMessageDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
+ * @see ETLProcessorResult#addResultsDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
  */
 class ETLProcessorResult {
 
@@ -18,23 +25,21 @@ class ETLProcessorResult {
 	Map<String, ?> ETLInfo
 
 	/**
-	 *
+	 * Current reference for the domain instance and its contents
 	 */
 	Map<String, ?> reference = [:]
-
 	/**
-	 * Current row number in the iterate loop
+	 * Collection of results with their data fields map
 	 */
-	Integer rowNumber = 0
-
 	List<Map<String, ?>> domains = []
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-				originalFilename: processor.dataSetFacade.fileName()
+			originalFilename: processor.dataSetFacade.fileName()
 		]
 	}
+
 	/**
 	 * Adds a new json entry in results list
 	 * @param domain
@@ -43,17 +48,11 @@ class ETLProcessorResult {
 
 		reference = domains.find { it.domain == domain.name() }
 
-		if (!reference) {
+		if(!reference){
 			reference = [
-					domain: domain.name(),
-					fields: [] as Set,
-					data  : [[
-									 op       : 'I',
-									 warn     : false,
-									 duplicate: false,
-									 errors   : [],
-									 fields   : [:]
-							 ]]
+				domain: domain.name(),
+				fields: [] as Set,
+				data  : [initialRowDataMap()]
 			]
 
 			domains.add(reference)
@@ -62,22 +61,6 @@ class ETLProcessorResult {
 
 	/**
 	 * Adds a find Element to the ETL Processor result.
-	 * It also prepares query map results.
-	 * with the domain.data following the current format:
-	 * <pre>
-	 *  [
-	 *  	"size": 3,
-	 * 		"matchOn": 2,
-	 * 		"results": [
-	 * 			115123,
-	 * 			115123,
-	 * 			115123
-	 * 		]
-	 * 	]
-	 * </pre>
-	 * Size is the total amount of results. Results are the id of the domain classes
-	 * collected by the find command, and matcOn defines the ordinal position
-	 * in the query object list where those results where found.
 	 * @param findElement is an instance of ETLFindElement
 	 * 			used to calculate a query data result
 	 */
@@ -87,29 +70,24 @@ class ETLProcessorResult {
 
 		Map<String, ?> data = currentData()
 
-		if (!data.fields.containsKey(dependentId)) {
+		if(!data.fields.containsKey(dependentId)){
 			throw ETLProcessorException.invalidFindCommand(dependentId)
 		}
 
 		Map<String, ?> find = data.fields[dependentId].find
 
-		find.query.add([
-				domain: findElement.currentFind.domain,
-				kv    : findElement.currentFind.kv
-		])
+		find.query.add(queryDataMap(findElement))
 
-		if (findElement.results) {
-			find.size = findElement.results.size
-			find.results = findElement.results.objects.collect {it.id}
-			find.matchOn = findElement.results.matchOn
+		if(findElement.results){
+			addResultsDataMap(find, findElement)
 		}
 	}
 
 	/**
-	 * Ass a war message in the result instance
+	 * It adds a wanr message in the result instance
 	 * <pre>
-	 *		find Application 'for' id by id with SOURCE.'application id'
-	 *		elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
+	 * 		find Application 'for' id by id with SOURCE.'application id'
+	 * 		elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
 	 * <pre>
 	 * @param findElement
 	 */
@@ -117,8 +95,7 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.objects){
 			Map<String, ?> data = reference.data.last()
-			data.fields[findElement.currentFind.dependentId].warn = true
-			data.fields[findElement.currentFind.dependentId].warnMsg = findElement.warnMessage
+			addWarnMessageDataMap(data.fields[findElement.currentFind.dependentId], findElement)
 		}
 	}
 
@@ -152,17 +129,8 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
-
 		reference.fields.add(element.field.name)
-		currentData().fields[element.field.name] = [
-				value        : element.value,
-				originalValue: element.originalValue,
-				error        : false,
-				warn     : false,
-				find         : [
-						query: []
-				]
-		]
+		currentData().fields[element.field.name] = initialFieldDataMap(element)
 	}
 
 	/**
@@ -170,19 +138,133 @@ class ETLProcessorResult {
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-
-		if (reference.data.size() < processor.currentRowIndex) {
-			Map data = [
-					op       : 'I',
-					warn     : false,
-					duplicate: false,
-					errors   : [],
-					fields   : [:]
-			]
-
-			reference.data.add(data)
+		if(reference.data.size() < processor.currentRowIndex){
+			reference.data.add(initialRowDataMap())
 		}
-
 		return reference.data.last()
+	}
+
+	/**
+	 * Init a row data map.
+	 * <pre>
+	 *	"data": [
+	 *		{
+	 * 		    "op": "I",
+	 * 		    "warn": true,
+	 * 		    "duplicate": true,
+	 * 		    "errors": [],
+	 * 		    "fields": { }
+	 * 	    }
+	 * </pre>
+	 * @return
+	 */
+	private Map<String, ?> initialRowDataMap() {
+		return [
+			op: 'I',
+			warn: false,
+			duplicate: false,
+			errors: [],
+			fields: [:]
+		]
+	}
+
+	/**
+	 * Prepares some of the fields result in the data result.
+	 * <pre>
+	 *	"asset": {
+	 *	    "value":null,
+	 *		"warn":true,
+	 *		"warnMsg": "found with wrong asset class",
+	 *		"duplicate": true,
+	 *			"find": {
+	 *				"query": [
+	 *					{"domain": "Application", "kv": {"id": null}},
+	 *					{"domain": "Application", "kv": { "assetName": "CommGen", "assetType": "Application" }},
+	 *					{"domain": "Application", "kv": { "assetName": "CommGen" }},
+	 *					{"domain": "Asset", "kv": { "assetName": "CommGen" }, "warn": true}
+	 *				],
+	 *				"size": 2,
+	 *				"matchOn": 2,
+	 *				"results": [12312,123123,123123123]
+	 *			},
+	 *		}
+	 * </pre>
+	 * @param element an element instance used to populate some of the data fields
+	 * @return a Map that contains a final structure of the field node in ETLProcessorResult
+	 */
+	private Map<String, ?> initialFieldDataMap(Element element) {
+		return [
+			value: element.value,
+			originalValue: element.originalValue,
+			error: false,
+			warn: false,
+			find: [
+				query: []
+			]
+		]
+	}
+
+	/**
+	 * Prepares the query data Map in the ETLProcessorResult
+	 * <pre>
+	 *	"query": [
+	 *		{
+	 *			"domain": "Application", "kv": {"id": null}
+	 *		},
+	 *	]
+	 * </pre>
+	 * @param findElement
+	 * @return
+	 */
+	private Map<String, ?> queryDataMap(ETLFindElement findElement) {
+		return [
+			domain: findElement.currentFind.domain,
+			kv    : findElement.currentFind.kv
+		]
+	}
+
+	/**
+	 * It adds the warn message result in the field Data Map
+	 * <pre>
+	 * "asset": {
+	 * 		....
+	 * 		"warn":true,
+	 * 		"warnMsg": "found with wrong asset class",
+	 * 		....
+	 * 	}
+	 * </pre>
+	 * @param fieldDataMap a field data map
+	 * @param findElement the find element with the warn message
+	 */
+	private void addWarnMessageDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
+		fieldDataMap.warn = true
+		fieldDataMap.warnMsg = findElement.warnMessage
+	}
+
+	/**
+	 * It prepares query map results with the domain.data
+	 * following the current format:
+	 * <pre>
+	 *  [
+	 *  	"size": 3,
+	 * 		"matchOn": 2,
+	 * 		"results": [
+	 * 			115123,
+	 * 			115123,
+	 * 			115123
+	 * 		]
+	 * 	]
+	 * </pre>
+	 * Size is the total amount of results.
+	 * Results are the id of the domain classes collected by the find command
+	 * and matcOn defines the ordinal position
+	 * in the query object list where those results where found.
+	 * @param fieldDataMap a field data map
+	 * @param findElement the find element with the warn message
+	 */
+	private void addResultsDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
+		fieldDataMap.size = findElement.results.size
+		fieldDataMap.results = findElement.results.objects.collect { it.id }
+		fieldDataMap.matchOn = findElement.results.matchOn
 	}
 }

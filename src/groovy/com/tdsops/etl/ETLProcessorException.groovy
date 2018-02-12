@@ -104,7 +104,7 @@ class ETLProcessorException extends GroovyRuntimeException {
     }
 
     static ETLProcessorException invalidDomainReference (ETLDomain domain, String fieldName) {
-		new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
+        new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
     }
 
     static ETLProcessorException invalidWhenFoundCommand(String fieldName) {

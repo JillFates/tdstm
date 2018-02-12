@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorResult
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -195,14 +196,14 @@ class WsAssetImportController implements ControllerMethods {
 
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
 
-		ETLProcessorResult etlResults = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename)
+		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename)
 
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
 
 		result.filename = outputFilename
 
 		try {
-			os << (etlResults.domains as JSON)
+			os << (etlProcessor.result.domains as JSON)
 			os.close()
 		}
 		catch(e) {

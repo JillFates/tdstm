@@ -37,7 +37,6 @@
                 <br>
                 <textarea class="form-control" name="dataSet" rows="${lineNumbers - 2}" style="width: 100%;">${dataSet}</textarea>
                 <br>
-
                 <div class="col-md-12">
                     <h1>Service Now Document</h1>
                     <g:if test="${flash.message}"><div class="message" role="status">${flash.message}</div></g:if>
@@ -48,9 +47,7 @@
                         <div class="col-md-4">
                             <g:submitButton name="fetch" class="form-control"  value="Fetch" />
                         </div>
-
                 </div>
-
             </fieldset>
         </div>
 
@@ -77,7 +74,7 @@
                     </div>
                 </g:if>
                 <br>
-                <input class="form-control" type="submit" value="Apply">
+                    <input class="form-control" type="submit" value="Apply">
                 <br>
                 <div class="col-md-5">
                      DataScript Id: <input type="text" size="3" name="dataScriptId" id="dataScriptId" value="${dataScriptId}"">
@@ -131,7 +128,14 @@
                             <g:each in="${resultsRow.data}" var="row" status="i">
                                 <tr>
                                     <g:each in="${resultsRow.fields}" var="fieldName">
-                                        <td>${row.fields[fieldName].value}</td>
+                                        <td>${row.fields[fieldName].value} <br>
+                                            ${row.fields[fieldName].find.query?:''} <br>
+
+                                            <g:if test="${(row.fields[fieldName].find.results)}">
+                                                <b>Results:</b>
+                                                ${row.fields[fieldName].find.results}
+                                            </g:if>
+                                        </td>
                                     </g:each>
                                 </tr>
                             </g:each>

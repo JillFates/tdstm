@@ -17,7 +17,7 @@ import com.tds.asset.AssetEntity
  */
 class FindingsFacade {
 
-	ETLFindElement findElement
+	private ETLFindElement findElement
 
 	FindingsFacade(ETLFindElement findElement) {
 		this.findElement = findElement
@@ -32,39 +32,63 @@ class FindingsFacade {
 	}
 
 	/**
-	 * Defines if the FindingsFacade contains results
-	 * and all these results are Database assets
-	 * @return
+	 * Defines if the FindingsFacade contains a single result
+	 * and that results is an Database asset instance
+	 * <pre>
+	 * 		def primaryFindings = FINDINGS
+	 * 		if (primaryFindings.size() > 0 && primaryFindings.isDatabase()){
+	 * 			....
+	 * 		}
+	 * </pre>
+	 * @return true if results is an Database instance
+	 * @throws ETLProcessorException if size is bigger than 1
+	 * @See AssetEntity#isaDatabase
 	 */
 	boolean isDatabase() {
-		if (hasResultsIn(AssetEntity)) {
-			return findElement.results.every { it.isaDatabase() }
+		if(size() > 1){
+			throw ETLProcessorException.incorrectFindingsMethodInvocation('isDatabase')
 		}
-		return false
+		return findElement.firstResult().isaDatabase()
 	}
 
 	/**
-	 * Defines if the FindingsFacade contains results
-	 * and all these results are Device assets
-	 * @return
+	 * Defines if the FindingsFacade contains a single result
+	 * and that results is an Device asset instance
+	 * <pre>
+	 * 		def primaryFindings = FINDINGS
+	 * 		if (primaryFindings.size() > 0 && primaryFindings.isDevice()){
+	 * 			....
+	 * 		}
+	 * </pre>
+	 * @return true if results is an Device instance
+	 * @throws ETLProcessorException if size is bigger than 1
+	 * @See AssetEntity#isaDevice
 	 */
 	boolean isDevice() {
-		if (hasResultsIn(AssetEntity)) {
-			return findElement.results.every { it.isaDevice() }
+		if(size() > 1){
+			throw ETLProcessorException.incorrectFindingsMethodInvocation('isDevice')
 		}
-		return false
+		return findElement.firstResult().isaDevice()
 	}
 
 	/**
-	 * Defines if the FindingsFacade contains results
-	 * and all these results are Application assets
-	 * @return
+	 * Defines if the FindingsFacade contains a single result
+	 * and that results is an Application asset instance
+	 * <pre>
+	 * 		def primaryFindings = FINDINGS
+	 * 		if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
+	 * 			....
+	 * 		}
+	 * </pre>
+	 * @return true if results is an Application instance
+	 * @throws ETLProcessorException if size is bigger than 1
+	 * @See AssetEntity#isaApplication
 	 */
 	boolean isApplication() {
-		if (hasResultsIn(AssetEntity)) {
-			return findElement.results.every { it.isaApplication() }
+		if(size() > 1){
+			throw ETLProcessorException.incorrectFindingsMethodInvocation('isApplication')
 		}
-		return false
+		return findElement.firstResult().isaApplication()
 	}
 
 	/**
