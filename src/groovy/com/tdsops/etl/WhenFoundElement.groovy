@@ -21,6 +21,6 @@ class WhenFoundElement extends FoundElement {
 	 * @return the current find Element
 	 */
 	FoundElement update(Closure closure) {
-		return action('update', closure)
+		return action(FoundElementType.update, closure)
 	}
 }

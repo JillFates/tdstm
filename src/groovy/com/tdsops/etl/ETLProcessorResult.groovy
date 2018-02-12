@@ -52,7 +52,7 @@ class ETLProcessorResult {
 			reference = [
 				domain: domain.name(),
 				fields: [] as Set,
-				data  : [initialRowDataMap()]
+				data: [initialRowDataMap()]
 			]
 
 			domains.add(reference)
@@ -114,12 +114,12 @@ class ETLProcessorResult {
 	void addFoundElement(FoundElement foundElement){
 
 		Map<String, ?> data = reference.data.last()
-		if(!data.fields[foundElement.dependentId]){
+		if(!data.fields[foundElement.domainPropertyName]){
 			throw ETLProcessorException.notCurrentFindElement()
 		}
 
-		Map<String, ?> field = data.fields[foundElement.dependentId]
-		field[foundElement.action] = foundElement.propertiesMap
+		Map<String, ?> field = data.fields[foundElement.domainPropertyName]
+		field[foundElement.actionName] = foundElement.propertiesMap
 	}
 
 	/**

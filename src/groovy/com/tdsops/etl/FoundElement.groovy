@@ -3,33 +3,44 @@ package com.tdsops.etl
 /**
  * Abstract implementation for whenFound and whenNotFound ETL command.
  * It manages common behaviour between both commands.
+ * <pre>
+ *  whenFound DOMAIN_PROPERTY_NAME update {
+ * </pre>
+ * The DOMAIN_PROPERTY_NAME can be createdBy, manufacturer, model, rack, bundle, etc.
  * @see WhenNotFoundElement
  * @see WhenFoundElement
  */
 abstract class FoundElement {
 
-	String dependentId
+	String domainPropertyName
+
+	enum FoundElementType {
+		update, create, unknown
+	}
+
 	/**
 	 * Defines if the found element instance
 	 * is 'update' or 'create'
 	 */
-	private String action
+	private FoundElementType action
+
 	/**
 	 * Map that collects properties to be added in the ETLProcessorResult
 	 * @see FoundElement#result
 	 */
 	private Map<String, ?> propertiesMap
+
 	/**
-	 * Result add the result of this ETL command invokation
+	 * Result add the result of this ETL command invocation
 	 * @see ETLProcessorResult#addFoundElement(com.tdsops.etl.FoundElement)
 	 */
 	private ETLProcessorResult result
 
-	FoundElement(String dependentId, ETLProcessorResult result) {
-		this.dependentId = dependentId
+	FoundElement(String domainPropertyName, ETLProcessorResult result) {
+		this.domainPropertyName = domainPropertyName
 		this.result = result
-		this.action = 'unknown'
-		propertiesMap = [:]
+		this.action = FoundElementType.unknown
+		this.propertiesMap = [:]
 	}
 
 	/**
@@ -44,7 +55,7 @@ abstract class FoundElement {
 	 * @return the current find Element
 	 */
 	FoundElement create(Closure closure) {
-		throw ETLProcessorException.invalidWhenFoundCommand(dependentId)
+		throw ETLProcessorException.invalidWhenFoundCommand(domainPropertyName)
 	}
 
 	/**
@@ -59,7 +70,7 @@ abstract class FoundElement {
 	 * @return the current find Element
 	 */
 	FoundElement update(Closure closure) {
-		throw ETLProcessorException.invalidWhenNotFoundCommand(dependentId)
+		throw ETLProcessorException.invalidWhenNotFoundCommand(domainPropertyName)
 	}
 
 	/**
@@ -156,12 +167,12 @@ abstract class FoundElement {
 		return fieldValue
 	}
 
-	String getDependentId() {
-		return dependentId
+	String getDomainPropertyName() {
+		return domainPropertyName
 	}
 
-	String getAction() {
-		return action
+	String getActionName() {
+		return action.name()
 	}
 
 	ETLProcessorResult getResult() {

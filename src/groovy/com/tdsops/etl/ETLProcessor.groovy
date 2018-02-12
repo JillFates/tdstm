@@ -375,7 +375,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (String columnName) {
-
+		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
 		if (!columnsMap.containsKey(columnName.toLowerCase())) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
 		}

@@ -23,6 +23,6 @@ class WhenNotFoundElement extends FoundElement {
 	 * @return the current find Element
 	 */
 	FoundElement create(Closure closure) {
-		return action('create', closure)
+		return action(FoundElementType.create, closure)
 	}
 }
