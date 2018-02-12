@@ -901,6 +901,131 @@ application id,vendor name,technology,location
 			service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
+
+		given:
+			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent())
+
+		and:
+			Project GMDEMO = Mock(Project)
+			GMDEMO.getId() >> 125612l
+
+			Project TMDEMO = Mock(Project)
+			TMDEMO.getId() >> 125612l
+
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getProject() >> it.project
+				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				if (args.containsKey('id')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == args.id }
+				} else if (args.containsKey('assetName')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == args.assetName }
+				}
+			}
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+						
+							extract AssetDependencyId load id
+							extract AssetId load asset
+							
+							find Asset 'for' asset by assetName with SOURCE.AssetName
+							// Grab the reference to the FINDINGS to be used later. 
+							def primaryFindings = FINDINGS
+	
+							if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
+							 	set comment with 'Asset results found'		
+							} else {
+							 	set comment with 'Asset results not found'
+							}
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'It throws an Exception because project was not defined'
+
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can create a domain when not found a instance with find command'() {
 
 		given:
