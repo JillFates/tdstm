@@ -1,7 +1,4 @@
 package com.tdsops.etl
-
-import com.tds.asset.AssetEntity
-
 /**
  * Find Element Facade used in ETL script for FINDINGS bound variable.
  * It could be used for defining the latest results

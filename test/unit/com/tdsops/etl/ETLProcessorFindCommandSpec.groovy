@@ -102,8 +102,23 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			GroovyMock(GormUtil, global: true)
+			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
+			}
+			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
+				propertyName == 'id'
+			}
+			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
+				true
 			}
 
 		and:
@@ -223,6 +238,9 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetDependency, global: true)
+			AssetDependency.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
 			}
@@ -625,6 +643,9 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -770,13 +791,15 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				if (args.containsKey('id')) {
 					applications.findAll { it.getId() == args.id && it.project.id == args.project.id }
 				} else {
 					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
 				}
-
 			}
 
 		and:
@@ -1287,7 +1310,7 @@ application id,vendor name,technology,location
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid domain: 'Unknown'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency]"
+			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 
 		cleanup:
 			service.deleteTemporaryFile(fileName)
