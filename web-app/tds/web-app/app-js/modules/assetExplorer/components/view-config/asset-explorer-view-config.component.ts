@@ -117,6 +117,7 @@ export class AssetExplorerViewConfigComponent {
 			this.model.schema.domains = [];
 			this.model.schema.columns = [];
 			this.draggableColumns = this.model.schema.columns.slice();
+			this.clearSorting();
 		} else {
 			this.model.schema.columns = this.model.schema.columns
 				.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
@@ -382,6 +383,11 @@ export class AssetExplorerViewConfigComponent {
 				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
+
+			if (!this.model.schema.columns.length) {
+				this.clearSorting();
+			}
+
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
 		this.grid.clear();
@@ -466,5 +472,10 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onDragEnd(): void {
 		this.model.schema.columns = this.draggableColumns.slice();
+	}
+
+	private clearSorting() {
+		this.grid.state.sort = [];
+		delete this.model.schema.sort;
 	}
 }
