@@ -114,4 +114,13 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException invalidWhenNotFoundCommand(String fieldName) {
         new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }".toString())
     }
+
+    static ETLProcessorException incorrectDomain (ETLDomain domain) {
+        new ETLProcessorException("Cannot create a query for domain ${domain.name()}".toString())
+    }
+
+	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
+		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
+	}
 }
+
