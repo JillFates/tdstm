@@ -28,7 +28,7 @@
 								<input type="text" (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name"
 								 required [ngClass]="{'has-error': (!dataScriptForm.form.valid && dataScriptForm.touched) && dataScriptModel.name.length <= 0}"
 								/>
-								<span *ngIf="!isUnique" style="color: red; font-weight: bold;">Datasource name must be unique</span>
+								<span *ngIf="!isUnique" style="color: red; font-weight: bold;">{{'DATA_INGESTION.DATA_SCRIPT' | translate }} name must be unique</span>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 								<label class="control-label label-detail">{{dataScriptModel.name}}</label>
@@ -80,7 +80,7 @@
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditDataScript()" class="btn btn-primary pull-left">
 			<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 		<button type="button" *ngIf="modalType === actionTypes.VIEW" (click)="onDataScriptDesigner()" class="btn btn-primary pull-left">
-			<span class="glyphicon glyphicon-eye-open"></span> Data Script Designer</button>
+			<span class="glyphicon glyphicon-eye-open"></span> {{'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate }}</button>
 		<button type="button" *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteDataScript()" class="btn btn-danger">
 			<span class="fa fa-fw fa-trash"></span> Delete</button>
 		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">

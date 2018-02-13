@@ -135,7 +135,7 @@ class WsAssetImportController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to invoke an ETL process on the filename (from invokeFetch) passed in using the Data Script that was
+	 * Used to invoke an ETL process on the filename (from invokeFetch) passed in using the DataScript that was
 	 * specified. It will return the status including counts, errors, and output filename.
 	 *
 	 * For testing
@@ -143,7 +143,7 @@ class WsAssetImportController implements ControllerMethods {
 	 * 		odd ids  - returns error
 	 * 		invalid ids - returns not found
 	 *
-	 * @param id - the id of the Data Script that should be used to Transform the data
+	 * @param id - the id of the DataScript that should be used to Transform the data
 	 * @param filename - the name of the temporary file that was provided by the fetch action
 	 * @return	JSON Map containing the following
 	 * 		status <String> indicating success|error
@@ -174,7 +174,7 @@ class WsAssetImportController implements ControllerMethods {
 
 		if (! dataScript.etlSourceCode) {
 			result.status='error'
-			result.errors << 'Data Script has no source specified'
+			result.errors << 'DataScript has no source specified'
 			return result
 		}
 
@@ -214,7 +214,7 @@ class WsAssetImportController implements ControllerMethods {
 	}
 
 	/**
-	 * Returns a collection of data lists including the actions and data scripts used to populate the form
+	 * Returns a collection of data lists including the actions and datascripts used to populate the form
 	 * @param
 	 * @return JSON map containing the following:
 	 * 		actions: <List><Map>
@@ -223,8 +223,8 @@ class WsAssetImportController implements ControllerMethods {
 	 * 			provider: <String> the name of the provider associated with the action
 	 * 			defaultDataScriptId: <Long> the DataScript that by default will be used to process the data from the action
 	 * 		dataScripts: <List><Map>
-	 * 			id: <Long> the id of the Data Script
-	 * 			name: <String> the name / label of the data script
+	 * 			id: <Long> the id of the DataScript
+	 * 			name: <String> the name / label of the datascript
 	 */
 	@HasPermission(Permission.AssetImport)
 	def manualFormOptions() {

@@ -40,7 +40,7 @@ export class DataScriptViewEditComponent implements OnInit {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create DataScript' : (this.modalType === ActionType.EDIT ? 'DataScript Edit' : 'DataScript Detail');
 		// ignore etl script from this context
 		let copy = {...this.dataScriptModel};
 		delete copy.etlSourceCode;
@@ -138,7 +138,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(): void {
@@ -175,7 +175,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Open the Data Script Designer
+	 * Open the DataScript Designer
 	 */
 	protected onDataScriptDesigner(): void {
 		this.dialogService.extra(DataScriptEtlBuilderComponent,

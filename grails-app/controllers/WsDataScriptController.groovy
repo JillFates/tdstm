@@ -63,7 +63,7 @@ class WsDataScriptController implements ControllerMethods {
      * name to look up, this method also expects:
      *
      * - Provider Id
-     * - Data Script Id.
+     * - DataScript Id.
      *
      * The latter is to contemplate the scenario where the user is editing a DataScript and this
      * endpoint is invoked. If the name hasn't changed, it would report the name as not unique.
