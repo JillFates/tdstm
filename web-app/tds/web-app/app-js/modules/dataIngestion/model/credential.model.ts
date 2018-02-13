@@ -72,4 +72,4 @@ export class CredentialModel {
 	}
 }
 
-export const AUTH_METHODS = ['HTTP_BASIC', 'HTTP_COOKIE', 'JWT_TOKEN', 'OAUTH'];
+export const AUTH_METHODS = ['HTTP_BASIC', 'HTTP_COOKIE'];

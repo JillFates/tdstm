@@ -118,6 +118,7 @@ export class CredentialViewEditComponent {
 		this.statusList = ACTIVE_INACTIVE;
 		if (this.modalType === ActionType.CREATE) {
 			this.credentialModel.status = this.statusList[0];
+			this.modifySignatureByProperty('status');
 		}
 	}
 
@@ -128,6 +129,7 @@ export class CredentialViewEditComponent {
 		this.authMethodList = AUTH_METHODS;
 		if (this.modalType === ActionType.CREATE) {
 			this.credentialModel.authMethod = this.authMethodList[0];
+			this.modifySignatureByProperty('authMethod');
 		}
 	}
 
