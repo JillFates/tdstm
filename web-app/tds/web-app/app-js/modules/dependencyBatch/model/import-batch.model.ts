@@ -1,14 +1,27 @@
 import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
+import {ProviderModel} from '../../dataIngestion/model/provider.model';
+import {DataScriptModel} from '../../dataIngestion/model/data-script.model';
 
-export class DependencyBatchModel {
+export class ImportBatchModel {
 	id: number;
 	status: string;
-	importedDate: Date;
-	importedBy: string;
-	domain: string;
-	provider: string;
-	datascript: string;
-	filename: string;
+	domainClassName: string;
+	provider: ProviderModel;
+	datascript: DataScriptModel;
+	createdBy: string;
+	archived: boolean;
+	timezone: any;
+	dateFormat: any;
+	progressInfoJob: any;
+	originalFilename: string;
+	nullIndicator: any;
+	overwriteWithBlanks: any;
+	autoProcess: any;
+	warnOnChangesAfter: any;
+	fieldNameList: any;
+	dateCreated: Date;
+	lastUpdated: Date;
+	// TODO: check if this is going to be implemented on backend ..
 	records: number;
 	errors: number;
 	pending: number;

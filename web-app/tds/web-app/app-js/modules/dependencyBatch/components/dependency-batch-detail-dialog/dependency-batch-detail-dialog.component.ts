@@ -1,6 +1,6 @@
 
 import {Component, OnInit} from '@angular/core';
-import {DependencyBatchModel} from '../../model/dependency-batch.model';
+import {ImportBatchModel} from '../../model/import-batch.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 
@@ -10,10 +10,10 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 })
 export class DependencyBatchDetailDialogComponent implements OnInit {
 
-	// public dependencyBatchModel: DependencyBatchModel;
+	// public dependencyBatchModel: ImportBatchModel;
 
 	constructor(
-		private dependencyBatchModel: DependencyBatchModel,
+		private dependencyBatchModel: ImportBatchModel,
 		private promptService: UIPromptService,
 		private dependencyBatchService: DependencyBatchService) {
 	}
