@@ -65,10 +65,30 @@ export class CredentialModel {
 	authMethod?: string;
 	dateCreated?: Date;
 
+	// Authentication Methods
+	username?: string;
+	password?: string;
+	authenticationTestURL?: string;
+	// cookie auth Method
+	cookieSessionMethod?: {
+		httpMethod?: string;
+		cookieName?: string;
+	};
+
 	constructor() {
 		this.name = '';
 		this.description = '';
 		this.provider = { id: null, name: '' };
+		this.credentialType = { id: null, name: ''};
+		this.status = '';
+		this.authMethod = '';
+		this.username = '';
+		this.password = '';
+		this.authenticationTestURL = '';
+		this.cookieSessionMethod = {
+			httpMethod: '',
+			cookieName: ''
+		};
 	}
 }
 

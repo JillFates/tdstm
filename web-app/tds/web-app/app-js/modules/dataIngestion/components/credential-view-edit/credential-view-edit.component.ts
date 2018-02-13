@@ -1,19 +1,17 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS} from '../../model/credential.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
+import {ActionType} from '../../../../shared/model/data-list-grid.model';
 import {ACTIVE_INACTIVE, KEYSTROKE} from '../../../../shared/model/constants';
 import {NgForm} from '@angular/forms';
-import {State} from '@progress/kendo-data-query';
-import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
-import * as R from 'ramda';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 
@@ -53,28 +51,11 @@ export class CredentialViewEditComponent {
 	public providerList = new Array<ProviderModel>();
 	public statusList = new Array<any>();
 	public authMethodList = new Array<any>();
-	public parameterList: GridDataResult;
 	public modalTitle: string;
 	public actionTypes = ActionType;
 	private dataSignature: string;
-	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
-	private currentTab = 0;
+	public authMethods = AUTH_METHODS;
 	public isEditing = false;
-	private initFormLoad = true;
-	private codeMirror = {
-		mode: {
-			name: 'groovy' // Looks like we lack of JS support for coloring
-		},
-		rows: 10,
-		cols: 4
-	};
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}]
-	};
-	public validInfoForm = false;
 	public checkActionModel = CHECK_ACTION;
 	constructor(
 		public originalModel: CredentialModel,
@@ -212,13 +193,5 @@ export class CredentialViewEditComponent {
 	 */
 	private modifySignatureByProperty(property: any): void {
 		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.credentialModel[property]);
-	}
-
-	/**
-	 * Verify if this is on View mode
-	 * @returns {boolean}
-	 */
-	isViewMode(): boolean {
-		return this.modalType === this.actionTypes.VIEW;
 	}
 }
