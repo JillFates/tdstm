@@ -283,17 +283,6 @@ class StringUtil {
 		 return str
 	 }
 
-   /**
-    * Sanitize the String with StringUtil.sanitize
-    * and then replace all white spaces with a '_'
-    */
-   static String sanitizeAndReplaceSpacesWithUnderscore(String str){
-		 if (str) {
-			 str = sanitize(str).replaceAll(/\s/, "_")
-		 }
-		 return str
-	 }
-
 	/**
 	 * Escape string being used in Dot graphs to avoid unterminated strings
 	 * @param str

@@ -48,7 +48,7 @@ class WsFileSystemController implements ControllerMethods{
     private def doFileUpload(FileCommand fileCommand) {
         String fileName = fileSystemService.transferFileToFileSystem(fileCommand)
         if (fileCommand.hasErrors()) {
-            render (errorsInValidation(fileCommand.errors) as JSON)
+            renderErrorJson(errorsInValidation(fileCommand.errors))
         } else {
             renderSuccessJson([filename: fileName])
         }

@@ -24,7 +24,6 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
@@ -37,7 +36,6 @@ class RackLayoutsController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 

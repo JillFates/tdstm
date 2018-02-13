@@ -10,7 +10,7 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
@@ -23,6 +23,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-View-config',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html',
@@ -123,6 +124,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.model.schema.domains = [];
 			this.model.schema.columns = [];
 			this.draggableColumns = this.model.schema.columns.slice();
+			this.clearSorting();
 		} else {
 			this.model.schema.columns = this.model.schema.columns
 				.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
@@ -147,6 +149,9 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		this.columnIndex = 0;
 		this.rowIndex = 0;
 		this.position = this.fields.map(x => this.fieldStyle(x['isTitle']));
+		setTimeout(() => {
+			jQuery('[data-toggle="popover"]').popover();
+		}, 200);
 	}
 
 	protected applyAssetSelectFilter(): void {
@@ -339,7 +344,8 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains: this.domains
+			domains: this.domains,
+			viewName: this.model.name
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
@@ -384,6 +390,11 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
+
+			if (!this.model.schema.columns.length) {
+				this.clearSorting();
+			}
+
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
 		this.grid.clear();
@@ -441,6 +452,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			this.assetExpService.previewQuery(params)
 				.subscribe(result => {
 					this.grid.apply(result);
+					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
 			this.grid.gridData = null;
@@ -503,5 +515,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	protected onDragEnd(): void {
 		this.model.schema.columns = this.draggableColumns.slice();
+	}
+
+	private clearSorting() {
+		this.grid.state.sort = [];
+		delete this.model.schema.sort;
 	}
 }

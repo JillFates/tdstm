@@ -41,18 +41,29 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATA_SCRIPT': 'Create Data Script',
 		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
-		'SAMPLE_DATA_TITLE': 'Sample Data',
-		'ETL_BUILDER_TITLE': 'DataScript Designer',
-		'CONSOLE_TITLE': 'ETL Console',
-		'ETL_BUILDER': {
-			'TEST': 'Test',
-			'CHECK_SYNTAX': 'Check Syntax',
-			'LOAD_SAMPLE_DATA': 'Load Sample Data',
-			'VIEW_CONSOLE': 'View Console'
+		'DATASCRIPT': {
+			'DESIGNER': {
+				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',
+				'TRANSFORMED_DATA_PREVIEW': 'Transformed Data Preview',
+				'SYNTAX_ERRORS': 'Syntax Errors',
+				'ETL_BUILDER_TITLE': 'DataScript Designer',
+				'CONSOLE_TITLE': 'ETL Console',
+				'SAMPLE_DATA_TITLE': 'Sample Data',
+				'TEST': 'Test',
+				'CHECK_SYNTAX': 'Check Syntax',
+				'LOAD_SAMPLE_DATA': 'Load Sample Data',
+				'VIEW_CONSOLE': 'View Console',
+				'FILE_EXTENSION': 'File Extension',
+				'PASTE_CONTENT': 'Paste content (CSV, TXT, JSON, XML)',
+				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON, XML)',
+				'FETCH_DATA_FROM_WEBSERVICE': 'Fetch data from web service',
+				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.'
+			}
 		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
+		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Enter field name to filter',
 		'PROJECT_LIST': 'Project List',
 		'CREATE_CUSTOM': 'Add Custom Field',
@@ -67,10 +78,13 @@ export const en_DICTIONARY: Object = {
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
-			'FETCH_DATA_ACTION': 'Fetch with Data Action:',
-			'TRANSFORM_DATA_SCRIPT': 'Transform with Data Script:',
-			'LOAD_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
-			'GOTO_IMPORT_BATCHES': 'Go to Manage Import Batches',
+			'FETCH_WITH_DATA_ACTION': 'Fetch with Data Action:',
+			'FETCH_WITH_FILE_UPLOAD': 'Fetch with File Upload:',
+			'CURRENTLY_USED': 'Currently used',
+			'OR': 'or',
+			'TRANSFORM_WITH_DATA_SCRIPT': 'Transform with Data Script:',
+			'LOAD_TRANSFORMED_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
+			'GOTO_MANAGE_IMPORT_BATCHES': 'Go to Manage Import Batches',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',
@@ -104,6 +118,8 @@ export const en_DICTIONARY: Object = {
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
+		'UPLOAD': 'Upload',
+		'FETCH': 'Fetch'
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

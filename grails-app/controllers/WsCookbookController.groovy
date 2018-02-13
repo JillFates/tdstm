@@ -20,65 +20,39 @@ class WsCookbookController implements ControllerMethods {
 
 	@HasPermission(Permission.RecipeCreate)
 	def createRecipe(String name, String description, String context, Long clonedFrom) {
-		try {
-			def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
-			renderSuccessJson(recipeId: recipeVersion.recipe.id)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		def recipeVersion = cookbookService.createRecipe(name, description, context, clonedFrom)
+		renderSuccessJson(recipeId: recipeVersion.recipe.id)
 	}
 
 	@HasPermission(Permission.RecipeCreate)
 	def cloneRecipe(Long recipeVersionid, String name, String description) {
-		try {
-			RecipeVersion rv = cookbookService.cloneRecipe(recipeVersionid, name, description)
-			renderSuccessJson(recipeId: rv.recipeId, recipeVersionId: rv.id)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		RecipeVersion rv = cookbookService.cloneRecipe(recipeVersionid, name, description)
+		renderSuccessJson(recipeId: rv.recipeId, recipeVersionId: rv.id)
 	}
 
 	@HasPermission(Permission.RecipeDelete)
 	def deleteRecipeOrVersion(Long id) {
-		try {
-			def version = params.version
-			if (version == null) {
-				cookbookService.deleteRecipe(id)
-			}
-			else {
-				cookbookService.deleteRecipeVersion(params.id, version)
-			}
-			renderSuccessJson()
+		def version = params.version
+		if (version == null) {
+			cookbookService.deleteRecipe(id)
+		} else {
+			cookbookService.deleteRecipeVersion(params.id, version)
 		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def updateRecipe(Long id) {
-		try {
-			def json = request.JSON
-			cookbookService.updateRecipe(id, json.name, json.description)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		def json = request.JSON
+		cookbookService.updateRecipe(id, json.name, json.description)
+		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def saveRecipeVersion(Long id, Long recipeVersionId) {
-		try {
-			cookbookService.saveOrUpdateWIPRecipe(id, recipeVersionId, params.name, params.description,
-					params.sourceCode, params.changelog)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.saveOrUpdateWIPRecipe(id, recipeVersionId, params.name, params.description,
+			params.sourceCode, params.changelog)
+		renderSuccessJson()
 	}
 
 	/**
@@ -86,13 +60,8 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeRelease)
 	def releaseRecipe(Long recipeId) {
-		try {
-			cookbookService.releaseRecipe(recipeId)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.releaseRecipe(recipeId)
+		renderSuccessJson()
 	}
 
 	/**
@@ -100,13 +69,8 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeEdit)
 	def revert(Long id) {
-		try {
-			cookbookService.revertRecipe(id)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.revertRecipe(id)
+		renderSuccessJson()
 	}
 
 	/**
@@ -114,52 +78,37 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeView)
 	def recipe(Long id, Integer version) {
-		try {
-			Map result = cookbookService.getRecipe(id, version)
-			Recipe recipe = result.recipe
-			RecipeVersion rv = result.recipeVersion
-			renderSuccessJson(recipeId: recipe.id,
-			                  name: recipe.name,
-			                  description: recipe.description,
-			                  context: recipe.context,
-			                  createdBy: result.person.firstName + ' ' + result.person.lastName,
-			                  lastUpdated: rv.lastUpdated,
-			                  versionNumber: rv.versionNumber,
-			                  releasedVersionNumber: recipe.releasedVersion?.versionNumber ?: -1,
-			                  recipeVersionId: rv.id,
-			                  hasWIP: result.wip != null,
-			                  sourceCode: rv.sourceCode,
-			                  changelog: rv.changelog,
-			                  clonedFrom: (rv.clonedFrom ?: '').toString(),
-			                  eventId: result.eventId,
-			                  bundleId: result.bundleId,
-			                  applicationId: result.applicationId)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		Map result = cookbookService.getRecipe(id, version)
+		Recipe recipe = result.recipe
+		RecipeVersion rv = result.recipeVersion
+		renderSuccessJson(recipeId: recipe.id,
+			name: recipe.name,
+			description: recipe.description,
+			context: recipe.context,
+			createdBy: result.person.firstName + ' ' + result.person.lastName,
+			lastUpdated: rv.lastUpdated,
+			versionNumber: rv.versionNumber,
+			releasedVersionNumber: recipe.releasedVersion?.versionNumber ?: -1,
+			recipeVersionId: rv.id,
+			hasWIP: result.wip != null,
+			sourceCode: rv.sourceCode,
+			changelog: rv.changelog,
+			clonedFrom: (rv.clonedFrom ?: '').toString(),
+			eventId: result.eventId,
+			bundleId: result.bundleId,
+			applicationId: result.applicationId)
 	}
 
 	@HasPermission(Permission.RecipeView)
 	def recipeList(String archived, String context) {
-		try {
-			def results = cookbookService.findRecipes(archived, context, params.search, params.projectType)
-			renderSuccessJson(list: results)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		def results = cookbookService.findRecipes(archived, context, params.search, params.projectType)
+		renderSuccessJson(list: results)
 	}
 
 	@HasPermission(Permission.RecipeView)
 	def recipeVersionList() {
-		try {
-			def results = cookbookService.findRecipeVersions(params.id)
-			renderSuccessJson(recipeVersions: results)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		def results = cookbookService.findRecipeVersions(params.id)
+		renderSuccessJson(recipeVersions: results)
 	}
 
 	/**
@@ -167,72 +116,41 @@ class WsCookbookController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.RecipeView)
 	def validateSyntax() {
-		try {
-			def results = cookbookService.validateSyntaxForUser(params.sourceCode)
-			if (results == null) {
-				renderSuccessJson()
-			}
-			else {
-				renderWarningJson(results)
-			}
-		}
-		catch (e) {
-			handleException e, logger
+		def results = cookbookService.validateSyntaxForUser(params.sourceCode)
+		if (results == null) {
+			renderSuccessJson()
+		} else {
+			renderWarningJson(results)
 		}
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def archiveRecipe() {
-		try {
-			cookbookService.archivedUnarchived(params.id, true)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.archivedUnarchived(params.id, true)
+		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def unarchiveRecipe() {
-		try {
-			cookbookService.archivedUnarchived(params.id, false)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.archivedUnarchived(params.id, false)
+		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeView)
 	def groups() {
-		try {
-			def groups = cookbookService.getGroups(params.recipeVersionId, params.contextId, params.contextType, params.sourceCode)
-			renderSuccessJson(groups: groups)
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		def groups = cookbookService.getGroups(params.recipeVersionId, params.contextId, params.contextType, params.sourceCode)
+		renderSuccessJson(groups: groups)
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def defineRecipeContext() {
-		try {
-			cookbookService.defineRecipeContext(params.recipeId, params.contextId)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.defineRecipeContext(params.recipeId, params.contextId)
+		renderSuccessJson()
 	}
 
 	@HasPermission(Permission.RecipeEdit)
 	def deleteRecipeContext() {
-		try {
-			cookbookService.deleteRecipeContext(params.recipeId)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		cookbookService.deleteRecipeContext(params.recipeId)
+		renderSuccessJson()
 	}
 }

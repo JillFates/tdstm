@@ -45,7 +45,6 @@ import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -68,7 +67,6 @@ class ReportsController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	ReportsService reportsService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 

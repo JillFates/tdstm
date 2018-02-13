@@ -24,13 +24,7 @@ class WsApplicationController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AssetView)
 	def listInBundle() {
-		try {
-			renderSuccessJson(list: applicationService.listInBundle(params.id))
-		}
-
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(list: applicationService.listInBundle(params.id))
 	}
 
 	/**

@@ -11,7 +11,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
-import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
+import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
@@ -70,6 +70,7 @@ export class AssetExplorerViewGridComponent {
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = MAX_DEFAULT;
 	private maxOptions = MAX_OPTIONS;
+	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
 		skip: 0,
@@ -103,8 +104,18 @@ export class AssetExplorerViewGridComponent {
 		}, (err) => console.log(err));
 	}
 
+	/**
+	 * Draws the Label property
+	 * @param {ViewColumn} column
+	 * @returns {string}
+	 */
 	getPropertyLabel(column: ViewColumn): string {
-		return this.fields.filter(f => f.key === `${column.domain}_${column.property}`)[0].label;
+		let field = this.fields.find(f => f.key === `${column.domain}_${column.property}`);
+		if (field) {
+			return field.label;
+		}
+		column.notFound = true;
+		return column.label;
 	}
 
 	rowCallbackClass(context: RowClassArgs) {

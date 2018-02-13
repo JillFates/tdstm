@@ -19,7 +19,6 @@ import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DashboardService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
@@ -33,7 +32,6 @@ class DashboardController implements ControllerMethods {
 	ControllerService controllerService
 	DashboardService dashboardService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	UserService userService

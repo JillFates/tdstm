@@ -10,7 +10,6 @@ import net.transitionmanager.domain.MoveEventSnapshot
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.StepSnapshot
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -19,7 +18,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 class WsDashboardController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 	TaskService taskService
 
 	/**

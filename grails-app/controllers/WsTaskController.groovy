@@ -10,7 +10,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.QzSignService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UnauthorizedException
 import com.tdsops.common.security.spring.HasPermission
@@ -27,7 +26,6 @@ class WsTaskController implements ControllerMethods {
 	TaskService taskService
 	CommentService commentService
 	QzSignService qzSignService
-	SecurityService securityService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -43,7 +41,6 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskPublish)
 	def unpublish() {
 		renderSuccessJson(tasksUpdated: taskService.unpublish(params.id))
-
 	}
 
 	/**
@@ -61,9 +58,8 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
 		def result = taskService.initiateCreateTasksWithRecipe(params.contextId, params.recipeId,
-				params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
+			params.deletePrevious == 'true', params.useWIP == 'true', params.autoPublish == 'true')
 		renderSuccessJson(jobId: result.jobId)
-
 	}
 
 	/**

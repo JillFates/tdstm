@@ -41,23 +41,6 @@ tdstm {
       passphrase = '3#AKk3XHTc'
   }
 
-
-	credentials {
-		// Credentials to access the AWS service (temporary)
-		aws {
-			accessKey = ''
-			secretKey = ''
-		}
-	}
-
-	credentials {
-		// Credentials to access the AWS service (temporary)
-		aws {
-			accessKey = ''
-			secretKey = ''
-		}
-	}
-
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)

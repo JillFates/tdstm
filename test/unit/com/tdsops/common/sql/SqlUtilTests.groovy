@@ -1,7 +1,7 @@
 package com.tdsops.common.sql
 
 import com.tds.asset.Application
-import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.search.FieldSearchData
 
 import spock.lang.Specification
 
