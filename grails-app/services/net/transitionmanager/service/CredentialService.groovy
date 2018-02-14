@@ -6,7 +6,8 @@ import com.tdssrc.grails.JsonUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.CredentialCO
+import net.transitionmanager.command.CredentialCreateCO
+import net.transitionmanager.command.CredentialUpdateCO
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -15,16 +16,16 @@ import org.springframework.http.MediaType
 
 @Transactional
 @Slf4j
-class CredentialService {
+class CredentialService implements ServiceMethods {
     ProjectService projectService
+    SecurityService securityService
 
     /**
      * Creates a new credential
      * @param credential
      * @return
      */
-    Credential createCredential(CredentialCO credentialCO) {
-        assert credentialCO.project != null : 'Invalid project param.'
+    Credential createCredential(CredentialCreateCO credentialCO) {
         assert credentialCO.provider != null : 'Invalid provider param.'
 
         if (credentialCO.hasErrors()) {
@@ -33,6 +34,7 @@ class CredentialService {
 
         Credential credentialInstance = new Credential()
         credentialCO.populateDomain(credentialInstance)
+        credentialInstance.project = securityService.getUserCurrentProject()
         credentialInstance.salt = '{sha}'
 
         credentialInstance.save()
@@ -46,9 +48,8 @@ class CredentialService {
      */
     Credential findById(Long id) {
         assert id != null : 'Invalid id param.'
-        return Credential.where {
-            id == id
-        }.get()
+        Project project = securityService.getUserCurrentProject()
+        return GormUtil.findInProject(project, Credential.class, id, true)
     }
 
     /**
@@ -63,12 +64,26 @@ class CredentialService {
     }
 
     /**
+     * Find all credential belonging to current user project
+     * @param project
+     * @return
+     */
+    List<Credential> findAllByCurrentUserProject() {
+        Project project = securityService.getUserCurrentProject()
+        return Credential.where {
+            project == project
+        }.list()
+    }
+
+    /**
      * Find all credential belonging to a provider
      * @param provider
      * @return
      */
     List<Credential> findAllByProvider(Provider provider) {
+        Project project = securityService.getUserCurrentProject()
         return Credential.where {
+            project == project
             provider == provider
         }.list()
     }
@@ -78,7 +93,7 @@ class CredentialService {
      * @param credential
      * @return
      */
-    Credential updateCredential(CredentialCO credentialCO) {
+    Credential updateCredential(CredentialUpdateCO credentialCO) {
         Credential credentialInstance = findById(credentialCO.id)
         GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
 
@@ -130,8 +145,8 @@ class CredentialService {
         assert credential != null : 'Invalid credential information provided.'
 
         Map authenticationResponse = null
-        switch (credential.method) {
-            case AuthenticationMethod.JWT_TOKEN:
+        switch (credential.authenticationMethod) {
+            case AuthenticationMethod.JWT:
                 authenticationResponse = doJWTTokenAuthentication(credential)
                 break
             default:
@@ -148,7 +163,7 @@ class CredentialService {
      * @return
      */
     private Map doJWTTokenAuthentication(Credential credential) {
-        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getAccessKey(), password: credential.getPassword()])
+        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: credential.getPassword()])
         RestBuilder rest = new RestBuilder()
         def resp = rest.post(credential.getAuthenticationUrl()) {
             header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

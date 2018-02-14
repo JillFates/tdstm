@@ -1,11 +1,10 @@
 import grails.test.spock.IntegrationSpec
-import net.transitionmanager.command.CredentialCO
+import net.transitionmanager.command.CredentialCreateCO
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.DomainUpdateException
-import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import test.helper.CredentialTestHelper
@@ -26,7 +25,7 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
 
     void '1. test create credential without project throws exception'() {
         setup:
-            CredentialCO credentialCO = credentialTestHelper.createCredentialCO(null, null)
+            CredentialCreateCO credentialCO = credentialTestHelper.createCredentialCO(null, null)
 
         when:
             credentialService.createCredential(credentialCO)
@@ -39,7 +38,7 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
     void '2. test create credential without provider throws exception'() {
         setup:
             Project project = projectTestHelper.createProject()
-            CredentialCO credentialCO = credentialTestHelper.createCredentialCO(project, null)
+            CredentialCreateCO credentialCO = credentialTestHelper.createCredentialCO(project, null)
 
         when:
             credentialService.createCredential(credentialCO)
@@ -113,7 +112,7 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             final Long id = credential.id
             final String newCredentialName = "***Credential name updated***"
 
-            CredentialCO credentialCO = new CredentialCO()
+            CredentialCreateCO credentialCO = new CredentialCreateCO()
             credentialCO.populateFromDomain(credential)
             credentialCO.name = newCredentialName
         when:
@@ -130,7 +129,7 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             Credential credential = credentialTestHelper.createAndSaveCredential(project, provider)
             final Long id = credential.id
 
-            CredentialCO credentialCO = new CredentialCO()
+            CredentialCreateCO credentialCO = new CredentialCreateCO()
             credentialCO.populateFromDomain(credential)
             credentialCO.id = id
             credentialCO.version = -1

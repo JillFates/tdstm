@@ -1,32 +1,34 @@
 package net.transitionmanager.command
 
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.CredentialEnvironment
+import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
-import com.tdsops.tm.enums.domain.CredentialType
 import grails.validation.Validateable
 import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 
+/**
+ * Command object to handle credential form data binding upon creation
+ */
 @Validateable
-class CredentialCO implements CommandObject {
-    Long id
-    Project project
+class CredentialCreateCO implements CommandObject {
     Provider provider
     String name
-    CredentialType type
+    CredentialHttpMethod httpMethod
+    CredentialEnvironment environment
     CredentialStatus status
-    AuthenticationMethod method
-    String accessKey
+    AuthenticationMethod authenticationMethod
+    String username
     String password
     String authenticationUrl
     String renewTokenUrl
     Date expirationDate
-    Long version
 
     static constraints = {
         importFrom Credential, include: [
                 'name'
         ]
+        renewTokenUrl nullable: true
     }
 }

@@ -35,11 +35,11 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
         signupHelper.deleteUserLoginByUsername(TEST_USERNAME)
     }
 
-    def "credentialService validate successful authentication using JWT_TOKEN using TDSTM as token issuer"() {
+    def "credentialService validate successful authentication using JWT using TDSTM as token issuer"() {
         given: 'a credential'
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
-            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, HOSTNAME, AuthenticationMethod.JWT_TOKEN)
+            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, HOSTNAME, AuthenticationMethod.JWT)
             final Long id = credential.id
 
         when: 'authenticate using provided credentials for a JWT token'
