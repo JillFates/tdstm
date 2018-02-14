@@ -139,7 +139,7 @@ export class DataScriptListComponent {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(dataItem: any): void {

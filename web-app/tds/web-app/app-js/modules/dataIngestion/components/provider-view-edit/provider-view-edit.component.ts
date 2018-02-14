@@ -112,7 +112,7 @@ export class ProviderViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteProvider(): void {

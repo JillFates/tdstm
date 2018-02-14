@@ -40,7 +40,7 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
-		
+
 		.script-error {
 			margin-bottom: 18px;
 		}
@@ -330,7 +330,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteApiAction(): void {
