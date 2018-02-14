@@ -18,7 +18,7 @@ export class ImportBatchModel {
 	overwriteWithBlanks: any;
 	autoProcess: any;
 	warnOnChangesAfter: any;
-	fieldNameList: any;
+	fieldNameList: Array<any>;
 	dateCreated: Date;
 	lastUpdated: Date;
 	// TODO: check if this is going to be implemented on backend ..
@@ -58,7 +58,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Imported At',
-				property: 'importedDate',
+				property: 'dateCreated',
 				type: 'date',
 				format: '{0:yyyy/MM/dd HH:mm:ss}',
 				width: 200,
@@ -66,35 +66,35 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Imported By',
-				property: 'importedBy',
+				property: 'createdBy',
 				type: 'text',
 				width: 100,
 				locked: false
 			},
 			{
 				label: 'Domain',
-				property: 'domain',
+				property: 'domainClassName',
 				type: 'text',
 				width: 130,
 				locked: false
 			},
 			{
 				label: 'Provider',
-				property: 'provider',
+				property: 'provider.name',
 				type: 'text',
 				width: 130,
 				locked: false
 			},
 			{
 				label: 'Datascript',
-				property: 'datascript',
+				property: 'datascript.name',
 				type: 'text',
 				width: 130,
 				locked: false
 			},
 			{
 				label: 'File Name',
-				property: 'filename',
+				property: 'originalFilename',
 				type: 'text',
 				width: 150,
 				locked: false

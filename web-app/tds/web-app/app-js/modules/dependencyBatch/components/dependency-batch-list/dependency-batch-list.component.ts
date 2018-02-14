@@ -36,6 +36,9 @@ export class DependencyBatchListComponent {
 		this.onLoad();
 	}
 
+	/**
+	 * On Page Load.
+	 */
 	private onLoad(): void {
 		this.columnsModel = new DependencyBatchColumnsModel();
 		if ( !this.canRunActions() ) {
@@ -46,12 +49,19 @@ export class DependencyBatchListComponent {
 		});
 	}
 
+	/**
+	 * Load all Import Batch Unarchived list
+	 */
 	private loadBatchList(): void {
 		this.dependencyBatchService.getImportBatches().subscribe(result => {
 			this.dataGridOperationsHelper.reloadData(result);
 		});
 	}
 
+	/**
+	 * Open Dialog Popups to display Batch Import detail.
+	 * @param {CellClickEvent} cellClick
+	 */
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		this.dialogService.open(DependencyBatchDetailDialogComponent, []).then(result => {
 			// silence is golden
@@ -60,6 +70,9 @@ export class DependencyBatchListComponent {
 		});
 	}
 
+	/**
+	 * On View Archived checkbox clicked, toggle load archived batch list
+	 */
 	private onViewArchived(): void {
 		if (this.viewArchived) {
 			this.loadArchivedBatchList();
@@ -68,12 +81,19 @@ export class DependencyBatchListComponent {
 		}
 	}
 
+	/**
+	 * Load Archived Batches.
+	 */
 	private loadArchivedBatchList(): void {
 		this.dependencyBatchService.getArchivedBatchList().subscribe( result => {
 			this.dataGridOperationsHelper.reloadData(result);
 		});
 	}
 
+	/**
+	 * On Play action button clicked, start import batch.
+	 * @param item
+	 */
 	private onPlayButton(item: any): void {
 		this.dependencyBatchService.startBatch(item.id).subscribe( (result) => {
 			if (result.status === 'success') {
@@ -91,6 +111,10 @@ export class DependencyBatchListComponent {
 		});
 	}
 
+	/**
+	 * On Stop action button clicked, stop import batch.
+	 * @param item
+	 */
 	private onStopButton(item: any): void {
 		this.dependencyBatchService.stopBatch(item.id).subscribe( (result) => {
 			if (result.status === 'success') {
@@ -102,14 +126,26 @@ export class DependencyBatchListComponent {
 		});
 	}
 
+	/**
+	 * Determines if has DataTransferBatchProcess permission to run actions.
+	 * @returns {boolean}
+	 */
 	private canRunActions(): boolean {
 		return this.permissionService.hasPermission(Permission.DataTransferBatchProcess);
 	}
 
+	/**
+	 * Determines if has DataTransferBatchDelete permission to bulk delete batches.
+	 * @returns {boolean}
+	 */
 	private canBulkDelete(): boolean {
 		return this.permissionService.hasPermission(Permission.DataTransferBatchDelete);
 	}
 
+	/**
+	 * Determines if has DataTransferBatchProcess permission to bulk archive batches.
+	 * @returns {boolean}
+	 */
 	private canBulkArchive(): boolean {
 		return this.permissionService.hasPermission(Permission.DataTransferBatchProcess);
 	}

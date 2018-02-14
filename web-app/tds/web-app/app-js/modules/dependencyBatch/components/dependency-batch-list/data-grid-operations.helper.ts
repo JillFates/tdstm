@@ -1,10 +1,17 @@
 import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
-import {CompositeFilterDescriptor, process, SortDescriptor, State} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult, RowArgs, SelectableSettings} from '@progress/kendo-angular-grid';
+import {CompositeFilterDescriptor, filterBy, process, SortDescriptor, State} from '@progress/kendo-data-query';
+import {
+	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
+	SelectableSettings
+} from '@progress/kendo-angular-grid';
+import {MAX_DEFAULT, MAX_OPTIONS} from '../../../../shared/model/constants';
 
 export class DataGridOperationsHelper {
 
-	public gridData: GridDataResult;
+	public gridData: GridDataResult = {
+		data: [],
+		total: 0
+	};
 	public resultSet: Array<any>;
 	public state: State = {
 		filter: {
@@ -18,6 +25,9 @@ export class DataGridOperationsHelper {
 	public selectAllCheckboxes = false;
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
+	public skip = 0;
+	public defaultPageSize = MAX_DEFAULT;
+	public defaultPageOptions = MAX_OPTIONS;
 
 	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
 		this.state.sort = defaultSort;
@@ -31,7 +41,8 @@ export class DataGridOperationsHelper {
 			}
 			this.checkboxSelectionConfig = checkboxSelectionConfig;
 		}
-		this.gridData = process(this.resultSet, this.state);
+		// this.gridData = process(this.resultSet, this.state);
+		this.loadPageData();
 	}
 
 	public onFilter(column: any): void {
@@ -106,14 +117,15 @@ export class DataGridOperationsHelper {
 	}
 
 	public filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
-		this.gridData = process(this.resultSet, this.state);
+		// this.gridData = process(this.resultSet, this.state);
+		this.loadPageData();
 	}
 
 	public sortChange(sort): void {
 		this.state.sort = sort;
-		this.gridData = process(this.resultSet, this.state);
+		// this.gridData = process(this.resultSet, this.state);
+		this.loadPageData();
 	}
 
 	/**
@@ -149,6 +161,31 @@ export class DataGridOperationsHelper {
 
 	public reloadData(result: any): void {
 		this.resultSet = result;
-		this.gridData = process(this.resultSet, this.state);
+		// this.gridData = process(this.resultSet, this.state);
+		this.loadPageData();
+	}
+
+	/**
+	 * Manage Pagination
+	 * @param {PageChangeEvent} event
+	 */
+	public pageChange(event: PageChangeEvent): void {
+		this.skip = event.skip;
+		this.loadPageData();
+	}
+
+	/**
+	 * Change the Model to the Page + Filter
+	 */
+	public loadPageData(): void {
+		this.gridData = {
+			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.state.filter),
+			total: this.resultSet.length
+		};
+		// If we delete an item and it was the last element in the page, go one page back
+		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
+			this.skip -= this.defaultPageSize;
+			this.loadPageData();
+		}
 	}
 }

@@ -25,22 +25,32 @@ export class DependencyBatchService {
 		// 	})
 		// 	.catch((error: any) => error.json());
 
-		// let mockResult: Array<ImportBatchModel> = [
-		// 	{
-		// 		id: 1,
-		// 		status: 'Pending',
-		// 		dateCreated: new Date(),
-		// 		createdBy: 'David Ontiveros',
-		// 		domainClassName: 'Dependencies',
-		// 		provider: 'Service Now',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'load_file_v1.xls',
-		// 		records: 20,
-		// 		errors: 0,
-		// 		pending: 20,
-		// 		processed: 0,
-		// 		ignored: 0
-		// 	},
+		let mockResult: Array<ImportBatchModel> = [
+			{
+				id: 1,
+				status: 'Pending',
+				domainClassName: 'Dependencies',
+				provider: {id: 1, name: 'Provider 1'},
+				datascript: {id: 1, name: 'Datascript 1'},
+				createdBy: 'David Ontiveros',
+				archived: false,
+				timezone: 'timezone',
+				dateFormat: 'dateFormat',
+				progressInfoJob: null,
+				originalFilename: 'load_file_v1.xls',
+				nullIndicator: null,
+				overwriteWithBlanks: null,
+				autoProcess: null,
+				warnOnChangesAfter: null,
+				fieldNameList: [],
+				dateCreated: new Date(),
+				lastUpdated: new Date(),
+				records: 20,
+				errors: 0,
+				pending: 0,
+				processed: 0,
+				ignored: 0
+			}];
 		// 	{
 		// 		id: 2,
 		// 		status: 'Pending',
@@ -118,7 +128,7 @@ export class DependencyBatchService {
 		// 	}
 		// ];
 
-		return Observable.of( [] );
+		return Observable.of( mockResult );
 	}
 
 	/**
