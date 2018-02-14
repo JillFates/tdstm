@@ -19,6 +19,7 @@ import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.LicenseAdminService
+import ControlTagLib
 
 import java.sql.Timestamp
 import java.text.DateFormat
@@ -535,6 +536,29 @@ class CustomTagLib implements InitializingBean {
 		int converted = powerTypePref == 'Watts' ? Math.round(rackPower) : (rackPower / 120).toFloat().round(1)
 		def result = (attrs.blankZero && converted == 0) ? '' : converted
 		out << result
+	}
+
+	/**
+	 * Used to render the Group Id value along with the tooltip and link to the Dependency Analyzer for that Group Id.
+	 * @attr groupId  The group id the asset belongs to. If empty, the result is an empty string.
+	 * @attr tab  The tab that the logic should switch to after the page is loaded. If not present, it defaults to "map".
+	 * @attr assetName  Not used yet, reserved for future feature.
+	 */
+	def showDependencyGroup = { attrs ->
+		if (!attrs.groupId) {
+			out << " "
+		} else {
+			StringBuilder span = new StringBuilder('')
+			span.append("<span ")
+			span.append( "data-toggle='popover' ")
+			span.append( "data-trigger='hover' ")
+			span.append( "data-content='Click to view group in Dependency Analyzer' ")
+			span.append(" >\n")
+			span.append(attrs.groupId)
+			span.append("\n </span>\n")
+			def url = g.link( mapping: "dependencyConsoleMap", params: [groupId:attrs.groupId], span)
+			out << url
+		}
 	}
 
 	def currentProjectMoveEvents = { attrs ->

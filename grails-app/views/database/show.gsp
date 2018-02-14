@@ -55,12 +55,8 @@
 							</td>
 							<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
 								<g:if test="${dependencyBundleNumber}">
-									<g:link mapping="dependencyConsoleMap" params="[groupId:dependencyBundleNumber]">
-										${databaseInstance?.moveBundle} :
-										<span data-toggle="popover" data-trigger="hover" data-content="Click to view group in Dependency Analyzer">
-											${dependencyBundleNumber}
-										</span>
-									</g:link>
+									${databaseInstance?.moveBundle} :
+									<tds:showDependencyGroup groupId="${dependencyBundleNumber}"/>
 								</g:if>
 								<g:else>
 									<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
