@@ -21,8 +21,6 @@ interface Message {
 			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
 			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
-			// ImportBatchBulkDeleteFailure        = 'importBatch.bulkDelete.exception',
-			// ImportBatchBulkUpdateFailure        = 'importBatch.bulkUpdate.exception',
 			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
 			ValidationMissingIds                = 'validation.missing.ids'
 

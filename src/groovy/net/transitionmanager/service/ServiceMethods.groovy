@@ -146,7 +146,6 @@ trait ServiceMethods {
 	 * @return
 	 */
 	String i18nMessage(String code, Object[] args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
-		// TODO : JPM 2018 : This takes the arguments but does NOT pass them to the i18nMessage function
 		return messageSourceService.i18nMessage(code, args, defaultMessage, locale)
 	}
 
