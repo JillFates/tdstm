@@ -206,11 +206,11 @@ class DataScriptService implements ServiceMethods{
         List<Map> references = DataScript.domainReferences
         Map<String, Long> foundReferences = [:]
         for (reference in references) {
-            if (reference.delete == "null") {
+            if (reference.delete == 'restrict') {
                 String hql = """
-                            SELECT COUNT(*) FROM ${reference.domain.getSimpleName()}
-                            WHERE ${reference.property} = :dataScript
-                             """
+                    SELECT COUNT(*) FROM ${reference.domain.getSimpleName()}
+                    WHERE ${reference.property} = :dataScript
+                """
                 Long refs = reference.domain.executeQuery(hql, [dataScript: dataScript])[0]
                 if (refs > 0) {
                     foundReferences[reference.domainLabel] = refs

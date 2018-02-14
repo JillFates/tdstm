@@ -55,4 +55,16 @@ class WsProgressController implements ControllerMethods {
 	def demoFailed() {
 		renderSuccessJson(progressService.demoFailed())
 	}
+
+	/**
+	 * Interrupt a Quartz Job given its ID.
+	 *
+	 * @param jobKey
+	 * @return
+	 */
+	@HasPermission(Permission.DataTransferBatchProcess)
+	def interruptJob(String jobKey){
+		progressService.interruptJob(jobKey)
+		renderSuccessJson([interrupted: true])
+	}
 }

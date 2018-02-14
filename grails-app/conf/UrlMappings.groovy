@@ -1,7 +1,3 @@
-import com.tdsops.common.exceptions.InvalidLicenseException
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
-
 class UrlMappings {
 
 	static mappings = {
@@ -291,7 +287,10 @@ class UrlMappings {
 
 		"/ws/progress/$id" {
 			controller = "wsProgress"
-			action = [GET:"retrieveStatus"]
+			action = [
+					GET:"retrieveStatus",
+					DELETE: "interruptJob"
+			]
 		}
 
 		"/ws/progress/demo" {
@@ -751,12 +750,62 @@ class UrlMappings {
 			]
 		}
 
-     "/ws/filename" {
-        controller = "wsAsset"
-        action = [
-                POST: "exportFilename"
-        ]
-     }
+		"/ws/filename" {
+			controller = "wsAsset"
+			action = [
+					POST: "exportFilename"
+			]
+		}
+
+		// List all Import Batches | Bulk Delete Import Batches
+		"/ws/import/batch" {
+			controller = "wsImportBatch"
+			action = [
+			        GET: "listImportBatches",
+					DELETE: "bulkDeleteImportBatches"
+			]
+		}
+
+		// Fetch | Delete one import batches by id
+		"/ws/import/batch/$id?" {
+			controller = "wsImportBatch"
+			action = [
+					GET: "fetchImportBatch",
+					DELETE: "deleteImportBatch"
+			]
+		}
+
+		// Archive a single Import Batch
+		"/ws/import/batch/archive/$id?" {
+			controller = 'wsImportBatch'
+			action = [
+					PUT: 'archiveImportBatch'
+			]
+		}
+
+		// Unarchive a single Import Batch
+		"/ws/import/batch/unarchive/$id" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "unarchiveImportBatch"
+			]
+		}
+
+		// Bulk Unarchive Import Batches
+		"/ws/import/batch/unarchive" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "bulkUnarchiveImportBatches"
+			]
+		}
+
+		// Bulk Archive Import Batches
+		"/ws/import/batch/archive" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "bulkArchiveImportBatches"
+			]
+		}
 
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
