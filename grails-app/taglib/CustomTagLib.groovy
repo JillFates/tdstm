@@ -19,7 +19,6 @@ import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.InitializingBean
 import net.transitionmanager.service.LicenseCommonService
 import net.transitionmanager.service.LicenseAdminService
-import ControlTagLib
 
 import java.sql.Timestamp
 import java.text.DateFormat
@@ -548,15 +547,8 @@ class CustomTagLib implements InitializingBean {
 		if (!attrs.groupId) {
 			out << " "
 		} else {
-			StringBuilder span = new StringBuilder('')
-			span.append("<span ")
-			span.append( "data-toggle='popover' ")
-			span.append( "data-trigger='hover' ")
-			span.append( "data-content='Click to view group in Dependency Analyzer' ")
-			span.append(" >\n")
-			span.append(attrs.groupId)
-			span.append("\n </span>\n")
-			def url = g.link( mapping: "dependencyConsoleMap", params: [groupId:attrs.groupId], span)
+			def value = dependencyGroupValueWithTooltip(attrs.groupId)
+			def url = g.link( mapping: "dependencyConsoleMap", params: [groupId:attrs.groupId], value)
 			out << url
 		}
 	}
@@ -577,5 +569,21 @@ class CustomTagLib implements InitializingBean {
 	void afterPropertiesSet() {
 		faviconStr = '<link href="' + grailsLinkGenerator.resource(dir:'/images', file:'favicon.ico') +
 				'" rel="shortcut icon" type="image/x-icon"/>'
+	}
+
+	/**
+	 * Returns an HTML span with tooltip, with the dependency group element inside.
+	 * @return  The group Id element with tooltip
+	 */
+	private String dependencyGroupValueWithTooltip(def groupId ) {
+		StringBuilder span = new StringBuilder('')
+		span.append("<span ")
+		span.append( "data-toggle='popover' ")
+		span.append( "data-trigger='hover' ")
+		span.append( "data-content='Click to view group in Dependency Analyzer' ")
+		span.append(" >\n")
+		span.append(groupId)
+		span.append("\n </span>\n")
+		return span.toString()
 	}
 }
