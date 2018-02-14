@@ -118,16 +118,16 @@
 							<table class="inner">
 								<tr>
 									<td width="50%">
-									<label>Predecessors:</label> 
-										<tds:hasPermission permission="${Permission.TaskCreate}"> 
+									<label>Predecessors:</label>
+										<tds:hasPermission permission="${Permission.TaskCreate}">
 											<a id="createSucTask" class="button btn" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
 											 ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Predecessor task">
 											 	<i class="fa fa-plus-circle"></i> Create</a>
 										</tds:hasPermission>
 									</td>
 									<td width="50%">
-									<label>Successors:</label> 
-										<tds:hasPermission permission="${Permission.TaskCreate}">  
+									<label>Successors:</label>
+										<tds:hasPermission permission="${Permission.TaskCreate}">
 											<a id="createPredTask" class="button btn" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
 											 ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Successor task">
 											 	<i class="fa fa-plus-circle"></i> Create</a>
@@ -223,4 +223,12 @@
 		<loading-indicator></loading-indicator>
 	</div>
 </div>
-<script>$('[data-toggle="popover"]').popover();</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		// defer setup tooltips until action-bar buttons is in place
+		setTimeout(function() {
+			$('[data-toggle="popover"]').popover();
+		},1500)
+	})
+</script>
