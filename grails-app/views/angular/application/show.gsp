@@ -25,7 +25,7 @@
 				<tr id="deps">
 					<g:render 
 						template="/angular/common/dependentShow" 
-						model="[supportAssets:supportAssets, dependentAssets:dependentAssets]" >
+						model="[supportAssets:supportAssets, dependentAssets:dependentAssets, assetEntity: applicationInstance]" >
 					</g:render>
 				</tr>
 				<tr id="commentListId">
