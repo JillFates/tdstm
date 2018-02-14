@@ -20,7 +20,7 @@ class CredentialTestHelper {
      * @param provider
      * @return
      */
-    CredentialCreateCO createCredentialCO(Project project, Provider provider, String accessKey = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null) {
+    CredentialCreateCO createCredentialCO(Provider provider, String accessKey = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null) {
         return new CredentialCreateCO(
                 environment: CredentialEnvironment.PRODUCTION,
                 httpMethod: CredentialHttpMethod.POST,
@@ -32,7 +32,6 @@ class CredentialTestHelper {
                 authenticationUrl: authenticationUrl == null ? 'http://localhost' : authenticationUrl,
                 renewTokenUrl: 'http://localhost',
                 expirationDate: new Date(),
-                project: project,
                 provider: provider
         )
     }
@@ -44,9 +43,10 @@ class CredentialTestHelper {
      * @return
      */
     Credential createAndSaveCredential(Project project, Provider provider) {
-        CredentialCreateCO credentialCO = createCredentialCO(project, provider)
+        CredentialCreateCO credentialCO = createCredentialCO(provider)
         Credential credential = new Credential()
         credentialCO.populateDomain(credential)
+        credential.project = project
         credential.salt = '{sha}'
 
         return credential.save(flush: true, failOnError: true)
@@ -62,9 +62,10 @@ class CredentialTestHelper {
      * @return
      */
     Credential createAndSaveCredential(Project project, Provider provider, String accessKey, String password, String authenticationUrl, AuthenticationMethod authenticationMethod) {
-        CredentialCreateCO credentialCO = createCredentialCO(project, provider, accessKey, password, authenticationUrl, authenticationMethod)
+        CredentialCreateCO credentialCO = createCredentialCO(provider, accessKey, password, authenticationUrl, authenticationMethod)
         Credential credential = new Credential()
         credentialCO.populateDomain(credential)
+        credential.project = project
         credential.salt = '{sha}'
 
         return credential.save(flush: true, failOnError: true)

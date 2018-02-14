@@ -37,7 +37,7 @@ class CredentialService implements ServiceMethods {
         credentialInstance.project = securityService.getUserCurrentProject()
         credentialInstance.salt = '{sha}'
 
-        credentialInstance.save()
+        credentialInstance.save(failOnError: true)
         return credentialInstance
     }
 
@@ -104,7 +104,7 @@ class CredentialService implements ServiceMethods {
             throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
         }
 
-        credentialInstance.save()
+        credentialInstance.save(failOnError: true)
 
         return credentialInstance
     }
