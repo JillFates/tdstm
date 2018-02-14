@@ -111,6 +111,7 @@ trait ServiceMethods {
 	 * @param code - message code
 	 * @return
 	 */
+	// TODO : JPM 2/2018 : Shouldn't this take the Locale as a default?
 	String i18nMessage(String code) {
 		return i18nMessage(code, [] as Object[], '')
 	}
@@ -121,6 +122,7 @@ trait ServiceMethods {
 	 * @param defaultMessage - default message if message code is not found
 	 * @return
 	 */
+	// TODO : JPM 2/2018 : Shouldn't this take the Locale as a default?
 	String i18nMessage(String code, String defaultMessage) {
 		return i18nMessage(code, [] as Object[], defaultMessage)
 	}
@@ -144,6 +146,32 @@ trait ServiceMethods {
 	 * @return
 	 */
 	String i18nMessage(String code, Object[] args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		// TODO : JPM 2018 : This takes the arguments but does NOT pass them to the i18nMessage function
 		return messageSourceService.i18nMessage(code, args, defaultMessage, locale)
 	}
+
+	/**
+	 * Used to throw an exception with a i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @param defaultMessage - default message if message code is not found
+	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
+	 */	
+	void throwException(Class exception, String messageCode, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		throwException(exception, messageCode, [] as Object[], defaultMessage, locale)
+	}
+
+	/**
+	 * Used to throw an exception with a i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @param defaultMessage - default message if message code is not found
+	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
+	 */	
+	void throwException(Class exception, String messageCode, List args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		String i18nMsg = i18nMessage(messageCode, args as Object[], defaultMessage, locale)
+		Exception ex = exception.newInstance(i18nMsg)
+		throw ex
+	}
+
 }

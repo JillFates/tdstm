@@ -1,5 +1,10 @@
 package com.tdsops.tm.enums.domain
+import groovy.transform.CompileStatic
 
+/**
+ * Indicates the type of operation that the ImportBatchRecord will perform when posting to the database
+ */
+@CompileStatic
 enum ImportOperationEnum {
 
 	INSERT('Insert'),
@@ -7,14 +12,22 @@ enum ImportOperationEnum {
 	DELETE('Delete'),
 	UNDETERMINED('Undetermined')
 
-	private String name
+	private String label
 
 	private ImportOperationEnum(String value) {
-		name = value
+		label = value
 	}
 
+    String getKey() {
+        return name()
+    }
+
+    String toString() {
+        return label
+    }
+
 	/**
-	 * Safely return the corresponding Enum constant.
+	 * Safely return the corresponding Enum constant
 	 * @param value
 	 * @return
 	 */

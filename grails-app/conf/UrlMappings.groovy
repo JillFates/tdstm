@@ -750,12 +750,12 @@ class UrlMappings {
 			]
 		}
 
-     "/ws/filename" {
-        controller = "wsAsset"
-        action = [
-                POST: "exportFilename"
-        ]
-     }
+		"/ws/filename" {
+			controller = "wsAsset"
+			action = [
+					POST: "exportFilename"
+			]
+		}
 
 		// List all Import Batches | Bulk Delete Import Batches
 		"/ws/import/batch" {
@@ -766,8 +766,8 @@ class UrlMappings {
 			]
 		}
 
-		// Find | Delete a single import batch
-		"/ws/import/batch/$ids" {
+		// Fetch | Delete one import batches by id
+		"/ws/import/batch/$id?" {
 			controller = "wsImportBatch"
 			action = [
 					GET: "fetchImportBatch",
@@ -776,18 +776,18 @@ class UrlMappings {
 		}
 
 		// Archive a single Import Batch
-		"/ws/import/batch/archive/$ids" {
-			controller = "wsImportBatch"
+		"/ws/import/batch/archive/$id?" {
+			controller = 'wsImportBatch'
 			action = [
-					POST: "archiveImportBatch"
+					PUT: 'archiveImportBatch'
 			]
 		}
 
 		// Unarchive a single Import Batch
-		"/ws/import/batch/unarchive/$ids" {
+		"/ws/import/batch/unarchive/$id" {
 			controller = "wsImportBatch"
 			action = [
-					POST: "unArchiveImportBatch"
+					PUT: "unarchiveImportBatch"
 			]
 		}
 
@@ -795,7 +795,7 @@ class UrlMappings {
 		"/ws/import/batch/unarchive" {
 			controller = "wsImportBatch"
 			action = [
-					POST: "bulkUnArchiveImportBatches"
+					PUT: "bulkUnarchiveImportBatches"
 			]
 		}
 
@@ -803,7 +803,7 @@ class UrlMappings {
 		"/ws/import/batch/archive" {
 			controller = "wsImportBatch"
 			action = [
-					POST: "bulkArchiveImportBatches"
+					PUT: "bulkArchiveImportBatches"
 			]
 		}
 

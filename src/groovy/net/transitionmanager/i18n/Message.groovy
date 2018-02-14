@@ -17,13 +17,14 @@ interface Message {
 			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
 			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
 			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+			DomainFailureBulk					= 'domain.failure.bulk',
 			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
 			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
-			ImportBatchBulkDelete               = 'importBatch.bulkDelete.exception',
-			ImportBatchBulkUpdate               = 'importBatch.bulkUpdate.exception',
+			// ImportBatchBulkDeleteFailure        = 'importBatch.bulkDelete.exception',
+			// ImportBatchBulkUpdateFailure        = 'importBatch.bulkUpdate.exception',
 			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
-			RequestMissingIds                   = 'request.missing.ids'
+			ValidationMissingIds                = 'validation.missing.ids'
 
 	/*
 		i18N messages for working with API Action endpoints.

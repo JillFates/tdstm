@@ -262,8 +262,9 @@ trait ControllerMethods {
 	 * @param dumpStacktrace - a flag to dump the stacktrace to the log (default false)
 	 */
 	private void handleException(Exception e, String viewName, errorStringOrList='', Boolean dumpStacktrace=false) {
+		log.debug "handleException(${e.getClass().getName()}) called"
 		if (dumpStacktrace) {
-			log.warn ExceptionUtil.stackTraceToString('IllegalArgumentException', e)
+			log.warn ExceptionUtil.stackTraceToString(e.getMessage(), e)
 		}
 
 		if (WebUtil.isAjax(request)) {
@@ -276,7 +277,7 @@ trait ControllerMethods {
 			String msg = errorStringOrList ? errorStringOrList.toString() : e.getMessage().toString()
 		 	response.setHeader(ERROR_MESG_HEADER, msg)
 
-			forward controller: 'errorHandler', action: viewName
+			forward controller: 'errorHandler', action: viewName, model: [exceptionLogged:true]
 		}
 	} 
 
@@ -389,24 +390,28 @@ trait ControllerMethods {
 	 *
 	 */
 	def <T> T fetchDomain(Class<T> clazz, Map params) {
+		if (! params.id) {
+			throw new InvalidParamException('Id was missing')
+		}
+
 		T t = (T) clazz.get(GormUtil.hasStringId(clazz) ? params.id : params.id.toLong())
-		if (t) {
-			if (GormUtil.isDomainProperty(t, 'project')) {
-				Project project = securityService.userCurrentProject
-				if (! project) {
-					// TODO : JPM 2/2018 : Change fetchDomain to throw new Exception for no project selected
-					throw new EmptyResultException()
-				} else {
-					if (project.id != t.project.id) {
-						securityService.reportViolation("attempted to access asset from unrelated project (asset ${t.id})")
-						throw new EmptyResultException()
-					}
-				}
-			}
-			return t
-		} else {
+		if (! t) {
 			throw new EmptyResultException()
 		}
+
+		if (GormUtil.isDomainProperty(t, 'project')) {
+			Project project = securityService.userCurrentProject
+			if (! project) {
+				// TODO : JPM 2/2018 : Change fetchDomain to throw new Exception for no project selected
+				throw new EmptyResultException()
+			} else {
+				if (project.id != t.project.id) {
+					securityService.reportViolation("attempted to access asset from unrelated project (asset ${t.id})")
+					throw new EmptyResultException()
+				}
+			}
+		}
+		return t
 	}
 
 	/**

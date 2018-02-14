@@ -1,12 +1,13 @@
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.IdsCommandObject
+import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ImportBatchService
+import net.transitionmanager.service.InvalidRequestException
 
 @Secured("isAuthenticated()")
 @Slf4j
@@ -15,7 +16,7 @@ class WsImportBatchController implements ControllerMethods{
 	ImportBatchService importBatchService
 
 	/**
-	 * Return all the Import Batches for the current project.
+	 * Return all the Import Batches for the current project
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchView)
@@ -26,25 +27,25 @@ class WsImportBatchController implements ControllerMethods{
 	}
 
 	/**
-	 * Find a single Import Batch by its ID.
-	 * @param id
+	 * Find a single Import Batch by its ID
+	 * @param idsCmd
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchView)
-	def fetchImportBatch(Long ids) {
-		ImportBatch importBatch = (ImportBatch)fetchDomain(ImportBatch, [id: ids])
+	def fetchImportBatch(Long id) {
+		ImportBatch importBatch = (ImportBatch)fetchDomain(ImportBatch, [id:id])
 		renderSuccessJson(importBatch.toMap())
 	}
 
 	/**
-	 * Delete an ImportBatch.
-	 * @param id
+	 * Delete a single ImportBatch by id
+	 * @param idsCmd
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchDelete)
-	def deleteImportBatch(IdsCommandObject cmd) {
+	def deleteImportBatch(Long id) {
 		Project project = getProjectForWs()
-		importBatchService.deleteImportBatch(cmd, project)
+		importBatchService.deleteImportBatch([id], project)
 		renderSuccessJson( [deleted: true] )
 	}
 
@@ -52,23 +53,24 @@ class WsImportBatchController implements ControllerMethods{
 	 * Delete a given list of batches.
 	 */
 	@HasPermission(Permission.DataTransferBatchDelete)
-	def bulkDeleteImportBatches(IdsCommandObject cmd) {
+	def bulkDeleteImportBatches(IdsCommand idsCmd) {
+		validateIdsCommand(idsCmd)
 		Project project = getProjectForWs()
-		importBatchService.deleteImportBatch(cmd, project)
+		importBatchService.deleteImportBatch(idsCmd.ids, project)
 		renderSuccessJson( [deleted: true] )
 	}
 
 	/**
-	 * Mark the given Import Batch as archived.
+	 * Mark the given Import Batch as archived
 	 * @param id - the id of the Import Batch
-	 * @return
+	 * @return a Map of the ImportBatch after it has been updated
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
-	def archiveImportBatch(IdsCommandObject cmd) {
+	def archiveImportBatch(Long id) {
 		Project project = getProjectForWs()
-		importBatchService.setArchivedFlagOnImportBatch(cmd, project, true)
-		//importBatchService.setArchivedFlagOnImportBatch(id, project, true)
-		renderSuccessJson( [updated: true] )
+		importBatchService.setArchivedFlagOnImportBatch([id], project, true)
+		ImportBatch ib = fetchDomain(ImportBatch, [id:id])
+		renderSuccessJson( ib.toMap() )
 	}
 
 	/**
@@ -77,10 +79,11 @@ class WsImportBatchController implements ControllerMethods{
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
-	def unArchiveImportBatch(IdsCommandObject cmd) {
+	def unarchiveImportBatch(Long id) {
 		Project project = getProjectForWs()
-		importBatchService.setArchivedFlagOnImportBatch(cmd, project, false)
-		renderSuccessJson( [updated: true])
+		importBatchService.setArchivedFlagOnImportBatch([id], project, false)
+		ImportBatch ib = fetchDomain(ImportBatch, [id:id])
+		renderSuccessJson( ib.toMap() )
 	}
 
 	/**
@@ -88,9 +91,10 @@ class WsImportBatchController implements ControllerMethods{
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
-	def bulkArchiveImportBatches(IdsCommandObject cmd) {
+	def bulkArchiveImportBatches(IdsCommand idsCmd) {
+		validateIdsCommand(idsCmd)
 		Project project = getProjectForWs()
-		importBatchService.setArchivedFlagOnImportBatch(cmd, project, true)
+		importBatchService.setArchivedFlagOnImportBatch(idsCmd.ids, project, true)
 		renderSuccessJson( [updated: true] )
 	}
 
@@ -99,10 +103,23 @@ class WsImportBatchController implements ControllerMethods{
 	 * @return
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
-	def bulkUnArchiveImportBatches(IdsCommandObject cmd) {
+	def bulkUnarchiveImportBatches(IdsCommand idsCmd) {
+		validateIdsCommand(idsCmd)
 		Project project = getProjectForWs()
-		importBatchService.setArchivedFlagOnImportBatch(cmd, project, false)
+		importBatchService.setArchivedFlagOnImportBatch(idsCmd.ids, project, false)
 		renderSuccessJson( [updated: true] )
+	}
+
+	/** 
+	 * Used by controller methods that use the IdsCommand class for params that will throw exception 
+	 * if there were no IDs or that an ID was less than 1
+	 * @param idsCmd - the IdsCommand object to validate
+	 * @throws InvalidRequestException
+	 */
+	private void validateIdsCommand(IdsCommand idsCmd) {
+		if (! idsCmd.validate()) {
+			throw new InvalidRequestException(Message.ValidationMissingIds)
+		}
 	}
 
 }
