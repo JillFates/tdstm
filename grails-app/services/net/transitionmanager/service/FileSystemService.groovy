@@ -1,11 +1,16 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.FileSystemUtil
 import grails.transaction.Transactional
-import org.springframework.beans.factory.InitializingBean
-import org.apache.commons.lang3.RandomStringUtils
 import groovy.util.logging.Slf4j
-import javax.management.RuntimeErrorException
+import net.transitionmanager.command.FileCommand
+import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadTextCommand
+import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.InitializingBean
 
+import javax.management.RuntimeErrorException
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
@@ -100,6 +105,7 @@ class FileSystemService  implements InitializingBean {
     String getUniqueFilename(String directory, String prefix='', String extension='tmp') {
         String filename
         int tries = maxUniqueTries
+        prefix = StringUtils.defaultIfEmpty(prefix, '')
         while(true) {
             filename = prefix + RandomStringUtils.randomAlphanumeric(32) + '.' + extension
             if (! temporaryFileExists(filename) ) {
@@ -142,5 +148,58 @@ class FileSystemService  implements InitializingBean {
             securityService.reportViolation("attempted to access file with path separator ($filename)")
             throw new InvalidRequestException('Filename contains path separator')
         }
+    }
+
+    /**
+     * Take a FileCommand instance and transfer the corresponding file
+     * to the file system by delegating the task in one of the overloaded
+     * implementations of writeFileFromCommand.
+     *
+     * @param fileCommand
+     * @return the filename for the temporary file that was created.
+     */
+    String transferFileToFileSystem(FileCommand fileCommand) {
+        String temporaryFileName = null
+        if (fileCommand && fileCommand.validate()) {
+            temporaryFileName = writeFileFromCommand(fileCommand)
+        }
+        return temporaryFileName
+    }
+
+    /**
+     * Write a file to the temporary directory using the extension and the content
+     * given in the command object.
+     * @param uploadTextCommand
+     * @return
+     */
+    private String writeFileFromCommand(UploadTextCommand uploadTextCommand) {
+        String extension = FileSystemUtil.formatExtension(uploadTextCommand.extension)
+        def (String filename, OutputStream os) = createTemporaryFile('', extension)
+        os << uploadTextCommand.content
+        os.close()
+        return filename
+    }
+
+    /**
+     * Copy an uploaded file to the temporary directory.
+     *
+     * @param uploadFileCommand
+     * @return
+     */
+    private String writeFileFromCommand(UploadFileCommand uploadFileCommand) {
+        String extension = FileSystemUtil.getFileExtension(uploadFileCommand.file.getOriginalFilename())
+        OutputStream os
+        String temporaryFileName
+        try {
+            (temporaryFileName, os) = createTemporaryFile('', extension)
+            os.write(uploadFileCommand.file.getBytes())
+            os.close()
+        } catch (Exception e) {
+            log.error(e.getMessage())
+            deleteTemporaryFile(temporaryFileName)
+            throw new InvalidParamException(e.getMessage())
+        }
+
+        return temporaryFileName
     }
 }

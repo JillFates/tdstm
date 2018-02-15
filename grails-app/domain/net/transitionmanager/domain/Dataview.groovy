@@ -38,17 +38,31 @@ class Dataview {
 	 * @return
 	 */
 	Map toMap(Long currentPersonId) {
-		Boolean isOwner = person ? (person.id == currentPersonId) : false
+
 		Map data = [
 				id				: id,
 				name			: name,
 				isSystem		: isSystem,
 				isShared		: isShared,
-				isOwner			: isOwner,
+				isOwner			: isOwner(currentPersonId),
 				isFavorite		: isFavorite(currentPersonId),
-				schema			: JsonUtil.parseJson(reportSchema)
+				schema			: JsonUtil.parseJson(reportSchema),
+				createdBy		: getOwnerName()
 		]
 		return data
+	}
+
+	/**
+	 * Determines if this person dataview is the owner of it.
+	 * @param currentPersonId current person in session.
+	 * @return boolean
+	 */
+	boolean isOwner (Long currentPersonId) {
+		if (!person) {
+			return false
+		} else {
+			return (person.id == currentPersonId)
+		}
 	}
 
 	/**
@@ -64,6 +78,17 @@ class Dataview {
 		return favCount > 0
 	}
 
+	/**
+	 * Returns the name of the dataview owner person.
+	 * If this dataview doesn't have a person associated, then returns empty string.
+	 * @return String
+	 */
+	String getOwnerName() {
+		if (person) {
+			return person.toString()
+		}
+		return ''
+	}
 
 	def beforeInsert = {
 		dateCreated = dateCreated = TimeUtil.nowGMT()

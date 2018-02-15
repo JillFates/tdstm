@@ -11,8 +11,30 @@ package net.transitionmanager.i18n
  */
 interface Message {
 
-	String ApiActionNotBoundProperty = 'apiAction.not.bound.property.exception'
-	String ApiActionInvalidBindingParams = 'apiAction.invalid.binding.params.exception'
-	String ApiActionMustReturnResults = 'apiAction.must.return.result.exception'
+	String 	ApiActionNotBoundProperty 			= 'apiAction.not.bound.property.exception',
+			ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
+			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
+			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
+			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
+			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+			DomainFailureBulk					= 'domain.failure.bulk',
+			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
+			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
+			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
+			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
+			ValidationMissingIds                = 'validation.missing.ids'
+
+	/*
+		i18N messages for working with API Action endpoints.
+	 */
+	String InvalidFieldForDomain = "domain.invalid.field"
+
+
+	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
+	String ApiActionInvalidProviderPreventsCredentialValidation = "apiActionCommand.crendetial.cannotbevalidated"
+	// Messages for the different errors in the ApiAction reactionJson
+	String ApiActionMissingStatusOrSuccessInReactionJson = "apiAction.reactionJson.emptyStatusOrSuccess"
+	String ApiActionMissingDefaultAndErrorInReactionJson = "apiAction.reactionJson.emptyDefaultAndError"
+
 
 }

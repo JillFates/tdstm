@@ -3,9 +3,8 @@ package net.transitionmanager.integration
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.i18n.Message
-import org.springframework.context.MessageSource
+import net.transitionmanager.service.MessageSourceService
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.context.support.StaticMessageSource
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -17,18 +16,15 @@ import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 @TestMixin(GrailsUnitTestMixin)
 class ApiActionScriptProcessorSpec extends Specification {
 
-	StaticMessageSource messageSource
-
 	static doWithSpring = {
-		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
-			bean.scope = 'prototype'
+		messageSourceService(MessageSourceService) { bean ->
 			messageSource = ref('messageSource')
 		}
-	}
 
-	def setup() {
-		messageSource = applicationContext.getBean(MessageSource)
-		assertNotNull messageSource
+		apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
+			bean.scope = 'prototype'
+			messageSourceService = ref('messageSourceService')
+		}
 	}
 
 	@Unroll
@@ -53,7 +49,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 		where: 'The ReactionScriptCode instance is defined'
 			reactionScriptCode          || hasRequest | hasResponse | hasTask | hasAsset | hasJob | hasSC
-			ReactionScriptCode.EVALUATE || true       | true        | false   | false    | false  | true
+			ReactionScriptCode.STATUS   || true       | true        | false   | false    | false  | true
 			ReactionScriptCode.SUCCESS  || true       | true        | true    | true     | true   | true
 			ReactionScriptCode.ERROR    || true       | true        | true    | true     | true   | true
 			ReactionScriptCode.DEFAULT  || true       | true        | true    | true     | true   | true
@@ -240,7 +236,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.with(new ReactionAssetFacade())
 					.with(new ReactionTaskFacade())
 					.with(new ApiActionJob())
-					.build(ReactionScriptCode.EVALUATE)
+					.build(ReactionScriptCode.STATUS)
 
 		expect: 'The evaluation of the script returns a ReactionScriptCode'
 			new GroovyShell(this.class.classLoader, scriptBinding)

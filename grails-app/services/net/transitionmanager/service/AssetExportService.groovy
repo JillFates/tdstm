@@ -5,6 +5,8 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.tm.asset.WorkbookSheetName
 import com.tdsops.tm.asset.export.SpreadsheetColumnMapper
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.FilenameUtil
+import com.tdsops.tm.enums.FilenameFormat
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -93,38 +95,10 @@ class AssetExportService {
 
 			List<String> bundle = params.bundle
 
-			// Set flag if Use for Planning was one of the choosen options and remove from the list
+			// Set flag if Use for Planning was one of the chosen options and remove from the list
 			boolean useForPlanning = bundle.remove(MoveBundle.USE_FOR_PLANNING)
 			boolean allBundles = bundle.remove(ALL_BUNDLES_OPTION)
 			int bundleSize = bundle.size()
-
-			// Determine what will be used for the name of the file + what is shown in the title sheet
-			// Examples:
-			//      project-BundleName-AssetTypes-date.xlsx
-			//      project-2Bundles-AssetTypes-date.xlsx
-			//      project-All-AssetTypes-date.xlsx
-			//      project-Planning-AssetTypes-date.xlsx
-			//      project-Planning+2+Bundles-AssetTypes-date.xlsx
-
-			StringBuilder bundleNameList = new StringBuilder()
-
-			if (allBundles) {
-				bundleNameList.append('All Bundles')
-			} else {
-				if (useForPlanning) {
-					bundleNameList.append('Planning')
-					if (bundleSize) {
-						bundleNameList.append("+$bundleSize bundle" + (bundleSize > 1 ? 's' : ''))
-					}
-				} else {
-					if (bundleSize==1) {
-						MoveBundle mb = MoveBundle.read( bundle[0] )
-						bundleNameList.append(mb.name)
-					} else {
-						bundleNameList.append("$bundleSize bundles")
-					}
-				}
-			}
 
 			def dataTransferSetInstance = DataTransferSet.get( dataTransferSet )
 
@@ -172,6 +146,8 @@ class AssetExportService {
 				query += ' AND d.moveBundle.useForPlanning = TRUE '
 			}
 
+			List<MoveBundle> bundles = []
+			String bundleNames = allBundles ? 'All Bundles' : 'Planning Bundles'
 			// Setup for multiple bundle selection
 			if (! allBundles && bundleSize) {
 				List bundleIds = []
@@ -185,6 +161,9 @@ class AssetExportService {
 				String bundleStr = bundleIds.join(',')
 				query += " AND d.moveBundle.id IN(${bundleStr})"
 				//queryParams.bundles = bundles
+
+				bundles = MoveBundle.where { project == project && id in bundleIds }.list()
+				bundleNames = bundles.join(", ")
 			}
 
 			/*
@@ -395,9 +374,8 @@ class AssetExportService {
 			WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
 			WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
 			WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(project))
-			WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
 			WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
-
+			WorkbookUtil.addCell(titleSheet, 1, 5, bundleNames)
 			def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
 			WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
 			WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
@@ -749,27 +727,24 @@ class AssetExportService {
 						def colNum = entry.value["order"] as int
 
 						def colVal = ''
-						switch(colName) {
+						switch(field) {
 							case 'Id':
 								colVal = app.id
-								break
-							case 'AppOwner':
-								colVal = app.appOwner
 								break
 							case 'DepGroup':
 								// Find the Dependency Group that this app is bound to
 								colVal = assetDepBundleMap[app.id]
 								break
-							case ~/ShutdownBy|StartupBy|TestingBy/:
+							case ~/shutdownBy|startupBy|testingBy/:
 								colVal = app[field] ? resolveByName(app[field], false)?.toString() : ''
 								break
-							case ~/ShutdownFixed|StartupFixed|TestingFixed/:
+							case ~/shutdownFixed|startupFixed|testingFixed/:
 								colVal = app[field] ? 'Yes' : 'No'
 								break
-							case ~/Retire Date|Maint Expiration/:
+							case ~/retireDate|maintExpDate/:
 								colVal = app[field] ? TimeUtil.formatDate(userDTFormat, app[field], TimeUtil.FORMAT_DATE) : ''
 								break
-							case ~/Modified Date/:
+							case ~/modifiedDate/:
 								colVal = app[field] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[field], TimeUtil.FORMAT_DATE_TIME) : ''
 								break
 							default:
@@ -1251,17 +1226,19 @@ class AssetExportService {
 			progressService.updateData(key, 'filename', savedWorkbookAbosolutePath)
 			profiler.endInfo("Create temporary export file")
 
-			// The filename will consiste of the following:
-			//    - Owner of the Project
-			//    - Name of the Project or ID
-			//    - Bundle name(s) selected or ALL
-			//    - Letters symbolizing each of the tabs that were exported
-			//    - The date that the spreadsheet was exported
-			//    - The file extension to use
-			project = Project.get(projectId)
-			String filename = project.client.name + '-' +
-					  ( project.name ?: project.id ) +
-					  "-${bundleNameList}-${exportedEntity}-${exportDate}.${fileExtension}"
+       // @See TM-7958
+       // The filename will consist of the following:
+       //    - Project Client
+       //    - Project Code
+       //    - Bundle name(s) selected or ALL_BUNDLES
+       //    - Letters symbolizing each of the tabs that were exported
+       //    - The date that the spreadsheet was exported in yyyyMMdd_HHmm format
+       def nameParams = [project:project,
+                         moveBundle:bundles,
+                         exportedEntities: exportedEntity,
+                         allBundles: allBundles,
+                         useForPlanning: useForPlanning]
+       String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_BUNDLE_CHECKBOXCODES_DATE, nameParams, fileExtension)
 
 			filename = StringUtil.sanitizeAndStripSpaces(filename)
 

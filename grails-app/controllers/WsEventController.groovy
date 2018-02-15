@@ -18,12 +18,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventView)
 	def listEventsAndBundles() {
-		try {
-			renderSuccessJson(list: eventService.listEventsAndBundles())
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(list: eventService.listEventsAndBundles())
 	}
 
 	/**
@@ -32,11 +27,6 @@ class WsEventController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.BundleView)
 	def listBundles() {
-		try {
-			renderSuccessJson(list: eventService.listBundles(params.id, params.useForPlanning))
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(list: eventService.listBundles(params.id, params.useForPlanning))
 	}
 }

@@ -1,7 +1,11 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.Project
+import net.transitionmanager.asset.AssetFacade
 
 class AssetService {
 
@@ -31,4 +35,58 @@ class AssetService {
             }
         }
     }
+
+   /**
+    * Used to delete asset dependencies in bulk with a list of dependency ids for a specific project
+    * @param project - the project that the asset dependencies should belong to
+    * @param dependencyIds - list of ids for which dependencies are requested to be deleted
+    * @return a count of the number of records that are deleted
+    */
+   String bulkDeleteDependencies(Project project, List<String> dependencyIds) {
+
+      // if no ids given don't process anything.
+      if (dependencyIds.isEmpty()) {
+         return "0 $type records were deleted"
+      }
+      List<Long> depIds = NumberUtil.toPositiveLongList(dependencyIds)
+
+      log.debug "bulkDeleteDependencies: $depIds to be deleted"
+      int count = depIds.size()
+
+      // Now make sure that the ids are associated to the project
+      List<Long> validatedDepIds =
+         AssetDependency.where {
+            asset.project == project
+            dependent.project == project
+             id in depIds
+         }
+         .projections { property 'id' }
+         .list()
+
+      if (count != validatedDepIds.size()) {
+         List<Long> idsNotInProject = depIds - validatedDepIds
+         log.warn "bulkDeleteDependencies called with dependency ids not assigned to project ($depIds)"
+      }
+
+      if (validatedDepIds.size() > 0) {
+            count = AssetDependency.where {
+               id in validatedDepIds
+            }.deleteAll()
+      } else {
+         count = 0
+      }
+
+      return "$count record${count==1? ' was' : 's were'} deleted"
+   }
+
+    /**
+     * Factory method that constructs a AssetFacade populating the custom fields specs for the asset entity type provided
+     * @param assetEntity - the assent entity
+     * @param readonly - whether the facade needs to be readonly
+     * @return
+     */
+    AssetFacade getAssetFacade(AssetEntity assetEntity, boolean readonly) {
+        Map<String, ?> fieldSpecs = customDomainService.customFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
+        return new AssetFacade(assetEntity, fieldSpecs, readonly)
+   }
 }

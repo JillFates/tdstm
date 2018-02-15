@@ -11,6 +11,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
@@ -26,11 +27,13 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
+import grails.validation.Validateable
+
 
 @Slf4j(value='logger')
 public class GormUtil {
 
-// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
+	// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
     // Used to control how some functions will perform comparisons with multiple where criteria
 	enum Operator { AND, OR }
 
@@ -45,11 +48,29 @@ public class GormUtil {
 		MessageSource messageSource = ApplicationContextHolder.getBean('messageSource', MessageSource)
 		StringBuilder text = new StringBuilder()
 		domain?.errors?.allErrors?.each {
+			// TODO : JPM 2/2018 : TM-9197 this is not properly converting locales
 			text << separator << ' ' << messageSource.getMessage(it, locale)
 		}
 		text.toString()
 	}
 
+	/**
+	 * Used to internationalize the validation errors from a Validatable object 
+	 * @param object - a domain or command object that has validation errors
+	 * @param locale - the locale to set the messages to (default US)
+	 * @return a list of the messages
+	 */
+	static List<String> validateErrorsI18n(Object object, Locale locale = Locale.US) {
+		// TODO : JPM 2/2018 : Change to use new MessageSourceService
+		MessageSource messageSource = ApplicationContextHolder.getBean('messageSource', MessageSource)
+		List<String> errors = []
+		for (e in object?.errors?.allErrors) {
+			// TODO : JPM 2/2018 : TM-9197 this is not properly converting locales
+			errors << messageSource.getMessage(e, locale)
+		}
+		return errors
+	}
+	
 	/**
 	 * Output GORM Domain constraints and update errors in human readable HTML Unordered List
 	 * @param domain  the domain instance that has errors
@@ -449,6 +470,51 @@ public class GormUtil {
 		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
 
 		return cp
+	}
+
+	/**
+	 * Retrieve a list of domain properties. If a list of property names is given, only
+	 * those properties will be included. If a list of properties to be skipped is provided,
+	 * those properties will be excluded.
+	 * If
+	 * @param domainClass
+	 * @param properties
+	 * @return
+	 */
+	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
+		List<GrailsDomainClassProperty> domainProperties = []
+		boolean allProperties = false
+		DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+		if (properties) {
+			for (String property in properties) {
+				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
+				if (domainProperty) {
+					domainProperties << domainProperty
+				} else {
+					/* if at least one property wasn't found, assume there's not enough information and all the
+					properties should be returned. */
+					allProperties = true
+					break
+				}
+			}
+		} else {
+			allProperties = true
+		}
+
+		if (allProperties) {
+			domainProperties = dfdc.getPersistentProperties()
+			// Grails won't fetch the Id property if it's not properly defined as a field
+			GrailsDomainClassProperty idProperty = dfdc.getPersistentProperty("id")
+			if (idProperty) {
+				domainProperties << idProperty
+			}
+		}
+
+		if (skipProperties) {
+			domainProperties = domainProperties.findAll { !(it.name in skipProperties) }
+		}
+		return domainProperties
+
 	}
 
 	/**
@@ -971,5 +1037,67 @@ public class GormUtil {
 			}
 		}
 		return instance
+	}
+
+	/**
+	 * Determine if a domain property represents a referenced class type or if the property is an association
+	 * @param domainObject
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isReferenceProperty(Object domainObject, String propertyName) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
+	}
+
+	/**
+	 * Return a map representation for the given domain object
+	 * @param domainObject
+	 * @param properties - you can narrow down the list of properties to be included by providing a list with their names.
+	 * @param skipProperties - you can exclude certain properties by passing their names in this list.
+	 * @return
+	 */
+	static Map domainObjectToMap(domainObject, List<String> properties = null, List<String> skipProperties = null, boolean navigateReferences = true) {
+
+		if (!domainObject) {
+			return null
+		}
+
+		List<String> minimalProperties = ["id", "name"]
+		Map domainMap = [:]
+
+		Class domainClass = domainObject.class
+		if (isDomainClass(domainClass)) {
+			// Get all the domain properties.
+			List<GrailsDomainClassProperty> domainProperties = getDomainProperties(domainClass, properties, skipProperties)
+
+			// Iterate over all the domain properties
+			for (GrailsDomainClassProperty property : domainProperties) {
+				// if the property is an enum, copy its .name()
+				if (property.type.isEnum()) {
+					if (domainObject[property.name]) {
+						domainMap[property.name] = domainObject[property.name].name()
+					}
+					// if the property is a reference, call this method recursively with a predefined list of fields..
+				} else if (isDomainClass(property.type)) {
+					if (navigateReferences) {
+						domainMap[property.name] = domainObjectToMap(domainObject[property.name], minimalProperties, null, false)
+					}
+
+				} else if (Collection.isAssignableFrom(property.type)){
+					if (navigateReferences) {
+						List<Map> listReferences = []
+						for (element in domainObject[property.name]) {
+							listReferences << domainObjectToMap(element, minimalProperties, null, false)
+						}
+					}
+				} else {
+					// If it's a regular property, just copy its value.
+					domainMap[property.name] = domainObject[property.name]
+				}
+			}
+		}
+
+		return domainMap
 	}
 }

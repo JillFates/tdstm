@@ -349,13 +349,7 @@ tdsops.buildFile = "/build.txt"
 //tdstm.security.auditLogging = "access"
 
 tdstm {
-	// TM-8654 - added the AWS credentials temporarily
-	credentials {
-		aws {
-			accessKey = 'AKIAJQVV5RZ45K6T5GRA'
-			secretKey = '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'
-		}
-	}
+	
 }
 
 grails {
@@ -403,29 +397,31 @@ grails {
 			//fii.rejectPublicInvocations = true
 
 			controllerAnnotations.staticRules = [
-				'/ws/**'			:'isAuthenticated()',
-				'/'					:'permitAll',
-				'/index'			:'permitAll',
-				'/index.gsp'		:'permitAll',
-				'/assets/**'		:'permitAll',		// Don't believe it is used
-				'/auth/**'			:'permitAll',		// Authentication Controller
-				'/**/js/**'			:'permitAll',		// Javascript
-				'/**/css/**'		:'permitAll',
-				'/**/images/**'		:'permitAll',
-				'/i/**'				:'permitAll',
-				'/**/icons/**'		:'permitAll',
-				'/**/favicon.ico'	:'permitAll',
-				'/app-js/**'		:'permitAll', // Angular1.6 - resources
-				'/i18n/**'			:'permitAll', // Angular - Translate
-				'/tds/web-app/**'	:'permitAll', // Angular2* - resources
-				'/module/**'		:'permitAll', // Angular2  - router access
-				'/test/**'			:'permitAll', // Angular - Test
-				'/monitoring'		:"hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
-				'/greenmail/**'		:'permitAll',
-				'/components/**'	:'permitAll',
-				'/templates/**' 	:'permitAll',
-				'/jasper/**'		:'permitAll',
-				'/oauth/access_token':'permitAll'
+					'/ws/**'              : 'isAuthenticated()',
+					'/'                   : 'permitAll',
+					'/index'              : 'permitAll',
+					'/index.gsp'          : 'permitAll',
+					'/assets/**'          : 'permitAll',        // Don't believe it is used
+					'/auth/**'            : 'permitAll',        // Authentication Controller
+					'/**/js/**'           : 'permitAll',        // Javascript
+					'/**/css/**'          : 'permitAll',
+					'/**/images/**'       : 'permitAll',
+					'/i/**'               : 'permitAll',
+					'/**/icons/**'        : 'permitAll',
+					'/**/favicon.ico'     : 'permitAll',
+					'/app-js/**'          : 'permitAll', // Angular1.6 - resources
+					'/i18n/**'            : 'permitAll', // Angular - Translate
+					'/tds/web-app/**'     : 'permitAll', // Angular2* - resources
+					'/module/**'          : 'permitAll', // Angular2  - router access
+					'/test/**'            : 'permitAll', // Angular - Test
+					'/monitoring'         : "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
+					'/greenmail/**'       : 'permitAll',
+					'/components/**'      : 'permitAll',
+					'/templates/**'       : 'permitAll',
+					'/console/**'         : "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
+					'/plugins/console*/**': "hasPermission(request, '${Permission.AdminUtilitiesAccess}')",
+					'/jasper/**'          : 'permitAll',
+					'/oauth/access_token' : 'permitAll'
 			]
 
 			ldap.active = false

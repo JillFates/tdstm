@@ -3,7 +3,6 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.SecurityService
 
 /**
  * @author oluna@tdsi.com
@@ -11,15 +10,9 @@ import net.transitionmanager.service.SecurityService
 @Secured('isAuthenticated()')
 @Slf4j
 class WsSecurityController implements ControllerMethods {
-	SecurityService securityService
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def permissions(){
-		try {
-			renderSuccessJson(securityService.currentUserPermissionMap())
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(securityService.currentUserPermissionMap())
 	}
 }

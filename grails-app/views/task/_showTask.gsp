@@ -37,24 +37,9 @@
 					</tr>
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
-						<td valign="top" class="value" id="vmAction" colspan="2">{{acData.apiAction.name}}</td>
-						<td valign="top" class="value" >
-							<g:set var="canInvoke" value="${false}"/>
-							<tds:hasPermission permission="${Permission.ActionInvoke}">
-								<g:set var="canInvoke" value="${true}"/>
-							</tds:hasPermission>
-							%{--<button class="btn btn-default" role="button" ng-if="acData.apiAction.id" ng-click="lookUpAction();" ng-disabled="<%= !canInvoke %>"><i class="fa fa-fw fa-search"></i></button>&nbsp;&nbsp;--}%
-							%{--<button class="btn btn-default" role="button" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction();" ng-disabled="<%= !canInvoke %>">Invoke</button>--}%
-							<span id="actionBarId2" class="slide">
-								<a class="task_action btn btn-default" ng-if="acData.apiAction.id" ng-click="lookUpAction();" ng-disabled="<%= !canInvoke %>">
-									<span class="fa fa-fw fa-search"></span>
-								</a>
-								<a style="margin-top: 8px;" class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" ng-if="acData.actionMode === 'M' && acData.actionInvocable" ng-click="invokeAction();" ng-disabled="<%= !canInvoke %>">
-									<span class="ui-button-icon-primary ui-icon task_icon ui-icon-gear"></span>
-									<span id="start_text_205966" ng-class="{task_button_disabled: (button.disabled), task_button: (!button.disabled)}">Invoke</span>
-								</a>
-							</span>
-						</td>
+						<td valign="top" class="value" id="vmAction" colspan="2">
+              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
+            </td>
 					</tr>
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
@@ -73,7 +58,7 @@
 					<tr id="assetShowId" class="prop">
 						<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 						<td valign="top" class="value" id="assetShowValueId" colspan="3">
-							<a ng-click="getEntityDetails();">{{acData.assetName}}</a>
+							<span class="clickableText" ng-click="getEntityDetails();">{{acData.assetName}}</span>
 						</td>
 					</tr>
 					<tr>
@@ -133,16 +118,16 @@
 							<table class="inner">
 								<tr>
 									<td width="50%">
-									<label>Predecessors:</label> 
-										<tds:hasPermission permission="${Permission.TaskCreate}"> 
+									<label>Predecessors:</label>
+										<tds:hasPermission permission="${Permission.TaskCreate}">
 											<a id="createSucTask" class="button btn" ng-class="{'btn-default':hoverPredecessor}" ng-mouseenter="hoverPredecessor=true" ng-mouseleave="hoverPredecessor=false"
 											 ng-click="comments.createCommentBy('issue','','',ac,'SUCCESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Predecessor task">
 											 	<i class="fa fa-plus-circle"></i> Create</a>
 										</tds:hasPermission>
 									</td>
 									<td width="50%">
-									<label>Successors:</label> 
-										<tds:hasPermission permission="${Permission.TaskCreate}">  
+									<label>Successors:</label>
+										<tds:hasPermission permission="${Permission.TaskCreate}">
 											<a id="createPredTask" class="button btn" ng-class="{'btn-default':hoverSuccessor}" ng-mouseenter="hoverSuccessor=true" ng-mouseleave="hoverSuccessor=false"
 											 ng-click="comments.createCommentBy('issue','','',ac,'PREDECESSOR')" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="Create Successor task">
 											 	<i class="fa fa-plus-circle"></i> Create</a>
@@ -238,4 +223,12 @@
 		<loading-indicator></loading-indicator>
 	</div>
 </div>
-<script>$('[data-toggle="popover"]').popover();</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		// defer setup tooltips until action-bar buttons is in place
+		setTimeout(function() {
+			$('[data-toggle="popover"]').popover();
+		},1500)
+	})
+</script>

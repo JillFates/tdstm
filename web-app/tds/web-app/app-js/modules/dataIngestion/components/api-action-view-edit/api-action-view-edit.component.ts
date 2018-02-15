@@ -1,4 +1,4 @@
-import {Component, ViewChild, HostListener} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -21,6 +21,11 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {SortUtils} from '../../../../shared/utils/sort.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import * as R from 'ramda';
+import {Observable} from 'rxjs/Observable';
+import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 
 declare var jQuery: any;
 
@@ -35,9 +40,13 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
+
+		.script-error {
+			margin-bottom: 18px;
+		}
 	`]
 })
-export class APIActionViewEditComponent {
+export class APIActionViewEditComponent implements OnInit {
 
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
@@ -47,6 +56,11 @@ export class APIActionViewEditComponent {
 	@ViewChild('apiActionAgent', { read: DropDownListComponent }) apiActionAgent: DropDownListComponent;
 	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent }) apiActionAgentMethod: DropDownListComponent;
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
+
+	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+
+	public codeMirrorComponent: CodeMirrorComponent;
+
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
 	public agentList = new Array<AgentModel>();
@@ -62,6 +76,9 @@ export class APIActionViewEditComponent {
 	private dataSignature: string;
 	private intervals = INTERVALS;
 	public interval = INTERVAL;
+	public selectedInterval = {value: 0, interval: ''};
+	public selectedLapsed = {value: 0, interval: ''};
+	public selectedStalled = {value: 0, interval: ''};
 	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
@@ -91,9 +108,10 @@ export class APIActionViewEditComponent {
 	];
 	private currentTab = 0;
 	public isEditing = false;
+	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
-			name: 'javascript'
+			name: 'groovy' // Looks like we lack of JS support for coloring
 		},
 		rows: 10,
 		cols: 4
@@ -104,7 +122,9 @@ export class APIActionViewEditComponent {
 			field: 'name'
 		}]
 	};
-
+	public validInfoForm = false;
+	public invalidScriptSyntax = false;
+	public checkActionModel = CHECK_ACTION;
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
@@ -115,7 +135,13 @@ export class APIActionViewEditComponent {
 		private customDomainService: CustomDomainService,
 		private dialogService: UIDialogService) {
 
-		this.apiActionModel = Object.assign({}, this.originalModel);
+		// Sub Objects are not being created, just copy
+		this.apiActionModel = R.clone(this.originalModel);
+
+		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
+		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
+		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
+
 		this.dataSignature = JSON.stringify(this.apiActionModel);
 
 		this.getProviders();
@@ -125,6 +151,24 @@ export class APIActionViewEditComponent {
 		this.getParameters();
 		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
+	}
+
+	ngOnInit(): void {
+		this.prepareFormListener();
+	}
+
+	/**
+	 * The NgIf hides elements completely in the UI but makes transition of tabs more smooth
+	 * Some complex component like Grid or Code Source got affected by this
+	 * this method subscribe the listener to have control of each tab validation.
+	 */
+	protected prepareFormListener(): void {
+		setTimeout(() => {
+			this.apiActionForm.valueChanges.subscribe(val => {
+				this.verifyIsValidForm();
+			});
+			this.verifyIsValidForm();
+		}, 100);
 	}
 
 	/**
@@ -231,11 +275,15 @@ export class APIActionViewEditComponent {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
-			(result: any) => {
-				this.activeDialog.close(result);
-			},
-			(err) => console.log(err));
+		this.validateAllSyntax().subscribe(() => {
+			if (!this.invalidScriptSyntax) {
+				this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
+					(result: any) => {
+						this.activeDialog.close(result);
+					},
+					(err) => console.log(err));
+			}
+		});
 	}
 
 	/**
@@ -282,7 +330,7 @@ export class APIActionViewEditComponent {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteApiAction(): void {
@@ -303,7 +351,45 @@ export class APIActionViewEditComponent {
 	}
 
 	protected setCurrentTab(num: number): void {
+		if (this.currentTab === 0) {
+			this.verifyIsValidForm();
+		}
+		if (num === 0) {
+			this.prepareFormListener();
+		}
+
+		if (num === 2) {
+			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
+				comps.forEach((child) => {
+					this.codeMirrorComponent = child;
+					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+				});
+			});
+		}
 		this.currentTab = num;
+	}
+
+	/**
+	 *  Verify if the Form is on a Valid state when switching between tabs.
+	 */
+	protected verifyIsValidForm(): void {
+		// Test API Action Form
+		if (this.apiActionForm) {
+			this.validInfoForm = this.apiActionForm.valid &&
+				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
+
+			if (this.apiActionModel.producesData) {
+				this.validInfoForm = this.apiActionModel.defaultDataScript.id !== 0;
+			}
+			if (!this.validInfoForm && !this.initFormLoad) {
+				for (let i in this.apiActionForm.controls) {
+					if (this.apiActionForm.controls[i]) {
+						this.apiActionForm.controls[i].markAsTouched();
+					}
+				}
+			}
+			this.initFormLoad = false;
+		}
 	}
 
 	/**
@@ -315,12 +401,16 @@ export class APIActionViewEditComponent {
 			this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
 				(result: any) => {
 					this.agentMethodList = new Array<AgentMethodModel>();
+					this.agentMethodList.push({id: 0, name: 'Select...'});
+
 					if (this.apiActionModel.agentMethod) {
 						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
-					} else {
-						this.agentMethodList.push({id: 0, name: 'Select...'});
+					}
+
+					if (!this.apiActionModel.agentMethod) {
 						this.apiActionModel.agentMethod = this.agentMethodList[0];
 					}
+
 					this.modifySignatureByProperty('agentMethod');
 					this.agentMethodList = result;
 				},
@@ -332,6 +422,15 @@ export class APIActionViewEditComponent {
 		}
 	}
 
+	/**
+	 *
+	 * @param pollingObject
+	 */
+	protected onIntervalChange(interval: any, pollingObject: any): void {
+		let newVal = DateUtils.convertInterval(pollingObject, interval.interval);
+		pollingObject.interval = interval.interval;
+		pollingObject.value = newVal;
+	}
 	/**
 	 * On a new Provider Value change
 	 * @param value
@@ -366,7 +465,7 @@ export class APIActionViewEditComponent {
 	 * Show only the Event Label if one Event is selected
 	 */
 	showsEventLabel(): boolean {
-		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.TIMEDOUT, EventReactionType.LAPSED, EventReactionType.STALLED];
+		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
@@ -378,10 +477,10 @@ export class APIActionViewEditComponent {
 	}
 
 	/**
-	 * Show only the Customize Label if one Custm is selected
+	 * Show only the Customize Label if one Custom is selected
 	 */
 	showsCustomizeLabel(): boolean {
-		let events = [EventReactionType.PRE_API_CALL, EventReactionType.FINALIZED_API_CALL];
+		let events = [EventReactionType.PRE, EventReactionType.FINAL];
 
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
@@ -398,16 +497,6 @@ export class APIActionViewEditComponent {
 	 */
 	openCloseCodeMirror(eventReaction: EventReaction): void {
 		eventReaction.open = !eventReaction.open;
-	}
-
-	/**
-	 *  Verify the current Event Reaction input is a valid code
-	 * @param {EventReaction} eventReaction
-	 */
-	verifyCode(eventReaction: EventReaction): void {
-		// to all validateCode on date ingestion service
-		eventReaction.valid = false;
-		eventReaction.error = 'Error at Line 3: Unknow variable burt!';
 	}
 
 	onEditParameters(): void {
@@ -460,6 +549,66 @@ export class APIActionViewEditComponent {
 	}
 
 	/**
+	 * Execute the validation and return an Observable
+	 * so we can attach this event to different validations
+	 * @returns {Observable<any>}
+	 */
+	validateAllSyntax(singleEventReaction?: EventReaction): Observable<any> {
+		return new Observable(observer => {
+			let scripts = [];
+			// Doing a single Event reaction Validation
+			if (singleEventReaction) {
+				if (singleEventReaction.value !== '') {
+					scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
+				}
+			} else {
+				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
+					eventReaction.state = this.checkActionModel.UNKNOWN;
+					eventReaction.error = '';
+					if (eventReaction.value !== '') {
+						scripts.push({code: eventReaction.type, script: eventReaction.value});
+					}
+				});
+			}
+			this.dataIngestionService.validateCode(scripts).subscribe(
+				(result: any) => {
+					this.invalidScriptSyntax = false;
+					result.forEach((eventResult: any) => {
+						let eventReaction = this.apiActionModel.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
+						if (!eventResult['validSyntax']) {
+							let errorResult = '';
+							eventResult.errors.forEach((error: string) => {
+								errorResult += error['message'] + '\n';
+							});
+							eventReaction.error = errorResult;
+							eventReaction.state = this.checkActionModel.INVALID;
+							this.invalidScriptSyntax = true;
+						} else {
+							eventReaction.state = this.checkActionModel.VALID;
+						}
+					});
+					observer.next();
+				},
+				(err) => console.log(err));
+		});
+	}
+
+	/**
+	 *  Verify the current Event Reaction input is a valid code
+	 * @param {EventReaction} eventReaction
+	 */
+	verifyCode(eventReaction: EventReaction): void {
+		this.validateAllSyntax(eventReaction).subscribe();
+	}
+
+	/**
+	 * Execute the API to validated every Syntax Value.
+	 */
+	onCheckAllSyntax(): void {
+		this.validateAllSyntax().subscribe();
+	}
+
+	/**
 	 * Refresh the list of elements after update, create or delete parameters / arguments
 	 */
 	public refreshParametersList(): void {
@@ -473,5 +622,13 @@ export class APIActionViewEditComponent {
 	 */
 	private modifySignatureByProperty(property: any): void {
 		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.apiActionModel[property]);
+	}
+
+	/**
+	 * Verify if this is on View mode
+	 * @returns {boolean}
+	 */
+	isViewMode(): boolean {
+		return this.modalType === this.actionTypes.VIEW;
 	}
 }

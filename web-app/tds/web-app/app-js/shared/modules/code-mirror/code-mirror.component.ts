@@ -8,7 +8,8 @@ declare var jQuery: any;
 	selector: 'code-mirror',
 	template: '<textarea  #codeMirror></textarea>',
 	exportAs: 'codeMirror'
-}) export class CodeMirrorComponent implements AfterViewInit {
+})
+export class CodeMirrorComponent implements AfterViewInit {
 	@ViewChild('codeMirror') el: ElementRef;
 	@Output() change = new EventEmitter<{ newValue: string, oldValue: string }>();
 	@Input() model: string;
@@ -17,12 +18,10 @@ declare var jQuery: any;
 	instance;
 
 	ngAfterViewInit(): void {
-		console.log(this.el, CodeMirror);
 		this.instance = CodeMirror.fromTextArea(this.el.nativeElement, {
 			mode: this.mode,
 			lineNumbers: true
 		});
-
 		this.instance.setValue(this.model);
 		this.instance.on('change', () => {
 			this.change.emit({ newValue: this.instance.getValue(), oldValue: this.model });
@@ -30,4 +29,24 @@ declare var jQuery: any;
 		});
 	}
 
+	/**
+	 * Disable the Input
+	 * @param {boolean} disable
+	 */
+	public setDisabled(disable: boolean): void {
+		this.instance.options.disableInput = disable;
+	}
+
+	public addSyntaxErrors(lineNumbers: Array<number>) {
+		for (let line of lineNumbers) {
+			this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
+		}
+	}
+
+	public clearSyntaxErrors(): void {
+		const elems = this.instance.display.lineDiv.querySelectorAll('.line-with-syntax-errors');
+		for (let elem of elems) {
+			elem.classList.remove('line-with-syntax-errors');
+		}
+	}
 }

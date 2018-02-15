@@ -1,3 +1,5 @@
+import {INTERVAL} from '../model/constants';
+
 export class DateUtils {
 
 	/**
@@ -13,5 +15,51 @@ export class DateUtils {
 		}
 		return compose;
 
+	}
+
+	public static getTimestamp(): String {
+		let time = new Date();
+		return time.getFullYear().toString() +
+				(time.getMonth() + 1 < 10 ? ('0' + (time.getMonth() + 1)) : time.getMonth() + 1) +
+				(time.getDate() + 1 < 10 ? ('0' + (time.getDate())) : time.getDate()) + '_' +
+				time.getHours() +
+				time.getMinutes();
+	}
+
+	/**
+	 * Convert a interval from one to another.
+	 * @param intervalBase
+	 * @param intervalTarget
+	 * @returns {string}
+	 */
+	public static convertInterval(intervalBase: any, intervalTarget: any): number {
+		if (intervalBase.interval === INTERVAL.SECONDS) {
+			if (intervalTarget === INTERVAL.MINUTES) {
+				return intervalBase.value / 60;
+			}
+			if (intervalTarget === INTERVAL.HOURS) {
+				return intervalBase.value / 3600;
+			}
+		}
+
+		if (intervalBase.interval === INTERVAL.MINUTES) {
+			if (intervalTarget === INTERVAL.HOURS) {
+				return intervalBase.value / 60;
+			}
+			if (intervalTarget === INTERVAL.SECONDS) {
+				return intervalBase.value * 60;
+			}
+		}
+
+		if (intervalBase.interval === INTERVAL.HOURS) {
+			if (intervalTarget === INTERVAL.MINUTES) {
+				return intervalBase.value * 60;
+			}
+			if (intervalTarget === INTERVAL.SECONDS) {
+				return intervalBase.value * 3600;
+			}
+		}
+		// Same Base / target conversion
+		return intervalBase.value;
 	}
 }

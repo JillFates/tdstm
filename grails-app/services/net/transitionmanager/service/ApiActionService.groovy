@@ -1,21 +1,19 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.*
-import net.transitionmanager.domain.ApiAction
-import net.transitionmanager.domain.Credential
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Project
-import com.tds.asset.AssetComment
-import net.transitionmanager.domain.Provider
+import net.transitionmanager.command.ApiActionCommand
+import net.transitionmanager.domain.*
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.*
+import org.codehaus.groovy.control.ErrorCollector
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
@@ -25,7 +23,7 @@ class ApiActionService implements ServiceMethods {
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
-	ProviderService providerService
+	SecurityService securityService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
@@ -110,7 +108,7 @@ class ApiActionService implements ServiceMethods {
 
 		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
 
-		List apiActions = ApiAction.where {
+		List<ApiAction> apiActions = ApiAction.where {
 			project == project
 			if (producesDataFilter != null) {
 				producesData == producesDataFilter
@@ -118,8 +116,7 @@ class ApiActionService implements ServiceMethods {
 		}.order("name", "asc").list()
 		List<Map> results = []
 		apiActions.each { apiAction ->
-			AbstractAgent agent = agentInstanceForAction(apiAction)
-			results << apiAction.toMap(agent, minimalInfo)
+			results << apiActionToMap(apiAction, minimalInfo)
 		}
 		return results
 	}
@@ -288,6 +285,9 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	boolean validateApiActionName (Project project, String name, Long apiActionId = null) {
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
 		boolean isValid = false
 
 		// Both name and project are required for validating.
@@ -303,6 +303,7 @@ class ApiActionService implements ServiceMethods {
 				isValid = true
 			}
 		}
+
 		return isValid
 
 	}
@@ -314,49 +315,39 @@ class ApiActionService implements ServiceMethods {
 	 * @param value
 	 * @return
 	 */
-	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false) {
+	def parseEnum(Class enumClass, String field, String value, Boolean mandatory = false, Boolean throwException = false) {
 		String baseErrorMsg = "Error trying to create or update an API Action."
-		if (!value && mandatory) {
-			throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
-		}
+		Object result = null
 		if (value) {
 			try {
-				return enumClass.valueOf(value)
+				result = enumClass.valueOf(value)
 			} catch (IllegalArgumentException e) {
-				throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+				if (throwException) {
+					throw new InvalidParamException("$baseErrorMsg $field with value '$value' is invalid.")
+				}
 			}
 		} else {
-			return null
+			if (mandatory && throwException) {
+				throw new InvalidParamException("$baseErrorMsg $field is mandatory.")
+			}
 		}
-
-	}
-
-	/**
-	 *
-	 * @param project
-	 * @param provider
-	 * @param credentialId
-	 * @return
-	 */
-	Credential findCredential(Project project, Provider provider, Long credentialId) {
-		return Credential.where {
-			id == credentialId
-			project == project
-			provider == provider
-		}
+		return result
 
 	}
 
 	/**
 	 * Create or Update an API Action based on a JSON Object.
-	 * @param project
 	 * @param apiActionJson
 	 * @param apiActionId
+	 * @param project
 	 * @return
 	 */
-	ApiAction saveOrUpdateApiAction (Project project, JSONObject apiActionJson, Long apiActionId = null) {
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
+		ApiAction apiAction = null
 
-		ApiAction apiAction
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
 
 		// If there's an apiActionId then it's an update operation.
 		if (apiActionId) {
@@ -366,37 +357,8 @@ class ApiActionService implements ServiceMethods {
 			apiAction = new ApiAction(project: project)
 		}
 
-		String actionName = apiActionJson.name
-
-		// Make sure the name is valid. Fail otherwise.
-		if (!validateApiActionName(project, apiActionJson.name, apiActionId)) {
-			throw new InvalidParamException("Invalid name for API Action.")
-		}
-
-		Provider prov = providerService.getProvider(NumberUtil.toLong(apiActionJson.providerId), project)
-
-		Credential credentials = getCredential(project, prov, apiActionJson)
-
-		DataScript dataScript = getDataScript(project, prov, apiActionJson)
-
-
-		apiAction.with {
-			agentClass = parseEnum(AgentClass, "Agent Class", apiActionJson.agentClass, true)
-			agentMethod = apiActionJson.agentMethod
-			asyncQueue = apiActionJson.asyncQueue
-			callbackMethod = apiActionJson.callbackMethod
-			callbackMode = parseEnum(CallbackMode, "Callback Mode", apiActionJson.callbackMode)
-			credential = credentials
-			description = apiActionJson.description
-			defaultDataScript = dataScript
-			description = apiActionJson.description
-			methodParams = apiActionJson.methodParams
-			name = actionName
-			pollingInterval = NumberUtil.toInteger(apiActionJson.pollingInterval)
-			producesData = NumberUtil.toZeroOrOne(apiActionJson.producesData)
-			provider = prov
-			timeout = NumberUtil.toInteger(apiActionJson.timeout)
-		}
+		// Populate the apiAction with the properties from the command object.
+		apiAction.properties = apiActionCommand.properties
 
 		apiAction.save(failOnError: true)
 		return apiAction
@@ -413,29 +375,25 @@ class ApiActionService implements ServiceMethods {
 	 * @param credentialId
 	 * @return
 	 */
-	private Credential getCredential(Project project, Provider provider, JSONObject apiActionJson) {
-		Credential credential = null
-		if (apiActionJson.credentialId) {
-			Long credentialId = NumberUtil.toLong(apiActionJson.credentialId)
-			credential = credentialService.findByProjectAndProvider(credentialId, project, provider, true)
+	Credential getCredential(Project project, Provider provider, Long credentialId, boolean throwException = false) {
+		if (!project) {
+			project = securityService.userCurrentProject
 		}
-		return credential
+		return credentialService.findByProjectAndProvider(credentialId, project, provider, throwException)
 	}
 
 	/**
 	 * Find and return a DataScript with the given id for the corresponding provider and project.
 	 * @param project
 	 * @param provider
-	 * @param apiActionJson
+	 * @param dataScriptId
 	 * @return
 	 */
-	private DataScript getDataScript(Project project, Provider provider, JSONObject apiActionJson) {
-		DataScript dataScript = null
-		if (apiActionJson.defaultDataScriptId) {
-			Long dataScriptId = NumberUtil.toLong(apiActionJson.defaultDataScriptId)
-			dataScript = dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, true)
+	DataScript getDataScript(Project project, Provider provider,  Long dataScriptId) {
+		if (!project) {
+			project = securityService.userCurrentProject
 		}
-		return dataScript
+		return dataScriptService.findByProjectAndProvider(dataScriptId, project, provider, false)
 	}
 
 	/**
@@ -452,9 +410,16 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
-	Map<String, ?> evaluateReactionScript(ReactionScriptCode code, String script, ActionRequest request, ApiActionResponse response, ReactionTaskFacade task, ReactionAssetFacade asset, ApiActionJob job) {
+	Map<String, ?> invokeReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
 				.with(request)
 				.with(response)
 				.with(asset)
@@ -471,6 +436,101 @@ class ApiActionService implements ServiceMethods {
 				result: result
 		]
 	}
+
+	/**
+	 * This method is used to parse the scripts syntax
+	 * First prepares an instance of ApiActionScriptProcessor.
+	 * Then it creates an instance of ApiActionScriptBinding based on code parameter.
+	 * After that it parses the script using an instance of GroovyShell.
+	 * @param code an instance of ReactionScriptCode to create a instance of ApiActionScriptBinding
+	 * @param script the script code to be evaluated
+	 * @param request ActionRequest instance to be bound in the ApiActionScriptBinding instance
+	 * @param response ApiActionResponse instance to be bound in the ApiActionScriptBinding instance
+	 * @param task ReactionTaskFacade instance to be bound in the ApiActionScriptBinding instance
+	 * @param asset ReactionAssetFacade instance to be bound in the ApiActionScriptBinding instance
+	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
+	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
+	 */
+	Map<String, ?> compileReactionScript(
+			ReactionScriptCode code,
+			String script,
+			ActionRequest request,
+			ApiActionResponse response,
+			ReactionTaskFacade task,
+			ReactionAssetFacade asset,
+			ApiActionJob job) {
+
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
+				.with(request)
+				.with(response)
+				.with(asset)
+				.with(task)
+				.with(job)
+				.build(ReactionScriptCode.FINAL)
+
+		List<Map<String, ?>> errors = []
+
+		try {
+
+			new GroovyShell(this.class.classLoader, scriptBinding)
+					.parse(script, ApiActionScriptBinding.class.name)
+
+		} catch (MultipleCompilationErrorsException cfe) {
+			ErrorCollector errorCollector = cfe.getErrorCollector()
+			log.error("ETL script parse errors: " + errorCollector.getErrorCount(), cfe)
+			errors = errorCollector.getErrors()
+		}
+
+		List errorsMap = errors.collect { error ->
+			[
+					startLine  : (error.cause?.startLine)?:"",
+					endLine    : (error.cause?.endLine)?:"",
+					startColumn: (error.cause?.startColumn)?:"",
+					endColumn  : (error.cause?.endColumn)?:"",
+					fatal      : (error.cause?.fatal)?:"",
+					message    : (error.cause?.message)?:""
+			]
+		}
+
+		return [
+				code: code.name(),
+				validSyntax: errors.isEmpty(),
+				errors     : errorsMap
+		]
+	}
+
+	/**
+	 * It validates a request with a list of API action/reaction scripts.
+	 * @see net.transitionmanager.service.ApiActionService#invokeReactionScript
+	 * @param scripts a list of net.transitionmanager.integration.ApiActionScriptCommand
+	 * @return a List with results of evaluating every instance of ApiActionScriptCommand
+	 */
+	List<Map<String, ?>> validateSyntax(List<ApiActionScriptCommand> scripts) {
+
+		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
+
+			Map<String, ?> scriptResults = [:]
+			try {
+
+				scriptResults = compileReactionScript(
+						scriptBindingCommand.code,
+						scriptBindingCommand.script,
+						new ActionRequest(),
+						new ApiActionResponse(),
+						new ReactionTaskFacade(),
+						new ReactionAssetFacade(),
+						new ApiActionJob()
+				)
+
+			} catch (Exception ex) {
+				log.error("Exception evaluating script ${scriptBindingCommand.script} with code: ${scriptBindingCommand.code}", ex)
+				scriptResults.error = ex.getMessage()
+			}
+
+			return scriptResults
+		}
+	}
+
 	/**
 	 * It checks if the code is ReactionScriptCode.EVALUATE and the results is an instance of ReactionScriptCode.
 	 * If results it is not an instance of ReactionScriptCode,  It throws an Exception.
@@ -478,11 +538,33 @@ class ApiActionService implements ServiceMethods {
 	 * @param result
 	 */
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
-		if (code == ReactionScriptCode.EVALUATE && !(result instanceof ReactionScriptCode)) {
-			throw new ApiActionException(messageSource.getMessage(Message.ApiActionMustReturnResults,
-					[] as String[],
-					'Script must return SUCCESS or ERROR',
-					LocaleContextHolder.locale))
+		if (code == ReactionScriptCode.STATUS && !(result instanceof ReactionScriptCode)) {
+			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
+					'Script must return SUCCESS or ERROR'))
 		}
+	}
+
+	/**
+	 * Return a map representation for an ApiAction.
+	 * @param apiAction
+	 * @param minimalInfo - flag that indicates that only the id and the name are required.
+	 * @return
+	 */
+	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
+		Map<String, Object> apiActionMap = null
+		List<String> properties = null
+		if (minimalInfo) {
+			properties = ["id", "name"]
+		}
+
+		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
+
+		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		if (!minimalInfo) {
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+		}
+
+		return apiActionMap
 	}
 }

@@ -78,7 +78,7 @@
             {{dataItem.shared | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="imp" title="Importance" [width]="100">
+    <kendo-grid-column field="imp" title="Importance" [width]="125">
         <ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
             Importance
             <popup-legends></popup-legends>
@@ -93,7 +93,7 @@
             </div>
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="constraints.required" title="Required" [width]="75" [class]="{'text-center':!isEditing}">
+    <kendo-grid-column field="constraints.required" title="Required" [width]="100" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else requiredTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" (change)="onRequired(dataItem)" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.constraints.required" name="required"></label>
@@ -103,7 +103,7 @@
             {{(dataItem.constraints? dataItem.constraints.required:false) | tdsUIBoolean}}
         </ng-template>
     </kendo-grid-column>
-    <kendo-grid-column field="show" title="Display" [width]="65" [class]="{'text-center':!isEditing}">
+    <kendo-grid-column field="show" title="Display" [width]="90" [class]="{'text-center':!isEditing}">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else displayTemp" let-dataItem>
             <div class="checkbox text-center">
                 <label><input type="checkbox" [disabled]="!dataItem.udf || toBeDeleted(dataItem)" [(ngModel)]="dataItem.show" name="required"></label>
@@ -127,13 +127,14 @@
     <kendo-grid-column field="control" title="Control" [width]="150">
         <ng-template kendoGridCellTemplate *ngIf="isEditing; else controlTemp" let-dataItem>
             <div *ngIf="dataItem.udf">
-                <select class="form-control" style="float:left;width:100px" name="control" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}"
-                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem,selectList,minMax)" [ngModel]="dataItem.control">
+                <select class="form-control" style="float:left;width:100px; padding-top: 0px; padding-bottom: 0px;" name="control" [disabled]="toBeDeleted(dataItem)" [ngClass]="{'to-be-deleted': toBeDeleted(dataItem)}"
+                    id="control{{dataItem.field}}" (ngModelChange)="onControlModelChange($event,dataItem)" [ngModel]="dataItem.control">
                     <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
                 </select>
                 <span *ngIf="!toBeDeleted(dataItem)">
-                    <selectlist-configuration-popup #selectList="selectlistConfig" [domain]="data.domain" [field]="dataItem"></selectlist-configuration-popup>
-                    <min-max-configuration-popup #minMax="minmaxConfig" [domain]="data.domain" [field]="dataItem"></min-max-configuration-popup>
+                    <div (click)="openFieldSettingsPopup(dataItem)" class="open-close-dropdown-container text-center">
+                        <i class="open-close-dropdown-icon fa fa-gear"></i>
+                    </div>
                 </span>
             </div>
             <span *ngIf="!dataItem.udf">{{dataItem.control}}</span>

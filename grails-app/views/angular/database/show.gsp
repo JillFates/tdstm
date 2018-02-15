@@ -4,7 +4,7 @@
 
 <div class="modal-content tds-angular-component-content">
     <div class="modal-header">
-        <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
+        <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">Database Detail</h4>
     </div>
     <div class="modal-body">
@@ -12,7 +12,6 @@
             <table style="border: 0">
                 <tr>
                     <td colspan="2">
-
                         <div class="dialog">
                             <g:if test="${errors}">
                                 <div id="messageDivId" class="message">${errors}</div>
@@ -52,7 +51,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.retireDate}">
-                                                {{'${asset?.retireDate}' | date:'dd/MM/yy' }} ${  /* TODO  <tds:convertDate>: You cannot use the session in non-request rendering operations */ }
+                                                <tds:convertDate date="${asset?.retireDate}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
                                         <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
@@ -71,7 +70,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-                                                {{'${asset?.maintExpDate}' | date:'dd/MM/yy'}} ${  /* TODO  <tds:convertDate>: You cannot use the session in non-request rendering operations */ }
+                                                <tds:convertDate date="${asset?.maintExpDate}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
@@ -84,7 +83,6 @@
                                     <tr>
                                         <td></td>
                                         <td></td>
-
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
                                         <td class="valueNW ${standardFieldSpecs.validation.imp?:''}" colspan="3">
@@ -99,8 +97,20 @@
                         </div>
                     </td>
                 </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <table class="dates-info">
+                            <tr>
+                                <td class="date-created">Date created: ${dateCreated}</td>
+                                <td class="last-updated">Last updated: ${lastUpdated}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
                 <tr id="deps">
-                    <g:render template="/angular/common/dependentShow" model="[asset:asset]" ></g:render>
+                    <g:render template="/angular/common/dependentShow" model="[assetEntity:asset]" ></g:render>
                 </tr>
                 <tr id="commentListId">
                     <g:render template="/angular/common/commentList" model="[asset:asset, prefValue:prefValue, viewUnpublishedValue:viewUnpublishedValue]" ></g:render>
@@ -108,7 +118,7 @@
             </table>
         </div>
     </div>
-<div class="modal-footer form-group-center">
-    <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
-</div>
+    <div class="modal-footer form-group-center">
+        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+    </div>
 </div>

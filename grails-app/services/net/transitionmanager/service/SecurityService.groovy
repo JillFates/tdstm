@@ -64,7 +64,6 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 	def auditService
 	def emailDispatchService
-	def grailsApplication
 	def partyRelationshipService
 	def personService
 	def springSecurityService
@@ -1853,12 +1852,15 @@ logger.debug "mergePersonsUserLogin() entered"
 		}
 	}
 
+	/**
+	 * Returns the permissions of the current User
+	 * @return
+	 */
+    Map currentUserPermissionMap() {
+        Set<String> permissions = (getCurrentUserDetails()?.permissions) ?: []
 
-	Map currentUserPermissionMap() {
-		Set<String> permissions = (getCurrentUserDetails()?.permissions) ?: []
-
-		permissions.collectEntries {
-			[(it): it]
-		}
-	}
+        permissions.collectEntries {
+            [(it): 1]
+        }
+    }
 }

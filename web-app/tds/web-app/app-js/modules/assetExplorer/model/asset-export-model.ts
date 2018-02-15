@@ -6,4 +6,5 @@ export class AssetExportModel {
 	queryId?: number;
 	totalData?: number;
 	domains: DomainModel[];
+	viewName?: string;
 }

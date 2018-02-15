@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -9,6 +9,7 @@ import { process, State } from '@progress/kendo-data-query';
 
 import { MinMaxConfigurationPopupComponent } from '../min-max/min-max-configuration-popup.component';
 import { SelectListConfigurationPopupComponent } from '../select-list/selectlist-configuration-popup.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 declare var jQuery: any;
 
@@ -33,6 +34,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
+	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	private state: State = {
@@ -62,7 +65,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor(private loaderService: UILoaderService, private prompt: UIPromptService) { }
+	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) {
+	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -251,18 +255,18 @@ export class FieldSettingsGridComponent implements OnInit {
 				}
 				if (!dataItem.constraints.values ||
 					dataItem.constraints.values.length === 0) {
-					selectList.onToggle();
+					// selectList.onToggle();
 				} else {
-					selectList.show = false;
+					this.selectList.show = false;
 				}
 				break;
 			case 'String':
 				dataItem.constraints.values = [];
 				if (!dataItem.constraints.minSize ||
 					!dataItem.constraints.maxSize) {
-					minMax.onToggle();
+					// minMax.onToggle();
 				} else {
-					minMax.show = false;
+					this.minMax.show = false;
 				}
 				break;
 			case 'YesNo':
@@ -316,6 +320,33 @@ export class FieldSettingsGridComponent implements OnInit {
 	 */
 	protected isFieldUsedAsPlanMethodology(field: FieldSettingsModel): boolean {
 		return this.data.planMethodology && this.data.planMethodology === field.field;
+	}
+
+	/**
+	 * Open The Dialog to Edit Custom Field Setting
+	 * @param {ProviderModel} providerModel
+	 * @param {number} actionType
+	 */
+	private openFieldSettingsPopup(dataItem: FieldSettingsModel): void {
+		if (dataItem.control === 'String') {
+			this.dialogService.open(MinMaxConfigurationPopupComponent, [
+				{ provide: FieldSettingsModel, useValue: dataItem },
+				{ provide: 'domain', useValue: this.data.domain }
+			]).then(result => {
+				// when popup closes ..
+			}).catch(result => {
+				console.log('Dismissed MinMaxConfigurationPopupComponent Dialog');
+			});
+		} else {
+			this.dialogService.open(SelectListConfigurationPopupComponent, [
+				{ provide: FieldSettingsModel, useValue: dataItem },
+				{ provide: 'domain', useValue: this.data.domain }
+			]).then(result => {
+				// when popup closes ..
+			}).catch(result => {
+				console.log('Dismissed SelectListConfigurationPopupComponent Dialog');
+			});
+		}
 	}
 
 }

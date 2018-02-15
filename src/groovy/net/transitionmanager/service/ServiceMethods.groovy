@@ -1,7 +1,8 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
-import org.springframework.context.MessageSource
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.context.i18n.LocaleContextHolder
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
@@ -11,8 +12,8 @@ import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
 
-	def applicationContext
-	MessageSource messageSource
+	GrailsApplication grailsApplication
+	MessageSourceService messageSourceService
 
 	/**
 	 * Calls get() to retrieve a domain class instance by id. The provided id can
@@ -94,7 +95,7 @@ trait ServiceMethods {
 	 * @return the Http Request session object
 	 */
 	HttpSession getSession() {
-		HttpSession session
+		HttpSession session = null
 		if (RequestContextHolder.getRequestAttributes()) {
 			GrailsWebRequest grailsWebRequest = WebUtils.retrieveGrailsWebRequest()
 			if (grailsWebRequest) {
@@ -102,5 +103,74 @@ trait ServiceMethods {
 				session = request.session
 			}
 		}
+		return session
 	}
+
+	/**
+	 * Get an i18n message
+	 * @param code - message code
+	 * @return
+	 */
+	// TODO : JPM 2/2018 : Shouldn't this take the Locale as a default?
+	String i18nMessage(String code) {
+		return i18nMessage(code, [] as Object[], '')
+	}
+
+	/**
+	 * Get an i18n message
+	 * @param code - message code
+	 * @param defaultMessage - default message if message code is not found
+	 * @return
+	 */
+	// TODO : JPM 2/2018 : Shouldn't this take the Locale as a default?
+	String i18nMessage(String code, String defaultMessage) {
+		return i18nMessage(code, [] as Object[], defaultMessage)
+	}
+
+	/**
+	 * Get an i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @return
+	 */
+	String i18nMessage(String code, Object[] args) {
+		return i18nMessage(code, args, null)
+	}
+
+	/**
+	 * Get an i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @param defaultMessage - default message if message code is not found
+	 * @param locale - message locale, ENGLISH, FRENCH, US, UK
+	 * @return
+	 */
+	String i18nMessage(String code, Object[] args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		return messageSourceService.i18nMessage(code, args, defaultMessage, locale)
+	}
+
+	/**
+	 * Used to throw an exception with a i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @param defaultMessage - default message if message code is not found
+	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
+	 */	
+	void throwException(Class exception, String messageCode, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		throwException(exception, messageCode, [] as Object[], defaultMessage, locale)
+	}
+
+	/**
+	 * Used to throw an exception with a i18n message
+	 * @param code - message code
+	 * @param args - message arguments to interpolate, e.g. `{0}` marks
+	 * @param defaultMessage - default message if message code is not found
+	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
+	 */	
+	void throwException(Class exception, String messageCode, List args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
+		String i18nMsg = i18nMessage(messageCode, args as Object[], defaultMessage, locale)
+		Exception ex = exception.newInstance(i18nMsg)
+		throw ex
+	}
+
 }

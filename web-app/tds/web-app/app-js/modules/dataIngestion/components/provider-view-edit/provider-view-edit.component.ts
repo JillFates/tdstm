@@ -55,7 +55,11 @@ export class ProviderViewEditComponent implements OnInit {
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
 			.subscribe(term => {
+				if (term) {
+					term = term.trim();
+				}
 				if (term && term !== '') {
+					this.providerModel.name = this.providerModel.name.trim();
 					this.dataIngestionService.validateUniquenessProviderByName(this.providerModel).subscribe(
 						(result: any) => {
 							this.isUnique = result.isUnique;
@@ -108,7 +112,7 @@ export class ProviderViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteProvider(): void {
@@ -122,5 +126,17 @@ export class ProviderViewEditComponent implements OnInit {
 						(err) => console.log(err));
 				}
 			});
+	}
+
+	/**
+	 * Verify if the Name is Empty
+	 * @returns {boolean}
+	 */
+	protected isEmptyValue(): boolean {
+		let term = '';
+		if (this.providerModel.name) {
+			term = this.providerModel.name.trim();
+		}
+		return term === '';
 	}
 }

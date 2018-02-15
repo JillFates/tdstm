@@ -30,7 +30,6 @@ import net.transitionmanager.service.GraphvizService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ReportsService
 import net.transitionmanager.service.RunbookService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
@@ -79,7 +78,6 @@ class TaskController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ReportsService reportsService
 	RunbookService runbookService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
@@ -1146,12 +1144,7 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskView)
 	def retrieveStaffRoles() {
-		try {
-			renderSuccessJson(taskService.getRolesForStaff())
-		}
-		catch (e) {
-			handleException e, log
-		}
+		renderSuccessJson(taskService.getRolesForStaff())
 	}
 
 	/**

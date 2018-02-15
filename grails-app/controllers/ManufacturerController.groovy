@@ -10,7 +10,6 @@ import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ManufacturerService
-import net.transitionmanager.service.SecurityService
 import org.hibernate.criterion.Order
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -21,7 +20,6 @@ class ManufacturerController implements ControllerMethods {
 	static defaultAction = 'list'
 
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 	ManufacturerService manufacturerService
 
 	@HasPermission(Permission.ManufacturerList)

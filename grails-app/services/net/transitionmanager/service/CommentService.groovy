@@ -14,6 +14,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
@@ -336,8 +337,13 @@ class CommentService implements ServiceMethods {
 
 			// Assign ApiAction to task
 			if(params.containsKey("apiActionId")){
-				long id = Long.parseLong(params.apiActionId)
-				assetComment.apiAction = apiActionService.find(id, assetComment.project)
+				Long id = NumberUtil.toLong(params.apiActionId)
+				ApiAction apiAction = null
+				if (id) {
+					apiAction = apiActionService.find(id, assetComment.project)
+				}
+				assetComment.apiAction = apiAction
+
 			}
 
 			// Use the service to update the Status because it does a number of things that we don't need to duplicate. This

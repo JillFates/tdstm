@@ -24,7 +24,7 @@ class Provider {
     ]
 
     static constraints = {
-        name size:1..255, unique: 'project'
+        name blank: false, size:1..255, unique: 'project'
         description size:0..255, nullable: true
         comment size:0..65254, nullable: true
         lastUpdated nullable: true
@@ -49,17 +49,23 @@ class Provider {
 
     /**
      * Return a map representation of this Provider.
+     * @param minimalInfo: if set to true only the id and name will be returned.
      * @return
      */
-    Map toMap() {
+    Map toMap(boolean minimalInfo = false) {
         Map dataMap = [
-                id: id,
-                name: name,
+            id: id,
+            name: name
+        ]
+        if (! minimalInfo) {
+            Map additionalFields = [
                 description: description,
                 comment: comment,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated
-        ]
+            ]
+            dataMap.putAll(additionalFields)
+        }
         return dataMap
     }
 }

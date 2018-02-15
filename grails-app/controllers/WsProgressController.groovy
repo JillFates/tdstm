@@ -21,12 +21,7 @@ class WsProgressController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProgressView)
 	def retrieveStatus() {
-		try {
-			renderSuccessJson(progressService.get(params.id))
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(progressService.get(params.id))
 	}
 
 	/**
@@ -34,12 +29,7 @@ class WsProgressController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProgressView)
 	def retrieveData() {
-		try {
-			renderSuccessJson(progressService.getData(params.id, params.dataKey))
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(progressService.getData(params.id, params.dataKey))
 	}
 
 	/**
@@ -47,12 +37,7 @@ class WsProgressController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProgressList)
 	def list() {
-		try {
-			renderSuccessJson(progressService.list())
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(progressService.list())
 	}
 
 	/**
@@ -60,12 +45,7 @@ class WsProgressController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProgressView)
 	def demo() {
-		try {
-			renderSuccessJson(progressService.demo())
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(progressService.demo())
 	}
 
 	/**
@@ -73,11 +53,18 @@ class WsProgressController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ProgressView)
 	def demoFailed() {
-		try {
-			renderSuccessJson(progressService.demoFailed())
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		renderSuccessJson(progressService.demoFailed())
+	}
+
+	/**
+	 * Interrupt a Quartz Job given its ID.
+	 *
+	 * @param jobKey
+	 * @return
+	 */
+	@HasPermission(Permission.DataTransferBatchProcess)
+	def interruptJob(String jobKey){
+		progressService.interruptJob(jobKey)
+		renderSuccessJson([interrupted: true])
 	}
 }

@@ -40,8 +40,11 @@ export class DataScriptViewEditComponent implements OnInit {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
-		this.dataSignature = JSON.stringify(this.dataScriptModel);
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create DataScript' : (this.modalType === ActionType.EDIT ? 'DataScript Edit' : 'DataScript Detail');
+		// ignore etl script from this context
+		let copy = {...this.dataScriptModel};
+		delete copy.etlSourceCode;
+		this.dataSignature = JSON.stringify(copy);
 		this.datasourceName.next(this.dataScriptModel.name);
 	}
 
@@ -56,7 +59,9 @@ export class DataScriptViewEditComponent implements OnInit {
 					this.dataScriptModel.provider = this.providerList[0];
 				}
 				this.providerList.push(...result);
-				this.dataSignature = JSON.stringify(this.dataScriptModel);
+				let copy = {...this.dataScriptModel};
+				delete copy.etlSourceCode;
+				this.dataSignature = JSON.stringify(copy);
 				setTimeout(() => { // Delay issues on Auto Focus
 					if (this.dataScriptProvider) {
 						this.dataScriptProvider.focus();
@@ -102,7 +107,9 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
-		return this.dataSignature !== JSON.stringify(this.dataScriptModel);
+		let copy = {...this.dataScriptModel};
+		delete copy.etlSourceCode;
+		return this.dataSignature !== JSON.stringify(copy);
 	}
 
 	/**
@@ -131,24 +138,50 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(): void {
-		this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this Datasource. Deleting this will not delete the batches but will no longer reference a Datasource. Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.dataIngestionService.deleteDataScript(this.dataScriptModel.id).subscribe(
-						(result) => {
-							this.activeDialog.close(result);
-						},
-						(err) => console.log(err));
+		this.dataIngestionService.validateDeleteScript(this.dataScriptModel.id).subscribe(
+			(result) => {
+				if (result && result['canDelete']) {
+					this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
+						.then((res) => {
+							if (res) {
+								this.deleteDataScript();
+							}
+						});
+				} else {
+					this.prompt.open('Confirmation Required', 'There are Ingestion Batches that have used this DataScript. Deleting this will not delete the batches but will no longer reference a DataScript. Do you want to proceed?', 'Yes', 'No')
+						.then((res) => {
+							if (res) {
+								this.deleteDataScript();
+							}
+						});
 				}
-			});
+			},
+			(err) => console.log(err));
 	}
 
+	/**
+	 * Execute the Service to delete the DataScript
+	 */
+	private deleteDataScript(): void {
+		this.dataIngestionService.deleteDataScript(this.dataScriptModel.id).subscribe(
+			(result) => {
+				this.activeDialog.close(result);
+			},
+			(err) => console.log(err));
+	}
+
+	/**
+	 * Open the DataScript Designer
+	 */
 	protected onDataScriptDesigner(): void {
-		this.dialogService.extra(DataScriptEtlBuilderComponent, [UIDialogService]).then(() => console.log('ok'), () => console.log('not ok'));
+		this.dialogService.extra(DataScriptEtlBuilderComponent,
+			[UIDialogService,
+				{provide: DataScriptModel, useValue: this.dataScriptModel}])
+			.then(() => console.log('ok'), () => console.log('not ok'));
 	}
 
 }

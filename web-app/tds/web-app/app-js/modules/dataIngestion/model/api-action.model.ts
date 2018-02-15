@@ -1,3 +1,6 @@
+import { INTERVAL } from '../../../shared/model/constants';
+import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
+
 export class APIActionColumnModel {
 	columns: any[];
 
@@ -34,7 +37,7 @@ export class APIActionColumnModel {
 				type: 'boolean',
 				width: 100
 			}, {
-				label: 'Default Data Script',
+				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
 				type: 'text'
 			}, {
@@ -111,19 +114,19 @@ export class APIActionModel {
 	callbackMethod?: string;
 	callbackMode?: string;
 	methodParams?: string;
-	pollingInterval?: boolean;
+	isPolling?: boolean;
 	polling?: {
 		frequency?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		lapsedAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		};
 		stalledAfter?: {
-			value?: number;
-			interval?: string;
+			value: number;
+			interval: string;
 		}
 	};
 	timeout?: number;
@@ -142,7 +145,64 @@ export class APIActionModel {
 		id?: number,
 		name?: string
 	};
+	endpointUrl?: '';
+	endpointPath?: '';
 	eventReactions?: EventReaction[];
+
+	constructor() {
+		this.name = '';
+		this.description = '';
+		this.provider = { id: null, name: '' };
+		this.agentClass = { id: null, name: '' };
+		this.agentMethod = { id: null, name: ''};
+		this.defaultDataScript = {id: null, name: ''};
+		this.isPolling = false;
+		this.producesData = false;
+		this.endpointUrl = '';
+		this.endpointPath = '';
+		this.polling =  {
+				frequency: {
+					value: 0,
+					interval: INTERVAL.SECONDS
+				},
+				lapsedAfter: {
+					value: 0,
+					interval: INTERVAL.MINUTES
+				},
+				stalledAfter: {
+					value: 0,
+					interval: INTERVAL.MINUTES
+				}
+			};
+		APIActionModel.createBasicReactions(this);
+	}
+
+	public static createBasicReactions(apiActionModel: APIActionModel): void {
+		apiActionModel.eventReactions = [];
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINAL, false, ''));
+	}
+
+	public static createReactions(apiActionModel: APIActionModel, reactionScriptsStringModel: string) {
+		let reactions = JSON.parse(reactionScriptsStringModel);
+		apiActionModel.eventReactions = [];
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, reactions['STATUS'] ? true : false, reactions['STATUS'] ? reactions['STATUS'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, reactions['SUCCESS'] ? true : false, reactions['SUCCESS'] ? reactions['SUCCESS'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, reactions['DEFAULT'] ? true : false, reactions['DEFAULT'] ? reactions['DEFAULT'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, reactions['ERROR'] ? true : false, reactions['ERROR'] ? reactions['ERROR'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, reactions['FAILED'] ? true : false, reactions['FAILED'] ? reactions['FAILED'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, reactions['LAPSED'] ? true : false, reactions['LAPSED'] ? reactions['LAPSED'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, reactions['STALLED'] ? true : false, reactions['STALLED'] ? reactions['STALLED'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.PRE, reactions['PRE'] ? true : false, reactions['PRE'] ? reactions['PRE'] : ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FINAL, reactions['FINAL'] ? true : false, reactions['FINAL'] ? reactions['FINAL'] : ''));
+	}
 }
 
 export class EventReaction {
@@ -150,7 +210,7 @@ export class EventReaction {
 	selected?: boolean;
 	value?: string;
 	open?: boolean;
-	valid?: boolean;
+	state?: CHECK_ACTION;
 	error?: string;
 
 	constructor(type: EventReactionType, selected: boolean, value: string) {
@@ -158,7 +218,7 @@ export class EventReaction {
 		this.selected = selected;
 		this.value = value;
 		this.open = true;
-		this.valid = true;
+		this.state = CHECK_ACTION.UNKNOWN;
 		this.error = '';
 	}
 }
@@ -180,14 +240,13 @@ export class ParameterContextModel {
 }
 
 export enum EventReactionType {
-	STATUS = 'status',
-	SUCCESS = 'success',
-	DEFAULT = 'default',
-	ERROR = 'error',
-	FAILED = 'failed',
-	TIMEDOUT = 'timedout',
-	LAPSED = 'lapsed',
-	STALLED = 'stalled',
-	PRE_API_CALL = 'preApiCall',
-	FINALIZED_API_CALL = 'finalizedApiCall'
+	STATUS = 'STATUS',
+	SUCCESS = 'SUCCESS',
+	DEFAULT = 'DEFAULT',
+	ERROR = 'ERROR',
+	FAILED = 'FAILED',
+	LAPSED = 'LAPSED',
+	STALLED = 'STALLED',
+	PRE = 'PRE',
+	FINAL = 'FINAL'
 };

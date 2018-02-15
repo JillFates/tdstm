@@ -23,12 +23,8 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderCreate)
     def createProvider() {
-        try {
-            Provider provider = providerService.saveOrUpdateProvider(request.JSON)
-            renderSuccessJson([provider: provider.toMap()])
-        } catch(Exception e) {
-            handleException(e, logger)
-        }
+        Provider provider = providerService.saveOrUpdateProvider(request.JSON)
+        renderSuccessJson([provider: provider.toMap()])
     }
 
     /**
@@ -38,12 +34,8 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderUpdate)
     def updateProvider(Long id) {
-        try {
-            Provider provider = providerService.saveOrUpdateProvider(request.JSON, id)
-            renderSuccessJson([provider: provider.toMap()])
-        } catch(Exception e) {
-            handleException(e, logger)
-        }
+        Provider provider = providerService.saveOrUpdateProvider(request.JSON, id)
+        renderSuccessJson([provider: provider.toMap()])
     }
 
     /**
@@ -54,12 +46,8 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderView)
     def getProvider(Long id) {
-        try {
-            Provider provider = providerService.getProvider(id)
-            renderSuccessJson([provider: provider.toMap()])
-        } catch(Exception e) {
-            handleException(e, logger)
-        }
+        Provider provider = providerService.getProvider(id, null, true)
+        renderSuccessJson([provider: provider.toMap()])
     }
 
     /**
@@ -69,13 +57,9 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderView)
     def validateUniqueName(String name) {
-        try {
-            Long providerId = NumberUtil.toLong(request.JSON.providerId)
-            boolean isUnique = providerService.validateUniqueName(name, providerId)
-            renderSuccessJson([isUnique: isUnique])
-        } catch(Exception e) {
-            handleException(e, logger)
-        }
+        Long providerId = NumberUtil.toLong(request.JSON.providerId)
+        boolean isUnique = providerService.validateUniqueName(name, providerId)
+        renderSuccessJson([isUnique: isUnique])
     }
 
     /**
@@ -84,12 +68,8 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderView)
     def getProviders(){
-        try {
-            List<Provider> providers = providerService.getProviders()
-            renderSuccessJson(providers*.toMap())
-        }catch(Exception e) {
-            handleException(e, logger)
-        }
+        List<Provider> providers = providerService.getProviders()
+        renderSuccessJson(providers*.toMap())
     }
 
     /**
@@ -100,11 +80,7 @@ class WsProviderController implements ControllerMethods{
      */
     @HasPermission(Permission.ProviderDelete)
     def deleteProvider(Long id) {
-        try {
-            providerService.deleteProvider(id)
-            renderSuccessJson([status: DELETE_OK_MESSAGE] )
-        } catch(Exception e) {
-            handleException(e, logger)
-        }
+        providerService.deleteProvider(id)
+        renderSuccessJson([status: DELETE_OK_MESSAGE] )
     }
 }

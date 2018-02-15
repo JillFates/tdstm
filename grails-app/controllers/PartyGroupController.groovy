@@ -14,7 +14,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,7 +28,6 @@ class PartyGroupController implements ControllerMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	/**

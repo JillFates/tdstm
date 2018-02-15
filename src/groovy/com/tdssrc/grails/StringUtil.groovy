@@ -277,7 +277,10 @@ class StringUtil {
 	 * and then replace all white spaces with a '+'
 	 */
 	 static String sanitizeAndStripSpaces(String str){
-	 	sanitize(str).replaceAll(/\s/, "+")
+		 if (str) {
+			 str = sanitize(str).replaceAll(/\s/, "+")
+		 }
+		 return str
 	 }
 
 	/**

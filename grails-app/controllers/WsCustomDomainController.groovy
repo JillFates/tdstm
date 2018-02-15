@@ -15,23 +15,15 @@ class WsCustomDomainController implements ControllerMethods {
     @HasPermission(Permission.UserGeneralAccess)
     @Transactional(readOnly = true)
     def getFieldSpec() {
-        try {
-            Project project = getProjectForWs()
-            renderAsJson(customDomainService.allFieldSpecs(project, params.domain))
-        } catch (e) {
-            handleException(e, logger)
-        }
+        Project project = getProjectForWs()
+        renderAsJson(customDomainService.allFieldSpecs(project, params.domain))
     }
 
     @HasPermission(Permission.ProjectFieldSettingsEdit)
     def saveFieldSpec() {
-        try {
-            Project project = getProjectForWs()
-            customDomainService.saveFieldSpecs(project, params.domain, request.JSON)
-            render status: 200
-        } catch (e) {
-            handleException(e, logger)
-        }
+        Project project = getProjectForWs()
+        customDomainService.saveFieldSpecs(project, params.domain, request.JSON)
+        renderSuccessJson()
     }
 
     /**
@@ -44,12 +36,8 @@ class WsCustomDomainController implements ControllerMethods {
     @HasPermission(Permission.ProjectFieldSettingsEdit)
     @Transactional(readOnly = true)
     def distinctValues() {
-        try {
-            Project project = getProjectForWs()
-            renderAsJson(customDomainService.distinctValues(project, params.id, request.JSON))
-        } catch (e) {
-            handleException(e, logger)
-        }
+        Project project = getProjectForWs()
+        renderAsJson(customDomainService.distinctValues(project, params.id, request.JSON))
     }
 
     def checkConstraints() {

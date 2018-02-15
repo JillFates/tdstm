@@ -45,7 +45,6 @@ import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -68,7 +67,6 @@ class ReportsController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
 	ReportsService reportsService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 
@@ -797,13 +795,13 @@ class ReportsController implements ControllerMethods {
 		def applicationOwner
 
 		def query = new StringBuffer(""" SELECT a.app_id AS id
-					FROM application a
-					LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
-					LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-					LEFT OUTER JOIN person p ON p.person_id=a.sme_id
-					LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
-					LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
-					WHERE ae.project_id = $project.id """)
+			FROM application a
+			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
+			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+			LEFT OUTER JOIN person p ON p.person_id=a.sme_id
+			LEFT OUTER JOIN person p1 ON p1.person_id=a.sme2_id
+			LEFT OUTER JOIN person p2 ON p2.person_id=ae.app_owner_id
+			WHERE ae.project_id = $project.id """)
 
 		if(params.moveBundle == 'useForPlanning'){
 			def bundleIds = MoveBundle.getUseForPlanningBundlesByProject(project)?.id
@@ -871,18 +869,33 @@ class ReportsController implements ControllerMethods {
 
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
+
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 
-			// TODO: we'd like to flush the session.
+			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
+			def startupById = startupBy instanceof Person ? startupBy.id : -1
+			def testingById = testingBy instanceof Person ? testingBy.id : -1
+
+			// TODO: we'd like to flush the session
 			// GormUtil.flushAndClearSession(idx)
-			appList.add([app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
-				          redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
-				          appMoveEvent: appMoveEvent, moveEventList: moveEventList, appMoveEvent: appMoveEventlist,
-				          dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				          project: project, prefValue: prefValue,
-				          shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy, errors: params.errors])
+			appList.add([
+				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
+				redirectTo: params.redirectTo, assetComment: assetComment, assetCommentList: assetCommentList,
+				appMoveEvent: appMoveEvent, 
+				moveEventList: moveEventList, 
+				appMoveEvent: appMoveEventlist,
+				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
+				project: project, prefValue: prefValue, 
+				shutdownById: shutdownById, 
+				startupById: startupById, 
+				testingById: testingById,
+				shutdownBy: shutdownBy, 
+				startupBy: startupBy, 
+				testingBy: testingBy, 
+				errors: params.errors
+			])
 		}
 
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
@@ -1023,9 +1036,7 @@ class ReportsController implements ControllerMethods {
 			def eventNames = moveEvents.collect{it.name}
 			eventsTitleSheet = eventNames.join(", ")
 		}
-		def nameParams = [project:project,
-						  moveEvent:(!allEvents ? moveEvents[0]: null),
-						  allEvents: allEvents]
+		def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
 		String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams, 'xls')
 
 		//set MIME TYPE as Excel
@@ -1118,11 +1129,12 @@ class ReportsController implements ControllerMethods {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		} else {
-			boolean allEvents = (reqEvents.size() > 1 || reqEvents[0] != "all") ? false : true
-			def moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
-			def nameParams = [project:project,
-							  moveEvent:(!allEvents ? moveEvents[0]: null),
-							  allEvents: allEvents]
+			boolean allEvents = reqEvents.remove("all")
+			def moveEvents
+			if (reqEvents) {
+				moveEvents = MoveEvent.findAll("FROM MoveEvent WHERE id IN(:ids)", [ids: reqEvents])
+			}
+			def nameParams = [project:project, moveEvent: moveEvents, allEvents: allEvents]
 			String filename = FilenameUtil.buildFilename(FilenameFormat.CLIENT_PROJECT_EVENT_DATE, nameParams)
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":filename,"_file":"taskReport"])

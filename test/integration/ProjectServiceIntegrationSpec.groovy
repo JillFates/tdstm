@@ -1,14 +1,21 @@
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SecurityRole
-import net.transitionmanager.domain.Dataview
 import com.tdsops.tm.enums.domain.SettingType
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.Dataview
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
+import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.*
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.PartyRelationshipService
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
+import net.transitionmanager.service.SecurityService
 import spock.lang.Specification
-import test.helper.DataScriptTestHelper
-import test.helper.ProviderTestHelper
 
 class ProjectServiceIntegrationSpec extends Specification {
 
@@ -331,5 +338,64 @@ class ProjectServiceIntegrationSpec extends Specification {
 				eq('id', dataview.id)
 				eq('project', project)
 			}
+	}
+
+	def '14. Test getPartners and getPartnerIds methods together'() {
+		expect: 'No partners for the project'
+			[] == projectService.getPartnerIds(project)
+			[] == projectService.getPartners(project)
+
+		when: 'a partner is added to the project'
+			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+		then: 'the partner id should be returned'
+			[ partner.id ] == projectService.getPartnerIds(project)
+		and: 'the partner object should be returned'
+			[ partner ] == projectService.getPartners(project)
+	}
+
+	def '15. Test getAssociatedStaffIds method'() {
+		setup: 'Get the list of owner staff'
+			List ownerStaffIds = projectService.getCompanyStaffIds(project.owner)
+		expect: 'Project owner staff should have one person'
+			1 == ownerStaffIds.size()
+		and: 'Project Associated Staff should be the owner staff person'
+			ownerStaffIds == projectService.getAssociatedStaffIds(project)
+		and: 'No partners for the project'
+			[] == projectService.getPartnerIds(project)
+		and: 'No staff for client of project'
+			[] == projectService.getCompanyStaffIds(project.client)
+
+		when: 'a partner is added to the project'
+			PartyGroup partner = projectHelper.createPartner(project.owner, project)
+		and: 'partner staff is added to the project'
+			def partnerPerson = personHelper.createStaff(partner)
+			projectService.addTeamMember(project, partnerPerson, ['PROJ_MGR'])
+			List assocStaff = projectService.getAssociatedStaffIds(project)
+		then: 'the list of associated staff should have increased by one'
+			2 == assocStaff.size()
+		and: 'the partner staff should be in the list'
+			assocStaff.contains(partnerPerson.id)
+
+		when: 'a client staff is created'
+			Person clientPerson = personHelper.createStaff(project.client)
+		then: 'the client staffing should have one person'
+			1 == projectService.getCompanyStaffIds(project.client).size()
+		and: 'the list of associated staff should have increased one more'
+			3 == projectService.getAssociatedStaffIds(project).size()
+
+		when: 'a client staff is assigned to the project'
+			projectService.addTeamMember(project, clientPerson, ['PROJ_MGR'])
+		then: 'the list of associated staff should remain the same size'
+			3 == projectService.getAssociatedStaffIds(project).size()
+
+		when: 'a owner staff is created'
+			Person ownerPerson = personHelper.createStaff(project.owner)
+		then: 'the list of associated staff should remain the same size'
+			3 == projectService.getAssociatedStaffIds(project).size()
+
+		when: 'a owner staff is assigned to the project'
+			projectService.addTeamMember(project, ownerPerson, ['PROJ_MGR'])
+		then: 'the list of associated staff should have increased by one'
+			4 == projectService.getAssociatedStaffIds(project).size()
 	}
 }

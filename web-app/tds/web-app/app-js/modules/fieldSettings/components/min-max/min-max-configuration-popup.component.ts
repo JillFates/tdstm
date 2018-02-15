@@ -1,5 +1,6 @@
-import {Component, Input, ViewChild, OnInit} from '@angular/core';
+import {Component, Input, ViewChild, OnInit, Inject} from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'min-max-configuration-popup',
@@ -9,16 +10,14 @@ import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.
 
 export class MinMaxConfigurationPopupComponent implements OnInit {
 
-	@Input() domain: string;
-	@Input() field: FieldSettingsModel;
-
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;
 
-	public onSave(): void {
-		this.field.constraints = { ...this.model };
-		this.onToggle();
+	constructor(
+		public field: FieldSettingsModel,
+		@Inject('domain') public domain: string,
+		private activeDialog: UIActiveDialogService) {
 	}
 
 	ngOnInit(): void {
@@ -29,14 +28,28 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 		}
 	}
 
-	public onToggle(): void {
-		this.show = !this.show;
-	}
-
+	/**
+	 * Validates the form
+	 */
 	public validateModel(): void {
 		this.minIsValid = true;
 		if (this.model.minSize > this.model.maxSize || this.model.minSize < 0) {
 			this.minIsValid = false;
 		}
+	}
+
+	/**
+	 * On button save click
+	 */
+	public onSave(): void {
+		this.field.constraints = { ...this.model };
+		this.activeDialog.dismiss();
+	}
+
+	/**
+	 * Close the Dialog but first it verify is not Dirty
+	 */
+	protected cancelCloseDialog(): void {
+		this.activeDialog.dismiss();
 	}
 }

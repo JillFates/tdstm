@@ -96,8 +96,33 @@
 			}
 			return returnval;
 		}
+
+		function validateRequiredFields() {
+		    // List of all the fields that are empty.
+		    var emptyFields = [];
+		    // Flag that everything went well.
+			var allFieldsOK = true;
+			// List of the ID of those required elements.
+			var requiredFields = ["#name", "#projectCode" , "#clientId"];
+			// The label for the required elements.
+			var requiredLabels = ["Name", "Code", "Client"];
+			// Iterate over the required fields. If they're empty, are the label to the list of empty fields.
+		    for (var i = 0; i < requiredFields.length; i++) {
+		    	if ($(requiredFields[i]).val().length === 0) {
+		    	    emptyFields.push(requiredLabels[i]);
+				}
+			}
+
+			// If any required field is empty, then false should be returned.
+			allFieldsOK = emptyFields.size() === 0;
+			if (!allFieldsOK) {
+			    alert("The following field(s) cannot be null: " + emptyFields.join(", "));
+			}
+			return allFieldsOK;
+		}
+
 		function validateForm() {
-			return validateDates() && Project.validSelectedPartners();
+			return validateRequiredFields() && validateDates() && Project.validSelectedPartners();
 		}
 	    </script>
 	<r:layoutResources/>

@@ -1,21 +1,28 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ApiActionValidateScriptCommand
+import net.transitionmanager.integration.ReactionAssetFacade
+import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
-import net.transitionmanager.service.SecurityService
 
 @Secured('isAuthenticated()')
 @Slf4j
 class WsApiActionController implements ControllerMethods {
 
     ApiActionService apiActionService
-    SecurityService securityService
 
     /**
      * Get a list of agent names
@@ -53,8 +60,7 @@ class WsApiActionController implements ControllerMethods {
     def fetch(Long id){
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
-        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
-        renderSuccessJson(apiAction.toMap(agent,false))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
     /**
@@ -73,27 +79,27 @@ class WsApiActionController implements ControllerMethods {
      * Create a new ApiAction.
      */
     @HasPermission(Permission.ActionCreate)
-    def create() {
-        try {
-            Project project = securityService.userCurrentProject
-            ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON)
-            AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
-            renderSuccessJson(apiAction.toMap(agent, false))
-        } catch (Exception e) {
-            e.printStackTrace()
-        }
-
+    def create(ApiActionCommand apiActionCommand) {
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand)
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
-
 
     /**
      * Update the corresponding ApiAction.
      */
     @HasPermission(Permission.ActionEdit)
-    def update(Long id) {
-        Project project = securityService.userCurrentProject
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(project, request.JSON, id)
-        AbstractAgent agent = apiActionService.agentInstanceForAction(apiAction)
-        renderSuccessJson(apiAction.toMap(agent, false))
+    def update(Long id, ApiActionCommand apiActionCommand) {
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
+
+	@HasPermission(Permission.ActionInvoke)
+	def validateSyntax(ApiActionValidateScriptCommand command) {
+		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
+			renderErrorJson( errorsInValidation([command.errors] + command.scripts.collect {it.errors}) )
+		} else {
+			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
+		}
+	}
+
 }

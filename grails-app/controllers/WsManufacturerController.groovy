@@ -24,13 +24,8 @@ class WsManufacturerController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ManufacturerMerge)
 	def merge() {
-		try {
-			controllerService.checkPermissionForWS(Permission.ModelEdit)
-			manufacturerService.merge(params.id, params.fromId)
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		controllerService.checkPermissionForWS(Permission.ModelEdit)
+		manufacturerService.merge(params.id, params.fromId)
+		renderSuccessJson()
 	}
 }

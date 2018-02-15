@@ -17,6 +17,7 @@ import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
+import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 // Shared Pipes
 import { UIBooleanPipe } from './pipes/ui-boolean.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -26,6 +27,8 @@ import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.com
 import { HeaderComponent } from './modules/header/header.component';
 import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
+import { DynamicComponent } from './components/dynamic.component';
+import { CheckActionComponent } from './components/check-action/check-action.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -36,8 +39,6 @@ import { NotFoundPageComponent } from './modules/pages/not-found-page.component'
 import { UIRouterModule } from '@uirouter/angular';
 import { SHARED_STATES } from './shared-routing.states';
 import { DictionaryService } from './services/dictionary.service';
-// Components
-import { DynamicComponent } from './components/dynamic.component';
 
 @NgModule({
 	imports: [
@@ -57,11 +58,13 @@ import { DynamicComponent } from './components/dynamic.component';
 		FormlyInputHorizontal,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		ErrorPageComponent,
 		NotFoundPageComponent,
 		UnauthorizedPageComponent,
 		DynamicComponent,
-		CodeMirrorComponent
+		CodeMirrorComponent,
+		CheckActionComponent
 	],
 	providers: [
 		AuthService,
@@ -76,6 +79,7 @@ import { DynamicComponent } from './components/dynamic.component';
 		UIActiveDialogService,
 		UIPromptService,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		DictionaryService,
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
@@ -84,13 +88,15 @@ import { DynamicComponent } from './components/dynamic.component';
 		UIDialogDirective,
 		UIBooleanPipe,
 		UISVGIconDirectiveDirective,
+		UIFloatingHeaderKGridDirective,
 		TranslatePipe,
 		FilterPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
 		FormlyInputHorizontal,
 		DynamicComponent,
-		CodeMirrorComponent
+		CodeMirrorComponent,
+		CheckActionComponent
 	],
 	entryComponents: [DynamicComponent]
 })

@@ -11,6 +11,7 @@ export class ViewColumn extends QueryColumn {
 	edit?= false;
 	filter = '';
 	label: string;
+	notFound?: boolean;
 }
 
 export class ViewSort extends QueryColumn {

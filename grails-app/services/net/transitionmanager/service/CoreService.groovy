@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import grails.util.Environment
 import grails.util.Metadata
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
 /**
@@ -16,8 +15,6 @@ class CoreService implements ServiceMethods {
 	// TODO - Refactor the tempDirProperty to not be tied to graph
 	static final String tempDirProperty = 'graph.tmpDir'
 
-
-	GrailsApplication grailsApplication
 
 	/**
 	 * Used to retrieve the name of the application

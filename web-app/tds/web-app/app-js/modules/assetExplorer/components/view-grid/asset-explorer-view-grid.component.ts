@@ -11,7 +11,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
 import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE } from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
-import { FieldSettingsModel } from '../../../fieldSettings/model/field-settings.model';
+import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { Permission } from '../../../../shared/model/permission.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
@@ -67,8 +67,10 @@ export class AssetExplorerViewGridComponent {
 	showMessage = true;
 	typingTimeout: any;
 	// Pagination Configuration
+	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 	private maxDefault = MAX_DEFAULT;
 	private maxOptions = MAX_OPTIONS;
+	public fieldNotFound = FIELD_NOT_FOUND;
 
 	state: State = {
 		skip: 0,
@@ -79,6 +81,7 @@ export class AssetExplorerViewGridComponent {
 	selectAll = false;
 	bulkItems = {};
 	bulkSelectedItems: string[] = [];
+	private columnFiltersOldValues = [];
 
 	constructor(
 		private userPref: PreferenceService,
@@ -101,8 +104,18 @@ export class AssetExplorerViewGridComponent {
 		}, (err) => console.log(err));
 	}
 
+	/**
+	 * Draws the Label property
+	 * @param {ViewColumn} column
+	 * @returns {string}
+	 */
 	getPropertyLabel(column: ViewColumn): string {
-		return this.fields.filter(f => f.key === `${column.domain}_${column.property}`)[0].label;
+		let field = this.fields.find(f => f.key === `${column.domain}_${column.property}`);
+		if (field) {
+			return field.label;
+		}
+		column.notFound = true;
+		return column.label;
 	}
 
 	rowCallbackClass(context: RowClassArgs) {
@@ -134,6 +147,9 @@ export class AssetExplorerViewGridComponent {
 		if (column.filter) {
 			column.filter = '';
 			this.state.skip = 0;
+			if ( this.preventFilterSearch(column)) {
+				return; // prevent search
+			}
 			this.onReload();
 		}
 	}
@@ -147,17 +163,27 @@ export class AssetExplorerViewGridComponent {
 		this.onReload();
 	}
 
-	onFilterKeyUp(e: KeyboardEvent): void {
+	private preventFilterSearch(column: ViewColumn): boolean {
+		let key = `${column.domain}_${column.property}`;
+		let oldVal = this.columnFiltersOldValues[key];
+		this.columnFiltersOldValues[key] = column.filter;
+		return oldVal === column.filter;
+	}
+
+	onFilterKeyUp(e: KeyboardEvent, column?: any): void {
+		if ( this.preventFilterSearch(column)) {
+			return; // prevent search
+		}
 		if (e.code === KEYSTROKE.ENTER) {
 			this.onFilter();
-		} else if (e.code !== KEYSTROKE.TAB && e.code !== KEYSTROKE.SHIFT_RIGHT && e.code !== KEYSTROKE.SHIFT_LEFT) {
+		} else if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 		}
 	}
 
 	onFilterKeyDown(e: KeyboardEvent): void {
-		if (e.code !== 'Tab') {
+		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
 	}
@@ -174,6 +200,9 @@ export class AssetExplorerViewGridComponent {
 			total: data.pagination.total
 		};
 		this.showMessage = data.pagination.total === 0;
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
 	}
 
 	clear(): void {
@@ -191,6 +220,11 @@ export class AssetExplorerViewGridComponent {
 	protected dataStateChange(state: DataStateChangeEvent): void {
 		this.state = state;
 		if (state.sort[0]) {
+			// Invert the Order to remove the Natural/Default from the UI (no arrow)
+			if (!state.sort[0].dir) {
+				state.sort[0].dir = (this.model.sort.order === 'a' ? 'desc' : 'asc');
+			}
+
 			let field = state.sort[0].field.split('_');
 			this.model.sort.domain = field[0];
 			this.model.sort.property = field[1];

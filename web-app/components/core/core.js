@@ -301,7 +301,9 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 				 */
 				if(typeof this.successWithErrors != "undefined"){
 					this.successWithErrors(data)
-				}
+				} else if (data.errors) {
+                    tdsCommon.displayWsError(xhr, data.errors, false)
+                }
 				return false;
 			}
 		} else {

@@ -1,7 +1,3 @@
-import com.tdsops.common.exceptions.InvalidLicenseException
-import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
-
 class UrlMappings {
 
 	static mappings = {
@@ -291,7 +287,10 @@ class UrlMappings {
 
 		"/ws/progress/$id" {
 			controller = "wsProgress"
-			action = [GET:"retrieveStatus"]
+			action = [
+					GET:"retrieveStatus",
+					DELETE: "interruptJob"
+			]
 		}
 
 		"/ws/progress/demo" {
@@ -435,6 +434,27 @@ class UrlMappings {
 			controller = "wsLicenseAdmin"
 			action = [
 					POST: "loadLicense"
+			]
+		}
+
+		"/ws/fileSystem/uploadText" {
+			controller = "wsFileSystem"
+			action = [
+			        POST: "uploadText"
+			]
+		}
+
+		"/ws/fileSystem/uploadFile" {
+			controller = "wsFileSystem"
+			action = [
+					POST: "uploadFile"
+			]
+		}
+
+		"/ws/fileSystem/delete" {
+			controller = "wsFileSystem"
+			action = [
+					DELETE: "deleteFile"
 			]
 		}
 
@@ -644,6 +664,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataingestion/datascript/validateDelete/$id?" {
+			controller = "wsDataScript"
+			action = [
+					GET: "validateDelete",
+			]
+		}
+
 		"/ws/dataingestion/datascript/validateunique/$name" {
 			controller = "wsDataScript"
 			action = [
@@ -695,6 +722,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/validateSyntax" {
+			controller = "wsApiAction"
+			action = [
+					POST: "validateSyntax"
+			]
+		}
+
 		"/ws/dataScript/testScript" {
 			controller = "wsDataScript"
 			action = [
@@ -713,6 +747,63 @@ class UrlMappings {
 			controller = "wsDataScript"
 			action = [
 					POST: "saveScript"
+			]
+		}
+
+		"/ws/filename" {
+			controller = "wsAsset"
+			action = [
+					POST: "exportFilename"
+			]
+		}
+
+		// List all Import Batches | Bulk Delete Import Batches
+		"/ws/import/batch" {
+			controller = "wsImportBatch"
+			action = [
+			        GET: "listImportBatches",
+					DELETE: "bulkDeleteImportBatches"
+			]
+		}
+
+		// Fetch | Delete one import batches by id
+		"/ws/import/batch/$id?" {
+			controller = "wsImportBatch"
+			action = [
+					GET: "fetchImportBatch",
+					DELETE: "deleteImportBatch"
+			]
+		}
+
+		// Archive a single Import Batch
+		"/ws/import/batch/archive/$id?" {
+			controller = 'wsImportBatch'
+			action = [
+					PUT: 'archiveImportBatch'
+			]
+		}
+
+		// Unarchive a single Import Batch
+		"/ws/import/batch/unarchive/$id" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "unarchiveImportBatch"
+			]
+		}
+
+		// Bulk Unarchive Import Batches
+		"/ws/import/batch/unarchive" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "bulkUnarchiveImportBatches"
+			]
+		}
+
+		// Bulk Archive Import Batches
+		"/ws/import/batch/archive" {
+			controller = "wsImportBatch"
+			action = [
+					PUT: "bulkArchiveImportBatches"
 			]
 		}
 
@@ -751,9 +842,10 @@ class UrlMappings {
 		"401" ( controller: 'errorHandler', action: 'unauthorized' )
 		"403" ( controller: 'errorHandler', action: 'forbidden' )
 		"404" ( controller: 'errorHandler', action: 'notFound' )
-		"500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
-		"500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
-		"500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
+		// These were commented out as part of TM-8782 - the exceptions in ControllerMethods should catch these now
+		// "500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
+		// "500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
+		// "500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
 		"500" ( controller: 'errorHandler', action: 'error' )
 
 	}

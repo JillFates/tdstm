@@ -11,7 +11,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 
 /**
@@ -25,7 +24,6 @@ class WsDataScriptController implements ControllerMethods {
 
     DataScriptService dataScriptService
     ScriptProcessorService scriptProcessorService
-    SecurityService securityService
     FileSystemService fileSystemService
 
     /**
@@ -33,12 +31,8 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptCreate)
     def createDataScript () {
-        try {
-            DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON)
-            renderSuccessJson([dataScript: dataScript.toMap()])
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON)
+        renderSuccessJson([dataScript: dataScript.toMap()])
     }
 
     /**
@@ -48,12 +42,8 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptUpdate)
     def updateDataScript (Long id) {
-        try {
-            DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON, id)
-            renderSuccessJson([dataScript: dataScript.toMap()])
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        DataScript dataScript = dataScriptService.saveOrUpdateDataScript(request.JSON, id)
+        renderSuccessJson([dataScript: dataScript.toMap()])
     }
 
     /**
@@ -64,12 +54,8 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptView)
     def getDataScript (Long id) {
-        try {
-            DataScript dataScript = dataScriptService.getDataScript(id)
-            renderSuccessJson([dataScript: dataScript.toMap()])
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        DataScript dataScript = dataScriptService.getDataScript(id)
+        renderSuccessJson([dataScript: dataScript.toMap()])
     }
 
     /**
@@ -77,21 +63,17 @@ class WsDataScriptController implements ControllerMethods {
      * name to look up, this method also expects:
      *
      * - Provider Id
-     * - Data Script Id.
+     * - DataScript Id.
      *
      * The latter is to contemplate the scenario where the user is editing a DataScript and this
      * endpoint is invoked. If the name hasn't changed, it would report the name as not unique.
      */
     @HasPermission(Permission.DataScriptView)
     def validateUniqueName (String name) {
-        try {
-            Long providerId = NumberUtil.toLong(request.JSON.providerId)
-            Long dataScriptId = NumberUtil.toLong(request.JSON.dataScriptId)
-            boolean isUnique = dataScriptService.validateUniqueName(name, dataScriptId, providerId)
-            renderSuccessJson([isUnique: isUnique])
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        Long providerId = NumberUtil.toLong(request.JSON.providerId)
+        Long dataScriptId = NumberUtil.toLong(request.JSON.dataScriptId)
+        boolean isUnique = dataScriptService.validateUniqueName(name, dataScriptId, providerId)
+        renderSuccessJson([isUnique: isUnique])
     }
 
     /**
@@ -102,13 +84,9 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptView)
     def getDataScripts () {
-        try {
-            Long providerId = NumberUtil.toLong(request.JSON.providerId)
-            List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)
-            renderSuccessJson(dataScripts*.toMap())
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        Long providerId = NumberUtil.toLong(request.JSON.providerId)
+        List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)
+        renderSuccessJson(dataScripts*.toMap())
     }
 
     /**
@@ -119,13 +97,20 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptDelete)
     def deleteDataScript (Long id) {
-        try {
-            dataScriptService.deleteDataScript(id)
-            renderSuccessJson([status: DELETE_OK_MESSAGE])
-        } catch (Exception e) {
-            handleException(e, logger)
-        }
+        dataScriptService.deleteDataScript(id)
+        renderSuccessJson([status: DELETE_OK_MESSAGE])
     }
+
+    /**
+     * Determine if the given DataScript can be safely deleted.
+     * @param id
+     * @return
+     */
+    @HasPermission(Permission.DataScriptDelete)
+    def validateDelete(Long id) {
+        renderSuccessJson(dataScriptService.checkDataScriptReferences(id))
+    }
+
 
     /**
      * Runs the script against the data provided and returns resulting transformed data
@@ -188,12 +173,7 @@ class WsDataScriptController implements ControllerMethods {
 
         Project project = securityService.getUserCurrentProjectOrException()
 
-        DataScript dataScript = fetchDomain(DataScript, [id: command.id])
-
-        if (!dataScript) {
-            sendNotFound()
-            return
-        }
+        DataScript dataScript = dataScriptService.getDataScript(command.id)
 
         if (dataScript.project != project) {
             securityService.reportViolation("attempted to ACTION dataview ($command.id) not assoc with project")
