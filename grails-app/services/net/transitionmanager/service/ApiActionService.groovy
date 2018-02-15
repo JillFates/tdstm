@@ -360,9 +360,6 @@ class ApiActionService implements ServiceMethods {
 		// Populate the apiAction with the properties from the command object.
 		apiAction.properties = apiActionCommand.properties
 
-		// set the apiAction.methodParams JSON Object (Should be validated when set? or Saved? or both?)
-		apiAction.methodParams = apiActionCommand.methodParams
-
 		apiAction.save(failOnError: true)
 		return apiAction
 

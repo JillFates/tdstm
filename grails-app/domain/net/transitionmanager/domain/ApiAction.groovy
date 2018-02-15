@@ -17,7 +17,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  * The ApiAction domain represents the individual mapped API methods that can be
  * invoked by the TransitionManager application in Tasks and other places.
  */
-@Slf4j(value='logger')
+@Slf4j
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
@@ -179,7 +179,7 @@ class ApiAction {
 			try {
 				list = slurper.parseText(methodParams)
 			} catch (e) {
-				logger.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
+				log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 			}
 		}
 		return list
@@ -251,7 +251,7 @@ class ApiAction {
 		// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
 		for (key in reactionJson.keySet()) {
 			if (!ReactionScriptCode.lookup(key)) {
-				logger.warn("Unrecognized key $key in reaction JSON.")
+				log.warn("Unrecognized key $key in reaction JSON.")
 				invalidKeys << key
 				errors = true
 			}
