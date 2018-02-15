@@ -1,6 +1,6 @@
 import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
@@ -12,7 +12,7 @@ import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS, DATA_TYPES, KEYSTROKE} from '../../../../shared/model/constants';
+import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
 import {AgentModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
 import {DataScriptModel} from '../../model/data-script.model';
 import {NgForm} from '@angular/forms';
@@ -50,6 +50,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
+	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 
 	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
@@ -79,7 +80,6 @@ export class APIActionViewEditComponent implements OnInit {
 	public selectedInterval = {value: 0, interval: ''};
 	public selectedLapsed = {value: 0, interval: ''};
 	public selectedStalled = {value: 0, interval: ''};
-	public dataTypes = DATA_TYPES;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public commonFieldSpecs;
 	public assetClassesForParameters = [
@@ -97,17 +97,13 @@ export class APIActionViewEditComponent implements OnInit {
 			value: 'Device'
 		}, {
 			assetClass: 'STORAGE',
-			value: 'Logical Storage'
-		}, {
-			assetClass: 'TASK',
-			value: 'Task'
+			value: 'Storage'
 		}, {
 			assetClass: 'USER_DEFINED',
 			value: 'User Defined'
 		}
 	];
 	private currentTab = 0;
-	public isEditing = false;
 	private initFormLoad = true;
 	private codeMirror = {
 		mode: {
@@ -117,12 +113,10 @@ export class APIActionViewEditComponent implements OnInit {
 		cols: 4
 	};
 	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}]
+		sort: []
 	};
 	public validInfoForm = false;
+	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
 	constructor(
@@ -132,8 +126,7 @@ export class APIActionViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private customDomainService: CustomDomainService,
-		private dialogService: UIDialogService) {
+		private customDomainService: CustomDomainService) {
 
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
@@ -143,12 +136,12 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 
 		this.dataSignature = JSON.stringify(this.apiActionModel);
+		this.parameterList = process([], this.state);
 
 		this.getProviders();
 		this.getAgents();
 		this.getCredentials();
 		this.getDataScripts();
-		this.getParameters();
 		this.getCommonFieldSpecs();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 	}
@@ -250,12 +243,12 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of existing parameters for the API Action
 	 */
 	getParameters(): void {
-		this.dataIngestionService.getParameters().subscribe(
+		this.dataIngestionService.getParameters(this.apiActionModel).subscribe(
 			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
-					this.parameterList = process([], this.state);
-				}
 				this.parameterList = process(result, this.state);
+				this.parameterList.data.forEach((parameter) => {
+					this.onContextValueChange(parameter);
+				});
 			},
 			(err) => console.log(err));
 	}
@@ -267,6 +260,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.customDomainService.getCommonFieldSpecs().subscribe(
 			(result: any) => {
 				this.commonFieldSpecs = result;
+				if (this.modalType !== ActionType.CREATE) {
+					this.getParameters();
+				}
 			},
 			(err) => console.log(err));
 	}
@@ -275,15 +271,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.validateAllSyntax().subscribe(() => {
-			if (!this.invalidScriptSyntax) {
-				this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
-					(result: any) => {
-						this.activeDialog.close(result);
-					},
-					(err) => console.log(err));
-			}
-		});
+		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
+			(result: any) => {
+				this.activeDialog.close(result);
+			},
+			(err) => console.log(err));
 	}
 
 	/**
@@ -298,7 +290,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
+		if (this.isDirty() || !this.validParametersForm) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
@@ -389,6 +381,10 @@ export class APIActionViewEditComponent implements OnInit {
 				}
 			}
 			this.initFormLoad = false;
+		}
+
+		if (this.apiActionParametersForm) {
+			this.validParametersForm = this.apiActionParametersForm.valid;
 		}
 	}
 
@@ -499,24 +495,16 @@ export class APIActionViewEditComponent implements OnInit {
 		eventReaction.open = !eventReaction.open;
 	}
 
-	onEditParameters(): void {
-		this.isEditing = true;
-	}
-
 	/**
 	 * Add a new argument to the list of parameters and refresh the list.
 	 */
 	onAddParameter(): void {
 		this.parameterList.data.push({
-			id: 0,
-			name: '',
-			description: '',
-			dataType: '',
-			context: {
-				value: '',
-				assetClass: ''
-			},
-			field: '',
+			param: '',
+			desc: '',
+			type: 'string',
+			context: '',
+			property: '',
 			currentFieldList: [],
 			value: ''
 		});
@@ -529,18 +517,26 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	onContextValueChange(dataItem: APIActionParameterModel): void {
 		let fieldSpecs = this.commonFieldSpecs.find((spec) => {
-			return spec.domain === dataItem.context.assetClass;
+			return spec.domain === dataItem.context;
 		});
 		if (fieldSpecs) {
 			dataItem.currentFieldList = fieldSpecs.fields;
+			let property = dataItem.currentFieldList.find((field) => {
+				return field.field === dataItem.property;
+			});
+			if (property) {
+				dataItem.property = property.field;
+			}
 		}
+
+		this.verifyIsValidForm();
 	}
 
 	/**
 	 * Delete from the paramaters the argument passed.
 	 * @param dataItem
 	 */
-	onDelete(dataItem: APIActionParameterModel): void {
+	onDeleteParameter(dataItem: APIActionParameterModel): void {
 		let parameterIndex = this.parameterList.data.indexOf(dataItem);
 		if (parameterIndex >= 0) {
 			this.parameterList.data.splice(parameterIndex, 1);
@@ -613,6 +609,10 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	public refreshParametersList(): void {
 		this.parameterList = process(this.parameterList.data, this.state);
+		// Wait 500 after the Grid has fully process the new params
+		setTimeout(() => {
+			this.verifyIsValidForm();
+		}, 100);
 	}
 
 	/**
@@ -631,4 +631,19 @@ export class APIActionViewEditComponent implements OnInit {
 	isViewMode(): boolean {
 		return this.modalType === this.actionTypes.VIEW;
 	}
+
+	/**
+	 * Get the Label value to show on the UI like Application instead of APPLICATION
+	 * @param context
+	 * @returns {string}
+	 */
+	getAssetClassValue(context: any): string {
+		let assetClass = this.assetClassesForParameters.find((param) => {
+			return param.assetClass === context;
+		});
+		if (assetClass && assetClass.value) {
+			return assetClass.value;
+		}
+		return context;
+	};
 }

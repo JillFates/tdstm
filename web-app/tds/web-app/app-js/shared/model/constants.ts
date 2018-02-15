@@ -30,6 +30,4 @@ export enum DIALOG_SIZE {
 	XLG = 'xlg'
 };
 
-export const DATA_TYPES = ['String', 'No Idea'];
-
 export const ERROR_STATUS = 'error';
