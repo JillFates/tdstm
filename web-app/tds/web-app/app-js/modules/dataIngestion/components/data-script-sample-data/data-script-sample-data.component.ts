@@ -26,7 +26,6 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		options : [
 			{ text: 'Select a format', value: -1 },
 			{ text: 'csv', value: 0 },
-			{ text: 'txt', value: 1 },
 			{ text: 'xml', value: 2 },
 			{ text: 'json', value: 3 }
 		],

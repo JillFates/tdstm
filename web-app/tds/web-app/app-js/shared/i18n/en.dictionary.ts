@@ -54,8 +54,8 @@ export const en_DICTIONARY: Object = {
 				'CHECK_SYNTAX': 'Check Syntax',
 				'LOAD_SAMPLE_DATA': 'Load Sample Data',
 				'VIEW_CONSOLE': 'View Console',
-				'FILE_EXTENSION': 'File Extension',
-				'PASTE_CONTENT': 'Paste content (CSV, TXT, JSON, XML)',
+				'FILE_TYPE': 'File Type',
+				'PASTE_CONTENT': 'Paste content (CSV, JSON, XML)',
 				'UPLOAD_FILE': 'Upload file (Excel, CSV, JSON, XML)',
 				'FETCH_DATA_FROM_WEBSERVICE': 'Fetch data from web service',
 				'PRESENTLY_THERE_ARE_NO_DATASOURCES': 'Presently there are no data source actions defined.'
