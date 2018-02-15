@@ -70,7 +70,7 @@ export class APIActionParameterColumnModel {
 				locked: true
 			}, {
 				label: 'Name',
-				property: 'name',
+				property: 'param',
 				type: 'text',
 				width: 210
 			}, {
@@ -85,7 +85,7 @@ export class APIActionParameterColumnModel {
 				width: 265
 			}, {
 				label: 'Description',
-				property: 'description',
+				property: 'desc',
 				type: 'text',
 				width: 310
 			}
@@ -219,19 +219,13 @@ export class EventReaction {
 }
 
 export class APIActionParameterModel {
-	id?: number;
-	name?: string;
-	description?: string;
-	dataType?: string;
-	context?: ParameterContextModel;
+	param?: string;
+	desc?: string;
+	type?: string;
+	context?: string;
+	property?: string;
 	value?: string;
-	field?: string;
 	currentFieldList?: Array<any>;
-}
-
-export class ParameterContextModel {
-	assetClass?: string;
-	value?: string;
 }
 
 export enum EventReactionType {

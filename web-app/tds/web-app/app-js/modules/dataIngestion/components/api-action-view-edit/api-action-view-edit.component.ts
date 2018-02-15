@@ -243,7 +243,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of existing parameters for the API Action
 	 */
 	getParameters(): void {
-		this.dataIngestionService.getParameters().subscribe(
+		this.dataIngestionService.getParameters(this.apiActionModel).subscribe(
 			(result: any) => {
 				this.parameterList = process(result, this.state);
 				this.parameterList.data.forEach((parameter) => {
@@ -273,7 +273,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onSaveApiAction(): void {
 		this.validateAllSyntax().subscribe(() => {
 			if (!this.invalidScriptSyntax) {
-				this.dataIngestionService.saveAPIAction(this.apiActionModel).subscribe(
+				this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 					(result: any) => {
 						this.activeDialog.close(result);
 					},
@@ -504,14 +504,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	onAddParameter(): void {
 		this.parameterList.data.push({
-			id: 0,
-			name: '',
-			description: '',
-			context: {
-				value: '',
-				assetClass: ''
-			},
-			field: '',
+			param: '',
+			desc: '',
+			type: 'string',
+			context: '',
+			property: '',
 			currentFieldList: [],
 			value: ''
 		});
@@ -524,13 +521,14 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	onContextValueChange(dataItem: APIActionParameterModel): void {
 		let fieldSpecs = this.commonFieldSpecs.find((spec) => {
-			return spec.domain === dataItem.context.assetClass;
+			return spec.domain === dataItem.context;
 		});
 		if (fieldSpecs) {
 			dataItem.currentFieldList = fieldSpecs.fields;
-			dataItem.field = dataItem.currentFieldList.find((field) => {
-				return field.field === dataItem.value;
+			let property = dataItem.currentFieldList.find((field) => {
+				return field.field === dataItem.property;
 			});
+			dataItem.property = property.field;
 		}
 
 		this.verifyIsValidForm();
@@ -635,4 +633,19 @@ export class APIActionViewEditComponent implements OnInit {
 	isViewMode(): boolean {
 		return this.modalType === this.actionTypes.VIEW;
 	}
+
+	/**
+	 * Get the Label value to show on the UI like Application instead of APPLICATION
+	 * @param context
+	 * @returns {string}
+	 */
+	getAssetClassValue(context: any): string {
+		let assetClass = this.assetClassesForParameters.find((param) => {
+			return param.assetClass === context;
+		});
+		if(assetClass && assetClass.value) {
+			return assetClass.value;
+		}
+		return context;
+	};
 }

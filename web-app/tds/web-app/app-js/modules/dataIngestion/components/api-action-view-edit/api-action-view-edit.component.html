@@ -282,15 +282,16 @@
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'name'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.name" style="width: 100%; height: 30px;" required [ngClass]="{'has-error': dataItem.name.length <= 0}" />
+											<div *ngIf="column.type === 'text' && column.property === 'param'">
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" style="width: 100%; height: 30px;" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
 														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
 														[data]="assetClassesForParameters"
 														[textField]="'value'"
-														[valueField]="'value'"
+														[valueField]="'assetClass'"
+														[valuePrimitive]="true"
 														(valueChange)="onContextValueChange(dataItem)"
 														[(ngModel)]="dataItem.context"
 														required
@@ -298,21 +299,37 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" style="width: 100%; height: 30px;" />
-												<kendo-combobox *ngIf="dataItem.context.assetClass !== 'USER_DEFINED'"
+												<input *ngIf="dataItem.context === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" style="width: 100%; height: 30px;" />
+												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
 																[textField]="'field'"
 																[valueField]="'field'"
-																[(ngModel)]="dataItem.field"
+																[valuePrimitive]="true"
+																[(ngModel)]="dataItem.property"
 																(valueChange)="verifyIsValidForm()"
 																required
-																[ngClass]="{'has-error': !dataItem.field}" >
+																[ngClass]="{'has-error': !dataItem.property}" >
 												</kendo-combobox>
 											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'description'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.description" style="width: 100%; height: 30px;" />
+											<div *ngIf="column.type === 'text' && column.property === 'desc'">
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.desc" style="width: 100%; height: 30px;" />
+											</div>
+										</ng-template>
+										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+											<div *ngIf="column.type === 'text' && column.property === 'param'">
+												<span>{{dataItem.param}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
+												<span>{{getAssetClassValue(dataItem.context)}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'value'">
+												<span *ngIf="dataItem.context === 'USER_DEFINED'">{{dataItem.value}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'desc'">
+												<span>{{dataItem.desc}}</span>
 											</div>
 										</ng-template>
 									</kendo-grid-column>
