@@ -40,7 +40,7 @@
 								<div class="checkboxdiv_control">
 									<g:each in="${dependencyType}" var="dependency">
 										<input type="checkbox" id="${dependency}"
-											   name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
+												 name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
 										<span id="dependecy_${dependency}"> ${dependency}</span>
 										<br />
 									</g:each>
@@ -51,7 +51,7 @@
 								<div class="checkboxdiv_control">
 									<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 										<input type="checkbox" id="${dependencyStatusInst}"
-											   name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
+												 name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
 										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
 										<br />
 									</g:each>
@@ -387,11 +387,31 @@
 			$(document).ready(function () {
 				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
-				var showMap = '${showMap}';
-				if(showMap == "true") {
+					debugger;
+				var showTabs = '${showTabs}';
+				if(showTabs == "true") {
 						// TM-8842, show the Dependency Analyzer Map, drilled-in from the group Id
-						getList("apps", '${groupId}');
-						getList("graph", '${groupId}');
+						getList("apps", '${groupId}'); // needed to show the selected groupId in the table, and for the other tabs to work
+						switch ('${tabName}') {
+								case "apps":
+										break; // do nothing, we are already there
+								case "map":
+										getList("graph", '${groupId}');
+										break;
+								case "all":
+										getList("all", '${groupId}');
+										break;
+								case "servers":
+										getList("server", '${groupId}');
+										break;
+								case "databases":
+										getList("database", '${groupId}');
+										break;
+								case "storage":
+										getList("files", '${groupId}');
+										break;
+						}
+
 				}
 			});
 

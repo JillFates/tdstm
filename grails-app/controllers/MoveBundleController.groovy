@@ -7,6 +7,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.DependencyAnalyzerTabs
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -34,6 +35,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -920,10 +922,20 @@ class MoveBundleController implements ControllerMethods {
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
+		// Check for correct URL params
+		if ( params.subsection || params.groupId) { // is the drill-in URL
+			if (!(params.subsection && params.groupId)) { // If any exists, then both should be present in the URL
+				throw new InvalidParamException("Subsection and Group Id params are both required.")
+			}
+			String subsection = params.subsection as String // Check for valid tab name
+			if (!(subsection.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
+				throw new InvalidParamException("Invalid Subsection name: ${subsection}")
+			}
+		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
 			params.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null, false, params.groupId)
+		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null, false, params.subsection, params.groupId)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map
