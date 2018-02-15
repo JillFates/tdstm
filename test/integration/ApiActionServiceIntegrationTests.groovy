@@ -163,6 +163,24 @@ class ApiActionServiceIntegrationTests extends Specification {
 			paramsList[0].desc
 	}
 
+
+	def '4.2 Tests for ApiAction.listMethodParams'() {
+		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
+		setup:
+			List paramsList
+
+		when: 'accessing the methodParamsList property a.k.a. methodParamsList()'
+			paramsList = action.listMethodParams
+		then: 'a list containing a map representing each of the method params should be returned'
+			paramsList
+			paramsList.size() == 3
+		and: 'the first map in the list should be the taskId as defined paramsJson above'
+			paramsList[0].param == 'taskId'
+			paramsList[0].context == 'TASK'
+			paramsList[0].property == 'id'
+			paramsList[0].desc
+	}
+
 	def '5. Test for AssetComment.actionInvocable'() {
 		// TODO : JPM 2/2017 : This test should be refactored into a spec for ApiAction domain
 
@@ -236,11 +254,13 @@ class ApiActionServiceIntegrationTests extends Specification {
 	}
 
 	@Ignore
-	def '8. tests not yet implemented'() {
+	def "8. tests not yet implemented"() {
 		//		expect: 'when calling invoke without a valid context that an exception occurs'
 		//			false
 		//		expect: 'when calling invoke with a defined parameter that references an undefined property that an an exception occurs'
 		//			false
+		expect:
+				true
 	}
 
 	def "9. tests deleting an ApiAction and other related methods"() {
@@ -345,6 +365,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 				pollingStalledAfter = 0
 				useWithTask = 0
 				useWithAsset = 0
+				methodParams = """
+						[ {
+							"param":"assetId",
+							"desc": "The unique id to reference the asset",
+							"type":"string",
+							"context": "${ContextType.ASSET.toString()}",
+							"property": "id",
+							"value": "user def value"
+						}]
+				"""
 			}
 
 		when: "Creating an API Action"
@@ -368,6 +398,16 @@ class ApiActionServiceIntegrationTests extends Specification {
 			cmd.agentClass = "AWS"
 			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
 		then: "The invalid reference makes the validation fail with a ValidationException."
+			thrown ValidationException
+
+		when: "methodParams contains an invalid JSON "
+			cmd.methodParams = """
+				[ {
+					'param':"assetId"
+				} ]
+			"""
+			apiAction2 = apiActionService.saveOrUpdateApiAction(cmd, null, project)
+		then: "The invalid JSON makes the validation fail with a ValidationException."
 			thrown ValidationException
 	}
 
