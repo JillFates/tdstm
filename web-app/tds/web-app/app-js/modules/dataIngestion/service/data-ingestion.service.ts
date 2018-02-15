@@ -234,6 +234,9 @@ export class DataIngestionService {
 		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
+			parameterList.data.forEach( (param) => {
+				delete param.currentFieldList;
+			});
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);
 		}
 

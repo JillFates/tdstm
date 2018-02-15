@@ -524,7 +524,9 @@ export class APIActionViewEditComponent implements OnInit {
 			let property = dataItem.currentFieldList.find((field) => {
 				return field.field === dataItem.property;
 			});
-			dataItem.property = property.field;
+			if (property) {
+				dataItem.property = property.field;
+			}
 		}
 
 		this.verifyIsValidForm();
