@@ -605,7 +605,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm || invalidScriptSyntax ">
+		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm ">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>

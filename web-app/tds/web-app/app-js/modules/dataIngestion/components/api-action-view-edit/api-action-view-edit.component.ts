@@ -271,15 +271,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveApiAction(): void {
-		this.validateAllSyntax().subscribe(() => {
-			if (!this.invalidScriptSyntax) {
-				this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
-					(result: any) => {
-						this.activeDialog.close(result);
-					},
-					(err) => console.log(err));
-			}
-		});
+		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
+			(result: any) => {
+				this.activeDialog.close(result);
+			},
+			(err) => console.log(err));
 	}
 
 	/**
@@ -643,7 +639,7 @@ export class APIActionViewEditComponent implements OnInit {
 		let assetClass = this.assetClassesForParameters.find((param) => {
 			return param.assetClass === context;
 		});
-		if(assetClass && assetClass.value) {
+		if (assetClass && assetClass.value) {
 			return assetClass.value;
 		}
 		return context;
