@@ -548,7 +548,8 @@ class CustomTagLib implements InitializingBean {
 			out << " "
 		} else {
 			def value = dependencyGroupValueWithTooltip(attrs.groupId)
-			def url = g.link( mapping: "dependencyConsoleMap", params: [groupId:attrs.groupId], value)
+			def tabName = attrs.tab ?: 'map'
+			def url = g.link( mapping: "dependencyConsoleMap", params: [groupId:attrs.groupId, subsection: tabName], value)
 			out << url
 		}
 	}
