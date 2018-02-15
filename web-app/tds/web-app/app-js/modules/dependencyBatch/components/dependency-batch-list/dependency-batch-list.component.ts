@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {DependencyBatchColumnsModel} from '../../model/import-batch.model';
+import {DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -44,7 +44,8 @@ export class DependencyBatchListComponent {
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
 		}
-		this.dependencyBatchService.getImportBatches().subscribe(result => {
+		this.dependencyBatchService.getImportBatches().subscribe( (result: Array<ImportBatchModel>) => {
+			console.log(result);
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
 		});
 	}

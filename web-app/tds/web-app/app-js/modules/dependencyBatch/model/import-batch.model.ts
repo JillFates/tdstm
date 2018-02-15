@@ -1,24 +1,26 @@
 import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
 import {ProviderModel} from '../../dataIngestion/model/provider.model';
 import {DataScriptModel} from '../../dataIngestion/model/data-script.model';
+import {ProjectModel} from '../../../shared/model/project.model';
 
 export class ImportBatchModel {
 	id: number;
 	status: string;
 	domainClassName: string;
+	project: ProjectModel;
 	provider: ProviderModel;
 	datascript: DataScriptModel;
 	createdBy: string;
 	archived: boolean;
-	timezone: any;
-	dateFormat: any;
+	timezone: string;
+	dateFormat: string;
 	progressInfoJob: any;
 	originalFilename: string;
-	nullIndicator: any;
-	overwriteWithBlanks: any;
-	autoProcess: any;
+	nullIndicator: string;
+	overwriteWithBlanks: number;
+	autoProcess: number;
 	warnOnChangesAfter: any;
-	fieldNameList: Array<any>;
+	fieldNameList: Array<string>;
 	dateCreated: Date;
 	lastUpdated: Date;
 	// TODO: check if this is going to be implemented on backend ..
