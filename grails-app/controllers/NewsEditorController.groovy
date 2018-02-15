@@ -12,7 +12,6 @@ import net.transitionmanager.domain.Project
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ControllerService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -22,7 +21,6 @@ class NewsEditorController implements ControllerMethods {
 
 	ControllerService controllerService
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	static defaultAction = 'newsEditorList'

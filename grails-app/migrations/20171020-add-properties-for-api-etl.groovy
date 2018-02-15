@@ -19,6 +19,11 @@ databaseChangeLog = {
 
     changeSet(author: "jmartin", id: "20171020 TM-7807_02") {
         comment("Add column provider to ApiAction table")
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                columnExists(tableName: 'api_action', columnName: 'provider_id')
+            }
+        }
 
         addColumn(tableName: 'api_action') {
             column(name: 'provider_id', type: 'BIGINT(20)', defaultValueNumeric:0) {

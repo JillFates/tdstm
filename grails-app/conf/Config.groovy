@@ -349,13 +349,7 @@ tdsops.buildFile = "/build.txt"
 //tdstm.security.auditLogging = "access"
 
 tdstm {
-	// TM-8654 - added the AWS credentials temporarily
-	credentials {
-		aws {
-			accessKey = 'AKIAJQVV5RZ45K6T5GRA'
-			secretKey = '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'
-		}
-	}
+	
 }
 
 grails {

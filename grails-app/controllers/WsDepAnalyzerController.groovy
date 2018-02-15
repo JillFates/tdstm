@@ -5,7 +5,6 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.SecurityService
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.service.InvalidParamException
 import grails.converters.JSON
@@ -20,7 +19,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 class WsDepAnalyzerController implements ControllerMethods {
 
 	JdbcTemplate jdbcTemplate
-	SecurityService securityService
 
 	/** Returns a list of people that are app owners or SMEs associated to applications in a dependency group
 	 * @param depGroup - the dependency group number or 'onePlus'

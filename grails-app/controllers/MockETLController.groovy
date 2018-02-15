@@ -35,17 +35,17 @@ read labels
 
 iterate {
     domain Application
-    
+
     extract 1 load id
     extract 'model name' transform with lowercase() load Name
     extract 3 transform with uppercase() load description
-    
+
     set environment with 'Production'
     //reference id with id
     reference assetName, id with Name, id
 
     domain Device
-    
+
     extract 1 load id
     extract 'model name' transform with uppercase() load Name
 }
@@ -134,7 +134,7 @@ iterate {
         switch (request.method) {
             case 'GET':
                 if (!id) {
-                    sendInvalidInput('Please provide Data Script Id')
+                    sendInvalidInput('Please provide DataScript Id')
                     return
                 }
                 DataScript script = DataScript.findByProjectAndId(project, id)
@@ -148,7 +148,7 @@ iterate {
 
             case 'POST':
                 if (!id) {
-                    sendInvalidInput('Please provide Data Script Id')
+                    sendInvalidInput('Please provide DataScript Id')
                     return
                 }
                 DataScript script = DataScript.findByProjectAndId(project, id)

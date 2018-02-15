@@ -75,7 +75,7 @@ export class FieldSettingsListComponent implements OnInit {
 					if (this.fieldsToDelete[domain.domain].length > 0) {
 						this.fieldsToDelete[domain.domain].forEach(field => {
 							let index = domain.fields.findIndex(x => x.field === field);
-							if (index) {
+							if (index !== -1) {
 								domain.fields.splice(index, 1);
 							}
 						});

@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil

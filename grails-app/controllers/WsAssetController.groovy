@@ -1,7 +1,9 @@
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
@@ -9,7 +11,18 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.service.*
+import net.transitionmanager.service.ApplicationService
+import net.transitionmanager.service.AssetEntityService
+import net.transitionmanager.service.AssetService
+import net.transitionmanager.service.ControllerService
+import net.transitionmanager.service.DatabaseService
+import net.transitionmanager.service.DeviceService
+import net.transitionmanager.service.SecurityService
+import net.transitionmanager.service.StorageService
+import net.transitionmanager.service.UserPreferenceService
+import org.grails.datastore.mapping.query.api.BuildableCriteria
+import grails.gsp.PageRenderer
+import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 import java.text.DateFormat
 
@@ -20,12 +33,14 @@ import java.text.DateFormat
 @Slf4j
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
-	SecurityService securityService
-	AssetEntityService assetEntityService
-	PageRenderer groovyPageRenderer
-	ControllerService controllerService
+
 	ApplicationService applicationService
+	AssetEntityService assetEntityService
+	AssetService assetService
+	ControllerService controllerService
+	DatabaseService databaseService
 	DeviceService deviceService
+	PageRenderer groovyPageRenderer
 	StorageService storageService
 	UserPreferenceService userPreferenceService
 
@@ -217,6 +232,16 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
+   /**
+    * Delete multiple Asset Dependencies.
+    * @param : dependencyIds[]  : list of ids for which assets are requested to be deleted
+    */
+   @HasPermission(Permission.AssetEdit)
+   def bulkDeleteDependencies(){
+      Project project = projectForWs
+      renderAsJson(resp: assetService.bulkDeleteDependencies(project, params.list("dependencyIds[]")))
+   }
+
 	/**
 	 * Update Asset Dependency Fields
 	 * @return
@@ -261,13 +286,15 @@ class WsAssetController implements ControllerMethods {
 			case "STORAGE":
 				model << storageService.getModelForShow(asset.project, asset, params)
 				break
+			case "DATABASE":
+				model << databaseService.getModelForShow(asset.project, asset, params)
+				break
 			default:
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
 				break
 		}
 
 		domainName=domainName.toLowerCase()
-
 		try {
 			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
 			if (pageHtml) {
@@ -320,5 +347,24 @@ class WsAssetController implements ControllerMethods {
 	def deleteAssets() {
 		String message = assetEntityService.deleteBulkAssets(projectForWs, 'Assets', request.getJSON().ids)
 		renderSuccessJson(message:message)
+	}
+
+	/**
+	 * This end point gets called from the View Manager when the user tries to export a View.
+	 * This generates the required filename in the appropriate format and returns it to the front end.
+	 * The file name is returned with no file extension as is attached by the View Manager.
+	 * Also the date is not returned, as it will be attached by the front end.
+	 *
+	 * @param viewName  The name of the view to save provided by the user
+	 * @return  The full file name formatted according to the given rules for a View Manager export file.
+	 */
+	def exportFilename() {
+		Project project = securityService.userCurrentProject
+		String viewName = request.JSON.viewName
+		if (!viewName) {
+			return renderFailureJson('Error: viewName cannot be null.')
+		}
+		Map params = [project: project, viewName: viewName, excludeDate: true]
+		return renderSuccessJson(FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params))
 	}
 }

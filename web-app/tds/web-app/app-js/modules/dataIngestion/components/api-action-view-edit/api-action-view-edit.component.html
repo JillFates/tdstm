@@ -141,8 +141,8 @@
 									</div>
 									<div class="col-md-5">
 										<div class="form-check">
-											<label class="form-check-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
+											<label class="form-check-label aligned-label" for="apiActionPollingInterval">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -229,14 +229,14 @@
 											</div>
 										</div>
 										<div class="form-check">
-											<label for="apiActionProduceData" class="form-check-label">
-												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
+											<label for="apiActionProduceData" class="form-check-label aligned-label">
+												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Provides Data
 											</label>
 											<popup-provides-data></popup-provides-data>
 										</div>
 										<div class="form-group intervals-content">
-											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default Data Script:</label>
+											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
 											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist
 																	id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"

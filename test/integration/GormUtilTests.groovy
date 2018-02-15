@@ -11,16 +11,21 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import com.tds.asset.AssetDependency
+import net.transitionmanager.domain.PartyRelationship
+
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Workflow
-
+import net.transitionmanager.service.PersonService
+import net.transitionmanager.service.ProjectService
+import grails.validation.Validateable
 
 class GormUtilTests extends Specification {
 
 	// IOC variables
 	def sessionFactory
-	def personService
+	PersonService personService
+	ProjectService projectService
 	PersonTestHelper personHelper
 	AssetTestHelper assetHelper
 	ProjectTestHelper projectHelper
@@ -31,7 +36,7 @@ class GormUtilTests extends Specification {
 		personHelper = new PersonTestHelper()
 	}
 
-	def "Test isDomainClass"() {
+	def "1. Test isDomainClass"() {
 		expect:
 			GormUtil.isDomainClass(new AssetDependency())
 			GormUtil.isDomainClass(Person)
@@ -39,7 +44,7 @@ class GormUtilTests extends Specification {
 			! GormUtil.isDomainClass(Date)
 	}
 
-	def "Test the getConstraintMaxSize"() {
+	def "2. Test the getConstraintMaxSize"() {
 		// Positive test first
 		when:
 			AssetDependency domain = new AssetDependency()
@@ -77,7 +82,7 @@ class GormUtilTests extends Specification {
 	/*
 	 * TODO Burt appeared to delete the bindData method from GormUtil
 	 *
-	def "Test the bindData functionality"() {
+	def "3. Test the bindData functionality"() {
 		when:
 			Map args = [firstName: 'robin', lastName: 'banks']
 			def pmap = new GrailsParameterMap(args, null)
@@ -103,7 +108,7 @@ class GormUtilTests extends Specification {
 	}
 	*/
 
-	def "Test persistentProperties"() {
+	def "4. Test persistentProperties"() {
 		when:
 			Person p = new Person()
 			List props = GormUtil.persistentProperties(p)
@@ -114,7 +119,7 @@ class GormUtilTests extends Specification {
 			! props.contains('assignedProjects')
 	}
 
-	def "Test cloneDomain"() {
+	def "5. Test cloneDomain"() {
 		when:
 			Person p = new Person(firstName:'Jack', middleName:'B', lastName:'Nimble')
 			Person n = GormUtil.cloneDomain(p, [lastName:'Quick'])
@@ -128,7 +133,7 @@ class GormUtilTests extends Specification {
 
 	}
 
-	def "Test hasCompositeKey"() {
+	def "6. Test hasCompositeKey"() {
 		expect:
 			GormUtil.hasCompositeKey(PartyRelationship)
 			! GormUtil.hasCompositeKey(Project)
@@ -139,7 +144,7 @@ class GormUtilTests extends Specification {
 			RuntimeException e = thrown()
 	}
 
-	def "Test getCompositeKeyProperties"() {
+	def "7. Test getCompositeKeyProperties"() {
 		when:
 			List list = GormUtil.getCompositeKeyProperties(PartyRelationship)
 		then:
@@ -154,7 +159,7 @@ class GormUtilTests extends Specification {
 
 	}
 
-	def 'Test getConstrainedProperties'() {
+	def '8. Test getConstrainedProperties'() {
 		when:
 			Map cp = GormUtil.getConstrainedProperties(Person)
 		then:
@@ -162,7 +167,7 @@ class GormUtilTests extends Specification {
 			cp['lastName']
 	}
 
-	def 'Test getConstrainedProperty'() {
+	def '9. Test getConstrainedProperty'() {
 		when:
 			ConstrainedProperty cp = GormUtil.getConstrainedProperty(Person, 'firstName')
 			Range range = cp.getAppliedConstraint('size').getRange()
@@ -179,7 +184,7 @@ class GormUtilTests extends Specification {
 
 	}
 
-	def 'Test getConstraint'() {
+	def '10. Test getConstraint'() {
 		when:
 			Constraint cp = GormUtil.getConstraint(Person, 'firstName', 'blank')
 		then:
@@ -205,7 +210,7 @@ class GormUtilTests extends Specification {
 			cp.getMaxSize() > 16380000
 	}
 
-	def 'Test getConstraintUniqueProperties'() {
+	def '11. Test getConstraintUniqueProperties'() {
 		when:
 			List props = GormUtil.getConstraintUniqueProperties(AssetDependency, 'asset')
 		then:
@@ -215,7 +220,7 @@ class GormUtilTests extends Specification {
 	}
 
 
-	def 'Test canDomainPropertyBeReplaced'() {
+	def '12. Test canDomainPropertyBeReplaced'() {
 		expect:
 			GormUtil.canDomainPropertyBeReplaced(PartyRelationship, 'comment') == true
 
@@ -231,13 +236,13 @@ class GormUtilTests extends Specification {
 	}
 
 
-	def 'Test canDomainPropertiesBeReplaced'() {
+	def '13. Test canDomainPropertiesBeReplaced'() {
 		expect:
 			GormUtil.canDomainPropertiesBeReplaced(PartyRelationship, ['comment', 'statusCode'] ) == true
 			GormUtil.canDomainPropertiesBeReplaced(PartyRelationship, ['comment', 'partyIdFrom'] ) == false
 	}
 
-	def 'Test getDomainProperty'() {
+	def '14. Test getDomainProperty'() {
 		when:
 			GrailsDomainClassProperty prop = GormUtil.getDomainProperty(Person, 'firstName')
 		then:
@@ -264,7 +269,7 @@ class GormUtilTests extends Specification {
 			org.codehaus.groovy.grails.exceptions.InvalidPropertyException e = thrown()
 	}
 
-	def 'Testing isCompositeProperty'() {
+	def '15. Testing isCompositeProperty'() {
 		expect:
 			! GormUtil.isCompositeProperty(Person, 'firstName')
 			GormUtil.isCompositeProperty(PartyRelationship, 'partyIdFrom')
@@ -280,7 +285,7 @@ class GormUtilTests extends Specification {
 			! GormUtil.isCompositeProperty(Person, property)
 	}
 
-	def 'Testing findAllByProperties'() {
+	def '16. Testing findAllByProperties'() {
 		when:
 			def projectHelper = new ProjectTestHelper()
 			Project project = projectHelper.getProject()
@@ -317,7 +322,7 @@ class GormUtilTests extends Specification {
 		return wf
 	}
 
-	def 'Testing mergeDomainReferences'() {
+	def '17. Testing mergeDomainReferences'() {
 		// This logic need to test several different aspects of merging persons which include:
 		//    1. Replacing references (e.g. Workflow.updatedBy)
 		//    2. Cloning domain where references are part of domain identity (e.g. PartyRelationship)
@@ -334,7 +339,8 @@ class GormUtilTests extends Specification {
 			String extraTeam = 'DB_ADMIN'
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'From'])
-			personService.addToProjectTeam(adminPerson.userLogin, project.id.toString(), fromPerson.id.toString(), extraTeam, results)
+
+			projectService.addTeamMember(project, fromPerson, extraTeam)
 
 			Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'To'])
 
@@ -377,7 +383,7 @@ class GormUtilTests extends Specification {
 
 	}
 
-	def 'Testing mergeDomainReferences for invalid parameters'() {
+	def '18. Testing mergeDomainReferences for invalid parameters'() {
 		when: 'called with non-domain classes'
 			GormUtil.mergeDomainReferences(new Date(), new Date())
 		then: 'an exception should occur'
@@ -393,7 +399,7 @@ class GormUtilTests extends Specification {
 	}
 
 	/*
-	void testGetDomainPropertiesWithConstraint() {
+	void '19. testGetDomainPropertiesWithConstraint'() {
 
 		def list
 
@@ -441,8 +447,9 @@ class GormUtilTests extends Specification {
 			// note
 			// score inList:[1,2,3,4,5]
 	}
+
 	// tests the GormUtil.flushAndClearSession and mergeWithSession functionality
-	void testFlushAndClearSession() {
+	void '20. testFlushAndClearSession()'' {
 		def session = sessionFactory.getCurrentSession()
 		assertTrue 'validate we have a session', (session != null)
 
@@ -471,7 +478,7 @@ class GormUtilTests extends Specification {
 	}
 	*/
 
-	def "Test findInProject on different scenarios" () {
+	def "21. Test findInProject on different scenarios" () {
 		setup: "Create some objects require for the tests"
 			Project project = projectHelper.createProject()
 			Project project2 = projectHelper.createProject()
@@ -533,8 +540,7 @@ class GormUtilTests extends Specification {
 			app == null
 	}
 
-
-	def "test domainObjectToMap under different scenarios"() {
+	def "22. test domainObjectToMap under different scenarios"() {
 		setup: "create a Project"
 			Project project = projectHelper.createProject()
 		when: "Converting the project to a map with default parameters"
@@ -567,4 +573,37 @@ class GormUtilTests extends Specification {
 		and: "The workflowCode is also in the map"
 			projectMap.containsKey("workflowCode")
 	}
+
+	void '23. Test validateErrorsI18n for validatable class'() {
+        when: 'the command object has bad values'
+             TestValidatableCommand tvc = new TestValidatableCommand(name:'Tom', age:120)
+        then: 'it should have errors'
+            ! tvc.validate() & tvc.hasErrors()
+		and: 'the error message should be about the age being out of range, defaulting to US'
+            ['Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'] == 
+				GormUtil.validateErrorsI18n(tvc)
+		and: 'the error should also translate to Spanish'
+			['Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'] == 
+				GormUtil.validateErrorsI18n(tvc, new Locale('es'))
+			// TODO : JM 2/2018 : TM-9197 : Fix to support proper localization
+			// ['La propiedad age de la clase TestValidatableCommand con valor [120] no entra en el rango válido de [1] a [110]'] == 
+			// 	GormUtil.validateErrorsI18n(tvc, new Locale('es'))
+
+	}
+
+}
+
+
+/**
+ * used in conjunction with the validation function tests
+ */
+@Validateable
+class TestValidatableCommand {
+    String name
+    Integer age
+
+    static constraints = {
+        name blank:false, inList:['Tom', 'Dick', 'Harry']
+        age range:1..110
+    }
 }

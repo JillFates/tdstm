@@ -1948,6 +1948,32 @@ function deleteAssets(action) {
 	}
 }
 
+function bulkDeleteDependencies() {
+    var dependencyArr = new Array();
+    $(".cbox:checkbox:checked").each(function () {
+        var depId = $(this).attr('id').split("_")[2]
+        if (depId)
+            dependencyArr.push(depId)
+    })
+    if (!dependencyArr) {
+        alert('Please select a dependency');
+    } else {
+        if (confirm("You are about to delete all of the selected dependencies for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")) {
+            jQuery.ajax({
+                url: tdsCommon.createAppURL('/wsAsset/bulkDeleteDependencies'),
+                data: { 'dependencyIds': dependencyArr },
+                type: 'POST',
+                success: function (data) {
+                    $(".ui-icon-refresh").click();
+                    $("#messageId").show();
+                    $("#messageId").html(data.resp);
+                    $('#deleteAssetId').attr('disabled', true)
+                }
+            });
+        }
+    }
+}
+
 function enableButton(list) {
 	var assetArr = new Array();
 	var j = 0;

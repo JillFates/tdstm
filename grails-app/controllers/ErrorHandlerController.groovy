@@ -4,6 +4,10 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.service.*
+import net.transitionmanager.service.InvalidConfigurationException
+import com.tdsops.common.exceptions.InvalidLicenseException
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.acls.model.NotFoundException
 
 /**
  * The ErrorHandlerController controller is used by the system to handle response to various non-success responses such
@@ -15,8 +19,6 @@ import net.transitionmanager.service.*
 class ErrorHandlerController implements ControllerMethods {
 
 	CoreService coreService
-	ErrorHandlerService errorHandlerService
-	SecurityService securityService
 	LicenseAdminService licenseAdminService
 
 	static final String SESSION_ATTR_ERROR = 'ErrorHandlerController.error'
@@ -31,8 +33,59 @@ class ErrorHandlerController implements ControllerMethods {
 		forward action:'unauthorized'
 	}
 
-	def testError() {
-		5/0
+	def testError(String exceptionName, String message) {
+		if (! exceptionName) {
+			exceptionName = 'RuntimeException'
+		}
+		if (! message) {
+			message = 'no message provided'
+		}
+
+		Exception ex
+
+		switch (exceptionName) {
+			case 'DomainUpdateException':
+				ex = new DomainUpdateException(message)
+				break
+			case 'EmptyResultException':
+				ex = new EmptyResultException(message)
+				break
+			case 'InvalidConfigurationException':
+				ex = new InvalidConfigurationException(message)
+				break
+			case 'InvalidConfigurationException':
+				ex = new InvalidConfigurationException(message)
+				break
+			case 'InvalidLicenseException':
+				ex = new InvalidLicenseException(message)
+				break
+			case 'InvalidParamExceptioneException':
+				ex = new InvalidParamException(message)
+				break
+			case 'InvalidRequestException':
+				ex = new InvalidRequestException(message)
+				break
+			case 'InvalidSyntaxException':
+				ex = new InvalidSyntaxException(message)
+				break
+			case 'LogicException':
+				ex = new LogicException(message)
+				break
+			case 'UnauthorizedException':
+				ex = new UnauthorizedException(message)
+				break
+			default:
+				try {
+					// Note that for some reason the TDS exception classes can not be constructed this way as the 
+					// classes are not found. Not sure why unless they need to be Java classes? 
+					Class ec = (exceptionName as Class)
+					ex =  ec.newInstance(message)
+				} catch (e) {
+			 		ex = new RuntimeException("Exception $exceptionName is not implemented in testError method : ${e.message}")
+				}
+				break
+		}
+		throw ex
 	}
 
 	// ------------
@@ -77,7 +130,7 @@ class ErrorHandlerController implements ControllerMethods {
 	 * respond with what?
 	 */
 	def forbidden() {
-		log.debug "Hit forbidden() 2"
+		log.debug "Hit forbidden()"
 
 		def ex = errorHandlerService.getException(request)
 		if (ex) {
@@ -88,7 +141,7 @@ class ErrorHandlerController implements ControllerMethods {
 		if (WebUtil.isAjax(request)){
 			response.status = 403
 			String message = response.getHeader("errorMessage")
-			ServiceResults.respondWithError(response,message)
+			ServiceResults.respondWithError(response, message)
 		} else {
 			response.status = 200
 			Map model = fetchModel()
@@ -145,34 +198,31 @@ class ErrorHandlerController implements ControllerMethods {
 
 		// Handle Ajax error messages
 		if (WebUtil.isAjax(request)) {
-			response.status = 200
-			if (model.exception) {
-				handleException(model.exception, log)
-			}
 			renderErrorJson('An unresolved error occurred')
 			return
 		}
 
-		if (model.exception) {
-			switch (model.exception) {
-				case UnauthorizedException:
-					forward action:'forbidden'
-					return
-					break
-
-				case IllegalArgumentException:
-					// This case handles invalid controller names which is the equivalant of a 404 Not Found
-					if (model.exceptionMsg =~ /^Secure object invocation FilterInvocation.*/) {
-						forward action:'notFound'
-						return
-					}
-					break
-
-				default:
-					log.warn ExceptionUtil.stackTraceToString('Unhandled Exception', model.exception)
-					// drop down into the standard error handler
-			}
-		}
+		// JM : 2/2018 : Change made for TM-8782 - don't believe this is needed any longer. Delete in a few months.
+		// if (model.exception) {
+		// 	switch (model.exception) {
+		// 		case UnauthorizedException:
+		// 			forward action:'forbidden'
+		// 			return
+		// 			break
+		//
+		// 		case IllegalArgumentException:
+		// 			// This case handles invalid controller names which is the equivalant of a 404 Not Found
+		// 			if (model.exceptionMsg =~ /^Secure object invocation FilterInvocation.*/) {
+		// 				forward action:'notFound'
+		// 				return
+		// 			}
+		// 			// Drop into the default if it wasn't as suspected
+		//
+		// 		default:
+		// 			log.warn ExceptionUtil.stackTraceToString('Unhandled Exception', model.exception)
+		// 			// drop down into the standard error handler
+		// 	}
+		// }
 
 		// Set the status back to 200 so that it doesn't appear as a real error (TBD if this is the proper thing to do)
 		response.status = 200

@@ -12,7 +12,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 
 @Slf4j(value='logger', category='grails.app.controllers.CommonController')
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -21,7 +20,6 @@ class CommonController implements ControllerMethods {
 	AssetEntityService assetEntityService
 	ControllerService controllerService
 	ProjectService projectService
-	SecurityService securityService
 
 	// TODO: This should be deleted
 	def index() { }

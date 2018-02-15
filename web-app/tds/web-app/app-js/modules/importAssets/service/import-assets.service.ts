@@ -11,7 +11,7 @@ export class ImportAssetsService {
 	constructor(private http: HttpInterceptor) {}
 
 	/**
-	 * Returns a collection of data lists including the actions and data scripts used to populate the form
+	 * Returns a collection of data lists including the actions and datascripts used to populate the form
 	 * @returns {Observable<Array<any>>}
 	 */
 	public getManualOptions(): Observable<any> {
@@ -78,7 +78,7 @@ export class ImportAssetsService {
 	}
 
 	/**
-	 * Invoke an ETL process on the filename (from invokeFetch) passed in using the Data Script that was specified.
+	 * Invoke an ETL process on the filename (from invokeFetch) passed in using the DataScript that was specified.
 	 * @param option
 	 * @returns {Observable<any>} It will return the status including counts, errors, and output filename.
 	 */

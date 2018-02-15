@@ -106,7 +106,11 @@ export class DataIngestionService {
 						}
 					};
 					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					APIActionModel.createReactions(r, r.reactionScripts);
+					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
+						APIActionModel.createReactions(r, r.reactionScripts);
+					} else {
+						APIActionModel.createBasicReactions(r);
+					}
 				});
 				return dataScriptModels;
 			})
@@ -295,6 +299,20 @@ export class DataIngestionService {
 
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Validate if the current DataScript is being or not used somewhere
+	 * @param {number} id
+	 * @returns {Observable<string>}
+	 */
+	validateDeleteScript(id: number): Observable<string> {
+		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

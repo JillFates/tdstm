@@ -41,7 +41,7 @@ class Person extends Party {
 	String tdsNote
 	String tdsLink
 	String staffType = 'Salary'
-	Integer travelOK = 1
+	Integer travelOK = 0
 
 	transient PartyRelationshipService partyRelationshipService
 

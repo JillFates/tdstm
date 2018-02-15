@@ -1,6 +1,5 @@
 package com.tdssrc.grails
 
-
 /**
  * The NumberUtil class contains a collection of useful number manipulation methods
  */
@@ -188,4 +187,22 @@ class NumberUtil {
 		}
 		return result
 	}
+
+  /**
+   * Receive a list of string numbers and converts them to longs. Then it returns the list of long values.
+   * If any value on the list is not positive, it will be just ignored and not returned/converted.
+   * @param stringsList    The list of strings to be converted
+   * @return   The resulting list of converted long values
+   */
+  static List<Long> toPositiveLongList(List<String> stringsList) {
+     List<Long> longsList = []
+     stringsList.each { v ->
+        Long id = toPositiveLong(v, null)
+        if (id != null) {
+           longsList << id
+        }
+     }
+     return longsList
+  }
+
 }

@@ -37,7 +37,6 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
@@ -61,7 +60,6 @@ class MoveBundleController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ProgressService progressService
 	Scheduler quartzScheduler
-	SecurityService securityService
 	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService

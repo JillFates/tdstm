@@ -9,7 +9,6 @@ import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
 import net.transitionmanager.service.PartyRelationshipService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -23,7 +22,6 @@ class MoveBundleAssetController implements ControllerMethods {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.AssetView)

@@ -3,7 +3,6 @@ package com.tdssrc.grails
 import com.fasterxml.jackson.databind.ObjectMapper
 import grails.converters.JSON
 import groovy.json.JsonBuilder
-import groovy.json.JsonOutput
 import groovy.json.JsonException
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -30,6 +29,19 @@ class JsonUtil {
             logger.error(e.message)
             throw new InvalidParamException("JSON is not valid")
         }
+    }
+
+    /**
+     * Used for parsing a JSON string that contains a list of elements.
+     * The parseJson in this class returns a JSONObject (a map) and will fail
+     * when passing a JSON with a list.
+     *
+     * @param jsonText
+     * @return a list after parsing the text
+     */
+    static List parseJsonList(String jsonText) {
+        JsonSlurper jsonSlurper = new JsonSlurper()
+        return (List)jsonSlurper.parseText(jsonText)
     }
 
     /**

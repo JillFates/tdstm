@@ -29,7 +29,6 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
 
@@ -56,7 +55,6 @@ class ProjectController implements ControllerMethods {
 	PersonService personService
 	ProjectService projectService
 	Scheduler quartzScheduler
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	UserService userService
 
@@ -137,7 +135,7 @@ class ProjectController implements ControllerMethods {
 	}
 
 	/**
-	 * Used to delet the user's current project
+	 * Used to delete the user's current project
 	 */
 	@HasPermission(Permission.ProjectDelete)
 	def delete() {

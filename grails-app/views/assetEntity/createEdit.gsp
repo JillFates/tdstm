@@ -284,13 +284,15 @@
 							<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
 								<label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
 							</td>
-							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
-								<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
-									   value="${assetEntityInstance.sourceRackPosition}"
-									   placeholder="U position"
-									   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
-									   size=10 tabindex="320"
-								/>
+							<td class="rackLabel">
+                                <tds:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
+                                    <input type="text" id="sourceRackPositionId" name="sourceRackPosition"
+                                           value="${assetEntityInstance.sourceRackPosition}"
+                                           placeholder="U position"
+                                           class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
+                                           size=10 tabindex="320"
+                                    />
+                                </tds:tooltipSpan>
 							</td>
 							<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRackPosition.tip?: standardFieldSpecs.targetRackPosition.label}">
 								<input type="text" id="targetRackPositionId" name="targetRackPosition"
@@ -434,8 +436,11 @@
 						</tbody>
 						</tbody>
 					</table>
-				</div></td>
+				</div>
+			</td>
 		</tr>
+
+
 
 		<g:if test="${action == 'save'}">
 			<tr>

@@ -2,8 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
-import com.tdsops.tm.search.FieldSearchData
-import net.transitionmanager.domain.AppMoveEvent
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -25,15 +23,20 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
+import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.controller.ServiceResults
+import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.KeyValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -45,20 +48,18 @@ import net.transitionmanager.domain.ProjectAssetMap
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.Criteria
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
-import grails.converters.JSON
-import grails.transaction.Transactional
 import javax.servlet.http.HttpSession
+import java.text.DateFormat
 import java.util.regex.Matcher
 
 @Transactional
@@ -1398,6 +1399,9 @@ class AssetEntityService implements ServiceMethods {
 		List<AssetDependency> dependentAssets = assetEntity.requiredDependencies()
 		List<AssetDependency> supportAssets = assetEntity.supportedDependencies()
 
+		String userTzId = userPreferenceService.timeZone
+		DateFormat formatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
+
 		def prefValue = userPreferenceService.getPreference(PREF.SHOW_ALL_ASSET_TASKS) ?: 'FALSE'
 		def viewUnpublishedValue = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) ?: 'false'
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
@@ -1431,6 +1435,8 @@ class AssetEntityService implements ServiceMethods {
 			viewUnpublishedValue: viewUnpublishedValue,
 			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
 			customs: customFields,
+			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
+			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
 			standardFieldSpecs: standardFieldSpecs
 		]
 	}
@@ -1781,15 +1787,9 @@ class AssetEntityService implements ServiceMethods {
         // if no ids given don't process anything.
 		if (assetIdList.isEmpty()) {
             return "0 $type records were deleted"
-        }
+    }
 
-		List<Long> assetIds = []
-		assetIdList.each { v ->
-			Long id = NumberUtil.toPositiveLong(v, -1)
-			if (id > 0) {
-				assetIds << id
-			}
-		}
+		List<Long> assetIds = NumberUtil.toPositiveLongList(assetIdList)
 		log.debug "deleteBulkAssets: $assetIds to be deleted"
 		int count = assetIds.size()
 
@@ -1808,14 +1808,8 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		if (validatedAssetIds.size() > 0) {
-			if (type == "dependencies") {
-				count = AssetDependency.where {
-					id in validatedAssetIds
-				}.deleteAll()
-			} else {
-				count = deleteAssets(validatedAssetIds)
-			}
-		} else {
+       count = deleteAssets(validatedAssetIds)
+    } else {
 			count = 0
 		}
 
@@ -2507,9 +2501,9 @@ class AssetEntityService implements ServiceMethods {
 					altColumns.append(", aeSourceChassis.asset_name AS sourceChassis")
 					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeSourceChassis ON aeSourceChassis.asset_entity_id=ae.source_chassis_id ")
 					break
-				case 'targerChassis':
+				case 'targetChassis':
 					altColumns.append(", aeTargetChassis.asset_name AS targetChassis")
-					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.targer_chassis_id ")
+					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.target_chassis_id ")
 					break
 
 				case 'validation':
