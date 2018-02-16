@@ -14,11 +14,11 @@ export class CredentialColumnModel {
 				property: 'name',
 				type: 'text',
 				locked: true
-			}, {
+			}, /*{
 				label: 'Description',
 				property: 'description',
 				type: 'text'
-			}, {
+			}, */{
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
@@ -65,7 +65,7 @@ export class CredentialModel {
 	// Authentication Methods
 	username?: string;
 	password?: string;
-	authenticationTestURL?: string;
+	authenticationURL?: string;
 	// cookie auth Method
 	httpMethod?: string;
 	cookieName?: string;
@@ -79,7 +79,7 @@ export class CredentialModel {
 		this.authMethod = '';
 		this.username = '';
 		this.password = '';
-		this.authenticationTestURL = '';
+		this.authenticationURL = '';
 		this.httpMethod = '';
 		this.cookieName = '';
 	}
@@ -98,4 +98,10 @@ export enum ENVIRONMENT {
 	OTHER = 'Other',
 	PRODUCTION = 'Production',
 	SANDBOX = 'SANDBOX'
+};
+
+export enum HTTP_METHOD {
+	POST = 'POST',
+	GET = 'GET',
+	PUT = 'PUT'
 };
