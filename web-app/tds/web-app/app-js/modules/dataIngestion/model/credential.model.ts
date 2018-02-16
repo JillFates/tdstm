@@ -106,3 +106,8 @@ export enum HTTP_METHOD {
 	GET = 'GET',
 	PUT = 'PUT'
 };
+
+export enum CREDENTIAL_STATUS {
+	ACTIVE = 'Active',
+	INACTIVE = 'Inactive'
+}

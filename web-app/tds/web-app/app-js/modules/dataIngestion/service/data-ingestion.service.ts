@@ -7,7 +7,7 @@ import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
-import {AUTH_METHODS, ENVIRONMENT} from '../model/credential.model';
+import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
@@ -112,6 +112,7 @@ export class DataIngestionService {
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.environment = ENVIRONMENT[r.environment];
 					r.authMethod = AUTH_METHODS[r.authenticationMethod];
+					r.status = CREDENTIAL_STATUS[r.status];
 				});
 				return credentialModels;
 			})
