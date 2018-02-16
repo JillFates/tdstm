@@ -23,12 +23,18 @@ export class DateUtils {
 				(time.getMonth() + 1 < 10 ? ('0' + (time.getMonth() + 1)) : time.getMonth() + 1) +
 				(time.getDate() + 1 < 10 ? ('0' + (time.getDate())) : time.getDate()) + '_' +
 				time.getHours() +
-				DateUtils.getNumberWithLeadingZeros(time.getMinutes(), 2);
+				DateUtils.getNumberWithLeadingZeros(time.getMinutes(), 1);
 	}
 
+	/**
+	 * Fills out a number with desired leading zeros as a string.
+	 * @param {number} number
+	 * @param {number} leadingZeros
+	 * @returns {string}
+	 */
 	public static getNumberWithLeadingZeros(number: number, leadingZeros: number): string {
 		let result = number.toString();
-		while (result.length < leadingZeros) {
+		while (result.length <= leadingZeros) {
 			result = '0' + result;
 		}
 		return result;
