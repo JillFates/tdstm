@@ -27,12 +27,12 @@ class ApiActionCommand{
     String description
     String endpointPath
     String endpointUrl
-    Integer isPolling
+    Integer isPolling = 0
     String methodParams
     String name
-    Integer pollingInterval
-    Integer pollingLapsedAfter
-    Integer pollingStalledAfter
+    Integer pollingInterval = 0
+    Integer pollingLapsedAfter = 0
+    Integer pollingStalledAfter = 0
     Integer producesData
     Provider provider
     String reactionScripts

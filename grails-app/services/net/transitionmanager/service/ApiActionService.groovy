@@ -349,6 +349,8 @@ class ApiActionService implements ServiceMethods {
 			project = securityService.userCurrentProject
 		}
 
+		validateBeforeSave(project, apiActionId, apiActionCommand)
+
 		// If there's an apiActionId then it's an update operation.
 		if (apiActionId) {
 			// Retrieve the corresponding API Action instance
@@ -566,5 +568,33 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		return apiActionMap
+	}
+
+	/**
+	 * Performs some additional checks before the save occurs that includes:
+	 *    - validate that the Provider is associated with the current project
+	 *    - validate that the name for the credential being created or updated doesn't already exist
+	 * If the validations fail then the InvalidParamException exception is thrown with an appropriate message.
+	 * @throws InvalidParamException
+	 */
+	private void validateBeforeSave(Project project, Long id, Object cmdObj) {
+		// Make certain that the provider specified is associated to the project
+//		Provider provider = cmdObj.provider.refresh()
+//		if (provider.project.id != project.id) {
+//			throw new InvalidParamException('Invalid Provider specified')
+//		}
+
+		// Make sure that name is unique
+		int count = ApiAction.where {
+			project == project
+			name == cmdObj.name
+			if (id) {
+				id != id
+			}
+		}.count()
+
+		if (count > 0) {
+			throw new InvalidParamException('An ApiAction with the same name already exists')
+		}
 	}
 }

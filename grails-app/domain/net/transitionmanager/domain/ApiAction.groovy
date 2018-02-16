@@ -275,6 +275,7 @@ class ApiAction {
 	 * that both reference the same project.
 	 */
 	static providerValidator = { provider, apiAction ->
+		provider.refresh()
 		if (provider.project.id != apiAction.project.id) {
 			return Message.InvalidFieldForDomain
 		}
@@ -286,6 +287,7 @@ class ApiAction {
 	 */
 	static crossProviderValidator = { aField, apiAction ->
 		if (aField) {
+			afield.refresh()
 			if (aField.provider.id != apiAction.provider.id) {
 				return Message.InvalidFieldForDomain
 			}

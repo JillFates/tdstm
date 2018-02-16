@@ -4,10 +4,10 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
-import net.transitionmanager.command.CommandObject
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
@@ -247,7 +247,7 @@ trait ControllerMethods {
 	}
 	// Thrown when validation fails during a GORM save(failOnError:true)
 	def validationExceptionHandler(ValidationException e) {
-		List<String> msgs = GormUtil.validateErrorsI18n(e.getErrors(), LocaleContextHolder.locale)
+		List<String> msgs = GormUtil.validateErrorsI18n(e, LocaleContextHolder.locale)
 		handleException(e, 'error', msgs)
 	}
 	// If all else fails the default exception hander will catch the rest
@@ -365,6 +365,20 @@ trait ControllerMethods {
 			// Call the invalidParamExceptionHandler
 			invalidParamExceptionHandler(new InvalidParamException(msg))
 		}
+	}
+	/**
+	 * Populates command object using the request.JSON from body in a http request
+	 * <pre>
+	 *      ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
+	 * </pr>
+	 * @param commandObjectClass command object class
+	 * @return a instance of commandObjectClass
+	 */
+	def <T> T populateCommandObject(Class<T> commandObjectClass){
+		// NOTE: For PUT command does populate the command objects properly
+		// SEE: https://github.com/grails/grails-core/issues/9172
+		return JsonUtil.readValue(request.JSON, commandObjectClass)
+
 	}
 
 	// ----------------------
