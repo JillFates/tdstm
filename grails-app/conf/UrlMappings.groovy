@@ -807,6 +807,36 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/credential/$id" {
+			controller = "wsCredential"
+			action = [
+				GET: "getCredential",
+				PUT: "updateCredential"
+			]
+		}
+
+		"/ws/credential" {
+			controller = "wsCredential"
+			action = [
+				GET: "list",
+				POST: "createCredential"
+			]
+		}
+
+		"/ws/credential/enums" {
+			controller = "wsCredential"
+			action = [
+				GET: "credentialEnums"
+			]
+		}
+
+		"/ws/credential/test/$id" {
+			controller = "wsCredential"
+			action = [
+				POST: "testAuthentication"
+			]
+		}
+
 		// Angular 1.5
 		"/app/**/*" ( controller: 'app', action: 'index' )
 		// Angular 2 and future latest version

@@ -8,6 +8,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.CredentialUpdateCO
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -139,5 +140,25 @@ class JsonUtil {
      */
     static JSONObject parseFile(InputStream inputStream) {
         return (JSONObject)JSON.parse(inputStream.text)
+    }
+
+    /**
+     * Maps an JSONObject into a target object.
+     * Used in conjunction with controllers and request.JSON
+     * @param json - the JSON send as part of the request
+     * @param target
+     * @return
+     */
+    static <T> T readValue(JSONObject json, Class<T> target) {
+        if (json) {
+            try {
+                return new ObjectMapper().readValue(json.toString(), target)
+            } catch (Exception e) {
+                logger.error(e.message)
+                throw new InvalidParamException("JSON is not valid")
+            }
+        } else {
+            throw new InvalidParamException("JSON is not valid")
+        }
     }
 }
