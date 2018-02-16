@@ -122,5 +122,9 @@ class ETLProcessorException extends GroovyRuntimeException {
 	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
 		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
 	}
+
+	static ETLProcessorException unknownAssetControlType (String controlType) {
+		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
+	}
 }
 

@@ -1,28 +1,25 @@
-package com.tdsops.etl
-
 import com.tds.asset.Application
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tds.asset.Database
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorException
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import net.transitionmanager.domain.DataScript
-import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
-import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
-@TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
-class ETLProcessorFindCommandSpec extends Specification {
+class ETLProcessorFindCommandIntegrationTests extends Specification {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -31,19 +28,8 @@ class ETLProcessorFindCommandSpec extends Specification {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
-	def setupSpec() {
-		String.mixin StringAppendElement
-	}
+	FileSystemService fileSystemService
+	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 
 	def setup() {
 
@@ -69,11 +55,8 @@ application id,vendor name,technology,location
 152254,Microsoft,(xlsx updated),ACME Data Center
 152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
-		GMDEMO = Mock(Project)
-		GMDEMO.getId() >> 125612l
-
-		TMDEMO = Mock(Project)
-		TMDEMO.getId() >> 125612l
+		GMDEMO = projectTestHelper.createProject(null)
+		TMDEMO = projectTestHelper.createProject(null)
 
 		validator = new DomainClassFieldsValidator()
 		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
@@ -183,7 +166,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with DOMAIN bound instance'() {
@@ -328,7 +311,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
@@ -493,7 +476,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can grab the reference to the FINDINGS to be used later'() {
@@ -622,7 +605,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
@@ -703,7 +686,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
@@ -769,7 +752,7 @@ application id,vendor name,technology,location
 			e.message == 'Project not defined.'
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
@@ -901,7 +884,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
@@ -1026,7 +1009,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can create a domain when not found a instance with find command'() {
@@ -1161,7 +1144,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenNotFound command defines an update action'() {
@@ -1255,7 +1238,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'Incorrect whenNotFound command. Use whenNotFound asset create { .... }'
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenFound command defines a create action'() {
@@ -1346,7 +1329,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'Incorrect whenFound command. Use whenFound asset update { .... }'
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
@@ -1441,7 +1424,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can update a domain when found a instance with find command'() {
@@ -1570,41 +1553,32 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Rack domain instances and find Rooms associated'() {
 
 		given:
 			List<Room> rooms = buildRooms([
-				[1, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
-				[2, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+				[GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
 			])
 
 		and:
 			List<Rack> racks = buildRacks([
-				[4, GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
-				[5, GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
-				[6, GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
+				[GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
+				[GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
+				[GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
 			])
 
 		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+${racks[0].id},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
 13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+${racks[1].id},${rooms[0].id},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
 13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
-
-		and:
-			GroovyMock(Room, global: true)
-			Room.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			Room.executeQuery(_, _) >> { String query, Map args ->
-				rooms.findAll { it.id == args.id }
-			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1624,9 +1598,7 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 							extract Location load location
 							extract Room load room
 					 
-					        if( SOURCE.RoomId.value ){
-								find Room 'for' room by id with SOURCE.RoomId
-							}
+					        find Room 'for' room by id with SOURCE.RoomId
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1636,10 +1608,37 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Rack.name()
 				fields == ['id', 'location', 'room'] as Set
+
+				data.collect { it.fields.id.value } == [
+					racks[0].id.toString(), '13145',
+					racks[1].id.toString(),
+					racks[2].id.toString(), '13358'
+				]
+
+				data.collect { it.fields.location.value } == [
+					'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
+					'ACME Data Center', 'New Colo Provider'
+				]
+
+				data.collect { it.fields.room.value } == [
+					'ACME Data Center / DC1', 'ACME Data Center / DC1',
+					'ACME Data Center / DC1', 'ACME Data Center / DC1',
+					'New Colo Provider / ACME Room 1'
+				]
+
+				with(data[4].fields.room){
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == ETLDomain.Room.name()
+						!kv.id
+						kv.error == 'Named parameter [id] value may not be null'
+					}
+				}
+
 			}
 
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 
@@ -1651,44 +1650,44 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 	 */
 	List<Room> buildRooms(List<List<?>> valuesList) {
 		return valuesList.collect { List<?> values ->
-			Room room = Mock()
-			room.getId() >> values[0]
-			room.getProject() >> values[1]
-			room.getRoomName() >> values[2]
-			room.getLocation() >> values[3]
-			room.getRoomDepth() >> values[4]
-			room.getRoomWidth() >> values[5]
-			room.getAddress() >> values[6]
-			room.getCity() >> values[7]
-			room.getStateProv() >> values[8]
-			room.getPostalCode() >> values[9]
+			Room room = new Room()
+			room.project = values[0]
+			room.roomName = values[1]
+			room.location = values[2]
+			room.roomDepth = values[3]
+			room.roomWidth = values[4]
+			room.address = values[5]
+			room.city = values[6]
+			room.stateProv = values[7]
+			room.postalCode = values[8]
+			room.save()
 			room
 		}
 	}
 
 	/**
 	 * Builds a list of Mock Room using this fields order
-	 * ['id', 'project', 'room', 'manufacturer', 'model', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
+	 * ['project', 'room', 'manufacturer', 'model', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
 	 * @param valuesList
 	 * @return a list of Mock(Rack)
 	 */
 	List<Rack> buildRacks(List<List<?>> valuesList) {
 		return valuesList.collect { List<?> values ->
-			Rack rack = Mock()
-			rack.getId() >> values[0]
-			rack.getProject() >> values[1]
-			rack.getRoom() >> values[2]
-			rack.getManufacturer() >> values[3]
-			rack.getModel() >> values[4]
-			rack.getLocation() >> values[5]
-			rack.getFront() >> values[6]
-			rack.getSource() >> values[7]
-			rack.getRoomX() >> values[8]
-			rack.getRoomY() >> values[9]
-			rack.getPowerA() >> values[10]
-			rack.getPowerB() >> values[11]
-			rack.getPowerC() >> values[12]
-			rack.getRackType() >> values[13]
+			Rack rack = new Rack()
+			rack.project = values[0]
+			rack.room = values[1]
+			rack.manufacturer = values[2]
+			rack.model = values[3]
+			rack.location = values[4]
+			rack.front = values[5]
+			rack.source = values[6]
+			rack.roomX = values[7]
+			rack.roomY = values[8]
+			rack.powerA = values[9]
+			rack.powerB = values[10]
+			rack.powerC = values[11]
+			rack.rackType = values[12]
+			rack.save()
 			rack
 		}
 	}
@@ -1776,11 +1775,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 	 */
 	private List buildCSVDataSet(String csvContent) {
 
-		def (String fileName, OutputStream sixRowsDataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
+		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetOS << csvContent
 		sixRowsDataSetOS.close()
 
-		String fullName = service.getTemporaryFullFilename(fileName)
+		String fullName = fileSystemService.getTemporaryFullFilename(fileName)
 
 		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
 		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)

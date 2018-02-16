@@ -1,10 +1,8 @@
 package com.tdsops.etl
-
-import com.tdssrc.grails.GormUtil
-
 /**
  * ETL find command implementation.
  * <code>
+ *     domain Dependency
  *  // Try to find the Application using different searches
  * 	find Application 	 for assetId by id 				     with assetId
  * 	elseFind Application for assetId by assetName, assetType with primaryName, primaryType
@@ -55,7 +53,7 @@ class ETLFindElement {
 	 * @return
 	 */
 	ETLFindElement 'for'(String dependentId) {
-		checkAssetFieldReference(dependentId)
+		validateReference(dependentId)
 		currentFind.dependentId = dependentId
 		this
 	}
@@ -80,8 +78,11 @@ class ETLFindElement {
 	}
 
 	/**
-	 * Sets the dataSource Fields and executes the query looking for assets
+	 * Sets the dataSource Fields and executes the query looking for domain instances
 	 * based on currentFind.fields
+	 * <p>
+	 * If there is an error requesting domain class instances
+	 * it adds an error message in the currentFind element
 	 * @param values
 	 * @return
 	 */
@@ -96,12 +97,18 @@ class ETLFindElement {
 		].transpose().collectEntries { it }
 
 		if (!results) {
-			currentFind.objects = AssetClassQueryHelper.where(
+
+			try {
+				currentFind.objects = DomainClassQueryHelper.where(
 					ETLDomain.lookup(currentFind.domain),
 					processor.project,
 					currentFind.kv)
+			} catch (all){
+				processor.debugConsole.debug("Error in find command: ${all.getMessage()} " )
+				currentFind.kv.error = all.getMessage()
+			}
 
-			if (!currentFind.objects.isEmpty()) {
+			if (currentFind.objects && !currentFind.objects.isEmpty()) {
 				results = [
 						size  : currentFind.objects.size(),
 						objects: currentFind.objects,
@@ -173,7 +180,6 @@ class ETLFindElement {
 	 */
 	boolean hasDependentId(String dependentId){
 		return this.currentFind.dependentId == dependentId
-
 	}
 
 
@@ -182,35 +188,25 @@ class ETLFindElement {
 	 * using the selected domain in the current script
 	 * @param fieldName an asset field name
 	 */
-	private Map<String, ?> checkAssetFieldSpec(String fieldName) {
-		return processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+	private ETLFieldSpec checkAssetFieldSpec(String fieldName) {
+		return processor.lookUpFieldSpecs(fieldName)
 	}
 
 	/**
-	 * Checks
-	 * @param fieldName
+	 * Validates if property is identifier or reference for the current domain
+	 * @param property
 	 */
-	void checkAssetFieldReference(String fieldName){
-
-		Class<?> clazz = currentDomain.getClazz()
-
-		if(!GormUtil.isDomainProperty(clazz.newInstance(), fieldName)) {
-			throw ETLProcessorException.invalidDomainPropertyName(currentDomain, fieldName)
-		}
-		if(!GormUtil.isDomainIdentifier(clazz, fieldName) &&
-				!GormUtil.isReferenceProperty(clazz.newInstance(), fieldName)){
-			throw ETLProcessorException.invalidDomainReference(currentDomain, fieldName)
-		}
+	void validateReference(String property){
+		processor.validateDomainPropertyAsReference(property)
 	}
 
 	private void setCurrentDomain(ETLDomain domain) {
 		currentDomain = domain
 		currentFind = [
-				domain     : domain.name(),
-				fields     : [],
-				values     : [],
-				queryParams: [:]
-
+			domain: domain.name(),
+			fields: [],
+			values: [],
+			queryParams: [:]
 		]
 	}
 

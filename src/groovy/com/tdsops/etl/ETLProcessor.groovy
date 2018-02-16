@@ -53,7 +53,7 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * An instance of this interface should be assigned
 	 * to be used in fieldSpec validations
-	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs( java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
 	/**
@@ -416,7 +416,7 @@ class ETLProcessor implements RangeChecker {
 		[
 				with: { value ->
 
-					Map<String, ?> fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+					ETLFieldSpec fieldSpec = lookUpFieldSpecs(field)
 
 					Element newElement = currentRow.addNewElement(value, this)
 					newElement.field.name = field
@@ -425,8 +425,7 @@ class ETLProcessor implements RangeChecker {
 					if (fieldSpec) {
 
 						newElement.field.label = fieldSpec.label
-						newElement.field.control = fieldSpec.control
-						newElement.field.constraints = fieldSpec.constraints
+						newElement.field.control = fieldSpec.type
 					}
 
 					addElementLoaded(selectedDomain, newElement)
@@ -537,22 +536,43 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldName
 	 * @return
 	 */
-	Map<String, ?> lookUpFieldSpecs (ETLDomain domain, String field) {
+	ETLFieldSpec lookUpFieldSpecs (String field) {
 
-		Map<String, ?> fieldSpec
+		ETLFieldSpec fieldSpec
 
-		if (ETLDomain.External != domain) {
+		if (ETLDomain.External != selectedDomain) {
 
-			if (!fieldsValidator.hasSpecs(domain, field)) {
-				throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
+			if (!fieldsValidator.hasSpecs(selectedDomain, field)) {
+				throw ETLProcessorException.unknownDomainFieldsSpec(selectedDomain, field)
 			}
 
 			fieldSpec = fieldsValidator.lookup(selectedDomain, field)
 			if (!fieldSpec) {
-				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
+				throw ETLProcessorException.domainWithoutFieldsSpec(selectedDomain, field)
 			}
 		}
 		fieldSpec
+	}
+
+	/**
+	 * It validates if a field is a reference domain property or
+	 * if it's a domain identifier
+	 * @param domain
+	 * @param fieldName
+	 * @throws ETLProcessorException if some of the validations fail
+	 */
+	void validateDomainPropertyAsReference(String property) {
+
+		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
+		Class<?> clazz = selectedDomain.clazz
+
+		if(!fieldsValidator.isDomainProperty(clazz, property)) {
+			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain, property)
+		}
+		if(!fieldsValidator.isDomainIdentifier(clazz, property) &&
+			!fieldsValidator.isReferenceProperty(clazz, property)){
+			throw ETLProcessorException.invalidDomainReference(selectedDomain, property)
+		}
 	}
 
 	/**
@@ -609,19 +629,17 @@ class ETLProcessor implements RangeChecker {
 
 		result.loadElement(element)
 
-		if (!currentRowResult.containsKey(selectedDomain)) {
+		if(!currentRowResult.containsKey(selectedDomain)){
 			currentRowResult[selectedDomain] = new ReferenceResult()
 		}
 
 		currentRowResult[selectedDomain].elements.add([
-				originalValue: element.originalValue,
-				value        : element.value,
-				field        : [
-						name       : element.field.name,
-						control    : element.field.control,
-						label      : element.field.label,
-						constraints: element.field.constraints
-				]
+			originalValue: element.originalValue,
+			value: element.value,
+			field: [
+				name: element.fieldSpec.name,
+				label: element.fieldSpec.label
+			]
 		])
 
 		debugConsole.info "Adding element ${element} in results for domain ${domain}"

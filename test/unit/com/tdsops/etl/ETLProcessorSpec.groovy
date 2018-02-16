@@ -6,7 +6,6 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -16,9 +15,13 @@ import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.json.JsonOutput
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -30,7 +33,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
 class ETLProcessorSpec extends Specification {
 
 	@Shared
@@ -50,7 +53,8 @@ class ETLProcessorSpec extends Specification {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
-
+	Project GMDEMO
+	ETLFieldsValidator validator
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -74,6 +78,9 @@ class ETLProcessorSpec extends Specification {
 	}
 
 	def setup() {
+
+		GMDEMO = Mock(Project)
+		GMDEMO.getId() >> 125612l
 
 		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 
@@ -138,7 +145,7 @@ class ETLProcessorSpec extends Specification {
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
-		applicationFieldsValidator = new ETLAssetClassFieldsValidator()
+		applicationFieldsValidator = new DomainClassFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
@@ -151,6 +158,12 @@ class ETLProcessorSpec extends Specification {
 			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
+
+		validator = new DomainClassFieldsValidator()
+		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 	}
 
 	void 'test can define a the primary domain'() {
@@ -975,7 +988,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can load field with an extracted element value after validate fields specs'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1015,7 +1028,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can load fields for more than one domain in the same iteration'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
 
@@ -1103,7 +1116,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can use if else groovy clause to load a field with an extracted element value'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1148,7 +1161,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can set a an extracted element in a variable'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1193,7 +1206,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can load field many times with the same extracted value'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1242,7 +1255,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an ETLProcessorException when try to load without domain definition'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1263,14 +1276,14 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'There is not validator for domain Application'
+			e.message == 'There is not validator for domain Application and field appVendor'
 
 	}
 
 	void 'test can throw an ETLProcessorException when try to load with domain definition but without domain fields specification'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1298,7 +1311,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can extract a field value and load into a domain object property name'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1338,7 +1351,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can process a selected domain rows'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -1383,7 +1396,7 @@ class ETLProcessorSpec extends Specification {
 	void 'test can create new results loading values without extract previously'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
 
@@ -1549,6 +1562,167 @@ class ETLProcessorSpec extends Specification {
 
 	}
 
+	void 'test can load Room domain instances'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
+673,DC1,ACME Data Center,26.00,40.00,Source,112 Main St ,Cumberland,,IA,50843
+674,ACME Room 1,New Colo Provider,4.00,42.00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
+
+		and:
+			List<Room> rooms = buildRooms([
+				[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Room
+							extract roomId load id 
+							extract Name load roomName
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Room domain results associated'
+			etlProcessor.result.domains.size() == 1
+
+
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can load Rack domain instances'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			List<Room> rooms = buildRooms([
+				[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			List<Rack> racks = buildRacks([
+				[13144, GMDEMO, 673, -1, -1, 'ACME Data Center', 'R', 'Source', 500, 235, 3300, 3300, 0, 'Rack'],
+				[13167, GMDEMO, 673, -1, -1, 'ACME Data Center', 'L', 'Source', 160, 0, 1430, 1430, 0, 'Rack'],
+				[13358, GMDEMO, -1, -1, -1, 'New Colo Provider', 'L', 'Source', 41, 42, 0, 0, 0, 'block3x5']
+			],
+				rooms)
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Rack
+							extract rackId load id 
+							extract Location load location
+							extract Room load room
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Rack domain results associated'
+			etlProcessor.result.domains.size() == 1
+
+
+		cleanup:
+			service.deleteTemporaryFile(fileName)
+	}
+
+	/**
+	 * Builds a list of Mock Room using this fields order
+	 * ['id', 'project', 'roomName', 'location', 'roomDepth', 'roomWidth', 'address', 'city', 'stateProv', 'postalCode']
+	 * @param valuesList
+	 * @return a list of Mock(Room)
+	 */
+	List<Room> buildRooms(List<List<?>> valuesList) {
+		return valuesList.collect { List<?> values ->
+			Room room = Mock()
+			room.getId() >> values[0]
+			room.getProject() >> values[1]
+			room.getRoomName() >> values[2]
+			room.getLocation() >> values[3]
+			room.getRoomDepth() >> values[4]
+			room.getRoomWidth() >> values[5]
+			room.getAddress() >> values[6]
+			room.getCity() >> values[7]
+			room.getStateProv() >> values[8]
+			room.getPostalCode() >> values[9]
+			room
+		}
+	}
+
+	/**
+	 * Builds a list of Mock Room using this fields order
+	 * ['id', 'project', 'modelId', 'manufacturerId', 'roomId', 'location', 'front', 'source', 'roomX', 'roomY', 'powerA', 'powerB', 'powerC', 'rackType'],
+	 * @param valuesList
+	 * @return a list of Mock(Rack)
+	 */
+	List<Rack> buildRacks(List<List<?>> valuesList, List<Room> rooms, List<Model> models = [], List<Manufacturer> manufacturers = []) {
+		return valuesList.collect { List<?> values ->
+			Rack rack = Mock()
+			rack.getId() >> values[0]
+			rack.getProject() >> values[1]
+			rack.getModel() >> models.find { it.getId() == values[2] }
+			rack.getManufacturer() >> manufacturers.find { it.getId() == values[3] }
+			rack.getRoom() >> rooms.find { it.getId() == values[4] }
+			rack.getLocation() >> values[5]
+			rack.getFront() >> values[6]
+			rack.getSource() >> values[7]
+			rack.getRoomX() >> values[8]
+			rack.getRoomY() >> values[9]
+			rack.getPowerA() >> values[10]
+			rack.getPowerB() >> values[11]
+			rack.getPowerC() >> values[12]
+			rack.getRackType() >> values[13]
+			rack
+		}
+	}
+
 	/**
 	 * Helper method to create Fields Specs based on Asset definition
 	 * @param asset
@@ -1557,15 +1731,15 @@ class ETLProcessorSpec extends Specification {
 	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch (asset) {
+		switch(asset){
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('appVendor', 'Vendor'),
-						buildFieldSpec('environment', 'Environment'),
-						buildFieldSpec('description', 'Description'),
-						buildFieldSpec('assetName', 'Name'),
-						buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('appVendor', 'Vendor'),
+					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('description', 'Description'),
+					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
 			case AssetClass.DATABASE:
@@ -1573,23 +1747,23 @@ class ETLProcessorSpec extends Specification {
 				break
 			case AssetClass.DEVICE:
 				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('location', 'Location'),
-						buildFieldSpec('name', 'Name'),
-						buildFieldSpec('environment', 'Environment'),
-						buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('location', 'Location'),
+					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
 			case ETLDomain.Dependency:
 				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('assetName', 'AssetName'),
-						buildFieldSpec('assetType', 'AssetType'),
-						buildFieldSpec('asset', 'Asset'),
-						buildFieldSpec('comment', 'Comment'),
-						buildFieldSpec('status', 'Status'),
-						buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-						buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('assetName', 'AssetName'),
+					buildFieldSpec('assetType', 'AssetType'),
+					buildFieldSpec('asset', 'Asset'),
+					buildFieldSpec('comment', 'Comment'),
+					buildFieldSpec('status', 'Status'),
+					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
+					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
 				]
 				break
 			case AssetClass.STORAGE:
@@ -1610,19 +1784,19 @@ class ETLProcessorSpec extends Specification {
 	 */
 	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
 		return [
-				constraints: [
-						required: required
-				],
-				control    : type,
-				default    : '',
-				field      : field,
-				imp        : 'U',
-				label      : label,
-				order      : 0,
-				shared     : 0,
-				show       : 0,
-				tip        : "",
-				udf        : 0
+			constraints: [
+				required: required
+			],
+			control: type,
+			default: '',
+			field: field,
+			imp: 'U',
+			label: label,
+			order: 0,
+			shared: 0,
+			show: 0,
+			tip: "",
+			udf: 0
 		]
 	}
 

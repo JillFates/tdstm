@@ -18,11 +18,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
-import org.codehaus.groovy.control.customizers.ImportCustomizer
-import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -135,7 +131,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
-		applicationFieldsValidator = new ETLAssetClassFieldsValidator()
+		applicationFieldsValidator = new DomainClassFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
@@ -592,7 +588,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings and element in a transformation chain'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -680,7 +676,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can plus strings, current element and a defined variable in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -722,7 +718,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings, current element and a defined variable in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -765,7 +761,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings and elements in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -807,7 +803,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can use a set element in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
@@ -849,7 +845,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can use a set element in a transformation closure'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:

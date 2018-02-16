@@ -3,7 +3,10 @@ package com.tdsops.etl
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 
 /**
  * This class helps in the ETL processor to prepare the correct query for find command.
@@ -21,7 +24,9 @@ import net.transitionmanager.domain.Project
  *            and AE.id = : id
  *  </pre>
  */
-class AssetClassQueryHelper {
+
+//TODO: DMC Refactor DomainClassQueryHelper
+class DomainClassQueryHelper {
 
 	/**
 	 * Executes the HQL query related to the domain defined.
@@ -41,6 +46,12 @@ class AssetClassQueryHelper {
 				break
 			case { AssetDependency.isAssignableFrom(it) }:
 				assets = assetDependencies(fieldsSpec)
+				break
+			case { Rack.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Rack, fieldsSpec)
+				break
+			case { Room.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Room, fieldsSpec)
 				break
 			default:
 				throw ETLProcessorException.incorrectDomain(domain)
@@ -66,6 +77,29 @@ class AssetClassQueryHelper {
 			   and $hqlWhere """.stripIndent()
 
 		return AssetEntity.executeQuery(hql, [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec))
+	}
+
+	/**
+	 *
+	 * @param clazz
+	 * @param fieldsSpec
+	 * @return
+	 */
+	static <T> List<T> nonAssetEntities(Class<T> clazz, Map<String, ?> fieldsSpec) {
+
+		String hqlWhere = fieldsSpec.keySet().collect { String field ->
+			" ${field} = :${field}\n".toString()
+		}.join(' and ')
+
+		Map<String, ?> hqlParams = fieldsSpec.collectEntries { String key, def value ->
+			[(key.toString()): nonAssetEntityTransformations[key].transform(value?.toString())]
+		}
+
+		String hql = """
+              from ${clazz.simpleName} D
+             where $hqlWhere """.stripIndent()
+
+		return clazz.executeQuery(hql, hqlParams)
 	}
 
 	/**
@@ -103,7 +137,7 @@ class AssetClassQueryHelper {
 	 * Transforms AssetEntity query params.
 	 * @param fieldsSpec a map with params to be used in the HQL query
 	 * @return a map with params transformed correctly
-	 * 		   based on com.tdsops.etl.AssetClassQueryHelper#assetEntityTransformations
+	 * 		   based on com.tdsops.etl.DomainClassQueryHelper#assetEntityTransformations
 	 */
 	static Map<String, ?> hqlParams(Map<String, ?> fieldsSpec) {
 		fieldsSpec.collectEntries { String key, def value ->
@@ -111,6 +145,17 @@ class AssetClassQueryHelper {
 				toString())]
 		}
 	}
+
+	private static final nonAssetEntityTransformations = [
+	    "id" : [ transform: { String value -> NumberUtil.toLong(value) }]
+	].withDefault { String key ->
+		[
+			property: "AE." + key,
+			namedParamter: key,
+			join: "",
+			transform: { String value -> value?.trim() }]
+	}
+
 
 	//TODO: Review this with John. Where I can put those commons configurations?
 	private static final Map<String, Map> assetEntityTransformations = [

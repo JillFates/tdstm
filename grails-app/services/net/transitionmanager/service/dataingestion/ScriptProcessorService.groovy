@@ -34,7 +34,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLAssetClassFieldsValidator validator = createFieldsSpecValidator(project)
+        DomainClassFieldsValidator validator = createFieldsSpecValidator(project)
 
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 
@@ -44,18 +44,18 @@ class ScriptProcessorService {
     }
 
     /**
-     * Base on a project it creates a ETLAssetClassFieldsValidator instance tha implements ETLFieldsValidator.
+     * Base on a project it creates a DomainClassFieldsValidator instance tha implements ETLFieldsValidator.
      * @param project a defined Project instance to be used in fields spec request
      * @see ETLFieldsValidator interface
-     * @return an instance of ETLAssetClassFieldsValidator.
+     * @return an instance of DomainClassFieldsValidator.
      */
-    private ETLAssetClassFieldsValidator createFieldsSpecValidator (Project project) {
+    private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
 
         def configureUsingDomain = { AssetClass assetClass ->
             customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
         }
 
-        ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+        ETLFieldsValidator validator = new DomainClassFieldsValidator()
 
         validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
         validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
@@ -125,7 +125,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLAssetClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new DomainClassFieldsValidator())
 
         List<Map<String, ?>> errors = []
 
