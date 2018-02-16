@@ -933,7 +933,7 @@ class MoveBundleController implements ControllerMethods {
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
 			params.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null, false, params.subsection, params.groupId)
+		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null, false, params.subsection, params.groupId, params.assetName)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map

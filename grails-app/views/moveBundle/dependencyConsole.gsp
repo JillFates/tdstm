@@ -389,6 +389,7 @@
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
 					debugger;
 				var showTabs = '${showTabs}';
+				var assetName = '${assetName}';
 				if(showTabs == "true") {
 						// TM-8842, show the Dependency Analyzer Map, drilled-in from the group Id
 						getList("apps", '${groupId}'); // needed to show the selected groupId in the table, and for the other tabs to work
@@ -397,6 +398,10 @@
 										break; // do nothing, we are already there
 								case "map":
 										getList("graph", '${groupId}');
+										window.setTimeout(function() {
+                        $('#searchBoxId').val(assetName);
+                        GraphUtil.performSearch();
+										}, 1500)
 										break;
 								case "all":
 										getList("all", '${groupId}');

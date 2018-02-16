@@ -13,7 +13,7 @@ class UrlMappings {
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
-		name dependencyConsoleMap: "/moveBundle/dependencyConsole/$subsection/$groupId" {
+		name dependencyConsoleMap: "/moveBundle/dependencyConsole/$subsection?/$groupId?/$assetName?" {
 			controller = "moveBundle"
 			action = [GET:"dependencyConsole"]
 		}
