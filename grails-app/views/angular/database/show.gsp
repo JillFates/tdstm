@@ -54,16 +54,22 @@
                                                 <tds:convertDate date="${asset?.retireDate}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
-                                        <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-                                            <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-                                                ${standardFieldSpecs.moveBundle.label} : Dep. Group
-                                            </label>
-                                        </td>
-                                        <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-                                                ${asset?.moveBundle} : ${dependencyBundleNumber}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+																				<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+																					<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+																						${standardFieldSpecs.moveBundle.label} : Dep. Group
+																					</label>
+																				</td>
+																				<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+																					<g:if test="${dependencyBundleNumber}">
+																						${asset?.moveBundle} :
+																						<tds:showDependencyGroup groupId="${dependencyBundleNumber}"/>
+																					</g:if>
+																					<g:else>
+																						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+																							${asset?.moveBundle}
+																						</tds:tooltipSpan>
+																					</g:else>
+																				</td>
                                     </tr>
                                     <tr class="prop">
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>

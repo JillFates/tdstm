@@ -53,7 +53,22 @@
 					<tds:nameAndCompany client="${client}" person="${asset.appOwner}" />
 				</span>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
+			<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+				<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+					${standardFieldSpecs.moveBundle.label} : Dep. Group
+				</label>
+			</td>
+			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+				<g:if test="${dependencyBundleNumber}">
+					${asset?.moveBundle} :
+					<tds:showDependencyGroup groupId="${dependencyBundleNumber}"/>
+				</g:if>
+				<g:else>
+					<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+						${asset?.moveBundle}
+					</tds:tooltipSpan>
+				</g:else>
+			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
