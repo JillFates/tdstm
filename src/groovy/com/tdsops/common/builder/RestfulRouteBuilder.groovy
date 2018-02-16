@@ -17,6 +17,8 @@ import org.apache.http.client.utils.URIBuilder
  */
 class RestfulRouteBuilder extends RouteBuilder {
     private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
+    private static final String HTTP_PROTOCOL_REPLACE_REGEX = '(?i)(https:|http:)'
+    private static final String CAMEL_HTTP4_PROTOCOL = 'http4:'
 
     @Override
     void configure() throws Exception {
@@ -76,7 +78,7 @@ class RestfulRouteBuilder extends RouteBuilder {
      */
     private String sanitizeHostname(String hostname) {
         // do this for http4 camel component
-        return "http4:" + hostname.replaceAll("(https:|http:)", "")
+        return hostname.replaceAll(HTTP_PROTOCOL_REPLACE_REGEX, CAMEL_HTTP4_PROTOCOL)
     }
 
     /**
