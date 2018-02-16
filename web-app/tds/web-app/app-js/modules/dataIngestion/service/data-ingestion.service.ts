@@ -24,61 +24,6 @@ export class DataIngestionService {
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	mockData: CredentialModel[] = [
-		{
-			id: 1,
-			name: 'ServiceNow',
-			description: 'ServiceNOW CMDB datasource',
-			provider: {
-				id: 1,
-				name: 'ServiceNow'
-			},
-			environment: 'Production',
-			status: 'Active',
-			authMethod: 'HTTP_BASIC',
-			dateCreated: new Date()
-		},
-		{
-			id: 2,
-			name: 'AWS SNS',
-			description: 'Aut Method USESAST1 SNS Service',
-			provider: {
-				id: 1,
-				name: 'ServiceNow'
-			},
-			environment: 'Production',
-			status: 'Active',
-			authMethod: 'HTTP_BASIC',
-			dateCreated: new Date()
-		},
-		{
-			id: 3,
-			name: 'BMC Atrium',
-			description: 'Legacy CMDB datasource',
-			provider: {
-				id: 1,
-				name: 'ServiceNow'
-			},
-			environment: 'Production',
-			status: 'Inactive',
-			authMethod: 'HTTP_BASIC',
-			dateCreated: new Date()
-		},
-		{
-			id: 4,
-			name: 'CloudScape',
-			description: 'Auto Discovery datasource',
-			provider: {
-				id: 1,
-				name: 'ServiceNow'
-			},
-			environment: 'Production',
-			status: 'Active',
-			authMethod: 'HTTP_BASIC',
-			dateCreated: new Date()
-		}
-	];
-
 	constructor(private http: HttpInterceptor) {
 	}
 
@@ -161,7 +106,14 @@ export class DataIngestionService {
 		return this.http.get(`${this.credentialUrl}`)
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				let credentialModels = result && result.status === 'success' && result.data;
+
+				credentialModels.forEach((r) => {
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.environment = ENVIRONMENT[r.environment];
+					r.authMethod = AUTH_METHODS[r.authenticationMethod];
+				});
+				return credentialModels;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -328,7 +280,7 @@ export class DataIngestionService {
 			status: model.status.toUpperCase(),
 			authenticationMethod: Object.keys(AUTH_METHODS).find((type) => AUTH_METHODS[type] === model.authMethod),
 			username: model.username,
-			authenticationUrl: model.authenticationURL,
+			authenticationUrl: model.authenticationUrl,
 			// Temporary Fix
 			expirationDate: '2020-02-16 00:00:00.213Z'
 		};
@@ -338,9 +290,8 @@ export class DataIngestionService {
 			postRequest.password = model.password;
 		}
 
-		if (postRequest.authenticationMethod === AUTH_METHODS.COOKIE) {
-			postRequest.httpMethod = model.httpMethod.toUpperCase();
-		}
+		// Does this is really required, what if the AUTH METHOD is not Cookie?
+		postRequest.httpMethod = model.httpMethod.toUpperCase();
 
 		if (!model.id) {
 			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
@@ -351,7 +302,8 @@ export class DataIngestionService {
 				})
 				.catch((error: any) => error.json());
 		} else {
-			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
+			postRequest.version = model.version;
+			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data;
@@ -454,7 +406,7 @@ export class DataIngestionService {
 	}
 
 	deleteCredential(id: number): Observable<string> {
-		return this.http.delete(`${this.credentialUrl}/apiAction/${id}`)
+		return this.http.delete(`${this.credentialUrl}/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

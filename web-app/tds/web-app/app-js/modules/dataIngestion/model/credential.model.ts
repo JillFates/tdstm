@@ -24,8 +24,8 @@ export class CredentialColumnModel {
 				type: 'text',
 				width: 200
 			}, {
-				label: 'Credential Type',
-				property: 'credentialType.name',
+				label: 'Environment',
+				property: 'environment',
 				type: 'text',
 				width: 200
 			}, {
@@ -35,7 +35,7 @@ export class CredentialColumnModel {
 				width: 100
 			}, {
 				label: 'Auth Method',
-				property: 'authMethod.name',
+				property: 'authMethod',
 				type: 'text',
 				width: 200
 			}, {
@@ -65,10 +65,11 @@ export class CredentialModel {
 	// Authentication Methods
 	username?: string;
 	password?: string;
-	authenticationURL?: string;
+	authenticationUrl?: string;
 	// cookie auth Method
 	httpMethod?: string;
 	cookieName?: string;
+	version?: number;
 
 	constructor() {
 		this.name = '';
@@ -79,7 +80,7 @@ export class CredentialModel {
 		this.authMethod = '';
 		this.username = '';
 		this.password = '';
-		this.authenticationURL = '';
+		this.authenticationUrl = '';
 		this.httpMethod = '';
 		this.cookieName = '';
 	}
