@@ -35,21 +35,20 @@ read labels
 
 iterate {
     domain Application
-    
+
     extract 1 load id
     extract 'model name' transform with lowercase() load Name
     extract 3 transform with uppercase() load description
-    
+
     set environment with 'Production'
-    //reference id with id
-    reference assetName, id with Name, id
+    find Application 'for' id by id with SOURCE.'device id'
 
     domain Device
-    
+
     extract 1 load id
     extract 'model name' transform with uppercase() load Name
-}
-""".stripIndent()
+    find Device 'for' id by id with SOURCE.'device id'
+}""".stripIndent()
 
 
     def index () {
@@ -88,7 +87,7 @@ iterate {
             os << dataSet
             os.close()
 
-            etlProcessor = scriptProcessorService.process(project, script, fileSystemService.getTemporaryFullFilename(fileName))
+            etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
 
             fileSystemService.deleteTemporaryFile(fileName)
 
@@ -114,7 +113,7 @@ iterate {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.results as JSON),
+                jsonResult          : (etlProcessor?.result?.domains as JSON),
                 dataScriptId        : params.dataScriptId,
                 providerName        : params.providerName,
                 dataScriptName      : params.dataScriptName,
@@ -134,7 +133,7 @@ iterate {
         switch (request.method) {
             case 'GET':
                 if (!id) {
-                    sendInvalidInput('Please provide Data Script Id')
+                    sendInvalidInput('Please provide DataScript Id')
                     return
                 }
                 DataScript script = DataScript.findByProjectAndId(project, id)
@@ -148,7 +147,7 @@ iterate {
 
             case 'POST':
                 if (!id) {
-                    sendInvalidInput('Please provide Data Script Id')
+                    sendInvalidInput('Please provide DataScript Id')
                     return
                 }
                 DataScript script = DataScript.findByProjectAndId(project, id)

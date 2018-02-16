@@ -1,26 +1,11 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.GormUtil
 
-enum IngestionOperation {
-    ADD('Add'),
-    UPDATE('Update'),
-    DELETE('Delete')
-
-    final String label
-
-    private IngestionOperation(String label) {
-        this.label = label
-    }
-    String getKey() {
-        return name()
-    }
-
-    String toString() {
-        return label
-    }
-}
-
+/** 
+ * Indicates what direction that the data is flowing for a data script (in or out)
+ */
 enum DataScriptMode {
     IMPORT('Import'),
     EXPORT('Export')
@@ -89,31 +74,37 @@ class DataScript {
         lastModifiedBy  column: 'last_modified_by'
     }
 
-    def beforeInsert = {
-       dateCreated = TimeUtil.nowGMT()
-    }
-    def beforeUpdate = {
-        lastUpdated = TimeUtil.nowGMT()
+    /**
+     * Return a map representation of the DataScript instance.
+     * @param minimalInfo: if set to true only the id and name will be returned.
+     * @return
+     */
+    Map toMap(boolean minimalInfo = false) {
+        Map map = [
+            id: id,
+            name: name
+        ]
+
+        if (! minimalInfo) {
+            map.description = description
+            map.target = target
+            map.mode = mode.toString()
+            map.etlSourceCode = etlSourceCode
+            map.provider = [id: provider.id, name: provider.name]
+            map.dateCreated = dateCreated
+            map.lastUpdated = lastUpdated
+        }
+
+        return map
     }
 
     /**
-     * Return a map representation of the DataScript instance.
-     * @return
+     * List of domain references for DataScripts
+     * TODO : JPM 2/2018 : TM-9346 - Change DataScriptService to not require DataScript.domainReferences
      */
-    Map toMap() {
-        Map dataMap = [
-                id: id,
-                name: name,
-                description: description,
-                target: target,
-                mode: mode.toString(),
-                etlSourceCode: etlSourceCode,
-                provider: [id: provider.id, name: provider.name],
-                dateCreated: dateCreated,
-                lastUpdated: lastUpdated
-        ]
-
-        return dataMap
-    }
+    static final List<Map> domainReferences = [
+        [domain: ApiAction, delete: "restrict", property: "defaultDataScript", domainLabel: "API Action"],
+        [domain: ImportBatch, delete: "cascade", property: "dataScript", domainLabel: "Import Batch"]
+    ]
 
 }

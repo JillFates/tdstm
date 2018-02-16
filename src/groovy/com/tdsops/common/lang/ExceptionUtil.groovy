@@ -21,7 +21,7 @@ class ExceptionUtil {
 	 * Used to generate a Stacktrace as a string that limited to N lines with a message prefix
 	 * @param msg - the prefix message to include in the resulting string
 	 * @param e - the exception to get the stacktrace on
-	 * @param lines - the number of lines to include in the trace (default 40)
+	 * @param lines - the number of lines to include in the trace (default 40), set to zero (0) will show all
 	 * @return The string containing the stacktrace
 	 */
 	static String stackTraceToString(String msg, Exception e, Integer lines = 40) {

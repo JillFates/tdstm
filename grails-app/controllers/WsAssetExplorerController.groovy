@@ -13,7 +13,6 @@ import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataviewService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.dataview.DataviewSpec
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -30,7 +29,6 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	private final static DELETE_OK_STATUS = "Dataview deleted successfully";
 
 	DataviewService dataviewService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
@@ -56,12 +54,8 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * @return
 	 */
 	def getDataview(Integer id) {
-		try {
-			Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
-			renderSuccessJson([dataView: dataviewMap])
-		} catch (Exception e) {
-			handleException e, log
-		}
+		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
+		renderSuccessJson([dataView: dataviewMap])
 	}
 
 	/**
@@ -72,15 +66,11 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured('isAuthenticated()')
 	def updateDataview(Integer id) {
-		try {
-            Person currentPerson = securityService.loadCurrentPerson()
-            Project currentProject = securityService.userCurrentProject
+		Person currentPerson = securityService.loadCurrentPerson()
+		Project currentProject = securityService.userCurrentProject
 
-			Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
-			renderSuccessJson([dataView: dataviewMap])
-		} catch (Exception e) {
-			handleException e, log
-		}
+		Map dataviewMap = dataviewService.update(currentPerson, currentProject, id, request.JSON).toMap(securityService.currentPersonId)
+		renderSuccessJson([dataView: dataviewMap])
 	}
 
 	/**
@@ -91,17 +81,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured('isAuthenticated()')
 	def createDataview() {
-		try {
+		JSONObject dataviewJson = request.JSON
+		Person person = securityService.loadCurrentPerson()
+		Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
 
-            JSONObject dataviewJson = request.JSON
-			Person person = securityService.loadCurrentPerson()
-			Project project = dataviewJson.isSystem ? Project.getDefaultProject() : securityService.userCurrentProject
-
-			Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
-			renderSuccessJson([dataView: dataviewMap])
-		} catch (Exception e) {
-			handleException e, log
-		}
+		Map dataviewMap = dataviewService.create(person, project, dataviewJson).toMap(securityService.currentPersonId)
+		renderSuccessJson([dataView: dataviewMap])
 	}
 
 	/**
@@ -112,14 +97,9 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 */
 	@Secured('isAuthenticated()')
 	def deleteDataview(Integer id) {
-		try {
-			dataviewService.delete(id)
-			renderSuccessJson([status: DELETE_OK_STATUS] )
-		} catch (Exception e) {
-			handleException e, log
-		}
+		dataviewService.delete(id)
+		renderSuccessJson([status: DELETE_OK_STATUS] )
 	}
-
 
     /**
      * Performs a query for the Asset Explorer data grid using a saved View Specification plus

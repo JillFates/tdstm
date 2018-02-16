@@ -201,5 +201,10 @@ export class ProviderListComponent {
 			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.filter),
 			total: this.resultSet.length
 		};
+		// If we delete an item and it was the last element in the page, go one page back
+		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
+			this.skip -= this.defaultPageSize;
+			this.loadPageData();
+		}
 	}
 }

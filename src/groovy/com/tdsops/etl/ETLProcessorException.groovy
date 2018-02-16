@@ -19,8 +19,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Incorrect skip step: $skip".toString())
     }
 
-    static ETLProcessorException invalidCommand (String message) {
-        new ETLProcessorException(message)
+    static ETLProcessorException notCurrentFindElement() {
+        new ETLProcessorException('You need to define a find element first')
     }
 
     static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain) {
@@ -75,7 +75,52 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException(message)
     }
 
+    static ETLProcessorException UnknownVariable (Object value) {
+        new ETLProcessorException("Unknown variable: ${value}".toString())
+    }
+
+    static ETLProcessorException unknownDataSetProperty (Object value) {
+        new ETLProcessorException("Unknown dataSet property: ${value}".toString())
+    }
+
+    static ETLProcessorException unknownDomainProperty (Object value) {
+        new ETLProcessorException("Unknown DOMAIN property: ${value}".toString())
+    }
+
     static ETLProcessorException currentElementNotDefined () {
         new ETLProcessorException('CE (current element) is not defined.')
     }
+
+	static ETLProcessorException findElementWithoutDependentIdDefinition (String... fields) {
+		new ETLProcessorException("Find commands does not have dependant definition using multiple field names ${fields.join(',')}".toString())
+	}
+
+    static ETLProcessorException invalidFindCommand (String dependentId) {
+        new ETLProcessorException("Find commands need to have defined a previous column result with ${dependentId} value".toString())
+    }
+
+    static ETLProcessorException invalidDomainPropertyName (ETLDomain domain, String fieldName) {
+        new ETLProcessorException("$fieldName is not a domain property for ${domain.name()}".toString())
+    }
+
+    static ETLProcessorException invalidDomainReference (ETLDomain domain, String fieldName) {
+        new ETLProcessorException("$fieldName is not a domain reference for ${domain.name()}".toString())
+    }
+
+    static ETLProcessorException invalidWhenFoundCommand(String fieldName) {
+        new ETLProcessorException("Incorrect whenFound command. Use whenFound $fieldName update { .... }".toString())
+    }
+
+    static ETLProcessorException invalidWhenNotFoundCommand(String fieldName) {
+        new ETLProcessorException("Incorrect whenNotFound command. Use whenNotFound $fieldName create { .... }".toString())
+    }
+
+    static ETLProcessorException incorrectDomain (ETLDomain domain) {
+        new ETLProcessorException("Cannot create a query for domain ${domain.name()}".toString())
+    }
+
+	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
+		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
+	}
 }
+

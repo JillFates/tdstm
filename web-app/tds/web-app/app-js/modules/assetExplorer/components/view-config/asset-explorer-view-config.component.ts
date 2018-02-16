@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit } from '@angular/core';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -10,7 +10,7 @@ import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewModel } from '../../model/view.model';
 import { ViewColumn, QueryColumn } from '../../model/view-spec.model';
 import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { AssetExplorerViewGridComponent } from '../view-grid/asset-explorer-view-grid.component';
+import {AssetExplorerViewGridComponent} from '../view-grid/asset-explorer-view-grid.component';
 import { AssetExplorerViewSelectorComponent } from '../view-selector/asset-explorer-view-selector.component';
 import { AssetExplorerViewSaveComponent } from '../view-save/asset-explorer-view-save.component';
 import { AssetExplorerViewExportComponent } from '../view-export/asset-explorer-view-export.component';
@@ -23,6 +23,7 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 
+declare var jQuery: any;
 @Component({
 	selector: 'asset-explorer-View-config',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/view-config/asset-explorer-view-config.component.html',
@@ -44,7 +45,7 @@ import { LAST_VISITED_PAGE } from '../../../../shared/model/constants';
 		}
 	`]
 })
-export class AssetExplorerViewConfigComponent {
+export class AssetExplorerViewConfigComponent implements OnInit {
 	@ViewChild('grid') grid: AssetExplorerViewGridComponent;
 	@ViewChild('select') select: AssetExplorerViewSelectorComponent;
 
@@ -101,6 +102,13 @@ export class AssetExplorerViewConfigComponent {
 		}, (err) => console.log(err));
 	}
 
+	ngOnInit(): void {
+		if (this.model.id) {
+			this.previewButtonClicked = true;
+			this.onPreview();
+		}
+	}
+
 	protected updateFilterbyModel() {
 		this.model.schema.domains.forEach((domain: string) => this.filterModel.assets[domain.toUpperCase()] = true);
 		this.applyFilters();
@@ -116,6 +124,7 @@ export class AssetExplorerViewConfigComponent {
 			this.model.schema.domains = [];
 			this.model.schema.columns = [];
 			this.draggableColumns = this.model.schema.columns.slice();
+			this.clearSorting();
 		} else {
 			this.model.schema.columns = this.model.schema.columns
 				.filter(c => this.model.schema.domains.indexOf(c.domain) !== -1);
@@ -140,6 +149,9 @@ export class AssetExplorerViewConfigComponent {
 		this.columnIndex = 0;
 		this.rowIndex = 0;
 		this.position = this.fields.map(x => this.fieldStyle(x['isTitle']));
+		setTimeout(() => {
+			jQuery('[data-toggle="popover"]').popover();
+		}, 200);
 	}
 
 	protected applyAssetSelectFilter(): void {
@@ -332,7 +344,8 @@ export class AssetExplorerViewConfigComponent {
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
 			assetQueryParams: this.getQueryParams(),
-			domains: this.domains
+			domains: this.domains,
+			viewName: this.model.name
 		};
 
 		this.dialogService.open(AssetExplorerViewExportComponent, [
@@ -377,18 +390,41 @@ export class AssetExplorerViewConfigComponent {
 				this.model.schema.sort.domain = this.model.schema.columns[0].domain;
 				this.model.schema.sort.property = this.model.schema.columns[0].property;
 			}
+
+			if (!this.model.schema.columns.length) {
+				this.clearSorting();
+			}
+
 		}
 		this.draggableColumns = this.model.schema.columns.slice();
 		this.grid.clear();
 		this.previewButtonClicked = false;
 	}
 
+	/**
+	 * This method allows to modify the signature to allow to change favorite without affect the model.
+	 * TODO: It could be moved into a Signature Class Utility to not have all this logic spread on sereval components
+	 * @param {boolean} isFavorite
+	 */
+	private modifyFavoriteSignature(isFavorite: boolean): void {
+		let signature = JSON.parse(this.dataSignature);
+		signature.isFavorite = isFavorite;
+		this.dataSignature = JSON.stringify(signature);
+	}
+
 	protected onFavorite() {
 		if (this.model.isFavorite) {
-			this.model.isFavorite = false;
 			if (this.model.id) {
-				this.select.loadData();
+				this.assetExpService.deleteFavorite(this.model.id)
+					.subscribe(d => {
+						this.model.isFavorite = false;
+						this.modifyFavoriteSignature(this.model.isFavorite);
+						this.select.loadData();
+					});
+			} else {
+				this.model.isFavorite = false;
 			}
+
 		} else {
 			if (this.assetExpService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
@@ -396,10 +432,18 @@ export class AssetExplorerViewConfigComponent {
 					message: 'Maximum number of favorite data views reached.'
 				});
 			} else {
-				this.model.isFavorite = true;
+				if (this.model.id) {
+					this.assetExpService.saveFavorite(this.model.id)
+						.subscribe(d => {
+							this.model.isFavorite = true;
+							this.modifyFavoriteSignature(this.model.isFavorite);
+							this.select.loadData();
+						});
+				} else {
+					this.model.isFavorite = true;
+				}
 			}
 		}
-
 	}
 
 	protected onPreview(): void {
@@ -408,10 +452,16 @@ export class AssetExplorerViewConfigComponent {
 			this.assetExpService.previewQuery(params)
 				.subscribe(result => {
 					this.grid.apply(result);
+					jQuery('[data-toggle="popover"]').popover();
 				}, err => console.log(err));
 		} else {
 			this.grid.gridData = null;
 		}
+	}
+
+	private freezeColumn(item: ViewColumn): void {
+		item.locked = !item.locked;
+		this.onLockedColumn(item);
 	}
 
 	protected onLockedColumn(item: ViewColumn): void {
@@ -452,6 +502,11 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
+		setTimeout(() => {
+			this.notifier.broadcast({
+				name: 'grid.header.position.change'
+			});
+		}, 1200);
 	}
 
 	protected onToggleSelectedColumnsPreview(): void {
@@ -460,5 +515,10 @@ export class AssetExplorerViewConfigComponent {
 
 	protected onDragEnd(): void {
 		this.model.schema.columns = this.draggableColumns.slice();
+	}
+
+	private clearSorting() {
+		this.grid.state.sort = [];
+		delete this.model.schema.sort;
 	}
 }

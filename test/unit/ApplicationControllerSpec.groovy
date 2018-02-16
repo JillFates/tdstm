@@ -2,6 +2,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.NumberUtil
 import grails.test.GrailsMock
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 
 import net.transitionmanager.domain.UserLogin

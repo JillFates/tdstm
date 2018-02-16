@@ -1312,6 +1312,8 @@ tds.comments.service.CommentService = function (utils, http, q) {
                 }).error(function (data, status, headers, config) {
                     deferred.reject(data);
                 });
+            } else {
+                deferred.resolve({});
             }
 		return deferred.promise;
 	};

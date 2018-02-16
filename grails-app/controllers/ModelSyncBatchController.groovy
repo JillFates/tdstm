@@ -11,7 +11,6 @@ import net.transitionmanager.domain.ModelSyncBatch
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ManufacturerService
 import net.transitionmanager.service.ModelService
-import net.transitionmanager.service.SecurityService
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -20,7 +19,6 @@ class ModelSyncBatchController implements ControllerMethods {
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
 
-	SecurityService securityService
 	ManufacturerService manufacturerService
 	ModelService modelService
 

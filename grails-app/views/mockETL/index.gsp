@@ -37,7 +37,6 @@
                 <br>
                 <textarea class="form-control" name="dataSet" rows="${lineNumbers - 2}" style="width: 100%;">${dataSet}</textarea>
                 <br>
-
                 <div class="col-md-12">
                     <h1>Service Now Document</h1>
                     <g:if test="${flash.message}"><div class="message" role="status">${flash.message}</div></g:if>
@@ -48,9 +47,7 @@
                         <div class="col-md-4">
                             <g:submitButton name="fetch" class="form-control"  value="Fetch" />
                         </div>
-
                 </div>
-
             </fieldset>
         </div>
 
@@ -77,7 +74,7 @@
                     </div>
                 </g:if>
                 <br>
-                <input class="form-control" type="submit" value="Apply">
+                    <input class="form-control" type="submit" value="Apply">
                 <br>
                 <div class="col-md-5">
                      DataScript Id: <input type="text" size="3" name="dataScriptId" id="dataScriptId" value="${dataScriptId}"">
@@ -114,36 +111,39 @@
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
 
-                <g:if test="${!(etlProcessor?.results)}">
+                <g:if test="${!(etlProcessor?.result)}">
                     <h2>Note Results yet</h2>
                 </g:if>
 
-                    <g:each in="${com.tdsops.etl.ETLDomain.values()}" var="domain">
-                        <g:set var="domainResults" value="${etlProcessor?.results?.getAt(domain)}"></g:set>
-                        <g:if test="${domainResults}">
+                <g:each in="${etlProcessor?.result?.domains}" var="resultsRow">
+                    <h3>Results for Domain ${resultsRow.domain}</h3>
 
-                            <h3>Results for Domain ${domain}</h3>
+                    <div class="table-responsive">
+                        <table style="width:100%" class="table table-condensed table-hover">
+                            <tr>
+                                <g:each in="${resultsRow.fields}" var="header">
+                                    <th>${header}</th>
+                                </g:each>
+                            </tr>
+                            <g:each in="${resultsRow.data}" var="row" status="i">
+                                <tr>
+                                    <g:each in="${resultsRow.fields}" var="fieldName">
+                                        <td>${row.fields[fieldName].value} <br>
+                                            ${row.fields[fieldName].find.query?:''} <br>
 
-                            <div class="table-responsive">
-                                <table style="width:100%" class="table table-condensed table-hover">
-                                    <tr>
-                                        <th># Reference</th>
-                                        <g:each in="${domainResults[0].elements}" var="header">
-                                            <th>${header.field.label}</th>
-                                        </g:each>
-                                    </tr>
-                                    <g:each in="${domainResults}" var="row" status="i">
-                                        <tr>
-                                            <td>${row.reference}</td>
-                                            <g:each in="${row.elements}" var="value">
-                                                <td>${value.value}</td>
-                                            </g:each>
-                                        </tr>
+                                            <g:if test="${(row.fields[fieldName].find.results)}">
+                                                <b>Results:</b>
+                                                ${row.fields[fieldName].find.results}
+                                            </g:if>
+                                        </td>
                                     </g:each>
-                                </table>
-                            </div>
-                        </g:if>
-                    </g:each>
+                                </tr>
+                            </g:each>
+                        </table>
+                    </div>
+
+                </g:each>
+
                 </div>
 
                 <div id="menu1" class="tab-pane fade">
@@ -230,7 +230,7 @@
         });
     }
 
-    // Saves the current script to the specified Data Script id
+    // Saves the current script to the specified DataScript id
     function saveDataScriptSource() {
         var dataScriptId = $("#dataScriptId").val();
         var data = { "script": $("#script").val() };

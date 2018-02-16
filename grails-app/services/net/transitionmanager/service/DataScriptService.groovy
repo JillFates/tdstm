@@ -180,4 +180,44 @@ class DataScriptService implements ServiceMethods{
         }
         return dataScript
     }
+
+    /**
+     * Find a given DataScript with the given ID and Project.
+     * @param dataScriptId
+     * @param project
+     * @return
+     */
+    DataScript findDataScriptByProject(Long dataScriptId, Project project = null) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
+        return GormUtil.findInProject(project, DataScript, dataScriptId, true)
+    }
+
+    /**
+     * Given a DataScript ID, this method returns a map containing the details
+     * of the references of this DataScript in other domains.
+     *
+     * @param dataScriptId
+     * @return
+     */
+    Map checkDataScriptReferences(Long dataScriptId) {
+        DataScript dataScript = findDataScriptByProject(dataScriptId)
+        List<Map> references = DataScript.domainReferences
+        Map<String, Long> foundReferences = [:]
+        for (reference in references) {
+            if (reference.delete == 'restrict') {
+                String hql = """
+                    SELECT COUNT(*) FROM ${reference.domain.getSimpleName()}
+                    WHERE ${reference.property} = :dataScript
+                """
+                Long refs = reference.domain.executeQuery(hql, [dataScript: dataScript])[0]
+                if (refs > 0) {
+                    foundReferences[reference.domainLabel] = refs
+                }
+            }
+        }
+
+        return [canDelete: !foundReferences, references: foundReferences]
+    }
 }

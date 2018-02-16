@@ -69,8 +69,20 @@ class ErrorHandlerService {
 		return uri
 	}
 
+	/** 
+	 * Used to retrieve the exception that was caught at the controller layer
+	 * @return the exception that occurred
+	 */
 	Exception getException(request) {
 		request.getAttribute('exception')
+	}
+
+	/**
+	 * Used to set the exception that the controller error handler layer should report
+	 * @param ex - the exception to report
+	 */
+	void setException(Exception ex, request) {
+		request.setAttribute('exception', ex)
 	}
 
 	/**

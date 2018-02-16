@@ -19,7 +19,6 @@ import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
@@ -36,7 +35,6 @@ class UserLoginController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
 	ProjectService projectService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.UserView)
@@ -85,22 +83,17 @@ class UserLoginController implements ControllerMethods {
 			active = 'Y'
 		}
 
-		// Search valid roles to display
-		def systemRolesList = []
-		for (RoleType sr in securityService.securityRoleTypes) {
-			systemRolesList << "'$sr.id'"
-		}
 
 		def query = new StringBuffer("""SELECT * FROM (SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate,
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId, u.is_local AS isLocal, u.locked_out_until AS locked, u.failed_login_attempts AS failedAttempts
-			FROM party_role pr
-			LEFT OUTER JOIN person p on p.person_id=pr.party_id
+			FROM person p
+			LEFT OUTER JOIN party_role pr on p.person_id=pr.party_id
 			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
-			WHERE role_type_id in (${systemRolesList.join(", ")}) AND u.active = '$active'""")
+			WHERE u.active = '$active'""")
 		if (active=='Y')
 			query.append(" AND u.expiry_date > '$presentDate' ")
 		else
@@ -122,7 +115,7 @@ class UserLoginController implements ControllerMethods {
 				query.append(" AND pg.party_group_id = $companyId ")
 			}
 			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name) as users")
-			query.append(" GROUP BY pr.party_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
+			query.append(" GROUP BY p.person_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
 
 			// Handle the filtering by each column's text field
 			def firstWhere = true

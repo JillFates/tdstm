@@ -19,7 +19,6 @@ import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.RackService
 import net.transitionmanager.service.RoomService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 
@@ -34,7 +33,6 @@ class RoomController implements ControllerMethods {
 	ControllerService controllerService
 	RackService rackService
 	RoomService roomService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 

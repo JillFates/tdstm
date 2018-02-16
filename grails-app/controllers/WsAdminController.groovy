@@ -15,12 +15,7 @@ class WsAdminController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserUnlock)
 	def unlockAccount() {
-		try {
-			securityService.unlockAccount(UserLogin.get(params.id))
-			renderSuccessJson()
-		}
-		catch (e) {
-			handleException e, logger
-		}
+		securityService.unlockAccount(UserLogin.get(params.id))
+		renderSuccessJson()
 	}
 }

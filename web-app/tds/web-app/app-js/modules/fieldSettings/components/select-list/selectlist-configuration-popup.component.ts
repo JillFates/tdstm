@@ -1,13 +1,12 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import {Component, Inject, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import { SortableComponent } from '@progress/kendo-angular-sortable';
+import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
-declare var jQuery: any;
 /**
  *
  */
@@ -59,17 +58,20 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 
 				let indexOfBlank = distinctValues.indexOf('');
 				// Add blank(empty) option if its a required field or remove it if opposite.
-				if (this.field.constraints.required && indexOfBlank !== -1) {
+				if (this.field.constraints.required && indexOfBlank !== ValidationUtils.NOT_FOUND) { // If REQUIRED remove blank(empty) option
 					distinctValues.splice(indexOfBlank, 1);
-				} else if (!this.field.constraints.required && indexOfBlank === -1) {
-					this.items.splice(0, 0, '');
+				} else if (!this.field.constraints.required && indexOfBlank === ValidationUtils.NOT_FOUND) { // If NOT REQUIRED and distinctValues have no empty option register it.
+					distinctValues.push('');
+					if (this.field.constraints.values && this.field.constraints.values.indexOf('') === ValidationUtils.NOT_FOUND) { // If it's not yet on current field values add it to items list (not deletable)
+						this.items.splice(0, 0, {deletable: false, value: ''} );
+					}
 				}
 
 				// build the option items list based on distinctValues and current stored values (maintain the order).
 				if (this.field.constraints.values) {
 					for (let option of this.field.constraints.values) {
 						let indexOfDistinctValue = distinctValues.indexOf(option);
-						if (indexOfDistinctValue === -1) {
+						if (indexOfDistinctValue === ValidationUtils.NOT_FOUND) {
 							this.items.push( {deletable: true, value: option} );
 						} else {
 							distinctValues.splice(indexOfDistinctValue, 1);
@@ -111,9 +113,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 			if (this.sortType) {
 				this.sortItems();
 			}
-			setTimeout(function () {
-				jQuery('#newItem').focus();
-			});
 		}
 	}
 

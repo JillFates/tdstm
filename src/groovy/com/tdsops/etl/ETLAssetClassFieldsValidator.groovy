@@ -5,10 +5,9 @@ import com.tdsops.tm.enums.domain.AssetClass
 class ETLAssetClassFieldsValidator implements ETLFieldsValidator {
 
     Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
-    /**
-     *
+
+	/**
      * Add fields specification for an AssetClass instance
-     *
      * @param assetClass
      * @param fieldsSpec
      */
@@ -29,10 +28,18 @@ class ETLAssetClassFieldsValidator implements ETLFieldsValidator {
                 break
         }
     }
+
+	/**
+	 * Add fields specification for an ETLDomain instance
+	 * @param domain an instance of ETLDomain
+	 * @param fieldsSpec
+	 */
+	void addAssetClassFieldsSpecFor (ETLDomain domain, List<Map<String, ?>> fieldsSpec) {
+		assetClassFieldsSpecMap[domain] = fieldsSpec
+	}
+
     /**
-     *
      * Checks if it has fields specification for a domain instance
-     *
      * @param domain
      * @param field
      * @return

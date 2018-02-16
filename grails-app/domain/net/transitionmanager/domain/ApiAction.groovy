@@ -3,10 +3,11 @@ package net.transitionmanager.domain
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
-import groovy.util.logging.Slf4j
-import groovy.transform.ToString
+import net.transitionmanager.command.ApiActionMethodParam
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
@@ -16,7 +17,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  * The ApiAction domain represents the individual mapped API methods that can be
  * invoked by the TransitionManager application in Tasks and other places.
  */
-@Slf4j(value='logger')
+@Slf4j
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
@@ -41,12 +42,13 @@ class ApiAction {
 
 	/*
 	 * A JSON object that contains the mapping of method parameters and where the values will be sourced from
-	 * [ {	'param':'assetId',
-	 *			'desc': 'The unique id to reference the asset',
-	 *			'type':'string',
-	 *			'context': ContextType.ASSET.toString(),	// The context that the param value will be pulled from
-	 * 			'property': 'id', 	// The property on the context that the value will be pulled from
-	 *			'value': 'user def value'	// The value to use context is ContextType.USER_DEF
+	 * [ {
+	 * 		"param":"assetId",
+	 *		"desc": "The unique id to reference the asset",
+	 *		"type":"string",
+	 *		"context": ContextType.ASSET.toString(),	// The context that the param value will be pulled from
+	 * 		"property": "field", 	// The property on the context that the value will be pulled from
+	 *		"value": "user def value"	// The value to use context is ContextType.USER_DEF
 	 *   }
 	 * ]
 	 */
@@ -172,9 +174,9 @@ class ApiAction {
 	 * @return The methodParams JSON as Groovy List<Map>
 	 */
 	List<Map> getMethodParamsList(){
-		JsonSlurper slurper = new groovy.json.JsonSlurper()
 		List<Map> list = []
 		if (methodParams) {
+			JsonSlurper slurper = new groovy.json.JsonSlurper()
 			try {
 				list = slurper.parseText(methodParams)
 			} catch (e) {
@@ -184,11 +186,39 @@ class ApiAction {
 		return list
 	}
 
-	def beforeInsert = {
+	/**
+	 * return a list of the ApiAction
+	 * @return
+	 */
+	List<ApiActionMethodParam> getListMethodParams() {
+		List<ApiActionMethodParam> list = []
+		if (methodParams) {
+			JsonSlurper slurper = new groovy.json.JsonSlurper()
+			def listJson = slurper.parseText(methodParams)
+			if(!(listJson instanceof List)){
+				listJson = [listJson]
+			}
+
+			list = listJson.collect { new ApiActionMethodParam(it) }
+		}
+		return list
+	}
+
+	def beforeInsert() {
 		dateCreated = TimeUtil.nowGMT()
 	}
-	def beforeUpdate = {
+	def beforeUpdate() {
 		lastModified = TimeUtil.nowGMT()
+	}
+
+	def beforeValidate() {
+		// validate methodParams
+		try{
+			getListMethodParams()
+		} catch (e) {
+			this.errors.rejectValue('methodParams', e.getMessage())
+		}
+
 	}
 
 	/**
@@ -222,7 +252,7 @@ class ApiAction {
 		// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
 		for (key in reactionJson.keySet()) {
 			if (!ReactionScriptCode.lookup(key)) {
-				logger.warn("Unrecognized key $key in reaction JSON.")
+				log.warn("Unrecognized key $key in reaction JSON.")
 				invalidKeys << key
 				errors = true
 			}

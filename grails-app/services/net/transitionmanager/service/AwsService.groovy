@@ -25,19 +25,13 @@ class AwsService implements InitializingBean {
 	// Queue name used for inbound responses to method invocations
 	static final String responseQueueName = 'TransitionManager_Response_Queue'
 
-	String accessKey
-	String secretKey
+	// making this null intentionally so no SQS and SNS routes are built
+	// TM-9052 <SL>
+	String accessKey = null
+	String secretKey = null
 
 	void afterPropertiesSet() {
 		def config = grailsApplication.config
-
-		// Settings that should now be in
-		// accessKey='AKIAJQVV5RZ45K6T5GRA'
-		// secretKey='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'
-
-		// TODO : The credentials should be loaded based on the project
-		accessKey = config?.tdstm?.credentials?.aws?.accessKey ?: null
-		secretKey = config?.tdstm?.credentials?.aws?.secretKey ?: null
 	}
 
 	/**

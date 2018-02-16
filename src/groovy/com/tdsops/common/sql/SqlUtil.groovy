@@ -1,7 +1,6 @@
 package com.tdsops.common.sql
 
-import com.tdsops.tm.search.FieldSearchData
-import com.tdssrc.grails.NumberUtil
+import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.StringUtils
@@ -561,19 +560,23 @@ class SqlUtil {
 	/**
 	 * Used to generate HQL that will properly concatenate a person's full name
 	 * @param propertyName - the particular property to construct the HQL for
-	 * @return the HQL for the computated fullName
+	 * @return the HQL for the computed fullName
 	 */
-	static String personFullName(String propertyName, String table = null) {
-		if (table != null) {
-			propertyName = "${table}.${propertyName}"
+	static String personFullName(String propertyName = "", String table = null) {
+		if (propertyName) {
+			if (table != null) {
+				propertyName = "${table}.${propertyName}"
+			}
+			propertyName = "${propertyName}."
 		}
+
 		return """
 				CONCAT( 
-					COALESCE(${propertyName}.firstName, ''),
-					CASE WHEN COALESCE(${propertyName}.middleName, '') = '' THEN '' ELSE ' ' END,
-					COALESCE(${propertyName}.middleName,''),
-					CASE WHEN COALESCE(${propertyName}.lastName, '') = '' THEN '' ELSE ' ' END,
-					COALESCE(${propertyName}.lastName,'')
+					COALESCE(${propertyName}firstName, ''),
+					CASE WHEN COALESCE(${propertyName}middleName, '') = '' THEN '' ELSE ' ' END,
+					COALESCE(${propertyName}middleName,''),
+					CASE WHEN COALESCE(${propertyName}lastName, '') = '' THEN '' ELSE ' ' END,
+					COALESCE(${propertyName}lastName,'')
 				)
 				"""
 	}

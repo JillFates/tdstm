@@ -10,6 +10,8 @@ import spock.lang.Shared
 import test.helper.CredentialTestHelper
 import test.helper.ProjectTestHelper
 import test.helper.ProviderTestHelper
+import grails.plugins.rest.client.RestBuilder
+import groovy.json.JsonOutput
 
 class CredentialServiceFunctionalSpec extends IntegrationSpec {
     final static String TEST_USERNAME = 'FooTestUser'
@@ -35,11 +37,11 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
         signupHelper.deleteUserLoginByUsername(TEST_USERNAME)
     }
 
-    def "credentialService validate successful authentication using JWT_TOKEN using TDSTM as token issuer"() {
+    def "1. credentialService validate successful authentication using JWT using TDSTM as token issuer"() {
         given: 'a credential'
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
-            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, HOSTNAME, AuthenticationMethod.JWT_TOKEN)
+            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, HOSTNAME, AuthenticationMethod.JWT)
             final Long id = credential.id
 
         when: 'authenticate using provided credentials for a JWT token'
@@ -51,6 +53,20 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
             'refresh_token'     in authentication.keySet()
             'token_type'        in authentication.keySet()
             'expires_in'        in authentication.keySet()
+    }
+
+    def '2. /ws/credential/enums call to get JSON map of Credential Enums'() {
+        when: 'calling the endpoint'
+            RestBuilder rest = new RestBuilder()
+            String urlString = "${grailServerUrl()}/ws/credential/enums" as String
+            def resp = rest.get(urlString) {
+                accept("application/json")
+            }
+
+        then: 'return should be OK'
+            resp.status == HttpServletResponse.SC_OK
+            println resp
+        
     }
 
 }

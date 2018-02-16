@@ -89,20 +89,6 @@ export class DataIngestionService {
 		}
 	];
 
-	mockParametersData: APIActionParameterModel[] = [
-		{
-			id: 1,
-			name: 'sys_id',
-			description: 'The Unique ID used by ServiceNow (sysid)',
-			dataType: 'String',
-			context: {
-				value: 'Application',
-				assetClass: 'APPLICATION'
-			},
-			value: 'externalRelId'
-		}
-	];
-
 	constructor(private http: HttpInterceptor) {
 	}
 
@@ -160,7 +146,11 @@ export class DataIngestionService {
 						}
 					};
 					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					APIActionModel.createReactions(r, r.reactionScripts);
+					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
+						APIActionModel.createReactions(r, r.reactionScripts);
+					} else {
+						APIActionModel.createBasicReactions(r);
+					}
 				});
 				return dataScriptModels;
 			})
@@ -181,8 +171,18 @@ export class DataIngestionService {
 		return Observable.from(this.mockData).bufferCount(this.mockData.length);
 	}
 
-	getParameters(): Observable<APIActionParameterModel[]> {
-		return Observable.from(this.mockParametersData).bufferCount(this.mockParametersData.length);
+	/**
+	 * Validate and wrap the content of the Parameters inside the Model and creates and observable from it.
+	 * @param {APIActionModel} model
+	 * @returns {Observable<APIActionParameterModel[]>}
+	 */
+	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
+		return new Observable(observer => {
+			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
+				observer.next(JSON.parse(model.methodParams));
+			}
+			observer.complete();
+		});
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
@@ -254,7 +254,7 @@ export class DataIngestionService {
 		}
 	}
 
-	saveAPIAction(model: APIActionModel): Observable<DataScriptModel> {
+	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
@@ -285,6 +285,13 @@ export class DataIngestionService {
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
 		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
+
+		if (parameterList && parameterList.data && parameterList.data.length > 0) {
+			parameterList.data.forEach( (param) => {
+				delete param.currentFieldList;
+			});
+			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+		}
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
@@ -374,6 +381,20 @@ export class DataIngestionService {
 
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Validate if the current DataScript is being or not used somewhere
+	 * @param {number} id
+	 * @returns {Observable<string>}
+	 */
+	validateDeleteScript(id: number): Observable<string> {
+		return this.http.get(`${this.dataIngestionUrl}/datascript/validateDelete/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
