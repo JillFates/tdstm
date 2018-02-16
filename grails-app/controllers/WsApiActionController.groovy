@@ -1,20 +1,11 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
-import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.integration.ApiActionJob
-import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionValidateScriptCommand
-import net.transitionmanager.integration.ReactionAssetFacade
-import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 

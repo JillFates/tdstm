@@ -1,3 +1,4 @@
+import com.tdsops.common.builder.RestfulRouteBuilder
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
@@ -187,4 +188,6 @@ beans = {
 		bean.scope = 'prototype'
 		messageSourceService = ref('messageSourceService')
 	}
+
+	restfulRouteBuilder(RestfulRouteBuilder)
 }
