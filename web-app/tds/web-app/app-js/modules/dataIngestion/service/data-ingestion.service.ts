@@ -216,7 +216,7 @@ export class DataIngestionService {
 	}
 
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
-		let postRequest = {
+		let postRequest: any = {
 			name: model.name,
 			description: model.description,
 			provider: model.provider.id,
@@ -252,6 +252,10 @@ export class DataIngestionService {
 				delete param.currentFieldList;
 			});
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+		}
+
+		if(model.credential && model.credential.id && model.credential.id !== 0) {
+			postRequest.credential = model.credential.id;
 		}
 
 		if (!model.id) {
