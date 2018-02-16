@@ -1,10 +1,22 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.integration.*
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ReactionHttpStatus
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 
@@ -21,6 +33,10 @@ class ApiActionServiceSpec extends Specification {
 			bean.scope = 'prototype'
 			messageSourceService = ref('messageSourceService')
 		}
+
+		taskFacade(TaskFacade) { bean ->
+			bean.scope = 'prototype'
+		}
 	}
 
 	def setup() {
@@ -33,8 +49,8 @@ class ApiActionServiceSpec extends Specification {
 
 			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
 			ApiActionResponse actionResponse = new ApiActionResponse()
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(null, [:], true)
+			TaskFacade task = new TaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A PRE script is evaluated'
@@ -69,8 +85,8 @@ class ApiActionServiceSpec extends Specification {
 
 			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
 			ApiActionResponse actionResponse = new ApiActionResponse()
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(null, [:], true)
+			TaskFacade task = new TaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A PRE script is evaluated'
@@ -107,8 +123,8 @@ class ApiActionServiceSpec extends Specification {
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.OK
 
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(null, [:], true)
+			TaskFacade task = new TaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A STATUS script is evaluated'
@@ -145,14 +161,26 @@ class ApiActionServiceSpec extends Specification {
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.OK
 
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(new AssetEntity([assetType: 'Database']), [:], true)
+			AssetComment assetComment = new AssetComment([status: 'Ready'])
+			//TaskFacade task = new TaskFacade(new AssetComment())
+			def taskServiceMock = mockFor(TaskService)
+			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
+			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
+				assetComment.status = 'Completed'
+				assetComment
+			}
+
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			task.taskService = taskServiceMock.createMock()
+
+
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A STATUS script is evaluated'
 			String script = """
 				// Check to see if the asset is a VM
-				if ( asset.isaDevice() && asset.isaDatabase() ) {
+				if ( asset.isaDevice() || asset.isaDatabase() ) {
 					task.done()
 				}
 			""".stripIndent()
@@ -168,9 +196,7 @@ class ApiActionServiceSpec extends Specification {
 			)
 
 		then: 'Service result has a ReactionScriptCode'
-			with(response) {
-				!!result
-			}
+			null == response.result
 
 		and: 'The asset and task object received the correct messages'
 			task.isDone()
@@ -183,8 +209,8 @@ class ApiActionServiceSpec extends Specification {
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(null, [:], true)
+			TaskFacade task = new TaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
 
@@ -224,8 +250,8 @@ class ApiActionServiceSpec extends Specification {
 			actionResponse.data = 'anything'
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetFacade asset = new AssetFacade(null, [:], true)
+			TaskFacade task = new TaskFacade()
 			ApiActionJob job = new ApiActionJob()
 
 

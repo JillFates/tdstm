@@ -1,9 +1,15 @@
 package net.transitionmanager.integration
 
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.domain.Person
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
+import net.transitionmanager.service.TaskService
+import net.transitionmanager.task.TaskFacade
 import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -25,6 +31,9 @@ class ApiActionScriptProcessorSpec extends Specification {
 			bean.scope = 'prototype'
 			messageSourceService = ref('messageSourceService')
 		}
+		taskFacade(TaskFacade) { bean ->
+			bean.scope = 'prototype'
+		}
 	}
 
 	@Unroll
@@ -34,8 +43,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(reactionScriptCode)
 
@@ -66,8 +75,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
 			applicationContext.getBean(ApiActionScriptBindingBuilder)
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -87,8 +96,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
 			applicationContext.getBean(ApiActionScriptBindingBuilder)
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -108,8 +117,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse())
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -160,8 +169,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -197,8 +206,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -233,8 +242,8 @@ class ApiActionScriptProcessorSpec extends Specification {
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(response.asImmutable())
-					.with(new ReactionAssetFacade())
-					.with(new ReactionTaskFacade())
+					.with(new AssetFacade(null, [:], true))
+					.with(new TaskFacade())
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.STATUS)
 
@@ -265,8 +274,19 @@ class ApiActionScriptProcessorSpec extends Specification {
 	void 'test can invoke a simple SUCCESS Script to check Asset if asset is a Device or an Application and change a task to done'() {
 
 		given:
-			ReactionAssetFacade asset = new ReactionAssetFacade()
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetEntity assetEntity = new AssetEntity(assetType: 'database')
+			AssetComment assetComment = new AssetComment([status: 'Ready'])
+			AssetFacade asset = new AssetFacade(assetEntity, [:], true)
+
+			def taskServiceMock = mockFor(TaskService)
+			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
+			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
+				assetComment.status = 'Completed'
+				assetComment
+			}
+
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			task.taskService = taskServiceMock.createMock()
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
@@ -280,7 +300,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			new GroovyShell(this.class.classLoader, scriptBinding)
 					.evaluate("""
 					// Check to see if the asset is a VM
-					if ( asset.isaDevice() && asset.isaDatabase() ) {
+					if ( asset.isaDevice() || asset.isaDatabase() ) {
 					   task.done()
 					} 
 					""".stripIndent(), ApiActionScriptBinding.class.name)
@@ -300,12 +320,24 @@ class ApiActionScriptProcessorSpec extends Specification {
 	void 'test can invoke a simple FINALIZE Script to evaluate what has been performed'() {
 
 		given:
-			ReactionTaskFacade task = new ReactionTaskFacade()
+			AssetEntity assetEntity = new AssetEntity(assetType: 'database')
+			AssetComment assetComment = new AssetComment([status: 'Ready'])
+			AssetFacade asset = new AssetFacade(assetEntity, [:], true)
+
+			def taskServiceMock = mockFor(TaskService)
+			taskServiceMock.demand.getAutomaticPerson() { -> new Person() }
+			taskServiceMock.demand.setTaskStatus() { AssetComment task, String status, Person whom ->
+				assetComment.status = 'Completed'
+				assetComment
+			}
+
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			task.taskService = taskServiceMock.createMock()
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
-					.with(new ReactionAssetFacade())
+					.with(new AssetFacade(null, [:], true))
 					.with(task)
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.FINAL)
@@ -315,14 +347,10 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.evaluate("""
 						// Complete the task 
 						task.done()
-						
-						// Add a note to the task
-						task.addNote('hickory dickery dock, a mouse ran up the clock')
 					""".stripIndent(), ApiActionScriptBinding.class.name)
 
 		then: 'The asset and task object received the correct messages'
 			task.isDone()
-			task.getNote() == 'hickory dickery dock, a mouse ran up the clock'
 
 		and: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
