@@ -254,7 +254,7 @@ export class DataIngestionService {
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);
 		}
 
-		if(model.credential && model.credential.id && model.credential.id !== 0) {
+		if (model.credential && model.credential.id && model.credential.id !== 0) {
 			postRequest.credential = model.credential.id;
 		}
 
@@ -308,6 +308,7 @@ export class DataIngestionService {
 				.catch((error: any) => error.json());
 		} else {
 			postRequest.version = model.version;
+			postRequest.expirationDate = new Date();
 			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();

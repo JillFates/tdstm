@@ -14,11 +14,11 @@ export class CredentialColumnModel {
 				property: 'name',
 				type: 'text',
 				locked: true
-			}, /*{
+			}, {
 				label: 'Description',
 				property: 'description',
 				type: 'text'
-			}, */{
+			}, {
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
@@ -70,6 +70,8 @@ export class CredentialModel {
 	httpMethod?: string;
 	cookieName?: string;
 	version?: number;
+	terminateUrl?: string;
+	requestMethod?: REQUEST_METHOD;
 
 	constructor() {
 		this.name = '';
@@ -83,15 +85,20 @@ export class CredentialModel {
 		this.authenticationUrl = '';
 		this.httpMethod = '';
 		this.cookieName = '';
+		this.terminateUrl = '';
 	}
+}
+
+export enum REQUEST_METHOD {
+	BASIC_AUTH,
+	FORM_VARIABLES
 }
 
 export enum AUTH_METHODS {
 	BASIC_AUTH = 'Basic Auth',
-	COOKIE = 'Cookie Session'
-	// Not Documented Yet
-	// HEADER = 'Header Session',
-	// JWT = 'JSON Web Tokens'
+	COOKIE = 'Cookie Session',
+	HEADER = 'Header Session',
+	JWT = 'JSON Web Tokens'
 };
 
 export enum ENVIRONMENT {

@@ -1,7 +1,7 @@
 import {Component, ViewChild, ViewChildren, HostListener, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {CredentialModel, AUTH_METHODS} from '../../model/credential.model';
+import {CredentialModel, AUTH_METHODS, REQUEST_METHOD} from '../../model/credential.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -30,6 +30,17 @@ declare var jQuery: any;
 		.script-error {
 			margin-bottom: 18px;
 		}
+		#httpMethod {
+			width: 75px;
+		}
+        .radio-aligned {
+            margin: 4px 4px 0;
+            vertical-align: top;
+        }
+		.label-detail {
+            font-weight: normal;
+			cursor: pointer;
+		}
 	`]
 })
 export class CredentialViewEditComponent {
@@ -55,6 +66,7 @@ export class CredentialViewEditComponent {
 	public httpMethodList = new Array<any>();
 	public modalTitle: string;
 	public actionTypes = ActionType;
+	public requestMethod = REQUEST_METHOD;
 	private dataSignature: string;
 	public authMethods = AUTH_METHODS;
 	public isEditing = false;
@@ -69,6 +81,10 @@ export class CredentialViewEditComponent {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
+
+		if (this.modalType === ActionType.CREATE) {
+			this.credentialModel.requestMethod = this.requestMethod.BASIC_AUTH;
+		}
 
 		this.dataSignature = JSON.stringify(this.credentialModel);
 
@@ -109,6 +125,9 @@ export class CredentialViewEditComponent {
 				this.httpMethodList = Object.keys(result['httpMethod']).map(type => {
 					return result['httpMethod'][type];
 				});
+				this.authMethodList = Object.keys(result['authenticationMethod']).map(type => {
+					return result['authenticationMethod'][type];
+				});
 				if (this.modalType === ActionType.CREATE) {
 					// Environments List Mapper
 					this.credentialModel.environment = this.environmentList[0];
@@ -116,9 +135,12 @@ export class CredentialViewEditComponent {
 					// Status List Mapper
 					this.credentialModel.status = this.statusList[0];
 					this.modifySignatureByProperty('status');
-					// Status List Mapper
+					// HTTP Method List Mapper
 					this.credentialModel.httpMethod = this.httpMethodList[0];
 					this.modifySignatureByProperty('httpMethod');
+					// Auth. Method List Mapper
+					this.credentialModel.authMethod = this.authMethodList[0];
+					this.modifySignatureByProperty('authenticationMethod');
 				}
 			},
 			(err) => console.log(err));
