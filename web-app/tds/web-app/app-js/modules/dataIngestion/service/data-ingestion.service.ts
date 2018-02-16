@@ -20,6 +20,7 @@ export class DataIngestionService {
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
+	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
 	mockData: CredentialModel[] = [
@@ -31,10 +32,7 @@ export class DataIngestionService {
 				id: 1,
 				name: 'ServiceNow'
 			},
-			credentialType: {
-				id: 1,
-				name: 'Production'
-			},
+			environment: 'Production',
 			status: 'Active',
 			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
@@ -47,10 +45,7 @@ export class DataIngestionService {
 				id: 1,
 				name: 'ServiceNow'
 			},
-			credentialType: {
-				id: 1,
-				name: 'Production'
-			},
+			environment: 'Production',
 			status: 'Active',
 			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
@@ -63,10 +58,7 @@ export class DataIngestionService {
 				id: 1,
 				name: 'ServiceNow'
 			},
-			credentialType: {
-				id: 1,
-				name: 'Production'
-			},
+			environment: 'Production',
 			status: 'Inactive',
 			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
@@ -79,10 +71,7 @@ export class DataIngestionService {
 				id: 1,
 				name: 'ServiceNow'
 			},
-			credentialType: {
-				id: 1,
-				name: 'Production'
-			},
+			environment: 'Production',
 			status: 'Active',
 			authMethod: 'HTTP_BASIC',
 			dateCreated: new Date()
@@ -169,6 +158,19 @@ export class DataIngestionService {
 
 	getCredentials(): Observable<CredentialModel[]> {
 		return Observable.from(this.mockData).bufferCount(this.mockData.length);
+	}
+
+	/**
+	 * Get the List of Elements we need to populate in the UI - dropdownlist
+	 * @returns {Observable<any>}
+	 */
+	getCredentialEnumsConfig(): Observable<any> {
+		return this.http.get(`${this.credentialUrl}/enums`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	/**

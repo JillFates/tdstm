@@ -57,10 +57,7 @@ export class CredentialModel {
 		id?: number,
 		name: string
 	};
-	credentialType?: {
-		id?: number,
-		name?: string
-	};
+	environment?: string;
 	status?: string;
 	authMethod?: string;
 	dateCreated?: Date;
@@ -70,26 +67,35 @@ export class CredentialModel {
 	password?: string;
 	authenticationTestURL?: string;
 	// cookie auth Method
-	cookieSessionMethod?: {
-		httpMethod?: string;
-		cookieName?: string;
-	};
+	httpMethod?: string;
+	cookieName?: string;
 
 	constructor() {
 		this.name = '';
 		this.description = '';
 		this.provider = { id: null, name: '' };
-		this.credentialType = { id: null, name: ''};
+		this.environment = '';
 		this.status = '';
 		this.authMethod = '';
 		this.username = '';
 		this.password = '';
 		this.authenticationTestURL = '';
-		this.cookieSessionMethod = {
-			httpMethod: '',
-			cookieName: ''
-		};
+		this.httpMethod = '';
+		this.cookieName = '';
 	}
 }
 
-export const AUTH_METHODS = ['HTTP_BASIC', 'HTTP_COOKIE'];
+export enum AUTH_METHODS {
+	BASIC_AUTH = 'Basic Auth',
+	COOKIE = 'Cookie Session'
+	// Not Documented Yet
+	// HEADER = 'Header Session',
+	// JWT = 'JSON Web Tokens'
+};
+
+export enum ENVIRONMENT {
+	DEVELOPMENT = 'Development',
+	OTHER = 'Other',
+	PRODUCTION = 'Production',
+	SANDBOX = 'SANDBOX'
+};

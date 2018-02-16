@@ -6,7 +6,7 @@ import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ActionType} from '../../../../shared/model/data-list-grid.model';
-import {ACTIVE_INACTIVE, KEYSTROKE} from '../../../../shared/model/constants';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NgForm} from '@angular/forms';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
@@ -51,6 +51,8 @@ export class CredentialViewEditComponent {
 	public providerList = new Array<ProviderModel>();
 	public statusList = new Array<any>();
 	public authMethodList = new Array<any>();
+	public environmentList = new Array<any>();
+	public httpMethodList = new Array<any>();
 	public modalTitle: string;
 	public actionTypes = ActionType;
 	private dataSignature: string;
@@ -71,15 +73,15 @@ export class CredentialViewEditComponent {
 		this.dataSignature = JSON.stringify(this.credentialModel);
 
 		this.getProviders();
-		this.getStatus();
 		this.getAuthMethods();
+		this.getCredentialEnumsConfig();
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Credential' : (this.modalType === ActionType.EDIT ? 'Credential Edit' : 'Credential Detail');
 	}
 
 	/**
 	 * Get the List of Providers
 	 */
-	getProviders(): void {
+	private getProviders(): void {
 		this.dataIngestionService.getProviders().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE) {
@@ -93,21 +95,42 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
-	 * Set the possible Status for the Credential
+	 * Get from the Server all Enums and do the Mapping by converting the Enums into Arrays of Native (String) Values
 	 */
-	getStatus(): void {
-		this.statusList = ACTIVE_INACTIVE;
-		if (this.modalType === ActionType.CREATE) {
-			this.credentialModel.status = this.statusList[0];
-			this.modifySignatureByProperty('status');
-		}
+	private getCredentialEnumsConfig(): void {
+		this.dataIngestionService.getCredentialEnumsConfig().subscribe(
+			(result: any) => {
+				this.environmentList = Object.keys(result['environment']).map(type => {
+					return result['environment'][type];
+				});
+				this.statusList = Object.keys(result['status']).map(type => {
+					return result['status'][type];
+				});
+				this.httpMethodList = Object.keys(result['httpMethod']).map(type => {
+					return result['httpMethod'][type];
+				});
+				if (this.modalType === ActionType.CREATE) {
+					// Environments List Mapper
+					this.credentialModel.environment = this.environmentList[0];
+					this.modifySignatureByProperty('environment');
+					// Status List Mapper
+					this.credentialModel.status = this.statusList[0];
+					this.modifySignatureByProperty('status');
+					// Status List Mapper
+					this.credentialModel.httpMethod = this.httpMethodList[0];
+					this.modifySignatureByProperty('httpMethod');
+				}
+			},
+			(err) => console.log(err));
 	}
 
 	/**
 	 * Set the possible Status for the Credential
 	 */
-	getAuthMethods(): void {
-		this.authMethodList = AUTH_METHODS;
+	private getAuthMethods(): void {
+		this.authMethodList = Object.keys(AUTH_METHODS).map(type => {
+			return AUTH_METHODS[type];
+		});
 		if (this.modalType === ActionType.CREATE) {
 			this.credentialModel.authMethod = this.authMethodList[0];
 			this.modifySignatureByProperty('authMethod');
