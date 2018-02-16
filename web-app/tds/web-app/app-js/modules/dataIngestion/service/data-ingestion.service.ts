@@ -371,6 +371,20 @@ export class DataIngestionService {
 	}
 
 	/**
+	 * Validate if the Authentication meets the requirements
+	 * @param {number} credentialId
+	 * @returns {Observable<any>}
+	 */
+	validateAuthentication(credentialId: number): Observable<any> {
+		return this.http.post(`${this.credentialUrl}/test/${credentialId}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Validate if the current DataScript is being or not used somewhere
 	 * @param {number} id
 	 * @returns {Observable<string>}

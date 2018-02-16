@@ -10,7 +10,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 import {NgForm} from '@angular/forms';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
-import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
+import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
 
 declare var jQuery: any;
@@ -40,6 +40,9 @@ declare var jQuery: any;
 		.label-detail {
             font-weight: normal;
 			cursor: pointer;
+		}
+		.check-action {
+			margin-left: 12px !important;
 		}
 	`]
 })
@@ -71,6 +74,7 @@ export class CredentialViewEditComponent {
 	public authMethods = AUTH_METHODS;
 	public isEditing = false;
 	public checkActionModel = CHECK_ACTION;
+	public operationStatusModel = new OperationStatusModel();
 	constructor(
 		public originalModel: CredentialModel,
 		public modalType: ActionType,
@@ -229,6 +233,15 @@ export class CredentialViewEditComponent {
 						(err) => console.log(err));
 				}
 			});
+	}
+
+	protected verifyCode(operationStatusModel: OperationStatusModel): void {
+		this.dataIngestionService.validateAuthentication(this.credentialModel.id).subscribe(
+			(result: any) => {
+				console.log(result);
+				operationStatusModel.state = this.checkActionModel.VALID;
+			},
+			(err) => console.log(err));
 	}
 
 	/**
