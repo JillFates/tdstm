@@ -20,25 +20,14 @@ class ScriptProcessorService {
     CustomDomainService customDomainService
 
     /**
-     *
-     * @param project
-     * @param scriptContent
-     * @param fileName
-     * @return
-     */
-    Map<ETLDomain, List<ReferenceResult>> execute (Project project, String scriptContent, String fileName) {
-        process(project, scriptContent, fileName).results
-    }
-
-    /**
      * Execute a DSL script using an instance of ETLProcessor using a project as a reference
      * and a file as an input of the ETL content data
      * @param project
      * @param scriptContent
      * @param fileName
-     * @return and instance of ETLProcessor used to process the scriptContent
+     * @return and instance of ETLProcessor used to execute the scriptContent
      */
-    ETLProcessor process (Project project, String scriptContent, String fileName) {
+    ETLProcessor execute (Project project, String scriptContent, String fileName) {
 
         CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
         CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
@@ -47,11 +36,11 @@ class ScriptProcessorService {
 
         ETLAssetClassFieldsValidator validator = createFieldsSpecValidator(project)
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator)
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 
         new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
 
-        etlProcessor
+        return etlProcessor
     }
 
     /**
@@ -72,7 +61,7 @@ class ScriptProcessorService {
         validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
         validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
         validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
-        validator
+        return validator
     }
 
     /**
@@ -92,7 +81,7 @@ class ScriptProcessorService {
             CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
 
             etlProcessor = new ETLProcessor(project,
-                    new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true),
+                    new DataSetFacade(new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
@@ -105,9 +94,9 @@ class ScriptProcessorService {
         }
 
         result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = etlProcessor?.results
+        result.data = [ETLInfo: etlProcessor.result.ETLInfo, domains: etlProcessor.result.domains]
 
-        result
+        return result
     }
 
     /**
@@ -136,7 +125,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, new ETLAssetClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLAssetClassFieldsValidator())
 
         List<Map<String, ?>> errors = []
 
@@ -178,7 +167,7 @@ class ScriptProcessorService {
         log.info "Updating DataScript ID: ${dataScript.id} with the following script content: ${scriptContent}"
         dataScript.etlSourceCode = scriptContent
         dataScript.save(failOnError: true)
-        dataScript
+        return dataScript
     }
 
 }
