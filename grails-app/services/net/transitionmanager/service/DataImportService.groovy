@@ -5,7 +5,6 @@ import com.tdsops.etl.DataImportHelper
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
@@ -15,8 +14,6 @@ import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Slf4j(value='log', category='net.transitionmanager.service.DataImportService')
@@ -56,19 +53,31 @@ class DataImportService implements ServiceMethods{
      *          assetsCreated: Integer - a count of the number of assets created
      */
     Map loadJsonIntoImportBatch(UserLogin userLogin, Project project, InputStream inputStream) {
-        JSONObject assetClasses = JsonUtil.parseFile(inputStream)
-        // Iterate over the asset classes.
-        Map results = [ batchesCreated: 0, domains:[] ]
-        assetClasses.each { assetClass, assets ->
-            // Create a Transfer Batch for the asset class
-            DataTransferBatch dataTransferBatch = createDataTransferBatch(assetClass, userLogin, project)
-            if (dataTransferBatch) {
-                results.batchesCreated++
-                // Map with info for logging and validations during the process
-                Map params = [assetClass: assetClass, project: project, assetIdx: 0]
-                // Import the assets for this batch.
-                importAssetBatch(dataTransferBatch, assets, params)
+        JSONObject assetsJson = JsonUtil.parseFile(inputStream)
+        // General purpose list of errors for reporting issues not related to specific assets (like incorrect domains, etc).
+        List<String> processErrors = []
+        // Map which summarizes the results from the import process.
+        Map results = [ batchesCreated: 0, domains:[], errors: processErrors]
 
+        List domains = assetsJson.domains
+
+        // Check if the JSON contains any domains. If not, return the results map as is.
+        if (!domains) {
+            return results
+        }
+
+        // Iterate over the domains
+        for (domainJson in domains) {
+            String assetClass = domainJson.domain
+            // Create a Transfer Batch for the asset class
+            DataTransferBatch dataTransferBatch = createDataTransferBatch(assetClass, userLogin, project, processErrors)
+            // Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
+            if (dataTransferBatch) {
+                // Map with info for logging and validations during the process
+                Map params = [assetClass: assetClass, project: project, assetIdx: 0, fields: domainJson.fields]
+                // Import the assets for this batch.
+                importAssetBatch(dataTransferBatch, domainJson.data, params)
+                results.batchesCreated++
                 results.domains << [assetClass: assetClass, assetsCreated: params.assetIdx]
             }
         }
@@ -82,22 +91,38 @@ class DataImportService implements ServiceMethods{
      * @param project
      * @return
      */
-    private DataTransferBatch createDataTransferBatch(String assetClass, UserLogin currentUser, Project project) {
+    private DataTransferBatch createDataTransferBatch(String assetClass, UserLogin currentUser, Project project, List<String> processErrors) {
         DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
         if (!dts) {
             dts = DataTransferSet.get(1)
         }
+
+        // Check if the domain class is valid
+        EavEntityType eavEntityType = EavEntityType.findByDomainName(assetClass)
+
+        // If the asset class is invalid, return null.
+        if (!eavEntityType) {
+            String error = "DataImportService.createDataTransferBatch() failed to create batch because of invalid Asset Class ${assetClass}."
+            log.error(error)
+            processErrors << error
+            return null
+        }
+
+
         DataTransferBatch dataTransferBatch = new DataTransferBatch(
                 statusCode: "PENDING",
                 transferMode: "I",
                 project: project,
                 userLogin: currentUser,
-                eavEntityType: EavEntityType.findByDomainName(assetClass),
+                eavEntityType: eavEntityType,
                 dataTransferSet: dts
                 )
 
         // Check if the transfer batch is valid, report the error if not.
         if (!dataTransferBatch.save()) {
+            String error = ""
+            log error(error)
+            processErrors << "There was an error trying to save the Batch for ${assetClass}."
             log.error 'DataImportService.createDataTransferBatch() failed save - {}', GormUtil.allErrorsString(dataTransferBatch)
             dataTransferBatch = null
         }
@@ -111,7 +136,7 @@ class DataImportService implements ServiceMethods{
      * @param assets - list of assets
      * @param params - additional parameters required for logging
      */
-    private void importAssetBatch(DataTransferBatch dataTransferBatch, List assets, Map params) {
+    private void importAssetBatch(DataTransferBatch dataTransferBatch, List assets , Map params) {
         // Iterate over the assets
         for (asset in assets) {
             // Process the fields for this asset.
@@ -130,11 +155,14 @@ class DataImportService implements ServiceMethods{
      */
     private void importAssetFields(DataTransferBatch dataTransferBatch, asset, Map params) {
         // Validate this asset
-        validateAsset(asset, params)
-        // Look up the Asset Entity Id
-        Long assetId = lookUpIdValueForJsonAsset(asset)
-        // Proceed to import all the fields for this asset.
-        importAssetFields(dataTransferBatch, asset, assetId, params)
+        boolean validAsset = validateAsset(asset, params)
+        // Proceed with the import if the asset passed validations (if not, the fields that failed will have the corresponding error messages)
+        if (validAsset) {
+            // Look up the Asset Entity Id
+            Long assetId = lookUpIdValueForJsonAsset(asset)
+            // Proceed to import all the fields for this asset.
+            importAssetFields(dataTransferBatch, asset, assetId, params)
+        }
     }
 
     /**
@@ -161,28 +189,35 @@ class DataImportService implements ServiceMethods{
         insertDataTransferValuesForAsset(dataTransferBatch, asset, assetId, params)
     }
 
-    def insertDataTransferValuesForAsset = { DataTransferBatch dataTransferBatch, asset, Long assetId, Map params ->
-        for (element in asset.elements) {
-
-            DataTransferValue dtv = new DataTransferValue(
-                dataTransferBatch: dataTransferBatch,
-                fieldName: element.field.name,
-                assetEntityId: assetId,
-                importValue: element.originalValue,
-                correctedValue: element.value,
-                rowId: params.assetIdx
-//                EavAttribute eavAttribute
-            )
-            if (asset.reference) {
-                if (asset.reference.size() > 1) {
-                    dtv.hasError = 1
-                    dtv.errorText = "Multiple assets referenced"
-                }
+    /**
+     * Create a new DataTransferValue for each field in the asset JSON. This JSON is a map
+     * where the keys are the field names and the values the actual info.
+     *
+     * @param dataTransferBatch - current batch.
+     * @param assetJson - the JSON for this asset.
+     * @param assetId - the id for the asset
+     * @param params - map with additional information.
+     *
+     */
+    def insertDataTransferValuesForAsset = { DataTransferBatch dataTransferBatch, JSONObject assetJson, Long assetId, Map params ->
+        for (fieldName in params.fields) {
+            // If the current field is the id, skip it (avoid inserting it into the database).
+            if (fieldName == "id") {
+                continue
             }
 
+            JSONObject fieldJSON = assetJson.fields[fieldName]
+            def newValue = DataImportHelper.resolveFieldValue(fieldName, fieldJSON)
+            DataTransferValue dtv = new DataTransferValue(
+                dataTransferBatch: dataTransferBatch,
+                fieldName: fieldName,
+                assetEntityId: assetId,
+                importValue: fieldJSON.originalValue,
+                correctedValue: newValue,
+                rowId: params.assetIdx
+            )
+
             if (!dtv.save()) {
-                //println "insertDataTransferValuesForAsset() failed to save"
-                //log.error 'DataImportService.insertDataTransferValuesForAsset() failed save - {}', GormUtil.allErrorsString(dtv)
                 println "DataImportService.insertDataTransferValuesForAsset() failed save - ${GormUtil.allErrorsString(dtv)}"
             }
         }
@@ -201,7 +236,7 @@ class DataImportService implements ServiceMethods{
     private String buildInsertSQLForDtvValues(DataTransferBatch dataTransferBatch, asset, Long assetId, Map params) {
         String[] dtvLines = []
         // Iterate over the fields for this asset.
-        for (field in asset.elements) {
+        for (field in asset.fields) {
             // Construct the line for inserting the DTV
             String sqlLine = getDtvSqlValues(dataTransferBatch, field, assetId, params)
             // Add the line for execution only if it's not null.
@@ -268,15 +303,12 @@ println "getDtvSqlValues(assetId=$assetId) parsingResults=$parsingResults"
      *
      * @param asset
      * @param params - additional parameters required for logging
+     *
+     * @return true: the asset is valid, false otherwise.
      */
-    private void validateAsset(asset, Map params) throws RuntimeException{
+    private boolean validateAsset(asset, Map params) throws RuntimeException{
         // Validate fields until the first error is detected.
-        String errorMsg = DataImportHelper.validateAsset(asset, params)
-        // If there was an error detected, report it and throw an exception.
-        if (errorMsg) {
-            securityService.reportViolation(errorMsg)
-            throw new RuntimeException(errorMsg)
-        }
+        return DataImportHelper.validateAsset(asset, params)
     }
 
     /**
@@ -284,9 +316,8 @@ println "getDtvSqlValues(assetId=$assetId) parsingResults=$parsingResults"
      * @param asset
      * @return
      */
-    private static Long lookUpIdValueForJsonAsset(asset) {
-        def field = DataImportHelper.findFieldInAssetJson(asset, DataImportHelper.ID_FIELD)
-        return NumberUtil.toPositiveLong(field.originalValue)
+    private static Long lookUpIdValueForJsonAsset(JSONObject assetJson) {
+        return DataImportHelper.resolveAssetId(assetJson)
     }
 
 
