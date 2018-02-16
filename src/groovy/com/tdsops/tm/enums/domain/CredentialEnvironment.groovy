@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 enum CredentialEnvironment {
     PRODUCTION('Production'),
     SANDBOX('Sandbox'),
-    DEV('Development'),
+    DEVELOPMENT('Development'),
     OTHER('Other')
 
     private final String environment;

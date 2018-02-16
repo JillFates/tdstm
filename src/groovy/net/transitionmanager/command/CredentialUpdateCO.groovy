@@ -8,12 +8,12 @@ import net.transitionmanager.domain.Credential
  */
 @Validateable
 class CredentialUpdateCO extends CredentialCreateCO {
-	Long id
 	Long version
 
 	static constraints = {
 		importFrom Credential, include: [
-				'name'
+				'name', 
+				'renewTokenUrl'
 		]
 		password nullable: true
 	}

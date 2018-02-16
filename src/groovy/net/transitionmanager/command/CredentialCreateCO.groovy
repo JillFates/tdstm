@@ -22,13 +22,13 @@ class CredentialCreateCO implements CommandObject {
     String username
     String password
     String authenticationUrl
-    String renewTokenUrl
+    String renewTokenUrl=''
     Date expirationDate
 
     static constraints = {
         importFrom Credential, include: [
-                'name'
+                'name',
+                'renewTokenUrl'
         ]
-        renewTokenUrl nullable: true
     }
 }

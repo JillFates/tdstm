@@ -28,10 +28,10 @@ class Credential {
     String password
 
     // The URL to the endpoint used to perform the authentication
-    String authenticationUrl
+    String authenticationUrl=''
 
     // The URL to the endpoint to renew tokens
-    String renewTokenUrl
+    String renewTokenUrl=''
 
 	// The date that the credential will expire and/or will no longer be used
 	Date expirationDate
@@ -46,8 +46,9 @@ class Credential {
 
     static constraints = {
         name size: 1..255, unique: 'project'
-		renewTokenUrl nullable: true
+		renewTokenUrl nullable: true, blank: true
         lastUpdated nullable: true
+        expirationDate nullable: true
     }
 
     static mapping = {
@@ -65,6 +66,8 @@ class Credential {
 
 		sort 'name'
     }
+
+    // Closure validateRenewTokenUrl = { ... }
 
     /**
      * Converts this credential object to a map.

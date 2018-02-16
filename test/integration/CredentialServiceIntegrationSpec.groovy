@@ -131,12 +131,11 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             final String newCredentialName = "***Credential name updated***"
 
             CredentialUpdateCO credentialCO = new CredentialUpdateCO()
-            credentialCO.id = id
             credentialCO.populateFromDomain(credential)
             credentialCO.name = newCredentialName
             credentialCO.version = credential.version
         when:
-            credentialService.updateCredential(credentialCO)
+            credentialService.updateCredential(id, credentialCO)
 
         then:
             credentialService.findById(id).name == newCredentialName
@@ -153,12 +152,12 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
 
             CredentialUpdateCO credentialCO = new CredentialUpdateCO()
             credentialCO.populateFromDomain(credential)
-            credentialCO.id = id
             credentialCO.version = -1
         when:
-            credentialService.updateCredential(credentialCO)
+            credentialService.updateCredential(id, credentialCO)
 
         then:
             thrown DomainUpdateException
     }
+
 }

@@ -7,6 +7,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
+import net.transitionmanager.command.CommandObject
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
@@ -266,14 +267,19 @@ trait ControllerMethods {
 			log.warn ExceptionUtil.stackTraceToString('IllegalArgumentException', e)
 		}
 
+		String alternateMsg = ''
+		if (!errorStringOrList) {
+			alternateMsg = e.getMessage() ?: e.getClass().getName()
+		}
+
 		if (WebUtil.isAjax(request)) {
-			renderErrorJson(errorStringOrList)
+			renderErrorJson( (errorStringOrList ?: alternateMsg ) )
 		} else {
 			// Stuff the exception into the request so that the page can access
 			errorHandlerService.setException(e, request)
 
 			// Put the message into a header so we can see the error
-			String msg = errorStringOrList ? errorStringOrList.toString() : e.getMessage().toString()
+			String msg = errorStringOrList ? errorStringOrList.toString() : alternateMsg
 		 	response.setHeader(ERROR_MESG_HEADER, msg)
 
 			forward controller: 'errorHandler', action: viewName
@@ -338,6 +344,26 @@ trait ControllerMethods {
 		}
 
 		instance
+	}
+
+	/**
+	 * This will validate a command object and if there is any error(s) it will throw an InvalidParamException 
+	 * containing the message of the validation errors.
+	 *
+	 * @throws InvalidParamException
+	 */
+
+	// void validateCommand(net.transitionmanager.command.CredentialCreateCO co) {
+	void validateCommandObject(Object co) {
+		// TODO : JPM 2/2018 : Change validateCommandObject so that it detects and throws exception if a non-command object
+		if (! co.getClass().isAnnotationPresent(grails.validation.Validateable.class)) {
+			throw new RuntimeException('validateCommandObject with object that does not implement the grails.validation.Validateable trait')
+		}
+		if (! co.validate()) {
+			String msg = GormUtil.allErrorsString(co)
+			// Call the invalidParamExceptionHandler
+			invalidParamExceptionHandler(new InvalidParamException(msg))
+		}
 	}
 
 	// ----------------------

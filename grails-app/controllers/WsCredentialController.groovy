@@ -28,38 +28,29 @@ class WsCredentialController implements ControllerMethods {
 
 	@HasPermission(Permission.CredentialView)
 	def getCredential(Long id) {
-		try {
-			renderSuccessJson(credentialService.findById(id).toMap())
-		} catch (Exception e) {
-			log.info ExceptionUtil.stackTraceToString(e)
-			renderErrorJson(e.message)
-		}
+		renderSuccessJson(credentialService.findById(id).toMap())
 	}
 
 	@HasPermission(Permission.CredentialCreate)
 	def createCredential(CredentialCreateCO command) {
-		if (!command.validate()) {
-			throw new InvalidParamException('Invalid parameters')
-		}
+		validateCommandObject(command)
 		renderSuccessJson(credentialService.createCredential(command).toMap())
 	}
 
 	@HasPermission(Permission.CredentialEdit)
-	def updateCredential() {
+	def updateCredential(Long id) {
+		// NOTE: For PUT command does populate the command objects properly
+		// SEE: https://github.com/grails/grails-core/issues/9172
 		CredentialUpdateCO command = JsonUtil.readValue(request.JSON, CredentialUpdateCO.class)
 
-		if (!command.validate()) {
-			throw new InvalidParamException('Invalid parameters')
-		}
-
-		try {
-			renderSuccessJson(credentialService.updateCredential(command).toMap())
-		} catch (Exception e) {
-			log.info ExceptionUtil.stackTraceToString(e)
-			renderErrorJson(e.message)
-		}
+		validateCommandObject(command)
+		renderSuccessJson(credentialService.updateCredential(id, command).toMap())
 	}
 
+	/**
+	 * Returns a JSON map containing the values of all of the enums used to
+	 * support the Credential domain.
+	 */
 	@HasPermission(Permission.CredentialView)
 	def credentialEnums() {
 		renderSuccessJson([
@@ -70,4 +61,17 @@ class WsCredentialController implements ControllerMethods {
 		])
 	}
 
+	/**
+	 * Used to test that a particular Credential can authenticate
+	 * @param id - the credential ID to validate
+	 * @return a map with the results or error? TBD
+	 */
+	def testAuthentication(Long id) {
+		Map authentication = credentialService.authenticate(id)
+		if (authentication?.error) {
+			renderErrorJson(authentication.error)
+		} else {
+			renderSuccessJson(authentication)
+		}
+	}
 }
