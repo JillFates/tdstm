@@ -73,6 +73,10 @@ export class CredentialModel {
 	terminateUrl?: string;
 	requestMethod?: REQUEST_METHOD;
 
+	// JWT Method
+	accessKey?: string;
+	secretAccessKey?: string;
+
 	constructor() {
 		this.name = '';
 		this.description = '';
@@ -86,6 +90,8 @@ export class CredentialModel {
 		this.httpMethod = '';
 		this.cookieName = '';
 		this.terminateUrl = '';
+		this.accessKey = '';
+		this.secretAccessKey = '';
 	}
 }
 
