@@ -1,4 +1,4 @@
-import { Component, Inject, AfterViewInit } from '@angular/core';
+import {Component, Inject, AfterViewInit, Renderer2} from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { NotifierService } from '../../services/notifier.service';
 import { AlertType } from '../../model/alert.model';
@@ -19,7 +19,8 @@ export class HeaderComponent implements AfterViewInit {
 	private pageMetaData: {
 		title: string,
 		instruction: string,
-		menu: Array<string>
+		menu: Array<string>,
+		topMenu: any,
 	};
 	taskCount: Number;
 
@@ -28,7 +29,8 @@ export class HeaderComponent implements AfterViewInit {
 		translatePipe: TranslatePipe,
 		state: StateService,
 		notifierService: NotifierService,
-		promptService: UIPromptService) {
+		promptService: UIPromptService,
+		private renderer: Renderer2) {
 		jQuery('.navbar-nav a[href!="#"]').off('click').on('click', function (e) {
 			if (state.$current.data.hasPendingChanges) {
 				e.preventDefault();
@@ -64,7 +66,6 @@ export class HeaderComponent implements AfterViewInit {
 
 		if (this.state && this.state.$current && this.state.$current.data) {
 			this.pageMetaData = this.state.$current.data.page;
-
 			document.title = translatePipe.transform(this.pageMetaData.title, []);
 		}
 	}
@@ -72,5 +73,30 @@ export class HeaderComponent implements AfterViewInit {
 	ngAfterViewInit(): void {
 		// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
 		jQuery('.menu-parent-tasks > a')[0].onclick = null;
+		this.selectTopMenuSections();
+	}
+
+	/**
+	 * Adds an active class to application top menu based on the pageMetadata.topMenu configuration.
+	 */
+	private selectTopMenuSections(): void {
+		if (!this.pageMetaData.topMenu) {
+			// clear out any other previous active menus.
+			jQuery('li[class^="dropdown menu-parent-"]').removeClass('active');
+			jQuery('li.menu-child-item').removeClass('active');
+		} else {
+			if (this.pageMetaData.topMenu.parent) {
+				let element = document.getElementsByClassName(this.pageMetaData.topMenu.parent)[0];
+				if (element) {
+					this.renderer.addClass(element, 'active');
+				}
+			}
+			if (this.pageMetaData.topMenu.child) {
+				let element = document.getElementsByClassName(this.pageMetaData.topMenu.child)[0];
+				if (element) {
+					this.renderer.addClass(element, 'active');
+				}
+			}
+		}
 	}
 }

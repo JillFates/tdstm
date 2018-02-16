@@ -140,7 +140,7 @@
 									</div><!-- /.box-tools -->
 								</div><!-- /.box-header -->
 								<div class="box-body">
-									Grey indicates that there are no outstanding conflicts but the dependency Validation needs to be set to Bundle Ready indicating the group is ready to Bundle.
+									Grey indicates that there are no outstanding conflicts but the Asset Validation needs to be set to Bundle Ready indicating the group is ready to Bundle.
 								</div><!-- /.box-body -->
 							</div>
 						</div>

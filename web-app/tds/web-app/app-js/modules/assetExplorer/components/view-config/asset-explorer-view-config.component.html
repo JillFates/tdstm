@@ -146,23 +146,15 @@
 							<div class="form-group">
 								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column order</label>
 								<kendo-sortable #kendoSortableInstance="kendoSortable" [data]="draggableColumns" [navigatable]="false" [animation]="false"
-								 class="row" style="margin-right:0px;" itemClass="item col-sm-4 col-md-4 col-lg-2"  (dragEnd)="onDragEnd()" [itemStyle]="{'cursor': 'pointer', 'margin-bottom':'1px','height':'35px','border':'1px solid #3c8dbc'}">
+								 class="row" style="margin-right:0px;" itemClass="item"  (dragEnd)="onDragEnd()">
 									<ng-template let-item="item" let-index="index">
-										<div class="row">
-											<div class="col-sm-8 drag-label">
+										<div class="row" style="height: 35px;">
+											<div class="drag-label" style="height: 35px;">
 												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
 												{{item.label}}
-											</div>
-											<div class="col-sm-4" style="padding:0">
-												<div class="checkbox">
-													<label for="">
-														<input type="checkbox" (change)="onLockedColumn(item)" name="locked_{{item.domain+'.'+item.property}}" [(ngModel)]="item.locked"> {{ 'GLOBAL.FREEZE' | translate }}
-													</label>
-												</div>
+												<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column" [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}" (click)="freezeColumn(item)"></i>
 											</div>
 										</div>
-
-
 									</ng-template>
 								</kendo-sortable>
 							</div>

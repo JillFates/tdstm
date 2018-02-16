@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation, ViewChild, ElementRef} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { DomainModel } from '../../model/domain.model';
 
@@ -34,6 +34,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	@Input('data') data: DomainModel;
 	@Input('state') gridState: any;
+	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
 	private fieldsSettings: FieldSettingsModel[];
 	private gridData: GridDataResult;
 	private state: State = {
@@ -63,7 +65,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	];
 	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
-	constructor(private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) { }
+	constructor( private loaderService: UILoaderService, private prompt: UIPromptService, private dialogService: UIDialogService) {
+	}
 
 	ngOnInit(): void {
 		this.fieldsSettings = this.data.fields;
@@ -254,7 +257,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					dataItem.constraints.values.length === 0) {
 					// selectList.onToggle();
 				} else {
-					selectList.show = false;
+					this.selectList.show = false;
 				}
 				break;
 			case 'String':
@@ -263,7 +266,7 @@ export class FieldSettingsGridComponent implements OnInit {
 					!dataItem.constraints.maxSize) {
 					// minMax.onToggle();
 				} else {
-					minMax.show = false;
+					this.minMax.show = false;
 				}
 				break;
 			case 'YesNo':

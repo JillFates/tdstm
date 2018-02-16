@@ -16,9 +16,9 @@ import net.transitionmanager.service.ImportService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.PersonService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.EmptyResultException
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -39,17 +39,11 @@ class DataTransferBatchController implements ControllerMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
-	SecurityService securityService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.AssetImport)
 	def importResults() {
-		def dtb = DataTransferBatch.get(params.id)
-		if (!dtb) {
-			sendMethodFailure()
-			return
-		}
-
+		DataTransferBatch dtb = fetchDomain(DataTransferBatch, params)
 		renderSuccessJson(importResults: dtb.importResults)
 	}
 
@@ -74,16 +68,14 @@ class DataTransferBatchController implements ControllerMethods {
 		 isMSIE: userAgent.contains("MSIE") || userAgent.contains("Firefox")]
 	}
 
-// TODO : JPM : 10/2013 - remove this function after done testing
-// Working on an improved version of the GormUtil function to get human readable error messages
+	// TODO : JPM : 10/2013 - remove this function after done testing
+	// Working on an improved version of the GormUtil function to get human readable error messages
 	static allErrorsString = { domain, separator= " : " ->
 		def text = new StringBuilder()
 		def first = true
 		domain.errors.allErrors.each {
-//			text.append( (first ? '' : separator) + messageSource.getMessage(it, null) )
 			text.append( (first ? '' : separator) + message(error:it) )
 		}
-
 		text.toString()
 	}
 

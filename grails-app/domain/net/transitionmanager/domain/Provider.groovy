@@ -49,17 +49,23 @@ class Provider {
 
     /**
      * Return a map representation of this Provider.
+     * @param minimalInfo: if set to true only the id and name will be returned.
      * @return
      */
-    Map toMap() {
+    Map toMap(boolean minimalInfo = false) {
         Map dataMap = [
-                id: id,
-                name: name,
+            id: id,
+            name: name
+        ]
+        if (! minimalInfo) {
+            Map additionalFields = [
                 description: description,
                 comment: comment,
                 dateCreated: dateCreated,
                 lastUpdated: lastUpdated
-        ]
+            ]
+            dataMap.putAll(additionalFields)
+        }
         return dataMap
     }
 }

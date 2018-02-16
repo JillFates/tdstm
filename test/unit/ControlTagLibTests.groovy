@@ -369,8 +369,8 @@ class ControlTagLibTests extends AbstractUnitSpec {
 		when: 'the tooltip property is empty'
 			field.tip = ''
 			result = applyTemplate(inputControlTagTemplate, [field:field, value:defValue, tabIndex:tabIndex])
-		then: 'data-content should contains the label'
-			result.contains(' data-content="Best program language ever &lt;!&gt;" ')
+		then: 'The content should return an empty string'
+			result.contains('')
 	}
 
 	void "Test InputLabel includes the correct CSS if the field is critical, or important, and it's empty." (){

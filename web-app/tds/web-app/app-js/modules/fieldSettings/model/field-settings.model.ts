@@ -44,3 +44,5 @@ export class FieldImportance {
 		color: '#F4F4F4'
 	};
 }
+
+export const FIELD_NOT_FOUND = 'Field Not Found';

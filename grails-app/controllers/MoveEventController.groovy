@@ -24,7 +24,6 @@ import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.ReportsService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringUtils
@@ -54,7 +53,6 @@ class MoveEventController implements ControllerMethods {
 	MoveEventService moveEventService
 	ProjectService projectService
 	ReportsService reportsService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 

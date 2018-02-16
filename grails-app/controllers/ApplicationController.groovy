@@ -4,14 +4,13 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdsops.tm.search.FieldSearchData
+import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Project
@@ -23,7 +22,6 @@ import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringEscapeUtils
@@ -47,7 +45,6 @@ class ApplicationController implements ControllerMethods {
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
 	AssetService assetService

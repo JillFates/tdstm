@@ -1,8 +1,5 @@
 package net.transitionmanager.command
 
-import grails.converters.JSON
-//import org.codehaus.groovy.grails.commons.GrailsDomainClass
-
 trait CommandObject {
 
 	/**

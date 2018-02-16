@@ -3,93 +3,93 @@
 <table class="planning-application-table">
 	<tbody>
 		<tr>
-			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}"/>
+			<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}"/>
 
 			<td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">
 				<tds:tooltipSpan field="${standardFieldSpecs.assetName}">
-					${applicationInstance.assetName}
+					${asset.assetName}
 				</tds:tooltipSpan>
 			</td>
-			<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
+			<tds:inputLabel field="${standardFieldSpecs.description}" value="${asset.description}"/>
 			<td colspan="3" class="${standardFieldSpecs.description.imp}" >
 				<tds:tooltipSpan field="${standardFieldSpecs.description}" tooltipDataPlacement="bottom">
-					${applicationInstance.description}
+					${asset.description}
 				</tds:tooltipSpan>
 			</td>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userCount}" value="${asset.userCount}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 			<td class="valueNW ${standardFieldSpecs.sme.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:standardFieldSpecs.sme.label}">
-					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
+				<span class="clickableText" onClick="Person.showPersonDialog(${asset.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:standardFieldSpecs.sme.label}">
+					<tds:nameAndCompany client="${client}" person="${asset.sme}" />
                 </span>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 			<td class="valueNW ${standardFieldSpecs.sme2.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme2?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?: standardFieldSpecs.sme2.label}">
-					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
+				<span class="clickableText" onClick="Person.showPersonDialog(${asset.sme2?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme2.tip?: standardFieldSpecs.sme2.label}">
+					<tds:nameAndCompany client="${client}" person="${asset.sme2}" />
 				</span>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.useFrequency}" value="${asset.useFrequency}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 			<td class="valueNW ${standardFieldSpecs.appOwner.imp}">
-				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?: standardFieldSpecs.appOwner.label}">
-					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
+				<span class="clickableText" onClick="Person.showPersonDialog(${asset.appOwner?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?: standardFieldSpecs.appOwner.label}">
+					<tds:nameAndCompany client="${client}" person="${asset.appOwner}" />
 				</span>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.license}" value="${asset.license}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.retireDate.imp}">
 			<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
-				{{'${applicationInstance?.retireDate}' | date:'dd/MM/yy' }}
+				<tds:convertDate date="${asset?.retireDate}" />
 			</tds:tooltipSpan>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp}">
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-				{{'${applicationInstance?.maintExpDate}' | date:'dd/MM/yy' }}
+				<tds:convertDate date="${asset?.maintExpDate}" />
 			</tdsAngular:tooltipSpan>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${applicationInstance.shutdownBy}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.url}" value="${asset.url}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
 			<td class="valueNW ${standardFieldSpecs.shutdownBy.imp}" nowrap="nowrap">
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
 			<g:if test="${shutdownById == -1}">
@@ -100,16 +100,16 @@
 					${shutdownBy}
 				</span>
 			</g:else>
-			<g:if test="${applicationInstance.shutdownFixed ==1 }">
+			<g:if test="${asset.shutdownFixed ==1 }">
 				<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
 				<label for="shutdownFixedId" >Fixed</label>
 			</g:if>
 			</tdsAngular:tooltipSpan>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 			<td class="valueNW ${standardFieldSpecs.startupBy.imp}" nowrap="nowrap" >
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupBy}">
 			<g:if test="${startupById == -1}">
@@ -120,14 +120,14 @@
 					${startupBy}
 				</span>
 			</g:else>
-			<g:if test="${applicationInstance.startupFixed ==1 }">
-				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" checked="checked"/>
+			<g:if test="${asset.startupFixed ==1 }">
+				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${asset.startupFixed}" checked="checked"/>
 				<label for="startupFixedId" >Fixed</label>
 			</g:if>
 			</tdsAngular:tooltipSpan>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
-			<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}"/>
+			<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 			<td class="valueNW ${standardFieldSpecs.testingBy.imp}" nowrap="nowrap">
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.testingBy}">
 			<g:if test="${testingById == -1}">
@@ -138,15 +138,15 @@
 					${testingBy}
 				</span>
 			</g:else>
-			<g:if test="${applicationInstance.testingFixed ==1 }">
+			<g:if test="${asset.testingFixed ==1 }">
 				<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
 				<label for="testingFixedId" >Fixed</label>
 			</g:if>
 			</tdsAngular:tooltipSpan>
 			</td>
-			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}" tooltipDataPlacement="bottom"/>
+			<tdsAngular:showLabelAndField field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" tooltipDataPlacement="bottom"/>
 		</tr>
-		<g:render template="assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
+		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
 	</tbody>
 </table>
 

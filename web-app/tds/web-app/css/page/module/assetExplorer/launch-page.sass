@@ -6,12 +6,14 @@ section.page-asset-explorer-index
     .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover,
     .bg-light-blue, .label-primary, .modal-primary .modal-body
       background-color: palette(tranman, action-toolbar2)
-    li.active
-      background-color: palette(tranman, action-toolbar2)
-      a
-        color: white
-        span
-          font-size: 12px
+    li
+      font-size: 13px
+      span.label
+        font-size: 90%
+      &.active
+        background-color: palette(tranman, action-toolbar2)
+        a
+          color: white
   @media (min-width: 992px)
     div.asset-explorer-index-left-menu
       max-width: 184px

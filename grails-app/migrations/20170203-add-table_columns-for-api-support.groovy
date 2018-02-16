@@ -35,6 +35,7 @@ databaseChangeLog = {
 
 	changeSet(author: 'jmartin', id: '20170203 TM-5958-02') {
 		comment('Add apiAction column to AssetComment table')
+		validCheckSum('3:12814100277f42189a7105798e66aa25')
 		sql("""
 			ALTER TABLE `asset_comment`
 			ADD COLUMN `api_action_id` bigint(20) NULL COMMENT 'The API Action to be invoked',

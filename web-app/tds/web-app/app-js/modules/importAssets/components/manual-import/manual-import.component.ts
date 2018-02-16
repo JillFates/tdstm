@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ImportAssetsService} from '../../service/import-assets.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 
 @Component({
 	selector: 'manual-import',
@@ -9,12 +11,15 @@ import {AlertType} from '../../../../shared/model/alert.model';
 })
 export class ManualImportComponent implements OnInit {
 
+	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	private actionOptions = [];
 	private dataScriptOptions = [];
 	private selectedActionOption = -1;
 	private selectedScriptOption = -1;
 	private fetchResult: any;
 	private fetchInProcess = false;
+	private fetchInputUsed: 'action' | 'file' = 'action';
 	private transformResult: any;
 	private transformInProcess = false;
 	private importResult: any;
@@ -22,8 +27,16 @@ export class ManualImportComponent implements OnInit {
 	private fetchFileContent: any;
 	private transformFileContent: any;
 	private viewDataType: string;
+	private uiConfig: any = {
+		labelColSize: 3,
+		inputColSize: 3,
+		buttonColSize: 1,
+		urlColSize: 2
+	};
 
-	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) { }
+	constructor( private importAssetsService: ImportAssetsService, private notifier: NotifierService) {
+		this.file.fileUID = null;
+	}
 
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
@@ -46,6 +59,7 @@ export class ManualImportComponent implements OnInit {
 		// this.selectedScriptOption = null;
 		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
 			this.fetchResult = result;
+			this.fetchInputUsed = 'action';
 			if (result.status === 'error') {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
@@ -166,6 +180,53 @@ export class ManualImportComponent implements OnInit {
 		this.transformFileContent = null;
 		this.viewDataType = null;
 		this.importResult = null;
+		this.removeFileByUID();
 	}
 
+	private disableTransformButton() {
+		return !this.selectedScriptOption || this.selectedScriptOption === -1
+			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === 'error';
+	}
+
+	private clearFilename(e?: any) {
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+	}
+
+	private onSelectFile(e?: any): void {
+		this.file.fileUID = e.files[0].uid;
+	}
+
+	private onRemoveFile(e: RemoveEvent): void {
+		if (!this.fetchResult || !this.fetchResult.filename) {
+			return;
+		}
+		e.data = { filename: this.fetchResult.filename };
+	}
+
+	private onUploadFile(e: any): void {
+		this.clearFilename();
+	}
+
+	private removeFileByUID(): void {
+		if (this.file.fileUID) {
+			this.kendoUploadInstance.removeFilesByUid(this.file.fileUID);
+		}
+	}
+
+	private completeEventHandler(e: SuccessEvent) {
+		let response = e.response.body.data;
+		if (response.operation === 'delete') { // file deleted successfully
+			// console.log(response.data);
+			this.clearFilename();
+			this.file.fileUID = null;
+		} else if (response.filename) { // file uploaded successfully
+			let filename = response.filename;
+			this.fetchResult = { status: 'success', filename: filename };
+			this.fetchInputUsed = 'file';
+		} else {
+			this.clearFilename();
+			this.fetchResult = { status: 'error' };
+		}
+	}
 }
