@@ -12,8 +12,9 @@ class AESCodecTests extends Specification {
 	void testEncodeDecode() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
-		def decodedValue = AESCodec.decode(encodedValue)
+		def salt = AESCodec.instance.generateRandomSalt()
+		def encodedValue = AESCodec.instance.encode(value, salt)
+		def decodedValue = AESCodec.instance.decode(encodedValue, salt)
 
 		//Value encoded and decode should be equal
 		then:
@@ -27,7 +28,8 @@ class AESCodecTests extends Specification {
 	void testEncodedNotEmpty() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
+		def salt = AESCodec.instance.generateRandomSalt()
+		def encodedValue = AESCodec.instance.encode(value, salt)
 
 		//Value encoded should not be empty
 		then:
@@ -41,7 +43,8 @@ class AESCodecTests extends Specification {
 	void testEncodedNotEquals() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
+		def salt = AESCodec.instance.generateRandomSalt()
+		def encodedValue = AESCodec.instance.encode(value, salt)
 
 		//Value encoded and value should not be equal
 		then:
@@ -55,8 +58,8 @@ class AESCodecTests extends Specification {
 	void testEncodeDecodeCustomSalt() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
-		def decodedValue = AESCodec.decode(encodedValue, "1234")
+		def encodedValue = AESCodec.instance.encode(value, "1234")
+		def decodedValue = AESCodec.instance.decode(encodedValue, "1234")
 
 		//Value encoded and decode should be equal
 		then:
@@ -70,7 +73,7 @@ class AESCodecTests extends Specification {
 	void testEncodedNotEmptyCustomSalt() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
+		def encodedValue = AESCodec.instance.encode(value, "1234")
 
 		//Value encoded should not be empty
 		then:
@@ -84,7 +87,7 @@ class AESCodecTests extends Specification {
 	void testEncodedNotEqualsCustomSalt() {
 		when:
 		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
+		def encodedValue = AESCodec.instance.encode(value, "1234")
 
 		//Value encoded and value should not be equal
 		then:
@@ -97,8 +100,8 @@ class AESCodecTests extends Specification {
 	 */
 	void testEncodeDecodeInvalid() {
 		when:
-		def encodedValue = AESCodec.encode("testvalue", "1234")
-		AESCodec.decode(encodedValue, "4321")
+		def encodedValue = AESCodec.instance.encode("testvalue", "1234")
+		AESCodec.instance.decode(encodedValue, "4321")
 
 		then:
 		thrown GeneralSecurityException

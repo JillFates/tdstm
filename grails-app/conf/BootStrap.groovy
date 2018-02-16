@@ -1,5 +1,6 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.security.AESCodec
 import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
@@ -68,6 +69,9 @@ class BootStrap {
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
+
+		// warm up AESCodec
+		AESCodec.getInstance()
 	}
 
 	/**
