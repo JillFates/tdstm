@@ -90,8 +90,8 @@ export class CredentialModel {
 }
 
 export enum REQUEST_MODE {
-	BASIC_AUTH,
-	FORM_VARIABLES
+	BASIC_AUTH = 'BASIC_AUTH',
+	FORM_VARS = 'FORM_VARS'
 }
 
 export enum AUTH_METHODS {
@@ -105,7 +105,7 @@ export enum ENVIRONMENT {
 	DEVELOPMENT = 'Development',
 	OTHER = 'Other',
 	PRODUCTION = 'Production',
-	SANDBOX = 'SANDBOX'
+	SANDBOX = 'Sandbox'
 };
 
 export enum HTTP_METHOD {

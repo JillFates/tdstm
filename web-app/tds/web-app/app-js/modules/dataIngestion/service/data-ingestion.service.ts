@@ -7,7 +7,7 @@ import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
-import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS} from '../model/credential.model';
+import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
@@ -280,23 +280,22 @@ export class DataIngestionService {
 
 		let postRequest: any = {
 			name: model.name,
+			description: model.description,
 			environment: Object.keys(ENVIRONMENT).find((type) => ENVIRONMENT[type] === model.environment),
-			provider: { id: model.provider.id },
+			provider: {id: model.provider.id},
 			status: model.status.toUpperCase(),
 			authenticationMethod: Object.keys(AUTH_METHODS).find((type) => AUTH_METHODS[type] === model.authMethod),
 			username: model.username,
-			authenticationUrl: model.authenticationUrl,
-			// Temporary Fix
-			expirationDate: '2020-02-16 00:00:00.213Z'
+			authenticationUrl: (model.authenticationUrl) ? model.authenticationUrl : '',
+			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
+			httpMethod: model.httpMethod.toUpperCase(),
+			terminateUrl: (model.terminateUrl) ? model.terminateUrl : ''
 		};
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it
 		if (model.password && model.password.length > 0 && model.password !== '') {
 			postRequest.password = model.password;
 		}
-
-		// Does this is really required, what if the AUTH METHOD is not Cookie?
-		postRequest.httpMethod = model.httpMethod.toUpperCase();
 
 		if (!model.id) {
 			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
@@ -308,7 +307,6 @@ export class DataIngestionService {
 				.catch((error: any) => error.json());
 		} else {
 			postRequest.version = model.version;
-			postRequest.expirationDate = new Date();
 			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
