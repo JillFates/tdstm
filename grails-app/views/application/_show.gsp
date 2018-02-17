@@ -124,7 +124,7 @@
 
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
+			<tds:showLabelAndURI field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
 

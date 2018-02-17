@@ -118,22 +118,22 @@
     table
       padding: 0px
       tr
-        &.even 
+        &.even
           background: #fff
         &.odd
           background: #e0e0e0
         td
-          &.dep-Validated 
+          &.dep-Validated
 	          background: LightGreen
-          &.dep-Unknown 
+          &.dep-Unknown
 	          background: #F9FF90
           &.dep-Questioned
 	          background: LightPink
           &.dep-Not
 	          background: #EEE
-          &.dep-Archived 
+          &.dep-Archived
             background: #EEE
-          &.dep-Future 
+          &.dep-Future
 	          background: #EEE
 
 .dates-info
@@ -144,3 +144,11 @@
   .last-updated
     font-size: inherit
     text-align: right
+.uri-field
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+  max-width: 90px
+.uri-field span a
+  font-weight: bold
+  color: black
