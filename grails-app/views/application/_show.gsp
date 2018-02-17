@@ -36,7 +36,7 @@
 			<td class="valueNW ${standardFieldSpecs.sme.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:standardFieldSpecs.sme.label}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
-								</span>
+				</span>
 			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
