@@ -64,9 +64,9 @@
 					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 				</g:if>
 				<g:else>
-					<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+					<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
 						${asset?.moveBundle}
-					</tds:tooltipSpan>
+					</tdsAngular:tooltipSpan>
 				</g:else>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" tooltipDataPlacement="bottom"/>

@@ -93,4 +93,26 @@ class Credential {
         ]
         return data
     }
+
+    /**
+     * Return a map representation of this Credential.
+     * @return
+     */
+    Map toMap() {
+        Map dataMap = [
+                id: id,
+                name: name,
+                type: type.name(),
+                status: status.name(),
+                method: method.name(),
+                accessKey: accessKey,
+                password: password,
+                authenticationUrl: authenticationUrl,
+                renewTokenurl: renewTokenUrl,
+                expirationDate: expirationDate,
+                lastUpdated: lastUpdated
+        ]
+        return dataMap.asImmutable()
+    }
+
 }

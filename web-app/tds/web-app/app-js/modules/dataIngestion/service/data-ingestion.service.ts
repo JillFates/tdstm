@@ -157,7 +157,8 @@ export class DataIngestionService {
 			name: model.name,
 			description: model.description,
 			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			etlSourceCode: model.etlSourceCode
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))

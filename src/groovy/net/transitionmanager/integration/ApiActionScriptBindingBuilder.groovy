@@ -1,12 +1,10 @@
 package net.transitionmanager.integration
 
-import com.tdssrc.grails.GormUtil
+import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
-import org.springframework.context.MessageSource
-import org.springframework.context.annotation.Scope
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.stereotype.Component
+import net.transitionmanager.task.TaskFacade
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Fluent API for Builder pattern.
@@ -21,17 +19,16 @@ import org.springframework.stereotype.Component
  *                  .build(ReactionScriptCode.FINAL)
  * </code>
  */
-//@Component
-//@Scope("prototype")
 class ApiActionScriptBindingBuilder {
 
 	MessageSourceService messageSourceService
 
 	ActionRequest request
 	ApiActionResponse response
-	ReactionAssetFacade asset
-	ReactionTaskFacade task
+	AssetFacade asset
+	TaskFacade task
 	ApiActionJob job
+
 
 	ApiActionScriptBindingBuilder with(ActionRequest request) {
 		this.request = request
@@ -43,12 +40,12 @@ class ApiActionScriptBindingBuilder {
 		this
 	}
 
-	ApiActionScriptBindingBuilder with(ReactionAssetFacade asset) {
+	ApiActionScriptBindingBuilder with(AssetFacade asset) {
 		this.asset = asset
 		this
 	}
 
-	ApiActionScriptBindingBuilder with(ReactionTaskFacade task) {
+	ApiActionScriptBindingBuilder with(TaskFacade task) {
 		this.task = task
 		this
 	}
@@ -57,6 +54,7 @@ class ApiActionScriptBindingBuilder {
 		this.job = job
 		this
 	}
+
 	/**
 	 * Check if all the params where defined to build an instance of ApiActionScriptBinding
 	 * to be used for ReactionScriptCode code Script
