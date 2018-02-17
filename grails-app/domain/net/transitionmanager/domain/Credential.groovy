@@ -1,9 +1,9 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
-import com.tdsops.tm.enums.domain.CredentialEnvironment
 
 class Credential {
     Project project
@@ -75,44 +75,23 @@ class Credential {
      */
     Map toMap() {
         Map data = [
-                id						: id,
-                project					: [id: project.id, name: project.name],
-                provider				: [id: provider.id, name: provider.name],
-                name					: name,
-                environment				: environment.name(),
-                status					: status.name(),
-                authenticationMethod	: authenticationMethod.name(),
-                httpMethod              : httpMethod.name(),
-                username        		: username,
-                authenticationUrl       : authenticationUrl,
-                renewTokenUrl           : renewTokenUrl,
-                expirationDate  		: expirationDate,
-                dateCreated     		: dateCreated,
-                lastUpdated     		: lastUpdated,
-                version                 : version
+            id: id,
+            project: [id: project.id, name: project.name],
+            provider: [id: provider.id, name: provider.name],
+            name: name,
+            environment: environment.name(),
+            status: status.name(),
+            authenticationMethod: authenticationMethod.name(),
+            httpMethod: httpMethod.name(),
+            username: username,
+            authenticationUrl: authenticationUrl,
+            renewTokenUrl: renewTokenUrl,
+            expirationDate: expirationDate,
+            dateCreated: dateCreated,
+            lastUpdated: lastUpdated,
+            version: version
         ]
-        return data
-    }
-
-    /**
-     * Return a map representation of this Credential.
-     * @return
-     */
-    Map toMap() {
-        Map dataMap = [
-                id: id,
-                name: name,
-                type: type.name(),
-                status: status.name(),
-                method: method.name(),
-                accessKey: accessKey,
-                password: password,
-                authenticationUrl: authenticationUrl,
-                renewTokenurl: renewTokenUrl,
-                expirationDate: expirationDate,
-                lastUpdated: lastUpdated
-        ]
-        return dataMap.asImmutable()
+        return data.asImmutable()
     }
 
 }
