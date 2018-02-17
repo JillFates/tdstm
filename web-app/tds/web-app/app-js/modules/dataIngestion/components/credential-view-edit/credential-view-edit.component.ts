@@ -1,7 +1,7 @@
 import {Component, ViewChild, ViewChildren, HostListener, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {CredentialModel, AUTH_METHODS, REQUEST_METHOD} from '../../model/credential.model';
+import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -69,7 +69,7 @@ export class CredentialViewEditComponent {
 	public httpMethodList = new Array<any>();
 	public modalTitle: string;
 	public actionTypes = ActionType;
-	public requestMethod = REQUEST_METHOD;
+	public requestMode = REQUEST_MODE;
 	private dataSignature: string;
 	public authMethods = AUTH_METHODS;
 	public isEditing = false;
@@ -87,7 +87,7 @@ export class CredentialViewEditComponent {
 		this.credentialModel = R.clone(this.originalModel);
 
 		if (this.modalType === ActionType.CREATE) {
-			this.credentialModel.requestMethod = this.requestMethod.BASIC_AUTH;
+			this.credentialModel.requestMode = this.requestMode.BASIC_AUTH;
 		}
 
 		this.dataSignature = JSON.stringify(this.credentialModel);

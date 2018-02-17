@@ -71,11 +71,7 @@ export class CredentialModel {
 	cookieName?: string;
 	version?: number;
 	terminateUrl?: string;
-	requestMethod?: REQUEST_METHOD;
-
-	// JWT Method
-	accessKey?: string;
-	secretAccessKey?: string;
+	requestMode?: REQUEST_MODE;
 
 	constructor() {
 		this.name = '';
@@ -90,12 +86,10 @@ export class CredentialModel {
 		this.httpMethod = '';
 		this.cookieName = '';
 		this.terminateUrl = '';
-		this.accessKey = '';
-		this.secretAccessKey = '';
 	}
 }
 
-export enum REQUEST_METHOD {
+export enum REQUEST_MODE {
 	BASIC_AUTH,
 	FORM_VARIABLES
 }
