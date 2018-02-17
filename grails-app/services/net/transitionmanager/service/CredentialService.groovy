@@ -29,24 +29,26 @@ class CredentialService implements ServiceMethods {
     Credential createCredential(CredentialCreateCO credentialCO) {
         Project project = securityService.getUserCurrentProject()
 
-        // Make sure that the name is unique
+        // Make sure that the name is unique and Provider is associated with the project
         validateBeforeSave(project, null, credentialCO)
 
         // Create the credential and populate it from the Co
         Credential credentialInstance = new Credential()
-        credentialCO.populateDomain(credentialInstance)
-        
+        credentialCO.populateDomain(credentialInstance, false, ['password','id'])
+
+        setEncryptedPassword(credentialInstance, credentialCO.password)
+
         credentialInstance.project = project
 
-        // Set the salt that will be used to encrypt the password with a random string
-        credentialInstance.salt = SecurityUtil.randomString(16)
-
         credentialInstance.save(failOnError: true)
+
         return credentialInstance
     }
 
     /**
-     * Update a credential
+     * Update a credential from a CommandObject. The password should ONLY be updated if the the password property
+     * has been populated and not overwrite it.
+     *
      * @param id - the ID of the Credential to update
      * @param credential - a Command object with values to update with
      * @return the updated Credential
@@ -58,14 +60,11 @@ class CredentialService implements ServiceMethods {
 
         Project project = securityService.getUserCurrentProject()
 
-        validateBeforeSave(project, null, credentialCO)
+        validateBeforeSave(project, id, credentialCO)
 
-        credentialCO.populateDomain(credentialInstance, true)
-        credentialInstance.lastUpdated = new Date()
+        credentialCO.populateDomain(credentialInstance, false, ['password', 'version'] )
 
-        if (credentialCO.hasErrors()) {
-            throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
-        }
+        setEncryptedPassword(credentialInstance, credentialCO.password)
 
         credentialInstance.save(failOnError: true)
 
@@ -182,9 +181,22 @@ class CredentialService implements ServiceMethods {
         }.list()
     }
 
+    /** 
+     * Used to encrypt the password when the password has a value
+     * @param credential - the domain instance to set the password on
+     * @param password - the cleartext password to encrypt
+     */
+    private void setEncryptedPassword(Credential credential, String password) {
+        // If a password was provided in the request then save the new password encrypted with a new salt
+        if (credential.password) {
+            // TODO - switch out calls to AESCodec when ready
+            credential.salt = 'lsdklkajsdfljasd'
+            credential.password = 'pswd with ' + credential.salt + ' salt'
+        }
+    }
+
     /**
      * Find a Credential instance with the given id, project and provider.
-     *
      * @param id
      * @param project
      * @param provider
@@ -213,6 +225,7 @@ class CredentialService implements ServiceMethods {
      */
     private void validateBeforeSave(Project project, Long id, Object cmdObj) {
         // Make certain that the provider specified is associated to the project
+        // TODO : JPM 2/2018 : to be replace by ofSameProject constraint when ready
         Provider provider = cmdObj.provider.refresh()
         if (provider.project.id != project.id) {
             throw new InvalidParamException('Invalid Provider specified')

@@ -28,7 +28,7 @@ class JsonUtil {
             return jsonSlurper.parseText(json) as JSONObject
         } catch (JsonException e) {
             logger.error(e.message)
-            throw new InvalidParamException("JSON is not valid")
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
     }
 

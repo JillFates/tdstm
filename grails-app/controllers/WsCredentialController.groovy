@@ -1,6 +1,7 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
@@ -34,7 +35,8 @@ class WsCredentialController implements ControllerMethods {
 	@HasPermission(Permission.CredentialCreate)
 	def createCredential(CredentialCreateCO command) {
 		validateCommandObject(command)
-		renderSuccessJson(credentialService.createCredential(command).toMap())
+		def result = credentialService.createCredential(command)
+		renderSuccessJson(result.toMap())
 	}
 
 	@HasPermission(Permission.CredentialEdit)
@@ -56,6 +58,7 @@ class WsCredentialController implements ControllerMethods {
 		renderSuccessJson([
 				'status': CredentialStatus.toMap(),
 				'authenticationMethod': AuthenticationMethod.toMap(),
+				'requestMode': AuthenticationRequestMode.toMap(),
 				'httpMethod': CredentialHttpMethod.names(),
 				'environment': CredentialEnvironment.toMap()
 		])
