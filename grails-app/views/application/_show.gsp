@@ -81,7 +81,7 @@
 			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 				<g:if test="${dependencyBundleNumber}">
 					${applicationInstance?.moveBundle} :
-					<tds:showDependencyGroup groupId="${dependencyBundleNumber}"/>
+					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/>
 				</g:if>
 				<g:else>
 					<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
