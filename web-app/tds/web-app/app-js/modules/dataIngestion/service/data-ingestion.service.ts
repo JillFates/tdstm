@@ -256,7 +256,7 @@ export class DataIngestionService {
 		}
 
 		if (model.credential && model.credential.id && model.credential.id !== 0) {
-			postRequest.credential = model.credential.id;
+			postRequest.credential = { id: model.credential.id };
 		}
 
 		if (!model.id) {
@@ -268,6 +268,7 @@ export class DataIngestionService {
 				})
 				.catch((error: any) => error.json());
 		} else {
+			postRequest.version = model.version;
 			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
