@@ -13,8 +13,7 @@ import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.i18n.Message
 
 /**
- * Command Object for handling API Action endpoints.
- *
+ * Command Object for handling API Action endpoints
  */
 @Validateable
 class ApiActionCommand {
@@ -29,16 +28,16 @@ class ApiActionCommand {
     String callbackMethod
     CallbackMode callbackMode
     DataScript defaultDataScript
+    String methodParams
+    String reactionScripts
     String endpointPath
     String endpointUrl
     Integer isPolling = 0
-    String methodParams
     Integer pollingInterval = 0
     Integer pollingLapsedAfter = 0
     Integer pollingStalledAfter = 0
-    Integer producesData
-    String reactionScripts
-    Integer timeout
+    Integer producesData=0
+    Integer timeout=0
     Integer useWithAsset = 0
     Integer useWithTask = 0
     Integer version=0
