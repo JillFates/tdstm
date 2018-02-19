@@ -57,7 +57,6 @@ export class DataScriptListComponent {
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -213,7 +212,7 @@ export class DataScriptListComponent {
 				}, 500);
 			}
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			// on dialog close, do nothing ..
 		});
 	}
 

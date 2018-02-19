@@ -69,7 +69,7 @@
 		<ng-template kendoGridFilterCellTemplate>
 			<div class=" has-feedback" style="margin-bottom:0px;">
 				<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" placeholder="Filter" value="" tabindex="{{i+1}}"
-                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event)" (keydown)="onFilterKeyDown($event)">
+                       [(ngModel)]="column.filter"  (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)">
 				<span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"
 				 aria-hidden="true"></span>
 			</div>

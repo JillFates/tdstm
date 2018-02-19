@@ -143,6 +143,7 @@ export class APIActionModel {
 	endpointUrl?: '';
 	endpointPath?: '';
 	eventReactions?: EventReaction[];
+	version?: number;
 
 	constructor() {
 		this.name = '';

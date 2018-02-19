@@ -101,7 +101,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 					}
 				});
 		} else {
-			this.dismiss();
+			const result = {
+				updated: this.operationStatus.save === 'success',
+				newEtlScriptCode: this.script
+			};
+			this.close(result);
 		}
 	}
 

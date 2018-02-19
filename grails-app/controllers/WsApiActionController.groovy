@@ -1,20 +1,11 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Project
-import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.integration.ApiActionJob
-import net.transitionmanager.integration.ApiActionResponse
-import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionValidateScriptCommand
-import net.transitionmanager.integration.ReactionAssetFacade
-import net.transitionmanager.integration.ReactionTaskFacade
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 
@@ -57,7 +48,7 @@ class WsApiActionController implements ControllerMethods {
      * @return
      */
     @HasPermission(Permission.ActionEdit)
-    def fetch(Long id){
+    def fetch(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
@@ -74,7 +65,6 @@ class WsApiActionController implements ControllerMethods {
         renderSuccessJson([deleted: true])
     }
 
-
     /**
      * Create a new ApiAction.
      */
@@ -88,13 +78,20 @@ class WsApiActionController implements ControllerMethods {
      * Update the corresponding ApiAction.
      */
     @HasPermission(Permission.ActionEdit)
-    def update(Long id, ApiActionCommand apiActionCommand) {
+    def update(Long id) {
+        // TODO: DMC For PUT command does populate the command objects properly
+        // SEE: https://github.com/grails/grails-core/issues/9172
+        ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
+    /**
+     * Used to validate that the API Reaction Scripts have the proper syntax
+     */
 	@HasPermission(Permission.ActionInvoke)
 	def validateSyntax(ApiActionValidateScriptCommand command) {
+        // TODO : JPM 2/2018 : TM-9414 Revisit the script validation - this doesn't look quite right
 		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
 			renderErrorJson( errorsInValidation([command.errors] + command.scripts.collect {it.errors}) )
 		} else {

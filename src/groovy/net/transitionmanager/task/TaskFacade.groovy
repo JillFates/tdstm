@@ -10,7 +10,6 @@ import net.transitionmanager.service.TaskService
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.exceptions.InvalidPropertyException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.util.ClassUtils
 
 class TaskFacade {
 	TaskService taskService

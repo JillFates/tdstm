@@ -43,7 +43,7 @@ class WsCredentialController implements ControllerMethods {
 	def updateCredential(Long id) {
 		// NOTE: For PUT command does populate the command objects properly
 		// SEE: https://github.com/grails/grails-core/issues/9172
-		CredentialUpdateCO command = JsonUtil.readValue(request.JSON, CredentialUpdateCO.class)
+		CredentialUpdateCO command = populateCommandObject(CredentialUpdateCO)
 
 		validateCommandObject(command)
 		renderSuccessJson(credentialService.updateCredential(id, command).toMap())

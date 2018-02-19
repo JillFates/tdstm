@@ -89,7 +89,7 @@ class Credential {
     /**
      * Converts this credential object to a map
      * NOTE: The password should NEVER be included in the Map
-     * @return 
+     * @return
      */
     Map toMap() {
         Map data = [
@@ -111,6 +111,7 @@ class Credential {
                 lastUpdated     		: lastUpdated,
                 version                 : version
         ]
-        return data
+        return data.asImmutable()
     }
+
 }
