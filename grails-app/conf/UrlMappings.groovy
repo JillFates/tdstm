@@ -811,7 +811,8 @@ class UrlMappings {
 			controller = "wsCredential"
 			action = [
 				GET: "getCredential",
-				PUT: "updateCredential"
+				PUT: "updateCredential",
+				DELETE: "deleteCredential"
 			]
 		}
 

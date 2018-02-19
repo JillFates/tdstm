@@ -9,6 +9,7 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCreateCO
 import net.transitionmanager.command.CredentialUpdateCO
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -72,21 +73,23 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Delete a credential
-     * @param credential
-     */
-    void deleteCredential(Credential credential) {
-        if (credential) {
-            credential.delete()
-        }
-    }
-
-    /**
      * Delete a credential by Id
      * @param id
      */
     void deleteCredential(Long id) {
-        deleteCredential(findById(id))
+        Credential credential = findById(id)
+
+        // Check if the credential is referenced by any ApiActions and prevent deleting
+        int count = ApiAction.where {
+            credential == credential
+        }.count()
+
+        if (count > 0) {
+            // TODO : JPM 2/2018 : change to use standard service method to throw message that is i18n
+            throw DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
+        }
+
+        credential.delete()
     }
 
     /**

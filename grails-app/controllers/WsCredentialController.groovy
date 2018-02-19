@@ -49,6 +49,12 @@ class WsCredentialController implements ControllerMethods {
 		renderSuccessJson(credentialService.updateCredential(id, command).toMap())
 	}
 
+	@HasPermission(Permission.CredentialCreate)
+	def deleteCredential(Long id) {
+		credentialService.deleteCredential(id)
+		renderSuccessJson()
+	}
+
 	/**
 	 * Returns a JSON map containing the values of all of the enums used to
 	 * support the Credential domain.
