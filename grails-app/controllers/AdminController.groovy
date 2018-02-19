@@ -1537,7 +1537,7 @@ class AdminController implements ControllerMethods {
 		def encodedValue
 		switch (hashAlgorithm) {
 			case 'AES':
-				encodedValue = AESCodec.encode(toHashString, hashSalt)
+				encodedValue = AESCodec.instance.encode(toHashString, hashSalt)
 				break
 			case 'DES':
 			default:
