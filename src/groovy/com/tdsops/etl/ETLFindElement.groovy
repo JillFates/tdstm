@@ -189,7 +189,7 @@ class ETLFindElement {
 	 * @param fieldName an asset field name
 	 */
 	private ETLFieldSpec checkAssetFieldSpec(String fieldName) {
-		return processor.lookUpFieldSpecs(fieldName)
+		return processor.lookUpFieldSpecs(currentDomain, fieldName)
 	}
 
 	/**

@@ -249,18 +249,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -1478,7 +1466,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
+			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -1624,9 +1612,7 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 							extract Location load location
 							extract Room load room
 					 
-					        if( SOURCE.RoomId.value ){
-								find Room 'for' room by id with SOURCE.RoomId
-							}
+							find Room 'for' room by id with SOURCE.RoomId
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)

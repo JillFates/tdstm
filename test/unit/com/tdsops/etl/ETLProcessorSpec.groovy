@@ -1305,7 +1305,7 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'The domain Application does not have specifications for field: vendedor'
+			e.message == 'There is not validator for domain Application and field vendedor'
 	}
 
 	void 'test can extract a field value and load into a domain object property name'() {

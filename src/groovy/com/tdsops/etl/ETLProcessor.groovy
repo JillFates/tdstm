@@ -415,7 +415,7 @@ class ETLProcessor implements RangeChecker {
 		[
 				with: { value ->
 
-					ETLFieldSpec fieldSpec = lookUpFieldSpecs(field)
+					ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
 					Element newElement = currentRow.addNewElement(value, this)
 					if (fieldSpec) {
@@ -532,19 +532,19 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldName
 	 * @return
 	 */
-	ETLFieldSpec lookUpFieldSpecs (String field) {
+	ETLFieldSpec lookUpFieldSpecs (ETLDomain domain, String field) {
 
 		ETLFieldSpec fieldSpec
 
-		if (ETLDomain.External != selectedDomain) {
+		if (ETLDomain.External != domain) {
 
-			if (!fieldsValidator.hasSpecs(selectedDomain, field)) {
-				throw ETLProcessorException.unknownDomainFieldsSpec(selectedDomain, field)
+			if (!fieldsValidator.hasSpecs(domain, field)) {
+				throw ETLProcessorException.unknownDomainFieldsSpec(domain, field)
 			}
 
-			fieldSpec = fieldsValidator.lookup(selectedDomain, field)
+			fieldSpec = fieldsValidator.lookup(domain, field)
 			if (!fieldSpec) {
-				throw ETLProcessorException.domainWithoutFieldsSpec(selectedDomain, field)
+				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
 		}
 		fieldSpec

@@ -33,7 +33,7 @@ class ETLFieldSpec {
 	 * @see DomainClassFieldsValidator#lookup(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldSpec(Map<String, ?> fieldSpec) {
-		this.name = fieldSpec.name
+		this.name = fieldSpec.field
 		this.label = fieldSpec.label
 		this.type = classForControlType(fieldSpec.control)
 	}

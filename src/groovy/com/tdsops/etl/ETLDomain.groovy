@@ -36,7 +36,7 @@ enum ETLDomain {
 	 * @return true if clazz is assignable from AssetEntity class.
 	 */
 	boolean isAsset(){
-		return clazz.isAssignableFrom(com.tds.asset.AssetEntity)
+		return com.tds.asset.AssetEntity.isAssignableFrom(clazz)
 	}
 
 	/**

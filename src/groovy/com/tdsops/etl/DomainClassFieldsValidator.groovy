@@ -50,7 +50,7 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
     Boolean hasSpecs (ETLDomain domain, String field) {
 
 		if(domain.isAsset()){
-	        (assetClassFieldsSpecMap[domain] != null)
+	        return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
 		} else {
 			return isDomainProperty(domain.clazz, field)
 		}
@@ -66,7 +66,8 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 
 	    if(domain.isAsset()){
 	        if (hasSpecs(domain, field)) {
-	            return new ETLFieldSpec(assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field })
+		        Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field }
+	            return new ETLFieldSpec(fieldSpec)
 	        }
 	    } else {
 		    Class<?> domainClass = domain.clazz

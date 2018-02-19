@@ -48,10 +48,10 @@ class DomainClassQueryHelper {
 				assets = assetDependencies(fieldsSpec)
 				break
 			case { Rack.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Rack, fieldsSpec)
+				assets = nonAssetEntities(Rack, project, fieldsSpec)
 				break
 			case { Room.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Room, fieldsSpec)
+				assets = nonAssetEntities(Room, project, fieldsSpec)
 				break
 			default:
 				throw ETLProcessorException.incorrectDomain(domain)
@@ -85,7 +85,7 @@ class DomainClassQueryHelper {
 	 * @param fieldsSpec
 	 * @return
 	 */
-	static <T> List<T> nonAssetEntities(Class<T> clazz, Map<String, ?> fieldsSpec) {
+	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> fieldsSpec) {
 
 		String hqlWhere = fieldsSpec.keySet().collect { String field ->
 			" ${field} = :${field}\n".toString()
@@ -97,9 +97,10 @@ class DomainClassQueryHelper {
 
 		String hql = """
               from ${clazz.simpleName} D
-             where $hqlWhere """.stripIndent()
+             where D.project = :project
+               and $hqlWhere """.stripIndent()
 
-		return clazz.executeQuery(hql, hqlParams)
+		return clazz.executeQuery(hql, [project: project] + hqlParams)
 	}
 
 	/**
