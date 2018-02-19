@@ -6,7 +6,7 @@
 # 1. Run Script
 #    This script should be invoked by given an environment. An environment
 #    is a file located on the resources/<server_hostname>.postman_environment.json
-#    to run the API automation test againt the TM QA 04 server, execute:
+#    to run the API automation test against the TM QA 04 server, execute:
 #        $ ./run_test.sh tmqa04.tm.tdsops.net
 #    the run_test.sh arguments will be translated to newman run tmqa04.tm.tdsops.net.postman_environment.json
 #
@@ -175,7 +175,7 @@ INTERACTIVE_MODE=false
 
 # Validate the command line arguments
 if [[ ! $1 ]]; then
-    echo "ERROR: You must specified a server. See the list below"
+    echo "ERROR: You must specify a server or command line argument. See the list below"
     echo
 
     LIST_OPTIONS
