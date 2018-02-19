@@ -206,7 +206,7 @@ export class DataIngestionService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			provider: model.provider.id,
+			provider: { id: model.provider.id },
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			endpointUrl: model.endpointUrl,

@@ -12,6 +12,7 @@ import net.transitionmanager.command.CredentialUpdateCO
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import com.tdsops.common.lang.ExceptionUtil
 
 @CompileStatic
 @Slf4j(value='logger')
@@ -27,8 +28,7 @@ class JsonUtil {
             JsonSlurper jsonSlurper = new JsonSlurper()
             return jsonSlurper.parseText(json) as JSONObject
         } catch (JsonException e) {
-            logger.error(e.message)
-            throw new InvalidParamException("JSON is not valid")
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
     }
 
@@ -41,6 +41,7 @@ class JsonUtil {
      * @return a list after parsing the text
      */
     static List parseJsonList(String jsonText) {
+        // TODO : JPM 2/2018 : Need to add try/catch
         JsonSlurper jsonSlurper = new JsonSlurper()
         return (List)jsonSlurper.parseText(jsonText)
     }
@@ -56,8 +57,7 @@ class JsonUtil {
             JsonBuilder jsonBuilder = new JsonBuilder(parsedJson)
             return jsonBuilder.toString()
         } catch (JsonException e) {
-            logger.error(e.message)
-            throw new InvalidParamException("JSON is not valid")
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
     }
 
@@ -71,8 +71,7 @@ class JsonUtil {
             JsonBuilder jsonBuilder = new JsonBuilder(json)
             return jsonBuilder.toString()
         } catch (JsonException e) {
-            logger.error(e.message)
-            throw new InvalidParamException("JSON is not valid")
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
     }
 
@@ -82,6 +81,7 @@ class JsonUtil {
      * @return
      */
     static Map<String, ?> convertJsonToMap(String json) {
+        // TODO : JPM 2/2018 : Need to add try/catch
         Map<String, Object> jsonMap = new ObjectMapper().readValue(json, HashMap.class)
         return jsonMap
     }
@@ -130,6 +130,8 @@ class JsonUtil {
      * @return
      */
     static JSONObject parseFile(String fileName) {
+        // TODO : JPM 2/2018 : Need to add try/catch
+
         return (JSONObject)JSON.parse(ExportUtil.getResource(fileName).inputStream.text)
     }
 
@@ -139,6 +141,8 @@ class JsonUtil {
      * @return JSON
      */
     static JSONObject parseFile(InputStream inputStream) {
+        // TODO : JPM 2/2018 : Need to add try/catch
+        
         return (JSONObject)JSON.parse(inputStream.text)
     }
 
@@ -154,11 +158,14 @@ class JsonUtil {
             try {
                 return new ObjectMapper().readValue(json.toString(), target)
             } catch (Exception e) {
-                logger.error(e.message)
-                throw new InvalidParamException("JSON is not valid")
+                String msg
+                if (e instanceof java.lang.NullPointerException) {
+                    msg = "Unable to map Json into ${target.name} object" 
+                }
+                throw new InvalidParamException("Invalid JSON : ${msg ?: e.message}")
             }
         } else {
-            throw new InvalidParamException("JSON is not valid")
+            throw new InvalidParamException("JSON value not present")
         }
     }
 }

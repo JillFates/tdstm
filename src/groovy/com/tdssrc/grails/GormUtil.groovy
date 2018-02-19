@@ -211,7 +211,7 @@ public class GormUtil {
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
 	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
-		def version = NumberUtil.toLong(params.version)
+		Long version = NumberUtil.toLong(params.version)
 		if (version == null) {
 			throw new DomainUpdateException("The $label version was missing from request")
 		} else {

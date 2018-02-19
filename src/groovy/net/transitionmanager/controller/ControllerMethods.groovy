@@ -4,10 +4,10 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
-import net.transitionmanager.command.CommandObject
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
@@ -22,6 +22,9 @@ import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.SecurityService
 import com.tdsops.common.grails.ApplicationContextHolder
+
+import com.google.gson.JsonSyntaxException
+import org.grails.databinding.bindingsource.InvalidRequestBodyException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -228,12 +231,32 @@ trait ControllerMethods {
 		String msg = e.getMessage() ?: 'A field values was invalid'
 		handleException(e, 'error', msg)
 	}
+	def invalidRequestBodyExceptionHandler(InvalidRequestBodyException e) {
+		// Grails throws this exception for a number of reasons so we need to grab the real cause and deal with that
+		String defaultMsg = 'An invalid request was received'
+		String causeMsg = e.message
+		boolean dumpstack = false
+		String msg=''
+
+		// This list will continue was we discover more exceptions that we want to report cleanly to the user
+		if (causeMsg.startsWith('com.google.gson.JsonSyntaxException:')) {
+		 	msg = 'Invalid JSON : ' + e.cause.cause.message ?: defaultMsg
+		} else {
+			msg = causeMsg ?: defaultMsg
+			dumpstack = true
+		}
+		handleException(e, 'error', msg, dumpstack)
+	}
 	def invalidRequestExceptionHandler(InvalidRequestException e) {
 		String msg = e.getMessage() ?: 'The request was missing required parameters'
 		handleException(e, 'error', msg)
 	}
 	def invalidSyntaxExceptionHandler(InvalidSyntaxException e) {
 		String msg = e.getMessage() ?: 'The syntax is invalid'
+		handleException(e, 'error', msg)
+	}
+	def jsonSyntaxExceptionHandler(JsonSyntaxException e) {
+		String msg = (e.getMessage() ? "JSON syntax error: ${e.getMessage()}" : 'JSON syntax is invalid')
 		handleException(e, 'error', msg)
 	}
 	def logicExceptionHandler(LogicException e) {
@@ -247,7 +270,7 @@ trait ControllerMethods {
 	}
 	// Thrown when validation fails during a GORM save(failOnError:true)
 	def validationExceptionHandler(ValidationException e) {
-		List<String> msgs = GormUtil.validateErrorsI18n(e.getErrors(), LocaleContextHolder.locale)
+		List<String> msgs = GormUtil.validateErrorsI18n(e, LocaleContextHolder.locale)
 		handleException(e, 'error', msgs)
 	}
 	// If all else fails the default exception hander will catch the rest
@@ -365,6 +388,20 @@ trait ControllerMethods {
 			// Call the invalidParamExceptionHandler
 			invalidParamExceptionHandler(new InvalidParamException(msg))
 		}
+	}
+	/**
+	 * Populates command object using the request.JSON from body in a http request
+	 * <pre>
+	 *      ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
+	 * </pr>
+	 * @param commandObjectClass command object class
+	 * @return a instance of commandObjectClass
+	 */
+	def <T> T populateCommandObject(Class<T> commandObjectClass){
+		// NOTE: For PUT command does populate the command objects properly
+		// SEE: https://github.com/grails/grails-core/issues/9172
+		return JsonUtil.readValue(request.JSON, commandObjectClass)
+
 	}
 
 	// ----------------------

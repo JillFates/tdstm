@@ -360,6 +360,42 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
+	 * Create or Update an API Action based on a JSON Object.
+	 * @param apiActionCommand - the command object containing the values loaded by controller
+	 * @param apiActionId - the id of the ApiAction to update 
+	 * @param project - the project that the ApiAction should belong to (optional)
+	 * @return the ApiAction instance that was created or updated
+	 */
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
+		ApiAction apiAction = null
+
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+
+		validateBeforeSave(project, apiActionId, apiActionCommand)
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+
+			// Make sure nobody changed it while the user was editting the data
+			GormUtil.optimisticLockCheck(apiAction, apiActionCommand, "API Action")
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+
+		// Populate the apiAction with the properties from the command object
+		// TODO : JPM 2/2018 : replace the properties setting as this causes the version to tick when nothing else has chanaged
+		// apiActionCommand.populateDomain(apiAction, false, ['version'])
+		apiAction.properties = apiActionCommand.properties
+
+		apiAction.save(failOnError: true)
+		return apiAction
+	}
+
+	/**
 	 * Delete the given ApiAction.
 	 * @param id
 	 * @param project
@@ -425,36 +461,6 @@ class ApiActionService implements ServiceMethods {
 			}
 		}
 		return result
-
-	}
-
-	/**
-	 * Create or Update an API Action based on a JSON Object.
-	 * @param apiActionJson
-	 * @param apiActionId
-	 * @param project
-	 * @return
-	 */
-	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
-		ApiAction apiAction = null
-
-		if (!project) {
-			project = securityService.userCurrentProject
-		}
-
-		// If there's an apiActionId then it's an update operation.
-		if (apiActionId) {
-			// Retrieve the corresponding API Action instance
-			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
-		} else {
-			apiAction = new ApiAction(project: project)
-		}
-
-		// Populate the apiAction with the properties from the command object.
-		apiAction.properties = apiActionCommand.properties
-
-		apiAction.save(failOnError: true)
-		return apiAction
 
 	}
 
@@ -648,17 +654,16 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
-		List<String> properties = null
-		if (minimalInfo) {
-			properties = ["id", "name"]
-		}
 
+		// Load just the minimal or all by setting properties to null
+		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
 		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
 		if (!minimalInfo) {
 			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.version = apiAction.version
 		}
 
 		return apiActionMap
@@ -672,5 +677,26 @@ class ApiActionService implements ServiceMethods {
 	 */
 	private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, ApiActionException apiActionException) {
 		taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, apiActionException.message))
+	}
+
+	/**
+	 * Performs some additional checks before the save occurs that includes:
+	 *    - validate that the name for the credential being created or updated doesn't already exist
+	 * If the validations fail then the InvalidParamException exception is thrown with an appropriate message.
+	 * @throws InvalidParamException
+	 */
+	private void validateBeforeSave(Project project, Long id, Object cmdObj) {
+		// Make sure that name is unique
+		int count = ApiAction.where {
+			project == project
+			name == cmdObj.name
+			if (id) {
+				id != id
+			}
+		}.count()
+
+		if (count > 0) {
+			throw new InvalidParamException('An ApiAction with the same name already exists')
+		}
 	}
 }
