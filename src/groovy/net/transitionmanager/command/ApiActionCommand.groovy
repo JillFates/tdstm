@@ -15,26 +15,26 @@ import net.transitionmanager.service.ApiActionService
  *
  */
 @Validateable
-class ApiActionCommand{
+class ApiActionCommand {
 
+    String name
+    String description
+    Provider provider
+    Credential credential
     AgentClass agentClass
     String agentMethod
     String asyncQueue
     String callbackMethod
     CallbackMode callbackMode
-    Credential credential
     DataScript defaultDataScript
-    String description
     String endpointPath
     String endpointUrl
     Integer isPolling = 0
     String methodParams
-    String name
     Integer pollingInterval = 0
     Integer pollingLapsedAfter = 0
     Integer pollingStalledAfter = 0
     Integer producesData
-    Provider provider
     String reactionScripts
     Integer timeout
     Integer useWithAsset = 0

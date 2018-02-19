@@ -84,7 +84,7 @@ class WsApiActionController implements ControllerMethods {
         // SEE: https://github.com/grails/grails-core/issues/9172
         ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
-        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction, id))
     }
 
 	@HasPermission(Permission.ActionInvoke)

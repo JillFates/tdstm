@@ -360,6 +360,37 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
+	 * Create or Update an API Action based on a JSON Object.
+	 * @param apiActionCommand - the command object containing the values loaded by controller
+	 * @param apiActionId - the id of the ApiAction to update 
+	 * @param project - the project that the ApiAction should belong to (optional)
+	 * @return the ApiAction instance that was created or updated
+	 */
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
+		ApiAction apiAction = null
+
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+
+		validateBeforeSave(project, apiActionId, apiActionCommand)
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+
+		// Populate the apiAction with the properties from the command object.
+		apiAction.properties = apiActionCommand.properties
+
+		apiAction.save(failOnError: true)
+		return apiAction
+	}
+
+	/**
 	 * Delete the given ApiAction.
 	 * @param id
 	 * @param project
@@ -425,38 +456,6 @@ class ApiActionService implements ServiceMethods {
 			}
 		}
 		return result
-
-	}
-
-	/**
-	 * Create or Update an API Action based on a JSON Object.
-	 * @param apiActionJson
-	 * @param apiActionId
-	 * @param project
-	 * @return
-	 */
-	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
-		ApiAction apiAction = null
-
-		if (!project) {
-			project = securityService.userCurrentProject
-		}
-
-		validateBeforeSave(project, apiActionId, apiActionCommand)
-
-		// If there's an apiActionId then it's an update operation.
-		if (apiActionId) {
-			// Retrieve the corresponding API Action instance
-			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
-		} else {
-			apiAction = new ApiAction(project: project)
-		}
-
-		// Populate the apiAction with the properties from the command object.
-		apiAction.properties = apiActionCommand.properties
-
-		apiAction.save(failOnError: true)
-		return apiAction
 
 	}
 
