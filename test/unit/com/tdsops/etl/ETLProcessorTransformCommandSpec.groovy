@@ -902,10 +902,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-			etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-			etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -927,10 +927,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-			etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -954,10 +954,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
-			etlProcessor.getElement(1, 1).field.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 	}
 
 	void 'test can transform globally a field value using replace command using a range in the iteration'() {
@@ -980,7 +980,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 	}
 
 	/**

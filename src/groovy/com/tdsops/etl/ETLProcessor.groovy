@@ -412,20 +412,16 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def set(final String field) {
-
 		[
 				with: { value ->
 
 					ETLFieldSpec fieldSpec = lookUpFieldSpecs(field)
 
 					Element newElement = currentRow.addNewElement(value, this)
-					newElement.field.name = field
-					newElement.domain = selectedDomain
-
 					if (fieldSpec) {
-
-						newElement.field.label = fieldSpec.label
-						newElement.field.control = fieldSpec.type
+						newElement.fieldSpec = fieldSpec
+						newElement.fieldSpec.label = fieldSpec.label
+						newElement.fieldSpec.type = fieldSpec.type
 					}
 
 					addElementLoaded(selectedDomain, newElement)

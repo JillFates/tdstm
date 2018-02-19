@@ -1388,7 +1388,7 @@ class ETLProcessorSpec extends Specification {
 			}
 			with(etlProcessor.getElement(0, 1)) {
 				value == "Microsoft"
-				field.name == "appVendor"
+				fieldSpec.name == "appVendor"
 			}
 	}
 
@@ -1503,10 +1503,10 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).field.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -1529,10 +1529,10 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).field.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -1555,10 +1555,10 @@ class ETLProcessorSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
-			etlProcessor.getElement(1, 1).field.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 
 	}
 
