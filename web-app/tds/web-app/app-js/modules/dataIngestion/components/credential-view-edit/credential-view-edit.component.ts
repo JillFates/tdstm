@@ -226,7 +226,7 @@ export class CredentialViewEditComponent {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.dataIngestionService.deleteAPIAction(this.credentialModel.id).subscribe(
+					this.dataIngestionService.deleteCredential(this.credentialModel.id).subscribe(
 						(result) => {
 							this.activeDialog.close(result);
 						},
@@ -238,8 +238,11 @@ export class CredentialViewEditComponent {
 	protected verifyCode(operationStatusModel: OperationStatusModel): void {
 		this.dataIngestionService.validateAuthentication(this.credentialModel.id).subscribe(
 			(result: any) => {
-				console.log(result);
-				operationStatusModel.state = this.checkActionModel.VALID;
+				if (!result) {
+					operationStatusModel.state = this.checkActionModel.INVALID;
+				} else {
+					operationStatusModel.state = this.checkActionModel.VALID;
+				}
 			},
 			(err) => console.log(err));
 	}
