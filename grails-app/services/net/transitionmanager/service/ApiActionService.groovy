@@ -379,11 +379,16 @@ class ApiActionService implements ServiceMethods {
 		if (apiActionId) {
 			// Retrieve the corresponding API Action instance
 			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+
+			// Make sure nobody changed it while the user was editting the data
+			GormUtil.optimisticLockCheck(apiAction, apiActionCommand, "API Action")
 		} else {
 			apiAction = new ApiAction(project: project)
 		}
 
-		// Populate the apiAction with the properties from the command object.
+		// Populate the apiAction with the properties from the command object
+		// TODO : JPM 2/2018 : replace the properties setting as this causes the version to tick when nothing else has chanaged
+		// apiActionCommand.populateDomain(apiAction, false, ['version'])
 		apiAction.properties = apiActionCommand.properties
 
 		apiAction.save(failOnError: true)
@@ -649,17 +654,16 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
-		List<String> properties = null
-		if (minimalInfo) {
-			properties = ["id", "name"]
-		}
 
+		// Load just the minimal or all by setting properties to null
+		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
 		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
 		if (!minimalInfo) {
 			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.version = apiAction.version
 		}
 
 		return apiActionMap

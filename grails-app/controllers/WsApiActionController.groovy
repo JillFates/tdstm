@@ -48,7 +48,7 @@ class WsApiActionController implements ControllerMethods {
      * @return
      */
     @HasPermission(Permission.ActionEdit)
-    def fetch(Long id){
+    def fetch(Long id) {
         Project project = securityService.userCurrentProject
         ApiAction apiAction = apiActionService.find(id, project, true)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
@@ -64,7 +64,6 @@ class WsApiActionController implements ControllerMethods {
         apiActionService.delete(id, project)
         renderSuccessJson([deleted: true])
     }
-
 
     /**
      * Create a new ApiAction.
@@ -84,11 +83,15 @@ class WsApiActionController implements ControllerMethods {
         // SEE: https://github.com/grails/grails-core/issues/9172
         ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
-        renderSuccessJson(apiActionService.apiActionToMap(apiAction, id))
+        renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
+    /**
+     * Used to validate that the API Reaction Scripts have the proper syntax
+     */
 	@HasPermission(Permission.ActionInvoke)
 	def validateSyntax(ApiActionValidateScriptCommand command) {
+        // TODO : JPM 2/2018 : TM-9414 Revisit the script validation - this doesn't look quite right
 		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
 			renderErrorJson( errorsInValidation([command.errors] + command.scripts.collect {it.errors}) )
 		} else {

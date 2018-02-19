@@ -10,6 +10,8 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.ApiActionService
 
+import net.transitionmanager.i18n.Message
+
 /**
  * Command Object for handling API Action endpoints.
  *
@@ -18,7 +20,7 @@ import net.transitionmanager.service.ApiActionService
 class ApiActionCommand {
 
     String name
-    String description
+    String description=''
     Provider provider
     Credential credential
     AgentClass agentClass
@@ -39,4 +41,14 @@ class ApiActionCommand {
     Integer timeout
     Integer useWithAsset = 0
     Integer useWithTask = 0
+    Integer version=0
+
+    static constraints = {
+        callbackMethod nullable: true
+        callbackMode nullable: true
+        credential nullable: true
+        defaultDataScript nullable:true
+        version nullable:true
+    }
+
 }
