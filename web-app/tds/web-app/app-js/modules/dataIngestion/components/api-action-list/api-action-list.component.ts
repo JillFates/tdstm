@@ -241,4 +241,9 @@ export class APIActionListComponent {
 	protected isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ActionDelete);
 	}
+
+	public onClickTemplate(e: any): void {
+		e.target && e.target.parentNode.click();
+	}
+
 }
