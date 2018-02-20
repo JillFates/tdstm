@@ -16,6 +16,7 @@ import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Specification
 
@@ -60,9 +61,10 @@ application id,vendor name,technology,location
 
 		validator = new DomainClassFieldsValidator()
 		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, buildFieldSpecsFor(AssetClass.DATABASE))
 		validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(ETLDomain.Dependency))
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -154,7 +156,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with DOMAIN bound instance'() {
@@ -249,30 +251,30 @@ application id,vendor name,technology,location
 
 
 				with(data[0].fields.id) {
-					find.size == 1
-					find.results == [1]
-					find.matchOn == 1
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Dependency.name()
 					find.query[0].kv.id == '1'
+					find.size == 1
+					find.results == [1]
+					find.matchOn == 1
 				}
 
 				with(data[1].fields.id) {
-					find.size == 1
-					find.results == [2]
-					find.matchOn == 1
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Dependency.name()
 					find.query[0].kv.id == '2'
+					find.size == 1
+					find.results == [2]
+					find.matchOn == 1
 				}
 
 				with(data[2].fields.id) {
-					find.size == 1
-					find.results == [3]
-					find.matchOn == 1
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Dependency.name()
 					find.query[0].kv.id == '3'
+					find.size == 1
+					find.results == [3]
+					find.matchOn == 1
 				}
 
 				(3..13).each { int value ->
@@ -287,7 +289,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
@@ -353,18 +355,6 @@ application id,vendor name,technology,location
 			GroovyMock(AssetDependency, global: true)
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -452,7 +442,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can grab the reference to the FINDINGS to be used later'() {
@@ -510,24 +500,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovySpy(AssetDependency, global: true)
-			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
-				assetDependencies.findAll { it.id == args.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -576,12 +548,11 @@ application id,vendor name,technology,location
 					}
 				}
 				// Validates command: set comment with 'Asset results found'
-				data[0..2].collect { it.fields.comment.value }.unique() == ['Asset results found']
-				data[3..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
+				data[0..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
@@ -610,18 +581,6 @@ application id,vendor name,technology,location
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -662,7 +621,7 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
@@ -691,18 +650,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GroovyMock(Project),
 					dataSet,
@@ -728,7 +675,7 @@ application id,vendor name,technology,location
 			e.message == 'Project not defined.'
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
@@ -762,18 +709,6 @@ application id,vendor name,technology,location
 				} else {
 					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
 				}
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -860,18 +795,12 @@ application id,vendor name,technology,location
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
 1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
@@ -937,18 +866,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
@@ -985,7 +902,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'You cannot use isApplication with more than one results in FINDINGS'
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can create a domain when not found a instance with find command'() {
@@ -1025,18 +942,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -1120,7 +1025,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenNotFound command defines an update action'() {
@@ -1163,18 +1068,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -1214,7 +1107,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'Incorrect whenNotFound command. Use whenNotFound asset create { .... }'
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenFound command defines a create action'() {
@@ -1257,18 +1150,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -1305,7 +1186,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == 'Incorrect whenFound command. Use whenFound asset update { .... }'
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
@@ -1345,18 +1226,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -1400,7 +1269,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can update a domain when found a instance with find command'() {
@@ -1437,7 +1306,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
+			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -1517,7 +1386,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can load Rack domain instances and find Rooms associated'() {
@@ -1670,6 +1539,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 						buildFieldSpec('appVendor', 'Vendor'),
 						buildFieldSpec('environment', 'Environment'),
 						buildFieldSpec('description', 'Description'),
+						buildFieldSpec('assetType', 'AssetType'),
 						buildFieldSpec('assetName', 'Name'),
 						buildFieldSpec('assetClass', 'Asset Class'),
 				]
@@ -1684,6 +1554,14 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 						buildFieldSpec('name', 'Name'),
 						buildFieldSpec('environment', 'Environment'),
 						buildFieldSpec('assetClass', 'Asset Class'),
+				]
+				break
+			case CustomDomainService.COMMON:
+				fieldSpecs = [
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('assetType', 'AssetType'),
+					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
 			case ETLDomain.Dependency:
