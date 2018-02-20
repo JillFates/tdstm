@@ -438,3 +438,16 @@ grails {
 		}
 	}
 }
+
+// Graph Properties
+graph {
+//	graphviz {
+//		//dotCmd = '/usr/bin/dot'
+//		dotCmd = '/usr/local/bin/dot'
+//		graphType = 'svg'
+//	}
+//	deleteDotFile = false
+	tmpDir = '/tmp/'
+//	targetDir = '/var/www/tdstm/images/tmp/'
+//	targetURI = '/../images/tmp/'
+}
