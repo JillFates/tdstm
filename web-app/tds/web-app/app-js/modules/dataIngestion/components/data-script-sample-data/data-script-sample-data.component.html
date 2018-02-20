@@ -15,10 +15,6 @@
                         <div class="col-md-12">
                             <div class="radio">
                                 <label>
-                                    <input type="radio" selected value="{{OPTIONS.CSV}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
-                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT' | translate }}
-                                </label>
-                                <label style="margin-left: 10px;">
                                     <input type="radio" value="{{OPTIONS.FILE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
                                     {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.UPLOAD_FILE' | translate }}
                                 </label>
@@ -26,40 +22,15 @@
                                     <input type="radio" value="{{OPTIONS.SERVICE}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
                                     {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FETCH_DATA_FROM_WEBSERVICE' | translate }}
                                 </label>
+                                <label style="margin-left: 10px;">
+                                    <input type="radio" selected value="{{OPTIONS.CSV}}" [(ngModel)]="OPTIONS.selected" name="loadSourceOption">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.PASTE_CONTENT' | translate }}
+                                </label>
                             </div>
                         </div>
                     </div>
 
                     <div class="row" style="margin-top: 10px;">
-                        <!-- csv -->
-                        <div *ngIf="OPTIONS.selected === OPTIONS.CSV" class="col-md-12">
-                            <div class="form-group" style="margin-bottom: 0px;">
-                                <label for="fileExtension" class="col-sm-12 control-label">
-                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FILE_TYPE' | translate }}
-                                </label>
-                                <div class="col-sm-12">
-                                    <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
-                                                        [(ngModel)]="csv.selected" (ngModelChange)="csv.state = 'dirty'"
-                                                        [data]="csv.options.slice(1)"
-                                                        textField="text"
-                                                        valueField="value">
-                                    </kendo-dropdownlist>
-                                </div>
-                                <div class="col-sm-12">
-                                    <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; padding-left: 0px; padding-right: 0px;"
-                                          [(ngModel)]="csv.fileContent" (ngModelChange)="csv.state = 'dirty'"></textarea>
-                                </div>
-                                <div class="col-sm-12">
-                                    <button [disabled]="csv.fileContent.length < 1 || csv.state === 'success' || csv.selected.value === -1" (click)="onUploadFileText()"
-                                            type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
-                                        {{ 'GLOBAL.UPLOAD' | translate }}
-                                        <input *ngIf="csv.state === 'success'" [(ngModel)]="csv.checked" (change)="onSelectFilename(OPTIONS.CSV)"
-                                               name="csvchecked" type="checkbox" style="margin-left: 5px;" >
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- file -->
                         <div *ngIf="OPTIONS.selected === OPTIONS.FILE" class="col-md-12">
                             <kendo-upload
@@ -100,8 +71,40 @@
                                     <button [disabled]="!webService.selected || webService.selected.id === -1" (click)="onFetch()"
                                             type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
                                         {{ 'GLOBAL.FETCH' | translate }}
-                                        <input *ngIf="webService.state === 'success'" [(ngModel)]="webService.checked" (change)="onSelectFilename(OPTIONS.SERVICE)"
-                                               name="webservicecheck" type="checkbox" style="margin-left: 5px;" >
+                                        <i *ngIf="csv.state === 'success'" class="green icon fa fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- csv -->
+                        <div *ngIf="OPTIONS.selected === OPTIONS.CSV" class="col-md-12">
+                            <div class="form-group" style="margin-bottom: 0px;">
+                                <label for="fileExtension" class="control-label" style="padding: 7px 15px 0px 15px;">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.FILE_TYPE' | translate }}
+                                </label>
+                                <div style="width: 200px; display: inline-block;">
+                                    <kendo-dropdownlist id="fileExtension" name="fileExtension" class="form-control"
+                                                        [(ngModel)]="csv.selected" (ngModelChange)="csv.state = 'dirty'"
+                                                        [data]="csv.options.slice(1)"
+                                                        textField="text"
+                                                        valueField="value">
+                                    </kendo-dropdownlist>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0px;">
+                                <label for="fileExtension" class="col-sm-12 control-label">
+                                    {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.CONTENT' | translate }}
+                                </label>
+                                <div class="col-sm-12">
+                                    <textarea class="col-sm-12" name="fileContent" cols="30" rows="8" style="resize: vertical; padding-left: 0px; padding-right: 0px;"
+                                              [(ngModel)]="csv.fileContent" (ngModelChange)="csv.state = 'dirty'"></textarea>
+                                </div>
+                                <div class="col-sm-12">
+                                    <button [disabled]="csv.fileContent.length < 1 || csv.state === 'success' || csv.selected.value === -1" (click)="onUploadFileText()"
+                                            type="button" class="btn btn-default pull-right" style="margin-top: 5px;">
+                                        {{ 'GLOBAL.UPLOAD' | translate }}
+                                        <i *ngIf="csv.state === 'success'" class="green icon fa fa-check"></i>
                                     </button>
                                 </div>
                             </div>
@@ -146,9 +149,8 @@
                 </form>
 
             </div>
-
 			<div class="modal-footer form-group-center">
-                <button [disabled]="!validForm()" (click)="onLoadData()" type="button" class="btn btn-primary pull-left">
+                <button [disabled]="!validForm()" (click)="onContinue()" type="button" class="btn btn-primary pull-left">
 					<span class="fa fa-fw fa-upload"></span> {{'GLOBAL.CONTINUE' | translate }}</button>
 				<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
 					<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
