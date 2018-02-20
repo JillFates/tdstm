@@ -4,7 +4,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import net.transitionmanager.service.InvalidParamException
 import com.tdsops.tm.enums.ControlType
-import org.apache.commons.lang.StringEscapeUtils as SEU
 
 /**
  * This TabLib is a clone of the ControlTagLib. The original lib was used to render the various data elements and input controls for the
@@ -117,30 +116,6 @@ class ControlAngularTagLib {
 	}
 
 	/**
-	 * Creates the cell with the URI of a field for displaying in show views.
-	 */
-	def labelForShowURI = { Map attrs ->
-		Map fieldSpec = attrs.field ?: [:]
-				def fieldValue = attrs.value ?: ""
-				def suffixFieldValue = attrs.valueSuffix ?: ""
-				def target = attrs.target ?: "_blank"
-
-		StringBuilder sb = new StringBuilder("\n")
-		String escapedURI = SEU.escapeHtml(SEU.escapeJavaScript(fieldValue))
-		sb.append("<td class=\"uri-field valueNW ${fieldSpec.imp}\">")
-		sb.append("<span ")
-		sb.append(tooltipAttrib(fieldSpec, attrs.tooltipDataPlacement))
-		sb.append(" >")
-				sb.append("<a href=\"${escapedURI}\" target=\"${target}\" title=\"${fieldValue}\">")
-				sb.append(fieldValue)
-				sb.append(suffixFieldValue)
-				sb.append("</a>")
-		sb.append("</span>")
-		sb.append("</td>")
-		out << sb.toString()
-	}
-
-	/**
 	 * Used to render text if the fieldSpec is required
 	 * @param field - the Field Specification (Map)
 	 */
@@ -214,14 +189,6 @@ class ControlAngularTagLib {
 		out << inputLabel(attrs)
 		out << labelForShowField(attrs)
 
-	}
-
-	/**
-	 * Used to render the label and a URI value for a field in show views.
-	 */
-	def showLabelAndURI = { Map attrs ->
-		out << inputLabel(attrs)
-		out << labelForShowURI(attrs)
 	}
 
 	/**
