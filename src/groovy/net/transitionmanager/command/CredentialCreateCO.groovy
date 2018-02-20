@@ -32,7 +32,8 @@ class CredentialCreateCO implements CommandObject {
     static constraints = {
         importFrom Credential, include: [
                 'name',
-                'renewTokenUrl'
+                'renewTokenUrl',
+                'terminateUrl'
         ]
     }
 }

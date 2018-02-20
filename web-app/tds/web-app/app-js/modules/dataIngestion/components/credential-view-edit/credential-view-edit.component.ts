@@ -169,7 +169,9 @@ export class CredentialViewEditComponent {
 	protected onSaveCredential(): void {
 		this.dataIngestionService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
-				this.activeDialog.close(result);
+				if (result && result.id) {
+					this.activeDialog.close(result);
+				}
 			},
 			(err) => console.log(err));
 

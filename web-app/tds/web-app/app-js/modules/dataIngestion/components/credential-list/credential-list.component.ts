@@ -193,11 +193,13 @@ export class CredentialListComponent {
 		], DIALOG_SIZE.XLG, false).then(result => {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
-				setTimeout(() => {
-					this.selectRow(result.id);
-					let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
-					this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
-				}, 500);
+				if (result && result.id) {
+					setTimeout(() => {
+						this.selectRow(result.id);
+						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
+						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
+					}, 500);
+				}
 			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
