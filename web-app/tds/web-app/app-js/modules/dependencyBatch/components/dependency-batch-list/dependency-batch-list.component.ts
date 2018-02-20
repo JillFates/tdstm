@@ -45,7 +45,6 @@ export class DependencyBatchListComponent {
 			this.columnsModel.columns.splice(0, 1);
 		}
 		this.dependencyBatchService.getImportBatches().subscribe( (result: Array<ImportBatchModel>) => {
-			console.log(result);
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
 		});
 	}
@@ -56,7 +55,8 @@ export class DependencyBatchListComponent {
 	private loadBatchList(): void {
 		this.dependencyBatchService.getImportBatches().subscribe(result => {
 			this.dataGridOperationsHelper.reloadData(result);
-		});
+		},
+		(err) => console.log(err));
 	}
 
 	/**
@@ -72,6 +72,27 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
+	 * Load Archived Batches.
+	 */
+	private loadArchivedBatchList(): void {
+		this.dependencyBatchService.getArchivedBatchList().subscribe( result => {
+			this.dataGridOperationsHelper.reloadData(result);
+		});
+	}
+
+	/**
+	 * On Archive batch button click.
+	 */
+	private onArchiveBatch(): void {
+		console.log(this.dataGridOperationsHelper.getCheckboxSelectedItems());
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.dependencyBatchService.archiveImportBatches(ids).subscribe( res => {
+			console.log(res);
+		},
+		(err) => console.log(err));
+	}
+
+	/**
 	 * On View Archived checkbox clicked, toggle load archived batch list
 	 */
 	private onViewArchived(): void {
@@ -80,15 +101,6 @@ export class DependencyBatchListComponent {
 		} else {
 			this.loadBatchList();
 		}
-	}
-
-	/**
-	 * Load Archived Batches.
-	 */
-	private loadArchivedBatchList(): void {
-		this.dependencyBatchService.getArchivedBatchList().subscribe( result => {
-			this.dataGridOperationsHelper.reloadData(result);
-		});
 	}
 
 	/**

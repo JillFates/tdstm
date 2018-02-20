@@ -24,111 +24,6 @@ export class DependencyBatchService {
 				return res.json() && res.json().data ? res.json().data : null;
 			})
 			.catch((error: any) => error.json());
-
-		// let mockResult: Array<ImportBatchModel> = [
-		// 	{
-		// 		id: 1,
-		// 		status: 'Pending',
-		// 		domainClassName: 'Dependencies',
-		// 		provider: {id: 1, name: 'Provider 1'},
-		// 		datascript: {id: 1, name: 'Datascript 1'},
-		// 		createdBy: 'David Ontiveros',
-		// 		archived: false,
-		// 		timezone: 'timezone',
-		// 		dateFormat: 'dateFormat',
-		// 		progressInfoJob: null,
-		// 		originalFilename: 'load_file_v1.xls',
-		// 		nullIndicator: null,
-		// 		overwriteWithBlanks: null,
-		// 		autoProcess: null,
-		// 		warnOnChangesAfter: null,
-		// 		fieldNameList: [],
-		// 		dateCreated: new Date(),
-		// 		lastUpdated: new Date(),
-		// 		records: 20,
-		// 		errors: 0,
-		// 		pending: 0,
-		// 		processed: 0,
-		// 		ignored: 0
-		// 	}];
-		// 	{
-		// 		id: 2,
-		// 		status: 'Pending',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'TDS Admin',
-		// 		domain: 'Dependencies',
-		// 		provider: 'TransitionManager',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'dep_cmdb.xls',
-		// 		records: 20,
-		// 		errors: 0,
-		// 		pending: 3,
-		// 		processed: 13,
-		// 		ignored: 0
-		// 	},
-		// 	{
-		// 		id: 3,
-		// 		status: 'Queued',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'Auto',
-		// 		domain: 'Dependencies',
-		// 		provider: 'TransitionManager',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'dep_cmdb.xls',
-		// 		records: 20,
-		// 		errors: 0,
-		// 		pending: 20,
-		// 		processed: 10,
-		// 		ignored: 1
-		// 	},
-		// 	{
-		// 		id: 4,
-		// 		status: 'Completed',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'Auto',
-		// 		domain: 'Dependencies',
-		// 		provider: 'Service Now',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'dep_cmdb_v2.xls',
-		// 		records: 40,
-		// 		errors: 3,
-		// 		pending: 8,
-		// 		processed: 21,
-		// 		ignored: 1
-		// 	},
-		// 	{
-		// 		id: 5,
-		// 		status: 'Pending',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'David Ontiveros',
-		// 		domain: 'Dependencies',
-		// 		provider: 'Service Now',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'batch_load.xls',
-		// 		records: 20,
-		// 		errors: 5,
-		// 		pending: 20,
-		// 		processed: 3,
-		// 		ignored: 10
-		// 	},
-		// 	{
-		// 		id: 6,
-		// 		status: 'Pending',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'TDS Admin',
-		// 		domain: 'Dependencies',
-		// 		provider: 'TransitionManager',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'batch_load2.xls',
-		// 		records: 50,
-		// 		errors: 0,
-		// 		pending: 10,
-		// 		processed: 1,
-		// 		ignored: 0
-		// 	}
-		// ];
-
-		// return Observable.of( mockResult );
 	}
 
 	/**
@@ -188,8 +83,11 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	archiveImportBatches(id: number): Observable<any> {
-		return this.http.post(`${this.importBatchUrl}/archive`, null)
+	archiveImportBatches(ids: Array<number>): Observable<any> {
+		const request = {
+			ids: ids
+		};
+		return this.http.put(`${this.importBatchUrl}/archive`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})

@@ -4,6 +4,7 @@
         <div>
             <div class="box-body box-with-empty-header">
                 <kendo-grid
+                        *ngIf="dataGridOperationsHelper"
                         [data]="dataGridOperationsHelper.gridData"
                         [filter]="dataGridOperationsHelper.state.filter"
                         [filterable]="true"
@@ -27,7 +28,9 @@
                                     class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
-                            <button *ngIf="canBulkArchive()" [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                            <button *ngIf="canBulkArchive()"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="onArchiveBatch()"
                                     class="btn btn-default" id="btnBulkArchive" type="button">
                                 <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
                                 <span *ngIf="!viewArchived"> {{ 'GLOBAL.ARCHIVE' | translate }} </span>
@@ -41,7 +44,7 @@
                         </ng-template>
 
                         <!--
-                            Select All column & cell
+                            Checkbox Template (Select All & Cell Content)
                         -->
                         <kendo-grid-column *ngIf="canBulkDelete() || canBulkArchive()" title="" [locked]="true" [filterable]="false" [width]="45">
                             <ng-template kendoGridHeaderTemplate>
@@ -63,7 +66,8 @@
                                         <input type="checkbox"
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
                                                name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
-                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])"
+                                               [disabled]="dataItem.status === 'PROCESSING'">
                                     </label>
                                 </div>
                             </ng-template>
@@ -93,19 +97,19 @@
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
-                                    <button *ngIf="dataItem.status === 'Pending'"
+                                    <button *ngIf="dataItem.status === 'PENDING'"
                                             (click)="onPlayButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status === 'Processing'"
+                                    <button *ngIf="dataItem.status === 'PROCESSING'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
                                         <i class="fa fa-stop"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status === 'Queued'" class="btn btn-action btn-default"
+                                    <button *ngIf="dataItem.status === 'QUEUED'" class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
                                         <i class="fa fa-eject"></i>
                                     </button>
