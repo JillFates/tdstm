@@ -27,6 +27,7 @@ class CredentialCreateCO implements CommandObject {
     String authenticationUrl=''
     String terminateUrl=''
     String renewTokenUrl = ''
+    String sessionName
 
     static constraints = {
         importFrom Credential, include: [

@@ -66,12 +66,15 @@ export class CredentialModel {
 	username?: string;
 	password?: string;
 	authenticationUrl?: string;
-	// cookie auth Method
-	httpMethod?: string;
-	cookieName?: string;
-	version?: number;
+	renewTokenUrl?: string;
 	terminateUrl?: string;
 	requestMode?: REQUEST_MODE;
+
+	// cookie auth Method
+	httpMethod?: string;
+	// Token / Cookie Session Name
+	sessionName?: string;
+	version?: number;
 
 	constructor() {
 		this.name = '';
@@ -83,9 +86,10 @@ export class CredentialModel {
 		this.username = '';
 		this.password = '';
 		this.authenticationUrl = '';
-		this.httpMethod = '';
-		this.cookieName = '';
+		this.renewTokenUrl = '';
 		this.terminateUrl = '';
+		this.httpMethod = '';
+		this.sessionName = '';
 	}
 }
 

@@ -47,6 +47,9 @@ class Credential {
     // The URL to the endpoint to renew tokens
     String renewTokenUrl=''
 
+    // The HTTP Header token or Cookie name used to reference the session token
+    String sessionName
+
 	Date dateCreated
     Date lastUpdated
 
@@ -64,6 +67,7 @@ class Credential {
         salt size:1..16
         username size:1..255
         password size:1..255
+        sessionName size:1..255
         lastUpdated nullable: true
     }
 
@@ -81,6 +85,7 @@ class Credential {
         environment enumType: 'String'
         httpMethod enumType: 'String'
         status enumType: 'String'
+        sessionName sqlType: 'VARCHAR(255)'
 
         // TODO : JPM 2/2018 : Would like to sort on Provider name + Credential name
 		sort 'name'
@@ -107,6 +112,7 @@ class Credential {
                 authenticationUrl       : authenticationUrl,
                 terminateUrl            : terminateUrl,
                 renewTokenUrl           : renewTokenUrl,
+                sessionName             : sessionName,
                 dateCreated     		: dateCreated,
                 lastUpdated     		: lastUpdated,
                 version                 : version

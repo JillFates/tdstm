@@ -289,9 +289,12 @@ export class DataIngestionService {
 			authenticationMethod: Object.keys(AUTH_METHODS).find((type) => AUTH_METHODS[type] === model.authMethod),
 			username: model.username,
 			authenticationUrl: (model.authenticationUrl) ? model.authenticationUrl : '',
+			terminateUrl: (model.terminateUrl) ? model.terminateUrl : '',
+			renewTokenUrl: (model.renewTokenUrl) ? model.renewTokenUrl : '',
 			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
 			httpMethod: model.httpMethod.toUpperCase(),
-			terminateUrl: (model.terminateUrl) ? model.terminateUrl : ''
+			sessionName: model.sessionName,
+			version: model.version
 		};
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it

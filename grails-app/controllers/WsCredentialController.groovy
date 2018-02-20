@@ -41,6 +41,7 @@ class WsCredentialController implements ControllerMethods {
 
 	@HasPermission(Permission.CredentialEdit)
 	def updateCredential(Long id) {
+		//renderErrorJson('blah'); return 
 		// NOTE: For PUT command does populate the command objects properly
 		// SEE: https://github.com/grails/grails-core/issues/9172
 		CredentialUpdateCO command = populateCommandObject(CredentialUpdateCO)

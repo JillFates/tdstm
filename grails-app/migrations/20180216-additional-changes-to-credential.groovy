@@ -36,4 +36,13 @@ databaseChangeLog = {
 				
 		""")
 	}
+
+	changeSet(author: "jmartin", id: "TM-9406-02") {
+		comment('Add the sessionName property to Credential ')
+		sql ("""
+                ALTER TABLE `credential` 
+                    ADD `session_name` VARCHAR(255) NOT NULL AFTER `renew_token_url`;
+        """)
+    }
+
 }
