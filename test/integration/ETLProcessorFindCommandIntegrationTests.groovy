@@ -60,9 +60,9 @@ application id,vendor name,technology,location
 		TMDEMO = projectTestHelper.createProject(null)
 
 		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, buildFieldSpecsFor(AssetClass.DATABASE))
-		validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, buildFieldSpecsFor(AssetClass.DEVICE))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(ETLDomain.Dependency))
 
@@ -151,139 +151,6 @@ application id,vendor name,technology,location
 					with(find.query[0]) {
 						domain == 'Application'
 						kv == [id: '152255']
-					}
-				}
-			}
-
-		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can find a domain Property Name with DOMAIN bound instance'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
-
-		and:
-			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getBundle() >> it.bundle
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-			].collect {
-				AssetDependency mock = Mock()
-				mock.getId() >> it.id
-				mock.getType() >> it.type
-				mock.getAsset() >> it.asset
-				mock.getDependent() >> it.dependent
-				mock
-			}
-
-		and:
-			GroovyMock(AssetDependency, global: true)
-			AssetDependency.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
-				assetDependencies.findAll { it.id == args.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
-							extract AssetDependencyId load id
-							find Dependency 'for' id by id with DOMAIN.id
-						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
-
-		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fields == ['id'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
-
-
-				with(data[0].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Dependency.name()
-					find.query[0].kv.id == '1'
-					find.size == 1
-					find.results == [1]
-					find.matchOn == 1
-				}
-
-				with(data[1].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Dependency.name()
-					find.query[0].kv.id == '2'
-					find.size == 1
-					find.results == [2]
-					find.matchOn == 1
-				}
-
-				with(data[2].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Dependency.name()
-					find.query[0].kv.id == '3'
-					find.size == 1
-					find.results == [3]
-					find.matchOn == 1
-				}
-
-				(3..13).each { int value ->
-					with(data[value].fields.id.find) {
-						query.size() == 1
-						with(query[0]) {
-							domain == ETLDomain.Dependency.name()
-							kv.id == (value + 1).toString()
-						}
 					}
 				}
 			}

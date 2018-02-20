@@ -132,7 +132,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
 		applicationFieldsValidator = new DomainClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -589,7 +589,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -677,7 +677,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
@@ -719,7 +719,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -762,7 +762,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -804,7 +804,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -846,7 +846,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(

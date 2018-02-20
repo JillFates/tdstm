@@ -77,7 +77,7 @@
                     <input class="form-control" type="submit" value="Apply">
                 <br>
                 <div class="col-md-5">
-                     DataScript Id: <input type="text" size="3" name="dataScriptId" id="dataScriptId" value="${dataScriptId}"">
+                     DataScript Id: <input type="text" size="3" name="dataScriptId" id="dataScriptId" value="${dataScriptId}">
                      <br>
                      Provider: <input type="text" size="25" name="providerName" id="providerName" value="${providerName}">
                      <br>

@@ -51,16 +51,21 @@ class ScriptProcessorService {
      */
     private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
 
-        def configureUsingDomain = { AssetClass assetClass ->
-            customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
-        }
+	    Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
 
-        ETLFieldsValidator validator = new DomainClassFieldsValidator()
+	    Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
+	    Map<String, ?> applicationFieldsSpec = fieldsSpecMap[AssetClass.APPLICATION.name()]
+	    Map<String, ?> deviceFieldsSpec = fieldsSpecMap[AssetClass.DEVICE.name()]
+	    Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
+	    Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
 
-        validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
+	    DomainClassFieldsValidator validator = new DomainClassFieldsValidator()
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Database, commonFieldsSpec.fields + dataBaseFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec.fields)
+
         return validator
     }
 

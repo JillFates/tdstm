@@ -2,8 +2,13 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
+import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
@@ -52,6 +57,21 @@ class DomainClassQueryHelper {
 				break
 			case { Room.isAssignableFrom(it) }:
 				assets = nonAssetEntities(Room, project, fieldsSpec)
+				break
+			case { Manufacturer.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Manufacturer, project, fieldsSpec)
+				break
+			case { MoveBundle.isAssignableFrom(it) }:
+				assets = nonAssetEntities(MoveBundle, project, fieldsSpec)
+				break
+			case { Model.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Model, project, fieldsSpec)
+				break
+			case { Person.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Person, project, fieldsSpec)
+				break
+			case { Files.isAssignableFrom(it) }:
+				assets = nonAssetEntities(Files, project, fieldsSpec)
 				break
 			default:
 				throw ETLProcessorException.incorrectDomain(domain)
@@ -148,7 +168,7 @@ class DomainClassQueryHelper {
 	}
 
 	private static final nonAssetEntityTransformations = [
-	    "id" : [ transform: { String value -> NumberUtil.toLong(value) }]
+		"id": [transform: { String value -> NumberUtil.toLong(value) }]
 	].withDefault { String key ->
 		[
 			property: "AE." + key,
@@ -156,7 +176,6 @@ class DomainClassQueryHelper {
 			join: "",
 			transform: { String value -> value?.trim() }]
 	}
-
 
 	//TODO: Review this with John. Where I can put those commons configurations?
 	private static final Map<String, Map> assetEntityTransformations = [

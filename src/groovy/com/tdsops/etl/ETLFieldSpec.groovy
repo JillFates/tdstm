@@ -61,7 +61,8 @@ class ETLFieldSpec {
 		} else if(ControlType.PERSON.toString() == controlType){
 			return Person
 		} else{
-			throw ETLProcessorException.unknownAssetControlType(controlType)
+			//throw ETLProcessorException.unknownAssetControlType(controlType)
+			return String
 		}
 	}
 

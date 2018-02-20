@@ -61,11 +61,8 @@ class ScriptProcessorServiceSpec extends Specification {
         applicationDataSetOS.close()
 
         service.customDomainService = Mock(CustomDomainService)
-        service.customDomainService.allFieldSpecs(_, _) >> { Project project, String domain ->
-            Map fieldSpec = [:]
-
-            fieldSpec[domain] = [fields: fieldSpecsMap[domain]]
-            fieldSpec
+        service.customDomainService.fieldSpecsWithCommon(_) >> { Project project ->
+            fieldSpecsMap
         }
     }
 
