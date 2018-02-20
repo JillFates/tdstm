@@ -347,14 +347,14 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="true"> Status
+														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="apiActionModel.eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"> Status
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="apiActionModel.eventReactions[1].value.length > 0 || modalType === actionTypes.VIEW"> Success
+														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="true"> Success
 													</label>
 												</div>
 											</div>
