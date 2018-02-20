@@ -60,15 +60,10 @@
 																					</label>
 																				</td>
 																				<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-																					<g:if test="${dependencyBundleNumber}">
-																						${asset?.moveBundle} :
-																						<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
-																					</g:if>
-																					<g:else>
-																						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-																							${asset?.moveBundle}
-																						</tds:tooltipSpan>
-																					</g:else>
+																					<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+																						${asset?.moveBundle}
+																					</tdsAngular:tooltipSpan>
+																					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 																				</td>
                                     </tr>
                                     <tr class="prop">

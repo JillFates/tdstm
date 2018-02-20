@@ -8,26 +8,11 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 enum DependencyAnalyzerTabs {
-	MAP('MAP'),
-	ALL('ALL'),
-	APPS('APPS'),
-	SERVERS('SERVERS'),
-	DATABASES('DATABASES'),
-	STORAGE('STORAGE')
-
-	private String value
-
-	DependencyAnalyzerTabs(String value) {
-		this.value = value
-	}
-
-	@Override
-	String toString() {
-		return value
-	}
-
-	String getValue() {
-		return this.value
-	}
+	MAP,
+	ALL,
+	APPS,
+	SERVERS,
+	DATABASES,
+	STORAGE
 
 }

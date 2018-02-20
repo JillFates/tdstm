@@ -913,27 +913,32 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
+	 * @param bundle  Move bundle id to filter for bundle
+	 * @param assignedGroup  Whether it is assigned
+	 * @param subsection  Tab name to show on the Dependency Analyzer (optional)
+	 * @param groupId  The group Id to show selected on the Dependency Analyzer (optional)
+	 * @param assetName  The asset to show selected on the Dependency Analyzer (optional)
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
-	def dependencyConsole() {
+	def dependencyConsole(Long bundle, String assinedGroup, String subsection, Long groupId, String assetName) {
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
 		// Check for correct URL params
-		if ( params.subsection || params.groupId) { // is the drill-in URL
-			if (!(params.subsection && params.groupId)) { // If any exists, then both should be present in the URL
+		if ( subsection || groupId) { // is the drill-in URL
+			if (!(subsection && groupId)) { // If any exists, then both should be present in the URL
 				throw new InvalidParamException("Subsection and Group Id params are both required.")
 			}
-			String subsection = params.subsection as String // Check for valid tab name
-			if (!(subsection.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
-				throw new InvalidParamException("Invalid Subsection name: ${subsection}")
+			String subsec = subsection as String // Check for valid tab name
+			if (!(subsec.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
+				throw new InvalidParamException("Invalid Subsection name: ${subsec}")
 			}
 		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
-			params.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null, false, params.subsection, params.groupId, params.assetName)
+			assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+		def map = moveBundleService.dependencyConsoleMap(project, bundle, assinedGroup, null, false, subsection, groupId, assetName)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map

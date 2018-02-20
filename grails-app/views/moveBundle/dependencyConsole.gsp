@@ -387,7 +387,6 @@
 			$(document).ready(function () {
 				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
 				$('#graphSVGContainer').append(appSVGShapes.getAll());
-					debugger;
 				var showTabs = '${showTabs}';
 				var assetName = '${assetName}';
 				if(showTabs == "true") {
@@ -401,7 +400,7 @@
 										window.setTimeout(function() {
                         $('#searchBoxId').val(assetName);
                         GraphUtil.performSearch();
-										}, 1500)
+										}, 1900)
 										break;
 								case "all":
 										getList("all", '${groupId}');

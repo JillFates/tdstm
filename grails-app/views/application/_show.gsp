@@ -79,15 +79,10 @@
 				</label>
 			</td>
 			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-				<g:if test="${dependencyBundleNumber}">
-					${applicationInstance?.moveBundle} :
-					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/>
-				</g:if>
-				<g:else>
-					<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-						${applicationInstance?.moveBundle}
-					</tds:tooltipSpan>
-				</g:else>
+				<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+					${applicationInstance?.moveBundle}
+				</tds:tooltipSpan>
+				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/>
 			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>

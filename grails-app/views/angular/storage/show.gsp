@@ -43,15 +43,10 @@
 									</label>
 								</td>
 								<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-									<g:if test="${dependencyBundleNumber}">
-										${filesInstance?.moveBundle} :
-										<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
-									</g:if>
-									<g:else>
-										<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-											${filesInstance?.moveBundle}
-										</tds:tooltipSpan>
-									</g:else>
+									<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
+										${filesInstance?.moveBundle}
+									</tdsAngular:tooltipSpan>
+									<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
 								</td>
 							</tr>
 							<tr class="prop">
