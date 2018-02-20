@@ -220,4 +220,8 @@ export class DataScriptListComponent {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
 	}
+
+	onClickTemplate(e: any): void {
+     e.target && e.target.parentNode.click();
+  }
 }

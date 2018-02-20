@@ -297,6 +297,10 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
+	onClickTemplate(e: any): void {
+		 e.target && e.target.parentNode.click();
+	}
+
 	/**
 	 * On cell click event.
 	 * Determines if cell clicked property is either assetName or assetId and opens detail popup.
