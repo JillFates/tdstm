@@ -2,7 +2,6 @@ package com.tdsops.common.security
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.service.InvalidConfigurationException
-import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Hex
 
 import javax.crypto.Cipher
@@ -32,17 +31,21 @@ class AESCodec {
 	private static final String SALT_PADDING = 'rnu8FkDMG8jhH7EgfCV5krmgE9ZjDKRp'
 	private static final int MINIMAL_SECRET_KEY_LENGTH = (int) (KEYLEN_BITS / 8)
 	private static final int ITERATION_COUNT = 65536
+	private static final String SECRET_KEY_ALGORITHM = 'PBKDF2WithHmacSHA256'
+	private static final String AES_ALGORITHM = 'AES'
+	private static final String AES_WITH_CBC_ALGORITHM = 'AES/CBC/PKCS5Padding'
 
 	/*
 	 * In order to do 256 bit crypto, you have to muck with the files for Java's "unlimited security"
 	 * The end user must also install them (not compiled in) so beware.
 	 * see here:  http://www.javamex.com/tutorials/cryptography/unrestricted_policy_files.shtml
 	 */
-	private static final int KEYLEN_BITS = 256
+	private static int KEYLEN_BITS = 0
 
 	private static final AESCodec INSTANCE = new AESCodec()
 
 	private AESCodec() {
+		KEYLEN_BITS = getSupportedBitsKeyLength()
 		ENCRYPTION_SALT_PREFIX = getSystemSaltKey()
 	}
 
@@ -220,7 +223,7 @@ class AESCodec {
 	 */
 	private SecretKey deriveSecretKey(String secretKey) {
 		// Derive the key, given secretKey
-		SecretKey secret = new SecretKeySpec(getPassword(secretKey), 'AES')
+		SecretKey secret = new SecretKeySpec(getPassword(secretKey), AES_ALGORITHM)
 
 		return secret
 	}
@@ -233,7 +236,7 @@ class AESCodec {
 	 * @return a cryptographic cipher for encryption and decryption
 	 */
 	private Cipher getCipher(int mode, String secretKey) {
-		Cipher cipher = Cipher.getInstance('AES')
+		Cipher cipher = Cipher.getInstance(AES_ALGORITHM)
 		cipher.init(mode, deriveSecretKey(secretKey))
 		return cipher
 	}
@@ -250,10 +253,10 @@ class AESCodec {
 	 */
 	private SecretKey deriveSecretKey(String secretKey, String salt) {
 		// Derive the key, given secretKey and salt
-		SecretKeyFactory factory = SecretKeyFactory.getInstance('PBKDF2WithHmacSHA256')
+		SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_ALGORITHM)
 		KeySpec spec = new PBEKeySpec(secretKey.toCharArray(), salt.bytes, ITERATION_COUNT, KEYLEN_BITS)
 		SecretKey tmp = factory.generateSecret(spec)
-		SecretKey secret = new SecretKeySpec(tmp.getEncoded(), 'AES')
+		SecretKey secret = new SecretKeySpec(tmp.getEncoded(), AES_ALGORITHM)
 
 		return secret
 	}
@@ -267,13 +270,23 @@ class AESCodec {
 	 * @return a cryptographic cipher for encryption and decryption
 	 */
 	private Cipher getCipherWithBlockChaining(int mode, String secretKey, String salt, byte[] initializationVector) {
-		Cipher cipher = Cipher.getInstance('AES/CBC/PKCS5Padding')
+		Cipher cipher = Cipher.getInstance(AES_WITH_CBC_ALGORITHM)
 		if (Cipher.ENCRYPT_MODE == mode) {
 			cipher.init(mode, deriveSecretKey(secretKey, salt))
 		} else {
 			cipher.init(mode, deriveSecretKey(secretKey, salt), new IvParameterSpec(initializationVector))
 		}
 		return cipher
+	}
+
+	/**
+	 * Gets how many key length bits current Java version supports
+	 * @return
+	 */
+	private static int getSupportedBitsKeyLength() {
+		// TODO <sl> this needs to be re-worked, by now implementing 128 bits by default
+		// return Cipher.getMaxAllowedKeyLength(AES_WITH_CBC_ALGORITHM) == 128 ? 128 : 256
+		return 128
 	}
 
 }

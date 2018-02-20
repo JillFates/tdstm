@@ -77,7 +77,7 @@ class AESCodecTests extends Specification {
 			AESCodec.instance.decode(encodedValue, "4321")
 		then: 'A general security exception is thrown'
 			GeneralSecurityException e = thrown()
-			e.message == 'Given final block not properly padded. Such issues can arise if a bad key is used during decryption.'
+			e.message ==~ /^Given final block not properly padded.*$/
 	}
 
 	/**
@@ -91,6 +91,11 @@ class AESCodecTests extends Specification {
 			def secondEncodedValue = AESCodec.instance.encode(value, salt)
 		then: 'The resultant encoded values are not the same'
 			firstEncodedValue != secondEncodedValue
+		and: 'Decoding encrypted values'
+			def firstDecodedValue = AESCodec.instance.decode(firstEncodedValue, salt)
+			def secondDecodedValue = AESCodec.instance.decode(secondEncodedValue, salt)
+		then: 'The values must be the same'
+			firstDecodedValue == secondDecodedValue
 	}
 
 }
