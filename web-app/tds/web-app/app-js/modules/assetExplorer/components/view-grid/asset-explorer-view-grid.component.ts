@@ -297,8 +297,14 @@ export class AssetExplorerViewGridComponent {
 		}
 	}
 
-	onClickTemplate(e: any): void {
-		 e.target && e.target.parentNode.click();
+	/**
+	 * Make the entire header clickable on Grid
+	 * @param event:any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 
 	/**
