@@ -184,5 +184,10 @@ class WsDataScriptController implements ControllerMethods {
         renderSuccessJson()
     }
 
+    @HasPermission(Permission.DataScriptCreate)
+    def sampleData (String filename) {
+
+        render status: 404
+    }
 
 }
