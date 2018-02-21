@@ -1,7 +1,7 @@
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
 import {Injectable} from '@angular/core';
-import { Response } from '@angular/http';
+import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchModel} from '../model/import-batch.model';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class DependencyBatchService {
 	getImportBatches(): Observable<any> {
 		return this.http.get(this.importBatchUrl)
 			.map( (res: Response) => {
-				return res.json() && res.json().data ? res.json().data : null;
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}
@@ -30,10 +30,15 @@ export class DependencyBatchService {
 	 * DELETE - Bulk Delete all Import Batches
 	 * @returns {Observable<any>}
 	 */
-	deleteImportBatches(): Observable<any> {
-		return this.http.delete(this.importBatchUrl)
+	deleteImportBatches(ids: Array<number>): Observable<any> {
+		let body = JSON.stringify({ids: ids} );
+		const headers = new Headers({ 'Content-Type': 'application/json' });
+		let options = new RequestOptions({
+			headers: headers,
+			body : body
+		});
+		return this.http.delete(this.importBatchUrl, options)
 			.map( (res: Response) => {
-				// response: [status: 'success|error', deleted: true]
 				return res.json();
 			})
 			.catch((error: any) => error.json());
@@ -66,12 +71,12 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * POST - Archives a single Import Batch.
+	 * PUT - Archives a single Import Batch.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
 	archiveImportBatch(id: number): Observable<any> {
-		return this.http.post(`${this.importBatchUrl}/archive/${id}`, null)
+		return this.http.put(`${this.importBatchUrl}/archive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -79,7 +84,7 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * POST - Bulk Archive Import Batches.
+	 * PUT - Bulk Archive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
@@ -95,12 +100,12 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * POST - Un-Archives a single Import Batch.
+	 * PUT - Un-Archives a single Import Batch.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
 	unArchiveImportBatch(id: number): Observable<any> {
-		return this.http.post(`${this.importBatchUrl}/unarchive/${id}`, null)
+		return this.http.put(`${this.importBatchUrl}/unarchive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -108,12 +113,15 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * POST - Bulk Unarchive Import Batches.
+	 * PUT - Bulk Unarchive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	unArchiveImportBatches(id: number): Observable<any> {
-		return this.http.post(`${this.importBatchUrl}/unarchive`, null)
+	unArchiveImportBatches(ids: Array<number>): Observable<any> {
+		const request = {
+			ids: ids
+		};
+		return this.http.put(`${this.importBatchUrl}/unarchive`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -144,42 +152,6 @@ export class DependencyBatchService {
 				return res.json();
 			})
 			.catch((error: any) => error.json());
-	}
-
-	getArchivedBatchList(): Observable<any> {
-		// let mockResult: Array<ImportBatchModel> = [
-		// 	{
-		// 		id: 1,
-		// 		status: 'Completed',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'David Ontiveros',
-		// 		domain: 'Dependencies',
-		// 		provider: 'Service Now',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'load_file_v1.xls',
-		// 		records: 30,
-		// 		errors: 0,
-		// 		pending: 0,
-		// 		processed: 28,
-		// 		ignored: 2
-		// 	},
-		// 	{
-		// 		id: 2,
-		// 		status: 'Completed',
-		// 		importedDate: new Date(),
-		// 		importedBy: 'TDS Admin',
-		// 		domain: 'Dependencies',
-		// 		provider: 'TransitionManager',
-		// 		datascript: 'TM File Import',
-		// 		filename: 'dep_cmdb.xls',
-		// 		records: 21,
-		// 		errors: 0,
-		// 		pending: 0,
-		// 		processed: 20,
-		// 		ignored: 1,
-		// 	}
-		// ];
-		return Observable.of( [] );
 	}
 
 	startBatch(batchId: number): Observable<any> {

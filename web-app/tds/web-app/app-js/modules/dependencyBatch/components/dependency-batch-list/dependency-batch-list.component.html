@@ -24,21 +24,29 @@
                              Toolbar Template
                         -->
                         <ng-template kendoGridToolbarTemplate [position]="'top'">
-                            <button *ngIf="canBulkDelete()" [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                            <button *ngIf="canBulkDelete()"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="onDeleteBatch()"
                                     class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
-                            <button *ngIf="canBulkArchive()"
+                            <button *ngIf="canBulkArchive() && !viewArchived"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                     (click)="onArchiveBatch()"
                                     class="btn btn-default" id="btnBulkArchive" type="button">
                                 <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
-                                <span *ngIf="!viewArchived"> {{ 'GLOBAL.ARCHIVE' | translate }} </span>
-                                <span *ngIf="viewArchived"> {{ 'DEPENDENCY_BATCH.LIST.UNARCHIVE' | translate }} </span>
+                                {{ 'GLOBAL.ARCHIVE' | translate }}
+                            </button>
+                            <button *ngIf="canBulkArchive() && viewArchived"
+                                    [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
+                                    (click)="onUnArchiveBatch()"
+                                    class="btn btn-default" id="btnBulkUnArchive" type="button">
+                                <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+                                {{ 'DEPENDENCY_BATCH.LIST.UNARCHIVE' | translate }}
                             </button>
                                 <label class="view-archived">
-                                    <input name="viewArchived" type="checkbox"
-                                           (change)="onViewArchived()" [(ngModel)]="viewArchived">
+                                    <input name="viewArchived" type="checkbox" style="margin-right: 5px; margin-top: 2px;"
+                                           (change)="onToggleViewArchived()" [(ngModel)]="viewArchived">
                                     {{'DEPENDENCY_BATCH.LIST.VIEW_ARCHIVED' | translate}}
                                 </label>
                         </ng-template>

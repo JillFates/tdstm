@@ -45,6 +45,10 @@ export class DataGridOperationsHelper {
 		this.loadPageData();
 	}
 
+	/**
+	 * On Filter column event.
+	 * @param column
+	 */
 	public onFilter(column: any): void {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 
@@ -107,6 +111,10 @@ export class DataGridOperationsHelper {
 		this.filterChange(root);
 	}
 
+	/**
+	 * On Clear Value for filter event.
+	 * @param column
+	 */
 	public clearValue(column: any): void {
 		column.filter = '';
 		if (this.state.filter && this.state.filter.filters.length > 0) {
@@ -116,15 +124,22 @@ export class DataGridOperationsHelper {
 		}
 	}
 
+	/**
+	 * On Filter Change.
+	 * @param {CompositeFilterDescriptor} filter
+	 */
 	public filterChange(filter: CompositeFilterDescriptor): void {
 		this.state.filter = filter;
 		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
 
+	/**
+	 * Updates Sort.
+	 * @param sort
+	 */
 	public sortChange(sort): void {
 		this.state.sort = sort;
-		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
 
@@ -143,22 +158,47 @@ export class DataGridOperationsHelper {
 		}
 	}
 
+	/**
+	 * Toggle select all checkboxes.
+	 */
 	public onSelectAllCheckboxes(): void {
 		Object.keys(this.bulkItems).forEach(key => {
 			this.bulkItems[key] = this.selectAllCheckboxes;
 		});
 	}
 
+	/**
+	 * Un selects all checkboxes.
+	 */
+	public unSelectAllCheckboxes(): void {
+		Object.keys(this.bulkItems).forEach(key => {
+			this.bulkItems[key] = false;
+		});
+		this.selectAllCheckboxes = false;
+	}
+
+	/**
+	 * Get all checkboxes currently selected items.
+	 * @returns {Array<any>}
+	 */
 	public getCheckboxSelectedItems(): Array<any> {
 		return Object.keys(this.bulkItems).filter(key =>  this.bulkItems[key] === true );
 	}
 
+	/**
+	 * On checkbox change event.
+	 * @param key
+	 */
 	public onCheckboxChange(key: any): void {
 		if (!this.bulkItems[key]) {
 			this.selectAllCheckboxes = false;
 		}
 	}
 
+	/**
+	 * Reloads data for current grid.
+	 * @param result
+	 */
 	public reloadData(result: any): void {
 		this.resultSet = result;
 		// this.gridData = process(this.resultSet, this.state);

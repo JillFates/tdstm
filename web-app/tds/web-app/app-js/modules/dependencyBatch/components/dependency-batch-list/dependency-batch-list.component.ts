@@ -44,19 +44,59 @@ export class DependencyBatchListComponent {
 		if ( !this.canRunActions() ) {
 			this.columnsModel.columns.splice(0, 1);
 		}
-		this.dependencyBatchService.getImportBatches().subscribe( (result: Array<ImportBatchModel>) => {
-			this.dataGridOperationsHelper = new DataGridOperationsHelper(result, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
+		this.getUnarchivedBatches().then( batchList => {
+			this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
 		});
 	}
 
 	/**
 	 * Load all Import Batch Unarchived list
 	 */
-	private loadBatchList(): void {
-		this.dependencyBatchService.getImportBatches().subscribe(result => {
-			this.dataGridOperationsHelper.reloadData(result);
-		},
-		(err) => console.log(err));
+	private reloadBatchList(): void {
+		this.getUnarchivedBatches().then( batchList => {
+			this.dataGridOperationsHelper.reloadData(batchList);
+		});
+	}
+
+	/**
+	 * Get Unarchived Import Batch List.
+	 * Calling the endpoint as a Promise for reuse.
+	 * @returns {Array<ImportBatchModel>}
+	 */
+	private getUnarchivedBatches(): Promise<any> {
+		let promise = new Promise((resolve, reject) => {
+			this.dependencyBatchService.getImportBatches().subscribe( (result) => {
+				if (result.status === 'success') {
+					let batches = result.data.filter( item => {
+						return !item.archived;
+					});
+					resolve(batches);
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+					resolve(null);
+				}
+			}, (err) => {
+				this.handleError(err);
+				resolve(null);
+			});
+		});
+		return promise;
+	}
+
+	/**
+	 * Load Archived Batches.
+	 */
+	private loadArchivedBatchList(): void {
+		this.dependencyBatchService.getImportBatches().subscribe( result => {
+			if (result.status === 'success') {
+				let batches = result.data.filter( (item: ImportBatchModel) => {
+					return item.archived;
+				});
+				this.dataGridOperationsHelper.reloadData(batches);
+			} else {
+				this.handleError(result.errors ? result.errors[0] : null);
+			}
+		});
 	}
 
 	/**
@@ -72,34 +112,77 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
-	 * Load Archived Batches.
-	 */
-	private loadArchivedBatchList(): void {
-		this.dependencyBatchService.getArchivedBatchList().subscribe( result => {
-			this.dataGridOperationsHelper.reloadData(result);
-		});
-	}
-
-	/**
 	 * On Archive batch button click.
 	 */
 	private onArchiveBatch(): void {
-		console.log(this.dataGridOperationsHelper.getCheckboxSelectedItems());
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.archiveImportBatches(ids).subscribe( res => {
-			console.log(res);
-		},
-		(err) => console.log(err));
+		this.dependencyBatchService.archiveImportBatches(ids).subscribe( result => {
+				if (result.status === 'success') {
+					this.reloadBatchList();
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+				}
+			},
+			(err) => this.handleError(err)
+		);
+	}
+
+	/**
+	 * On UnArchive batch button click.
+	 */
+	private onUnArchiveBatch(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( result => {
+				if (result.status === 'success') {
+					this.loadArchivedBatchList();
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+				}
+			},
+			(err) => this.handleError(err)
+		);
+	}
+
+	/**
+	 * On Delete batch button click.
+	 */
+	private onDeleteBatch(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.dependencyBatchService.deleteImportBatches(ids).subscribe( result => {
+				if (result.status === 'success') {
+					if (this.viewArchived) {
+						this.loadArchivedBatchList();
+					} else {
+						this.reloadBatchList();
+					}
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+				}
+			},
+			(err) => this.handleError(err)
+		);
+	}
+
+	/**
+	 * Handles API error results. Displays messages.
+	 * @param {string} error
+	 */
+	private handleError(error: string): void {
+		this.notifierService.broadcast({
+			name: AlertType.DANGER,
+			message: error
+		});
 	}
 
 	/**
 	 * On View Archived checkbox clicked, toggle load archived batch list
 	 */
-	private onViewArchived(): void {
+	private onToggleViewArchived(): void {
+		this.dataGridOperationsHelper.unSelectAllCheckboxes();
 		if (this.viewArchived) {
 			this.loadArchivedBatchList();
 		} else {
-			this.loadBatchList();
+			this.reloadBatchList();
 		}
 	}
 
