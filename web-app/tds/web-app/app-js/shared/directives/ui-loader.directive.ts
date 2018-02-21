@@ -65,9 +65,10 @@ export class UILoaderDirective {
 		this.notifierService.on('httpRequestHandlerCompletedWithErrors', (event) => {
 			this.loaderService.stopProgress();
 			this.loaderService.hide();
-			this.notifierService.broadcast({
+			// TM-9413 - An Error should not close a dialog
+			/* this.notifierService.broadcast({
 				name: 'dialog.dismiss',
-			});
+			}); */
 		});
 	}
 

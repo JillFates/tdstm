@@ -19,6 +19,8 @@ import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 import { PopupPollingComponent } from './components/popups/popup-polling.component';
 import { PopupProvidesDataComponent } from './components/popups/popup-provides-data.component';
+import { CredentialListComponent } from './components/credential-list/credential-list.component';
+import { CredentialViewEditComponent } from './components/credential-view-edit/credential-view-edit.component';
 // Import Kendo Modules
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -64,7 +66,9 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		APIActionListComponent,
 		APIActionViewEditComponent,
 		PopupPollingComponent,
-		PopupProvidesDataComponent
+		PopupProvidesDataComponent,
+		CredentialListComponent,
+		CredentialViewEditComponent
 	],
 	providers: [DataIngestionService,
 		ImportAssetsService, {
@@ -76,7 +80,8 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		DataScriptListComponent,
 		DataScriptViewEditComponent,
 		ProviderListComponent,
-		ProviderViewEditComponent
+		ProviderViewEditComponent,
+		CredentialViewEditComponent
 	],
 	entryComponents: [
 		DataScriptViewEditComponent,
@@ -84,7 +89,8 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		DataScriptConsoleComponent,
 		DataScriptEtlBuilderComponent,
 		DataScriptSampleDataComponent,
-		APIActionViewEditComponent
+		APIActionViewEditComponent,
+		CredentialViewEditComponent
 	]
 })
 

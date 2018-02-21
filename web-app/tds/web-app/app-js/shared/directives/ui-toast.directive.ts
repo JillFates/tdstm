@@ -33,7 +33,6 @@ export class UIToastDirective {
 		this.showsPopUp = true;
 		this.alertModel.alertType = alertType;
 		this.alertModel.message = message;
-		setTimeout(() => this.hidePopUp(), 3000);
 	}
 
 	eventListeners() {

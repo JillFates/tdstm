@@ -1,16 +1,18 @@
+import {CredentialModel} from '../model/credential.model';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
-import {APIActionModel, APIActionParameterModel, EventReactionType} from '../model/api-action.model';
-import {AgentModel, CredentialModel, AgentMethodModel} from '../model/agent.model';
+import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
+import {AgentModel, AgentMethodModel} from '../model/agent.model';
+import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {HttpEvent, HttpEventType, HttpProgressEvent, HttpResponse} from '@angular/common/http';
+import {HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -19,22 +21,8 @@ export class DataIngestionService {
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
+	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
-
-	mockData: CredentialModel[] = [
-		{
-			id: 1,
-			name: 'Credential 1'
-		},
-		{
-			id: 2,
-			name: 'Credential 2'
-		},
-		{
-			id: 3,
-			name: 'Credential 3'
-		}
-	];
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -114,8 +102,34 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	getCredentials(): Observable<AgentModel[]> {
-		return Observable.from(this.mockData).bufferCount(this.mockData.length);
+	getCredentials(): Observable<CredentialModel[]> {
+		return this.http.get(`${this.credentialUrl}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let credentialModels = result && result.status === 'success' && result.data;
+
+				credentialModels.forEach((r) => {
+					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					r.environment = ENVIRONMENT[r.environment];
+					r.authMethod = AUTH_METHODS[r.authenticationMethod];
+					r.status = CREDENTIAL_STATUS[r.status];
+				});
+				return credentialModels;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Get the List of Elements we need to populate in the UI - dropdownlist
+	 * @returns {Observable<any>}
+	 */
+	getCredentialEnumsConfig(): Observable<any> {
+		return this.http.get(`${this.credentialUrl}/enums`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	/**
@@ -203,7 +217,7 @@ export class DataIngestionService {
 	}
 
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
-		let postRequest = {
+		let postRequest: any = {
 			name: model.name,
 			description: model.description,
 			provider: { id: model.provider.id },
@@ -241,6 +255,10 @@ export class DataIngestionService {
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);
 		}
 
+		if (model.credential && model.credential.id && model.credential.id !== 0) {
+			postRequest.credential = { id: model.credential.id };
+		}
+
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))
 				.map((res: Response) => {
@@ -250,7 +268,50 @@ export class DataIngestionService {
 				})
 				.catch((error: any) => error.json());
 		} else {
+			postRequest.version = model.version;
 			return this.http.put(`${this.dataDefaultUrl}/apiAction/${model.id}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					return result && result.status === 'success' && result.data;
+				})
+				.catch((error: any) => error.json());
+		}
+	}
+
+	saveCredential(model: CredentialModel): Observable<CredentialModel> {
+
+		let postRequest: any = {
+			name: model.name,
+			description: model.description,
+			environment: Object.keys(ENVIRONMENT).find((type) => ENVIRONMENT[type] === model.environment),
+			provider: {id: model.provider.id},
+			status: model.status.toUpperCase(),
+			authenticationMethod: Object.keys(AUTH_METHODS).find((type) => AUTH_METHODS[type] === model.authMethod),
+			username: model.username,
+			authenticationUrl: (model.authenticationUrl) ? model.authenticationUrl : '',
+			terminateUrl: (model.terminateUrl) ? model.terminateUrl : '',
+			renewTokenUrl: (model.renewTokenUrl) ? model.renewTokenUrl : '',
+			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
+			httpMethod: model.httpMethod.toUpperCase(),
+			sessionName: model.sessionName,
+		};
+
+		// The UI validates if the Password exists however, on edition is not required unless you want to change it
+		if (model.password && model.password.length > 0 && model.password !== '') {
+			postRequest.password = model.password;
+		}
+
+		if (!model.id) {
+			return this.http.post(`${this.credentialUrl}`, JSON.stringify(postRequest))
+				.map((res: Response) => {
+					let result = res.json();
+					let dataItem = (result && result.status === 'success' && result.data);
+					return dataItem;
+				})
+				.catch((error: any) => error.json());
+		} else {
+			postRequest.version = model.version;
+			return this.http.put(`${this.credentialUrl}/${model.id}`, JSON.stringify(postRequest))
 				.map((res: Response) => {
 					let result = res.json();
 					return result && result.status === 'success' && result.data;
@@ -312,6 +373,20 @@ export class DataIngestionService {
 	}
 
 	/**
+	 * Validate if the Authentication meets the requirements
+	 * @param {number} credentialId
+	 * @returns {Observable<any>}
+	 */
+	validateAuthentication(credentialId: number): Observable<any> {
+		return this.http.post(`${this.credentialUrl}/test/${credentialId}`, null)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Validate if the current DataScript is being or not used somewhere
 	 * @param {number} id
 	 * @returns {Observable<string>}
@@ -345,6 +420,15 @@ export class DataIngestionService {
 
 	deleteAPIAction(id: number): Observable<string> {
 		return this.http.delete(`${this.dataDefaultUrl}/apiAction/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	deleteCredential(id: number): Observable<string> {
+		return this.http.delete(`${this.credentialUrl}/${id}`)
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;

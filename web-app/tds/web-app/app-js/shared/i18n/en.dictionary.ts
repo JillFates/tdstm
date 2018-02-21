@@ -39,9 +39,20 @@ export const en_DICTIONARY: Object = {
 		'DATA_SCRIPTS': 'DataScripts',
 		'DATA_SCRIPT': 'DataScript',
 		'PROVIDERS': 'Providers',
+		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREATE_DATA_SCRIPT': 'Create DataScript',
 		'CREATE_PROVIDER': 'Create Provider',
 		'CREATE_ACTION': 'Create Action',
+		'CREDENTIALS': 'Credentials',
+		'SAMPLE_DATA_TITLE': 'Sample Data',
+		'ETL_BUILDER_TITLE': 'DataScript Designer',
+		'CONSOLE_TITLE': 'ETL Console',
+		'ETL_BUILDER': {
+			'TEST': 'Test',
+			'CHECK_SYNTAX': 'Check Syntax',
+			'LOAD_SAMPLE_DATA': 'Load Sample Data',
+			'VIEW_CONSOLE': 'View Console'
+		},
 		'DATASCRIPT': {
 			'DESIGNER': {
 				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',

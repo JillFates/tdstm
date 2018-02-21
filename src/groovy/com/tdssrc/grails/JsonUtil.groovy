@@ -8,7 +8,6 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.CredentialUpdateCO
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -142,7 +141,7 @@ class JsonUtil {
      */
     static JSONObject parseFile(InputStream inputStream) {
         // TODO : JPM 2/2018 : Need to add try/catch
-        
+
         return (JSONObject)JSON.parse(inputStream.text)
     }
 
@@ -160,7 +159,7 @@ class JsonUtil {
             } catch (Exception e) {
                 String msg
                 if (e instanceof java.lang.NullPointerException) {
-                    msg = "Unable to map Json into ${target.name} object" 
+                    msg = "Unable to map Json into ${target.name} object"
                 }
                 throw new InvalidParamException("Invalid JSON : ${msg ?: e.message}")
             }

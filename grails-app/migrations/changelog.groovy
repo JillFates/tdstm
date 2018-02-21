@@ -211,10 +211,11 @@ databaseChangeLog = {
 	include file: '20171221-add-credential-and-agentclass-to-apiaction.groovy'
 	include file: '20171227-rename-all-assets-view.groovy'
 	include file: '20171228-make-some-columns-nullable-for-api-action.groovy'
-  include file: '20180104-drop-not-null-user-login-id-constraint-on-data-transfer-batch-table.groovy'
+	include file: '20180104-drop-not-null-user-login-id-constraint-on-data-transfer-batch-table.groovy'
 	include file: '20180111-add-columns-for-reactions-in-apiaction.groovy'
 	include file: '20180123-api-action-make-description-nullable.groovy'
 	include file: '20180201-set-asset_entity-project_id-mandatory.groovy'
 	include file: '20180129-create-import-batch-tables.groovy'
 	include file: '20180213-change-credential-and-add-credential-permission.groovy'
+	include file: '20180216-additional-changes-to-credential.groovy'
 }

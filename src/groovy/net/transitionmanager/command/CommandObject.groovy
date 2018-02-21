@@ -17,15 +17,25 @@ trait CommandObject {
 	 * Used to populate the domain object from the command object with the option to skip properties that are empty/null
 	 * @param domain - the domain object to set the properties on
 	 * @param skipEmptyProperties - flag (true|false) to indicate if empty properties of the command object should be skipped over (default false)
+	 * @param ignoreProperties - an optional list of properties to not copy over
 	 */
-	void populateDomain(Object domain, boolean skipEmptyProperties=false) {
+	void populateDomain(Object domain, boolean skipEmptyProperties=false, List<String> ignoreProperties=[]) {
+		if (ignoreProperties == null) {
+			ignoreProperties = []
+		}
 		for (prop in commandProperties()) {
 			// If skip empty and the Command Object doesn't have a value for the property we will skip over the it
-			if (skipEmptyProperties && (prop.value == null || ((prop.value instanceof String) && prop.value == '' ))) {
+			if ( skipEmptyProperties && (prop.value == null || ((prop.value instanceof String) && prop.value == '' ))) {
 				continue
 			}
+
+			// Check to see if the property is in the ignoreProperties list
+			if (prop.key in ignoreProperties) {
+				continue
+			}
+
+			// Only set the value if is different so as to not trigger the dirty flag
 			if (prop.value != domain[prop.key]) {
-				// println "populateDomain() changing ${prop.key} to ${prop.value}"
 				domain[prop.key] = prop.value
 			}
 		}

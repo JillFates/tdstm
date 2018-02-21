@@ -7,11 +7,12 @@ import com.tdsops.common.security.SecurityUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.CredentialCreateCO
-import net.transitionmanager.command.CredentialUpdateCO
+import net.transitionmanager.command.CredentialCommand
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import net.transitionmanager.service.ProjectRequiredException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 
@@ -26,46 +27,48 @@ class CredentialService implements ServiceMethods {
      * @param credential
      * @return
      */
-    Credential createCredential(CredentialCreateCO credentialCO) {
+    Credential create(CredentialCommand credentialCO) {
         Project project = securityService.getUserCurrentProject()
+        if (project == null) {
+            throw new ProjectRequiredException()
+        }
 
-        // Make sure that the name is unique
+        // Make sure that the name is unique and Provider is associated with the project
         validateBeforeSave(project, null, credentialCO)
 
         // Create the credential and populate it from the Co
         Credential credentialInstance = new Credential()
-        credentialCO.populateDomain(credentialInstance)
-        
+        credentialCO.populateDomain(credentialInstance, false, ['password','id', 'version'])
+
+        setEncryptedPassword(credentialInstance, credentialCO.password)
+
         credentialInstance.project = project
 
-        // Set the salt that will be used to encrypt the password with a random string
-        credentialInstance.salt = SecurityUtil.randomString(16)
-
         credentialInstance.save(failOnError: true)
+
         return credentialInstance
     }
 
     /**
-     * Update a credential
+     * Update a credential from a CommandObject. The password should ONLY be updated if the the password property
+     * has been populated and not overwrite it.
+     *
      * @param id - the ID of the Credential to update
      * @param credential - a Command object with values to update with
      * @return the updated Credential
      */
-    Credential updateCredential(Long id, CredentialUpdateCO credentialCO) {
+    Credential update(Long id, CredentialCommand credentialCO) {
         Credential credentialInstance = findById(id)
         
         GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
 
         Project project = securityService.getUserCurrentProject()
 
-        validateBeforeSave(project, null, credentialCO)
+        validateBeforeSave(project, id, credentialCO)
 
-        credentialCO.populateDomain(credentialInstance, true)
-        credentialInstance.lastUpdated = new Date()
+        credentialCO.populateDomain(credentialInstance, false, ['password', 'version'] )
 
-        if (credentialCO.hasErrors()) {
-            throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
-        }
+        setEncryptedPassword(credentialInstance, credentialCO.password)
 
         credentialInstance.save(failOnError: true)
 
@@ -73,21 +76,23 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Delete a credential
-     * @param credential
-     */
-    void deleteCredential(Credential credential) {
-        if (credential) {
-            credential.delete()
-        }
-    }
-
-    /**
      * Delete a credential by Id
      * @param id
      */
-    void deleteCredential(Long id) {
-        deleteCredential(findById(id))
+    void delete(Long id) {
+        Credential credential = findById(id)
+
+        // Check if the credential is referenced by any ApiActions and prevent deleting
+        int count = ApiAction.where {
+            credential == credential
+        }.count()
+
+        if (count > 0) {
+            // TODO : JPM 2/2018 : change to use standard service method to throw message that is i18n
+            throw DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
+        }
+
+        credential.delete()
     }
 
     /**
@@ -182,9 +187,22 @@ class CredentialService implements ServiceMethods {
         }.list()
     }
 
+    /** 
+     * Used to encrypt the password when the password has a value
+     * @param credential - the domain instance to set the password on
+     * @param password - the cleartext password to encrypt
+     */
+    private void setEncryptedPassword(Credential credential, String password) {
+        // If a password was provided in the request then save the new password encrypted with a new salt
+        if (password?.trim().size() > 0) {
+            // TODO - switch out calls to AESCodec when ready
+            credential.salt = 'lsdklkajsdfljasd'
+            credential.password = password.reverse()
+        }
+    }
+
     /**
      * Find a Credential instance with the given id, project and provider.
-     *
      * @param id
      * @param project
      * @param provider
@@ -213,8 +231,22 @@ class CredentialService implements ServiceMethods {
      */
     private void validateBeforeSave(Project project, Long id, Object cmdObj) {
         // Make certain that the provider specified is associated to the project
-        Provider provider = cmdObj.provider.refresh()
-        if (provider.project.id != project.id) {
+        // TODO : JPM 2/2018 : to be replace by ofSameProject constraint when ready        
+        Long providerProjectId = 0
+        if (cmdObj.provider.project) {
+            providerProjectId = cmdObj.provider.project.id
+        } else {
+            // id = Provider.executeQuery('select p.project.id from Provider p where p.id = :id', [id: ])[0]
+
+            List ids = Provider.where { id == cmdObj.provider.id }
+                .projections { property('project.id')}
+                .list()
+            if (ids) {
+                id = ids[0]
+            }
+
+        }
+        if (id == 0 || id != project.id) {
             throw new InvalidParamException('Invalid Provider specified')
         }
 

@@ -4,7 +4,7 @@ import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdsops.tm.enums.domain.CredentialEnvironment
-import net.transitionmanager.command.CredentialCreateCO
+import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -20,8 +20,8 @@ class CredentialTestHelper {
      * @param provider
      * @return
      */
-    CredentialCreateCO createCredentialCO(Provider provider, String accessKey = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null) {
-        return new CredentialCreateCO(
+    CredentialCommand createCredentialCO(Provider provider, String accessKey = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null) {
+        return new CredentialCommand(
                 environment: CredentialEnvironment.PRODUCTION,
                 httpMethod: CredentialHttpMethod.POST,
                 status: CredentialStatus.ACTIVE,
@@ -31,7 +31,6 @@ class CredentialTestHelper {
                 password: password == null ? 'pwd' : password,
                 authenticationUrl: authenticationUrl == null ? 'http://localhost' : authenticationUrl,
                 renewTokenUrl: 'http://localhost',
-                expirationDate: new Date(),
                 provider: provider
         )
     }
@@ -43,7 +42,7 @@ class CredentialTestHelper {
      * @return
      */
     Credential createAndSaveCredential(Project project, Provider provider) {
-        CredentialCreateCO credentialCO = createCredentialCO(provider)
+        CredentialCommand credentialCO = createCredentialCO(provider)
         Credential credential = new Credential()
         credentialCO.populateDomain(credential)
         credential.project = project
@@ -62,7 +61,7 @@ class CredentialTestHelper {
      * @return
      */
     Credential createAndSaveCredential(Project project, Provider provider, String accessKey, String password, String authenticationUrl, AuthenticationMethod authenticationMethod) {
-        CredentialCreateCO credentialCO = createCredentialCO(provider, accessKey, password, authenticationUrl, authenticationMethod)
+        CredentialCommand credentialCO = createCredentialCO(provider, accessKey, password, authenticationUrl, authenticationMethod)
         Credential credential = new Credential()
         credentialCO.populateDomain(credential)
         credential.project = project
