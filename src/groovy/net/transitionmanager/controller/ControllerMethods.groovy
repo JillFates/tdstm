@@ -21,7 +21,6 @@ import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.UnauthorizedException
 import net.transitionmanager.service.SecurityService
-import com.tdsops.common.grails.ApplicationContextHolder
 
 import com.google.gson.JsonSyntaxException
 import org.grails.databinding.bindingsource.InvalidRequestBodyException
@@ -30,10 +29,8 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
-import org.springframework.security.acls.model.NotFoundException
 import org.springframework.validation.Errors
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND

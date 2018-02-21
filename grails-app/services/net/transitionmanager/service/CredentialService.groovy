@@ -214,7 +214,10 @@ class CredentialService implements ServiceMethods {
      * @return the unencrypted password
      */ 
     String decryptPassword(Credential credential) {
-        return AESCodec.instance.decode(credential.password, credential.salt)
+        return AESCodec.instance.decode(
+                credential.password,
+                credential.salt
+        )
     }
 
     /**
