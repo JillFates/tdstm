@@ -184,6 +184,11 @@ beans = {
 		messageSourceService = ref('messageSourceService')
 	}
 
+	restfulRouteBuilder(RestfulRouteBuilder) { bean ->
+		bean.scope = 'prototype'
+		credentialService = ref('credentialService')
+	}
+
 	apiActionScriptBindingBuilder(ApiActionScriptBindingBuilder) { bean ->
 		bean.scope = 'prototype'
 		messageSourceService = ref('messageSourceService')

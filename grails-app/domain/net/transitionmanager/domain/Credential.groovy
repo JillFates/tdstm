@@ -93,6 +93,14 @@ class Credential {
 		sort 'name'
 	}
 
+	void setStatus(String status) {
+		this.status = CredentialStatus.valueOf(status)
+	}
+
+	void setAuthenticationMethod(String method ) {
+		this.authenticationMethod = AuthenticationMethod.valueOf(method)
+	}
+
 	/**
 	 * Used to validate if the sessionName property is set for AuthenticationMethods that require a value
 	 */

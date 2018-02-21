@@ -214,19 +214,10 @@ class CredentialService implements ServiceMethods {
      * @return the unencrypted password
      */ 
     String decryptPassword(Credential credential) {
-        return decryptPassword( [
-            password: credential.password,
-            salt: credential.salt
-        ] )
-    }
-
-    /**
-     * Used to decrypt a password from a Credential record
-     * @param credential - a Map object with password and salt necessary to be decrypted the password
-     * @return the unencrypted password
-     */
-    String decryptPassword(Map credential) {
-        return AESCodec.instance.decode(credential.password, credential.salt)
+        return AESCodec.instance.decode(
+                credential.password,
+                credential.salt
+        )
     }
 
     /**
