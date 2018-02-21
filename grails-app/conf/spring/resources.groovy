@@ -184,8 +184,7 @@ beans = {
 		messageSourceService = ref('messageSourceService')
 	}
 
-	restfulRouteBuilder(RestfulRouteBuilder) { bean ->
-		// bean.scope = 'singleton'  // the default scope is singleton, only one instance ever exists
+	restfulRouteBuilder(RestfulRouteBuilder) {
 		credentialService = ref('credentialService')
 	}
 
