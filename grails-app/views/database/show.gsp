@@ -9,7 +9,7 @@
 			<div class="dialog" <tds:hasPermission permission="${Permission.AssetEdit}"> ondblclick="EntityCrud.showAssetEditView('${databaseInstance.assetClass}',${databaseInstance?.id})" </tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
-			    </g:if>
+					</g:if>
 				<table>
 					<tbody>
 						<tr class="prop">
@@ -55,8 +55,9 @@
 							</td>
 							<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									${databaseInstance?.moveBundle} : ${dependencyBundleNumber}
+									${databaseInstance?.moveBundle}
 								</tds:tooltipSpan>
+								<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${databaseInstance.assetName}"/>
 							</td>
 						</tr>
 						<tr class="prop">

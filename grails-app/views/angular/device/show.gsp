@@ -179,16 +179,16 @@
 														</tdsAngular:tooltipSpan>
 													</td>
 													<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-														<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?: standardFieldSpecs.moveBundle.label}">
-															Bundle : Dep. Group
+														<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+															${standardFieldSpecs.moveBundle.label} : Dep. Group
 														</label>
 													</td>
 													<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 														<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-															${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}
+															${assetEntity?.moveBundle}
 														</tdsAngular:tooltipSpan>
+														<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
 													</td>
-
 													<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
 														<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
 															Size/Scale

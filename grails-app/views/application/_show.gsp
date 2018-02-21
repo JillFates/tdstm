@@ -36,7 +36,7 @@
 			<td class="valueNW ${standardFieldSpecs.sme.imp}">
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.sme?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sme.tip?:standardFieldSpecs.sme.label}">
 					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
-                </span>
+				</span>
 			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
@@ -73,7 +73,17 @@
 				</span>
 			</td>
 
-			<tds:showLabelAndField field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle}" labelSuffix=" : Dep. Group" valueSuffix=" : ${dependencyBundleNumber?:''}"/>
+			<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+				<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+					${standardFieldSpecs.moveBundle.label} : Dep. Group
+				</label>
+			</td>
+			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+				<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+					${applicationInstance?.moveBundle}
+				</tds:tooltipSpan>
+				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/>
+			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
 

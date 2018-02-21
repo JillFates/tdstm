@@ -38,8 +38,9 @@
 					</td>
 					<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-							${filesInstance?.moveBundle} : ${dependencyBundleNumber}
+							${filesInstance?.moveBundle}
 						</tds:tooltipSpan>
+						<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
 					</td>
 				</tr>
 				<tr class="prop">

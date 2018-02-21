@@ -7,6 +7,7 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.DependencyAnalyzerTabs
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -34,6 +35,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProgressService
@@ -911,17 +913,32 @@ class MoveBundleController implements ControllerMethods {
 
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
+	 * @param bundle  Move bundle id to filter for bundle
+	 * @param assignedGroup  Whether it is assigned
+	 * @param subsection  Tab name to show on the Dependency Analyzer (optional)
+	 * @param groupId  The group Id to show selected on the Dependency Analyzer (optional)
+	 * @param assetName  The asset to show selected on the Dependency Analyzer (optional)
 	 */
 	@HasPermission(Permission.DepAnalyzerView)
-	def dependencyConsole() {
+	def dependencyConsole(Long bundle, String assinedGroup, String subsection, Long groupId, String assetName) {
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
+		// Check for correct URL params
+		if ( subsection || groupId) { // is the drill-in URL
+			if (!(subsection && groupId)) { // If any exists, then both should be present in the URL
+				throw new InvalidParamException("Subsection and Group Id params are both required.")
+			}
+			String subsec = subsection as String // Check for valid tab name
+			if (!(subsec.toUpperCase() in (DependencyAnalyzerTabs.values() as String[]))) {
+				throw new InvalidParamException("Invalid Subsection name: ${subsec}")
+			}
+		}
 		//Date start = new Date()
 		userPreferenceService.setPreference(PREF.ASSIGNED_GROUP,
-			params.assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
-		def map = moveBundleService.dependencyConsoleMap(project, params.bundle, params.assinedGroup, null)
+			assinedGroup ?: userPreferenceService.getPreference(PREF.ASSIGNED_GROUP) ?: "1")
+		def map = moveBundleService.dependencyConsoleMap(project, bundle, assinedGroup, null, false, subsection, groupId, assetName)
 
 		//logger.info 'dependencyConsole() : moveBundleService.dependencyConsoleMap() took {}', TimeUtil.elapsed(start)
 		return map

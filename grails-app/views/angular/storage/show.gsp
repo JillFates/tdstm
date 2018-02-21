@@ -37,7 +37,6 @@
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.LUN}" value="${filesInstance.LUN}"/>
 
 								<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
-
 								<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
 									<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
 										${standardFieldSpecs.moveBundle.label} : Dep. Group
@@ -45,8 +44,9 @@
 								</td>
 								<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 									<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-										${filesInstance?.moveBundle} : ${dependencyBundleNumber}
+										${filesInstance?.moveBundle}
 									</tdsAngular:tooltipSpan>
+									<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
 								</td>
 							</tr>
 							<tr class="prop">

@@ -60,8 +60,9 @@
 			</td>
 			<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
 				<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-					${asset.moveBundle} : ${dependencyBundleNumber}
+					${asset?.moveBundle}
 				</tdsAngular:tooltipSpan>
+				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}" tooltipDataPlacement="bottom"/>
 		</tr>

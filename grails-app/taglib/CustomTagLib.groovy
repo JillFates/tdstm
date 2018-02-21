@@ -537,6 +537,23 @@ class CustomTagLib implements InitializingBean {
 		out << result
 	}
 
+	/**
+	 * Used to render the Group Id value along with the tooltip and link to the Dependency Analyzer for that Group Id.
+	 * @attr groupId  The group id the asset belongs to. If empty, the result is an empty string.
+	 * @attr tab  The tab that the logic should switch to after the page is loaded. If not present, it defaults to "map".
+	 * @attr assetName  Not used yet, reserved for future feature.
+	 */
+	def showDependencyGroup = { attrs ->
+		if (!attrs.groupId) {
+			out << " "
+		} else {
+			def value = dependencyGroupValueWithTooltip(attrs.groupId)
+			def tabName = attrs.tab ?: 'map'
+			def url = g.link( mapping: "dependencyConsoleMap", params: [subsection: tabName, groupId:attrs.groupId, assetName: attrs.assetName], value)
+			out << url
+		}
+	}
+
 	def currentProjectMoveEvents = { attrs ->
 		MoveEvent.findAllByProject(securityService.loadUserCurrentProject())
 	}
@@ -553,5 +570,21 @@ class CustomTagLib implements InitializingBean {
 	void afterPropertiesSet() {
 		faviconStr = '<link href="' + grailsLinkGenerator.resource(dir:'/images', file:'favicon.ico') +
 				'" rel="shortcut icon" type="image/x-icon"/>'
+	}
+
+	/**
+	 * Returns an HTML span with tooltip, with the dependency group element inside.
+	 * @return  The group Id element with tooltip
+	 */
+	private String dependencyGroupValueWithTooltip(def groupId ) {
+		StringBuilder span = new StringBuilder('')
+		span.append("<span ")
+		span.append( "data-toggle='popover' ")
+		span.append( "data-trigger='hover' ")
+		span.append( "data-content='Click to view group in Dependency Analyzer' ")
+		span.append(" >\n")
+		span.append(groupId)
+		span.append("\n </span>\n")
+		return span.toString()
 	}
 }

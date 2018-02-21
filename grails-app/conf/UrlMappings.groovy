@@ -10,6 +10,14 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		/**
+		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
+		 */
+		name dependencyConsoleMap: "/moveBundle/dependencyConsole/$subsection?/$groupId?" {
+			controller = "moveBundle"
+			action = [GET:"dependencyConsole"]
+		}
+
 		/*
 		TM-5299 Commenting out the line below because it's interfering
 		with requests that pass a 'format' parameter.

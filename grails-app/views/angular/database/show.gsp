@@ -54,16 +54,17 @@
                                                 <tds:convertDate date="${asset?.retireDate}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
-                                        <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-                                            <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-                                                ${standardFieldSpecs.moveBundle.label} : Dep. Group
-                                            </label>
-                                        </td>
-                                        <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}" colspan="3">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-                                                ${asset?.moveBundle} : ${dependencyBundleNumber}
-                                            </tdsAngular:tooltipSpan>
-                                        </td>
+																				<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
+																					<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
+																						${standardFieldSpecs.moveBundle.label} : Dep. Group
+																					</label>
+																				</td>
+																				<td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
+																					<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+																						${asset?.moveBundle}
+																					</tdsAngular:tooltipSpan>
+																					<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
+																				</td>
                                     </tr>
                                     <tr class="prop">
                                         <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
