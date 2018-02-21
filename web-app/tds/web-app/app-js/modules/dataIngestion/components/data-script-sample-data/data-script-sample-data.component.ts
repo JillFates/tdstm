@@ -16,9 +16,9 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
 	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	private OPTIONS: any = {
-		CSV: 'csv',
 		FILE: 'file',
 		SERVICE: 'service',
+		CSV: 'csv',
 		selected: undefined,
 		useFileFrom: undefined
 	};
@@ -26,22 +26,19 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		options : [
 			{ text: 'Select a format', value: -1 },
 			{ text: 'csv', value: 0 },
-			{ text: 'txt', value: 1 },
 			{ text: 'xml', value: 2 },
 			{ text: 'json', value: 3 }
 		],
 		selected : undefined,
 		fileContent : '',
-		filename: undefined,
+		filename: null,
 		state: undefined,
-		checked: false
 	};
 	private webService: any = {
 		options: [],
 		selected: undefined,
 		state: undefined,
-		filename: undefined,
-		checked: false
+		filename: null,
 	};
 
 	private autoETL = false;
@@ -61,9 +58,14 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 			this.onPageLoad();
 	}
 
+	/**
+	 * On Page loads, pre-select default options.
+	 * Set File radio button as pre-selected.
+	 * Pre-select option with value 1(CSV) on file content type options.
+	 * Load Manual Options for web services dropdown.
+	 */
 	private onPageLoad(): void {
-		this.file.uploadedFilename = undefined;
-		this.file.checked = false;
+		this.file.uploadedFilename = null;
 		this.csv.selected = this.csv.options[0];
 		this.OPTIONS.selected = this.OPTIONS.FILE;
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
@@ -73,41 +75,61 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		});
 	}
 
-	private onSelectFilename(option: string): void {
-		if (this.csv.checked) {
-			this.OPTIONS.useFileFrom = this.OPTIONS.CSV;
-		} else if (this.file.checked) {
-			this.OPTIONS.useFileFrom = this.OPTIONS.FILE;
-		} else if (this.webService.checked) {
-			this.OPTIONS.useFileFrom = this.OPTIONS.SERVICE;
+	/**
+	 * On Continue button click.
+	 * Set the current sample data upload type and close the dialog.
+	 */
+	private onContinue(): void {
+		let filename = null;
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
+			filename = this.csv.filename;
 		}
-		console.log(this.OPTIONS.useFileFrom);
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE) {
+			filename = this.webService.filename;
+		}
+		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE) {
+			filename = this.file.uploadedFilename;
+		}
+		this.close(filename);
 	}
 
+	/**
+	 * Validates the form.
+	 * Filename should not be empty for the current selection.
+	 * @returns {boolean}
+	 */
 	private validForm(): boolean {
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV && this.csv.filename.length > 0) {
+		if (this.OPTIONS.selected === this.OPTIONS.CSV && this.csv.filename) {
 			return true;
-		}
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE && this.webService.filename.length > 0) {
+		} else if (this.OPTIONS.selected === this.OPTIONS.SERVICE && this.webService.filename) {
 			return true;
-		}
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE && this.file.uploadedFilename.length > 0) {
+		} else if (this.OPTIONS.selected === this.OPTIONS.FILE && this.file.uploadedFilename) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
+	/**
+	 * Upload Content action.
+	 * On Upload button click.
+	 */
 	private onUploadFileText(): void {
 		this.dataIngestionService.uploadText(this.csv.fileContent, this.csv.selected.text).subscribe( result => {
 			if (result.status === 'success' && result.data.filename) {
 				this.csv.filename = result.data.filename;
 				this.csv.state = 'success';
+				this.OPTIONS.useFileFrom = this.OPTIONS.CSV;
 			} else {
 				this.csv.state = 'fail';
 			}
 		});
 	}
 
+	/**
+	 * Fetch from webservice action.
+	 * On Fetch button click.
+	 */
 	private onFetch(): void {
 		this.importAssetsService.postFetch(this.webService.selected).subscribe( (result) => {
 			if (result.status === 'success' && result.data.filename) {
@@ -123,20 +145,11 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		} );
 	}
 
-	private onLoadData(): void {
-		let filename = null;
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.CSV) {
-			filename = this.csv.filename;
-		}
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.SERVICE) {
-			filename = this.webService.filename;
-		}
-		if (this.OPTIONS.useFileFrom === this.OPTIONS.FILE) {
-			filename = this.file.uploadedFilename;
-		}
-		this.close(filename);
-	}
-
+	/**
+	 * Upload File event.
+	 * On upload completed.
+	 * @param {SuccessEvent} e
+	 */
 	private completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
 		if (response.operation === 'delete') { // file deleted successfully
@@ -149,15 +162,28 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		}
 	}
 
+	/**
+	 * Upload File action.
+	 * On clear file name.
+	 * @param e
+	 */
 	private clearFilename(e?: any) {
 		this.file.uploadedFilename = null;
 		this.OPTIONS.useFileFrom = null;
 	}
 
+	/**
+	 * Upload File action.
+	 * On Remove file button click.
+	 * @param {RemoveEvent} e
+	 */
 	private onRemoveFile(e: RemoveEvent) {
 		e.data = { filename: this.file.uploadedFilename};
 	}
 
+	/**
+	 * On Cancel Close Dialog Popup Component.
+	 */
 	protected cancelCloseDialog(): void {
 		this.dismiss();
 	}
