@@ -34,7 +34,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLAssetClassFieldsValidator validator = createFieldsSpecValidator(project)
+        DomainClassFieldsValidator validator = createFieldsSpecValidator(project)
 
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 
@@ -44,23 +44,28 @@ class ScriptProcessorService {
     }
 
     /**
-     * Base on a project it creates a ETLAssetClassFieldsValidator instance tha implements ETLFieldsValidator.
+     * Base on a project it creates a DomainClassFieldsValidator instance tha implements ETLFieldsValidator.
      * @param project a defined Project instance to be used in fields spec request
      * @see ETLFieldsValidator interface
-     * @return an instance of ETLAssetClassFieldsValidator.
+     * @return an instance of DomainClassFieldsValidator.
      */
-    private ETLAssetClassFieldsValidator createFieldsSpecValidator (Project project) {
+    private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
 
-        def configureUsingDomain = { AssetClass assetClass ->
-            customDomainService.allFieldSpecs(project, assetClass.name())[assetClass.name()]["fields"]
-        }
+	    Map<String, ?> fieldsSpecMap = customDomainService.fieldSpecsWithCommon(project)
 
-        ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
+	    Map<String, ?> commonFieldsSpec = fieldsSpecMap[CustomDomainService.COMMON]
+	    Map<String, ?> applicationFieldsSpec = fieldsSpecMap[AssetClass.APPLICATION.name()]
+	    Map<String, ?> deviceFieldsSpec = fieldsSpecMap[AssetClass.DEVICE.name()]
+	    Map<String, ?> storageFieldsSpec = fieldsSpecMap[AssetClass.STORAGE.name()]
+	    Map<String, ?> dataBaseFieldsSpec = fieldsSpecMap[AssetClass.DATABASE.name()]
 
-        validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, configureUsingDomain(AssetClass.APPLICATION))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DEVICE, configureUsingDomain(AssetClass.DEVICE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.DATABASE, configureUsingDomain(AssetClass.DATABASE))
-        validator.addAssetClassFieldsSpecFor(AssetClass.STORAGE, configureUsingDomain(AssetClass.STORAGE))
+	    DomainClassFieldsValidator validator = new DomainClassFieldsValidator()
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Application, commonFieldsSpec.fields + applicationFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Device, commonFieldsSpec.fields + deviceFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, commonFieldsSpec.fields + storageFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Database, commonFieldsSpec.fields + dataBaseFieldsSpec.fields)
+	    validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec.fields)
+
         return validator
     }
 
@@ -125,7 +130,7 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLAssetClassFieldsValidator())
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new DomainClassFieldsValidator())
 
         List<Map<String, ?>> errors = []
 

@@ -11,7 +11,7 @@ class Element implements RangeChecker {
     ETLDomain domain
     ETLProcessor processor
 
-    Field field = new Field()
+    ETLFieldSpec fieldSpec
 
     /**
      * Transform command on an element with a closure to be executed
@@ -43,21 +43,11 @@ class Element implements RangeChecker {
      * <code>
      *     extract 3 transform with lowercase() load description
      * </code>
-     * @param field
+     * @param fieldName
      * @return the element instance that received this command
      */
     Element load (String fieldName) {
-
-        Map<String, ?> fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-
-        if (fieldSpec) {
-            field.name = fieldSpec.field
-            domain = processor.selectedDomain
-
-            field.label = fieldSpec.label
-            field.control = fieldSpec.control
-            field.constraints = fieldSpec.constraints
-        }
+        this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
         processor.addElementLoaded(processor.selectedDomain, this)
         this
     }

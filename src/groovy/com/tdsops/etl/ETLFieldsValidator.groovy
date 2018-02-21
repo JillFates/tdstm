@@ -25,8 +25,31 @@ interface ETLFieldsValidator {
      * @param domain : a ETL Domain used for looking a field spec up
      * @param field : field name use to lookup
      *
-     * @return a Map instance with fields name
+     * @return an instance of ETLFieldSpec with field name, label and type
      */
-    Map<String, ?> lookup (ETLDomain domain, String field)
+	ETLFieldSpec lookup (ETLDomain domain, String field)
 
+	/**
+	 *
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+    boolean isDomainProperty(Class domainClass, String propertyName)
+
+	/**
+	 *
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	boolean isDomainIdentifier(Class domainClass, String propertyName)
+
+	/**
+	 *
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	boolean isReferenceProperty(Class domainClass, String propertyName)
 }

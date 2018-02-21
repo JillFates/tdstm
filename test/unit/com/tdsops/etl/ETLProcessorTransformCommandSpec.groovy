@@ -18,11 +18,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
-import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
-import org.codehaus.groovy.control.customizers.ImportCustomizer
-import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -135,8 +131,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
-		applicationFieldsValidator = new ETLAssetClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+		applicationFieldsValidator = new DomainClassFieldsValidator()
+		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -592,8 +588,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings and element in a transformation chain'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -680,8 +676,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can plus strings, current element and a defined variable in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
@@ -722,8 +718,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings, current element and a defined variable in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -765,8 +761,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can append strings and elements in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -807,8 +803,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can use a set element in a transformation'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -849,8 +845,8 @@ class ETLProcessorTransformCommandSpec extends Specification {
 	void 'test can use a set element in a transformation closure'() {
 
 		given:
-			ETLFieldsValidator validator = new ETLAssetClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(AssetClass.APPLICATION, buildFieldSpecsFor(AssetClass.APPLICATION))
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -906,10 +902,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-			etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-			etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -931,10 +927,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-			etlProcessor.getRow(0).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getRow(1).getElement(1).field.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
 
 	}
 
@@ -958,10 +954,10 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
-			etlProcessor.getElement(1, 1).field.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 	}
 
 	void 'test can transform globally a field value using replace command using a range in the iteration'() {
@@ -984,7 +980,7 @@ class ETLProcessorTransformCommandSpec extends Specification {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).field.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
 	}
 
 	/**

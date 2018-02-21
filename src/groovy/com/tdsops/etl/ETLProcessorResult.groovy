@@ -129,8 +129,8 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
-		reference.fields.add(element.field.name)
-		currentData().fields[element.field.name] = initialFieldDataMap(element)
+		reference.fields.add(element.fieldSpec.name)
+		currentData().fields[element.fieldSpec.name] = initialFieldDataMap(element)
 	}
 
 	/**
@@ -209,7 +209,9 @@ class ETLProcessorResult {
 	 * <pre>
 	 *	"query": [
 	 *		{
-	 *			"domain": "Application", "kv": {"id": null}
+	 *			"domain": "Application",
+	 *			"kv": {"id": null},
+	 *	    	"error" : "Named parameter [id] value may not be null"
 	 *		},
 	 *	]
 	 * </pre>
@@ -217,10 +219,17 @@ class ETLProcessorResult {
 	 * @return
 	 */
 	private Map<String, ?> queryDataMap(ETLFindElement findElement) {
-		return [
+
+		Map<String, ?> queryDataMap = [
 			domain: findElement.currentFind.domain,
 			kv    : findElement.currentFind.kv
 		]
+
+		if(findElement.currentFind.error){
+			queryDataMap.error = findElement.currentFind.error
+		}
+
+		return queryDataMap
 	}
 
 	/**

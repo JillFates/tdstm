@@ -23,8 +23,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('You need to define a find element first')
     }
 
-    static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain) {
-        new ETLProcessorException("There is not validator for domain $domain".toString())
+    static ETLProcessorException unknownDomainFieldsSpec (ETLDomain domain, String field) {
+        new ETLProcessorException("There is not validator for domain $domain and field $field".toString())
     }
 
     static ETLProcessorException domainWithoutFieldsSpec (ETLDomain domain, String field) {
@@ -121,6 +121,10 @@ class ETLProcessorException extends GroovyRuntimeException {
 
 	static ETLProcessorException incorrectFindingsMethodInvocation (String method) {
 		new ETLProcessorException("You cannot use $method with more than one results in FINDINGS".toString())
+	}
+
+	static ETLProcessorException unknownAssetControlType (String controlType) {
+		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
 	}
 }
 
