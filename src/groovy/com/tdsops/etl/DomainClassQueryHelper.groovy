@@ -29,8 +29,6 @@ import net.transitionmanager.domain.Room
  *            and AE.id = : id
  *  </pre>
  */
-
-//TODO: DMC Refactor DomainClassQueryHelper
 class DomainClassQueryHelper {
 
 	/**
