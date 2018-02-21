@@ -161,18 +161,4 @@ class ScriptProcessorService {
         ]
     }
 
-    /**
-     * Updates a DataScript instance with a scriptContent String instance
-     * @param dataScript an instance of DataScript already saved in database
-     * @param scriptContent the new ETL Script content to be saved in DataScript instance
-     * @return the DataScript instance with the etlSourceCode already updated in database
-     */
-    DataScript saveScript (DataScript dataScript, String scriptContent) {
-
-        log.info "Updating DataScript ID: ${dataScript.id} with the following script content: ${scriptContent}"
-        dataScript.etlSourceCode = scriptContent
-        dataScript.save(failOnError: true)
-        return dataScript
-    }
-
 }

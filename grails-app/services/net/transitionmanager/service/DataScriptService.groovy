@@ -71,25 +71,33 @@ class DataScriptService implements ServiceMethods{
     }
 
     /**
+     * Updates a DataScript instance with a scriptContent String instance
+     * @param dataScript an instance of DataScript already saved in database
+     * @param scriptContent the new ETL Script content to be saved in DataScript instance
+     * @return the DataScript instance with the etlSourceCode already updated in database
+     */
+    DataScript saveScript (Long id, String scriptContent) {
+        Project project = securityService.userCurrentProject
+        DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
+        dataScript.etlSourceCode = scriptContent
+        dataScript.save(failOnError: true)
+
+        return dataScript
+    }
+
+    /**
      * Find a DataScript with the given ID, checking if it belongs
      * to the user's project.
      *
      * @param dataScriptId
      * @return
      */
-    DataScript getDataScript(Long dataScriptId, Project project = null) {
+    DataScript getDataScript(Long id, Project project = null) {
         if (!project) {
             project = securityService.userCurrentProject
         }
-        // Find a datascript with the given id for this project.
-        DataScript dataScript = DataScript.where{
-            id == dataScriptId
-            project == project
-        }.find()
 
-        if (!dataScript) {
-            throw new EmptyResultException("No DataScript with id ${dataScriptId} exists for this project.")
-        }
+        DataScript dataScript = GormUtil.findInProject(project, DataScript.class, id, true)
 
         return dataScript
     }
