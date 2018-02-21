@@ -3,10 +3,12 @@ package net.transitionmanager.service
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdsops.common.security.SecurityUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.CredentialCO
+import net.transitionmanager.command.CredentialCreateCO
+import net.transitionmanager.command.CredentialUpdateCO
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
@@ -15,72 +17,48 @@ import org.springframework.http.MediaType
 
 @Transactional
 @Slf4j
-class CredentialService {
+class CredentialService implements ServiceMethods {
     ProjectService projectService
+    SecurityService securityService
 
     /**
      * Creates a new credential
      * @param credential
      * @return
      */
-    Credential createCredential(CredentialCO credentialCO) {
-        assert credentialCO.project != null : 'Invalid project param.'
-        assert credentialCO.provider != null : 'Invalid provider param.'
+    Credential createCredential(CredentialCreateCO credentialCO) {
+        Project project = securityService.getUserCurrentProject()
 
-        if (credentialCO.hasErrors()) {
-            throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
-        }
+        // Make sure that the name is unique
+        validateBeforeSave(project, null, credentialCO)
 
+        // Create the credential and populate it from the Co
         Credential credentialInstance = new Credential()
         credentialCO.populateDomain(credentialInstance)
-        credentialInstance.salt = '{sha}'
+        
+        credentialInstance.project = project
 
-        credentialInstance.save()
+        // Set the salt that will be used to encrypt the password with a random string
+        credentialInstance.salt = SecurityUtil.randomString(16)
+
+        credentialInstance.save(failOnError: true)
         return credentialInstance
     }
 
     /**
-     * Find a credential by Id
-     * @param id
-     * @return
-     */
-    Credential findById(Long id) {
-        assert id != null : 'Invalid id param.'
-        return Credential.where {
-            id == id
-        }.get()
-    }
-
-    /**
-     * Find all credential belonging to a project
-     * @param project
-     * @return
-     */
-    List<Credential> findAllByProject(Project project) {
-        return Credential.where {
-            project == project
-        }.list()
-    }
-
-    /**
-     * Find all credential belonging to a provider
-     * @param provider
-     * @return
-     */
-    List<Credential> findAllByProvider(Provider provider) {
-        return Credential.where {
-            provider == provider
-        }.list()
-    }
-
-    /**
      * Update a credential
-     * @param credential
-     * @return
+     * @param id - the ID of the Credential to update
+     * @param credential - a Command object with values to update with
+     * @return the updated Credential
      */
-    Credential updateCredential(CredentialCO credentialCO) {
-        Credential credentialInstance = findById(credentialCO.id)
+    Credential updateCredential(Long id, CredentialUpdateCO credentialCO) {
+        Credential credentialInstance = findById(id)
+        
         GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
+
+        Project project = securityService.getUserCurrentProject()
+
+        validateBeforeSave(project, null, credentialCO)
 
         credentialCO.populateDomain(credentialInstance, true)
         credentialInstance.lastUpdated = new Date()
@@ -89,7 +67,7 @@ class CredentialService {
             throw new InvalidParamException(GormUtil.allErrorsString(credentialCO))
         }
 
-        credentialInstance.save()
+        credentialInstance.save(failOnError: true)
 
         return credentialInstance
     }
@@ -130,13 +108,12 @@ class CredentialService {
         assert credential != null : 'Invalid credential information provided.'
 
         Map authenticationResponse = null
-        switch (credential.method) {
-            case AuthenticationMethod.JWT_TOKEN:
+        switch (credential.authenticationMethod) {
+            case AuthenticationMethod.JWT:
                 authenticationResponse = doJWTTokenAuthentication(credential)
                 break
             default:
-                // do nothing
-                log.info('Authentication method provided not implemented yet. {}', credential.method)
+                authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
                 break
         }
         return authenticationResponse
@@ -148,7 +125,7 @@ class CredentialService {
      * @return
      */
     private Map doJWTTokenAuthentication(Credential credential) {
-        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getAccessKey(), password: credential.getPassword()])
+        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: credential.getPassword()])
         RestBuilder rest = new RestBuilder()
         def resp = rest.post(credential.getAuthenticationUrl()) {
             header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -156,6 +133,53 @@ class CredentialService {
             json jsonString
         }
         return JsonUtil.convertJsonToMap(resp.json)
+    }
+
+    /**
+     * Find a credential by Id
+     * @param id
+     * @return
+     */
+    Credential findById(Long id) {
+        assert id != null : 'Invalid id param.'
+        Project project = securityService.getUserCurrentProject()
+        return GormUtil.findInProject(project, Credential.class, id, true)
+    }
+
+    /**
+     * Find all credential belonging to a project
+     * @param project
+     * @return
+     */
+    List<Credential> findAllByProject(Project project) {
+        return Credential.where {
+            project == project
+        }.list()
+    }
+
+    /**
+     * Find all credential belonging to current user project
+     * @param project
+     * @return
+     */
+    List<Credential> findAllByCurrentUserProject() {
+        Project project = securityService.getUserCurrentProject()
+        return Credential.where {
+            project == project
+        }.list()
+    }
+
+    /**
+     * Find all credential belonging to a provider
+     * @param provider
+     * @return
+     */
+    List<Credential> findAllByProvider(Provider provider) {
+        Project project = securityService.getUserCurrentProject()
+        return Credential.where {
+            project == project
+            provider == provider
+        }.list()
     }
 
     /**
@@ -178,5 +202,33 @@ class CredentialService {
             throw new EmptyResultException("No Credential exists with the ID $id for the Project $project and Provider $provider.")
         }
         return credential
+    }
+
+    /**
+     * Performs some additional checks before the save occurs that includes:
+     *    - validate that the Provider is associated with the current project
+     *    - validate that the name for the credential being created or updated doesn't already exist
+     * If the validations fail then the InvalidParamException exception is thrown with an appropriate message.
+     * @throws InvalidParamException
+     */
+    private void validateBeforeSave(Project project, Long id, Object cmdObj) {
+        // Make certain that the provider specified is associated to the project
+        Provider provider = cmdObj.provider.refresh()
+        if (provider.project.id != project.id) {
+            throw new InvalidParamException('Invalid Provider specified')
+        }
+
+        // Make sure that name is unique
+        int count = Credential.where {
+            project == project
+            name == cmdObj.name
+            if (id) {
+                id != id
+            }
+        }.count()
+
+        if (count > 0) {
+            throw new InvalidParamException('A Credential with the same name already exists')
+        }
     }
 }

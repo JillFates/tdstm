@@ -36,20 +36,6 @@ export class DataIngestionService {
 		}
 	];
 
-	mockParametersData: APIActionParameterModel[] = [
-		{
-			id: 1,
-			name: 'sys_id',
-			description: 'The Unique ID used by ServiceNow (sysid)',
-			dataType: 'String',
-			context: {
-				value: 'Application',
-				assetClass: 'APPLICATION'
-			},
-			value: 'externalRelId'
-		}
-	];
-
 	constructor(private http: HttpInterceptor) {
 	}
 
@@ -107,7 +93,11 @@ export class DataIngestionService {
 						}
 					};
 					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					APIActionModel.createReactions(r, r.reactionScripts);
+					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
+						APIActionModel.createReactions(r, r.reactionScripts);
+					} else {
+						APIActionModel.createBasicReactions(r);
+					}
 				});
 				return dataScriptModels;
 			})
@@ -128,8 +118,18 @@ export class DataIngestionService {
 		return Observable.from(this.mockData).bufferCount(this.mockData.length);
 	}
 
-	getParameters(): Observable<APIActionParameterModel[]> {
-		return Observable.from(this.mockParametersData).bufferCount(this.mockParametersData.length);
+	/**
+	 * Validate and wrap the content of the Parameters inside the Model and creates and observable from it.
+	 * @param {APIActionModel} model
+	 * @returns {Observable<APIActionParameterModel[]>}
+	 */
+	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
+		return new Observable(observer => {
+			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
+				observer.next(JSON.parse(model.methodParams));
+			}
+			observer.complete();
+		});
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
@@ -157,7 +157,8 @@ export class DataIngestionService {
 			name: model.name,
 			description: model.description,
 			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			etlSourceCode: model.etlSourceCode
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
@@ -201,11 +202,11 @@ export class DataIngestionService {
 		}
 	}
 
-	saveAPIAction(model: APIActionModel): Observable<DataScriptModel> {
+	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			provider: model.provider.id,
+			provider: { id: model.provider.id },
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			endpointUrl: model.endpointUrl,
@@ -232,6 +233,13 @@ export class DataIngestionService {
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
 		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
+
+		if (parameterList && parameterList.data && parameterList.data.length > 0) {
+			parameterList.data.forEach( (param) => {
+				delete param.currentFieldList;
+			});
+			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+		}
 
 		if (!model.id) {
 			return this.http.post(`${this.dataDefaultUrl}/apiAction`, JSON.stringify(postRequest))

@@ -349,13 +349,7 @@ tdsops.buildFile = "/build.txt"
 //tdstm.security.auditLogging = "access"
 
 tdstm {
-	// TM-8654 - added the AWS credentials temporarily
-	credentials {
-		aws {
-			accessKey = 'AKIAJQVV5RZ45K6T5GRA'
-			secretKey = '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'
-		}
-	}
+	
 }
 
 grails {
@@ -443,4 +437,17 @@ grails {
 
 		}
 	}
+}
+
+// Graph Properties
+graph {
+//	graphviz {
+//		//dotCmd = '/usr/bin/dot'
+//		dotCmd = '/usr/local/bin/dot'
+//		graphType = 'svg'
+//	}
+//	deleteDotFile = false
+	tmpDir = '/tmp/'
+//	targetDir = '/var/www/tdstm/images/tmp/'
+//	targetURI = '/../images/tmp/'
 }

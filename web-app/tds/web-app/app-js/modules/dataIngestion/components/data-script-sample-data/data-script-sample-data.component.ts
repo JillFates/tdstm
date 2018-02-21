@@ -5,6 +5,7 @@ import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {ImportAssetsService} from '../../../importAssets/service/import-assets.service';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 
 @Component({
 	selector: 'data-script-sample-data',
@@ -13,21 +14,13 @@ import {ImportAssetsService} from '../../../importAssets/service/import-assets.s
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-
+	private file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	private OPTIONS: any = {
 		CSV: 'csv',
 		FILE: 'file',
 		SERVICE: 'service',
 		selected: undefined,
 		useFileFrom: undefined
-	};
-	private file: any = {
-		uploadRestrictions : { allowedExtensions: ['csv', 'txt', 'xml', 'json', '.xlxs', 'xls'] },
-		uploadSaveUrl : 'saveUrl',
-		uploadDeleteUrl : 'removeUrl',
-		autoUpload: false,
-		uploadedFilename: undefined,
-		checked: false
 	};
 	private csv: any = {
 		options : [
@@ -69,6 +62,8 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	}
 
 	private onPageLoad(): void {
+		this.file.uploadedFilename = undefined;
+		this.file.checked = false;
 		this.csv.selected = this.csv.options[0];
 		this.OPTIONS.selected = this.OPTIONS.FILE;
 		this.importAssetsService.getManualOptions().subscribe( (result) => {

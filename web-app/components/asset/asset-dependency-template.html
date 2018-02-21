@@ -129,7 +129,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 100px; vertical-align: top;">
+                        <td style="max-width: 100px; vertical-align: top;">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label control-label-title">Frequency</label>
                             </div>
@@ -155,7 +155,7 @@
                                 <label class="col-sm-4 control-label control-label-title">C4</label>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" style="height: 50px;">
                                 <label class="col-sm-4 control-label control-label-title">Comment</label>
                             </div>
 
@@ -171,7 +171,7 @@
                                 <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                             </div>
                         </td>
-                        <td style="width: 200px; vertical-align: top;">
+                        <td style="max-width: 200px; vertical-align: top;">
                             <div class="form-group">
                                 <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.dataFlowFreq}}</label>
                                 <select ng-if="actionTypeEdit" ng-change="changeData()" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.dataFlowFreq" ng-options="frequency as frequency for frequency in assetDependency.dataFlowFreq"></select>
@@ -204,9 +204,9 @@
                                 <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetA.dependency.c4}}</label>
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetA.delete}" class="form-control" ng-model="assetDependency.assetA.dependency.c4" />
                             </div>
-                            <div class="form-group">
-                                <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetA.dependency.comment}}</label>
-                                <textarea style="width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetA.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetA.dependency.comment"></textarea>
+                            <div class="form-group" style="height: 50px;">
+                                <label style="height: 70px; overflow: auto; width: 137px" ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetA.dependency.comment}}</label>
+                                <textarea style="resize: none; height: 65px; width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetA.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetA.dependency.comment"></textarea>
                             </div>
 
                             <div class="form-group" style="margin-top:20px">
@@ -221,7 +221,8 @@
                                 <button type="button" style="margin-top: 25px;" ng-click="toDeleteDependency('assetA', false)" class="btn btn-default"><img src="../icons/database_delete.png" border="0px"> Delete</button>
                             </div>
                         </td>
-                        <td ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id" style="width: 200px; vertical-align: baseline;">
+                        <td ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id"
+                            style="max-width: 200px; vertical-align: baseline;">
                             <div class="form-group">
                                 <label ng-if="!actionTypeEdit" class="col-sm-12 control-label">{{assetDependency.assetB.dependency.dataFlowFreq}}</label>
                                 <select ng-if="actionTypeEdit" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" class="form-control" ng-model="assetDependency.assetB.dependency.dataFlowFreq" ng-options="frequency as frequency for frequency in assetDependency.dataFlowFreq"></select>
@@ -255,9 +256,9 @@
                                 <input ng-if="actionTypeEdit" ng-change="changeData()" type="text" ng-class="{'delete-property': assetDependency.assetB.delete}" class="form-control" ng-model="assetDependency.assetB.dependency.c4" />
                             </div>
 
-                            <div class="form-group">
-                                <label ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetB.dependency.comment}}</label>
-                                <textarea style="width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetB.dependency.comment"></textarea>
+                            <div style="height: 50px;" class="form-group">
+                                <label style="height: 70px; overflow: auto; width: 137px;" ng-if="!actionTypeEdit"  class="col-sm-12 control-label">{{assetDependency.assetB.dependency.comment}}</label>
+                                <textarea style="resize: none; height: 65px;  width: 188px;" maxlength="65535" ng-class="{'delete-property': assetDependency.assetB.delete}" ng-change="changeData()" ng-if="actionTypeEdit"  class="form-control" rows="2" ng-model="assetDependency.assetB.dependency.comment"></textarea>
                             </div>
 
                             <div class="form-group" style="margin-top:20px">

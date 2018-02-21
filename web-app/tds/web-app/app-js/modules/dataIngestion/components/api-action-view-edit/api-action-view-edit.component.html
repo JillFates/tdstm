@@ -18,9 +18,6 @@
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(2)}">
 						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
 					</li>
-					<!-- <li role="presentation" [ngClass]="{'active':isCurrentTab(3)}">
-						<a href="#tab_4" (click)="setCurrentTab(3)" data-toggle="tab">Test</a>
-					</li> -->
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(1)}">
 					<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}" id="tab_1">
@@ -144,8 +141,8 @@
 									</div>
 									<div class="col-md-5">
 										<div class="form-check">
-											<label class="form-check-label" for="apiActionPollingInterval">
-												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
+											<label class="form-check-label aligned-label" for="apiActionPollingInterval">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -232,14 +229,14 @@
 											</div>
 										</div>
 										<div class="form-check">
-											<label for="apiActionProduceData" class="form-check-label">
-												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input">
+											<label for="apiActionProduceData" class="form-check-label aligned-label">
+												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Provides Data
 											</label>
 											<popup-provides-data></popup-provides-data>
 										</div>
 										<div class="form-group intervals-content">
-											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default Data Script:</label>
+											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
 											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist
 																	id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"
@@ -270,54 +267,69 @@
 										[pageSize]="25"
 										[height]="430"
 										(sortChange)="sortChange($event)">
-									<ng-template kendoGridToolbarTemplate [position]="'top'">
-										<button class="btn btn-default mar-left-15" id="btnEditParameters" type="button" (click)="onEditParameters()"><i class="fa fa-fw fa-list-ul"></i> {{ 'GLOBAL.EDIT' | translate }}</button>
-										<button *ngIf="isEditing" class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_ARGUMENT' | translate }}</button>
+									<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
+										<button class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_ARGUMENT' | translate }}</button>
 									</ng-template>
-									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index" field="{{column.property}}" [locked]="column.locked" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-										<ng-template kendoGridHeaderTemplate>
-											<label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
-										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
+													   field="{{column.property}}"
+													   [locked]="column.locked"
+													   format="{{column.format}}"
+                                                       title="{{column.label}}"
+													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
-												<button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+												<button class="btn btn-default" (click)="onDeleteParameter(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf='isEditing' let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'name'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.name" style="width: 100%;" />
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'dataType'">
-												<kendo-dropdownlist
-														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-														[data]="dataTypes"
-														[(ngModel)]="dataItem.dataType">
-												</kendo-dropdownlist>
+										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+											<div *ngIf="column.type === 'text' && column.property === 'param'">
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" style="width: 100%; height: 30px;" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
 														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
 														[data]="assetClassesForParameters"
 														[textField]="'value'"
-														[valueField]="'value'"
+														[valueField]="'assetClass'"
+														[valuePrimitive]="true"
 														(valueChange)="onContextValueChange(dataItem)"
-														[(ngModel)]="dataItem.context">
+														[(ngModel)]="dataItem.context"
+														required
+														[ngClass]="{'has-error': !dataItem.context || dataItem.context.value === ''}" >
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input *ngIf="dataItem.context.assetClass === 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'" type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.value" style="width: 100%;" />
-												<kendo-combobox *ngIf="dataItem.context.assetClass !== 'USER_DEFINED' && dataItem.context.assetClass !== 'TASK'"
+												<input *ngIf="dataItem.context === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" style="width: 100%; height: 30px;" />
+												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
 																[textField]="'field'"
 																[valueField]="'field'"
-																[(ngModel)]="dataItem.field">
-
+																[valuePrimitive]="true"
+																[(ngModel)]="dataItem.property"
+																(valueChange)="verifyIsValidForm()"
+																required
+																[ngClass]="{'has-error': !dataItem.property}" >
 												</kendo-combobox>
 											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'description'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.description" style="width: 100%;" />
+											<div *ngIf="column.type === 'text' && column.property === 'desc'">
+												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.desc" style="width: 100%; height: 30px;" />
+											</div>
+										</ng-template>
+										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+											<div *ngIf="column.type === 'text' && column.property === 'param'">
+												<span>{{dataItem.param}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
+												<span>{{getAssetClassValue(dataItem.context)}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'value'">
+												<span *ngIf="dataItem.context === 'USER_DEFINED'">{{dataItem.value}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property}}</span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'desc'">
+												<span>{{dataItem.desc}}</span>
 											</div>
 										</ng-template>
 									</kendo-grid-column>
@@ -335,14 +347,14 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="true"> Status
+														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="apiActionModel.eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"> Status
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="apiActionModel.eventReactions[1].value.length > 0 || modalType === actionTypes.VIEW"> Success
+														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="true"> Success
 													</label>
 												</div>
 											</div>
@@ -593,7 +605,7 @@
 	</div>
 	<div class="modal-footer form-group-center">
 		<button type="button" *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE" (click)="onSaveApiAction()"
-		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || invalidScriptSyntax">
+		 class="btn btn-primary pull-left" [disabled]="!validInfoForm || !validParametersForm ">
 			<span class="fa fa-fw fa-floppy-o"></span> Save</button>
 		<button type="button" *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(2)" (click)="onCheckAllSyntax()" class="btn btn-primary pull-left">
 			<span class="fa fa-fw fa-thumbs-o-up"></span> Check Syntax</button>

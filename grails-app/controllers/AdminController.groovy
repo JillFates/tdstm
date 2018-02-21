@@ -27,7 +27,6 @@ import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.UserService
 
 import org.springframework.jdbc.core.JdbcTemplate
@@ -49,7 +48,6 @@ class AdminController implements ControllerMethods {
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProjectService projectService
-	SecurityService securityService
 	UserService userService
 
 	static final String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
@@ -1539,7 +1537,7 @@ class AdminController implements ControllerMethods {
 		def encodedValue
 		switch (hashAlgorithm) {
 			case 'AES':
-				encodedValue = AESCodec.encode(toHashString, hashSalt)
+				encodedValue = AESCodec.instance.encode(toHashString, hashSalt)
 				break
 			case 'DES':
 			default:

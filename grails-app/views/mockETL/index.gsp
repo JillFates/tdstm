@@ -230,7 +230,7 @@
         });
     }
 
-    // Saves the current script to the specified Data Script id
+    // Saves the current script to the specified DataScript id
     function saveDataScriptSource() {
         var dataScriptId = $("#dataScriptId").val();
         var data = { "script": $("#script").val() };

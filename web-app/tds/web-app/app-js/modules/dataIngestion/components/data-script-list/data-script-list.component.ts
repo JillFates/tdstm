@@ -57,7 +57,6 @@ export class DataScriptListComponent {
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -139,7 +138,7 @@ export class DataScriptListComponent {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(dataItem: any): void {
@@ -213,12 +212,22 @@ export class DataScriptListComponent {
 				}, 500);
 			}
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			// on dialog close, do nothing ..
 		});
 	}
 
 	private selectRow(dataItemId: number): void {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
+	}
+
+	/**
+	 * Make the entire header clickable on Grid
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 }

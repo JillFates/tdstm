@@ -5,11 +5,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-<title>Application Migration Results</title>
+<title>Application Event Results</title>
 <g:javascript src="report.js"/>
 </head>
 <body>
-<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Migration Results']"/>
+<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Event Results']"/>
 	<div class="body">
 		
 		<g:if test="${flash.message}">

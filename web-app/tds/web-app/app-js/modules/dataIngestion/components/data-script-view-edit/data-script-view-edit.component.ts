@@ -28,6 +28,10 @@ export class DataScriptViewEditComponent implements OnInit {
 	private dataSignature: string;
 	private isUnique = true;
 	private datasourceName = new Subject<String>();
+	private etlScriptCode = {
+		updated: false,
+		code: null
+	};
 
 	constructor(
 		public originalModel: DataScriptModel,
@@ -40,9 +44,10 @@ export class DataScriptViewEditComponent implements OnInit {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Data Script' : (this.modalType === ActionType.EDIT ? 'Data Script Edit' : 'Data Script Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create DataScript' : (this.modalType === ActionType.EDIT ? 'DataScript Edit' : 'DataScript Detail');
 		// ignore etl script from this context
 		let copy = {...this.dataScriptModel};
+		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		this.dataSignature = JSON.stringify(copy);
 		this.datasourceName.next(this.dataScriptModel.name);
@@ -60,6 +65,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 				this.providerList.push(...result);
 				let copy = {...this.dataScriptModel};
+				this.etlScriptCode.code = copy.etlSourceCode;
 				delete copy.etlSourceCode;
 				this.dataSignature = JSON.stringify(copy);
 				setTimeout(() => { // Delay issues on Auto Focus
@@ -76,6 +82,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * Create a new DataScript
 	 */
 	protected onSaveDataScript(): void {
+		this.dataScriptModel.etlSourceCode = this.etlScriptCode.code;
 		this.dataIngestionService.saveDataScript(this.dataScriptModel).subscribe(
 			(result: any) => {
 				this.activeDialog.close(result);
@@ -104,10 +111,12 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	/**
 	 * Verify the Object has not changed
+	 * - Ignore etl-script changes
 	 * @returns {boolean}
 	 */
 	protected isDirty(): boolean {
 		let copy = {...this.dataScriptModel};
+		this.etlScriptCode.code = copy.etlSourceCode;
 		delete copy.etlSourceCode;
 		return this.dataSignature !== JSON.stringify(copy);
 	}
@@ -126,7 +135,11 @@ export class DataScriptViewEditComponent implements OnInit {
 					}
 				});
 		} else {
-			this.activeDialog.dismiss();
+			if (this.etlScriptCode.updated) {
+				this.activeDialog.close();
+			} else {
+				this.activeDialog.dismiss();
+			}
 		}
 	}
 
@@ -138,7 +151,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Delete the selected Data Script
+	 * Delete the selected DataScript
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(): void {
@@ -175,14 +188,17 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Open the Data Script Designer
+	 * Open the DataScript Designer
 	 */
 	protected onDataScriptDesigner(): void {
 		this.dialogService.extra(DataScriptEtlBuilderComponent,
 			[UIDialogService,
-				{provide: DataScriptModel, useValue: this.dataScriptModel}],
-			true, false)
-			.then(() => console.log('ok'), () => console.log('not ok'));
+				{provide: DataScriptModel, useValue: this.dataScriptModel}])
+			.then((result) => {
+				if (result.updated) {
+					this.etlScriptCode.updated = result.updated;
+					this.etlScriptCode.code = result.newEtlScriptCode;
+				}
+			});
 	}
-
 }

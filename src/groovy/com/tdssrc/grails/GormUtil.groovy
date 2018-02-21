@@ -27,11 +27,13 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
+import grails.validation.Validateable
+
 
 @Slf4j(value='logger')
 public class GormUtil {
 
-// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
+	// TODO : JPM 1/2017 : PersonMerge -- enum Operator was deleted by Burt
     // Used to control how some functions will perform comparisons with multiple where criteria
 	enum Operator { AND, OR }
 
@@ -46,11 +48,29 @@ public class GormUtil {
 		MessageSource messageSource = ApplicationContextHolder.getBean('messageSource', MessageSource)
 		StringBuilder text = new StringBuilder()
 		domain?.errors?.allErrors?.each {
+			// TODO : JPM 2/2018 : TM-9197 this is not properly converting locales
 			text << separator << ' ' << messageSource.getMessage(it, locale)
 		}
 		text.toString()
 	}
 
+	/**
+	 * Used to internationalize the validation errors from a Validatable object 
+	 * @param object - a domain or command object that has validation errors
+	 * @param locale - the locale to set the messages to (default US)
+	 * @return a list of the messages
+	 */
+	static List<String> validateErrorsI18n(Object object, Locale locale = Locale.US) {
+		// TODO : JPM 2/2018 : Change to use new MessageSourceService
+		MessageSource messageSource = ApplicationContextHolder.getBean('messageSource', MessageSource)
+		List<String> errors = []
+		for (e in object?.errors?.allErrors) {
+			// TODO : JPM 2/2018 : TM-9197 this is not properly converting locales
+			errors << messageSource.getMessage(e, locale)
+		}
+		return errors
+	}
+	
 	/**
 	 * Output GORM Domain constraints and update errors in human readable HTML Unordered List
 	 * @param domain  the domain instance that has errors
@@ -191,7 +211,7 @@ public class GormUtil {
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
 	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
-		def version = NumberUtil.toLong(params.version)
+		Long version = NumberUtil.toLong(params.version)
 		if (version == null) {
 			throw new DomainUpdateException("The $label version was missing from request")
 		} else {

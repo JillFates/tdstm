@@ -241,4 +241,15 @@ export class APIActionListComponent {
 	protected isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ActionDelete);
 	}
+
+	/**
+	 * Make the entire header clickable on Grid
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
+	}
+
 }

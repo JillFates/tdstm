@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
-<title>Application Migration Results</title>
+<title>Application Event Results</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>
@@ -31,7 +31,7 @@
 </script>
 </head>
 <body>
-	<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Migration Results']"/>
+	<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Event Results']"/>
 	<div class="body" style="width:1000px;" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>${project.name} : ${moveBundle}</b><br/>

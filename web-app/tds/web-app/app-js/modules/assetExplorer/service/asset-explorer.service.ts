@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { Response } from '@angular/http';
-import { ViewModel, ViewGroupModel, ViewType } from '../model/view.model';
-import { QuerySpec } from '../model/view-spec.model';
-import { HttpInterceptor } from '../../../shared/providers/http-interceptor.provider';
-import { Permission } from '../../../shared/model/permission.model';
-import { PermissionService } from '../../../shared/services/permission.service';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs/Rx';
+import {Response} from '@angular/http';
+import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
+import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {Permission} from '../../../shared/model/permission.model';
+import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -13,6 +12,7 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class AssetExplorerService {
 
+	private defaultUrl = '../ws';
 	private assetExplorerUrl = '../ws/assetExplorer';
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
@@ -145,7 +145,7 @@ export class AssetExplorerService {
 	}
 
 	deleteAssets(ids: string[]): Observable<any> {
-		return this.http.post(`${this.assetUrl}/deleteAssets`, JSON.stringify({ ids: ids }))
+		return this.http.post(`${this.assetUrl}/deleteAssets`, JSON.stringify({ids: ids}))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -153,4 +153,12 @@ export class AssetExplorerService {
 			.catch((error: any) => error.json());
 	}
 
+	getFileName(viewName: string): Observable<any> {
+		return this.http.post(`${this.defaultUrl}/filename`, JSON.stringify({viewName: viewName}))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
 }

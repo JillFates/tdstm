@@ -3,10 +3,11 @@ package net.transitionmanager.domain
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.json.JsonSlurper
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
-import groovy.util.logging.Slf4j
-import groovy.transform.ToString
+import net.transitionmanager.command.ApiActionMethodParam
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
@@ -16,7 +17,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  * The ApiAction domain represents the individual mapped API methods that can be
  * invoked by the TransitionManager application in Tasks and other places.
  */
-@Slf4j(value='logger')
+@Slf4j
 @ToString(includes='name, agentClass, agentMethod, provider', includeNames=true, includePackage=false)
 class ApiAction {
 
@@ -41,12 +42,13 @@ class ApiAction {
 
 	/*
 	 * A JSON object that contains the mapping of method parameters and where the values will be sourced from
-	 * [ {	'param':'assetId',
-	 *			'desc': 'The unique id to reference the asset',
-	 *			'type':'string',
-	 *			'context': ContextType.ASSET.toString(),	// The context that the param value will be pulled from
-	 * 			'property': 'id', 	// The property on the context that the value will be pulled from
-	 *			'value': 'user def value'	// The value to use context is ContextType.USER_DEF
+	 * [ {
+	 * 		"param":"assetId",
+	 *		"desc": "The unique id to reference the asset",
+	 *		"type":"string",
+	 *		"context": ContextType.ASSET.toString(),	// The context that the param value will be pulled from
+	 * 		"property": "field", 	// The property on the context that the value will be pulled from
+	 *		"value": "user def value"	// The value to use context is ContextType.USER_DEF
 	 *   }
 	 * ]
 	 */
@@ -112,8 +114,7 @@ class ApiAction {
 	]
 
 	static constraints = {
-		agentClass  nullable: false
-		agentMethod nullable: false, size: 1..64
+		agentMethod size: 1..64
 		asyncQueue nullable: true, size: 0..64
 		callbackMethod nullable: true
 		callbackMode nullable: true
@@ -122,19 +123,19 @@ class ApiAction {
 		description nullable: true
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
-		isPolling nullable: false, range: 0..1
+		isPolling range: 0..1
 		lastModified nullable: true
 		methodParams nullable: true
-		name nullable: false, size: 1..64, unique: 'project'
-		pollingLapsedAfter nullable: false, min: 0
-		pollingStalledAfter nullable: false, min: 0
-		producesData nullable: false, range:0..1
-		provider nullable: false, validator: providerValidator
+		name size: 1..64, unique: 'project'
+		pollingLapsedAfter min: 0
+		pollingStalledAfter min: 0
+		producesData range:0..1
+		provider validator: providerValidator
 		reactionScripts size: 1..65535, blank: false, validator: reactionJsonValidator
-		reactionScriptsValid nullable: false, range: 0..1
-		timeout nullable: true
-		useWithAsset nullable: false, range: 0..1
-		useWithTask nullable: false, range: 0..1
+		reactionScriptsValid range: 0..1
+		timeout min:0
+		useWithAsset range: 0..1
+		useWithTask range: 0..1
 	}
 
 	static mapping = {
@@ -164,7 +165,7 @@ class ApiAction {
 	 * @return true if action is syncronous otherwise false
 	 */
 	boolean isSync() {
-		callbackMode == CallbackMode.NA
+		! isAsync()
 	}
 
 	/*
@@ -172,9 +173,9 @@ class ApiAction {
 	 * @return The methodParams JSON as Groovy List<Map>
 	 */
 	List<Map> getMethodParamsList(){
-		JsonSlurper slurper = new groovy.json.JsonSlurper()
 		List<Map> list = []
 		if (methodParams) {
+			JsonSlurper slurper = new groovy.json.JsonSlurper()
 			try {
 				list = slurper.parseText(methodParams)
 			} catch (e) {
@@ -184,11 +185,32 @@ class ApiAction {
 		return list
 	}
 
-	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
+	/**
+	 * return a list of the ApiAction
+	 * @return
+	 */
+	List<ApiActionMethodParam> getListMethodParams() {
+		List<ApiActionMethodParam> list = []
+		if (methodParams) {
+			JsonSlurper slurper = new groovy.json.JsonSlurper()
+			def listJson = slurper.parseText(methodParams)
+			if(!(listJson instanceof List)){
+				listJson = [listJson]
+			}
+
+			list = listJson.collect { new ApiActionMethodParam(it) }
+		}
+		return list
 	}
-	def beforeUpdate = {
-		lastModified = TimeUtil.nowGMT()
+
+	def beforeValidate() {
+		// validate methodParams
+		try {
+			getListMethodParams()
+		} catch (e) {
+			this.errors.rejectValue('methodParams', e.getMessage())
+		}
+
 	}
 
 	/**
@@ -222,7 +244,7 @@ class ApiAction {
 		// Iterate over all the keys warning and removing anything not defined in ReactionScriptCode. See TM-8697
 		for (key in reactionJson.keySet()) {
 			if (!ReactionScriptCode.lookup(key)) {
-				logger.warn("Unrecognized key $key in reaction JSON.")
+				log.warn("Unrecognized key $key in reaction JSON.")
 				invalidKeys << key
 				errors = true
 			}
@@ -241,25 +263,58 @@ class ApiAction {
 	}
 
 	/**
-	 * A validator that takes an API Action and a field and checks
-	 * that both reference the same project.
+	 * Used to validate that the Provider is of the same Project as that of the ApiAction
+	 * @param value - the value to be set on a property
+	 * @param domainObject - the ApiAction domain object being created/updated
 	 */
-	static providerValidator = { provider, apiAction ->
-		if (provider.project.id != apiAction.project.id) {
+	static providerValidator = { Provider providerObject, ApiAction domainObject ->
+		Long providerProjectId=0
+		if (providerObject.project) {
+			providerProjectId = providerObject.project.id
+		} else {
+			// Need to use a new session to fetch the Provider so as not to mess up the current 
+			// objects in the session.
+			Provider.withNewSession {
+				Provider p = Provider.read(providerObject.id)
+				if (p) {
+					providerProjectId = p.project.id
+				}
+			}
+		}
+
+		if ( providerProjectId != domainObject.project.id) {
 			return Message.InvalidFieldForDomain
 		}
 	}
 
 	/**
-	 * Validator that accepts a field of an ApiAction and the corresponding
-	 * ApiAction and checks that the providers are the same.
+	 * Used to validate the field value is of the same Provider as the ApiAction
+	 * @param value - the value to be set on a property
+	 * @param domainObject - the ApiAction domain object being created/updated
 	 */
-	static crossProviderValidator = { aField, apiAction ->
-		if (aField) {
-			if (aField.provider.id != apiAction.provider.id) {
-				return Message.InvalidFieldForDomain
-			}
+	static crossProviderValidator = { value, ApiAction domainObject ->
+		if (! value) {
+			return true
 		}
+
+		Long valueProviderId = 0
+
+        if (value.provider) {
+			valueProviderId = value.provider.id
+		} else {
+			// Need to use a new session to fetch the Domain so as not to mess up the current 
+			// objects in the session.
+			value.class.withNewSession {
+				def obj = value.class.read(value.id)
+				if (obj) {
+					valueProviderId = obj.provider.id
+				}
+			}
+        }
+
+        if ( valueProviderId !=  domainObject.provider.id) {
+			return Message.InvalidFieldForDomain
+        }
 	}
 
 }

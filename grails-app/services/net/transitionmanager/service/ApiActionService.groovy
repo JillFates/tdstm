@@ -1,25 +1,49 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.ThreadLocalUtil
+import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.agent.*
+import net.transitionmanager.agent.AbstractAgent
+import net.transitionmanager.agent.AgentClass
+import net.transitionmanager.agent.AwsAgent
+import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.agent.DictionaryItem
+import net.transitionmanager.agent.RestfulAgent
+import net.transitionmanager.agent.RiverMeadowAgent
+import net.transitionmanager.agent.ServiceNowAgent
+import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.integration.*
+import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.integration.ApiActionJob
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.integration.ApiActionScriptBinding
+import net.transitionmanager.integration.ApiActionScriptBindingBuilder
+import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.task.TaskFacade
+import org.apache.camel.Exchange
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.context.i18n.LocaleContextHolder
 
 @Slf4j
 @Transactional
 class ApiActionService implements ServiceMethods {
-
+	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [ThreadLocalVariable.ACTION_REQUEST, ThreadLocalVariable.TASK_FACADE, ThreadLocalVariable.REACTION_SCRIPTS]
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
@@ -29,7 +53,8 @@ class ApiActionService implements ServiceMethods {
 	private static Map agentClassMap = [
 		(AgentClass.AWS)         : AwsAgent,
 		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-		(AgentClass.SERVICE_NOW) : ServiceNowAgent
+		(AgentClass.SERVICE_NOW) : ServiceNowAgent,
+		(AgentClass.RESTFULL) 	 : RestfulAgent
 	].asImmutable()
 
 	/**
@@ -126,19 +151,19 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
-	void invoke (ApiAction action, Object context) {
+	void invoke(ApiAction action, Object context) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 		if (context.hasErrors()) {
 			log.warn 'Invoke() encountered data errors in context: {}', com.tdssrc.grails.GormUtil.allErrorsString(context)
 		}
-		if (!context) {
+		if (! context) {
 			throw new InvalidRequestException('invoke() required context was null')
 		}
 
 		if (context instanceof AssetComment) {
 			// Validate that the method is still invocable
-			if (!context.isActionInvocable()) {
+			if (! context.isActionInvocable() ) {
 				throw new InvalidRequestException('Task state does not permit action to be invoked')
 			}
 
@@ -154,14 +179,14 @@ class ApiActionService implements ServiceMethods {
 			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
 
 			if (methodRequiresCallbackMethod) {
-				if (!action.callbackMethod) {
+				if (! action.callbackMethod) {
 					log.warn 'Action is missing required callback: {}', action.toString()
 					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
 				}
 				remoteMethodParams << [callbackMethod: action.callbackMethod]
 			}
 
-			if (CallbackMode.NA != action.callbackMode) {
+			if (CallbackMode.MESSAGE == action.callbackMode) {
 				// We're going to perform an Async Message Invocation
 				if (!action.asyncQueue) {
 					throw new InvalidConfigurationException("Action $action missing required message queue name")
@@ -171,13 +196,81 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method
 				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', agent.name, action.agentMethod, action.asyncQueue, remoteMethodParams
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
+			} else if (CallbackMode.DIRECT == action.callbackMode) {
+				// add additional data to the api action execution to have it available when needed
+				remoteMethodParams << [
+						actionId: action.id, 
+						taskId: context.id,
+						producesData: action.producesData,
+						credentials: action.credential?.toMap()
+				]
+				def agent = agentInstanceForAction(action)
 
+				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+				// params?
+				// headers?
+
+				// set config data
+				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
+				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
+
+				// check pre script
+				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
+				String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
+
+				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.ACTION_REQUEST, actionRequest)
+				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
+
+				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
+				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.TASK_FACADE, taskFacade)
+
+				// execute PRE script if present
+				if (preScript) {
+					try {
+						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+					} catch (ApiActionException preScriptException) {
+						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
+						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
+						String defaultScript = reactionScripts[ReactionScriptCode.DEFAULT.name()]
+						String finalizeScript = reactionScripts[ReactionScriptCode.FINAL.name()]
+
+						// execute ERROR or DEFAULT scripts if present
+						if (errorScript) {
+							try {
+								invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+							} catch (ApiActionException errorScriptException) {
+								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
+							}
+						} else if (defaultScript) {
+							try {
+								invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+							} catch (ApiActionException defaultScriptException) {
+								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
+							}
+						}
+
+						// finalize PRE branch when it failed
+						if (finalizeScript) {
+							try {
+								invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+							} catch (ApiActionException finalizeScriptException) {
+								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
+							}
+						}
+						ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+						return
+					}
+				}
+
+				// Lets try to invoke the method if nothing came up with the PRE script execution
+				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
+				agent."${action.agentMethod}"(actionRequest)
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
 		} else {
 			throw new InvalidRequestException(
-					'invoke() not implemented for class ' + context.getClass().getName())
+					'invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
@@ -267,6 +360,42 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
+	 * Create or Update an API Action based on a JSON Object.
+	 * @param apiActionCommand - the command object containing the values loaded by controller
+	 * @param apiActionId - the id of the ApiAction to update 
+	 * @param project - the project that the ApiAction should belong to (optional)
+	 * @return the ApiAction instance that was created or updated
+	 */
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
+		ApiAction apiAction = null
+
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+
+		validateBeforeSave(project, apiActionId, apiActionCommand)
+
+		// If there's an apiActionId then it's an update operation.
+		if (apiActionId) {
+			// Retrieve the corresponding API Action instance
+			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
+
+			// Make sure nobody changed it while the user was editting the data
+			GormUtil.optimisticLockCheck(apiAction, apiActionCommand, "API Action")
+		} else {
+			apiAction = new ApiAction(project: project)
+		}
+
+		// Populate the apiAction with the properties from the command object
+		// TODO : JPM 2/2018 : replace the properties setting as this causes the version to tick when nothing else has chanaged
+		// apiActionCommand.populateDomain(apiAction, false, ['version'])
+		apiAction.properties = apiActionCommand.properties
+
+		apiAction.save(failOnError: true)
+		return apiAction
+	}
+
+	/**
 	 * Delete the given ApiAction.
 	 * @param id
 	 * @param project
@@ -336,36 +465,6 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Create or Update an API Action based on a JSON Object.
-	 * @param apiActionJson
-	 * @param apiActionId
-	 * @param project
-	 * @return
-	 */
-	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
-		ApiAction apiAction = null
-
-		if (!project) {
-			project = securityService.userCurrentProject
-		}
-
-		// If there's an apiActionId then it's an update operation.
-		if (apiActionId) {
-			// Retrieve the corresponding API Action instance
-			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
-		} else {
-			apiAction = new ApiAction(project: project)
-		}
-
-		// Populate the apiAction with the properties from the command object.
-		apiAction.properties = apiActionCommand.properties
-
-		apiAction.save(failOnError: true)
-		return apiAction
-
-	}
-
-	/**
 	 * Return the corresponding credential from this API Action JSON, validating that its provider matches
 	 * the one for the API Action.
 	 * The credential is not mandatory, so if none is provided, no exception will be thrown. However, if an
@@ -410,22 +509,24 @@ class ApiActionService implements ServiceMethods {
 	 * @param job ApiActionJob instance to be bound in the ApiActionScriptBinding instance
 	 * @return a Map that contains the result of the execution script using an instance of GroovyShell
 	 */
+	@Transactional(noRollbackFor = [Exception])
 	Map<String, ?> invokeReactionScript(
 			ReactionScriptCode code,
 			String script,
 			ActionRequest request,
 			ApiActionResponse response,
-			ReactionTaskFacade task,
-			ReactionAssetFacade asset,
+			TaskFacade task,
+			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
-				.with(request)
-				.with(response)
-				.with(asset)
-				.with(task)
-				.with(job)
-				.build(ReactionScriptCode.FINAL)
+		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(
+				ApiActionScriptBindingBuilder.class)
+			.with(request)
+			.with(response)
+			.with(asset)
+			.with(task)
+			.with(job)
+			.build(code)
 
 		def result = new GroovyShell(this.class.classLoader, scriptBinding)
 				.evaluate(script, ApiActionScriptBinding.class.name)
@@ -456,8 +557,8 @@ class ApiActionService implements ServiceMethods {
 			String script,
 			ActionRequest request,
 			ApiActionResponse response,
-			ReactionTaskFacade task,
-			ReactionAssetFacade asset,
+			TaskFacade task,
+			AssetFacade asset,
 			ApiActionJob job) {
 
 		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
@@ -466,7 +567,7 @@ class ApiActionService implements ServiceMethods {
 				.with(asset)
 				.with(task)
 				.with(job)
-				.build(ReactionScriptCode.FINAL)
+				.build(code)
 
 		List<Map<String, ?>> errors = []
 
@@ -517,8 +618,8 @@ class ApiActionService implements ServiceMethods {
 						scriptBindingCommand.script,
 						new ActionRequest(),
 						new ApiActionResponse(),
-						new ReactionTaskFacade(),
-						new ReactionAssetFacade(),
+						new TaskFacade(),
+						new AssetFacade(new AssetEntity(), [:], true),
 						new ApiActionJob()
 				)
 
@@ -537,6 +638,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param code
 	 * @param result
 	 */
+	@Transactional(noRollbackFor = [Exception])
 	private void checkEvaluationScriptResult(ReactionScriptCode code, result) {
 		if (code == ReactionScriptCode.STATUS && !(result instanceof ReactionScriptCode)) {
 			throw new ApiActionException(i18nMessage(Message.ApiActionMustReturnResults,
@@ -552,19 +654,49 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
-		List<String> properties = null
-		if (minimalInfo) {
-			properties = ["id", "name"]
-		}
 
+		// Load just the minimal or all by setting properties to null
+		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
 
 		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
 		if (!minimalInfo) {
 			AbstractAgent agent = agentInstanceForAction(apiAction)
-			apiActionMap["agentClass"] = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.version = apiAction.version
 		}
 
 		return apiActionMap
+	}
+
+	/**
+	 * Add task error message through the task facade
+	 * @param taskFacade - the task facade wrapper
+	 * @param reactionScriptCode - the reaction script code generating the message
+	 * @param apiActionException - the API Exception
+	 */
+	private void addTaskScriptInvocationError(TaskFacade taskFacade, ReactionScriptCode reactionScriptCode, ApiActionException apiActionException) {
+		taskFacade.error(String.format('%s script failure: %s', reactionScriptCode, apiActionException.message))
+	}
+
+	/**
+	 * Performs some additional checks before the save occurs that includes:
+	 *    - validate that the name for the credential being created or updated doesn't already exist
+	 * If the validations fail then the InvalidParamException exception is thrown with an appropriate message.
+	 * @throws InvalidParamException
+	 */
+	private void validateBeforeSave(Project project, Long id, Object cmdObj) {
+		// Make sure that name is unique
+		int count = ApiAction.where {
+			project == project
+			name == cmdObj.name
+			if (id) {
+				id != id
+			}
+		}.count()
+
+		if (count > 0) {
+			throw new InvalidParamException('An ApiAction with the same name already exists')
+		}
 	}
 }

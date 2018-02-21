@@ -37,7 +37,7 @@ export class APIActionColumnModel {
 				type: 'boolean',
 				width: 100
 			}, {
-				label: 'Default Data Script',
+				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
 				type: 'text'
 			}, {
@@ -70,29 +70,24 @@ export class APIActionParameterColumnModel {
 				locked: true
 			}, {
 				label: 'Name',
-				property: 'name',
+				property: 'param',
 				type: 'text',
-				width: 180
-			}, {
-				label: 'Data Type',
-				property: 'dataType',
-				type: 'text',
-				width: 110
+				width: 210
 			}, {
 				label: 'Context',
 				property: 'context.value',
 				type: 'text',
-				width: 140
+				width: 160
 			}, {
-				label: 'value',
+				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 240
+				width: 265
 			}, {
 				label: 'Description',
-				property: 'description',
+				property: 'desc',
 				type: 'text',
-				width: 277
+				width: 310
 			}
 		];
 	}
@@ -224,19 +219,13 @@ export class EventReaction {
 }
 
 export class APIActionParameterModel {
-	id?: number;
-	name?: string;
-	description?: string;
-	dataType?: string;
-	context?: ParameterContextModel;
+	param?: string;
+	desc?: string;
+	type?: string;
+	context?: string;
+	property?: string;
 	value?: string;
-	field?: string;
 	currentFieldList?: Array<any>;
-}
-
-export class ParameterContextModel {
-	assetClass?: string;
-	value?: string;
 }
 
 export enum EventReactionType {

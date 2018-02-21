@@ -43,6 +43,7 @@ grails.project.dependency.resolution = {
 		runtime 'org.apache.commons:commons-lang3:3.1'
 
 		runtime "org.apache.camel:camel-aws:${camelVersion}"
+		runtime "org.apache.camel:camel-http4:${camelVersion}"
 
 		// CSV Parser - https://github.com/xlson/groovycsv
 		runtime 'com.xlson.groovycsv:groovycsv:1.2'

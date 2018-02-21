@@ -8,7 +8,6 @@ import groovy.time.TimeDuration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-
 /**
  * Handles the logic for holding the status of async tasks
  *
@@ -230,5 +229,37 @@ class ProgressService implements ServiceMethods {
 			}
 		})
 		return [key: key]
+	}
+
+	/**
+	 * Given a Quartz Job key, this method will try to locate and interrupt
+	 * the corresponding job, updating also the progress info cache.
+	 * 
+	 * Bear in mind that, in order to be interrupted, jobs must implements
+	 * the InterruptableJob interface.
+	 * @param jobKey
+	 */
+	void interruptJob(String jobKey) {
+
+		throw new RuntimeException("Need to review implementation before this will work.")
+
+		/* Although we still need to define what needs to be done here, I'm commenting out my first approach,
+		in case that in comes in handy in the future.
+		 */
+
+		/*// Check the key corresponds to a scheduled job
+		if (progressInfo.get(jobKey)) {
+			 Scheduler scheduler = new StdSchedulerFactory().getScheduler()
+			try {
+				boolean stopped = scheduler.interrupt(jobKey)
+				// If the job was successfully stopped, update the progress info for this job.
+				if (stopped) {
+					fail(jobKey)
+				}
+			} catch (UnableToInterruptJobException e) {
+				// Throw an exception that ControllerMethods can handle.
+				throw new RuntimeException(Message.ProgressInfoUnableToStopRunningJob)
+			}
+		}*/
 	}
 }

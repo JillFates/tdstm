@@ -6,49 +6,39 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ProjectService
-import net.transitionmanager.service.SecurityService
 
 /**
- * Handles WS calls of the ProjectsService.
- *
- * @author Diego Scarpa <diego.scarpa@bairesdev.com>
+ * Handles WS calls of the ProjectsService
  */
 @Secured('isAuthenticated()')
-@Slf4j(value='logger', category='grails.app.controllers.WsProjectController')
+@Slf4j
 class WsProjectController implements ControllerMethods {
 
 	ProjectService projectService
-	SecurityService securityService
 
 	/**
 	 * Gets the projects associated to a user
 	 */
 	def userProjects() {
-
 		def projectStatus = ProjectStatus.valueOfParam(params.status) ?: ProjectStatus.ANY
-
-		def searchParams = [:]
-		searchParams.maxRows = params.maxRows
-		searchParams.currentPage = params.currentPage
-		searchParams.sortOn = ProjectSortProperty.valueOfParam(params.sortOn)
-		searchParams.sortOrder = SortOrder.valueOfParam(params.sortOrder)
-
-		try {
-			def projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
-			def dataMap = [:]
-			def results = []
-			projects.each { project ->
-				results.add(name: project.name, description: project.description, clientId: project.client.id,
-				            id: project.id, projectCode: project.projectCode, status: project.getStatus(),
-				            clientName: project.client.name, completionDate: project.completionDate)
-			}
-
-			dataMap.projects = results
-
-			renderSuccessJson(dataMap)
+		// TODO : JPM 2/2018 : This should be a Command Object
+		Map searchParams = [
+			maxRows: params.maxRows,
+			currentPage: params.currentPage,
+			sortOn: ProjectSortProperty.valueOfParam(params.sortOn),
+			sortOrder: SortOrder.valueOfParam(params.sortOrder)
+		]
+		def projects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
+		Map dataMap = [:]
+		List results = []
+		projects.each { project ->
+			results.add(name: project.name, description: project.description, clientId: project.client.id,
+				id: project.id, projectCode: project.projectCode, status: project.getStatus(),
+				clientName: project.client.name, completionDate: project.completionDate)
 		}
-		catch (e) {
-			handleException e, logger
-		}
+
+		dataMap.projects = results
+
+		renderSuccessJson(dataMap)
 	}
 }

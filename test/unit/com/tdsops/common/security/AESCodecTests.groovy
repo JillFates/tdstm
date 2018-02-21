@@ -10,97 +10,92 @@ class AESCodecTests extends Specification {
 	 * Tests that after encode and decode a value the result is the same
 	 */
 	void testEncodeDecode() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
-		def decodedValue = AESCodec.decode(encodedValue)
-
-		//Value encoded and decode should be equal
-		then:
-		// Keeps equal to original
-		value == decodedValue
+		when: 'Encoding and decoding a value'
+			def value = "testvalue"
+			def salt = AESCodec.instance.generateRandomSalt()
+			def encodedValue = AESCodec.instance.encode(value, salt)
+			def decodedValue = AESCodec.instance.decode(encodedValue, salt)
+		then: 'Value encoded and decode should be equal'
+			value == decodedValue
 	}
 
 	/*
 	 * Tests that after encode a value the new string is not empty
 	 */
 	void testEncodedNotEmpty() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
-
-		//Value encoded should not be empty
-		then:
-		// Encoded value not empty
-		encodedValue
+		when: 'Encoding a value'
+			def value = "testvalue"
+			def salt = AESCodec.instance.generateRandomSalt()
+			def encodedValue = AESCodec.instance.encode(value, salt)
+		then: 'Value encoded should not be empty'
+			encodedValue
 	}
 
 	/*
 	 * Tests that the encoded value is not equals that original
 	 */
 	void testEncodedNotEquals() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value)
-
-		//Value encoded and value should not be equal
-		then:
-		// Encoded value not equals to original
-		value != encodedValue
+		when: 'Encoding a value'
+			def value = "testvalue"
+			def salt = AESCodec.instance.generateRandomSalt()
+			def encodedValue = AESCodec.instance.encode(value, salt)
+		then: 'Value encoded and value should not be equal'
+			value != encodedValue
 	}
 
 	/*
 	 * Tests that after encode and decode a value the result is the same, using a custom salt
 	 */
 	void testEncodeDecodeCustomSalt() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
-		def decodedValue = AESCodec.decode(encodedValue, "1234")
-
-		//Value encoded and decode should be equal
-		then:
-		// Keeps equal to original
-		value == decodedValue
+		when: 'Encoding a value using custom salt'
+			def value = "testvalue"
+			def encodedValue = AESCodec.instance.encode(value, "1234")
+			def decodedValue = AESCodec.instance.decode(encodedValue, "1234")
+		then: 'Value encoded and decode should be equal'
+			value == decodedValue
 	}
 
 	/*
 	 * Tests that after encode a value the new string is not empty, using a custom salt
 	 */
 	void testEncodedNotEmptyCustomSalt() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
-
-		//Value encoded should not be empty
-		then:
-		// Encoded value not empty
-		encodedValue
-	}
-
-	/*
-	 * Tests that the encoded value is not equals that original, using a custom salt
-	 */
-	void testEncodedNotEqualsCustomSalt() {
-		when:
-		def value = "testvalue"
-		def encodedValue = AESCodec.encode(value, "1234")
-
-		//Value encoded and value should not be equal
-		then:
-		// Encoded value not equals to original
-		value != encodedValue
+		when: 'Encoding a value using custom salt'
+			def value = "testvalue"
+			def encodedValue = AESCodec.instance.encode(value, "1234")
+		then: 'Value encoded should not be empty'
+			encodedValue
+		and: 'Value encoded and original value should not be equal'
+			value != encodedValue
 	}
 
 	/*
 	 * Tests that decoding is not possible if the salt is not equal
 	 */
 	void testEncodeDecodeInvalid() {
-		when:
-		def encodedValue = AESCodec.encode("testvalue", "1234")
-		AESCodec.decode(encodedValue, "4321")
-
-		then:
-		thrown GeneralSecurityException
+		when: 'Encoding a value and when decoding using a wrong or invalid salt'
+			def encodedValue = AESCodec.instance.encode("testvalue", "1234")
+			AESCodec.instance.decode(encodedValue, "4321")
+		then: 'A general security exception is thrown'
+			GeneralSecurityException e = thrown()
+			e.message ==~ /^Given final block not properly padded.*$/
 	}
+
+	/**
+	 * Tests that encoding the same value multiple times generates always different encoded values
+	 */
+	void testEncodingValueUsingTheSameSaltDoesNotGenerateTheSameOutputUsingChainingBlockCipher() {
+		when: 'Encoding the same value twice'
+			def value = "testvalue"
+			def salt = AESCodec.instance.generateRandomSalt()
+			def firstEncodedValue = AESCodec.instance.encode(value, salt)
+			def secondEncodedValue = AESCodec.instance.encode(value, salt)
+		then: 'The resultant encoded values are not the same'
+			firstEncodedValue != secondEncodedValue
+		and: 'Decoding encrypted values'
+			def firstDecodedValue = AESCodec.instance.decode(firstEncodedValue, salt)
+			def secondDecodedValue = AESCodec.instance.decode(secondEncodedValue, salt)
+		then: 'The values must be the same'
+			firstDecodedValue == secondDecodedValue
+	}
+
 }

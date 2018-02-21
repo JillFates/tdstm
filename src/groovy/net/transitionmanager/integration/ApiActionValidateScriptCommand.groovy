@@ -7,7 +7,7 @@ import net.transitionmanager.command.CommandObject
  * API action command object for /ws/apiAction/validateSyntax request.
  * It should be bind with the following JSON content example:
  * <pre>
- {
+ * {
  *		"scripts" : [
  *		{
  *			"code": "EVALUATE",

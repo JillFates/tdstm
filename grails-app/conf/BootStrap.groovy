@@ -1,5 +1,6 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.security.AESCodec
 import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
@@ -62,12 +63,21 @@ class BootStrap {
 
 		Notice.registerObjectMarshaller()
 
-		if (Environment.current == Environment.PRODUCTION) return
+		// Warm up AESCodec
+		AESCodec.getInstance()
+
+		//
+		// NOTHING NEEDED IN PRODUCTION SHOULD BE PLACED BELOW HERE
+		// 
+		if (Environment.current == Environment.PRODUCTION) {
+			return
+		}
 
 		// createInitialData()
 
 		//LOAD TESTS for dev
 		//testMemoryAllocation()
+
 	}
 
 	/**
