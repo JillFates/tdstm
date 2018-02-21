@@ -17,6 +17,7 @@ import { FieldSettingsModule } from '../modules/fieldSettings/field-settings.mod
 import { AssetExplorerModule } from '../modules/assetExplorer/asset-explorer.module';
 import { DataIngestionModule} from '../modules/dataIngestion/data-ingestion.module';
 import { ImportAssetsModule } from '../modules/importAssets/import-assets.module';
+import {DependencyBatchModule} from '../modules/dependencyBatch/dependency-batch.module';
 // Router Logic
 import { UIRouterModule, UIView } from '@uirouter/angular';
 import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './tds-routing.states';
@@ -35,6 +36,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 		AssetExplorerModule,
 		DataIngestionModule,
 		ImportAssetsModule,
+		DependencyBatchModule,
 		// Routing Modules using UI Router
 		UIRouterModule.forRoot(<UIRouterModule>{
 			states: TDSRoutingStates,
@@ -48,7 +50,7 @@ import { TDSRoutingStates, AuthConfig, PermissionConfig, MiscConfig } from './td
 	],
 	declarations: [
 		TDSAppComponent,
-	], // components, directives and pipes ONLY and only ONCE\
+	], // components, directives and pipes ONLY and only ONCE
 	providers: [
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
 	],

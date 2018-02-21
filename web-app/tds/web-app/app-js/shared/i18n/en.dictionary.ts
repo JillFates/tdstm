@@ -104,12 +104,21 @@ export const en_DICTIONARY: Object = {
 			'VIEW_DATA': 'View Data'
 		}
 	},
-	'DEPENDENCY_INJECTION': {
-		'MANUAL_ASSET_IMPORT': 'Manual Asset Import'
+	'DEPENDENCY_BATCH': {
+		'MANAGE_LIST': 'Manage Dependency Batches',
+		'DEPENDENCY_BATCH': 'Dependency Batch',
+		'LIST': {
+			'PENDING_TOOLTIP': 'Queue to be processed',
+			'QUEUED_TOOLTIP': 'Remove from queue',
+			'PROCESSING_TOOLTIP': 'Stop processing',
+			'VIEW_ARCHIVED': 'View Archived',
+			'UNARCHIVE': 'Unarchive'
+		}
 	},
 	'GLOBAL': {
 		'OK': 'Ok',
 		'ADD': 'Add',
+		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
 		'CREATE': 'Create',
 		'CLOSE': 'Close',

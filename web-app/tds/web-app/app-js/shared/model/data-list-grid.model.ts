@@ -16,3 +16,23 @@ export enum ActionType {
 	CREATE,
 	EDIT
 };
+
+export class GridColumnModel {
+	label: string;
+	property: string;
+	type: string;
+	format?: string;
+	width: number;
+	locked: boolean;
+	filter?: any;
+	headerStyle?: any;
+	headerClass?: Array<string>;
+	cellStyle?: any;
+	cellClass?: string|Array<string>;
+
+	constructor() {
+		this.type = 'text';
+		this.width = COLUMN_MIN_WIDTH;
+		this.locked = true;
+	}
+}
