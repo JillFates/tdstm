@@ -87,9 +87,11 @@
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tooltipDataPlacement="bottom"/>
 		</tr>
 		<tr>
-			<td class='label url N'>URL</td>
-			<td class="url-field">
-				<tds:textAsLink  text="${asset.url}" target="_new"/>
+			<tds:inputLabel field="${standardFieldSpecs.url}" />
+			<td class="${standardFieldSpecs.url.imp}" >
+				<tds:tooltipSpan field="${standardFieldSpecs.url}" tooltipDataPlacement="bottom" class="url-field">
+				  <tds:textAsLink  text="${asset.url}" target="_new"/>
+				</tds:tooltipSpan>
 			</td>
 
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"/>
