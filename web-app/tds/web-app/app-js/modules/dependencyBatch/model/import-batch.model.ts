@@ -29,8 +29,13 @@ export class ImportBatchModel {
 	pending: number;
 	processed: number;
 	ignored: number;
+	currentProgress?: number;
 }
 
+/**
+ * Configuration of the Import Batches Grid.
+ * Defines the columns.
+ */
 export class DependencyBatchColumnsModel {
 	columns: Array<GridColumnModel>;
 

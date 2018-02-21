@@ -153,21 +153,4 @@ export class DependencyBatchService {
 			})
 			.catch((error: any) => error.json());
 	}
-
-	startBatch(batchId: number): Observable<any> {
-		// The endpoint /ws/import/process/$ID will be called
-		let mockResult = {};
-		if ( !this.mockRunningBatchFlag ) {
-			mockResult = { status: 'success', data: {} };
-			this.mockRunningBatchFlag = true;
-		} else {
-			mockResult = { status: 'error', error: 'Another batch is already running ...' };
-		}
-		return Observable.of( mockResult );
-	}
-
-	stopBatch(batchId: number): Observable<any> {
-		this.mockRunningBatchFlag = false;
-		return Observable.of( { status: 'success', data: {}} );
-	}
 }

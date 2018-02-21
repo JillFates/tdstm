@@ -1,3 +1,7 @@
+<style>
+
+</style>
+
 <!-- Main content -->
 <div class="content body default-list-component dependency-batch-list-component">
     <section>
@@ -75,7 +79,7 @@
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
                                                name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
                                                (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])"
-                                               [disabled]="dataItem.status === 'PROCESSING'">
+                                               [disabled]="dataItem.status === 'RUNNING'">
                                     </label>
                                 </div>
                             </ng-template>
@@ -99,8 +103,14 @@
                             <ng-template kendoGridHeaderTemplate>
                                 <label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
                             </ng-template>
+
                             <!--
-                                Cell Template
+                                Cell Templates
+                            -->
+                            <!-- TODO: fix issue with the date format not working :(
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
+                                {{dataItem[column.property] | date: 'yyyy-mm-dd'}}
+                            </ng-template>
                             -->
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
@@ -111,7 +121,7 @@
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status === 'PROCESSING'"
+                                    <button *ngIf="dataItem.status === 'RUNNING'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
@@ -125,14 +135,19 @@
                             </ng-template>
                             <!-- Status -->
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-                                <div [ngClass]="{ 'status-with-errors' : dataItem.errors > 0 }">
-                                    {{ dataItem.status }}
-                                </div>
-                                <div *ngIf="dataItem.status === 'Processing'">
+                                <div *ngIf="dataItem.status !== 'RUNNING'; then statusTemplate else statusProgressTemplate;"></div>
+                                <ng-template #statusTemplate>
+                                     <div [ngClass]="{ 'status-with-errors' : dataItem.errors > 0 }" class="status-text">
+                                        {{ dataItem.status }}
+                                     </div>
+                                </ng-template>
+                                <ng-template #statusProgressTemplate>
                                     <div class="progress" style="margin-bottom: 0px;">
-                                        <div class="progress-bar" role="progressbar" style="width: 50%">50%</div>
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
+                                            {{dataItem.currentProgress}}%
+                                        </div>
                                     </div>
-                                </div>
+                                </ng-template>
                             </ng-template>
                             <!--
                                 Filter Template

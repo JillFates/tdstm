@@ -9,6 +9,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
+import {Observable} from 'rxjs/Observable';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -67,9 +68,20 @@ export class DependencyBatchListComponent {
 		let promise = new Promise((resolve, reject) => {
 			this.dependencyBatchService.getImportBatches().subscribe( (result) => {
 				if (result.status === 'success') {
-					let batches = result.data.filter( item => {
+					let batches: Array<ImportBatchModel> = result.data.filter( item => {
 						return !item.archived;
 					});
+					for (let batch of batches ) {
+						if (batch.status === 'RUNNING') {
+							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe(res => {
+								if (res.data.percentComp) {
+									batch.currentProgress =  res.data.percentComp;
+								} else {
+									batch.currentProgress = 80;
+								}
+							}, error => console.log(error));
+						}
+					}
 					resolve(batches);
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -191,35 +203,21 @@ export class DependencyBatchListComponent {
 	 * @param item
 	 */
 	private onPlayButton(item: any): void {
-		this.dependencyBatchService.startBatch(item.id).subscribe( (result) => {
-			if (result.status === 'success') {
-				let batchFound = this.dataGridOperationsHelper.resultSet.find( batch => {
-					return batch.id === item.id;
-				});
-				batchFound.status = 'Processing';
-			} else {
-				this.notifierService.broadcast({
-					name: AlertType.DANGER,
-					message: result.error
-				});
-				console.log(result.error);
-			}
-		});
+		// Not yet implemented ..
 	}
 
 	/**
 	 * On Stop action button clicked, stop import batch.
 	 * @param item
 	 */
-	private onStopButton(item: any): void {
-		this.dependencyBatchService.stopBatch(item.id).subscribe( (result) => {
+	private onStopButton(batch: ImportBatchModel): void {
+		this.dependencyBatchService.stopImportBatch(batch.id).subscribe( (result) => {
 			if (result.status === 'success') {
-				let batchFound = this.dataGridOperationsHelper.resultSet.find( batch => {
-					return batch.id === item.id;
-				});
-				batchFound.status = 'Pending';
+				this.reloadBatchList();
+			} else {
+				this.handleError(result.errors ? result.errors[0] : null);
 			}
-		});
+		}, error => this.handleError(error));
 	}
 
 	/**
