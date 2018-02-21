@@ -810,9 +810,9 @@ class UrlMappings {
 		"/ws/credential/$id" {
 			controller = "wsCredential"
 			action = [
-				GET: "getCredential",
-				PUT: "updateCredential",
-				DELETE: "deleteCredential"
+				GET: "fetch",
+				PUT: "update",
+				DELETE: "delete"
 			]
 		}
 
@@ -820,14 +820,14 @@ class UrlMappings {
 			controller = "wsCredential"
 			action = [
 				GET: "list",
-				POST: "createCredential"
+				POST: "create"
 			]
 		}
 
 		"/ws/credential/enums" {
 			controller = "wsCredential"
 			action = [
-				GET: "credentialEnums"
+				GET: "enums"
 			]
 		}
 

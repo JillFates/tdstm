@@ -7,7 +7,7 @@ enum AuthenticationMethod {
 	BASIC_AUTH('Basic Auth'),
 	COOKIE('Cookie Session'),
 	HEADER('Header Session'),
-	JWT ('JSON Web Tokens')
+	JWT('JSON Web Tokens')
 	// Not yet implemented
 	// AWS ('Amazon AWS Security')
 	// OAUTH ('OAuth')

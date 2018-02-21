@@ -13,7 +13,7 @@ import net.transitionmanager.domain.Provider
  * Command object to handle credential form data binding upon creation
  */
 @Validateable
-class CredentialCreateCO implements CommandObject {
+class CredentialCommand implements CommandObject {
     Provider provider
     String name
     String description = ''
@@ -27,13 +27,6 @@ class CredentialCreateCO implements CommandObject {
     String authenticationUrl=''
     String terminateUrl=''
     String renewTokenUrl = ''
-    String sessionName
-
-    static constraints = {
-        importFrom Credential, include: [
-                'name',
-                'renewTokenUrl',
-                'terminateUrl'
-        ]
-    }
+    String sessionName=''
+    Long version=0
 }

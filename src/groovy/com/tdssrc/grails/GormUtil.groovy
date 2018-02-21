@@ -1017,29 +1017,29 @@ public class GormUtil {
 					// fetch the instance
 					instance = type.get(id)
 					if (!instance) {
-						errorMsg = "The domain object with type $type couldn't be found using the id $id"
+						errorMsg = "The record $type not found for id $id"
 					}
 				// Most likely and invalid type was given. Using a generic Exception to not tie it to a particular Hibernate implementation.
 				} catch(Exception e) {
-					errorMsg = "The domain object with type $type couldn't be found using the id $id"
+					errorMsg = "The record $type not found for id $id"
 				}
 
 				// Make sure the domain class has a 'project' field.
 				if (instance && isDomainProperty(instance, 'project')) {
 					// Validate the projects' id match.
 					if (project.id != instance.project.id) {
-						errorMsg = "The domain object with type $type and id $id doesn't belong to project ${project.name}."
+						errorMsg = "The record $type for id $id not associated to project ${project.name}"
 					}
 				}
 			} else {
-				errorMsg = "$type is not a domain class."
+				errorMsg = "$type is not a domain class"
 			}
 		} else {
-			errorMsg = "findInProject requires a project, a domain class and an id."
+			errorMsg = "findInProject() requires a project, a domain class and an id"
 		}
 
 		if (errorMsg) {
-			logger.error(errorMsg)
+			logger.info(errorMsg)
 			if (throwException) {
 				throw new EmptyResultException(errorMsg)
 			} else {

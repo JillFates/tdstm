@@ -45,4 +45,13 @@ databaseChangeLog = {
         """)
     }
 
+	changeSet(author: "jmartin", id: "TM-9406-03") {
+		comment('Change Credential httpMethod and requestMode to be NULLABLE')
+		sql ("""
+                ALTER TABLE `credential` 
+                    CHANGE `http_method` `http_method` VARCHAR(16),
+                    CHANGE `request_mode` `request_mode` VARCHAR(16);
+        """)
+    }
+
 }
