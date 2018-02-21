@@ -35,6 +35,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Unrecognized command $method with args $args".toString())
     }
 
+    static ETLProcessorException methodMissingInFindCommand (String method, args) {
+        new ETLProcessorException("Unrecognized command $method with args $args for the find / elseFind command".toString())
+    }
+
     static ETLProcessorException parameterMissing (String parameter) {
         new ETLProcessorException("Unrecognized command $parameter".toString())
     }

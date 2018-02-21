@@ -177,7 +177,7 @@ class ScriptProcessorServiceSpec extends Specification {
                     extract 'application id' load id
                     extract 'vendor name' load Vendor
                     set environment with Production
-                    find Application 'for' id by id with DOMAIN.id
+                    find Application of id by id with DOMAIN.id
                 }
             """.stripIndent()
 
