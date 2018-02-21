@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdsops.common.security.AESCodec
 import com.tdsops.common.security.SecurityUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
@@ -15,6 +16,7 @@ import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.ProjectRequiredException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+
 
 @Transactional
 @Slf4j
@@ -130,7 +132,7 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map doJWTTokenAuthentication(Credential credential) {
-        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: credential.getPassword()])
+        String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: decryptPassword(credential)])
         RestBuilder rest = new RestBuilder()
         def resp = rest.post(credential.getAuthenticationUrl()) {
             header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -188,17 +190,31 @@ class CredentialService implements ServiceMethods {
     }
 
     /** 
-     * Used to encrypt the password when the password has a value
+     * Used to encrypt the password when the password has a value. Passwords have a limit of 60 characters
+     * due to the encoded value is 2.5x bigger. 
      * @param credential - the domain instance to set the password on
      * @param password - the cleartext password to encrypt
+     * @throws InvalidParamException if password is more than 60 characters
      */
     private void setEncryptedPassword(Credential credential, String password) {
-        // If a password was provided in the request then save the new password encrypted with a new salt
-        if (password?.trim().size() > 0) {
-            // TODO - switch out calls to AESCodec when ready
-            credential.salt = 'lsdklkajsdfljasd'
-            credential.password = password.reverse()
+        int size = (password ? password.trim().size() : 0)
+        if (size > 60) {
+            throw new InvalidParamException('Passwords have a limit of 60 characters')
         }
+        if ( size > 0) {
+            // If the request has a password then a new salt will be created and used to encode the password
+            credential.salt = AESCodec.instance.generateRandomSalt().substring(0,16)
+            credential.password = AESCodec.instance.encode(password, credential.salt)
+        }
+    }
+
+    /**
+     * Used to decrypt a password from a Credential record
+     * @param credential - a Credential object with a password to be decrypted
+     * @return the unencrypted password
+     */ 
+    String decryptPassword(Credential credential) {
+        return AESCodec.instance.decode(credential.password, credential.salt)
     }
 
     /**
@@ -236,17 +252,15 @@ class CredentialService implements ServiceMethods {
         if (cmdObj.provider.project) {
             providerProjectId = cmdObj.provider.project.id
         } else {
-            // id = Provider.executeQuery('select p.project.id from Provider p where p.id = :id', [id: ])[0]
-
             List ids = Provider.where { id == cmdObj.provider.id }
                 .projections { property('project.id')}
                 .list()
             if (ids) {
-                id = ids[0]
+                providerProjectId = ids[0]
             }
 
         }
-        if (id == 0 || id != project.id) {
+        if (providerProjectId == 0 || providerProjectId != project.id) {
             throw new InvalidParamException('Invalid Provider specified')
         }
 
