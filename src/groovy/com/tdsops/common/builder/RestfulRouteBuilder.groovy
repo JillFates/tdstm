@@ -23,7 +23,7 @@ class RestfulRouteBuilder extends RouteBuilder {
     private static final String HTTP_PROTOCOL_REPLACE_REGEX = '(?i)(https:|http:)'
     private static final String CAMEL_HTTP4_PROTOCOL = 'http4:'
 
-    private CredentialService credentialService
+    CredentialService credentialService
 
     @Override
     void configure() throws Exception {
