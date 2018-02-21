@@ -1,9 +1,11 @@
 package com.tdsops.common.builder
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.service.CredentialService
 import org.apache.camel.Exchange
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.RouteDefinition
@@ -19,6 +21,9 @@ class RestfulRouteBuilder extends RouteBuilder {
     private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
     private static final String HTTP_PROTOCOL_REPLACE_REGEX = '(?i)(https:|http:)'
     private static final String CAMEL_HTTP4_PROTOCOL = 'http4:'
+
+	@Lazy
+	private static CredentialService credentialService = { -> ApplicationContextHolder.getBean('credentialService', CredentialService) }()
 
     @Override
     void configure() throws Exception {
@@ -111,10 +116,13 @@ class RestfulRouteBuilder extends RouteBuilder {
         if (actionRequest.param.credentials) {
             Map<String, ?> credentials = actionRequest.param.credentials
             if (credentials.status == CredentialStatus.ACTIVE.name()) {
-                // if basic auth
-                if (credentials.method == AuthenticationMethod.HTTP_BASIC.name()) {
-                    builder.addParameter('authUsername', credentials.accessKey)
-                    builder.addParameter('authPassword', credentials.password)
+                switch credentials.method {
+                    case AuthenticationMethod.BASIC_AUTH.name():
+                        builder.addParameter('authUsername', credentials.username)
+                        builder.addParameter( 'authPassword', credentialService.decryptPassword(credentials) )
+                        break;
+                    default:
+                        throw new RuntimeException("Authentication method ${credentials.method} has not been implemented in RestfulRouteBuilder")
                 }
             }
         }
