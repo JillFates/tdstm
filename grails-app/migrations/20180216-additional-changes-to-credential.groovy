@@ -54,4 +54,11 @@ databaseChangeLog = {
         """)
     }
 
+	changeSet(author: "ecantu", id: "TM-9454-01") {
+		comment('Change Credential default request_mode to BASIC_AUTH')
+		sql ("""
+                UPDATE `credential` SET `request_mode` = 'BASIC_AUTH' WHERE `request_mode` IS NULL or `request_mode` = '';
+        """)
+	}
+
 }
