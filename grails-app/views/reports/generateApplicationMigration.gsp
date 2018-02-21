@@ -31,7 +31,7 @@
 </script>
 </head>
 <body>
-	<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Event Results']"/>
+	<tds:subHeader title="Application Event Results" crumbs="['Reports', 'Application Event Results']"/>
 	<div class="body" style="width:1000px;" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>${project.name} : ${moveBundle}</b><br/>

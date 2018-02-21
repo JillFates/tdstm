@@ -9,7 +9,7 @@
 <g:javascript src="report.js"/>
 </head>
 <body>
-<tds:subHeader title="Application Migration Results" crumbs="['Reports', 'Application Event Results']"/>
+<tds:subHeader title="Application Event Results" crumbs="['Reports', 'Application Event Results']"/>
 	<div class="body">
 		
 		<g:if test="${flash.message}">
