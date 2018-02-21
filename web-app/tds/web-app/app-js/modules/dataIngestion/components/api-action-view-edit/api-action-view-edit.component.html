@@ -413,7 +413,7 @@
 										</div>
 									</div>
 									<div class="all-codemirrors">
-										<div class="col-md-12 codemirror-wrapper">
+										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[0].selected">
 											<div class="form-group">
 												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">logic to determine the Success or other status based on API response.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
