@@ -103,9 +103,18 @@ export class HttpInterceptor extends Http {
 		}
 		return observable.catch((error, source) => {
 
+			let errorMessage = error.message;
+
+			// TODO: For Angular 5, Found a way to inject Translate Pipe or move this outside the interceptor
+			if (error && error.status === 404) {
+				errorMessage = 'The requested resource was not found';
+			} else {
+				errorMessage = 'Bad Request';
+			}
+
 			this.notifierService.broadcast({
 				name: AlertType.DANGER,
-				message: error.message
+				message: errorMessage
 			});
 
 			if (error.status === 401) {
