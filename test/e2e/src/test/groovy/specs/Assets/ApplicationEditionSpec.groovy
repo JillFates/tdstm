@@ -2,8 +2,8 @@ package specs.Assets
 
 import geb.spock.GebReportingSpec
 import jodd.util.RandomString
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import pages.Assets.ApplicationCreationPage
 import pages.Assets.ApplicationDetailsPage
 import pages.Assets.ApplicationEditionPage

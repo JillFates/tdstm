@@ -6,8 +6,8 @@ import pages.TaskManager.TaskCreationPage
 import pages.TaskManager.TaskDetailsPage
 import pages.TaskManager.TaskEditionPage
 import pages.TaskManager.TaskManagerPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise

@@ -7,8 +7,8 @@ import pages.Cookbook.TabHistoryTabActionsPage
 import pages.Cookbook.TabHistoryTabGenLogPage
 import pages.Cookbook.TabHistoryTabTasksPage
 import pages.Cookbook.TaskDetailsPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise

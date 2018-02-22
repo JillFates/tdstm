@@ -7,8 +7,8 @@ import pages.Assets.AssetClonePage
 import pages.Assets.ApplicationCreationPage
 import pages.Assets.ApplicationDetailsPage
 import pages.Assets.ApplicationListPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise

@@ -4,8 +4,8 @@ import geb.spock.GebReportingSpec
 import pages.Cookbook.CookbookPage
 import pages.Cookbook.CreateRecipePage
 import pages.Cookbook.TabEditorPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise

@@ -6,8 +6,8 @@ import pages.Admin.StaffListPage
 import pages.Admin.StaffCreationPage
 import pages.Admin.UserCreationPage
 import pages.Admin.UserDetailsPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -29,10 +29,8 @@ class StaffListSpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
     }
 
     def setup() {

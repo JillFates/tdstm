@@ -1,8 +1,8 @@
-package specs.common
+package specs.Login
 
 import geb.spock.GebReportingSpec
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
