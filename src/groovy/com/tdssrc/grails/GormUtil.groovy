@@ -421,11 +421,31 @@ public class GormUtil {
 	 * @return true if the property exists otherwise false
 	 */
 	static boolean isDomainProperty(Object domainObject, String propertyName) {
-		boolean valid=false
-		if (propertyName && domainObject) {
-			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
-		}
-		return valid
+		return isDomainProperty(domainObject.getClass(), propertyName)
+	}
+
+	/**
+	 * Checks if a property name is a valid domain property.
+	 * It could be part of the persistent property or an indentifier.
+	 * In both cases it returs null. Otherwise it returns false.
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isDomainProperty(Class domainClass, String propertyName) {
+		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
+		return grailsDomainClass.hasPersistentProperty(propertyName) ||
+			grailsDomainClass.identifier.name == propertyName
+	}
+
+	/**
+	 * Creates an instance of Grails domain class
+	 * @param domainClass
+	 * @return a new instance of DefaultGrailsDomainClass
+	 * @see DefaultGrailsDomainClass
+	 */
+	static DefaultGrailsDomainClass grailsDomainClass(Class domainClass) {
+		return new DefaultGrailsDomainClass(domainClass)
 	}
 
 	/**
@@ -434,10 +454,12 @@ public class GormUtil {
 	 * @return true if the object is a Domain class otherwise false
 	 */
 	static boolean isDomainClass(Class domainClass) {
-		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
-		return grailsApp.isDomainClass( domainClass )
+		//def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
+		//return grailsApp.isDomainClass( domainClass )
 //		return grailsApp.isDomainClass( domainObj.getClass() )
 		//org.codehaus.groovy.grails.commons.isDomainClass(domainClass)
+		return DomainClassArtefactHandler.isDomainClass(domainClass)
+
 	}
 
 	/**
