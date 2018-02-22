@@ -136,7 +136,10 @@ class DataImportHelper {
 			String errorMsg = validator(fieldJson, fieldName, params)
 			// If an error is detected, report it back.
 			if (errorMsg) {
+<<<<<<< HEAD
 				// TODO : JPM 2/2018 : errors in validateAsset are lost
+=======
+>>>>>>> 30870273384e1b46643043a873b94c02fd468de2
 				fieldJson.error = errorMsg
 				validAsset = false
 			}
@@ -267,7 +270,10 @@ class DataImportHelper {
 	 * @return
 	 */
 	static Long resolveAssetId(JSONObject assetJson) {
+<<<<<<< HEAD
 		// TODO : JPM 2/2018 : resolveAssetId doesn't appear to be implemented correctly
+=======
+>>>>>>> 30870273384e1b46643043a873b94c02fd468de2
 		Map idField = assetJson.fields[ID_FIELD]
 		Long idValue = null
 		if (idField.containsKey('find')) {
@@ -276,12 +282,19 @@ class DataImportHelper {
 			if (numIds == 1) {
 				idValue = NumberUtil.toPositiveLong(results[0])
 			} else if (numIds > 1) {
+<<<<<<< HEAD
 				// TODO : JPM 2/2018 : what is the point of recording an error when it isn't returned
+=======
+>>>>>>> 30870273384e1b46643043a873b94c02fd468de2
 				idField.error = 'Duplicate asset references'
 			}
 		}
 
 		return idValue
+<<<<<<< HEAD
+=======
+
+>>>>>>> 30870273384e1b46643043a873b94c02fd468de2
 	}
 
 	/**
