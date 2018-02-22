@@ -134,7 +134,12 @@
 
 		</tr>
 		<tr>
-			<tds:showLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}"/>
+			<tds:inputLabel field="${standardFieldSpecs.url}" />
+			<td class="valueNW ${standardFieldSpecs.url.imp}" >
+				<tds:tooltipSpan field="${standardFieldSpecs.url}" tooltipDataPlacement="bottom">
+				  <tds:textAsLink  text="${applicationInstance.url}" target="_new"/>
+				</tds:tooltipSpan>
+			</td>
 
 			<tds:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
 

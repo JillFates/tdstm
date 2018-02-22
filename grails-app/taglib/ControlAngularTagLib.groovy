@@ -6,10 +6,10 @@ import net.transitionmanager.service.InvalidParamException
 import com.tdsops.tm.enums.ControlType
 
 /**
- * This TabLib is a clone of the ControlTagLib. The original lib was used to render the various data elements and input controls for the 
+ * This TabLib is a clone of the ControlTagLib. The original lib was used to render the various data elements and input controls for the
  * asset CRUD forms. This lib was created to support the rendering of the asset CRUD forms that will render the forms as html templates
  * for Angular (e.g. adding ng tags to the templates).
- */ 
+ */
 class ControlAngularTagLib {
 
 	static String namespace = 'tdsAngular'
