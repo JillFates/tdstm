@@ -3,16 +3,17 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
+import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import {HttpResponse} from '@angular/common/http';
+import {StringUtils} from '../../../shared/utils/string.utils';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -144,6 +145,43 @@ export class DataIngestionService {
 			}
 			observer.complete();
 		});
+	}
+
+	/**
+	 * Get Sample Data of a File by passing the FileName to the server
+	 * @param {string} fileName
+	 * @returns {Observable<SampleDataModel>}
+	 */
+	getSampleData(fileName: string): Observable<SampleDataModel> {
+		return this.http.get(`${this.dataScriptUrl}/sampleData/${fileName}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data: any = (result && result.status === 'success' && result.data);
+				let columns: any = [];
+				let sampleDataModel;
+				if (data.config) {
+					for (let property in data.config) {
+						if (data.config.hasOwnProperty(property)) {
+							let column: {
+								label?: string,
+								property: string,
+								type: string,
+								width?: 150
+							} = {
+								label: StringUtils.toCapitalCase(data.config[property].property, true),
+								property: data.config[property].property,
+								type: data.config[property].type,
+								width: 150
+							};
+							columns.push(column);
+						}
+					}
+					console.log(columns);
+					sampleDataModel = new SampleDataModel(columns, data.rows);
+				}
+				return sampleDataModel;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {

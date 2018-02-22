@@ -151,12 +151,22 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
 			.then((filename) => {
 				this.filename = filename;
+				this.extractSampleDataFromFile();
 			})
 			.catch((err) => {
 				console.log('SampleDataDialog error occurred..');
 				if (err) {
 					console.log(err);
 				}
+		});
+	}
+
+	/**
+	 * Call API and get the Sample Data based on the FileName already Uploaded
+	 */
+	private extractSampleDataFromFile() {
+		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
+			console.log(result);
 		});
 	}
 

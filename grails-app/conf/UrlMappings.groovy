@@ -686,7 +686,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataScript/sampleData" {
+		"/ws/dataScript/sampleData/$filename" {
 			controller = "wsDataScript"
 			action = [
 					  GET: "sampleData"

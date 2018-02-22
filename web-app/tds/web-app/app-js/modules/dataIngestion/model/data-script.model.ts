@@ -45,7 +45,7 @@ export class DataScriptColumnModel {
 			}
 		];
 	}
-}
+};
 
 export class DataScriptModel {
 	id?: number;
@@ -78,4 +78,17 @@ export enum ActionType {
 export enum DataScriptMode {
 	IMPORT,
 	EXPORT
-}
+};
+
+/**
+ * Base Class for Reference Purposes
+ * The Model is being retrieved from the Server see: WsDataScriptController.sampleData
+ */
+export class SampleDataModel {
+	columns: any[];
+	data: any[];
+	constructor(columns: any, data: any) {
+		this.columns = columns;
+		this.data = data;
+	}
+};
