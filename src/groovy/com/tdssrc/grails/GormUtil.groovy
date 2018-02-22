@@ -401,13 +401,21 @@ public class GormUtil {
 		getDomainClass(clazz)?.identifier.name == propertyName
 	}
 
+	static boolean isDomainIdentifier(Object domainInstance, String propertyName){
+		getDomainClass(domainInstance.getClass())?.identifier.name == propertyName
+	}
+
 	static boolean hasStringId(Class clazz) {
 		getDomainClass(clazz).identifier.type == String
 	}
 
-	static GrailsDomainClass getDomainClass(Class clazz) {
-		// TODO Assert.isTrue(app.isDomainClass(clazz))
-		(GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, clazz.name)
+	/**
+	 *
+	 * @param domainClass
+	 * @return
+	 */
+	static GrailsDomainClass getDomainClass(Class domainClass) {
+		return new DefaultGrailsDomainClass(domainClass)
 	}
 
 	private static GrailsApplication getGrailsApplication() {
@@ -433,30 +441,9 @@ public class GormUtil {
 	 * @return
 	 */
 	static boolean isDomainProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
+		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
 		return grailsDomainClass.hasPersistentProperty(propertyName) ||
 			grailsDomainClass.identifier.name == propertyName
-	}
-
-	/**
-	 * Returns an instance of GrailsDomainClassProperty
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	static GrailsDomainClassProperty getGrailsDomainClassProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
-		return grailsDomainClass.getPropertyByName(propertyName)
-	}
-
-	/**
-	 * Creates an instance of Grails domain class
-	 * @param domainClass
-	 * @return a new instance of DefaultGrailsDomainClass
-	 * @see DefaultGrailsDomainClass
-	 */
-	static DefaultGrailsDomainClass grailsDomainClass(Class domainClass) {
-		return new DefaultGrailsDomainClass(domainClass)
 	}
 
 	/**
@@ -508,10 +495,8 @@ public class GormUtil {
 			println "getDomainProperty() domainClass=${domainClass.getName()}"
 			throw new RuntimeException('Called with non-domain class parameter')
 		}
-
 		def d = new DefaultGrailsDomainClass(domainClass)
 		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
-
 		return cp
 	}
 
