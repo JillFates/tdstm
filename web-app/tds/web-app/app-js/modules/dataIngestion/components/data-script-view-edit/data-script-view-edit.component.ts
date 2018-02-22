@@ -94,13 +94,14 @@ export class DataScriptViewEditComponent implements OnInit {
 		this.datasourceName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
-			.filter((term) => term && term.trim())
 			.subscribe(term => {
-					this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel).subscribe(
-						(result: any) => {
-							this.isUnique = result.isUnique;
-						},
-						(err) => console.log(err));
+					if (term && term.trim().length > 0) {
+						this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel).subscribe(
+							(result: any) => {
+								this.isUnique = result.isUnique;
+							},
+							(err) => console.log(err));
+					}
 			});
 	}
 
