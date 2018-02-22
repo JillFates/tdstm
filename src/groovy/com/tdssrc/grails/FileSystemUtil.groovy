@@ -8,8 +8,10 @@ import java.util.regex.Matcher
 @Slf4j
 class FileSystemUtil {
 
-    /** These are the accepted file extensions when uploading ETL files */
-    public static final String[] ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ["csv", "txt", "json", "xls", "xlsx", "xml"]
+    /*
+     * These are the accepted file extensions when uploading ETL files 
+     */
+    public static final String[] ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ['csv', 'json', 'xls', 'xlsx', 'xml']
 
     /**
      * Format a file extension and validate it's among the accepted extensions.
