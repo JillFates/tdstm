@@ -1,4 +1,4 @@
-package pages.common
+package pages.Login
 
 import geb.Page
 import modules.MenuModule

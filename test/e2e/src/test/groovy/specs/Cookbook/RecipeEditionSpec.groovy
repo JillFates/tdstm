@@ -6,8 +6,8 @@ import pages.Cookbook.CreateRecipePage
 import pages.Cookbook.EditRecipePage
 import pages.Cookbook.TabEditorPage
 import pages.Cookbook.TabEditorTabSyntaxErrorsPage
-import pages.common.LoginPage
-import pages.common.MenuPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
