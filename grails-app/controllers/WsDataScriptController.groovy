@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.etl.DataScriptSaveScriptCommand
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -52,8 +51,8 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptUpdate)
     def saveScript () {
-        DataScriptSaveScriptCommand co = populateCommandObject(DataScriptSaveScriptCommand)
-        DataScript dataScript = dataScriptService.saveScript(co.id, co.script)
+        Long id = request.JSON.id
+        DataScript dataScript = dataScriptService.saveScript(id, request.JSON.script)
         renderSuccessJson(dataScript: dataScript.toMap())
     }
 

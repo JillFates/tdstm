@@ -72,8 +72,8 @@ class DataScriptService implements ServiceMethods{
 
     /**
      * Updates a DataScript instance with a scriptContent String instance
-     * @param dataScript an instance of DataScript already saved in database
-     * @param scriptContent the new ETL Script content to be saved in DataScript instance
+     * @param id - the ID of the DataScript to save the script to
+     * @param scriptContent - the new ETL Script content to be saved in DataScript instance
      * @return the DataScript instance with the etlSourceCode already updated in database
      */
     DataScript saveScript (Long id, String scriptContent) {
