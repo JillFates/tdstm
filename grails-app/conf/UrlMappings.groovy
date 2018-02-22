@@ -652,7 +652,7 @@ class UrlMappings {
 		"/ws/dataingestion/datascript/list" {
 			controller = "wsDataScript"
 			action = [
-			        GET: "getDataScripts"
+			        GET: "list"
 			]
 		}
 
@@ -716,6 +716,9 @@ class UrlMappings {
 			]
 		}
 
+		//
+		// ApiAction
+		//
 		"/ws/apiAction/agent" {
 			controller = "wsApiAction"
 			action = [
@@ -737,6 +740,9 @@ class UrlMappings {
 			]
 		}
 
+		//
+		// DataScript
+		//
 		"/ws/dataScript/testScript" {
 			controller = "wsDataScript"
 			action = [
@@ -754,10 +760,14 @@ class UrlMappings {
 		"/ws/dataScript/saveScript" {
 			controller = "wsDataScript"
 			action = [
+					// TODO : This should be a PUT
 					POST: "saveScript"
 			]
 		}
 
+		//
+		// Filename
+		//
 		"/ws/filename" {
 			controller = "wsAsset"
 			action = [
@@ -765,6 +775,9 @@ class UrlMappings {
 			]
 		}
 
+		//
+		// Import
+		//
 		// List all Import Batches | Bulk Delete Import Batches
 		"/ws/import/batch" {
 			controller = "wsImportBatch"
@@ -815,6 +828,9 @@ class UrlMappings {
 			]
 		}
 
+		//
+		// Credentials
+		//
 		"/ws/credential/$id" {
 			controller = "wsCredential"
 			action = [

@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.etl.DataScriptSaveScriptCommand
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -47,6 +46,17 @@ class WsDataScriptController implements ControllerMethods {
     }
 
     /**
+     * Saves the script to the datascript domain record
+     * @return
+     */
+    @HasPermission(Permission.DataScriptUpdate)
+    def saveScript () {
+        Long id = request.JSON.id
+        DataScript dataScript = dataScriptService.saveScript(id, request.JSON.script)
+        renderSuccessJson(dataScript: dataScript.toMap())
+    }
+
+   /**
      * Endpoint for searching for a particular DataScript.
      *
      * @param id - DataScript id
@@ -83,7 +93,7 @@ class WsDataScriptController implements ControllerMethods {
      * @return
      */
     @HasPermission(Permission.DataScriptView)
-    def getDataScripts () {
+    def list() {
         Long providerId = NumberUtil.toLong(request.JSON.providerId)
         List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)
         renderSuccessJson(dataScripts*.toMap())
@@ -159,30 +169,5 @@ class WsDataScriptController implements ControllerMethods {
 
         renderSuccessJson(result)
     }
-
-    /**
-     * Saves the script to the datascript domain record
-     * @return
-     */
-    @HasPermission(Permission.DataScriptUpdate)
-    def saveScript (DataScriptSaveScriptCommand command) {
-
-        if (!command.validate()) {
-            throw new InvalidParamException('Invalid parameters')
-        }
-
-        Project project = securityService.getUserCurrentProjectOrException()
-
-        DataScript dataScript = dataScriptService.getDataScript(command.id)
-
-        if (dataScript.project != project) {
-            securityService.reportViolation("attempted to ACTION dataview ($command.id) not assoc with project")
-        }
-
-        scriptProcessorService.saveScript(dataScript, command.script)
-
-        renderSuccessJson()
-    }
-
 
 }
