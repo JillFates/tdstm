@@ -298,38 +298,6 @@ class ScriptProcessorServiceSpec extends Specification {
 			}
 	}
 
-	def 'test can save a script'() {
-
-		given:
-			String etlSourceCode = """
-                console on
-                read labels
-                iterate {
-                    domain Application
-                    load environment with Production
-                    extract 'location' load Vendor
-                    reference assetName with Vendor
-                }
-            """.stripIndent()
-
-			DataScript dataScript = GroovyMock(DataScript)
-			dataScript.getName() >> 'Script test'
-			dataScript.getDescription() >> 'Description Test'
-			dataScript.getTarget() >> 'Target Test'
-			dataScript.getMode() >> DataScriptMode.IMPORT
-			dataScript.getProvider() >> GroovyMock(Provider)
-			dataScript.getEtlSourceCode() >> etlSourceCode
-			dataScript.getProject() >> GroovyMock(Project)
-			dataScript.getCreatedBy() >> GroovyMock(Person)
-
-		when: 'Service saves the scripts updating source code'
-			DataScript result = service.saveScript(dataScript, etlSourceCode)
-
-		then: 'Service results contains console details and ETLProcessor results'
-			result.etlSourceCode == etlSourceCode
-
-	}
-
 	static Map fieldSpecsMap = [
 		(AssetClass.APPLICATION.toString()): [
 			fields: [
