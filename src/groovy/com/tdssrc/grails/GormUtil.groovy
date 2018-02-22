@@ -439,6 +439,17 @@ public class GormUtil {
 	}
 
 	/**
+	 * Returns an instance of GrailsDomainClassProperty
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	static GrailsDomainClassProperty getGrailsDomainClassProperty(Class domainClass, String propertyName) {
+		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
+		return grailsDomainClass.getPropertyByName(propertyName)
+	}
+
+	/**
 	 * Creates an instance of Grails domain class
 	 * @param domainClass
 	 * @return a new instance of DefaultGrailsDomainClass
