@@ -253,7 +253,7 @@ application id,vendor name,technology,location
 						domain Application
 						iterate {
 							extract AssetId load id
-							find Application 'for' id by id with DOMAIN.id 
+							find Application of id by id with DOMAIN.id 
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -392,7 +392,7 @@ application id,vendor name,technology,location
 						iterate {
 						
 							extract AssetDependencyId load id
-							find Dependency 'for' id by id with DOMAIN.id
+							find Dependency of id by id with DOMAIN.id
 							
 							// Process the PRIMARY asset in the dependency
     						extract AssetId load asset
@@ -401,10 +401,10 @@ application id,vendor name,technology,location
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
 						}
 						""".stripIndent(),
@@ -423,7 +423,7 @@ application id,vendor name,technology,location
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 				]
 
-				// Validates command: find Application 'for' asset by id with DOMAIN.asset
+				// Validates command: find Application of asset by id with DOMAIN.asset
 				(1..14).eachWithIndex { int value, int index ->
 					with(data[index].fields.id.find) {
 						query.size() == 1
@@ -434,7 +434,7 @@ application id,vendor name,technology,location
 					}
 				}
 
-				// Validates command: elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
+				// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
 				with(data[0].fields.asset.find) {
 					query.size() == 4
 					with(query[0]) {
@@ -540,7 +540,7 @@ application id,vendor name,technology,location
 						iterate {
 						
 							extract AssetId load id
-							find Application 'for' id by id with DOMAIN.id
+							find Application of id by id with DOMAIN.id
 							
 							// Grab the reference to the FINDINGS to be used later. 
 							def primaryFindings = FINDINGS
@@ -611,7 +611,7 @@ application id,vendor name,technology,location
 						
 						iterate {
 							extract 'application id' load asset
-							find Application 'for' asset by id with DOMAIN.asset  
+							find Application of asset by id with DOMAIN.asset  
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -677,7 +677,7 @@ application id,vendor name,technology,location
 							domain Application
 							set environment with Production
 							extract 'application id' load id
-							find Application 'for' id by id with id
+							find Application of id by id with id
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -752,8 +752,8 @@ application id,vendor name,technology,location
 							set environment with Production
 							extract 'vendor name' load Vendor
 							extract 'application id' load id
-							find Application 'for' id by id with SOURCE.'application id'
-							elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
+							find Application of id by id with SOURCE.'application id'
+							elseFind Application of id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -919,7 +919,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetDependencyId load id
 							extract AssetId load asset
 							
-							find Asset 'for' asset by assetName with SOURCE.AssetName
+							find Asset of asset by assetName with SOURCE.AssetName
 							// Grab the reference to the FINDINGS to be used later. 
 							def primaryFindings = FINDINGS
 	
@@ -1012,10 +1012,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
     						whenNotFound asset create {
     							assetClass Application
@@ -1147,10 +1147,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						//elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						//elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
     						whenNotFound asset update {
     							assetClass Application
@@ -1241,10 +1241,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
     						whenFound asset create {
     							"TN Last Seen" NOW
@@ -1332,10 +1332,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
 							whenNotFound asset create {
 								assetClass Unknown
@@ -1427,10 +1427,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application 'for' asset by id with DOMAIN.asset 
-   							elseFind Application 'for' asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application 'for' asset by assetName with SOURCE.DependentName
-    						elseFind Asset 'for' asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application of asset by id with DOMAIN.asset 
+   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
     						whenFound asset update {
     							"TN Last Seen" NOW
@@ -1536,7 +1536,7 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 							extract Location load location
 							extract Room load room
 					 
-							find Room 'for' room by id with SOURCE.RoomId
+							find Room of room by id with SOURCE.RoomId
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1547,6 +1547,71 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 				domain == ETLDomain.Rack.name()
 				fields == ['id', 'location', 'room'] as Set
 			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can throw an Exception if the find/elseFind command is incorrectly formatted'() {
+
+		given:
+			List<Room> rooms = buildRooms([
+				[1, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[2, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			List<Rack> racks = buildRacks([
+				[4, GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
+				[5, GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
+				[6, GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
+			])
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Rack
+							extract rackId load id 
+							extract Location load location
+							extract Room load room
+					 
+							find Room 'for' room by id with SOURCE.RoomId
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
