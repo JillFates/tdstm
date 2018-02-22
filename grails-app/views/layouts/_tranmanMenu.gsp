@@ -284,11 +284,6 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetExport}">
-                                <li class="menu-child-item menu-parent-assets-export-assets">
-                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
-                                </li>
-                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.HelpMenuView}">
                                 <li class="menu-child-item">
                                     <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a>
