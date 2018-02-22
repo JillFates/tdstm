@@ -88,7 +88,7 @@
 		</tr>
 		<tr>
 			<tds:inputLabel field="${standardFieldSpecs.url}" />
-			<td class="${standardFieldSpecs.url.imp}" >
+			<td class="valueNW ${standardFieldSpecs.url.imp}" >
 				<tds:tooltipSpan field="${standardFieldSpecs.url}" tooltipDataPlacement="bottom" class="url-field">
 				  <tds:textAsLink  text="${asset.url}" target="_new"/>
 				</tds:tooltipSpan>
