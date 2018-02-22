@@ -1,6 +1,7 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -173,7 +174,23 @@ class WsDataScriptController implements ControllerMethods {
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
 
-        render status: 404
+        def jsonMap = [
+                status: 'success',
+                data: [
+                        config: [
+                                [property:'id', type: 'text'],
+                                [property:'server name', type: 'text']
+                        ],
+                        rows: [
+                                [ id: '12312', 'server name': 'widget'],
+                                [ id: '34323', 'server name': 'widget']
+                        ]
+                ]
+        ]
+
+        render jsonMap as JSON
+
+        // render status: 404
     }
 
 }
