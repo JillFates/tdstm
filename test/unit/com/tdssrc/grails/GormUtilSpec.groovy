@@ -6,6 +6,7 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
@@ -17,13 +18,7 @@ import spock.lang.Unroll
 /**
  * Unit test cases for the GormUtil class
  */
-class GormUtilUnitSpec extends Specification {
-
-	protected void setup() {
-	}
-
-	protected void cleanup() {
-	}
+class GormUtilSpec extends Specification {
 
 	void 'Test isDomainProperty'() {
 		when:
@@ -57,7 +52,6 @@ class GormUtilUnitSpec extends Specification {
 			AssetEntity | "priority"          | java.lang.Integer
 			AssetEntity | "bogusPropertyName" | null
 	}
-
 
 	@Unroll
 	void 'test if #clazz is a DomainClass'() {
@@ -133,7 +127,7 @@ class GormUtilUnitSpec extends Specification {
 			GrailsDomainException e = thrown GrailsDomainException
 			e.message == 'Identity property not found, but required in domain class [net.transitionmanager.integration.ApiActionResponse]'
 
-		when: 'It tries to evaluate a property for an instance'
+		when: 'It tries to evaluate a property for an clazz'
 			GormUtil.isDomainProperty(new ApiActionResponse(), 'assetType')
 
 		then: 'An exception is thrown'
@@ -145,16 +139,73 @@ class GormUtilUnitSpec extends Specification {
 	@Unroll
 	void 'test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
 		expect:
-			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getGrailsDomainClassProperty(clazz, propertyName)
+			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
 			grailsDomainClassProperty.name == name
+			grailsDomainClassProperty.type == type
 
 		where:
-			clazz       | propertyName || name
-			AssetEntity | 'id'         || 'id'
-			Database    | 'assetType'  || 'assetType'
-			Application | 'assetName'  || 'assetName'
-			Room        | 'roomName'   || 'roomName'
-			Person      | 'firstName'  || 'firstName'
+			clazz       | propertyName || name        | type
+			AssetEntity | 'id'         || 'id'        | Long
+			Database    | 'assetType'  || 'assetType' | String
+			Application | 'sme'        || 'sme'       | Person
+			Room        | 'roomName'   || 'roomName'  | String
+			Person      | 'firstName'  || 'firstName' | String
 	}
 
+	@Unroll
+	void 'test if #propertyName is a property for a and instance of a DomainClass is an identifier'() {
+		expect:
+			GormUtil.isDomainIdentifier(instance, propertyName) == isDomainIdentifier
+
+		where:
+			instance          | propertyName || isDomainIdentifier
+			new AssetEntity() | 'id'         || true
+			new AssetEntity() | 'assetType'  || false
+			new Application() | 'id'         || true
+			new Room()        | 'roomName'   || false
+			new Person()      | 'id'         || true
+	}
+
+	@Unroll
+	void 'test if #propertyName is a property for a DomainClass is an identifier'() {
+		expect:
+			GormUtil.isDomainIdentifier(clazz, propertyName) == isDomainIdentifier
+
+		where:
+			clazz       | propertyName || isDomainIdentifier
+			AssetEntity | 'id'         || true
+			AssetEntity | 'assetType'  || false
+			Application | 'id'         || true
+			Room        | 'roomName'   || false
+			Person      | 'id'         || true
+	}
+
+	@Unroll
+	void 'test if #propertyName is a property for a and instance of a DomainClass is a reference'() {
+		expect:
+			GormUtil.isReferenceProperty(instance, propertyName) == isReferenceProperty
+
+		where:
+			instance          | propertyName || isReferenceProperty
+			new AssetEntity() | 'id'         || false
+			new AssetEntity() | 'moveBundle' || true
+			new Application() | 'sme'        || true
+			new Room()        | 'roomName'   || false
+			new Person()      | 'id'         || false
+	}
+
+	@Unroll
+	void 'test if #propertyName is a property for a #clazz DomainClass is a reference'() {
+		expect:
+			GormUtil.isReferenceProperty(clazz, propertyName) == isReferenceProperty
+
+		where:
+			clazz       | propertyName || isReferenceProperty
+			AssetEntity | 'id'         || false
+			AssetEntity | 'moveBundle' || true
+			Rack        | 'room'       || true
+			Application | 'id'         || false
+			Room        | 'roomName'   || false
+			Person      | 'id'         || false
+	}
 }
