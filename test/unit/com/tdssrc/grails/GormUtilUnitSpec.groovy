@@ -9,6 +9,7 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Room
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.DataviewService
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.exceptions.GrailsDomainException
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -123,7 +124,7 @@ class GormUtilUnitSpec extends Specification {
 	void 'test can throw an exception if it ask for a property in a not DomainClass'() {
 
 		given:
-			Class clazz = ApiActionResponse
+			Class clazz = ApiActionResponse.class
 
 		when: 'It tries to evaluate a property for a clazz'
 			GormUtil.isDomainProperty(clazz, 'assetType')
@@ -141,5 +142,19 @@ class GormUtilUnitSpec extends Specification {
 
 	}
 
+	@Unroll
+	void 'test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
+		expect:
+			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getGrailsDomainClassProperty(clazz, propertyName)
+			grailsDomainClassProperty.name == name
+
+		where:
+			clazz       | propertyName || name
+			AssetEntity | 'id'         || 'id'
+			Database    | 'assetType'  || 'assetType'
+			Application | 'assetName'  || 'assetName'
+			Room        | 'roomName'   || 'roomName'
+			Person      | 'firstName'  || 'firstName'
+	}
 
 }
