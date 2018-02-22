@@ -7,6 +7,7 @@ import com.tdssrc.grails.JsonUtil
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.service.CredentialService
+import net.transitionmanager.service.InvalidRequestException
 import org.apache.camel.Exchange
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.RouteDefinition
@@ -114,17 +115,9 @@ class RestfulRouteBuilder extends RouteBuilder {
         builder.addParameter('throwExceptionOnFailure', 'false')
 
         if (actionRequest.param.credentials) {
-            Map <String, ?> pCredentials = actionRequest.param.credentials
-            Credential credential = new Credential([
-                    username : pCredentials.username,
-                    password : pCredentials.password,
-                    salt : pCredentials.salt,
-                    status : pCredentials.status,
-                    authenticationMethod : pCredentials.method,
+            Credential credential = Credential.read(actionRequest.param.credentials.id)
 
-            ])
-
-            if (credential.status == CredentialStatus.ACTIVE.name()) {
+            if (credential.status == CredentialStatus.ACTIVE) {
                 switch (credential.authenticationMethod) {
                     case AuthenticationMethod.BASIC_AUTH:
                         builder.addParameter('authUsername', credential.username)
@@ -133,6 +126,8 @@ class RestfulRouteBuilder extends RouteBuilder {
                     default:
                         throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
                 }
+            } else {
+	            throw new InvalidRequestException("The Credential associated with API Action is disabled")
             }
         }
 
