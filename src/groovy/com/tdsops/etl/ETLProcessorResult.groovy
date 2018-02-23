@@ -145,6 +145,23 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
+	 * 		ETLInfo <Map>
+	 * 		domains <List><Map>
+	 *
+	 * @return A map of this object
+	 */
+	Map<String, ?> toMap() {
+		return [
+			// should this be this.ETLInfo ?
+
+			ETLInfo: this.ETLInfo,
+			domains: this.domains
+		]
+	}
+
+
+	/**
 	 * Init a row data map.
 	 * <pre>
 	 *	"data": [

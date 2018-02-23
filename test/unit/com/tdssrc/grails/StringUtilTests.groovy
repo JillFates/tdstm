@@ -276,4 +276,26 @@ class StringUtilTests extends Specification {
 		"SMALLTEXT"					 | "SMALLTEXT"
 	}
 
+	void 'Test isBlank with different values'() {
+		given:
+			CharSequence cs1 = ''
+			CharSequence cs2 = 'hello'
+			CharSequence cs3 = null
+
+		expect:
+			result == StringUtil.isBlank(value)
+
+		where:
+			value					| result
+			''						| true
+			'a'						| false
+			""						| true
+			"a"						| false
+			null					| true
+			'' as CharSequence		| true
+			'a'	as CharSequence		| false
+			null as CharSequence	| true
+
+	}
+
 }

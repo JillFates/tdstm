@@ -50,7 +50,7 @@ class StringUtil {
 	 * @param subject - the string to check
 	 * @return true if blank
 	 */
-	static boolean isBlank(String subject) {
+	static boolean isBlank(CharSequence subject) {
 		return StringUtils.isBlank(subject)
 	}
 

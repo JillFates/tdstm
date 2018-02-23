@@ -6,316 +6,334 @@ import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
-import grails.transaction.Transactional
-import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+
+import groovy.util.logging.Slf4j
+import grails.transaction.Transactional
+import grails.transaction.NotTransactional
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.TransactionDefinition
 
+/**
+ * DataImportService - contains the methods for dealing with data importing from the ETL process;
+ * interacting with the Import Batch management; and posting of data into various domains.
+ *
+ * The service class is setup for specialized Transactional management. By default all private methods
+ * will use the PROPAGATION_MANDATORY, assuming the transaction created by the public methods. The
+ * loadETLJsonIntoImportBatch() method in particular creates Transactions at the individual batch level
+ * to use transactions more efficiently.
+ *
+ */
 @Slf4j(value='log', category='net.transitionmanager.service.DataImportService')
-@Transactional
-class DataImportService implements ServiceMethods{
+@Transactional(propagation=Propagation.MANDATORY)
+class DataImportService implements ServiceMethods {
 
-    SecurityService securityService
-    JdbcTemplate jdbcTemplate
+	SecurityService securityService
 
-    // private Logger log = LoggerFactory.getLogger(DataImportService.class)
+	/**
+	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
+	 *
+	 * This method will create a DataTransferBatch for each domain present in the importJsonData and then
+	 * create DataTransferValues for each field the rows specified in the meta-data.
+	 *
+	 * The method is marked NonTransactional so that each the domains in the importJsonData can be handled
+	 * as independent transactions.
+	 *
+	 * @param userLogin
+	 * @param project
+	 * @param importJsonData
+	 * @return a Map containing details about the import creation
+	 *      batchesCreated <Integer> - count of the number of batches created
+	 *      domains <List><Map> - a list of each domain that records were created
+	 *          domainClass <String> - name of the domain
+	 *          rowsCreated <Integer> - the count of the records created
+	 *			rowsSkipped <Integer> - the count of rows that were skipped due to errors
+	 */
+	@NotTransactional()
+	Map loadETLJsonIntoImportBatch(Project project, UserLogin userLogin, JSONObject importJsonData) {
+		return localFunction(project, userLogin, importJsonData)
+	}
+	// TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
+	// This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
+	// that the @NotTransactional annotation causes issues. This was a neat trick to get around that since the loadETLJsonIntoImportBatch
+	// method wasn't being changed. Groovy is more forgiving with Closures...
+	def localFunction = { Project project, UserLogin userLogin, JSONObject importJsonData ->
 
+		// Map which summarizes the results from the import process.
+		Map importResults = [ batchesCreated: 0, domains:[], errors: [] ]
 
-    /**
-     * Root of the SQL Statement to insert Data Transer Values into the database.
-     */
-    private static final String DTV_SQL_INSERT = '''
-            INSERT INTO data_transfer_value
-            (asset_entity_id, data_transfer_batch_id, import_value, corrected_value, field_name, has_error, error_text, row_id)
-            VALUES 
-        '''.stripIndent()
+		// A map that contains various objects used throughout the import process
+		Map importContext = [
+			project: project,
+			user: userLogin,
+			domainClass: null,
+			fields: [],
+			// The following are reset per domain
+			rowsCreated: 0,
+			rowsSkipped: 0,
+			rowNumber: 0,
+			errors:[]
+		]
 
-    /**
-     *
-     * Entry point for the process of importing assets.
-     *
-     * Create a DataTransfer batch for each asset class present in the JSON file being loaded for import.
-     *
-     * @param userLogin
-     * @param project
-     * @param fqFilename - the fully qualified path and filename of the source JSON file
-     * @return a map containing details about the import creation
-     *      batchesCreated: Integer - count of the number of batches created
-     *      domains: List - A list of each domain that assets were created
-     *          assetClass: String - name of the asset class
-     *          assetsCreated: Integer - a count of the number of assets created
-     */
-    Map loadJsonIntoImportBatch(UserLogin userLogin, Project project, InputStream inputStream) {
-        JSONObject assetsJson = JsonUtil.parseFile(inputStream)
+		// Iterate over the domains and create batches for each
+		for (domainJson in importJsonData.domains) {
+			importContext.domainClass = domainJson.domain
 
-        // Map which summarizes the results from the import process.
-        Map results = [ batchesCreated: 0, domains:[], errors: []]
+			List<JSONObject> importRows = domainJson.data
+			if (! importRows) {
+				importResults.errors << "Domain $domainClass contained no data"
+				importResults.domains << [ domainClass: domainClass, rowsCreated: 0, rowsSkipped: 0 ]
+			} else {
 
-        List domains = assetsJson.domains
+				// Process each batch in a separate transaction to help with performance and memory
+				DataTransferBatch.withNewTransaction { session ->
+					// Attach the project to the current transaction
+					// project.attach()
 
-        // Check if the JSON contains any domains. If not, return the results map as is.
-        if (!domains) {
-            return results
-        }
+					// Create a Transfer Batch for the asset class
+					DataTransferBatch dataTransferBatch = createDataTransferBatch(project, importContext.domainClass, userLogin, importContext.errors)
 
-        // Iterate over the domains
-        for (domainJson in domains) {
-            String assetClass = domainJson.domain
+					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
+					if (! dataTransferBatch) {
+						// Creating the batch failed so record the error and metrics for endpoint consumer
+						importResults.errors << importContext.errors
+						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: 0 ]
+					} else {
+						//
+						// Process the rows for the batch
+						//
 
-            // Create a Transfer Batch for the asset class
-            DataTransferBatch dataTransferBatch = createDataTransferBatch(assetClass, userLogin, project, results.errors)
+						// Reset the batch level context variables
+						importContext.with {
+							errors = []
+							rowsCreated = 0
+							rowsSkipped = 0
+							rowNumber = 0
+							fields = domainJson.fields
+						}
 
-            // Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
-            if (dataTransferBatch) {
-                // Map with info for logging and validations during the process
-                Map params = [assetClass: assetClass, project: project, assetIdx: 0, fields: domainJson.fields]
+						// Import the assets for this batch
+						importRowsIntoBatch(session, dataTransferBatch, importRows, importContext)
 
-                List<String> newErrors = importAssetsIntoBatch (dataTransferBatch, domainJson.data, params)
-                int errorCount = newErrors.size()
-                if (errorCount > 0) {
-                    // Record the errors into the Batch importResults
-                    String results = "<h2>Import Errors</h2><ul>" +
-                        errors.collect { "<li>$it</li>" } +
-                        "</ul>"
-                    dataTransferBatch.importResults = results
-                }
-                results.batchesCreated++
-                results.domains << [assetClass: assetClass, assetsCreated: params.assetIdx, errorCount: errorCount]
-            }
-        }
-        return results
-    }
+						// Update the batch with information about the import results
+						dataTransferBatch.importResults = DataImportHelper.createBatchResultsReport(importContext)
 
-    /**
-     * Create a Transfer Batch for the given Asset Class.
-     * @param assetClass
-     * @param currentUser
-     * @param project
-     * @return
-     */
-    private DataTransferBatch createDataTransferBatch(String assetClass, UserLogin currentUser, Project project, List<String> processErrors) {
-        DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
-        if (!dts) {
-            // TODO : JPM 2/2018 : Augusto - what is going on here?
-            dts = DataTransferSet.get(1)
-        }
+						// Update the reporting
+						importResults.batchesCreated++
+						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: importContext.rowsCreated ]
+					}
+				}
+			}
+		}
 
-        // Check if the domain class is valid
-        EavEntityType eavEntityType = EavEntityType.findByDomainName(assetClass)
+		return importResults
+	}
 
-        // If the asset class is invalid, return null
-        if (!eavEntityType) {
-            String error = "Import does not support domain type ${assetClass}"
-            log.error(error)
-            processErrors << error
-            return null
-        }
+	/**
+	 * LEGACY - Create a Transfer Batch for the given Asset Class.
+	 * @param domainClass
+	 * @param currentUser
+	 * @param project
+	 * @return
+	 */
+	private DataTransferBatch createDataTransferBatch(Project project, String domainClass, UserLogin currentUser, List<String> errors) {
+		DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
+		if (!dts) {
+			dts = DataTransferSet.get(1)
+		}
 
-        DataTransferBatch dataTransferBatch = new DataTransferBatch(
-                statusCode: "PENDING",
-                transferMode: "I",
-                project: project,
-                userLogin: currentUser,
-                eavEntityType: eavEntityType,
-                dataTransferSet: dts
-            )
+		// TODO : JPM 2/2018 : use ETL Enum that translate to the correct domain - See Diego as he implement the Enum for ETL processing
+		// Note need to test importing each of the domain types
+		Map translate = [
+			'Device':'AssetEntity',
+			'Application':'Application',
+			'Database':'Database',
+			'Storage':'Files'
+		]
+		String transDomainName = translate[domainClass]
 
-        // Check if the transfer batch is valid, report the error if not
-        if (!dataTransferBatch.save()) {
-            String error = ""
-            log error(error)
-            processErrors << "An error occurred when creating the batch for ${assetClass}"
-            log.error 'DataImportService.createDataTransferBatch() failed save: {}', GormUtil.allErrorsString(dataTransferBatch)
+		// Check if the domain class is valid
+		EavEntityType eavEntityType = EavEntityType.findByDomainName(transDomainName)
 
-            // Use discard to get the domain object out of the session
-            dataTransferBatch.discard()
-            dataTransferBatch = null
-        }
-        return dataTransferBatch
-    }
+		// If the asset class is invalid, return null
+		if (! eavEntityType) {
+			errors << "Import does not support domain type ${domainClass}"
+			return null
+		}
 
-    /**
-     * Import all the assets for the given batch.
-     *
-     * @param dataTransferBatch - current batch
-     * @param assets - list of assets
-     * @param params - additional parameters required for logging
-     * @return a list of any errors that occurred during the importing
-     */
-    private List<String> importAssetsIntoBatch (DataTransferBatch dataTransferBatch, List assets , Map params) {
-        List errors = []
+		DataTransferBatch dataTransferBatch = new DataTransferBatch(
+				statusCode: DataTransferBatch.PENDING,
+				transferMode: "I",
+				project: project,
+				userLogin: currentUser,
+				eavEntityType: eavEntityType,
+				dataTransferSet: dts
+			)
 
-        for (asset in assets) {
-            List<String> newErrors = createFieldsForRow(dataTransferBatch, asset, params)
-            if (newErrors) {
-                errors.addAll(newErrors)
-            }
-            params.assetIdx++
-        }
+		// Check if the transfer batch is valid, report the error if not.
+		if (!dataTransferBatch.save()) {
+			errors << "There was an error when creating th import batch for ${domainClass}"
+			log.error 'DataImportService.createDataTransferBatch() failed save: {}', GormUtil.allErrorsString(dataTransferBatch)
+			return null
+		}
 
-        return errors
-    }
+		return dataTransferBatch
+	}
 
-    /**
-     * Import an individual asset.
-     *
-     * @param dataTransferBatch
-     * @param asset - LazyMap with all the field information
-     * @param params - additional parameters required for logging
-     */
-    private List<String> createFieldsForRow(DataTransferBatch dataTransferBatch, asset, Map params) {
-        List<String> errors = []
+	/**
+	 * Import all the assets for the given batch.
+	 *
+	 * @param dataTransferBatch - current batch
+	 * @param assets - list of assets
+	 * @param importContext - additional parameters required for logging
+	 */
+	private void importRowsIntoBatch(session, DataTransferBatch dataTransferBatch, List<JSONObject> importRows, Map importContext) {
+		for (rowData in importRows) {
+			// Keep track of the row number for reporting
+			importContext.rowNumber++
 
-        // Validate this asset
-        // TODO : JPM 2/2018 : Change so that validateAsset returns list of errors
-        boolean validAsset = validateAsset(asset, params)
-        
-        // Proceed with the import if the asset passed validations (if not, the fields that failed will have the corresponding error messages)
-        if (! validAsset) {
-            errors << "Row ${params.assetIdx} failed validation"
-        } else {
-            // Look up the Asset Entity Id
-            Long assetId = lookUpIdValueForJsonAsset(asset)
+			// Process the fields for this row
+			importRow(session, dataTransferBatch, rowData, importContext)
+		}
+	}
 
-            // Proceed to import all the fields for this asset
-            for (fieldName in params.fields) {
-                // Avoid inserting the 'id' into the batch as a field
-                if (fieldName == 'id') {
-                    continue
-                }
+	/**
+	 * Import an individual row of data
+	 *
+	 * @param dataTransferBatch
+	 * @param asset - LazyMap with all the field information
+	 * @param importContext - additional parameters required for logging
+	 */
+	private void importRow(session, DataTransferBatch dataTransferBatch, JSONObject rowData, Map importContext ) {
 
-                JSONObject fieldJSON = assetJson.fields[fieldName]
-                def newValue = DataImportHelper.resolveFieldValue(fieldName, fieldJSON)
-                DataTransferValue dtv = new DataTransferValue(
-                    dataTransferBatch: dataTransferBatch,
-                    fieldName: fieldName,
-                    assetEntityId: assetId,
-                    importValue: fieldJSON.originalValue,
-                    correctedValue: newValue,
-                    rowId: params.assetIdx
-                )
+		// TODO : JPM 2/2018 : CRITICAL - presently getting error message that ID must be a numeric value
+		Long domainId = getAndValidateDomainId(rowData, importContext)
 
-                if (!dtv.save()) {
-                    errors << "Row ${params.assetIdx} field $fieldName failed to save: ${GormUtil.allErrorsString(dtv)}"
-                    log.warn "DataImportService.insertDataTransferValuesForAsset() failed save: ${GormUtil.allErrorsString(dtv)}"
-                    dtv.discard()
-                }
-            }
-        }
-        return errors
-    }
+		// Process the row as long as there wasn't an error with the ID reference
+		if (domainId == null || domainId > 0) {
 
-    /**
-     * Build the lines for inserting all the DataTransferValue required.
-     *
-     * @param dataTransferBatch
-     * @param asset
-     * @param assetId
-     * @param params
-     * @return
-     */
-    // private String buildInsertSQLForDtvValues(DataTransferBatch dataTransferBatch, asset, Long assetId, Map params) {
-    //     String[] dtvLines = []
-    //     // Iterate over the fields for this asset.
-    //     for (field in asset.fields) {
-    //         // Construct the line for inserting the DTV
-    //         String sqlLine = getDtvSqlValues(dataTransferBatch, field, assetId, params)
-    //         // Add the line for execution only if it's not null.
-    //         if (sqlLine) {
-    //             dtvLines << lines
-    //         }
-    //     }
+			// Validate that the row can be processed, any errors will be captured in importContext.errors
+			// TODO : JPM 2/2018 : MINOR - Review and fix the canRowDataBeImported logic, wait for Dependency imports
+			// boolean canImportRow = canRowDataBeImported(rowData, domainId, importContext)
+			boolean canImportRow=true
 
-    //     return dtvLines.join(SqlUtil.COMMA)
-    // }
+			if (canImportRow) {
+				if (insertRowDataIntoDataTransferValues(session, dataTransferBatch, rowData, domainId, importContext )) {
+					importContext.rowsCreated++
+				} else {
+					importContext.rowsSkipped++
+				}
+			}
+		}
+	}
 
+	/**
+	 * Create a new DataTransferValue for each field in the rowData. Any errors will be added to the importContext.errors list and
+	 * the entire row will be skipped. This method is implemented with a NESTED transaction so that it will rollback all of the fields
+	 * that were added prior to the error.
+	 *
+	 * @param dataTransferBatch - current batch
+	 * @param rowData - the meta-data for the current field to be inserted
+	 * @param domainId - the id for the domain object if known
+	 * @param importContext - Map of the import context objects
+	 * @return true if all of the fields were successfully added to the DataTransferValue table or false if there was an error
+	 */
+	private boolean insertRowDataIntoDataTransferValues(session, DataTransferBatch dataTransferBatch, JSONObject rowData, Long domainId, Map importContext ) {
 
-    /**
-     * Build the SQL for inserting the data for a single Data Transfer Value.
-     *
-     * @param sqlValues
-     * @param dataTransferBatch
-     * @param fieldJson
-     * @param assetId
-     *
-     * @return sql line with all the values for a data transfer value.
-     */
-    // private String getDtvSqlValues(DataTransferBatch dataTransferBatch, fieldJson, Long assetId, Map params) {
+		int rowNum = importContext.rowNumber - 1
 
-    //     // If both values are empty (or null) don't build the line
-    //     // TODO: we could do the same for existing assets when both values are the same
-    //     if (StringUtil.isBlank(fieldJson.originalValue) && StringUtil.isBlank(fieldJson.value)) {
-    //         return null
-    //     }
+		// Tried using sessionFactory.currentSession but that session object did not have the createSavepoint() method
+		def savePoint = session.createSavepoint()
 
-    //     StringBuilder sqlValues = new StringBuilder()
+		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
+		for (fieldName in importContext.fields) {
 
-    //     // Parse the values for this field
-    //     Map parsingResults = DataImportHelper.parseFieldValues(fieldJson, params)
-    //     println "getDtvSqlValues(assetId=$assetId) parsingResults=$parsingResults"
+			// If the current field is the id, skip it (avoid inserting it into the database).
+			if (fieldName == 'id') {
+				continue
+			}
 
-    //     sqlValues.append(SqlUtil.LEFT_PARENTHESIS)
-    //     sqlValues.append(assetId).append(SqlUtil.COMMA) // AssetId
-    //     sqlValues.append(dataTransferBatch.id).append(SqlUtil.COMMA) // Batch Id
+			JSONObject field = rowData.fields[fieldName]
 
-    //     appendStringValue(sqlValues, parsingResults.originalValue).append(SqlUtil.COMMA) // import value
-    //     appendStringValue(sqlValues, parsingResults.newValue).append(SqlUtil.COMMA) // corrected value
-    //     appendStringValue(sqlValues, fieldJson.field.name).append(SqlUtil.COMMA) // field name
+			// TODO : JPM 2/2018 : MINOR - Revisit this later - this implementation is iffy - will be important for Dependency implementation
+			// def fieldValue = DataImportHelper.resolveFieldValue(fieldName, field)
+			def fieldValue = field.value
 
-    //     // If there were errors while parsing this field's values, add the message received.
-    //     if (parsingResults.errorMsg) {
-    //         sqlValues.append(1).append(SqlUtil.COMMA) // has error
-    //         sqlValues.append(errorMsg).append(SqlUtil.COMMA) // error msg
-    //     } else {
-    //         sqlValues.append(0).append(SqlUtil.COMMA) // has error
-    //         sqlValues.append(SqlUtil.NULL).append(SqlUtil.COMMA) // error msg
-    //     }
-    //     sqlValues.append(params.assetIdx).append(SqlUtil.COMMA) // asset index within the batch. TODO: Do we need this?
-    //     sqlValues.append(SqlUtil.RIGHT_PARENTHESIS)
+			// Don't bother with String values that are empty or any types that are null
+			if ( fieldValue == null || ( (fieldValue instanceof CharSequence) && StringUtil.isBlank(fieldValue) ) ) {
+				continue
+			}
 
-    //     return sqlValues.toString()
+			DataTransferValue dtv = new DataTransferValue(
+				dataTransferBatch: dataTransferBatch,
+				fieldName: fieldName,
+				assetEntityId: domainId,
+				importValue: field.originalValue,
+				correctedValue: fieldValue,
+				rowId: rowNum
+			)
 
-    // }
+			// This is just test code to force a row of data to trigger the Savepoint rollback
+			// boolean triggerRollbackTest = (fieldName == 'assetName' && field.originalValue == 'oradbsrv02')
+			boolean triggerRollbackTest = false
 
-    /**
-     *  Check if the json for this asset is valid in terms of the content. Validate
-     *  the id is present (and wasn't changed) and also the asset name.
-     *
-     *  If an error is detected, an exception will be thrown.
-     *
-     * @param asset
-     * @param params - additional parameters required for logging
-     *
-     * @return true: the asset is valid, false otherwise.
-     */
-    private boolean validateAsset(asset, Map params) throws RuntimeException {
-        // Validate fields until the first error is detected.
-        return DataImportHelper.validateAsset(asset, params)
-    }
+			// This should NOT throw an exception because we're dealing errors in a savepoint rollback
+			if (! dtv.save(flush:true, failOnError:false) || triggerRollbackTest) {
+				// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
+				importContext.errors << "Unable to save field $fieldName on row ${importContext.rowNumber}: ${GormUtil.allErrorsString(dtv)}"
 
-    /**
-     * Retrieve the 'id' for the given asset.
-     * @param asset
-     * @return
-     */
-    private static Long lookUpIdValueForJsonAsset(JSONObject assetJson) {
-        return DataImportHelper.resolveAssetId(assetJson)
-    }
+				// Get rid of the GORM object that can't be saved so the main transaction can
+				// still be committed.
+				dtv.discard()
 
-    /**
-     * Append a quotation mark, the escaped string and a trailing quotation mark to the String Builder.
-     *
-     * @param sql
-     * @param value
-     */
-    // private static void appendStringValue(StringBuilder sb, String value) {
-    //     sb.append(SqlUtil.STRING_QUOTE)
-    //     sb.append(SqlUtil.escapeStringParameter(value))
-    //     sb.append(SqlUtil.STRING_QUOTE)
-    // }
+				// Roll back so none of the fields for this one row will be saved
+				session.rollbackToSavepoint(savePoint)
+
+				return false
+			}
+		}
+
+		// TODO : JPM 2/2018 : Determine if the releaseSavepoint should be called after the rollbackToSavepoint
+		// It seems to work okay but would like confirmation.
+		session.releaseSavepoint(savePoint)
+
+		return true
+	}
+
+	/**
+	 *  Check if the field values for row are valid for the given domain class
+	 *
+	 * @param domainId - the validated specified domain id if it exists
+	 * @param rowData - the meta-data object containing all of the row fields
+	 * @param importContext - Map of the import context objects
+	 * @return true: the asset is valid, false otherwise.
+	 */
+	private boolean canRowDataBeImported(JSONObject rowData, Long domainId, Map importContext) {
+		return DataImportHelper.validateRowData(rowData, domainId, importContext)
+	}
+
+	/**
+	 * Used to retrieve the domain id from the row data and if present it validates that the domain object
+	 * exists and is associated to the current project. It will return one of the following values:
+	 *     null - no id was specified
+	 *     > 0 - the id number of the valid domain object
+	 *     -1 - an error occurred, possible causes (captured in the importContext.errors)
+	 *			- invalid number
+	 *			- domain object doesn't exist
+	 * 			- domain object doesn't belong to the current project
+	 *
+	 * @param rowData - the meta-data for the current field to be inserted
+	 * @param importContext - Map of the import context objects
+	 * @return the id of the domain, null if not specified or -1 if there was an error
+	 */
+	private static Long getAndValidateDomainId(JSONObject rowData, Map importContext) {
+		return DataImportHelper.getAndValidateDomainId(rowData, importContext)
+	}
+
 }
