@@ -2,12 +2,12 @@ package specs.Assets
 
 import geb.spock.GebReportingSpec
 import jodd.util.RandomString
-import pages.Login.LoginPage
-import pages.Login.MenuPage
 import pages.Assets.ApplicationCreationPage
 import pages.Assets.ApplicationDetailsPage
 import pages.Assets.ApplicationEditionPage
 import pages.Assets.ApplicationListPage
+import pages.Login.LoginPage
+import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -44,10 +44,8 @@ class ApplicationEditionSpec extends GebReportingSpec{
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
         at MenuPage
         waitFor { menuModule.goToApplications() }
         at ApplicationListPage

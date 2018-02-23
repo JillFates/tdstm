@@ -34,9 +34,8 @@ class TaskEditionSpec extends GebReportingSpec{
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
+        login()
         loginModule.login(username,password)
         at MenuPage
         menuModule.goToTasksManager()
