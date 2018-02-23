@@ -394,13 +394,19 @@ public class GormUtil {
 	/**
 	 * Validates if a property is an identifier for a domain class
 	 * @param clazz a Class to be used in the identifier detection
-	 * @param propertyName a String with the peroperty name to be used in the validation
+	 * @param propertyName a String with the property name to be used in the validation
 	 * @return tru if property is an identifier for clazz parameter
 	 */
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
 		getDomainClass(clazz)?.identifier.name == propertyName
 	}
 
+	/**
+	 * Validates if a property is an identifier for a domain class instance
+	 * @param clazz a Class to be used in the identifier detection
+	 * @param propertyName a String with the property name to be used in the validation
+	 * @return tru if property is an identifier for clazz parameter
+	 */
 	static boolean isDomainIdentifier(Object domainInstance, String propertyName){
 		getDomainClass(domainInstance.getClass())?.identifier.name == propertyName
 	}
@@ -452,10 +458,6 @@ public class GormUtil {
 	 * @return true if the object is a Domain class otherwise false
 	 */
 	static boolean isDomainClass(Class domainClass) {
-		//def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
-		//return grailsApp.isDomainClass( domainClass )
-//		return grailsApp.isDomainClass( domainObj.getClass() )
-		//org.codehaus.groovy.grails.commons.isDomainClass(domainClass)
 		return DomainClassArtefactHandler.isDomainClass(domainClass)
 
 	}
@@ -1071,7 +1073,7 @@ public class GormUtil {
 	 * Determine if a domain property represents a referenced class type or if the property is an association
 	 * @param domainObject
 	 * @param propertyName
-	 * @return
+	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
 	 */
 	static boolean isReferenceProperty(Object domainObject, String propertyName) {
 		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
