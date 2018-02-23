@@ -22,4 +22,8 @@ class ActionRequestConfig extends HashMap<String, Object> {
 		this.put(key, value)
 	}
 
+	boolean hasProperty(String key) {
+		return this.containsKey(key)
+	}
+
 }
