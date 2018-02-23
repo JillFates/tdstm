@@ -81,8 +81,12 @@
                             </button>
                         </div>
                         <div class="col-md-12" *ngIf="!collapsed.sample">
-                            <kendo-grid>
-
+                            <kendo-grid [data]="sampleDataModel.data" [height]="200">
+                                <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}">
+                                    <ng-template kendoGridHeaderTemplate>
+                                        <label> {{column.label}}</label>
+                                    </ng-template>
+                                </kendo-grid-column>
                             </kendo-grid>
                         </div>
                     </div>

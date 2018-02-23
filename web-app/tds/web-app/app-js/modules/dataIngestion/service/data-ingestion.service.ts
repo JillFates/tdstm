@@ -176,7 +176,6 @@ export class DataIngestionService {
 							columns.push(column);
 						}
 					}
-					console.log(columns);
 					sampleDataModel = new SampleDataModel(columns, data.rows);
 				}
 				return sampleDataModel;

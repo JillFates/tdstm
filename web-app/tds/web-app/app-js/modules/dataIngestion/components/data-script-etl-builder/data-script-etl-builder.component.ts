@@ -2,7 +2,7 @@ import {Component, Output, EventEmitter, AfterViewInit, ViewChild} from '@angula
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
-import {DataScriptModel} from '../../model/data-script.model';
+import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -23,6 +23,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private script: string;
 	private filename: string;
+	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
+
 	private operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
@@ -166,7 +168,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private extractSampleDataFromFile() {
 		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
-			console.log(result);
+			this.sampleDataModel = result;
 		});
 	}
 
