@@ -5,7 +5,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
@@ -365,18 +364,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -724,18 +711,6 @@ application id,vendor name,technology,location
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -890,18 +865,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
@@ -978,18 +941,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -1116,18 +1067,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -1210,18 +1149,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			}
 
 		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 					GMDEMO,
 					dataSet,
@@ -1298,18 +1225,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			GroovySpy(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -1393,18 +1308,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
