@@ -11,7 +11,6 @@ class TaskEditionPage extends Page{
     }
 
     static content = {
-
         teModalWindow(wait:true)        { $("div#editTaskPopup")}
         teModalLoading (wait:true)      { teModalWindow.find("div", class:"loading-indicator", "ng-show":"isLoading")}
         teModalTitle                    { teModalWindow.find("span#ui-id-5", class:"ui-dialog-title ng-binding") }
@@ -35,5 +34,4 @@ class TaskEditionPage extends Page{
         teModalCancelBtn                { teModalWindow.find("button",class:"btn btn-default tablesave cancel")}
         teModalCloseBtn                 { teModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
     }
-
 }

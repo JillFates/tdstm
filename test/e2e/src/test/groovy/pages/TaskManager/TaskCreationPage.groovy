@@ -1,7 +1,7 @@
 package pages.TaskManager
 import geb.Page
 
-class TaskCreationPage extends Page{
+class TaskCreationPage extends Page {
 
     static at = {
         tcModalTitle.text() == "Create Task"
@@ -11,7 +11,6 @@ class TaskCreationPage extends Page{
     }
 
     static content = {
-
         tcModalWindow(wait:true)        { $("div#editTaskPopup")}
         tcModalLoading (wait:true)      { tcModalWindow.find("div", class:"loading-indicator", "ng-show":"isLoading")}
         tcModalTitle                    { tcModalWindow.find("span#ui-id-5", class:"ui-dialog-title ng-binding") }
@@ -30,7 +29,5 @@ class TaskCreationPage extends Page{
         tcModalSaveBtn                  { tcModalWindow.find("button#saveAndCloseBId")}
         tcModalCancelBtn                { tcModalWindow.find("button",class:"btn btn-default tablesave cancel")}
         tcModalCloseBtn                 { tcModalWindow.find("button", "class":"ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close")}
-
     }
-
 }
