@@ -34,7 +34,7 @@ import spock.lang.Specification
 
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
-class ETLProcessorSpec extends Specification {
+class ETLDataSetSpec extends Specification {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -170,17 +170,17 @@ class ETLProcessorSpec extends Specification {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project),
-					GroovyMock(DataSetFacade),
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(DataSetFacade),
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Application
 						
 					 """.stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -197,14 +197,14 @@ class ETLProcessorSpec extends Specification {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					GroovyMock(DataSetFacade),
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				GroovyMock(DataSetFacade),
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						// Script supports one line comments
 						domain Application
 						/*
@@ -212,7 +212,7 @@ class ETLProcessorSpec extends Specification {
 						*/
 						
 					 """.stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -230,16 +230,17 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an exception if an invalid domain is defined'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 
 						domain Unknown
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -249,18 +250,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can define a several domains in an ETL script'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 
 						domain Application
 						domain Device
 						domain Storage
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The last domain selected could be recovered'
 			etlProcessor.selectedDomain == ETLDomain.Storage
@@ -286,18 +288,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can define a domain more than once in an ETL script'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 
 						domain Application
 						domain Device
 						domain Application
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The last domain selected could be recovered'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -318,11 +321,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an Exception if the skip parameter is bigger that rows count'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("skip 20", ETLProcessor.class.name)
+				.evaluate("skip 20", ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -332,11 +336,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an Exception if the scrip command is not recognized'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("invalid command", ETLProcessor.class.name)
+				.evaluate("invalid command", ETLProcessor.class.name)
 
 		then: 'An MissingMethodException exception is thrown'
 			MissingMethodException missingMethodException = thrown MissingMethodException
@@ -346,11 +351,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can read labels from dataSource and create a map of columns'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 					""".stripIndent(), ETLProcessor.class.name)
@@ -375,14 +381,14 @@ class ETLProcessorSpec extends Specification {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					sixRowsDataSet,
-					GroovyMock(DebugConsole),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						
@@ -410,18 +416,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can iterate over all data source rows'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == sixRowsDataSet.readRows()
@@ -430,18 +437,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can iterate over all data source rows from a json dataset'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), jsonDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), jsonDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == jsonDataSet.readRows()
@@ -450,18 +458,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can iterate over a range of data source rows'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						from 1 to 3 iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == 2
@@ -470,18 +479,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an exception when iterates over an invalid range of data source rows'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script with iterate staring in zero is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						from 0 to 3 iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -490,14 +500,14 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script with iterate with a bigger to parameter is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						from 1 to 8 iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			e = thrown ETLProcessorException
@@ -508,18 +518,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can iterate over a list of data source rows'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						from 1, 2, 3 iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == 3
@@ -528,18 +539,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an exception with a message when iterates over a invalid list of data source rows'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						from 0, 2, 4 iterate {
 							println it
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -553,11 +565,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can extract a field value over all rows based on column ordinal position'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 
 						domain Device
 						read labels
@@ -566,7 +579,7 @@ class ETLProcessorSpec extends Specification {
 						}
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The last column index is selected correctly'
 			etlProcessor.currentColumnIndex == 1
@@ -585,11 +598,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can extract a field value over all rows based on column name'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 					
 						domain Device
 						read labels
@@ -598,7 +612,7 @@ class ETLProcessorSpec extends Specification {
 						}
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'The last column index is selected correctly'
 			etlProcessor.currentColumnIndex == 1
@@ -613,11 +627,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an Exception if a column name is invalid'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 					
 						domain Device
 						read labels
@@ -626,7 +641,7 @@ class ETLProcessorSpec extends Specification {
 						}
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -637,18 +652,19 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an Exception if a column position is zero'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 0
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -658,11 +674,12 @@ class ETLProcessorSpec extends Specification {
 	void 'test can throw an Exception if a column index is not between row elements range'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 					
 						domain Device
 						read labels
@@ -671,7 +688,7 @@ class ETLProcessorSpec extends Specification {
 						}
 						
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -681,17 +698,18 @@ class ETLProcessorSpec extends Specification {
 	void 'test can check syntax errors at evaluation time'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""domain Device
+				.evaluate("""domain Device
 						read labels
 						iterate 
 							extract 'MODEL NAME' 
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -700,7 +718,8 @@ class ETLProcessorSpec extends Specification {
 	void 'test can disallow closure creation using a secure syntax with AST customizer'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -722,13 +741,13 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration)
-					.evaluate("""
+				.evaluate("""
 						domain Device
 						read labels
 						def greeting = { String name -> "Hello, \$name!" }
 						assert greeting('Diego') == 'Hello, Diego!'
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An MissingMethodException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -738,7 +757,8 @@ class ETLProcessorSpec extends Specification {
 	void 'test can disallow method creation using a secure syntax with AST customizer'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -756,7 +776,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
-					evaluate("""
+				evaluate("""
 			domain Device
 			read labels
 			def greeting(String name){ 
@@ -773,7 +793,8 @@ class ETLProcessorSpec extends Specification {
 	void 'test can disallow unnecessary imports using a secure syntax with AST customizer'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -792,7 +813,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
-					evaluate("""
+				evaluate("""
 			
 			import java.lang.Math
 			
@@ -800,7 +821,7 @@ class ETLProcessorSpec extends Specification {
 			read labels
 			Math.max 10, 100
 		""".stripIndent(),
-							ETLProcessor.class.name)
+					ETLProcessor.class.name)
 
 		then: 'An MultipleCompilationErrorsException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -810,7 +831,8 @@ class ETLProcessorSpec extends Specification {
 	void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -830,7 +852,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration).
-					evaluate("""
+				evaluate("""
 			
 			import java.lang.Math.*
 			
@@ -838,7 +860,7 @@ class ETLProcessorSpec extends Specification {
 			read labels
 			max 10, 100
 		""".stripIndent(),
-							ETLProcessor.class.name)
+					ETLProcessor.class.name)
 
 		then: 'An MultipleCompilationErrorsException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
@@ -848,7 +870,8 @@ class ETLProcessorSpec extends Specification {
 	void 'test can allow stars imports using a secure syntax with AST customizer'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
 
 		and:
 			ImportCustomizer customizer = new ImportCustomizer()
@@ -868,11 +891,11 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding, configuration)
-					.evaluate("""
+				.evaluate("""
 						read labels
 						max 10, 100
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An MultipleCompilationErrorsException exception is not thrown'
 			notThrown MultipleCompilationErrorsException
@@ -882,25 +905,25 @@ class ETLProcessorSpec extends Specification {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					simpleDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					GroovyMock(ETLFieldsValidator))
+				GroovyMock(Project),
+				simpleDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 							console on
 							domain Device
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
 			etlProcessor.debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-					.append(System.lineSeparator())
-					.append("INFO - Selected Domain: Device")
-					.append(System.lineSeparator())
-					.toString()
+				.append(System.lineSeparator())
+				.append("INFO - Selected Domain: Device")
+				.append(System.lineSeparator())
+				.toString()
 	}
 
 	@Ignore
@@ -914,18 +937,18 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 							console
 							domain Device
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
 			debugConsole.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-					.append(System.lineSeparator())
-					.append("INFO - Selected Domain: Device")
-					.append(System.lineSeparator())
-					.toString()
+				.append(System.lineSeparator())
+				.append("INFO - Selected Domain: Device")
+				.append(System.lineSeparator())
+				.toString()
 	}
 
 	void 'test can debug a selected value for a column name'() {
@@ -938,7 +961,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 							console on
 							read labels
 							domain Device
@@ -946,22 +969,22 @@ class ETLProcessorSpec extends Specification {
 								debug 'device id'
 							}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
 			console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-					.append(System.lineSeparator())
-					.append("INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name]")
-					.append(System.lineSeparator())
-					.append("INFO - Selected Domain: Device")
-					.append(System.lineSeparator())
-					.append("DEBUG - [position:[0, 1], value:152254]")
-					.append(System.lineSeparator())
-					.append("DEBUG - [position:[0, 2], value:152255]")
-					.append(System.lineSeparator())
-					.append("DEBUG - [position:[0, 3], value:152256]")
-					.append(System.lineSeparator())
-					.toString()
+				.append(System.lineSeparator())
+				.append("INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name]")
+				.append(System.lineSeparator())
+				.append("INFO - Selected Domain: Device")
+				.append(System.lineSeparator())
+				.append("DEBUG - [position:[0, 1], value:152254]")
+				.append(System.lineSeparator())
+				.append("DEBUG - [position:[0, 2], value:152255]")
+				.append(System.lineSeparator())
+				.append("DEBUG - [position:[0, 3], value:152256]")
+				.append(System.lineSeparator())
+				.toString()
 	}
 
 	void 'test can throw an ETLProcessorException for an invalid console status'() {
@@ -974,11 +997,11 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 							console open
 							domain Device
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -993,20 +1016,20 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								domain Application
 								iterate {
 									extract 'vendor name' load appVendor
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -1041,14 +1064,14 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					dataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								iterate {
 									domain Application
@@ -1059,7 +1082,7 @@ class ETLProcessorSpec extends Specification {
 									extract 'device id' load id
 									extract 'model name' load name
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 2
@@ -1121,14 +1144,14 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								domain Application
 								iterate {
@@ -1140,7 +1163,7 @@ class ETLProcessorSpec extends Specification {
 										load environment
 									}
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1166,14 +1189,14 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								domain Application
 								iterate {
@@ -1185,7 +1208,7 @@ class ETLProcessorSpec extends Specification {
 										load environment
 									}
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1211,20 +1234,20 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								domain Application
 								iterate {
 									extract 'vendor name' load appVendor load description
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1259,20 +1282,20 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								domain Application
 								read labels
 								iterate {
 									extract 'vendor name' load appVendor
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -1288,20 +1311,20 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 								read labels
 								domain Application
 								iterate {
 									extract 'vendor name' load vendedor
 								}""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -1316,21 +1339,21 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Application
 						read labels
 						iterate {
 							extract 'vendor name' load appVendor
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.result.domains.size() == 1
@@ -1356,21 +1379,21 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						domain Application
 						read labels
 						iterate {
 							extract 'vendor name' load appVendor
 						}
 						""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1402,14 +1425,14 @@ class ETLProcessorSpec extends Specification {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GroovyMock(Project),
-					applicationDataSet,
-					new DebugConsole(buffer: new StringBuffer()),
-					validator)
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						read labels
 						iterate {
 							domain Application
@@ -1422,7 +1445,7 @@ class ETLProcessorSpec extends Specification {
 							set location with 'Development'        
 						}
 						""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 2
@@ -1491,7 +1514,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						trim on
 						domain Application
 						read labels
@@ -1499,7 +1522,7 @@ class ETLProcessorSpec extends Specification {
 							extract 'vendor name' load appVendor
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
@@ -1517,7 +1540,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						trim on
 						domain Application
 						read labels
@@ -1525,7 +1548,7 @@ class ETLProcessorSpec extends Specification {
 							extract 'vendor name' load appVendor
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
@@ -1543,7 +1566,7 @@ class ETLProcessorSpec extends Specification {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+				.evaluate("""
 						sanitize on
 						domain Application
 						read labels
@@ -1551,7 +1574,7 @@ class ETLProcessorSpec extends Specification {
 							extract 'vendor name' load appVendor
 						}
 					""".stripIndent(),
-					ETLProcessor.class.name)
+				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
@@ -1637,7 +1660,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 		and:
 			GroovyMock(Room, global: true)
-			Room.isAssignableFrom(_) >> { Class<?> clazz->
+			Room.isAssignableFrom(_) >> { Class<?> clazz ->
 				return true
 			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
@@ -1671,29 +1694,6 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 		cleanup:
 			service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can throw an exception if an domain is not specified'() {
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-id
-1""".stripIndent())
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					
-					iterate {
-						extract 1 load id
-					}						
-					""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown()
-			e.message == 'A domain must be specified'
 	}
 
 	/**
