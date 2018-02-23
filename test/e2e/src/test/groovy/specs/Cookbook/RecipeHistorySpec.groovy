@@ -19,10 +19,9 @@ class RecipeHistorySpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
+        
         at MenuPage
         menuModule.goToTasksCookbook()
         at CookbookPage
