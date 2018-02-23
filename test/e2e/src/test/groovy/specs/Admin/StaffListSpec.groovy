@@ -122,7 +122,4 @@ class StaffListSpec extends GebReportingSpec {
         at UserDetailsPage
         waitFor {pageMessage.text() == "UserLogin "+userName+" created"}
     }
-
 }
-
-

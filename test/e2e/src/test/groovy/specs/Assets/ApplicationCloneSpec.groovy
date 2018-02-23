@@ -12,7 +12,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ApplicationCloneSpec extends GebReportingSpec{
+class ApplicationCloneSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -36,6 +36,7 @@ class ApplicationCloneSpec extends GebReportingSpec{
         alNameFilter = filterpattern
         waitFor {alLoadingGrid.displayed}
         waitFor {!alLoadingGrid.displayed}
+
         if (alGridRows.size() > 0) {
             appName = alFirstAppName.text().trim()
             alNameFilter = appName
@@ -43,7 +44,7 @@ class ApplicationCloneSpec extends GebReportingSpec{
             waitFor {!alLoadingGrid.displayed}
             appCountBefore = alGridRows.size()
             waitFor{alFirstAppName.click()}
-        }else {
+        } else {
             def appNameCreate = baseName + " " + randStr + " App For E2E Created"
             def appDescCreate = baseName + " " + randStr + " App Description Created"
             def appBundleCreate = "Buildout"
@@ -194,7 +195,7 @@ class ApplicationCloneSpec extends GebReportingSpec{
         when:
         at ApplicationDetailsPage
         then:
-// TODO some Application Detail items can be reached because cannot be identified by itself. Will chaneg this feature after FE code has reviewed
+        // TODO some Application Detail items can be reached because cannot be identified by itself. Will chaneg this feature after FE code has reviewed
         waitFor{adModalAppName[1].text().trim() == appName}
         waitFor{adModalCloseBtn.click()}
     }
@@ -222,6 +223,5 @@ class ApplicationCloneSpec extends GebReportingSpec{
         at ApplicationEditionPage
         aeModalAppName.value() ==  appName
     }
-
 }
 

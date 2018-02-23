@@ -10,7 +10,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ApplicationCreationSpec extends GebReportingSpec{
+class ApplicationCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -106,13 +106,10 @@ class ApplicationCreationSpec extends GebReportingSpec{
         when:
         at ApplicationDetailsPage
         then:
-// TODO some items cannot located due to missing ID's
+        // TODO some items cannot located due to missing ID's
         waitFor{adModalAppName[1].text().trim() == appName}
         adModalSME1.text().trim() == appSME1
         adModalSME2.text().trim() == appSME2
         adModalAppOwner.text().trim() == appOwner
-
     }
-
 }
-

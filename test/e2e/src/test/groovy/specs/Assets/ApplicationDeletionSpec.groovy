@@ -9,7 +9,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ApplicationDeletionSpec extends GebReportingSpec{
+class ApplicationDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -53,7 +53,7 @@ class ApplicationDeletionSpec extends GebReportingSpec{
         waitFor{alFirstAppName.click()}
         then:
         at ApplicationDetailsPage
-// TODO Following item fetch by data-content cannot be located as self (Label and Value have the same properties)
+        // TODO Following item fetch by data-content cannot be located as self (Label and Value have the same properties)
         adModalAppName[1].text().trim() == appName
     }
 
@@ -116,7 +116,4 @@ class ApplicationDeletionSpec extends GebReportingSpec{
         at ApplicationListPage
         waitFor{alGridRows.size() == 0}
     }
-
-
 }
-
