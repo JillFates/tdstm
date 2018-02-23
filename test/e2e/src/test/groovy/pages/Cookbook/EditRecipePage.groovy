@@ -13,12 +13,11 @@ class EditRecipePage extends Page {
     }
 
     static content = {
-
-        loadingIndicator                { $("div", "ng-show": "isLoading") }
+        loadingIndicator                { $("div", "ng-show": "isLoading")}
         editorModalWindow(wait:true)    { $("div", "window-class":"code-editor-modal")}
         editorModalArea                 { $("div#recipeModalSourceCode")}
-        editorModalTextArea             { editorModalWindow.find("div", class: "CodeMirror-code").find("pre") }
-        editorModalCloseBtn(wait:true)  { $("button", "ng-click": "storeCode()") }
-        editorModalCancelBtn(wait:true) { $("button", "ng-click": "cancel()") }
+        editorModalTextArea             { editorModalWindow.find("div", class: "CodeMirror-code").find("pre")}
+        editorModalCloseBtn(wait:true)  { $("button", "ng-click": "storeCode()")}
+        editorModalCancelBtn(wait:true) { $("button", "ng-click": "cancel()")}
     }
 }
