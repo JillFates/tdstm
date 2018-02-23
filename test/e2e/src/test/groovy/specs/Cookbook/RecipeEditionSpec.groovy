@@ -137,7 +137,8 @@ class RecipeEditionSpec extends GebReportingSpec {
         when:
         edTabSaveWipBtn.click()
         then:
-//   TODO should compare the recipe text vs textarea
+
+        //   TODO should compare the recipe text vs textarea
         waitFor {edTabSaveWipBtn.@disabled == "true"}
     }
 
@@ -163,7 +164,6 @@ class RecipeEditionSpec extends GebReportingSpec {
     }
 
     // Fix Recipe and check syntax
-
     def "Edit recipe to fix error"() {
         testKey = "TM-XXXX"
         given:
@@ -172,7 +172,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         edTabEditorBtn.click()
         then:
         at EditRecipePage
-//   TODO should compare the recipe text vs textarea
+        //   TODO should compare the recipe text vs textarea
     }
 
     def "Add text to editor"() {
@@ -199,7 +199,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         when:
         browser.driver.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipeText+'"');
         then:
-//   TODO should compare the recipe text vs textarea
+        //   TODO should compare the recipe text vs textarea
         editorModalTextArea
     }
 
@@ -211,7 +211,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         waitFor {editorModalCloseBtn.click()}
         then:
         at TabEditorPage
-//   TODO should verify if the modal is closed
+        //   TODO should verify if the modal is closed
     }
 
     def "Check Save WIP Button enabled again"() {
@@ -229,7 +229,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         when:
         waitFor {edTabSaveWipBtn.click()}
         then:
-//   TODO should compare the recipe text vs textarea eg: edTabTextArea == recipeText
+        //   TODO should compare the recipe text vs textarea eg: edTabTextArea == recipeText
         waitFor {edTabSaveWipBtn.@disabled == "true"}
     }
 
@@ -243,9 +243,7 @@ class RecipeEditionSpec extends GebReportingSpec {
         at TabEditorTabSyntaxErrorsPage
         waitFor {SyntErrTabTitle.text() == "No errors found"}
         waitFor {SyntErrTabDetails.text() == ""}
-
     }
-
 }
 
 

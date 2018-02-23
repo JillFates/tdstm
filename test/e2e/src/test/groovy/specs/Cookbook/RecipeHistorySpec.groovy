@@ -270,7 +270,6 @@ class RecipeHistorySpec extends GebReportingSpec {
         hisTabGenLogTabTxt.text().contains("Tasks and")
         hisTabGenLogTabTxt.text().contains("Dependencies created in")
     }
-
 }
 
 

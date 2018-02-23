@@ -45,7 +45,6 @@ class RecipeDeletionSpec extends GebReportingSpec {
         waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
         println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
     }
-
 }
 
 

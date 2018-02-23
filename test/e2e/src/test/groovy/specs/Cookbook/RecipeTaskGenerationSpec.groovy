@@ -82,7 +82,6 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
         gebRecipesWithTasks.getAt(0).text().trim() == "Geb Recipe With Tasks Test"
     }
 
-
     // Task Generation Tab
 
     def "Go to Task Generation tab"() {

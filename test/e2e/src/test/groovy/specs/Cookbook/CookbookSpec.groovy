@@ -55,7 +55,4 @@ class CookbookSpec extends GebReportingSpec {
         recipeGridHeaderCols.getAt(6).text().trim() == "WIP"
         recipeGridHeaderCols.getAt(7).text().trim() == "Actions"
     }
-
 }
-
-

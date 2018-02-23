@@ -139,7 +139,4 @@ class RecipeCreationSpec extends GebReportingSpec {
         editorTab.parent(".active")
         at TabEditorPage
     }
-
 }
-
-
