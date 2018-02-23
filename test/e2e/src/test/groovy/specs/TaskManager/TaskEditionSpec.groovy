@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class TaskEditionSpec extends GebReportingSpec{
+class TaskEditionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -88,7 +88,6 @@ class TaskEditionSpec extends GebReportingSpec{
         teModalNote = taskNote
         then:
         at TaskEditionPage
-
     }
 
     def "Edit Task - Add Asset Type and Name"() {
@@ -184,4 +183,3 @@ class TaskEditionSpec extends GebReportingSpec{
         at TaskManagerPage
     }
 }
-

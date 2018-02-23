@@ -10,7 +10,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class TaskCreationSpec extends GebReportingSpec{
+class TaskCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -98,8 +98,5 @@ class TaskCreationSpec extends GebReportingSpec{
         tdModalTaskStatus.text().trim() == taskStatus
         tdModalTaskPerson.text().trim() == taskPerson
         tdModalTaskTeam.text().trim() == taskTeam
-        
     }
-
 }
-

@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class TaskDeletionSpec extends GebReportingSpec{
+class TaskDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -76,6 +76,4 @@ class TaskDeletionSpec extends GebReportingSpec{
         then:
         at TaskManagerPage
     }
-
 }
-
