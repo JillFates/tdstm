@@ -10,7 +10,7 @@ class Login{
      */
     String readCredentials() {
         String credentials=''
-        File dataFile = new File("C:/TDS/tdstm/test/e2e/src/testDataFile.txt")
+        File dataFile = new File("testDataFile.txt")
         def stream = dataFile.withInputStream {
            credentials=dataFile.text.toString()
         }
