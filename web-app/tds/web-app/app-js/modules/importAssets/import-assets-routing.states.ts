@@ -2,6 +2,8 @@ import { Ng2StateDeclaration } from '@uirouter/angular';
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 import {ManualImportComponent} from './components/manual-import/manual-import.component';
 
+const TOP_MENU_PARENT_SECTION = 'menu-parent-assets';
+
 export class ImportAssetsStates {
 	public static readonly IMPORT_ASSETS = {
 		name: 'tds.importassets',
@@ -16,7 +18,8 @@ export const importAssetsState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 		page: {
 			title: 'IMPORT_ASSETS.MANUAL_IMPORT.MANUAL_ASSET_IMPORT',
 			instruction: '',
-			menu: []
+			menu: [],
+			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-import-assets-etl'}
 		},
 		requiresAuth: true,
 		// requiresPermission: Permission.ProjectFieldSettingsView, TODO: add permissions.
