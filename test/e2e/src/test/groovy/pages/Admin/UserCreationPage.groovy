@@ -1,7 +1,7 @@
 package pages.Admin
 import geb.Page
 
-class UserCreationPage extends Page{
+class UserCreationPage extends Page {
 
     static at = {
         ucPageTitle.text().trim() == "Create UserLogin"
@@ -9,8 +9,7 @@ class UserCreationPage extends Page{
     }
 
     static content = {
-
-        ucPageTitle             { $("section", class:"content-header").find("h1") }
+        ucPageTitle             { $("section", class:"content-header").find("h1")}
         pageMessage (required: false, wait:true) { $("div", class:"message")}
         ucPageForm              { $("form", id:"createUserForm")}
         ucUsername              { ucPageForm.find("input#username")}
@@ -21,9 +20,5 @@ class UserCreationPage extends Page{
         ucActiveSelector        { ucPageForm.find("select#active")}
         ucProjectSelector       { ucPageForm.find("select#projectId")}
         ucSaveBtn               { $("input", class:"save")}
-
     }
-
-
-
 }

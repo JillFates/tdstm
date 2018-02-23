@@ -11,10 +11,10 @@ class ApplicationDetailsPage extends Page{
     }
 
     static content = {
-
         adModalWindow                   (wait:true) { $("div","aria-describedby":"showEntityView","aria-labelledby":"ui-id-7")}
-        adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title") }
-// TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
+        adModalTitle                    { adModalWindow.find("span#ui-id-7", class:"ui-dialog-title")}
+
+        // TODO Following items fetch by data-content cannot be located as self (Label and Value have the same properties)
         adModalAppName                  { adModalWindow.find("span","data-content":"Asset Name *")}
         adModalDescription              { adModalWindow.find("span","data-content":"Description")}
         adModalSME1                     { adModalWindow.find("span","data-content":"SME1")}
@@ -28,7 +28,7 @@ class ApplicationDetailsPage extends Page{
         adModalIsDepColTitles           (required:false) { adModalWindow.find("tr#deps td div",1).find("table thead tr th")}
         adModalIsDepList                (required:false) { adModalWindow.find("tr#deps td div",1).find("table tbody tr")}
 
-//TODO following butttons have no ID to reference them
+        //TODO following butttons have no ID to reference them
         adModalEditBtn                  { adModalWindow.find("button", "onclick":contains("EntityCrud.showAssetEditView"))}
         adModalDeleteBtn                { adModalWindow.find("button", name:"_action_Delete")}
         adModalCloneBtn                 { adModalWindow.find("button", name:"_action_clone")}
@@ -36,9 +36,5 @@ class ApplicationDetailsPage extends Page{
         adModalAddCommentBtn            { adModalWindow.find("button", "onclick":contains("createIssue('${adModalAppName.text().trim()}','comment'"))}
         adModalArchGraphBtn             { adModalWindow.find("button", name:"_action_Delete")}
         adModalCloseBtn                 { adModalWindow.find("button", class:"ui-dialog-titlebar-close")}
-
     }
-
-
-
 }
