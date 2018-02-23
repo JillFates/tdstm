@@ -495,7 +495,7 @@ public class GormUtil {
 			println "getDomainProperty() domainClass=${domainClass.getName()}"
 			throw new RuntimeException('Called with non-domain class parameter')
 		}
-		def d = new DefaultGrailsDomainClass(domainClass)
+		def d = getDomainClass(domainClass)
 		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
 		return cp
 	}

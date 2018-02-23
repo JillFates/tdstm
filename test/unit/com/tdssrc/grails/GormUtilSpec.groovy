@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tds.asset.Application
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
@@ -144,12 +145,13 @@ class GormUtilSpec extends Specification {
 			grailsDomainClassProperty.type == type
 
 		where:
-			clazz       | propertyName || name        | type
-			AssetEntity | 'id'         || 'id'        | Long
-			Database    | 'assetType'  || 'assetType' | String
-			Application | 'sme'        || 'sme'       | Person
-			Room        | 'roomName'   || 'roomName'  | String
-			Person      | 'firstName'  || 'firstName' | String
+			clazz           | propertyName || name        | type
+			AssetEntity     | 'id'         || 'id'        | Long
+			AssetDependency | 'id'         || 'id'        | Long
+			Database        | 'assetType'  || 'assetType' | String
+			Application     | 'sme'        || 'sme'       | Person
+			Room            | 'roomName'   || 'roomName'  | String
+			Person          | 'firstName'  || 'firstName' | String
 	}
 
 	@Unroll
