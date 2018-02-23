@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
 /**
@@ -562,11 +563,11 @@ class ETLProcessor implements RangeChecker {
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.clazz
 
-		if(!fieldsValidator.isDomainProperty(clazz, property)) {
+		if(!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain, property)
 		}
-		if(!fieldsValidator.isDomainIdentifier(clazz, property) &&
-			!fieldsValidator.isReferenceProperty(clazz, property)){
+		if(!GormUtil.isDomainIdentifier(clazz, property) &&
+			!GormUtil.isReferenceProperty(clazz, property)){
 			throw ETLProcessorException.invalidDomainReference(selectedDomain, property)
 		}
 	}
