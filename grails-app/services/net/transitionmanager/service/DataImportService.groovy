@@ -6,11 +6,16 @@ import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+
+// LEGACY
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
+
+
 
 import groovy.util.logging.Slf4j
 import grails.transaction.Transactional
@@ -34,7 +39,17 @@ import org.springframework.transaction.TransactionDefinition
 @Transactional(propagation=Propagation.MANDATORY)
 class DataImportService implements ServiceMethods {
 
+	// IOC
 	SecurityService securityService
+
+	// TODO : JPM 2/2018 : use ETL Enum that translate to the correct domain - See Diego as he implement the Enum for ETL processing
+	// Note need to test importing each of the domain types
+	static final Map ETL_ASSETNAME_MAP = [
+			'Device':'AssetEntity',
+			'Application':'Application',
+			'Database':'Database',
+			'Storage':'Files'
+		]
 
 	/**
 	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
@@ -91,16 +106,29 @@ class DataImportService implements ServiceMethods {
 				importResults.domains << [ domainClass: domainClass, rowsCreated: 0, rowsSkipped: 0 ]
 			} else {
 
+				Boolean isLegacy = isLegacy( importContext )
+				Class batchClass = isLegacy ? DataTransferBatch : ImportBatch
+
 				// Process each batch in a separate transaction to help with performance and memory
-				DataTransferBatch.withNewTransaction { session ->
+				batchClass.withNewTransaction { session ->
 					// Attach the project to the current transaction
 					// project.attach()
 
+					// Reset the batch level context variables
+					importContext.with {
+						errors = []
+						rowsCreated = 0
+						rowsSkipped = 0
+						rowNumber = 0
+					}
+					importContext.domainClass = domainClass
+					importContext.fields = domainJson.fields
+
 					// Create a Transfer Batch for the asset class
-					DataTransferBatch dataTransferBatch = createDataTransferBatch(project, importContext.domainClass, userLogin, importContext.errors)
+					def batch = createBatch(importContext)
 
 					// Proceed with the import if the dtb is not null (if it is, the errors were already reported and added to the processErrors list).
-					if (! dataTransferBatch) {
+					if (! batch) {
 						// Creating the batch failed so record the error and metrics for endpoint consumer
 						importResults.errors << importContext.errors
 						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: 0 ]
@@ -109,20 +137,11 @@ class DataImportService implements ServiceMethods {
 						// Process the rows for the batch
 						//
 
-						// Reset the batch level context variables
-						importContext.with {
-							errors = []
-							rowsCreated = 0
-							rowsSkipped = 0
-							rowNumber = 0
-							fields = domainJson.fields
-						}
-
 						// Import the assets for this batch
-						importRowsIntoBatch(session, dataTransferBatch, importRows, importContext)
+						importRowsIntoBatch(session, batch, importRows, importContext)
 
 						// Update the batch with information about the import results
-						dataTransferBatch.importResults = DataImportHelper.createBatchResultsReport(importContext)
+						batch.importResults = DataImportHelper.createBatchResultsReport(importContext)
 
 						// Update the reporting
 						importResults.batchesCreated++
@@ -136,27 +155,42 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to determine if the importContext at the moment is for the Legacy DataImportBatch or the
+	 * new ImportBatch system.
+	 * @param importContext - the map with all the juicy information used by the Import process
+	 * @return true if Legacy otherwise false
+	 */
+	private Boolean isLegacy(Map importContext) {
+		return ETL_ASSETNAME_MAP.keys().contains( importContext.domainClass )
+	}
+
+	/**
+	 * This is used to create either an ImportBatch or legacy DataTransferBatch object
+	 * @param importContext - the map with all the juicy information used by the Import process
+	 * @return either an ImportBatch or DataTransferBatch Domain instance or null if failed to be created
+	 */
+	private Object createBatch(Map importContext) {
+		if ( isLegacy(importContext) ) {
+			return createDataTransferBatch(importContext)
+		} else {
+			return createImportBatch(importContext)
+		}
+	}
+
+	/**
 	 * LEGACY - Create a Transfer Batch for the given Asset Class.
 	 * @param domainClass
 	 * @param currentUser
 	 * @param project
 	 * @return
 	 */
-	private DataTransferBatch createDataTransferBatch(Project project, String domainClass, UserLogin currentUser, List<String> errors) {
+	private DataTransferBatch createDataTransferBatch(Map importContext) {
 		DataTransferSet dts = DataTransferSet.findBySetCode('ETL')
 		if (!dts) {
 			dts = DataTransferSet.get(1)
 		}
 
-		// TODO : JPM 2/2018 : use ETL Enum that translate to the correct domain - See Diego as he implement the Enum for ETL processing
-		// Note need to test importing each of the domain types
-		Map translate = [
-			'Device':'AssetEntity',
-			'Application':'Application',
-			'Database':'Database',
-			'Storage':'Files'
-		]
-		String transDomainName = translate[domainClass]
+		String transDomainName = ETL_ASSETNAME_MAP[importContext.domainClass]
 
 		// Check if the domain class is valid
 		EavEntityType eavEntityType = EavEntityType.findByDomainName(transDomainName)
@@ -168,22 +202,75 @@ class DataImportService implements ServiceMethods {
 		}
 
 		DataTransferBatch dataTransferBatch = new DataTransferBatch(
+				project: importContext.project,
+				userLogin: importContext.userLogin,
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
-				project: project,
-				userLogin: currentUser,
 				eavEntityType: eavEntityType,
 				dataTransferSet: dts
 			)
 
 		// Check if the transfer batch is valid, report the error if not.
 		if (!dataTransferBatch.save()) {
-			errors << "There was an error when creating th import batch for ${domainClass}"
+			importContext.errors << "There was an error when creating th import batch for ${domainClass}"
 			log.error 'DataImportService.createDataTransferBatch() failed save: {}', GormUtil.allErrorsString(dataTransferBatch)
 			return null
 		}
 
 		return dataTransferBatch
+	}
+
+	/**
+	 * NEW ETL - Create a ImportBatch record for a given Domain Class
+	 * @param domainClass
+	 * @param currentUser
+	 * @param project
+	 * @return a newly created ImportBatch object
+	 */
+	private ImportBatch createImportBatch(Project project, ETLInfo etlInfo, Map importContext) {
+
+		// TODO : JPM 2/2018 : use ETL Enum that translate to the correct domain - See Diego as he implement the Enum for ETL processing
+		// Note need to test importing each of the domain types
+		Map translate = [
+			'Device': 'AssetEntity',
+			'Application': 'Application',
+			'Database': 'Database',
+			'Storage': 'Files'
+		]
+
+		String transDomainName = translate[importContext.domainClass]
+
+		ImportBatch ib = new ImportBatch(
+				project: project,
+				status: ImportBatchStatusEnum.PENDING,
+				provider: etlInfo.provider
+				dataScript: etlInfo.dataScript
+
+				// TODO : JPM 2/2018 : Not certain that this we want (see Deigo's ETL Enum for the Domains)
+				domainClassName: transDomainName
+
+				createdBy: etlInfo.createdBy
+				autoProcess: etlInfo.autoProcess
+				dateFormat: etlInfo.dataFormat
+
+				// Stored in MySQL as JSON
+				fieldNameList: JsonUtil.toJson(importContext.fields)
+
+				nullIndicator: etlInfo.nullIndicator
+				originalFilename: etlInfo.originalFilename
+				overwriteWithBlanks: etlInfo.overwriteWithBlanks
+				timezone: etlInfo.timezone
+				warnOnChangesAfter: etlInfo.warnOnChangesAfter
+			)
+
+		// Check if the transfer batch is valid, report the error if not.
+		if (!ib.save()) {
+			importContext.errors << "There was an error when creating th import batch for ${domainClass}"
+			log.error 'DataImportService.createImportBatch() failed save: {}', GormUtil.allErrorsString(dataTransferBatch)
+			return null
+		}
+
+		return ib
 	}
 
 	/**

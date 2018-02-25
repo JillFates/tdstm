@@ -218,4 +218,5 @@ databaseChangeLog = {
 	include file: '20180129-create-import-batch-tables.groovy'
 	include file: '20180213-change-credential-and-add-credential-permission.groovy'
 	include file: '20180216-additional-changes-to-credential.groovy'
+	include file: '20180225-changes-to-import-batch.groovy'
 }

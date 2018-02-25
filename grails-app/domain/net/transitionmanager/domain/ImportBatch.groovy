@@ -63,6 +63,9 @@ class ImportBatch {
 	// A JSON List of the field names that are referenced in the detail records
 	String fieldNameList = '[]'
 
+	// The results of the various import process steps (in HTML format)
+	String importResults
+
 	Date dateCreated
 	Date lastUpdated
 
