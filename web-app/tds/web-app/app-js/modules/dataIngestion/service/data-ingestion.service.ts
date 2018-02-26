@@ -162,21 +162,17 @@ export class DataIngestionService {
 				if (data.config) {
 					for (let property in data.config) {
 						if (data.config.hasOwnProperty(property)) {
-							let column: {
-								label?: string,
-								property: string,
-								type: string,
-								width?: 150
-							} = {
+							let column = {
 								label: StringUtils.toCapitalCase(data.config[property].property, true),
 								property: data.config[property].property,
 								type: data.config[property].type,
-								width: 150
+								width: 140
 							};
 							columns.push(column);
 						}
 					}
 					sampleDataModel = new SampleDataModel(columns, data.rows);
+					sampleDataModel.gridHeight = 300;
 				}
 				return sampleDataModel;
 			})

@@ -87,6 +87,7 @@ export enum DataScriptMode {
 export class SampleDataModel {
 	columns: any[];
 	data: any[];
+	gridHeight = 23;
 	constructor(columns: any, data: any) {
 		this.columns = columns;
 		this.data = data;

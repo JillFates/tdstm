@@ -80,9 +80,9 @@
                                 <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-up':collapsed.sample}" style="padding-right:0px"></i>
                             </button>
                         </div>
-                        <div class="col-md-12" *ngIf="!collapsed.sample">
-                            <kendo-grid [data]="sampleDataModel.data" [height]="200">
-                                <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}">
+                        <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="overflow-y: scroll;">
+                            <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
+                                <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
                                     <ng-template kendoGridHeaderTemplate>
                                         <label> {{column.label}}</label>
                                     </ng-template>
