@@ -3,6 +3,10 @@ package com.tdsops.tm.enums.domain
 import groovy.transform.CompileStatic
 import net.transitionmanager.service.InvalidParamException
 
+/**
+ * This enum represents the AssetComment properties exposed to the API Action operations
+ * so the user can add them as parameters upon an API Action execution.
+ */
 @CompileStatic
 enum AssetCommentPropertyEnum {
 	TASK_NUMBER('taskNumber', 'Task Number'),
