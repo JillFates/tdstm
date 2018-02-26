@@ -1,13 +1,11 @@
 export class ScriptTestResultModel {
 	consoleLog: string;
-	data: Array<any>;
 	isValid: boolean;
 	error?: string;
-	domains: Array<string> = [];
+	domains: Array<any> = []; // this contains {domain, fields(columns, data(rows)}
 
 	constructor() {
 		this.consoleLog = null;
-		this.data = null;
 		this.isValid = false;
 		this.domains = [];
 	}
