@@ -1,6 +1,9 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
+import getl.csv.CSVConnection
+import getl.csv.CSVDataset
+import getl.data.Field
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -12,6 +15,8 @@ import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import org.apache.poi.hssf.record.aggregates.CustomViewSettingsRecordAggregate
+import org.springframework.http.HttpStatus
 
 /**
  * Provide the endpoints for working with DataScripts.
@@ -57,7 +62,7 @@ class WsDataScriptController implements ControllerMethods {
         renderSuccessJson(dataScript: dataScript.toMap())
     }
 
-   /**
+    /**
      * Endpoint for searching for a particular DataScript.
      *
      * @param id - DataScript id
@@ -174,23 +179,32 @@ class WsDataScriptController implements ControllerMethods {
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
 
-        def jsonMap = [
-                status: 'success',
-                data: [
-                        config: [
-                                [property:'id', type: 'text'],
-                                [property:'server name', type: 'text']
-                        ],
-                        rows: [
-                                [ id: '12312', 'server name': 'widget'],
-                                [ id: '34323', 'server name': 'widget']
-                        ]
-                ]
-        ]
+	    CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
+	    def csv = new CSVDataset(connection: con, fileName: filename, header: true)
 
-        render jsonMap as JSON
+	    try {
+		    List<Field> fields = csv.connection.driver.fields(csv)
 
-        // render status: 404
+		    List<Map<String, String>> config = fields.collect {
+			    def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+			    [
+					      property: it.name,
+					      type    : type
+			    ]
+		    }
+
+		    def jsonMap = [
+				      status: 'success',
+				      data  : [
+							     config: config,
+							     rows  : csv.rows()
+				      ]
+		    ]
+
+		    render jsonMap as JSON
+	    }catch ( ex ) {
+		    render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
+	    }
     }
 
 }
