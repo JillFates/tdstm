@@ -4,6 +4,11 @@ import com.tdsops.etl.ETLProcessorResult
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
@@ -111,29 +116,27 @@ class WsAssetImportController implements ControllerMethods {
 		Person person = currentPerson()
 
 		if (!filename) {
-			sendInvalidInput('Missing filename')
-			return
+			throw new InvalidParamException('Missing filename')
 		}
 
 		if (! filename.endsWith('.json')) {
-			sendInvalidInput('File must be JSON format')
-			return
+			throw new InvalidParamException('File must be JSON format')
 		}
 
 		InputStream inputStream = fileSystemService.openTemporaryFile(filename)
 		if (!inputStream) {
-			sendInvalidInput 'Specified input file not found'
-			return
+			throw new InvalidParamException('Specified input file not found')
 		}
 
-
-		Map importResults = dataImportService.loadJsonIntoImportBatch(person.userLogin, project, inputStream)
+		JSONObject importJson = JsonUtil.parseFile(inputStream)
 
 		inputStream.close()
 
-		Map result = [status:'success', errors:[], batchesCreated: importResults.batchesCreated]
+		Map importResults = dataImportService.loadETLJsonIntoImportBatch(project, person.userLogin, importJson)
 
-		renderAsJson result
+		log.debug "Results of loadData() $importResults"
+
+		renderSuccessJson(importResults)
 	}
 
 	/**
@@ -161,37 +164,29 @@ class WsAssetImportController implements ControllerMethods {
 	def transformData(Long dataScriptId, String filename) {
 		Project project = getProjectForWs()
 
-		Map result = [status:'success', errors:[], results: []]
-
+		Map result = [filename:'']
 		if (!dataScriptId) {
-			sendInvalidInput 'Missing dataScriptId parameter'
-			return
-		}
-		// See if we can find an action to be invoked
-		DataScript dataScript = DataScript.read(dataScriptId)
-		if (!dataScript) {
-			sendNotFound("DataScript $dataScriptId Not Found")
-			return
-		}
-
-		if (! dataScript.etlSourceCode) {
-			result.status='error'
-			result.errors << 'DataScript has no source specified'
-			return result
+			throw new InvalidParamException('Missing required dataScriptId parameter')
 		}
 
 		if (!filename) {
-			sendInvalidInput 'Missing filename parameter'
-			return
+			throw new InvalidParamException('Missing filename parameter')
 		}
 
 		if (! (filename.endsWith('.csv') || filename.endsWith('.xml'))) {
-			sendInvalidInput 'File type was not CSV or XML'
-			return
+			// TODO : JPM 2/2016 : get the list of extentions from FileSystemUtil
+			throw new InvalidParamException('File type must be JSON')
 		}
 
 		if (! fileSystemService.temporaryFileExists(filename)) {
-			sendInvalidInput 'Specified input file not found'
+			throw new InvalidParamException('Specified input file not found')
+		}
+
+		// See if we can find an action to be invoked
+		DataScript dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
+
+		if (! dataScript.etlSourceCode) {
+			throw new InvalidParamException('DataScript has no source specified')
 		}
 
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
@@ -203,16 +198,15 @@ class WsAssetImportController implements ControllerMethods {
 		result.filename = outputFilename
 
 		try {
-			os << (etlProcessor.result.domains as JSON)
+			os << (etlProcessor.result.toMap() as JSON)
 			os.close()
 		}
 		catch(e) {
-			result.success='error'
-			result.errors << 'Unable to write output file'
 			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
+			throw new RuntimeException('Unable to write output file : ' + e.message)
 		}
 
-		renderAsJson result
+		renderSuccessJson result
 	}
 
 	/**

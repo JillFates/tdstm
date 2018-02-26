@@ -1,5 +1,6 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
 import com.tdsops.metaclass.CustomMethods
 import com.tdssrc.eav.EavAttributeSet
@@ -59,8 +60,12 @@ class BootStrap {
 			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
 		}
 
+		// Enable the ability to do Rollback to Savepoints
+		ApplicationContextHolder.getBean('transactionManager').setNestedTransactionAllowed(true)
+
 		taskService.init()
 
+		// Registers a marshaller for JSON for the Notice domain ( to support notice as JSON )
 		Notice.registerObjectMarshaller()
 
 		// Warm up AESCodec
@@ -68,7 +73,7 @@ class BootStrap {
 
 		//
 		// NOTHING NEEDED IN PRODUCTION SHOULD BE PLACED BELOW HERE
-		// 
+		//
 		if (Environment.current == Environment.PRODUCTION) {
 			return
 		}

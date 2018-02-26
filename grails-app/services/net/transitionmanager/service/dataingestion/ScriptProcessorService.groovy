@@ -99,10 +99,11 @@ class ScriptProcessorService {
         }
 
         result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = [ETLInfo: etlProcessor.result.ETLInfo, domains: etlProcessor.result.domains]
+        result.data = etlProcessor.result.toMap()
 
         return result
     }
+
 
     /**
      * Checks if the syntax for a script content is correct using GrooyShell.parse method.

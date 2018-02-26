@@ -28,6 +28,8 @@ export const en_DICTIONARY: Object = {
 			'FAVORITE': 'Favorite',
 			'NAME': 'Name',
 			'CREATED_BY': 'Created By',
+			'CREATED_ON': 'Created On',
+			'UPDATED_ON': 'Updated On',
 			'SHARED': 'Shared',
 		},
 		'SYSTEM_VIEW': 'System View'
