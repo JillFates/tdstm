@@ -158,13 +158,15 @@ class ETLDataSetSpec extends ETLBaseSpec {
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
-
 	}
 
 	void 'test can read labels from dataSource and create a map of columns'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -193,7 +195,10 @@ class ETLDataSetSpec extends ETLBaseSpec {
 	void 'test can iterate over all data source rows from a json dataset'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), jsonDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				jsonDataSet,
+				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -209,5 +214,18 @@ class ETLDataSetSpec extends ETLBaseSpec {
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == jsonDataSet.readRows()
+
+			// TODO: Auto detect JSON headers. Not yet implemented
+//		and : 'A column map is created'
+//			etlProcessor.column('device id').index == 0
+//			etlProcessor.column(0).label == 'device id'
+//
+//		and:
+//			etlProcessor.column('model name').index == 1
+//			etlProcessor.column(1).label == 'model name'
+//
+//		and:
+//			etlProcessor.column('manufacturer name').index == 2
+//			etlProcessor.column(2).label == 'manufacturer name'
 	}
 }
