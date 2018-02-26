@@ -42,7 +42,7 @@ enum AssetCommentPropertyEnum {
 		return label
 	}
 
-	static AssetCommentPropertyEnum getByFieldOrLabel(String str) {
+	static AssetCommentPropertyEnum valueOfFieldOrLabel(String str) {
 		AssetCommentPropertyEnum value = values().find { e ->
 			e.field == str || e.label == str
 		}
