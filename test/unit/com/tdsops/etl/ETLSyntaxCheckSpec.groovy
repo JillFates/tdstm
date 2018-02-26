@@ -29,11 +29,10 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
 import spock.lang.Shared
-import spock.lang.Specification
 
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model])
-class ETLSyntaxCheckSpec extends Specification {
+class ETLSyntaxCheckSpec extends ETLBaseSpec {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
