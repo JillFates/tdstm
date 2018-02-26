@@ -740,6 +740,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/apiAction/fields" {
+			controller = "wsApiAction"
+			action = [
+					GET: "domainFields"
+			]
+		}
+
 		//
 		// DataScript
 		//

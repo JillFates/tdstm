@@ -1,4 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiActionCommand
@@ -98,5 +99,23 @@ class WsApiActionController implements ControllerMethods {
 			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
 		}
 	}
+
+    /**
+     * Retrieve domain properties for API Action CRUD
+     */
+    @HasPermission(Permission.UserGeneralAccess)
+    def domainFields(String domains) {
+        Map<String, String> domainsFieldsMap = [:]
+        if (domains) {
+            for (String domain : domains.split(',')) {
+                switch (domain) {
+                    case ~/(?i)(task)/:
+                        domainsFieldsMap.put(domain, AssetCommentPropertyEnum.toMap())
+                        break;
+                }
+            }
+        }
+        renderSuccessJson(domains: [domainsFieldsMap])
+    }
 
 }
