@@ -20,11 +20,16 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import spock.lang.Shared
-import spock.lang.Specification
 
+/**
+ * Test about ETLProcessor commands:
+ * <ul>
+ *     <li><b>transform</b></li>
+ * </ul>
+ */
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database])
-class ETLTransformSpec extends Specification {
+class ETLTransformSpec extends ETLBaseSpec {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -43,7 +48,6 @@ class ETLTransformSpec extends Specification {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
-
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -132,7 +136,8 @@ class ETLTransformSpec extends Specification {
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
 		applicationFieldsValidator = new DomainClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, 
+			buildFieldSpecsFor(AssetClass.APPLICATION))
 
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
@@ -1075,82 +1080,5 @@ class ETLTransformSpec extends Specification {
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
 			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
 
-	}
-
-	/**
-	 * Helper method to create Fields Specs based on Asset definition
-	 * @param asset
-	 * @return
-	 */
-	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
-
-		List<Map<String, ?>> fieldSpecs = []
-		switch(asset){
-			case AssetClass.APPLICATION:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('appVendor', 'Vendor'),
-					buildFieldSpec('environment', 'Environment'),
-					buildFieldSpec('description', 'Description'),
-					buildFieldSpec('assetName', 'Name'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case AssetClass.DATABASE:
-
-				break
-			case AssetClass.DEVICE:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('location', 'Location'),
-					buildFieldSpec('name', 'Name'),
-					buildFieldSpec('environment', 'Environment'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case ETLDomain.Dependency:
-				fieldSpecs = [
-					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetName', 'AssetName'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('asset', 'Asset'),
-					buildFieldSpec('comment', 'Comment'),
-					buildFieldSpec('status', 'Status'),
-					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
-				]
-				break
-			case AssetClass.STORAGE:
-
-				break
-		}
-
-		return fieldSpecs
-	}
-
-	/**
-	 * Builds a spec structure used to validate asset fields
-	 * @param field
-	 * @param label
-	 * @param type
-	 * @param required
-	 * @return a map with the correct fieldSpec format
-	 */
-	private Map<String, ?> buildFieldSpec(String field, String label, String type = "String", Integer required = 0) {
-		return [
-			constraints: [
-				required: required
-			],
-			control: type,
-			default: '',
-			field: field,
-			imp: 'U',
-			label: label,
-			order: 0,
-			shared: 0,
-			show: 0,
-			tip: "",
-			udf: 0
-		]
 	}
 }
