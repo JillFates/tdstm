@@ -457,10 +457,6 @@ export class DataIngestionService {
 		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let response = res.json();
-				response.data.domains = [];
-				for (let domain of Object.keys(response.data.data)) {
-					response.data.domains.push(domain);
-				}
 				return response;
 			})
 			.catch((error: any) => error.json());

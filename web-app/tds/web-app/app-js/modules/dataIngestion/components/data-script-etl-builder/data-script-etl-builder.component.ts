@@ -62,9 +62,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.clearLogVariables('test');
 		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
 			this.scriptTestResult = result.data;
+			this.scriptTestResult.domains = result.data.data.domains;
 			this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
 			for (let domain of this.scriptTestResult.domains) {
-				this.collapsed[domain] = false;
+				this.collapsed[domain.domain] = false;
 			}
 			this.consoleSettings.scriptTestResult = this.scriptTestResult;
 		});
