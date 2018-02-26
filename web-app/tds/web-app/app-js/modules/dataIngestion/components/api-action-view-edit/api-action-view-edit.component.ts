@@ -67,6 +67,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public agentList = new Array<AgentModel>();
 	public agentMethodList = new Array<AgentMethodModel>();
 	public agentCredentialList = new Array<CredentialModel>();
+	public providerCredentialList = new Array<CredentialModel>();
 	public datascriptList = new Array<DataScriptModel>();
 	public providerDatascriptList = new Array<DataScriptModel>();
 	public parameterList: GridDataResult;
@@ -373,7 +374,7 @@ export class APIActionViewEditComponent implements OnInit {
 				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
 
 			if (this.apiActionModel.producesData) {
-				this.validInfoForm = this.apiActionModel.defaultDataScript.id !== 0;
+				this.validInfoForm = this.validInfoForm && this.apiActionModel.defaultDataScript.id !== 0;
 			}
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {
@@ -434,19 +435,25 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
-		// Call Credential API that does not exist yet...
+		// Populate only the Credentials that are related to the provider
+		this.providerCredentialList = new Array<CredentialModel>();
+		this.providerCredentialList.push({id: 0, name: 'Select...'});
+		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
 
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
 		this.providerDatascriptList.push({id: 0, name: 'Select...'});
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
+
 		if (previousValue) {
 			this.apiActionModel.defaultDataScript = this.providerDatascriptList.find((datascript) => datascript.id === this.apiActionModel.defaultDataScript.id);
 			this.modifySignatureByProperty('defaultDataScript');
+
+			this.apiActionModel.credential = this.providerCredentialList.find((credential) => credential.id === this.apiActionModel.credential.id);
+			this.modifySignatureByProperty('credential');
 		} else {
 			this.apiActionModel.defaultDataScript = this.providerDatascriptList[0];
-			// Set Credential to default
-			this.apiActionModel.credential = this.agentCredentialList[0];
+			this.apiActionModel.credential = this.providerCredentialList[0];
 		}
 	}
 
