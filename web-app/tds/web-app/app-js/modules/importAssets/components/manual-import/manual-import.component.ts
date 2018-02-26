@@ -4,6 +4,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
 
 @Component({
 	selector: 'manual-import',
@@ -20,7 +21,7 @@ export class ManualImportComponent implements OnInit {
 	private fetchResult: any;
 	private fetchInProcess = false;
 	private fetchInputUsed: 'action' | 'file' = 'action';
-	private transformResult: any;
+	private transformResult: ApiReponseModel;
 	private transformInProcess = false;
 	private importResult: any;
 	private importInProcess = false;
@@ -92,10 +93,10 @@ export class ManualImportComponent implements OnInit {
 		this.importResult = null;
 		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result) => {
 			this.transformResult = result;
-			if (result.status === 'error') {
+			if (this.transformResult.status === 'error') {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
-					message: result.errors[0]
+					message: this.transformResult.errors[0]
 				});
 			}
 			this.transformInProcess = false;
@@ -109,7 +110,7 @@ export class ManualImportComponent implements OnInit {
 	private onImport(): void {
 		this.importInProcess = true;
 		this.importResult = null;
-		this.importAssetsService.postImport(this.transformResult.filename).subscribe( (result) => {
+		this.importAssetsService.postImport(this.transformResult.data.filename).subscribe( (result) => {
 			this.importResult = result;
 			this.importInProcess = false;
 		});
@@ -153,7 +154,7 @@ export class ManualImportComponent implements OnInit {
 			});
 		} else {
 			this.transformFileContent = null;
-			this.importAssetsService.getFileContent(this.transformResult.filename).subscribe((result) => {
+			this.importAssetsService.getFileContent(this.transformResult.data.filename).subscribe((result) => {
 				this.transformFileContent = result;
 			});
 		}

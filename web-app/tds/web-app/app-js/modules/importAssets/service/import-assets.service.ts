@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import { Response } from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
+import {ApiReponseModel} from '../../../shared/model/ApiReponseModel';
 
 @Injectable()
 export class ImportAssetsService {
@@ -20,16 +21,6 @@ export class ImportAssetsService {
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());
-
-		/*
-		// TODO: call real endpoint
-		let results = [
-			{id: 1, name: 'Service Now - Linux Servers'},
-			{id: 2, name: 'Service Now - Linux Servers v2'},
-			{id: 3, name: 'Service Now - Linux Servers v3'}
-		];
-		return Observable.of(results);
-		*/
 	}
 
 	/**
@@ -43,13 +34,6 @@ export class ImportAssetsService {
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());
-		/*
-		let result = {
-			status: 'Success',
-			filename: 'fetchResults.json',
-			extension: 'JSON'
-		};
-		return Observable.of(result);*/
 	}
 
 	/**
@@ -69,12 +53,6 @@ export class ImportAssetsService {
 					return res['_body'];
 				}
 			}).catch((error: any) => error.json());
-		/*let result = {
-			a: 'foo',
-			b: 'bar',
-			c: 'foobar'
-		};
-		return Observable.of(result);*/
 	}
 
 	/**
@@ -82,20 +60,12 @@ export class ImportAssetsService {
 	 * @param option
 	 * @returns {Observable<any>} It will return the status including counts, errors, and output filename.
 	 */
-	public postTransform(datascript: any, filename: string): Observable<any> {
+	public postTransform(datascript: any, filename: string): Observable<ApiReponseModel> {
 		let url = this.importEndpointURL + 'transformData?dataScriptId=' + datascript.id + '&filename=' + filename;
 		return this.http.post(url, null)
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());
-		/*let result = {
-			status: 'Success',
-			counts: 100,
-			errors: ['error1', 'error2'],
-			outputFilename: 'transformResults.json',
-			outputFilenameExtension: 'JSON'
-		};
-		return Observable.of(result);*/
 	}
 
 	/**
@@ -108,11 +78,5 @@ export class ImportAssetsService {
 			.map((res: Response) => {
 				return res.json();
 			}).catch((error: any) => error.json());
-		/*let result = {
-			status: 'Success',
-			counts: 100,
-			errors: ['error1', 'error2']
-		};
-		return Observable.of(result);*/
 	}
 }
