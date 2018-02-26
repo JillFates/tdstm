@@ -343,7 +343,7 @@
 								<div class="row">
 									<div class="col-md-12 event-wrapper">
 										<div class="row">
-											<div class="col-md-1"><label>Events:</label></div>
+											<div class="col-md-1 event-title"><label>Events:</label></div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
@@ -395,7 +395,7 @@
 													</div>
 												</div>
 											</div>
-											<div class="col-md-2 customize"><label>Customize:</label></div>
+											<div class="col-md-2 customize event-title"><label>Customize:</label></div>
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
@@ -415,7 +415,7 @@
 									<div class="all-codemirrors">
 										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[0].selected">
 											<div class="form-group">
-												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">logic to determine the Success or other status based on API response.</span></label>
+												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">- logic to determine the Success or other status based on API response.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
 													<tds-check-action *ngIf="modalType !== actionTypes.VIEW" [(model)]="apiActionModel.eventReactions[0]" (onClick)="verifyCode(apiActionModel.eventReactions[0])"></tds-check-action>
 													<button class="btn btn-default" (click)="openCloseCodeMirror(apiActionModel.eventReactions[0])">
