@@ -222,6 +222,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
+		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
