@@ -273,7 +273,9 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onSaveApiAction(): void {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
-				this.activeDialog.close(result);
+				if (result) {
+					this.activeDialog.close(result);
+				}
 			},
 			(err) => console.log(err));
 	}
