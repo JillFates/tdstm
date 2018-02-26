@@ -6,6 +6,10 @@ export class AgentModel {
 export class CredentialModel {
 	id?: number;
 	name?: string;
+	provider?: {
+		id?: number,
+		name: string
+	};
 }
 
 export class AgentMethodModel {
