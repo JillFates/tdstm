@@ -31,6 +31,8 @@ export class DataScriptListComponent {
 		}
 	};
 
+	public pageSize = 25;
+	public skip = 0;
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
@@ -45,6 +47,8 @@ export class DataScriptListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
+		this.state.take = this.pageSize;
+		this.state.skip = this.skip;
 		dataScripts.subscribe(
 			(result) => {
 				this.resultSet = result;
@@ -229,5 +233,11 @@ export class DataScriptListComponent {
 		if (event.target && event.target.parentNode) {
 			event.target.parentNode.click();
 		}
+	}
+
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.gridData = process(this.resultSet, this.state);
 	}
 }
