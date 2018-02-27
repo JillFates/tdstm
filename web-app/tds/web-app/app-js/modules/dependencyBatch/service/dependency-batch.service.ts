@@ -154,9 +154,14 @@ export class DependencyBatchService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * TODO: document.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
 	getImportBatchRecords(id: number): Observable<any> {
 		const mockResult: Array<ImportBatchRecordModel> = [
-			{id: 1, status: 'Pending', errorCount: 1, operation: 'Add', sourceRow: 1, name: 'pwebwp01', type: 'VM', depType: 'VM Runs On', nameD: 'VMClusterPCI01', typeD: 'Application'},
+			{id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRow: 1, name: 'pwebwp01', type: 'VM', depType: 'VM Runs On', nameD: 'VMClusterPCI01', typeD: 'Application'},
 			{id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRow: 2, name: 'Batch Reporting', type: 'Application', depType: 'File', nameD: 'Ecommerce', typeD: 'Application'},
 			{id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRow: 3, name: 'Batch Reporting', type: 'Application', depType: 'DB', nameD: null, typeD: null},
 			{id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRow: 4, name: 'Online Banking', type: 'Application', depType: 'Web Service', nameD: 'RSA SecureID SaaS', typeD: 'Application'},
