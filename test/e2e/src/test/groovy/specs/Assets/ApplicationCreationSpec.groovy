@@ -14,7 +14,8 @@ class ApplicationCreationSpec extends GebReportingSpec {
 
     def testKey
     static testCount
-    //Define the names of the app you will Create and Edit
+
+    //Define the names of the Application you will Create and Edit
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static baseName = "QAE2E"
     static appName = baseName +" "+ randStr + " App For E2E Created"
@@ -40,72 +41,87 @@ class ApplicationCreationSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Asset Applications"() {
-        testKey = "TM-XXXX"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToApplications()
-        then:
-        at ApplicationListPage
+    def "1. The User Navigates in the Assets Application List Section"() {
+        testKey = "tm-xxxx"
+        given: 'the user searches in the menu page'
+            at MenuPage
+        when: 'the user clicks in the assets > applications menu option'
+            menuModule.goToApplications()
+
+        then: 'application list should be displayed'
+            at ApplicationListPage
     }
 
-    def "Open Create Application Modal Window"() {
+    def "2. The User gains access to the Application Creation Window"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        alCreateAppBtn.click()
-        then:
-        at ApplicationCreationPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User Clicks the "Create App" Button'
+            alCreateAppBtn.click()
+
+        then: 'Application Create Pop-up should be displayed'
+            at ApplicationCreationPage
     }
 
-    def "Create Application"() {
+    def "3. A brand new Application is successfully created"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationCreationPage
-        when:
-        acModalAppName = appName
-        acModalDescription = appDesc
-        acModalSME1Selector.click()
-        waitFor { acModalSelectorValues.size() > 2 }
-        appSME1 = acModalSelectorValues[2].text()
-        waitFor { acModalSelectorValues.find("div", role:"option", text: appSME1).click() }
-        acModalSME2Selector.click()
-        waitFor { acModalSelectorValues.size() > 2 }
-        appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-1,2)].text()
-        waitFor { acModalSelectorValues.find("div", role:"option", text: appSME2).click() }
-        acModalAppOwnerSelector.click()
-        appOwner = acModalSelectorValues[acModalSelectorValues.size()-1].text()
-        waitFor { acModalSelectorValues.size() > 2 }
-        waitFor { acModalSelectorValues.find("div", role:"option", text: appOwner).click() }
-        acModalBundleSelector = appBundle
-        acModalPlanStatusSelector = appStatus
-        waitFor { acModalSaveBtn.click() }
-        then:
-        at ApplicationDetailsPage
-        waitFor { adModalCloseBtn.click() }
-        at ApplicationListPage
+
+        given: 'The User is in the Application Create Pop-up'
+            at ApplicationCreationPage
+        when: 'The User completes all the Random Information for Name and Description'
+            acModalAppName = appName
+            acModalDescription = appDesc
+        and: 'The User Searches by SME1'
+            acModalSME1Selector.click()
+            waitFor { acModalSelectorValues.size() > 2 }
+            appSME1 = acModalSelectorValues[2].text()
+            waitFor { acModalSelectorValues.find("div", role:"option", text: appSME1).click() }
+        and: 'The User Searches by SME2'
+            acModalSME2Selector.click()
+            waitFor { acModalSelectorValues.size() > 2 }
+            appSME2 = acModalSelectorValues[Math.floorDiv(acModalSelectorValues.size()-1,2)].text()
+            waitFor { acModalSelectorValues.find("div", role:"option", text: appSME2).click() }
+        and: 'The User Searches by App Owner'
+            acModalAppOwnerSelector.click()
+            appOwner = acModalSelectorValues[acModalSelectorValues.size()-1].text()
+            waitFor { acModalSelectorValues.size() > 2 }
+            waitFor { acModalSelectorValues.find("div", role:"option", text: appOwner).click() }
+        and: 'The User chooses a Bundle'
+            acModalBundleSelector = appBundle
+        and: 'The User chooses a proper Status'
+            acModalPlanStatusSelector = appStatus
+        and: 'The User clicks the the "Save" Button'
+            waitFor { acModalSaveBtn.click() }
+
+        then: ' The User is redirected to the Application Details Page'
+            at ApplicationDetailsPage
+        and: 'The User closes the Application Details Page'
+            waitFor { adModalCloseBtn.click() }
+        and: 'The User is redirected to the Application List Page'
+            at ApplicationListPage
     }
 
-    def "Filter Application on List"() {
+    def "4. The User Filters out by Application Name Name that was recently created"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        waitFor{alFirstAppName.text().trim() == appName}
-        waitFor{alFirstAppName.click()}
-        then:
-        at ApplicationDetailsPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User Clicks the Application Name Filter Column'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+            waitFor{alFirstAppName.text().trim() == appName}
+        and: 'The User searches for it'
+            waitFor{alFirstAppName.click()}
+
+        then: 'The Application should be displayed'
+            at ApplicationDetailsPage
     }
 
-    def "Validate Application Details"() {
+    def "5. Validate Application Details"() {
         testKey = "TM-XXXX"
-        when:
-        at ApplicationDetailsPage
-        then:
+        when: 'The User is on the Application List Page'
+            at ApplicationDetailsPage
+
+        then: 'The User Searches by the AppName, SME1, SME2, AppOwner'
         // TODO some items cannot located due to missing ID's
         waitFor{adModalAppName[1].text().trim() == appName}
         adModalSME1.text().trim() == appSME1
