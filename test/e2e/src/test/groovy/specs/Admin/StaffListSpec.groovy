@@ -16,7 +16,7 @@ class StaffListSpec extends GebReportingSpec {
     static testCount
     static randStr =  RandomString.getInstance().randomAlphaNumeric(4)
 
-    //Define the names for the Staffq you will Create and Edit
+    //Define the names for the Staff that you will Create and Edit
     static baseName = "QAE2E"
     static userProject = "TM-Demo"
     static teamName = "Account Manager"
@@ -42,84 +42,100 @@ class StaffListSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    // Enter on Staff page
-    def "Go to List Staff"() {
+    def "1. The User Navigates in the Staff List Section"() {
         testKey = "TM-XXXX"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToAdminListStaff()
-        then:
-        at StaffListPage
-        waitFor { gridSize > 0 }
+        given: 'The User searches in the Menu Page'
+            at MenuPage
+        when: 'The User Clicks in the Admin > List Staff Menu Option'
+            menuModule.goToAdminListStaff()
+
+        then: 'Staff List Should be displayed'
+            at StaffListPage
+        and: 'We wait for the Entire in order to be properly displayed'
+            waitFor { gridSize > 0 }
     }
 
-    def "Open Create Staff pop up"() {
+    def "2. The User gains access to the Create Staff Pop-up"() {
         testKey = "TM-XXXX"
-        given:
-        at StaffListPage
-        when:
-        waitFor {createStaffBtn.click()}
-        then:
-        at StaffCreationPage
+        given: 'The User is on the Staff List Page'
+            at StaffListPage
+        when: 'The User Clicks the "Create Staff" Button'
+            waitFor {createStaffBtn.click()}
+
+        then: 'Create Staff Pop-up should be displayed'
+            at StaffCreationPage
     }
 
-    def "Create Staff"() {
+    def "3. A brand new Staff is successfully created"() {
         testKey = "TM-XXXX"
-        given:
-        at StaffCreationPage
-        when:
-        scModalFirstName = firstName
-        scModalMiddleName = middleName
-        scModalLastName = lastName
-        scModalAddTeam.click()
-        waitFor {scModalTeamSelector.present}
-        scModalTeamSelector = teamName
-        waitFor { scModalSaveBtn.click() }
+        given: 'The User is in the Create Staff Pop-up'
+            at StaffCreationPage
+        when: 'The User randomly completes First, Middle and Last Name'
+            scModalFirstName = firstName
+            scModalMiddleName = middleName
+            scModalLastName = lastName
+        and: 'The User Clicks the "Add Team" Option'
+            scModalAddTeam.click()
+        and: 'We wait for the Selector to be present'
+            waitFor {scModalTeamSelector.present}
+        and: 'The User Searches by the "Account Manager" Team Member'
+            scModalTeamSelector = teamName
+        and: 'The User Clicks the "Save" Button'
+            waitFor { scModalSaveBtn.click() }
 
-        then:
-        at StaffListPage
-        waitFor {pageMessage.text() == "A record for "+firstName+" "+middleName+" "+lastName+" was created"}
+        then: 'The Pop-up should be closed and the User should be redirected to the Staff List Page'
+            at StaffListPage
+        and: 'A Success massage stating the User that was currently created should be displayed'
+            waitFor {pageMessage.text() == "A record for "+firstName+" "+middleName+" "+lastName+" was created"}
     }
 
-    def "Filter by Staff First Name" () {
+    def "3. The User Filters out by Staff First Name that was recently created"() {
         testKey = "TM-XXXX"
-        given:
-        at StaffListPage
-        when:
-        waitFor { firstNameFilter.click() }
-        firstNameFilter = firstName
-        then:
-        waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_firstname").find("a").text() == firstName}
+        given: 'The User is on the Staff List Page'
+            at StaffListPage
+        when: 'The User Clicks the First Name Filter Column'
+            waitFor { firstNameFilter.click() }
+        and: 'The User enters the First Name'
+            firstNameFilter = firstName
+
+        then: 'The User should be found out'
+            waitFor{$("td", "role": "gridcell", "aria-describedby": "personIdGrid_firstname").find("a").text() == firstName}
     }
 
-    def "Open Create UserLogin Page" () {
+    def "4. The User gains access to the Create UserLogin Section"() {
         testKey = "TM-XXXX"
-        given:
-        at StaffListPage
-        when:
-        waitFor{$("td","role":"gridcell",title:" Create User").find("a").click()}
-        then:
-        at UserCreationPage
+        given: 'The User is on the Staff List Page'
+            at StaffListPage
+        when: 'The User Searches by and clicks the "Create User" Button'
+            waitFor{$("td","role":"gridcell",title:" Create User").find("a").click()}
+
+        then: 'The User is redirected to the UserLogin Section'
+            at UserCreationPage
     }
 
-    def "Create User"() {
+    def "5. A brand New User is successfully created"() {
         testKey = "TM-XXXX"
-        given:
-        at UserCreationPage
-        when:
-        ucUsername = userName
-        ucEmail = userEmail
-        waitFor {ucPassword.click()}
-        ucPassword = userPass
-        waitFor { ucConfirmPassword.click()}
-        ucConfirmPassword = userPass
-        ucProjectSelector = userProject
-        ucAdminRoleCB.value(true)
-        waitFor { ucSaveBtn.click() }
+        given: 'The User is on the Create UserLogin Section'
+            at UserCreationPage
+        when: 'The User Completes his Username, Email'
+            ucUsername = userName
+            ucEmail = userEmail
+        and: 'The User Completes the Password'
+            waitFor {ucPassword.click()}
+            ucPassword = userPass
+        and: 'The User Confirms the Password'
+            waitFor { ucConfirmPassword.click()}
+            ucConfirmPassword = userPass
+        and: 'The User Selects The Project'
+            ucProjectSelector = userProject
+        and: 'The Admin Role is being checked'
+            ucAdminRoleCB.value(true)
+        and: 'The User clicks the "Save" Button'
+            waitFor { ucSaveBtn.click() }
 
-        then:
-        at UserDetailsPage
-        waitFor {pageMessage.text() == "UserLogin "+userName+" created"}
+        then: 'The User should be redirected to the User List Section'
+            at UserDetailsPage
+        and: 'A success message related to the User that was created should be displayed'
+            waitFor {pageMessage.text() == "UserLogin "+userName+" created"}
     }
 }
