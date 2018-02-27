@@ -1,9 +1,6 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
-import getl.data.Field
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -15,7 +12,6 @@ import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
-import org.apache.poi.hssf.record.aggregates.CustomViewSettingsRecordAggregate
 import org.springframework.http.HttpStatus
 
 /**
@@ -178,28 +174,8 @@ class WsDataScriptController implements ControllerMethods {
 
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
-
-	    CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
-	    def csv = new CSVDataset(connection: con, fileName: filename, header: true)
-
 	    try {
-		    List<Field> fields = csv.connection.driver.fields(csv)
-
-		    List<Map<String, String>> config = fields.collect {
-			    def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
-			    [
-					      property: it.name,
-					      type    : type
-			    ]
-		    }
-
-		    def jsonMap = [
-				      status: 'success',
-				      data  : [
-							     config: config,
-							     rows  : csv.rows()
-				      ]
-		    ]
+		    Map jsonMap = dataScriptService.parseDataFromFile(filename)
 
 		    render jsonMap as JSON
 	    }catch ( ex ) {
