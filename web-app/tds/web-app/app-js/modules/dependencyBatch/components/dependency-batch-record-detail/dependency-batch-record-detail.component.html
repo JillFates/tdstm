@@ -5,11 +5,10 @@
     </button>
 </div>
 
-<div class="col-md-12" *ngIf="!collapsed">
-    <div>
-        {{importBatch | json}}
-    </div>
-    <div>
-        {{batchRecord | json}}
-    </div>
-</div>
+<section class="summary-section col-md-12" *ngIf="!collapsed">
+    <dependency-batch-record-detail-summary
+            [importBatch]="importBatch"
+            [batchRecord]="batchRecord">
+    </dependency-batch-record-detail-summary>
+    <hr>
+</section>
