@@ -1155,4 +1155,69 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			MissingMethodException e = thrown MissingMethodException
 			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
 	}
+
+	void 'test can abort current row based on some condition'() {
+
+//		updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+//		updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'application id' load Id
+						extract 'vendor name' load appVendor
+						
+						if (!SOURCE.'vendor name'.startsWith('Mi')){
+							skip row
+						} else {
+							domain Device
+							extract 'application id' load Id
+							extract technology load Name
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == 'Application'
+				fields == ['appVendor', 'environment'] as Set
+
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
+				}
+
+				with(data[0].fields.environment) {
+					value == 'Production'
+					originalValue == 'Production'
+				}
+
+				with(data[1].fields.appVendor) {
+					value == 'Mozilla'
+					originalValue == 'Mozilla'
+				}
+
+				with(data[1].fields.environment) {
+					value == 'Development'
+					originalValue == 'Development'
+				}
+			}
+	}
 }
