@@ -1,7 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {ImportBatchModel} from '../../model/import-batch.model';
+
+import {Component, Inject, OnInit} from '@angular/core';
+import {ImportBatchModel, ImportBatchRecordDetailColumnsModel} from '../../model/import-batch.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {SelectableSettings} from '@progress/kendo-angular-grid';
+import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
@@ -38,9 +42,6 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
 	}
 
-	/**
-	 * TODO: document
-	 */
 	ngOnInit(): void {
 		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( result => {
 			this.batchRecords = result;
@@ -62,6 +63,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private handleError(error): void {
 		console.log(error);
+		this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
 	}
 
 	/**
