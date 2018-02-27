@@ -7,13 +7,15 @@
 						[data]="gridData"
 						[filter]="state.filter"
 						[filterable]="true"
+						[skip]="skip"
 						(filterChange)="filterChange($event)"
 						[sort]="state.sort"
 						[sortable]="{mode:'single'}"
-						[pageSize]="25"
+						[pageSize]="pageSize"
 						[resizable]="true"
 						(sortChange)="sortChange($event)"
-						[pageable]="{ pageSizes:[25,50,100,250,500,1000], info: true}"
+						[pageable]="{ pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
+						(pageChange)="pageChange($event)"
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">

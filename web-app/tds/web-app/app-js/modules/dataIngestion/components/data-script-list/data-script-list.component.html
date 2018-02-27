@@ -14,7 +14,7 @@
 						[pageSize]="pageSize"
 						[resizable]="true"
 						(sortChange)="sortChange($event)"
-						[pageable]="true"
+						[pageable]="{ pageSizes: defaultPageOptions , pageSize: pageSize, info: true}" 
 						(cellClick)="cellClick($event)"
 						[selectable]="true"
 						(pageChange)="pageChange($event)"
