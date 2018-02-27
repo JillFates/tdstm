@@ -1,0 +1,15 @@
+<div class="col-md-12">
+    <h4 class="pull-left">Record Detail</h4>
+    <button class="pull-right btn btn-default" (click)="toggleSection()">
+        <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed, 'fa-angle-double-up':collapsed}" style="padding-right:0px"></i>
+    </button>
+</div>
+
+<div class="col-md-12" *ngIf="!collapsed">
+    <div>
+        {{importBatch | json}}
+    </div>
+    <div>
+        {{batchRecord | json}}
+    </div>
+</div>
