@@ -72,7 +72,6 @@ export class APIActionListComponent {
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}

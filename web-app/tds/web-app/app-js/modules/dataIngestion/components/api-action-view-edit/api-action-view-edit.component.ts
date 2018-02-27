@@ -210,7 +210,7 @@ export class APIActionViewEditComponent implements OnInit {
 	getCredentials(): void {
 		this.dataIngestionService.getCredentials().subscribe(
 			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
+				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
 					this.agentCredentialList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
