@@ -226,7 +226,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
-			etlProcessor.currentRowIndex == 2
+			etlProcessor.currentRowIndex == 3
 	}
 
 	void 'test can throw an exception when iterates over an invalid range of data source rows'() {
@@ -264,7 +264,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			e = thrown ETLProcessorException
-			e.message == "Invalid to parameter = 8"
+			e.message == "Invalid to parameter = 9"
 
 	}
 
