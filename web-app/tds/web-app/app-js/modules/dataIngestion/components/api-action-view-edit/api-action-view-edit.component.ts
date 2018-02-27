@@ -530,15 +530,24 @@ export class APIActionViewEditComponent implements OnInit {
 		});
 		if (fieldSpecs) {
 			dataItem.currentFieldList = fieldSpecs.fields;
+			dataItem.sourceFieldList = fieldSpecs.fields;
 			let property = dataItem.currentFieldList.find((field) => {
 				return field.field === dataItem.property;
 			});
 			if (property) {
-				dataItem.property = property.field;
+				dataItem.property = property;
 			}
 		}
 
 		this.verifyIsValidForm();
+	}
+
+	/**
+	 * Make the Field from Context, filterable
+	 * @param filter
+	 */
+	public filterChange(filter: any, dataItem: any): void {
+		dataItem.currentFieldList = dataItem.sourceFieldList.filter((s) => s.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
 	}
 
 	/**

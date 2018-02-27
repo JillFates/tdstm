@@ -304,9 +304,9 @@
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
-																[textField]="'field'"
+																(filterChange)="filterChange($event, dataItem)"
+																[textField]="'label'"
 																[valueField]="'field'"
-																[valuePrimitive]="true"
 																[(ngModel)]="dataItem.property"
 																(valueChange)="verifyIsValidForm()"
 																required

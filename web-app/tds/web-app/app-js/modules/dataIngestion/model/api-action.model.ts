@@ -227,6 +227,7 @@ export class APIActionParameterModel {
 	property?: string;
 	value?: string;
 	currentFieldList?: Array<any>;
+	sourceFieldList?: Array<any>;
 }
 
 export enum EventReactionType {

@@ -250,6 +250,10 @@ export class DataIngestionService {
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
 			parameterList.data.forEach( (param) => {
+				if (param.property && param.property.field) {
+					param.property = param.property.field;
+				}
+				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);
