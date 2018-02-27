@@ -1006,15 +1006,153 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == 'Application'
+				fields == ['appVendor', 'environment'] as Set
+
 				with(data[0].fields.appVendor) {
 					value == 'Microsoft'
 					originalValue == 'Microsoft'
+				}
+
+				with(data[0].fields.environment) {
+					value == 'Production'
+					originalValue == 'Production'
 				}
 
 				with(data[1].fields.appVendor) {
 					value == 'Mozilla'
 					originalValue == 'Mozilla'
 				}
+
+				with(data[1].fields.environment) {
+					value == 'Development'
+					originalValue == 'Development'
+				}
 			}
+	}
+
+	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						if (DOMAIN.appVendor.unknownMethod('Mi')){
+							set environment with 'Production'
+						} else {
+							set environment with 'Development'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			MissingMethodException e = thrown MissingMethodException
+			e.message == 'No signature of method: com.tdsops.etl.DomainField.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+	}
+
+	void 'test can evaluate a value loaded into the SOURCE.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						if (!SOURCE.technology.startsWith('NGM')){
+							set environment with 'Production'
+						} else {
+							set environment with 'Development'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == 'Application'
+				fields == ['appVendor', 'environment'] as Set
+
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
+				}
+
+				with(data[0].fields.environment) {
+					value == 'Production'
+					originalValue == 'Production'
+				}
+
+				with(data[1].fields.appVendor) {
+					value == 'Mozilla'
+					originalValue == 'Mozilla'
+				}
+
+				with(data[1].fields.environment) {
+					value == 'Development'
+					originalValue == 'Development'
+				}
+			}
+	}
+
+	void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						if (!SOURCE.technology.unknownMethod('NGM')){
+							set environment with 'Production'
+						} else {
+							set environment with 'Development'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			MissingMethodException e = thrown MissingMethodException
+			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
 	}
 }
