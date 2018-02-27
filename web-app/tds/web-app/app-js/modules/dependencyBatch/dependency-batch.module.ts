@@ -15,6 +15,7 @@ import { GridModule } from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Services
 import {DependencyBatchService} from './service/dependency-batch.service';
+import {DependencyBatchDetailDialogComponent} from './components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 
 @NgModule({
 	imports: [
@@ -28,7 +29,8 @@ import {DependencyBatchService} from './service/dependency-batch.service';
 		UIRouterModule.forChild({ states: DEPENDENCY_BATCH_STATES })
 	],
 	declarations: [
-		DependencyBatchListComponent
+		DependencyBatchListComponent,
+		DependencyBatchDetailDialogComponent
 	],
 	providers: [
 		DependencyBatchService
@@ -36,7 +38,9 @@ import {DependencyBatchService} from './service/dependency-batch.service';
 	exports: [
 		DependencyBatchListComponent
 	],
-	entryComponents: [],
+	entryComponents: [
+		DependencyBatchDetailDialogComponent
+	],
 })
 
 export class DependencyBatchModule {
