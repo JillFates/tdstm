@@ -3,9 +3,9 @@
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
         </button>
-        <h4 class="modal-title">Batch Detail - {{batchModel.id}} - {{batchModel.domainClassName}}</h4>
+        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
     </div>
-    <div class="modal-body" style="height: 600px; overflow: auto;">
+    <div class="modal-body" style="height: 100%; overflow: auto;">
         <div class="modal-body-container">
 
             <section>
@@ -25,19 +25,32 @@
                                 (sortChange)="dataGridOperationsHelper.sortChange($event)"
                                 [selectable]="selectableSettings"
                                 [rowSelected]="dataGridOperationsHelper.isRowSelected"
-                                (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchDetail($event)">
+                                (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchRecordDetail($event)">
                             <!--
                                  Toolbar Template
                             -->
                             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <button (click)="onDeleteBatch()"
-                                        class="btn btn-default" type="button">
-                                    Revalidate
-                                </button>
-                                <button (click)="onArchiveBatch()"
-                                        class="btn btn-default" type="button">
-                                    Ignore
-                                </button>
+                                <div class="col-sm-1 toolbar-button">
+                                    <button (click)="onDeleteBatch()"
+                                            class="btn btn-default" type="button">
+                                        Revalidate
+                                    </button>
+                                </div>
+                                <div class="col-sm-1 toolbar-button">
+                                    <button (click)="onArchiveBatch()"
+                                            class="btn btn-default" type="button">
+                                        Ignore
+                                    </button>
+                                </div>
+                                <div class="col-sm-2 toolbar-button">
+                                    <kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
+                                                        [data]="batchRecordsFilter.options"
+                                                        [textField]="'name'"
+                                                        [valueField]="'id'"
+                                                        [(ngModel)]="batchRecordsFilter.selected"
+                                                        placeholder="Filter"
+                                                        class="form-control"></kendo-dropdownlist>
+                                </div>
                             </ng-template>
 
                             <!--
@@ -113,9 +126,17 @@
                 </div>
             </section>
 
+            <section *ngIf="selectedBatchRecord">
+                <hr>
+                <div class="row">
+                    <dependency-batch-record-detail [importBatch]="importBatchModel"
+                                                    [batchRecord]="selectedBatchRecord">
+                    </dependency-batch-record-detail>
+                </div>
+            </section>
         </div>
     </div>
-    <div class="modal-footer form-group-center">
+    <div class="modal-footer">
         <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
             <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
     </div>
