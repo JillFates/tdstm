@@ -25,7 +25,7 @@
 		$(document).ready(function () {
 
 			// refresh timer initialization
-			progressTimer = new ProgressTimer(0, 'RefreshTaskGraph', function () {
+			progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.TASKGRAPH_REFRESH}', function () {
 				generateGraph($('#moveEventId').val());
 				progressTimer.resetTimer();
 			});
