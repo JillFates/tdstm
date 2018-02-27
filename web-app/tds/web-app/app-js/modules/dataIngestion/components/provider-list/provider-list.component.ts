@@ -190,6 +190,7 @@ export class ProviderListComponent {
 	 */
 	public pageChange(event: PageChangeEvent): void {
 		this.skip = event.skip;
+		this.defaultPageSize = event.take || this.defaultPageSize;
 		this.loadPageData();
 	}
 
