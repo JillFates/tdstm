@@ -11,7 +11,7 @@
 						(cellClick)="cellClick($event)"
 						[pageSize]="defaultPageSize"
 						[skip]="skip"
-						[pageable]="{ pageSizes: defaultPageOptions , info: true}"
+						[pageable]="{ pageSizes: defaultPageOptions, pageSize: defaultPageSize, info: true}"
 						(pageChange)="pageChange($event)"
 						[selectable]="true"
 						[rowSelected]="isRowSelected">

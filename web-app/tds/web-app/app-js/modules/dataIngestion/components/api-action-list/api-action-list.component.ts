@@ -8,6 +8,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel, EventReaction, EventReactionType} from '../../model/api-action.model';
 import {
 	COLUMN_MIN_WIDTH,
@@ -40,6 +41,9 @@ export class APIActionListComponent {
 		}
 	};
 
+	public skip = 0;
+	public pageSize = MAX_DEFAULT;
+	public defaultPageOptions = MAX_OPTIONS;
 	public apiActionColumnModel = new APIActionColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
@@ -57,8 +61,10 @@ export class APIActionListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
-		apiActions.subscribe(
-			(result) => {
+			this.state.take = this.pageSize;
+			this.state.skip = this.skip;
+			apiActions
+			.subscribe((result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
 			},
@@ -252,4 +258,11 @@ export class APIActionListComponent {
 		}
 	}
 
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.state.take = event.take || this.state.take;
+		this.pageSize = this.state.take;
+		this.gridData = process(this.resultSet, this.state);
+	}
 }
