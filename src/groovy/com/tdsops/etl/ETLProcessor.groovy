@@ -181,7 +181,7 @@ class ETLProcessor implements RangeChecker {
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
-				to--
+				to
 				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
