@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
 /**
@@ -180,7 +181,7 @@ class ETLProcessor implements RangeChecker {
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
-				to--
+				to
 				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
@@ -221,6 +222,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
+		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
@@ -562,11 +564,11 @@ class ETLProcessor implements RangeChecker {
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.clazz
 
-		if(!fieldsValidator.isDomainProperty(clazz, property)) {
+		if(!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain, property)
 		}
-		if(!fieldsValidator.isDomainIdentifier(clazz, property) &&
-			!fieldsValidator.isReferenceProperty(clazz, property)){
+		if(!GormUtil.isDomainIdentifier(clazz, property) &&
+			!GormUtil.isReferenceProperty(clazz, property)){
 			throw ETLProcessorException.invalidDomainReference(selectedDomain, property)
 		}
 	}

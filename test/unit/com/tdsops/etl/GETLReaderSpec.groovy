@@ -8,7 +8,15 @@ import getl.excel.ExcelDataset
 import getl.exception.ExceptionGETL
 import spock.lang.Specification
 
-
+/**
+ * Testing GroovyETL project.
+ * It shows how to open a file using deiferrent connections and drivers.
+ * <pre>
+ *      CSVConnection connection = new CSVConnection(config: "csv", path: pathName)
+ *      CSVDataset dataset = new CSVDataset(connection: connection, fileName: fileName, header: true)
+ *      dataset.readLinesCount() == 3
+ * </pre>
+ */
 class GETLReaderSpec extends Specification {
 
 
@@ -37,7 +45,7 @@ class GETLReaderSpec extends Specification {
             files.retrieveObjects(type: "DIR").size() == 0
 
         and: 'It can read files from parent directory'
-            files.retrieveObjects(directory: "..").size() == 5
+            files.retrieveObjects(directory: "..").size() == 10
 
     }
 

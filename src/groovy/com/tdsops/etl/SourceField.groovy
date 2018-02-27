@@ -9,7 +9,7 @@ package com.tdsops.etl
  */
 class SourceField {
 
-	Object value
+	@Delegate String value
 
 	SourceField(Object value) {
 		this.value = value
