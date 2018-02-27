@@ -1,0 +1,122 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">Batch Detail - {{batchModel.id}} - {{batchModel.domainClassName}}</h4>
+    </div>
+    <div class="modal-body" style="height: 600px; overflow: auto;">
+        <div class="modal-body-container">
+
+            <section>
+                <div class="box-body box-with-empty-header">
+                    <kendo-grid *ngIf="dataGridOperationsHelper"
+                                [data]="dataGridOperationsHelper.gridData"
+                                [filter]="dataGridOperationsHelper.state.filter"
+                                [filterable]="true"
+                                (filterChange)="dataGridOperationsHelper.filterChange($event)"
+                                [sort]="dataGridOperationsHelper.state.sort"
+                                [sortable]="{mode:'single'}"
+                                [pageSize]="dataGridOperationsHelper.defaultPageSize"
+                                [skip]="dataGridOperationsHelper.skip"
+                                [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+                                (pageChange)="dataGridOperationsHelper.pageChange($event)"
+                                [resizable]="true"
+                                (sortChange)="dataGridOperationsHelper.sortChange($event)"
+                                [selectable]="selectableSettings"
+                                [rowSelected]="dataGridOperationsHelper.isRowSelected"
+                                (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchDetail($event)">
+                            <!--
+                                 Toolbar Template
+                            -->
+                            <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                <button (click)="onDeleteBatch()"
+                                        class="btn btn-default" type="button">
+                                    Revalidate
+                                </button>
+                                <button (click)="onArchiveBatch()"
+                                        class="btn btn-default" type="button">
+                                    Ignore
+                                </button>
+                            </ng-template>
+
+                            <!--
+                                Checkbox Template (Select All & Cell Content)
+                            -->
+                            <kendo-grid-column [locked]="true" [filterable]="false" [width]="45">
+                                <ng-template kendoGridHeaderTemplate>
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <div class="checkbox checkbox-grid">
+                                                <label>
+                                                    <input type="checkbox" name="selectAll"
+                                                           [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
+                                                           (change)="dataGridOperationsHelper.onSelectAllCheckboxes()" >
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                                <ng-template kendoGridCellTemplate let-dataItem>
+                                    <div class="text-center k-grid-ignore-click">
+                                        <label style="min-height: 15px;">
+                                            <input type="checkbox"
+                                                   [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                                   name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                                   (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                        </label>
+                                    </div>
+                                </ng-template>
+                            </kendo-grid-column>
+                            <!--
+                                Columns
+                            -->
+                            <kendo-grid-column *ngFor="let column of columnsModel.columns"
+                                               field="{{column.property}}"
+                                               [locked]="column.locked"
+                                               format="{{column.format}}"
+                                               [headerClass]="column.headerClass ? column.headerClass : ''"
+                                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+                                               [class]="column.cellClass ? column.cellClass : ''"
+                                               [style]="column.cellStyle ? column.cellStyle : ''"
+                                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+                                <!--
+                                    Header Template
+                                -->
+                                <ng-template kendoGridHeaderTemplate>
+                                    <label> {{column.label}}</label>
+                                </ng-template>
+                                <!--
+                                    Cell Templates
+                                -->
+                                <!--
+                                    Filter Template
+                                -->
+                                <ng-template kendoGridFilterCellTemplate let-filter>
+                                    <div class="has-feedback" *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )" style="margin-bottom:0px;">
+                                        <div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
+                                        <ng-template #dateFilter>
+                                            <kendo-datepicker (valueChange)="dataGridOperationsHelper.onFilter(column)" [(ngModel)]="column.filter"></kendo-datepicker>
+                                            <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)"
+                                                  style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                        </ng-template>
+                                        <ng-template #stringFilter>
+                                            <input [(ngModel)]="column.filter" (keyup)="dataGridOperationsHelper.onFilter(column)"
+                                                   type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
+                                            <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                                        </ng-template>
+                                    </div>
+                                </ng-template>
+                            </kendo-grid-column>
+                        </kendo-grid>
+                </div>
+            </section>
+
+        </div>
+    </div>
+    <div class="modal-footer form-group-center">
+        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default text-center">
+            <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}</button>
+    </div>
+</div>

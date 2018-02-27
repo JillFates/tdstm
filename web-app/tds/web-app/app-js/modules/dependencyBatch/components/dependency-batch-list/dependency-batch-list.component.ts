@@ -10,6 +10,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {Observable} from 'rxjs/Observable';
+import {DIALOG_SIZE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -116,7 +117,9 @@ export class DependencyBatchListComponent {
 	 * @param {CellClickEvent} cellClick
 	 */
 	private openBatchDetail(cellClick: CellClickEvent): void {
-		this.dialogService.open(DependencyBatchDetailDialogComponent, []).then(result => {
+		this.dialogService.open(DependencyBatchDetailDialogComponent, [
+			{ provide: ImportBatchModel, useValue: (cellClick as any).dataItem}
+		], DIALOG_SIZE.XLG, false).then(result => {
 			// silence is golden
 		}).catch(result => {
 			console.log('Dismissed Dialog');
