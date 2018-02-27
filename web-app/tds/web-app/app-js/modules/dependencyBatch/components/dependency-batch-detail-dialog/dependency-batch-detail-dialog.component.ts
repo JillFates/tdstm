@@ -1,42 +1,42 @@
 
-import {Component, OnInit} from '@angular/core';
-import {ImportBatchModel} from '../../model/import-batch.model';
+import {Component, Inject, OnInit} from '@angular/core';
+import {ImportBatchModel, ImportBatchRecordDetailColumnsModel} from '../../model/import-batch.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {SelectableSettings} from '@progress/kendo-angular-grid';
+import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
-	templateUrl: '../tds/web-app/app-js/modules/depedendencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component.html'
 })
 export class DependencyBatchDetailDialogComponent implements OnInit {
 
-	// public dependencyBatchModel: ImportBatchModel;
+	private columnsModel: ImportBatchRecordDetailColumnsModel;
+	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
+	private dataGridOperationsHelper: DataGridOperationsHelper;
+	private checkboxSelectionConfig = {
+		useColumn: 'id'
+	};
+	private batchRecords: Array<any> = [];
 
 	constructor(
-		private dependencyBatchModel: ImportBatchModel,
+		private batchModel: ImportBatchModel,
 		private promptService: UIPromptService,
-		private dependencyBatchService: DependencyBatchService) {
+		private dependencyBatchService: DependencyBatchService,
+		private activeDialog: UIActiveDialogService) {
+		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
 	}
 
 	ngOnInit(): void {
-		// silence is golden.
+		this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
 	}
 
 	/**
 	 * Close the Dialog but first it verify is not Dirty
-	protected cancelCloseDialog(): void {
-		if (this.isDirty()) {
-			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-				if (result) {
-					this.activeDialog.dismiss();
-				}
-			});
-		} else {
-			this.activeDialog.dismiss();
-		}
-	}
 	 */
+	protected cancelCloseDialog(): void {
+		this.activeDialog.dismiss();
+	}
 }
