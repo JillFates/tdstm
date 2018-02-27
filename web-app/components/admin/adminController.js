@@ -15,7 +15,7 @@ tds.admin.controller.MainController = function (scope, modal, utils, adminServic
 		var msg = "<ul><li>Username: " + username + "</li>" +
 		"<li>Failed Logins: " + failedLoginAttempts+ "</li>" + 
 		"<li>Account locked out for: " + lockedOutUntil + "</li>" +
-		"<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>"
+		"<p>You are about to unlock user account, press Confirm to continue or press Cancel to abort.</p>"
 
 		$("#unlockUserDialog").html(msg)
 
