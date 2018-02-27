@@ -451,7 +451,7 @@
 	var progressTimer;
 
 	$(document).ready(function() {
-		progressTimer = new ProgressTimer(60, 'RefreshEventDB', refreshDashboard);
+		progressTimer = new ProgressTimer(60, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.EVENTDB_REFRESH}', refreshDashboard);
 
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
