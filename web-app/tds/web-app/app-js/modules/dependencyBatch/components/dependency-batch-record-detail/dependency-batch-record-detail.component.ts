@@ -1,0 +1,22 @@
+import {Component, Input} from '@angular/core';
+import {DependencyBatchService} from '../../service/dependency-batch.service';
+import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
+import {ImportBatchModel} from '../../model/import-batch.model';
+
+@Component({
+	selector: 'dependency-batch-record-detail',
+	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail/dependency-batch-record-detail.component.html'
+})
+export class DependencyBatchRecordDetailComponent {
+
+	@Input('importBatch') importBatch: ImportBatchModel;
+	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
+	private collapsed = false;
+
+	constructor(private dependencyBatchService: DependencyBatchService) {
+	}
+
+	private toggleSection(): void {
+		this.collapsed = !this.collapsed;
+	}
+}

@@ -3,13 +3,13 @@ import {Observable} from 'rxjs/Observable';
 import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchModel} from '../model/import-batch.model';
+import {ImportBatchRecordModel} from '../model/import-batch-record.model';
 
 @Injectable()
 export class DependencyBatchService {
 
 	private readonly importBatchUrl = '../ws/import/batch';
 	private readonly batchProgressUrl = '../ws/progress';
-	private mockRunningBatchFlag = false;
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -152,5 +152,16 @@ export class DependencyBatchService {
 				return res.json();
 			})
 			.catch((error: any) => error.json());
+	}
+
+	getImportBatchRecords(id: number): Observable<any> {
+		const mockResult: Array<ImportBatchRecordModel> = [
+			{id: 1, status: 'Pending', errorCount: 1, operation: 'Add', sourceRow: 1, name: 'pwebwp01', type: 'VM', depType: 'VM Runs On', nameD: 'VMClusterPCI01', typeD: 'Application'},
+			{id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRow: 2, name: 'Batch Reporting', type: 'Application', depType: 'File', nameD: 'Ecommerce', typeD: 'Application'},
+			{id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRow: 3, name: 'Batch Reporting', type: 'Application', depType: 'DB', nameD: null, typeD: null},
+			{id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRow: 4, name: 'Online Banking', type: 'Application', depType: 'Web Service', nameD: 'RSA SecureID SaaS', typeD: 'Application'},
+			{id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
+		];
+		return Observable.of(mockResult);
 	}
 }
