@@ -6,9 +6,14 @@ import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
+import net.transitionmanager.domain.ImportBatch
+import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+
 
 // LEGACY
 import net.transitionmanager.domain.DataTransferBatch
@@ -227,7 +232,7 @@ class DataImportService implements ServiceMethods {
 	 * @param project
 	 * @return a newly created ImportBatch object
 	 */
-	private ImportBatch createImportBatch(Project project, ETLInfo etlInfo, Map importContext) {
+	private ImportBatch createImportBatch(Project project, JSONObject etlInfo, Map importContext) {
 
 		// TODO : JPM 2/2018 : use ETL Enum that translate to the correct domain - See Diego as he implement the Enum for ETL processing
 		// Note need to test importing each of the domain types
@@ -243,23 +248,19 @@ class DataImportService implements ServiceMethods {
 		ImportBatch ib = new ImportBatch(
 				project: project,
 				status: ImportBatchStatusEnum.PENDING,
-				provider: etlInfo.provider
-				dataScript: etlInfo.dataScript
-
+				provider: etlInfo.provider,
+				dataScript: etlInfo.dataScript,
 				// TODO : JPM 2/2018 : Not certain that this we want (see Deigo's ETL Enum for the Domains)
-				domainClassName: transDomainName
-
-				createdBy: etlInfo.createdBy
-				autoProcess: etlInfo.autoProcess
-				dateFormat: etlInfo.dataFormat
-
+				domainClassName: transDomainName,
+				createdBy: etlInfo.createdBy,
+				autoProcess: etlInfo.autoProcess,
+				dateFormat: etlInfo.dataFormat,
 				// Stored in MySQL as JSON
-				fieldNameList: JsonUtil.toJson(importContext.fields)
-
-				nullIndicator: etlInfo.nullIndicator
-				originalFilename: etlInfo.originalFilename
-				overwriteWithBlanks: etlInfo.overwriteWithBlanks
-				timezone: etlInfo.timezone
+				fieldNameList: JsonUtil.toJson(importContext.fields),
+				nullIndicator: etlInfo.nullIndicator,
+				originalFilename: etlInfo.originalFilename,
+				overwriteWithBlanks: etlInfo.overwriteWithBlanks,
+				timezone: etlInfo.timezone,
 				warnOnChangesAfter: etlInfo.warnOnChangesAfter
 			)
 
@@ -298,6 +299,7 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - additional parameters required for logging
 	 */
 	private void importRow(session, DataTransferBatch dataTransferBatch, JSONObject rowData, Map importContext ) {
+		boolean canImportRow=false
 
 		// TODO : JPM 2/2018 : CRITICAL - presently getting error message that ID must be a numeric value
 		Long domainId = getAndValidateDomainId(rowData, importContext)
@@ -307,21 +309,27 @@ class DataImportService implements ServiceMethods {
 
 			// Validate that the row can be processed, any errors will be captured in importContext.errors
 			// TODO : JPM 2/2018 : MINOR - Review and fix the canRowDataBeImported logic, wait for Dependency imports
-			// boolean canImportRow = canRowDataBeImported(rowData, domainId, importContext)
-			boolean canImportRow=true
+			// canImportRow = canRowDataBeImported(rowData, domainId, importContext)
+			canImportRow=true
 
 			if (canImportRow) {
-				if (insertRowDataIntoDataTransferValues(session, dataTransferBatch, rowData, domainId, importContext )) {
-					importContext.rowsCreated++
+				if (importContext.isLegacy) {
+					canImportRow = insertRowDataIntoDataTransferValues(session, dataTransferBatch, rowData, domainId, importContext )
 				} else {
-					importContext.rowsSkipped++
+					canImportRow = insertRowDataIntoImportBatchRecord(session, dataTransferBatch, rowData, domainId, importContext )
 				}
 			}
 		}
+		if (canImportRow) {
+			importContext.rowsCreated++
+		} else {
+			importContext.rowsSkipped++
+		}
+
 	}
 
 	/**
-	 * Create a new DataTransferValue for each field in the rowData. Any errors will be added to the importContext.errors list and
+	 * LEGACY -- Create a new DataTransferValue for each field in the rowData. Any errors will be added to the importContext.errors list and
 	 * the entire row will be skipped. This method is implemented with a NESTED transaction so that it will rollback all of the fields
 	 * that were added prior to the error.
 	 *
@@ -331,7 +339,7 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - Map of the import context objects
 	 * @return true if all of the fields were successfully added to the DataTransferValue table or false if there was an error
 	 */
-	private boolean insertRowDataIntoDataTransferValues(session, DataTransferBatch dataTransferBatch, JSONObject rowData, Long domainId, Map importContext ) {
+	private boolean insertRowDataIntoDataTransferValues(session, DataTransferBatch batch, JSONObject rowData, Long domainId, Map importContext ) {
 
 		int rowNum = importContext.rowNumber - 1
 
@@ -357,8 +365,8 @@ class DataImportService implements ServiceMethods {
 				continue
 			}
 
-			DataTransferValue dtv = new DataTransferValue(
-				dataTransferBatch: dataTransferBatch,
+			DataTransferValue batchRecord = new DataTransferValue(
+				dataTransferBatch: batch,
 				fieldName: fieldName,
 				assetEntityId: domainId,
 				importValue: field.originalValue,
@@ -371,13 +379,13 @@ class DataImportService implements ServiceMethods {
 			boolean triggerRollbackTest = false
 
 			// This should NOT throw an exception because we're dealing errors in a savepoint rollback
-			if (! dtv.save(flush:true, failOnError:false) || triggerRollbackTest) {
+			if (! batchRecord.save(flush:true, failOnError:false) || triggerRollbackTest) {
 				// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
-				importContext.errors << "Unable to save field $fieldName on row ${importContext.rowNumber}: ${GormUtil.allErrorsString(dtv)}"
+				importContext.errors << "Unable to save field $fieldName on row ${rowNum}: ${GormUtil.allErrorsString(batchRecord)}"
 
 				// Get rid of the GORM object that can't be saved so the main transaction can
 				// still be committed.
-				dtv.discard()
+				batchRecord.discard()
 
 				// Roll back so none of the fields for this one row will be saved
 				session.rollbackToSavepoint(savePoint)
@@ -391,6 +399,56 @@ class DataImportService implements ServiceMethods {
 		session.releaseSavepoint(savePoint)
 
 		return true
+	}
+
+	/**
+	 * Create a new ImportBatchRecord for the given row. Any errors will be added to the importContext.errors list and
+	 * the entire row will be skipped.
+	 *
+	 * @param dataTransferBatch - current batch
+	 * @param rowData - the meta-data for the current field to be inserted
+	 * @param domainId - the id for the domain object if known
+	 * @param importContext - Map of the import context objects
+	 * @return true if all of the fields were successfully added to the DataTransferValue table or false if there was an error
+	 */
+	private boolean insertRowDataIntoImportBatchRecord(session, ImportBatchRecord batch, JSONObject rowData, Long domainId, Map importContext ) {
+
+		int rowNum = importContext.rowNumber - 1
+
+		// Detemine if there were duplicates found
+		// TODO : JPM 2/2018 : the dupsFound logic is questionable (need to compare against latest JSON). Also this will be
+		// good to move to the command object.
+		Integer dupsFound = 0
+		if (rowData.fields.containsKey('id') && rowData.fields.id.containsKey('find')) {
+			dupsFound = ( rowData.fields.id.size() > 1 ? 1 : 0)
+		}
+
+		ImportBatchRecord batchRecord = new ImportBatchRecord(
+			importBatch: batch,
+			operation: ImportOperationEnum.lookup(rowData.op),
+			domainPrimaryId: domainId,
+			fieldName: fieldName,
+			// TODO : JPM 2/2018 : replace sourceRowId with value from rowData.rowNum when TM-9510 is implemented
+			sourceRowId: rowNum,
+			errorCount: rowData.errors.count(),
+			errors: JsonUtil.toJson( (rowData.errors ?: '[]') ),
+			warn: (rowData.warn ? 1 : 0),
+			duplicateReferences: dupsFound,
+			fieldsInfo: JsonUti.toJson(rowData.fields)
+		)
+		if (! batchRecord.save(flush:true, failOnError:false)) {
+			// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
+			importContext.errors << "Unable to save field $fieldName on row ${rowNum}: ${GormUtil.allErrorsString(batchRecord)}"
+
+			// Get rid of the GORM object that can't be saved so the main transaction can
+			// still be committed.
+			batchRecord.discard()
+
+			return false
+		}
+
+		return true
+
 	}
 
 	/**

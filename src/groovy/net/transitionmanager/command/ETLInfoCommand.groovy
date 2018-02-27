@@ -1,7 +1,11 @@
 package net.transitionmanager.command
 
 import net.transitionmanager.command.CommandObject
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Provider
 import grails.validation.Validateable
+
 
 @Validateable
 class ETLInfoCommand implements CommandObject  {
@@ -18,25 +22,25 @@ class ETLInfoCommand implements CommandObject  {
 	Person createdBy
 
 	// The format that date strings were loaded (default "mm/dd/yyyy")
-	dateFormat = 'mm/dd/yyyy'
+	String dateFormat = 'mm/dd/yyyy'
 
 	// The filename of the original file that was uploaded to the system (where appliable)
-	originalFilename = ''
+	String originalFilename = ''
 
 	// Flag if blank values should overwrite existing values (default: true)
 	Boolean overwriteWithBlanks
 
 	// The indicator that a field should be nulled or cleared out (Default "NULL")
-	nullIndicator = 'NULL'
+	String nullIndicator = 'NULL'
 
 	// The timezone that the source data was generated in. This is primarily used to support
 	// Excel spreadsheets. We'll most likely convert the datetimes strings to GMT
 	// so this property wouldn't be necessary
-	timezone = 'GMT'
+	String timezone = 'GMT'
 
 	// This would be populated with value from Info sheet of TM Export and would
 	// warn on changes that were made in TM to assets since the warnOnChangesAfter time
 	// It will default to the time that the batch was created otherwise.
-	warnOnChangesAfter = new Date()
+	Date warnOnChangesAfter = new Date()
 
 }
