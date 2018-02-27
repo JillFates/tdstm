@@ -972,4 +972,49 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can evaluate a value loaded into the DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						if (DOMAIN.appVendor.startsWith('Mi')){
+							set environment with 'Production'
+						} else {
+							set environment with 'Development'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == 'Application'
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
+				}
+
+				with(data[1].fields.appVendor) {
+					value == 'Mozilla'
+					originalValue == 'Mozilla'
+				}
+			}
+	}
 }
