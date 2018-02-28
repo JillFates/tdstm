@@ -291,4 +291,15 @@ export class DependencyBatchService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	getImportBatchRecordFieldDetail(id: number): Observable<any> {
+		const mockResult: Array<any> = [
+			{name: 'Name (P)', currentValue: '', importValue: 'Online Banking', error: ''},
+			{name: 'Type (P)', currentValue: '', importValue: 'Application', error: ''},
+			{name: 'Dep Type (P)', currentValue: '', importValue: 'Web Service', error: 'Invalid Dep Type'},
+			{name: 'Name (D)', currentValue: '', importValue: 'RSA SecureID SaaS', error: 'Depends On Asset Not Found'},
+			{name: 'Type (D)', currentValue: '', importValue: 'Application', error: ''}
+		];
+		return Observable.of(mockResult);
+	}
 }
