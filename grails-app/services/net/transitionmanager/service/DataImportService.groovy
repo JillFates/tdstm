@@ -49,7 +49,7 @@ class DataImportService implements ServiceMethods {
 	static final Map LEGACY_DOMAIN_CLASSES = [
 			( ETLDomain.Application.name() ) : ETLDomain.Application,
 			( ETLDomain.Database.name() ) : ETLDomain.Database,
-			// ( ETLDomain.Device.name() ) : ETLDomain.Device,
+			( ETLDomain.Device.name() ) : ETLDomain.Device,
 			( ETLDomain.Storage.name() ) : ETLDomain.Storage
 		]
 
