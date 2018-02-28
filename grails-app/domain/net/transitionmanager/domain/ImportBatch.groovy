@@ -4,6 +4,8 @@ import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.etl.ETLDomain
+
 /**
  * ImportBatch
  *
@@ -24,70 +26,73 @@ class ImportBatch {
 	DataScript dataScript
 
 	// The domain that the batch is going to manipulate (e.g. Application, Dependency, Manufacturer, etc)
-	String domainClassName
+	//
+	ETLDomain domainClassName
 
 	// The person whom processed the import/transformation
 	Person createdBy
 
-	// Flag if the batch has been archived
+	// Flag if the batch has been archived (0-false/1-true, default 0)
 	Integer archived = 0
+
+	// Flag if the batch should be automatically processed after the import load has been completed (0-false/1-true, default 0)
+	Integer autoProcess = 0
+
+	// For dates that are imported as strings this format will be used to parse the String into a Date. This
+	// maybe processed by the ETL process instead and therefore would be unnecessary (TBD).
+	String dateFormat = ''
+
+	// A JSON List of the field names that are referenced in the detail records
+	String fieldNameList = '[]'
+
+	// The results of the various import process steps (in HTML format)
+	String importResults = ''
+
+	// The reference to the job that which is assigned when Quartz begins processing the batch
+	String progressInfoJob
+
+	// The filename that was originally uploaded to the application
+	String originalFilename = ''
+
+	// A String value that will be used to indicate that a property should be nulled/blanked out.
+	// In the legacy import 'NULL' is used to clear out values.
+	String nullIndicator = ''
+
+	// Flag if existing values should be overwritten with blank/null values (0-false/1-true)
+	Integer overwriteWithBlanks = 0
 
 	// The timezone that String versions of dates were formatted in (default GMT). Dates that are not GMT
 	// will be parsed and adjusted to GMT as part of the import process. This maybe processed by the ETL process
 	// instead and therefore would be unnecessary (TBD).
 	String timezone = TimeUtil.defaultTimeZone
 
-	// For dates that are imported as strings this format will be used to parse the String into a Date. This
-	// maybe processed by the ETL process instead and therefore would be unnecessary (TBD).
-	String dateFormat = ''
-
-	// The reference to the Quartz job which is assigned when Quartz begins processing the batch
-	String progressInfoJob
-
-	// The filename that was originally uploaded to the application
-	String originalFilename = ''
-
-	// A String value that will be used to indicate that a property should be nulled/blanked out
-	String nullIndicator = ''
-
-	// Flag if existing values should be overwritten with blank/null values
-	Integer overwriteWithBlanks = 0
-
-	// Flag if the batch should be automatically processed after the import load has been completed
-	Integer autoProcess = 0
-
 	// A Datetime value that if set will warn on posting if the domain object was modified after this datetime. This
 	// is primarily used with the TM Asset Export spreadsheet so that changes are not overwritten accidently.
 	Date warnOnChangesAfter
-
-	// A JSON List of the field names that are referenced in the detail records
-	String fieldNameList = '[]'
 
 	Date dateCreated
 	Date lastUpdated
 
 	static belongsTo = [
-			dataScript: DataScript,
-			project: Project,
-			provider: Provider,
-			createdBy: Person
+		createdBy: Person,
+		dataScript: DataScript,
+		project: Project,
+		provider: Provider
 	]
 
 	static constraints = {
-		archived nullable: false, range: 0..1
-		autoProcess nullable: false, range: 0..1
+		archived range: 0..1
+		autoProcess range: 0..1
 		createdBy nullable: true
-		dateFormat nullable: false, size: 0..32
-		domainClassName nullable: false, validator: domainValidator
-		fieldNameList nullable: false, size: 2..65635
+		dateFormat nullable: true, blank:true, size: 0..32
+		dataScript nullable: true
+		fieldNameList size: 2..65635
 		lastUpdated nullable: true
-		originalFilename nullable: false, size: 0..255
-		nullIndicator nullable: false, size: 0..255
+		originalFilename blank:true, size: 0..255
+		nullIndicator nullable:true, blank:true, size: 0..255
 		progressInfoJob nullable: true
-		project  nullable: false
 		provider nullable: true
-		status nullable: false
-		timezone nullable: false, size: 1..255
+		timezone size: 1..255
 		warnOnChangesAfter nullable: true
 	}
 
@@ -96,30 +101,15 @@ class ImportBatch {
 		archived sqltype: 'TINYINT(1)'
 		autoProcess sqltype: 'TINYINT(1)'
 		dateFormat sqltype: 'VARCHAR(32)'
-		domainClassName sqltype: 'VARCHAR(255)'
-		fieldNameList sqltype: 'TEXT'
+		domainClassName sqltype: 'VARCHAR(32)', enumType: 'String'
+		fieldNameList sqltype: 'TEXT'	// JSON
 		progressInfoJob sqltype: 'VARCHAR(255)'
 		overwriteWithBlanks sqltype: 'TINYINT(1)'
 		originalFilename sqltype: 'VARCHAR(255)'
 		nullIndicator sqltype: 'VARCHAR(255)'
-		status sqltype: 'VARCHAR(32)'
+		status sqltype: 'VARCHAR(32)', enumType: "String"
 		timezone sqltype: 'VARCHAR(255)'
 		createdBy column: 'created_by'
-	}
-
-	/**
-	 * Validate that the provided class name is, in fact, a valid Domain Class.
-	 */
-	static domainValidator = { String value ->
-		String domainPackage = "net.transitionmanager.domain."
-		boolean isDomain = true
-		try {
-			Class domain = Class.forName(domainPackage + value)
-			isDomain = GormUtil.isDomainClass(domain)
-		} catch (ClassNotFoundException e) {
-			isDomain = false
-		}
-		return isDomain
 	}
 
 	/**
@@ -170,6 +160,13 @@ class ImportBatch {
 		}
 
 		return dataMap
+	}
+
+	//
+	// Setter functions to deal with the JSON properties
+	//
+	void setFieldNameList(Object value) {
+		this.fieldNameList = JsonUtil.toJson(value)
 	}
 
 }
