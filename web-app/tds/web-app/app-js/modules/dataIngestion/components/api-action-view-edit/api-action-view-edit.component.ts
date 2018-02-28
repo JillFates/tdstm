@@ -100,6 +100,9 @@ export class APIActionViewEditComponent implements OnInit {
 			assetClass: 'STORAGE',
 			value: 'Storage'
 		}, {
+			assetClass: 'TASK',
+			value: 'Task'
+		}, {
 			assetClass: 'USER_DEFINED',
 			value: 'User Defined'
 		}
@@ -258,7 +261,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Preload the list of Common Fields Specs
 	 */
 	getCommonFieldSpecs(): void {
-		this.customDomainService.getCommonFieldSpecs().subscribe(
+		this.customDomainService.getCommonFieldSpecsWithShared().subscribe(
 			(result: any) => {
 				this.commonFieldSpecs = result;
 				if (this.modalType !== ActionType.CREATE) {
