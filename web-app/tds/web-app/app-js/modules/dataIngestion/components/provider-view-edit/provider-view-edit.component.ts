@@ -1,10 +1,11 @@
-import {ElementRef, Component, OnInit, ViewChild} from '@angular/core';
+import {ElementRef, Component, OnInit, ViewChild, HostListener} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../model/data-script.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -126,6 +127,16 @@ export class ProviderViewEditComponent implements OnInit {
 						(err) => console.log(err));
 				}
 			});
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	/**

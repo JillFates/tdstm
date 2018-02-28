@@ -50,7 +50,6 @@ export class APIActionListComponent {
 	public gridData: GridDataResult;
 	public resultSet: APIActionModel[];
 	public selectedRows = [];
-	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	private interval = INTERVAL;
@@ -62,14 +61,14 @@ export class APIActionListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
-			this.state.take = this.pageSize;
-			this.state.skip = this.skip;
-			apiActions
+		this.state.take = this.pageSize;
+		this.state.skip = this.skip;
+		apiActions
 			.subscribe((result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-			},
-			(err) => console.log(err));
+					this.resultSet = result;
+					this.gridData = process(this.resultSet, this.state);
+				},
+				(err) => console.log(err));
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
