@@ -48,7 +48,7 @@ class ApplicationCreationSpec extends GebReportingSpec {
         when: 'The User clicks in the Assets > applications menu option'
             menuModule.goToApplications()
 
-        then: 'application list should be displayed'
+        then: 'Aapplication list should be displayed'
             at ApplicationListPage
     }
 
