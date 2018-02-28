@@ -12,6 +12,8 @@
             [batchRecord]="batchRecord">
     </dependency-batch-record-detail-summary>
     <hr>
-    <dependency-batch-record-detail-fields>
+    <dependency-batch-record-detail-fields
+            *ngIf="batchRecord"
+            [batchRecord]="batchRecord">
     </dependency-batch-record-detail-fields>
 </section>

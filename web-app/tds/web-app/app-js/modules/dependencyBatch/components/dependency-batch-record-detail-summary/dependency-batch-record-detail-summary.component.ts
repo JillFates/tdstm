@@ -13,5 +13,6 @@ export class DependencyBatchRecordDetailSummaryComponent {
 
 	constructor() {
 		// Silence is golden
+		console.log(this.batchRecord);
 	}
 }
