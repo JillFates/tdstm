@@ -45,7 +45,7 @@ class ApplicationCreationSpec extends GebReportingSpec {
         testKey = "tm-xxxx"
         given: 'The User searches in the menu page'
             at MenuPage
-        when: 'The User clicks in the assets > applications menu option'
+        when: 'The User clicks in the Assets > applications menu option'
             menuModule.goToApplications()
 
         then: 'application list should be displayed'
