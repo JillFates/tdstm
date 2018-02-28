@@ -47,6 +47,9 @@ class ApplicationEditionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+
+        // Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
+        // NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         waitFor { menuModule.goToApplications() }
         at ApplicationListPage
         waitFor { alCreateAppBtn.click() }
@@ -84,56 +87,63 @@ class ApplicationEditionSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Asset Applications and filter created Application on List"() {
+    def "1. Filtering out by the Application already created"() {
         testKey = "TM-8492"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToApplications()
-        then:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appNameOld
-        then:
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-        waitFor{alFirstAppName.text().trim() == appNameOld}
-        when:
-        waitFor{alFirstAppName.click()}
-        then:
-        at ApplicationDetailsPage
+        given: 'The User displays the Menu Page'
+            at MenuPage
+        when: 'The User clicks in the Assets > Applications Menu option'
+            menuModule.goToApplications()
+
+        then: 'Application list should be displayed'
+            at ApplicationListPage
+        when: 'The User searches by the App Name already created'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appNameOld
+
+        then: 'That App should be shown'
+            waitFor {alLoadingGrid.displayed}
+            waitFor {!alLoadingGrid.displayed}
+            waitFor{alFirstAppName.text().trim() == appNameOld}
+        when: 'The User clicks on that Application'
+            waitFor{alFirstAppName.click()}
+
+        then: 'The Application should be displayed'
+            at ApplicationDetailsPage
     }
 
-    def "Open Edit Application Modal Window by Edit Button and Cancel"() {
+    def "2. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationDetailsPage
-        when:
-        waitFor {adModalEditBtn.click()}
-        then:
-        at ApplicationEditionPage
-        when:
-        aeModalCancelBtn.click()
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application Details Page'
+            at ApplicationDetailsPage
+        when: 'The User clicks the "Edit" Button'
+            waitFor {adModalEditBtn.click()}
+
+        then: 'The Option to edit every Option should be displayed'
+            at ApplicationEditionPage
+        when: 'The User clicks the "Cancel" Button'
+            aeModalCancelBtn.click()
+
+        then: 'The User should be redirected to the ApplicationListPage'
+            at ApplicationListPage
     }
 
-    def "filter created Application on List and open de Application edit modal window by icon en left"() {
+    def "3. Using the Edit Button on the Application List section, right on the Left"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appNameOld
-        then:
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-        waitFor{alFirstAppName.text().trim() == appNameOld}
-        when:
-        waitFor{alFirstAppEdit.click()}
-        then:
-        at ApplicationEditionPage
+        given: 'The User is on the Application Details Page'
+         at ApplicationListPage
+        when: 'The User searches by the App Name already created'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appNameOld
+
+        then: 'That App should be shown'
+            waitFor {alLoadingGrid.displayed}
+            waitFor {!alLoadingGrid.displayed}
+            waitFor{alFirstAppName.text().trim() == appNameOld}
+        when: 'The User clicks on the "Edit" Button right on the left'
+            waitFor{alFirstAppEdit.click()}
+
+        then: 'The Option to edit every Option should be displayed'
+            at ApplicationEditionPage
     }
 
     def "Edit Application - Change Names and Static dropdowns"() {
