@@ -379,7 +379,8 @@ class DataImportService implements ServiceMethods {
 
 				// println "** insertRowDataIntoDataTransferValues() domainId=$domainId for batch ${batch.id}, batchRecord.assetEntityId=${batchRecord.assetEntityId} field:${batchRecord.fieldName} value: ${batchRecord.correctedValue}"
 
-				Boolean triggerFailureTest = (fieldValue == 'oradbsrv02')
+				// Boolean triggerFailureTest = (fieldValue == 'oradbsrv02')
+				Boolean triggerFailureTest = false
 
 				// This should NOT throw an exception because we're dealing errors in a savepoint rollback
 				if (! batchRecord.save(failOnError:false) || triggerFailureTest ) {
