@@ -43,9 +43,9 @@ class ApplicationCreationSpec extends GebReportingSpec {
 
     def "1. The User Navigates in the Assets Application List Section"() {
         testKey = "tm-xxxx"
-        given: 'the user searches in the menu page'
+        given: 'The User searches in the menu page'
             at MenuPage
-        when: 'the user clicks in the assets > applications menu option'
+        when: 'The User clicks in the assets > applications menu option'
             menuModule.goToApplications()
 
         then: 'application list should be displayed'
