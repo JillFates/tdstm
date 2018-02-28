@@ -1,3 +1,4 @@
+
 <div class="col-md-12">
     <h4 class="pull-left">Record Detail</h4>
     <button class="pull-right btn btn-default" (click)="toggleSection()">
@@ -5,10 +6,12 @@
     </button>
 </div>
 
-<section class="summary-section col-md-12" *ngIf="!collapsed">
+<section class="col-md-12" *ngIf="!collapsed">
     <dependency-batch-record-detail-summary
             [importBatch]="importBatch"
             [batchRecord]="batchRecord">
     </dependency-batch-record-detail-summary>
     <hr>
+    <dependency-batch-record-detail-fields>
+    </dependency-batch-record-detail-fields>
 </section>
