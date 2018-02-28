@@ -757,6 +757,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						domain Application
 						read labels
 						iterate {
+							extract 'application id' load id
 							extract 'vendor name' load appVendor
 						}
 					""".stripIndent(),
@@ -766,14 +767,20 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == 'Application'
-				with(data[0].fields.appVendor) {
-					originalValue == "Microsoft"
-					value == "Microsoft"
+				with(data[0]) {
+					rowNum == 1
+					with (fields.appVendor){
+						originalValue == "Microsoft"
+						value == "Microsoft"
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					originalValue == "Mozilla"
-					value == "Mozilla"
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor){
+						originalValue == "Mozilla"
+						value == "Mozilla"
+					}
 				}
 			}
 	}
@@ -1164,6 +1171,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1176,16 +1184,17 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					read labels
-					domain Application
+					
 					iterate {
-						extract 'application id' load Id
+						domain Application
+						extract 'application id' load id
 						extract 'vendor name' load appVendor
 						
 						if (!SOURCE.'vendor name'.startsWith('Mi')){
-							skip row
+							ignore row
 						} else {
 							domain Device
-							extract 'application id' load Id
+							extract 'application id' load id
 							extract technology load Name
 						}
 					}
@@ -1194,7 +1203,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.result.domains.size() == 2
 			with(etlProcessor.result.domains[0]) {
 				domain == 'Application'
 				fields == ['appVendor', 'environment'] as Set

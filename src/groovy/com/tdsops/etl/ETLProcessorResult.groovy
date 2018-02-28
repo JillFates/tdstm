@@ -130,7 +130,9 @@ class ETLProcessorResult {
 	 */
 	void loadElement(Element element) {
 		reference.fields.add(element.fieldSpec.name)
-		currentData().fields[element.fieldSpec.name] = initialFieldDataMap(element)
+		Map<String, ?> currentData = currentData()
+		currentData.rowNum = element.rowIndex
+		currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
 	}
 
 	/**
