@@ -78,7 +78,7 @@ class ApiAction {
 
 	Date dateCreated
 
-	Date lastModified
+	Date lastUpdated
 
 	// The URL to the endpoint
 	String endpointUrl
@@ -124,7 +124,7 @@ class ApiAction {
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
 		isPolling range: 0..1
-		lastModified nullable: true
+		lastUpdated nullable: true
 		methodParams nullable: true
 		name size: 1..64, unique: 'project'
 		pollingLapsedAfter min: 0
