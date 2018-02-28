@@ -43,7 +43,7 @@
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
-																	id="apiActionProvider" name="apiActionProvider" class="form-control"
+																	id="apiActionProvider" name="apiActionProvider"
                                                                     (valueChange)="onProviderValueChange($event, false)"
 																	[data]="providerList"
 																	[textField]="'name'"
@@ -257,7 +257,7 @@
 							</div>
 						</form>
 					</div>
-					<div class="tab-pane no-padding " style="height: 430px;" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}" id="tab_2">
+					<div class="tab-pane no-padding api-action-parameters-form" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}" id="tab_2">
 						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body no-padding ">
 								<kendo-grid
@@ -278,12 +278,12 @@
 													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
-												<button class="btn btn-default" (click)="onDeleteParameter(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+												<button class="btn btn-default" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'param'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" style="width: 100%; height: 30px;" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
@@ -299,7 +299,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input *ngIf="dataItem.context === 'USER_DEFINED'" type="text" name="{{column.property + columnIndex + rowIndex}}" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" style="width: 100%; height: 30px;" />
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEFINED'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
 												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
@@ -308,13 +308,14 @@
 																[textField]="'label'"
 																[valueField]="'field'"
 																[(ngModel)]="dataItem.property"
+																(keypress)="getOnInputKey($event)"
 																(valueChange)="verifyIsValidForm()"
 																required
 																[ngClass]="{'has-error': !dataItem.property}" >
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input type="text" name="{{column.property + columnIndex + rowIndex}}" [(ngModel)]="dataItem.desc" style="width: 100%; height: 30px;" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -326,7 +327,7 @@
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
 												<span *ngIf="dataItem.context === 'USER_DEFINED'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
 												<span>{{dataItem.desc}}</span>

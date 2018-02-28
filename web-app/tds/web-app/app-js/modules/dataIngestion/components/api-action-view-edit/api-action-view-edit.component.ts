@@ -73,6 +73,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public parameterList: GridDataResult;
 	public apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	public modalTitle: string;
+	public editModeFromView = false;
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
 	private dataSignature: string;
@@ -324,7 +325,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Change the View Mode to Edit Mode
 	 */
 	protected changeToEditApiAction(): void {
+		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
+		this.verifyIsValidForm();
 	}
 
 	/**
@@ -349,6 +352,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	protected setCurrentTab(num: number): void {
+		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();
 		}
@@ -387,6 +391,9 @@ export class APIActionViewEditComponent implements OnInit {
 				}
 			}
 			this.initFormLoad = false;
+		}
+		if (this.editModeFromView) {
+			this.validInfoForm = this.editModeFromView;
 		}
 
 		if (this.apiActionParametersForm) {
@@ -557,7 +564,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Delete from the paramaters the argument passed.
 	 * @param dataItem
 	 */
-	onDeleteParameter(dataItem: APIActionParameterModel): void {
+	onDeleteParameter(event: any, dataItem: APIActionParameterModel): void {
 		let parameterIndex = this.parameterList.data.indexOf(dataItem);
 		if (parameterIndex >= 0) {
 			this.parameterList.data.splice(parameterIndex, 1);
@@ -667,4 +674,16 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 		return context;
 	};
+
+	/**
+	 * Workaround to stop propagation on shared events on Kendo
+	 * Clicking on enter was causing other events to execute
+	 * @param event
+	 */
+	public getOnInputKey(event: any): void {
+		if (event.key === KEYSTROKE.ENTER) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	}
 }
