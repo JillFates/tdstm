@@ -162,11 +162,12 @@ class ImportBatch {
 		return dataMap
 	}
 
+	// TODO : JPM 2/2018 : When using this setter the assignments were NOT working correctly
 	//
 	// Setter functions to deal with the JSON properties
 	//
-	void setFieldNameList(Object value) {
-		this.fieldNameList = JsonUtil.toJson(value)
-	}
+	// void setFieldNameList(Object value) {
+	// 	this.fieldNameList = JsonUtil.toJson(value)
+	// }
 
 }

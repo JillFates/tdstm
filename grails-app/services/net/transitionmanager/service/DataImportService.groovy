@@ -49,7 +49,7 @@ class DataImportService implements ServiceMethods {
 	static final Map LEGACY_DOMAIN_CLASSES = [
 			( ETLDomain.Application.name() ) : ETLDomain.Application,
 			( ETLDomain.Database.name() ) : ETLDomain.Database,
-			( ETLDomain.Device.name() ) : ETLDomain.Device,
+			//( ETLDomain.Device.name() ) : ETLDomain.Device,
 			( ETLDomain.Storage.name() ) : ETLDomain.Storage
 		]
 
@@ -255,7 +255,7 @@ class DataImportService implements ServiceMethods {
 				// createdBy: importContext.etlInfo.createdBy,
 				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
 				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
-				fieldNameList: importContext.fields,
+				fieldNameList: JsonUtil.toJson(importContext.fields),
 				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
@@ -422,7 +422,6 @@ class DataImportService implements ServiceMethods {
 	private boolean insertRowDataIntoImportBatchRecord(session, ImportBatch batch, JSONObject rowData, Long domainId, Map importContext ) {
 
 		int rowNum = importContext.rowNumber - 1
-
 		// Detemine if there were duplicates found
 		// TODO : JPM 2/2018 : the dupsFound logic is questionable (need to compare against latest JSON). Also this will be
 		// good to move to the command object.
@@ -448,11 +447,12 @@ class DataImportService implements ServiceMethods {
 			// TODO : JPM 2/2018 : Replace sourceRowId with value from rowData.rowNum when TM-9510 is implemented
 			sourceRowId: rowNum,
 			errorCount: rowData.errors.size(),
-			errorList: (rowData.errors ?: '[]'),
+			errorList: JsonUtil.toJson( (rowData.errors ?: []) ),
 			warn: (rowData.warn ? 1 : 0),
 			duplicateReferences: dupsFound,
-			fieldsInfo: rowData.fields
+			fieldsInfo: JsonUtil.toJson(rowData.fields)
 		)
+
 		if (! batchRecord.save(failOnError:false)) {
 			// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
 			String gmsg = GormUtil.allErrorsString(batchRecord)
