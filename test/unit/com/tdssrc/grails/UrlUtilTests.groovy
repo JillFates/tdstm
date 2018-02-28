@@ -40,10 +40,10 @@ class UrlUtilTests extends Specification {
 			'HTTP://test.me'    | 'http4://test.me'
 			'http://test.me'    | 'http4://test.me'
 			'Http://test.me'    | 'http4://test.me'
-			' Https://test.me'  | ' https4://test.me'
-			' https://test.me'  | ' https4://test.me'
-			' http://test.me'   | ' http4://test.me'
-			' Http://test.me'   | ' http4://test.me'
+			' Https://test.me'  | 'https4://test.me'
+			' https://test.me'  | 'https4://test.me'
+			' http://test.me'   | 'http4://test.me'
+			' Http://test.me'   | 'http4://test.me'
 	}
 
 }

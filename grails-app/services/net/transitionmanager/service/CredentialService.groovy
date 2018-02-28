@@ -134,7 +134,7 @@ class CredentialService implements ServiceMethods {
         Map<String, ?> authenticationResponse
         switch (credential.authenticationMethod) {
 			case AuthenticationMethod.BASIC_AUTH:
-				authenticationResponse = ['username': credential.username, 'password': decryptPassword(credential)]
+				// this is handled directly where it is being used
 				break;
             case AuthenticationMethod.JWT:
                 authenticationResponse = doJWTTokenAuthentication(credential)
@@ -175,7 +175,7 @@ class CredentialService implements ServiceMethods {
     private Map<String, ?> doCookieAuthentication(Credential credential) {
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
         def resp = rest.post(credential.getAuthenticationUrl()) {
-            // TODO determine the httpMethod is GET, POST or PUT
+            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
             // verify if we need to parse parameters out of the URL
             switch (credential.requestMode) {
                 case AuthenticationRequestMode.BASIC_AUTH:

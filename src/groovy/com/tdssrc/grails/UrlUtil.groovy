@@ -27,9 +27,9 @@ class UrlUtil {
 	static String sanitizeUrlForCamel(String url) {
 		// do this for http4 camel component
 		if (isSecure(url)) {
-			return url.replaceAll(HTTPS_PROTOCOL_REPLACE_REGEX, CAMEL_HTTPS4_PROTOCOL)
+			return url.replaceAll(HTTPS_PROTOCOL_REPLACE_REGEX, CAMEL_HTTPS4_PROTOCOL).trim()
 		} else {
-			return url.replaceAll(HTTP_PROTOCOL_REPLACE_REGEX, CAMEL_HTTP4_PROTOCOL)
+			return url.replaceAll(HTTP_PROTOCOL_REPLACE_REGEX, CAMEL_HTTP4_PROTOCOL).trim()
 		}
 	}
 

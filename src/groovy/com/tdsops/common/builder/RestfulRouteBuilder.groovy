@@ -121,14 +121,13 @@ class RestfulRouteBuilder extends RouteBuilder {
 			// fetch a fresh copy of the credentials to have access to password and salt when needed
 			// TODO use CredentialService if possible
 			Credential credential = Credential.read(actionRequest.param.credentials.id)
-
-			Map<String, ?> authentication = credentialService.authenticate(credential)
 			switch (credential.authenticationMethod) {
 				case AuthenticationMethod.BASIC_AUTH:
-					builder.addParameter('authUsername', authentication.username)
-					builder.addParameter('authPassword', authentication.password)
+					builder.addParameter('authUsername', credential.username)
+					builder.addParameter( 'authPassword', credentialService.decryptPassword(credential))
 					break;
 				case AuthenticationMethod.COOKIE:
+					Map<String, ?> authentication = credentialService.authenticate(credential)
 					routeDefinition.setHeader(authentication.sessionName, constant(authentication.sessionValue))
 					break;
 				default:
