@@ -129,7 +129,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
 
     def "3. Using the Edit Button on the Application List section, right on the Left"() {
         testKey = "TM-8492"
-        given: 'The User is on the Application Details Page'
+        given: 'The User is on the Application List Page'
          at ApplicationListPage
         when: 'The User searches by the App Name already created'
             waitFor {alNameFilter.click()}
@@ -146,163 +146,173 @@ class ApplicationEditionSpec extends GebReportingSpec {
             at ApplicationEditionPage
     }
 
-    def "Edit Application - Change Names and Static dropdowns"() {
+    def "4. Edit Application - Changing Names and Static dropdowns"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationEditionPage
-        when:
-        aeModalAppName = appName
-        aeModalDescription = appDesc
-        aeModalBundleSelector.click()
-        waitFor { aeModalBundleSelector.find("option", text: appBundle).first().click() }
-        aeModalPlanStatusSelector.click()
-        waitFor { aeModalPlanStatusSelector.find("option", text: appStatus).first().click() }
-        then:
-        aeModalAppName.value() == appName
-        aeModalDescription.value() == appDesc
-        aeModalBundleSelector.find("option", value:aeModalBundleSelector.value()).text() == appBundle
-        aeModalPlanStatusSelector.find("option", value:aeModalPlanStatusSelector.value()).text() == appStatus
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User changes the App Name, description, Bundle and Status values'
+            aeModalAppName = appName
+            aeModalDescription = appDesc
+            aeModalBundleSelector.click()
+            waitFor { aeModalBundleSelector.find("option", text: appBundle).first().click() }
+            aeModalPlanStatusSelector.click()
+            waitFor { aeModalPlanStatusSelector.find("option", text: appStatus).first().click() }
+
+        then: 'Every value should be accordingly changed'
+            aeModalAppName.value() == appName
+            aeModalDescription.value() == appDesc
+            aeModalBundleSelector.find("option", value:aeModalBundleSelector.value()).text() == appBundle
+            aeModalPlanStatusSelector.find("option", value:aeModalPlanStatusSelector.value()).text() == appStatus
     }
 
-    def "Edit Application - Change dynamic Dropdowns"() {
+    def "5. Edit Application - Changing dynamic Dropdowns"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationEditionPage
-        when:
-        aeModalSME1Selector.click()
-        waitFor { aeModalSelectorValues.size() > 2 }
-        appSME1 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appSME1).first().click()
-        aeModalSME2Selector.click()
-        waitFor { aeModalSelectorValues.size() > 2 }
-        appSME2 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appSME2).first().click()
-        aeModalAppOwnerSelector.click()
-        waitFor { aeModalSelectorValues.size() > 2 }
-        appOwner = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
-        aeModalSelectorValues.find("div", role: "option", text: appOwner).first().click()
-        then:
-        at ApplicationEditionPage
-        aeModalSME1Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME1
-        aeModalSME2Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME2
-        aeModalAppOwnerSelector.find("span",id: startsWith("select2-chosen")).text().trim() == appOwner
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User changes the App SME1, SME2, appOwner values'
+            aeModalSME1Selector.click()
+            waitFor { aeModalSelectorValues.size() > 2 }
+            appSME1 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
+            aeModalSelectorValues.find("div", role: "option", text: appSME1).first().click()
+            aeModalSME2Selector.click()
+            waitFor { aeModalSelectorValues.size() > 2 }
+            appSME2 = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
+            aeModalSelectorValues.find("div", role: "option", text: appSME2).first().click()
+            aeModalAppOwnerSelector.click()
+            waitFor { aeModalSelectorValues.size() > 2 }
+            appOwner = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()-2))+2].text()
+            aeModalSelectorValues.find("div", role: "option", text: appOwner).first().click()
 
+        then: 'Every value should be accordingly changed'
+            at ApplicationEditionPage
+            aeModalSME1Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME1
+            aeModalSME2Selector.find("span",id: startsWith("select2-chosen")).text().trim() == appSME2
+            aeModalAppOwnerSelector.find("span",id: startsWith("select2-chosen")).text().trim() == appOwner
     }
 
-    def "Edit Application - add Support"() {
+    def "6. Edit Application - Adding Support Dependencies"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationEditionPage
-        when:
-        aeModalAddSuppBtn.click()
-        then:
-        waitFor { aeModalSuppColTitles[0].text().trim() == "Frequency" }
-        aeModalSuppColTitles[1].text().trim() == "Class"
-        aeModalSuppColTitles[2].text().trim() == "Name"
-        aeModalSuppColTitles[3].text().trim() == "Bundle"
-        aeModalSuppColTitles[4].text().trim() == "Type"
-        aeModalSuppColTitles[5].text().trim() == "Status"
-        aeModalSuppList.size() > 0
-        when:
-        aeModalSuppFreqSelector.click()
-        waitFor { aeModalSuppFreqSelector.find("option", text: suppFreq).first().click() }
-        aeModalSuppClassSelector.click()
-        waitFor { aeModalSuppClassSelector.find("option", text: suppClass).first().click() }
-        aeModalSuppNameSelector.click()
-        waitFor { aeModalSelectorValues.size() > 2 }
-        suppName = aeModalSelectorValues[Math.abs(new Random().nextInt() % (aeModalSelectorValues.size()))].text()
-        waitFor { aeModalSelectorValues.find("div", role: "option", text: suppName).first().click() }
-        aeModalSuppBundleSelector.click()
-        waitFor { aeModalSuppBundleSelector.find("option", text: suppBundle).first().click() }
-        aeModalSuppTypeSelector.click()
-        waitFor { aeModalSuppTypeSelector.find("option", text: suppType).first().click() }
-        aeModalSuppStatusSelector.click()
-        waitFor { aeModalSuppStatusSelector.find("option", text: suppStatus).first().click() }
-        then:
-        aeModalSuppFreqSelector.find("option", value: aeModalSuppFreqSelector.value()).text().trim() == suppFreq
-        aeModalSuppClassSelector.find("option", value: aeModalSuppClassSelector.value()).text().trim() == suppClass
-        aeModalSuppNameSelector.find("span", id: startsWith("select2-chosen")).text().trim() == suppName
-        aeModalSuppBundleSelector.find("option", value: aeModalSuppBundleSelector.value()).text().trim() == suppBundle
-        aeModalSuppTypeSelector.find("option", value: aeModalSuppTypeSelector.value()).text().trim() == suppType
-        aeModalSuppStatusSelector.find("option", value: aeModalSuppStatusSelector.value()).text().trim() == suppStatus
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User clicks the "Support" Button'
+            aeModalAddSuppBtn.click()
+
+        then: 'A New Layout containing different Options should be displayed'
+            waitFor { aeModalSuppColTitles[0].text().trim() == "Frequency" }
+            aeModalSuppColTitles[1].text().trim() == "Class"
+            aeModalSuppColTitles[2].text().trim() == "Name"
+            aeModalSuppColTitles[3].text().trim() == "Bundle"
+            aeModalSuppColTitles[4].text().trim() == "Type"
+            aeModalSuppColTitles[5].text().trim() == "Status"
+            aeModalSuppList.size() > 0
+        when: 'The User completes information related to Frequency, Calls, Name, Bundle, Type and Status'
+            aeModalSuppFreqSelector.click()
+            waitFor { aeModalSuppFreqSelector.find("option", text: suppFreq).first().click() }
+            aeModalSuppClassSelector.click()
+            waitFor { aeModalSuppClassSelector.find("option", text: suppClass).first().click() }
+            aeModalSuppNameSelector.click()
+            waitFor { aeModalSelectorValues.size() > 2 }
+            suppName = aeModalSelectorValues[Math.abs(new Random().nextInt() % (aeModalSelectorValues.size()))].text()
+            waitFor { aeModalSelectorValues.find("div", role: "option", text: suppName).first().click() }
+            aeModalSuppBundleSelector.click()
+            waitFor { aeModalSuppBundleSelector.find("option", text: suppBundle).first().click() }
+            aeModalSuppTypeSelector.click()
+            waitFor { aeModalSuppTypeSelector.find("option", text: suppType).first().click() }
+            aeModalSuppStatusSelector.click()
+            waitFor { aeModalSuppStatusSelector.find("option", text: suppStatus).first().click() }
+
+        then: 'Every value should be accordingly added'
+            aeModalSuppFreqSelector.find("option", value: aeModalSuppFreqSelector.value()).text().trim() == suppFreq
+            aeModalSuppClassSelector.find("option", value: aeModalSuppClassSelector.value()).text().trim() == suppClass
+            aeModalSuppNameSelector.find("span", id: startsWith("select2-chosen")).text().trim() == suppName
+            aeModalSuppBundleSelector.find("option", value: aeModalSuppBundleSelector.value()).text().trim() == suppBundle
+            aeModalSuppTypeSelector.find("option", value: aeModalSuppTypeSelector.value()).text().trim() == suppType
+            aeModalSuppStatusSelector.find("option", value: aeModalSuppStatusSelector.value()).text().trim() == suppStatus
     }
 
-    def "Edit Application - add Is Dependent on"() {
+    def "7. Edit Application - Adding Dependencies"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationEditionPage
-        when:
-        aeModalAddIsDepBtn.click()
-        then:
-        waitFor {aeModalIsDepColTitles[0].text().trim() == "Frequency"}
-        aeModalIsDepColTitles[1].text().trim() == "Class"
-        aeModalIsDepColTitles[2].text().trim() == "Name"
-        aeModalIsDepColTitles[3].text().trim() == "Bundle"
-        aeModalIsDepColTitles[4].text().trim() == "Type"
-        aeModalIsDepColTitles[5].text().trim() == "Status"
-        aeModalIsDepList.size() > 0
-        when:
-        aeModalIsDepFreqSelector.click()
-        waitFor { aeModalIsDepFreqSelector.find("option", text: isDepFreq).first().click() }
-        aeModalIsDepClassSelector.click()
-        waitFor { aeModalIsDepClassSelector.find("option", text: isDepClass).first().click() }
-        aeModalIsDepNameSelector.click()
-        waitFor { aeModalSelectorValues.size() > 2 }
-        isDepName = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()))].text()
-        waitFor { aeModalSelectorValues.find("div", role: "option", text: isDepName).first().click() }
-        aeModalIsDepBundleSelector.click()
-        waitFor { aeModalIsDepBundleSelector.find("option", text: isDepBundle).first().click() }
-        aeModalIsDepTypeSelector.click()
-        waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
-        aeModalIsDepStatusSelector.click()
-        waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).first().click() }
-        then:
-        aeModalIsDepFreqSelector.find("option", value:aeModalIsDepFreqSelector.value()).text().trim() == isDepFreq
-        aeModalIsDepClassSelector.find("option", value:aeModalIsDepClassSelector.value()).text().trim() == isDepClass
-        aeModalIsDepNameSelector.find("span",id: startsWith("select2-chosen")).text().trim() == isDepName
-        aeModalIsDepBundleSelector.find("option", value:aeModalIsDepBundleSelector.value()).text().trim() == isDepBundle
-        aeModalIsDepTypeSelector.find("option", value:aeModalIsDepTypeSelector.value()).text().trim() == isDepType
-        aeModalIsDepStatusSelector.find("option", value:aeModalIsDepStatusSelector.value()).text().trim() == isDepStatus
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User clicks the "Dependency" Button'
+            aeModalAddIsDepBtn.click()
+
+        then: 'A New Layout containing different Options should be displayed'
+            waitFor {aeModalIsDepColTitles[0].text().trim() == "Frequency"}
+            aeModalIsDepColTitles[1].text().trim() == "Class"
+            aeModalIsDepColTitles[2].text().trim() == "Name"
+            aeModalIsDepColTitles[3].text().trim() == "Bundle"
+            aeModalIsDepColTitles[4].text().trim() == "Type"
+            aeModalIsDepColTitles[5].text().trim() == "Status"
+            aeModalIsDepList.size() > 0
+        when: 'The User completes information related to Frequency, Calls, Name, Bundle, Type and Status'
+            aeModalIsDepFreqSelector.click()
+            waitFor { aeModalIsDepFreqSelector.find("option", text: isDepFreq).first().click() }
+            aeModalIsDepClassSelector.click()
+            waitFor { aeModalIsDepClassSelector.find("option", text: isDepClass).first().click() }
+            aeModalIsDepNameSelector.click()
+            waitFor { aeModalSelectorValues.size() > 2 }
+            isDepName = aeModalSelectorValues[Math.abs(new Random().nextInt()%(aeModalSelectorValues.size()))].text()
+            waitFor { aeModalSelectorValues.find("div", role: "option", text: isDepName).first().click() }
+            aeModalIsDepBundleSelector.click()
+            waitFor { aeModalIsDepBundleSelector.find("option", text: isDepBundle).first().click() }
+            aeModalIsDepTypeSelector.click()
+            waitFor { aeModalIsDepTypeSelector.find("option", text: isDepType).first().click() }
+            aeModalIsDepStatusSelector.click()
+            waitFor { aeModalIsDepStatusSelector.find("option", text: isDepStatus).first().click() }
+
+        then: 'Every value should be accordingly added'
+            aeModalIsDepFreqSelector.find("option", value:aeModalIsDepFreqSelector.value()).text().trim() == isDepFreq
+            aeModalIsDepClassSelector.find("option", value:aeModalIsDepClassSelector.value()).text().trim() == isDepClass
+            aeModalIsDepNameSelector.find("span",id: startsWith("select2-chosen")).text().trim() == isDepName
+            aeModalIsDepBundleSelector.find("option", value:aeModalIsDepBundleSelector.value()).text().trim() == isDepBundle
+            aeModalIsDepTypeSelector.find("option", value:aeModalIsDepTypeSelector.value()).text().trim() == isDepType
+            aeModalIsDepStatusSelector.find("option", value:aeModalIsDepStatusSelector.value()).text().trim() == isDepStatus
     }
 
-    def "Edit Application - Save Changes and close modal"() {
+    def "8. Edit Application - Save Changes and close modal"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationEditionPage
-        when:
-        waitFor { aeModalUpdateBtn.click() }
-        then:
-        at ApplicationDetailsPage
-        when:
-        waitFor { adModalCloseBtn.click() }
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User clicks the "Update" Button'
+            waitFor { aeModalUpdateBtn.click() }
+
+        then: 'The User should be redirected to the Application Details Pop-Up'
+            at ApplicationDetailsPage
+        when: 'The User clicks the "Close" Button'
+            waitFor { adModalCloseBtn.click() }
+
+        then: 'The User should be redirected to the Application List Section'
+            at ApplicationListPage
     }
 
     def "Filter edited Application on List"() {
         testKey = "TM-8492"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        waitFor{alFirstAppName.text().trim() == appName}
-        waitFor{alFirstAppName.click()}
-        then:
-        at ApplicationDetailsPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User searches by the Application already edited'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+            waitFor{alFirstAppName.text().trim() == appName}
+        And: 'The User clicks on that Application'
+            waitFor{alFirstAppName.click()}
+
+        then: 'The User should be redirected to the Application Details Page'
+            at ApplicationDetailsPage
     }
 
     def "Validate Application Details"() {
         testKey = "TM-8492"
-        when:
-        at ApplicationDetailsPage
-        then:
-        // TODO following items are located by array instead of itself because cannot be identified
-        waitFor{adModalAppName[1].text().trim() == appName}
-        // TODO some items cannot be located due to missing ID's
-        adModalSME1.text().trim().contains(appSME1)
-        adModalSME2.text().trim().contains(appSME2)
-        adModalAppOwner.text().trim().contains(appOwner)
-        // TODO Dependency elements are unreachable due to missing ID's
+        when: 'The User is on the Application Details Page'
+            at ApplicationDetailsPage
+
+        then: 'New AppName, SME1, SME2 and AppOwner values should be displayed'
+            // TODO following items are located by array instead of itself because cannot be identified
+            waitFor{adModalAppName[1].text().trim() == appName}
+            // TODO some items cannot be located due to missing ID's
+            adModalSME1.text().trim().contains(appSME1)
+            adModalSME2.text().trim().contains(appSME2)
+            adModalAppOwner.text().trim().contains(appOwner)
+            // TODO Dependency elements are unreachable due to missing ID's
     }
 }
