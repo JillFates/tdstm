@@ -1,0 +1,23 @@
+<div class="fields-filters row" style="margin-left: 10px;">
+    <label class="col-sm-1">Fields</label>
+    <div class="fieldsFilter col-sm-2">
+        <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
+                            [data]="fieldsFilter.options"
+                            [textField]="'text'"
+                            [valueField]="'value'"
+                            [(ngModel)]="fieldsFilter.selected"
+                            placeholder="Filter"
+                            class="form-control input-sm"></kendo-dropdownlist>
+    </div>
+    <div class="fieldsFilterText col-sm-2">
+        <input [(ngModel)]="fieldsFilter.text"
+               type="text"
+               class="form-control"
+               name="fieldsFilterText"
+               placeholder="Filter on field name">
+        <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+    </div>
+</div>
+<div class="fields-container row">
+    show fields here ...
+</div>

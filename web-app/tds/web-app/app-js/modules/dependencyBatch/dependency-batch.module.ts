@@ -14,6 +14,7 @@ import {DependencyBatchDetailDialogComponent} from './components/dependency-batc
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {DependencyBatchRecordDetailComponent} from './components/dependency-batch-record-detail/dependency-batch-record-detail.component';
 import {DependencyBatchRecordDetailSummaryComponent} from './components/dependency-batch-record-detail-summary/dependency-batch-record-detail-summary.component';
+import {DependencyBatchRecordDetailFieldsComponent} from './components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component';
 
 @NgModule({
 	imports: [
@@ -31,7 +32,8 @@ import {DependencyBatchRecordDetailSummaryComponent} from './components/dependen
 		DependencyBatchListComponent,
 		DependencyBatchDetailDialogComponent,
 		DependencyBatchRecordDetailComponent,
-		DependencyBatchRecordDetailSummaryComponent
+		DependencyBatchRecordDetailSummaryComponent,
+		DependencyBatchRecordDetailFieldsComponent
 	],
 	providers: [
 		DependencyBatchService
