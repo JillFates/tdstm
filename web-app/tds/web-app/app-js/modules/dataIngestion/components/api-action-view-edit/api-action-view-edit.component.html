@@ -117,7 +117,7 @@
 																	[(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.credential?.name}}</label>
+												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
 											</div>
 										</div>
 										<div class="form-group">

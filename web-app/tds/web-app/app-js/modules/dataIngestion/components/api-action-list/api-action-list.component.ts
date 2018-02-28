@@ -54,6 +54,7 @@ export class APIActionListComponent {
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	private interval = INTERVAL;
+	private openLastItemId = 0;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -202,6 +203,15 @@ export class APIActionListComponent {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
+
+				if (this.openLastItemId !== 0) {
+					setTimeout(() => {
+						this.selectRow(this.openLastItemId);
+						let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === this.openLastItemId);
+						this.openLastItemId = 0;
+						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
+					}, 700);
+				}
 			},
 			(err) => console.log(err));
 	}
@@ -216,14 +226,10 @@ export class APIActionListComponent {
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
 		], DIALOG_SIZE.XLG, false).then(result => {
-			this.reloadData();
 			if (actionType === ActionType.CREATE) {
-				setTimeout(() => {
-					this.selectRow(result.id);
-					let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
-					this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
-				}, 500);
+				this.openLastItemId = result.id;
 			}
+			this.reloadData();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});

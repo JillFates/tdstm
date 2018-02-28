@@ -10,6 +10,7 @@ import {AgentModel, AgentMethodModel} from '../model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import {DOMAIN} from '../../../shared/model/constants';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {HttpResponse} from '@angular/common/http';
@@ -140,7 +141,19 @@ export class DataIngestionService {
 	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
 		return new Observable(observer => {
 			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
-				observer.next(JSON.parse(model.methodParams));
+				let parameterList = JSON.parse(model.methodParams);
+				parameterList.forEach( (param) => {
+					if (param.property && param.property.field) {
+						param.property = param.property.field;
+					}
+					if (param.context === 'ASSET') {
+						param.context = DOMAIN.COMMON;
+					}
+					delete param.sourceFieldList;
+					delete param.currentFieldList;
+				});
+
+				observer.next(parameterList);
 			}
 			observer.complete();
 		});
@@ -252,6 +265,9 @@ export class DataIngestionService {
 			parameterList.data.forEach( (param) => {
 				if (param.property && param.property.field) {
 					param.property = param.property.field;
+				}
+				if (param.context === DOMAIN.COMMON) {
+					param.context = 'ASSET';
 				}
 				delete param.sourceFieldList;
 				delete param.currentFieldList;
