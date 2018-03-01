@@ -46,34 +46,40 @@ class TaskDeletionSpec extends GebReportingSpec {
         String sCount = String.format("%03d", testCount)
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
-    def "Filter Task on List"() {
+
+    def "1. Filtering out by Tasks on the List"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskManagerPage
-        when:
-        waitFor {tmDescriptionTColFlt.click()}
-        tmDescriptionTColFlt = taskName
-        waitFor{tmFirstElementDesc.text() == taskName}
-        waitFor{tmFirstElementDesc.click()}
-        waitFor{tmTaskDetailBtn.click()}
-        then:
-        at TaskDetailsPage
+        given: 'The User is on the Task Manager Section'
+            at TaskManagerPage
+        when: 'The User searches by a specific Task'
+            waitFor {tmDescriptionTColFlt.click()}
+            tmDescriptionTColFlt = taskName
+            waitFor{tmFirstElementDesc.text() == taskName}
+        and: 'The User Clicks to display it'
+            waitFor{tmFirstElementDesc.click()}
+            waitFor{tmTaskDetailBtn.click()}
+
+        then: 'The User should be redirected to the Task Details Section'
+            at TaskDetailsPage
     }
 
-    def "Open Task Details"() {
+    def "2. Opens up the Task Details Section"() {
         testKey = "TM-XXXX"
-        when:
-        at TaskDetailsPage
-        then:
-        waitFor{tdModalTaskName.text().trim() == taskName}
+        when: 'The User is on the Task Details Section'
+            at TaskDetailsPage
+
+        then: 'The User waits for the Task to be shown'
+            waitFor{tdModalTaskName.text().trim() == taskName}
     }
 
-    def "Delete Task"() {
+    def "3. Deleting the Task"() {
         testKey = "TM-XXXX"
-        at TaskDetailsPage
-        when:
-        withConfirm(true){waitFor {tdModalDeleteBtn.click() }}
-        then:
-        at TaskManagerPage
+        given: 'The User is on the Task Details Section'
+            at TaskDetailsPage
+        when: 'The User clicks the "Delete" Button'
+            withConfirm(true){waitFor {tdModalDeleteBtn.click() }}
+
+        then: 'The User should be redirected to the Task Manager Section'
+            at TaskManagerPage
     }
 }
