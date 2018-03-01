@@ -123,7 +123,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
         when: 'The User clicks the "Cancel" Button'
             aeModalCancelBtn.click()
 
-        then: 'The User should be redirected to the ApplicationListPage'
+        then: 'The User should be redirected to the Application List Page'
             at ApplicationListPage
     }
 
