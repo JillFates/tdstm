@@ -1,11 +1,15 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
-import groovy.util.logging.Slf4j
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.ImportBatch
+import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.EmptyResultException
+
 import org.apache.commons.lang3.BooleanUtils
+import groovy.util.logging.Slf4j
 
 @Slf4j
 class ImportBatchService implements ServiceMethods {
@@ -27,12 +31,40 @@ class ImportBatchService implements ServiceMethods {
 	}
 
 	/**
+	 * Return a list of the ImportBatchRecords for a given ImportBatch
+	 * the given status (optional).
+	 * @param batch - The batch to return a list of the records for
+	 * @return all the batches for the project.
+	 */
+	List<ImportBatch> listBatchRecords(Project project, ImportBatch batch) {
+		return ImportBatchRecord.where {
+			importBatch == batch
+		}.list()
+	}
+
+	/**
+	 * Return an individual ImportBatchRecord by its ID number
+	 * @param project - if null, the user's current project will be used.
+	 * @param id  - Id of the batch record
+	 * @return the ImportBatchRecord if found otherwise throws EmptyResultException exception
+	 */
+	ImportBatchRecord fetchImportBatchRecord(Project project, Long batchId, Long recordId) throws EmptyResultException {
+		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+
+		ImportBatchRecord record = ImportBatchRecord.get(recordId)
+		if (! record || record.importBatch.id != batch.id ) {
+			throw new EmptyResultException('Requested record was not found')
+		}
+		return record
+	}
+
+	/**
 	 * Delete a list of Import Batches, throwing an exception if not all of them
 	 * are deleted because of invalid ids of because they're being processed.
 	 * @param importBatchIds
 	 * @param project
 	 */
-	void deleteImportBatch(List<Long> importBatchIds, Project project) {
+	void deleteImportBatch(Project project, List<Long> importBatchIds) {
 		int deletedBatches = ImportBatch.where {
 			project == project
 			id in importBatchIds
@@ -41,7 +73,7 @@ class ImportBatchService implements ServiceMethods {
 
 		// Throw an exception if not all the batches were deleted
 		if (importBatchIds.size() > deletedBatches) {
-			String domainTitle = 'Import Batch' + (importBatchIds.size() > 1 ? 'es' : '')			
+			String domainTitle = 'Import Batch' + (importBatchIds.size() > 1 ? 'es' : '')
 			throwException(DomainUpdateException, Message.DomainFailureBulk, ['Delete', domainTitle], "Deleting of $domainTitle failed")
 		}
 	}
@@ -52,7 +84,7 @@ class ImportBatchService implements ServiceMethods {
 	 * @param project - current project
 	 * @param archived - true: archive / false: unarchive
 	 */
-	void setArchivedFlagOnImportBatch(List<Long> importBatchIds, Project project, boolean archivedFlag) {
+	Integer setArchivedFlagOnImportBatch(Project project, List<Long> importBatchIds, boolean archivedFlag) {
 		// Transform the boolean flag to 0: false, 1: true
 		Integer archived = BooleanUtils.toInteger(archivedFlag)
 		Integer idCount = importBatchIds.size()
@@ -62,11 +94,54 @@ class ImportBatchService implements ServiceMethods {
 
 		Map params = [archived: archived, project: project, batches: importBatchIds]
 		Integer updated = ImportBatch.executeUpdate(hql, params)
-		
-		if (updated < idCount) {
-			String actionName = archivedFlag ? 'Archive' : 'Unarchive'
-			String domainTitle = 'Import Batch' + (idCount > 1 ? 'es' : '')
-			throwException(DomainUpdateException, Message.DomainFailureBulk, [actionName, domainTitle], "$actionName of $domainTitle failed")
-		}
+
+		return updated
+	}
+
+	/**
+	 * Triggers the queuing of one or more batches to be processed if they haven't already been queued. It will only
+	 * updating batches that are in the PENDING status for the user's current project.
+	 * @param project - current project
+	 * @param importBatchIds - the id of the batch
+	 * @return the count of batches that were queued
+	 */
+	Integer queueBatchesForProcessing(Project project, List<Long> batchIds) {
+		// Transform the boolean flag to 0: false, 1: true
+		Integer idCount = batchIds.size()
+
+		// Query that archives or unarchives a list of batches.
+		String hql = 'UPDATE ImportBatch SET status = :status WHERE project = :project AND status=:currentStatus AND id in (:batches)'
+		Map params = [
+			currentStatus: ImportBatchStatusEnum.PENDING,
+			status: ImportBatchStatusEnum.QUEUED,
+			project: project,
+			batches: batchIds ]
+
+		Integer updated = ImportBatch.executeUpdate(hql, params)
+
+		return updated
+	}
+
+	/**
+	 * Ejects or removes one or more batches from the processing queue. It will only update batches that are
+	 * associated to the user's current project and the status is QUEUED.
+	 * @param project - current project
+	 * @param importBatchIds - the id of the batch
+	 * @return the count of batches that were queued
+	 */
+	Integer ejectBatchesFromQueue(Project project, List<Long> batchIds) {
+		// Transform the boolean flag to 0: false, 1: true
+		Integer idCount = batchIds.size()
+
+		// Query that archives or unarchives a list of batches.
+		String hql = 'UPDATE ImportBatch SET status = :status WHERE project = :project AND status=:currentStatus AND id in (:batches)'
+		Map params = [
+			currentStatus: ImportBatchStatusEnum.QUEUED,
+			status: ImportBatchStatusEnum.PENDING,
+			project: project,
+			batches: batchIds ]
+		Integer updated = ImportBatch.executeUpdate(hql, params)
+
+		return updated
 	}
 }
