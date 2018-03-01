@@ -23,9 +23,9 @@ class Dataview {
 	Date lastModified
 
     static constraints = {
-    	name size: 1..255
-		person nullable: true
-		lastModified nullable: true
+			name size: 1..255, unique: true
+			person nullable: true
+			lastModified nullable: true
     }
 
 	static mapping = {
