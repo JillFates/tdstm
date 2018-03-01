@@ -28,13 +28,14 @@ class TaskManagerSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Task Manager"() {
+    def "1. Going To The Task Manager Section"() {
         testKey = "TM-XXXX"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToTasksManager()
-        then:
+        given: 'The User is at the Menu Page'
+            at MenuPage
+        when: 'User Goes to the Tasks > Task Manager Section'
+            menuModule.goToTasksManager()
+
+        then: 'Task Creation Pop-Up should be displayed'
         at TaskManagerPage
     }
 }
