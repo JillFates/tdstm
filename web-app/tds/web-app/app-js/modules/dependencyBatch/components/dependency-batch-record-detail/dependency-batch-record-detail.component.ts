@@ -22,6 +22,5 @@ export class DependencyBatchRecordDetailComponent {
 	private onCancel(): void {
 		this.cancelEvent.emit();
 		this.batchRecord = null;
-		console.log('recordDetail onCancel');
 	}
 }

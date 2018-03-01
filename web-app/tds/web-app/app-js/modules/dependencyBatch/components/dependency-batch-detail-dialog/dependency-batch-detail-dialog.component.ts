@@ -10,6 +10,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -39,7 +40,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		private promptService: UIPromptService,
 		private dependencyBatchService: DependencyBatchService,
 		private activeDialog: UIActiveDialogService) {
-		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
+			this.prepareColumnsModel();
 	}
 
 	ngOnInit(): void {
@@ -47,6 +48,23 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			this.batchRecords = result;
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
 		}, error => this.handleError(error));
+	}
+
+	/**
+	 * TODO: document
+	 */
+	private prepareColumnsModel(): void {
+		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
+		// TODO: use --> this.importBatchModel.fieldNameList;
+		const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
+		let fieldColumns: Array<GridColumnModel> = mock.map( field => {
+			const column: GridColumnModel = new GridColumnModel();
+			column.label = field;
+			column.property = `fields.${field}`;
+			column.width = 130;
+			return column;
+		});
+		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
 	}
 
 	/**
@@ -62,7 +80,6 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private closeBatchRecordDetail(): void {
 		this.selectedBatchRecord = null;
-		console.log('Dialog unselect batch record');
 	}
 
 	/**
