@@ -127,7 +127,13 @@ abstract class ETLBaseSpec extends Specification {
 				]
 				break
 			case AssetClass.DATABASE:
-
+				fieldSpecs = [
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('assetClass', 'Asset Class'),
+				]
+				break
 				break
 			case AssetClass.DEVICE:
 				fieldSpecs = [

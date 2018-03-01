@@ -136,6 +136,21 @@ class ETLProcessorResult {
 	}
 
 	/**
+	 * Removes data from current row.
+	 * @param rowIndex
+	 */
+	void ignoreCurrentRow(Integer rowIndex) {
+		reference.data.find{ it.rowNum == rowIndex}.ignore = true
+	}
+
+	/**
+	 * Removes ignore row in the current reference
+	 */
+	def removeIgnoredRows() {
+		reference.data.removeAll { it.ignore == true }
+	}
+
+	/**
 	 * Calculates the current data map based on row index
 	 * @return a map with the current data node
 	 */

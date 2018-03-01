@@ -227,7 +227,8 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor ignore (String label) {
 
 		if('row'.equalsIgnoreCase(label)){
-
+			result.ignoreCurrentRow(currentRowIndex)
+			debugConsole.info("Ignore rows for ${currentRowIndex}")
 		}
 
 		return this
@@ -249,6 +250,8 @@ class ETLProcessor implements RangeChecker {
 			binding.addDynamicVariable(NOW_VARNAME, new Date())
 
 			closure(addCrudRowData(currentRowIndex, row))
+
+			result.removeIgnoredRows()
 
 			currentRowResult = [:]
 			currentRowIndex++

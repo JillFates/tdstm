@@ -41,13 +41,13 @@ iterate {
     extract 3 transform with uppercase() load description
 
     set environment with 'Production'
-    find Application 'for' id by id with SOURCE.'device id'
+    find Application of id by id with SOURCE.'device id'
 
     domain Device
 
     extract 1 load id
     extract 'model name' transform with uppercase() load Name
-    find Device 'for' id by id with SOURCE.'device id'
+    find Device of id by id with SOURCE.'device id'
 }""".stripIndent()
 
 

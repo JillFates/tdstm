@@ -225,6 +225,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
+					data.size() == 1
 					data[0].fields == [:]
 				}
 			}
@@ -274,16 +275,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 3
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
+				data.size() == 1
 				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
+				data.size() == 1
 				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[2]) {
 				domain == ETLDomain.Storage.name()
+				data.size() == 1
 				data[0].fields == [:]
 			}
 	}
@@ -312,11 +316,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 2
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
+				data.size() == 1
 				data[0].fields == [:]
 			}
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
+				data.size() == 1
 				data[0].fields == [:]
 			}
 	}
@@ -488,13 +494,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					
-						domain Device
-						read labels
-						iterate {
-							extract 10000
-						}
-						
+					domain Device
+					read labels
+					iterate {
+						extract 10000
+					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -519,26 +523,34 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' load appVendor
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
 			}
 	}
@@ -559,31 +571,38 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' 
-									
-									if ( CE == 'Microsoft'){
-										load appVendor
-									} else {
-										load environment
-									}
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' 
+						if ( CE == 'Microsoft'){
+							load appVendor
+						} else {
+							load environment
+						}
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 				}
 
-				with(data[1].fields.environment) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+				with(data[1]) {
+					rowNum == 2
+					with(fields.environment) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
 			}
 	}
@@ -604,31 +623,39 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name'
-									def myVar = CE
-									if ( myVar == 'Microsoft'){
-										load appVendor
-									} else {
-										load environment
-									}
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name'
+						def myVar = CE
+						if ( myVar == 'Microsoft'){
+							load appVendor
+						} else {
+							load environment
+						}
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 				}
 
-				with(data[1].fields.environment) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+				with(data[1]) {
+					rowNum == 2
+					with(fields.environment) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
 			}
 	}
@@ -649,35 +676,49 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' load appVendor load description
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor load description
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.appVendor) {
-					originalValue == "Microsoft"
-					value == "Microsoft"
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						originalValue == "Microsoft"
+						value == "Microsoft"
+					}
 				}
 
-				with(data[0].fields.description) {
-					originalValue == "Microsoft"
-					value == "Microsoft"
+				with(data[0]) {
+					rowNum == 1
+					with(fields.description) {
+						originalValue == "Microsoft"
+						value == "Microsoft"
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					originalValue == "Mozilla"
-					value == "Mozilla"
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor) {
+						originalValue == "Mozilla"
+						value == "Mozilla"
+					}
 				}
 
-				with(data[1].fields.description) {
-					originalValue == "Mozilla"
-					value == "Mozilla"
+				with(data[1]) {
+					rowNum == 2
+					with(fields.description) {
+						originalValue == "Mozilla"
+						value == "Mozilla"
+					}
 				}
 			}
 	}
@@ -697,11 +738,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								domain Application
-								read labels
-								iterate {
-									extract 'vendor name' load appVendor
-								}""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
@@ -726,11 +768,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' load vendedor
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load vendedor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
@@ -754,19 +797,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'application id' load id
-							extract 'vendor name' load appVendor
-						}
-					""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'application id' load id
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
+				domain == ETLDomain.Application.name()
 				with(data[0]) {
 					rowNum == 1
 					with (fields.appVendor){
@@ -802,76 +845,110 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						read labels
-						iterate {
-							domain Application
-							set environment with Production
-							extract 1 load id
-							extract 'vendor name' load appVendor
+					read labels
+					iterate {
+						domain Application
+						set environment with Production
+						extract 1 load id
+						extract 'vendor name' load appVendor
 							
-							domain Device
-							extract 1 load id 
-							set location with 'Development'        
-						}
-						""".stripIndent(),
+						domain Device
+						extract 1 load id 
+						set location with 'Development'        
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 2
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+
+				with(data[0]) {
+					rowNum == 1
+					with(fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
 				}
 
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == '152254'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.id) {
+						originalValue == '152254'
+						value == '152254'
+					}
 				}
 
-				with(data[0].fields.appVendor) {
-					originalValue == 'Microsoft'
-					value == 'Microsoft'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						originalValue == 'Microsoft'
+						value == 'Microsoft'
+					}
 				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
 				}
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.id) {
+						originalValue == '152254'
+						value == '152254'
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					originalValue == 'Mozilla'
-					value == 'Mozilla'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						originalValue == 'Microsoft'
+						value == 'Microsoft'
+					}
 				}
 			}
 
 		and: 'Results should contain Device domain results associated'
 			with(etlProcessor.result.domains[1]) {
-				domain == 'Device'
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == '152254'
+				domain == ETLDomain.Device.name()
+				data.size() == 2
+
+				with(data[0]) {
+					rowNum == 1
+					with(fields.id) {
+						originalValue == '152254'
+						value == '152254'
+					}
 				}
 
-				with(data[0].fields.location) {
-					originalValue == 'Development'
-					value == 'Development'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.location) {
+						originalValue == 'Development'
+						value == 'Development'
+					}
 				}
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.id) {
+						originalValue == '152254'
+						value == '152254'
+					}
 				}
 
-				with(data[1].fields.location) {
-					originalValue == 'Development'
-					value == 'Development'
+				with(data[0]) {
+					rowNum == 1
+					with(fields.location) {
+						originalValue == 'Development'
+						value == 'Development'
+					}
 				}
 			}
 	}
@@ -917,7 +994,6 @@ roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Co
 
 		then: 'Results should contain Room domain results associated'
 			etlProcessor.result.domains.size() == 1
-
 
 
 		cleanup:
@@ -1012,27 +1088,38 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
+				domain == ETLDomain.Application.name()
 				fields == ['appVendor', 'environment'] as Set
-
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 				}
 
-				with(data[0].fields.environment) {
-					value == 'Production'
-					originalValue == 'Production'
+				with(data[0]){
+					rowNum == 1
+					with(fields.environment) {
+						value == 'Production'
+						originalValue == 'Production'
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
 
-				with(data[1].fields.environment) {
-					value == 'Development'
-					originalValue == 'Development'
+				with(data[1]){
+					rowNum == 2
+					with(fields.environment) {
+						value == 'Development'
+						originalValue == 'Development'
+					}
 				}
 			}
 	}
@@ -1104,7 +1191,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
+				domain == ETLDomain.Application.name()
 				fields == ['appVendor', 'environment'] as Set
 
 				with(data[0].fields.appVendor) {
@@ -1165,9 +1252,6 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 	void 'test can abort current row based on some condition'() {
 
-//		updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-//		updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
-
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
@@ -1205,28 +1289,109 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
 			etlProcessor.result.domains.size() == 2
 			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				fields == ['appVendor', 'environment'] as Set
+				domain == ETLDomain.Application.name()
+				fields == ['id', 'appVendor'] as Set
+				data.size() == 1
+				with(data[0]){
+					rowNum == 1
+					with(fields.id){
+						value == '152254'
+						originalValue == '152254'
+					}
+				}
 
 				with(data[0].fields.appVendor) {
 					value == 'Microsoft'
 					originalValue == 'Microsoft'
 				}
+			}
 
-				with(data[0].fields.environment) {
-					value == 'Production'
-					originalValue == 'Production'
+			with(etlProcessor.result.domains[1]) {
+				domain == ETLDomain.Device.name()
+				fields == ['id', 'name'] as Set
+				data.size() == 1
+				with(data[0]){
+					rowNum == 1
+					with(fields.id) {
+						value == '152254'
+						originalValue == '152254'
+					}
+
+					with(fields.name) {
+						value == '(xlsx updated)'
+						originalValue == '(xlsx updated)'
+					}
+				}
+			}
+	}
+
+	void 'test can abort current row more than once in the same iteration'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						extract 'application id' load id
+						extract 'vendor name' load appVendor
+						
+						if (!SOURCE.'vendor name'.startsWith('Mi')){
+							ignore row
+						} else {
+							domain Device
+							extract 'application id' load id
+							extract technology load Name
+							
+							if(DOMAIN.name.contains('updated')){
+								ignore row
+							} else {
+								domain Database
+								extract 'application id' load id
+							}
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 2
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['id', 'appVendor'] as Set
+				data.size() == 1
+				with(data[0]){
+					rowNum == 1
+					with(fields.id){
+						value == '152254'
+						originalValue == '152254'
+					}
 				}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
 				}
+			}
 
-				with(data[1].fields.environment) {
-					value == 'Development'
-					originalValue == 'Development'
-				}
+			with(etlProcessor.result.domains[1]) {
+				domain == ETLDomain.Device.name()
+				fields == ['id', 'name'] as Set
+				data.isEmpty()
 			}
 	}
 }
