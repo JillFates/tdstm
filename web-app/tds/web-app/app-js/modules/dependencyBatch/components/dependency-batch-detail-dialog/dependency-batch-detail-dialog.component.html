@@ -8,6 +8,9 @@
     <div class="modal-body" style="height: 100%; overflow: auto;">
         <div class="modal-body-container">
 
+            <!--
+                Batch Records Grid
+            -->
             <section>
                 <div class="box-body box-with-empty-header">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
@@ -84,7 +87,7 @@
                                 </ng-template>
                             </kendo-grid-column>
                             <!--
-                                Columns
+                                Batch Record - Static Columns
                             -->
                             <kendo-grid-column *ngFor="let column of columnsModel.columns"
                                                field="{{column.property}}"
@@ -124,10 +127,34 @@
                                     </div>
                                 </ng-template>
                             </kendo-grid-column>
-                        </kendo-grid>
+                            <!--
+                                Batch Record - Field Columns (dynamic)
+                            -->
+                            <!--<kendo-grid-column *ngFor="let column of columnsModel.columns"-->
+                                               <!--field="{{column.property}}"-->
+                                               <!--[width]="!column.width ? COLUMN_MIN_WIDTH : column.width">-->
+                                <!--&lt;!&ndash;-->
+                                    <!--Header Template-->
+                                <!--&ndash;&gt;-->
+                                <!--<ng-template kendoGridHeaderTemplate>-->
+                                    <!--<label> {{column.label}}</label>-->
+                                <!--</ng-template>-->
+                                <!--&lt;!&ndash;-->
+                                    <!--Filter Template-->
+                                <!--&ndash;&gt;-->
+                                <!--<ng-template kendoGridFilterCellTemplate let-filter>-->
+                                    <!--<input [(ngModel)]="column.filter" (keyup)="dataGridOperationsHelper.onFilter(column)"-->
+                                           <!--type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">-->
+                                    <!--<span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>-->
+                                <!--</ng-template>-->
+                            <!--</kendo-grid-column>-->
+                    </kendo-grid>
                 </div>
             </section>
 
+            <!--
+                Batch Record Detail
+            -->
             <section *ngIf="selectedBatchRecord">
                 <div class="row">
                     <dependency-batch-record-detail [importBatch]="importBatchModel"
