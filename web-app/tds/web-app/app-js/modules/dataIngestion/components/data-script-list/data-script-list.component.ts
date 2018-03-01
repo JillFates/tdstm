@@ -9,6 +9,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { COLUMN_MIN_WIDTH, DataScriptColumnModel, DataScriptModel, DataScriptMode, Flatten, ActionType } from '../../model/data-script.model';
 import { DataScriptViewEditComponent } from '../data-script-view-edit/data-script-view-edit.component';
+import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-list',
@@ -31,6 +32,9 @@ export class DataScriptListComponent {
 		}
 	};
 
+	public pageSize = MAX_DEFAULT;
+	public skip = 0;
+	public defaultPageOptions = MAX_OPTIONS;
 	public dataScriptColumnModel = new DataScriptColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
@@ -45,6 +49,8 @@ export class DataScriptListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
+		this.state.take = this.pageSize;
+		this.state.skip = this.skip;
 		dataScripts.subscribe(
 			(result) => {
 				this.resultSet = result;
@@ -229,5 +235,13 @@ export class DataScriptListComponent {
 		if (event.target && event.target.parentNode) {
 			event.target.parentNode.click();
 		}
+	}
+
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.state.take = event.take || this.state.take;
+		this.pageSize = this.state.take;
+		this.gridData = process(this.resultSet, this.state);
 	}
 }

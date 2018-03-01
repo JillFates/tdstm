@@ -12,6 +12,7 @@ import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.dataview.DataviewSpec

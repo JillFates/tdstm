@@ -65,7 +65,10 @@ enum UserPreferenceEnum {
 	TASK_CREATE_STATUS,
 	TASK_LIST_SIZE('TaskListSize'),
 	TASKMGR_REFRESH('RefreshTaskMgr'),
-	VIEW_UNPUBLISHED('viewUnpublished')
+	VIEW_UNPUBLISHED('viewUnpublished'),
+	EVENTDB_REFRESH('RefreshEventDB'),
+	TASKGRAPH_REFRESH('RefreshTaskGraph'),
+	TIMELINE_REFRESH('RefreshTimeline')
 
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportCabling,

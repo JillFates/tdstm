@@ -542,7 +542,9 @@ class TaskService implements ServiceMethods {
 		// Override the whom if this is an automated task being completed
 		if (task.isAutomatic() && status == ACS.COMPLETED) {
 			whom = getAutomaticPerson()
+		}
 
+		if (task.isAutomatic() && status == ACS.READY) {
 			if (ACTIONABLE_STATUSES.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to

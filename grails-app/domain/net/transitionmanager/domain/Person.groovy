@@ -118,6 +118,7 @@ class Person extends Party {
 		[domain: EmailDispatch, 	onDelete: 'delete', properties: ['toPerson'] ],
 		[domain: EmailDispatch, 	onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: ExceptionDates, 	onDelete: 'delete', properties: ['person'] ],
+		[domain: ImportBatch, 		onDelete: 'null',   properties: ['createdBy'] ],
 		[domain: Model, 			onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
 		[domain: ModelSync, 		onDelete: 'null',   properties: ['createdBy', 'updatedBy', 'validatedBy'] ],
 		[domain: MoveEventNews, 	onDelete: 'null',   properties: ['archivedBy', 'createdBy'] ],

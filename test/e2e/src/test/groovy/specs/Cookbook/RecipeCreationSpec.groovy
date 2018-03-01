@@ -16,10 +16,8 @@ class RecipeCreationSpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
         at MenuPage
         menuModule.goToTasksCookbook()
     }
@@ -33,115 +31,121 @@ class RecipeCreationSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Open 'Create Recipe' page"() {
+    def "1. Opening The Create Recipe page"() {
         testKey = "TM-7180"
-        given:
-        at CookbookPage
-        when:
-        waitFor { createRecipeButton.click()}
-        then:
-        at CreateRecipePage
+        given: 'The User is on the Cookbook Section'
+            at CookbookPage
+        when: 'The User clicks the "Create Recipe" Button'
+            waitFor { createRecipeButton.click()}
+
+        then: 'The User should be redirected to the Create Recipe Section'
+            at CreateRecipePage
     }
 
-    def "Check 'Create Recipe' page active elements"() {
+    def "2. Check 'Create Recipe' page active elements"() {
         testKey = "TM-XXXX"
-        when:
-        at CreateRecipePage
-        then:
-        saveButton.@disabled == "true"
-        nameFieldContents.@required == "true"
-        contextSelector2.@required == "true"
-        brandNewRecipeTab.parent(".active")
+        when: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+
+        then: 'Active Elements should be checked'
+            saveButton.@disabled == "true"
+            nameFieldContents.@required == "true"
+            contextSelector2.@required == "true"
+            brandNewRecipeTab.parent(".active")
     }
 
-    def "Add a recipe name"() {
+    def "3. Adding a recipe name"() {
         testKey = "TM-7181"
-        given:
-        at CreateRecipePage
-        when:
-        nameFieldContents = "Geb Recipe Test"
-        then:
-        nameFieldContents == "Geb Recipe Test"
-        saveButton.@disabled == "true"
+        given: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+        when: 'The User adds a Name'
+            nameFieldContents = "Geb Recipe Test"
+
+        then: 'Create Recipe Name should be created'
+            nameFieldContents == "Geb Recipe Test"
+            saveButton.@disabled == "true"
     }
 
-    def "Check 'Context' selector options"() {
+    def "4. Checking 'Context' selector options"() {
         testKey = "TM-7182"
-        given:
-        at CreateRecipePage
-        when:
-        contextSelector2.click()
-        then:
-        contextSelector2.$("option")[0].text() == 'Select context'
-        contextSelector2.$("option")[1].text() == 'Event'
-        contextSelector2.$("option")[2].text() == 'Bundle'
-        contextSelector2.$("option")[3].text() == 'Application'
+        given: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+        when: 'The User searches by the Context Selector'
+            contextSelector2.click()
+
+        then: 'Event, Bundle and Application options should be displayed'
+            contextSelector2.$("option")[0].text() == 'Select context'
+            contextSelector2.$("option")[1].text() == 'Event'
+            contextSelector2.$("option")[2].text() == 'Bundle'
+            contextSelector2.$("option")[3].text() == 'Application'
     }
 
-    def "Select an 'Event' context"() {
+    def "5. Selecting the 'Event' context"() {
         testKey = "TM-7183"
-        when:
-        contextSelector2 = "Event"
-        then:
-        contextSelector2 == "Event"
+        when: 'Selecting the Event Element'
+            contextSelector2 = "Event"
+
+        then: 'Event should be selected'
+            contextSelector2 == "Event"
     }
 
-    def "Check the 'Save' Button status"() {
+    def "6. Checking the 'Save' Button status"() {
         testKey = "TM-XXXX"
-        when:
-        at CreateRecipePage
-        then:
-        saveButton.@disabled == ""
+        when: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+
+        then: 'Save Button should be disabled'
+            saveButton.@disabled == ""
     }
 
-    def "Add description contents"() {
+    def "7. Adding some description contents"() {
         testKey = "TM-XXXX"
-        given:
-        at CreateRecipePage
-        when:
-        descriptionContents = "This is a Geb created recipe for an Event context"
-        then:
-        saveButton.@disable == ""
+        given: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+        when: 'The User adds some description'
+            descriptionContents = "This is a Geb created recipe for an Event context"
+
+        then: 'Save Button should be disabled'
+            saveButton.@disable == ""
     }
 
-    def "Save recipe"() {
+    def "8. Saving recipe"() {
         testKey = "TM-7184"
         def selectedRow = 0
-        given:
-        at CreateRecipePage
-        when:
-        saveButton.click()
-        then:
-        at CookbookPage
+        given: 'The User is on the Create Recipe Section'
+            at CreateRecipePage
+        when: 'The User Clicks the "Save" button'
+            saveButton.click()
+
+        then: 'The User should be redirected to the Cookbook Section'
+            at CookbookPage
     }
 
-    def "Check the saved recipe description"() {
+    def "9. Checking the saved recipe description"() {
         testKey = "TM-7184"
         def selectedRow = 0
-        when:
-        at CookbookPage
+        when: 'The User is on the Cookbook Section'
+            at CookbookPage
 
-        then:
-        (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe for an Event context")
-        recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
-        recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe for an Event context"
-        recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "Event"
-        recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == "e2e user"
-        // TODO next line will check dates for the new recipe. Verify actual local time
-        // recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == now()
-        recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == ""
-        recipeGridRowsCols.getAt(selectedRow*rowSize+6).text().trim() == "yes"
+        then: 'The information that has been added should be displayed'
+            (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe for an Event context")
+            recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe for an Event context"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "Event"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == "e2e user"
+            // TODO next line will check dates for the new recipe. Verify actual local time
+            // recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == now()
+            recipeGridRowsCols.getAt(selectedRow*rowSize+5).text().trim() == ""
+            recipeGridRowsCols.getAt(selectedRow*rowSize+6).text().trim() == "yes"
     }
 
-    def "Check 'Editor' tab selected after recipe is created"() {
+    def "10. Check 'Editor' tab selected after recipe is created"() {
         testKey = "TM-XXXX"
-        when:
-        at CookbookPage
-        then:
-        editorTab.parent(".active")
-        at TabEditorPage
-    }
+        when: 'The User is on the Cookbook Section'
+            at CookbookPage
 
+        then: 'Editor Option should be Active'
+            editorTab.parent(".active")
+            at TabEditorPage
+    }
 }
-
-

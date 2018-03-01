@@ -128,7 +128,7 @@
 		<script type="text/javascript">
 			var progressTimer;
 			$(document).ready(function() {
-				progressTimer = new ProgressTimer(0, 'RefreshTimeline', function () {
+				progressTimer = new ProgressTimer(0, '${com.tdsops.tm.enums.domain.UserPreferenceEnum.TIMELINE_REFRESH}', function () {
 					reloadGraph();
 					progressTimer.resetTimer();
 				});

@@ -6,7 +6,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class TaskManagerSpec extends GebReportingSpec{
+class TaskManagerSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -14,10 +14,8 @@ class TaskManagerSpec extends GebReportingSpec{
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
     }
 
     def setup() {
@@ -29,15 +27,14 @@ class TaskManagerSpec extends GebReportingSpec{
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Task Manager"() {
+    def "1. Going To The Task Manager Section"() {
         testKey = "TM-XXXX"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToTasksManager()
-        then:
+        given: 'The User is at the Menu Page'
+            at MenuPage
+        when: 'User Goes to the Tasks > Task Manager Section'
+            menuModule.goToTasksManager()
+
+        then: 'Task Creation Pop-Up should be displayed'
         at TaskManagerPage
     }
-
 }
-

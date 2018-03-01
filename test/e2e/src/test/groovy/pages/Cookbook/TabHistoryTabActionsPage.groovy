@@ -9,15 +9,13 @@ class TabHistoryTabActionsPage extends Page {
         hisTabActTabResetBtn.text() == "Reset"
         hisTabActTabRefreshBtn.text() == "Refresh"
         hisTabActTabDeleteBtn.text() == "Delete"
-
     }
 
     static content = {
-
-        hisTabActTab                    { $("li", heading: "Actions").find("a") }
-        hisTabActTabPublishBtn          { $("button", "ng-click": "tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)") }
-        hisTabActTabResetBtn            { $("button", "ng-click": "tasks.resetTaskBatch(tasks.selectedTaskBatch.id)") }
-        hisTabActTabRefreshBtn          { $("button", "ng-click": "tasks.refreshTaskBatches()") }
-        hisTabActTabDeleteBtn           { $("button", "ng-click": "tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)") }
+        hisTabActTab                    { $("li", heading: "Actions").find("a")}
+        hisTabActTabPublishBtn          { $("button", "ng-click": "tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)")}
+        hisTabActTabResetBtn            { $("button", "ng-click": "tasks.resetTaskBatch(tasks.selectedTaskBatch.id)")}
+        hisTabActTabRefreshBtn          { $("button", "ng-click": "tasks.refreshTaskBatches()")}
+        hisTabActTabDeleteBtn           { $("button", "ng-click": "tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)")}
     }
 }

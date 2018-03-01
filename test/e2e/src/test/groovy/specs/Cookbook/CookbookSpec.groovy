@@ -14,10 +14,8 @@ class CookbookSpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
     }
 
     def setup() {
@@ -29,35 +27,33 @@ class CookbookSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    // Enter on Cookbook page
-    def "Go to Cookbook page"() {
+    def "1. Going to the Cookbook Section"() {
         testKey = "TM-7179"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToTasksCookbook()
-        then:
-        at CookbookPage
-        waitFor { recipeGridRows.size() > 0 }
+        given: 'The User is at the Menu Page'
+            at MenuPage
+        when: 'The User Goes to the Tasks > Cookbook Section'
+            menuModule.goToTasksCookbook()
+
+        then: 'Cookbook Section should be displayed'
+            at CookbookPage
+            waitFor { recipeGridRows.size() > 0 }
     }
 
-    def "Check Cookbook page active elements"() {
+    def "2. Checking Cookbook page active elements"() {
         testKey = "TM-XXXX"
-        when:
-        at CookbookPage
-        then:
-        pageTitle.text().trim() == "Cookbook"
-        taskGenerationTab.parent(".active")
-        recipeGridHeaderCols.getAt(0).text().trim() == "Recipe"
-        recipeGridHeaderCols.getAt(1).text().trim() == "Description"
-        recipeGridHeaderCols.getAt(2).text().trim() == "Context"
-        recipeGridHeaderCols.getAt(3).text().trim() == "Editor"
-        recipeGridHeaderCols.getAt(4).text().trim() == "Last Updated"
-        recipeGridHeaderCols.getAt(5).text().trim() == "Version"
-        recipeGridHeaderCols.getAt(6).text().trim() == "WIP"
-        recipeGridHeaderCols.getAt(7).text().trim() == "Actions"
+        when: 'The User is in the Cookbook Section'
+            at CookbookPage
+
+        then: 'Active Elements should be present'
+            pageTitle.text().trim() == "Cookbook"
+            taskGenerationTab.parent(".active")
+            recipeGridHeaderCols.getAt(0).text().trim() == "Recipe"
+            recipeGridHeaderCols.getAt(1).text().trim() == "Description"
+            recipeGridHeaderCols.getAt(2).text().trim() == "Context"
+            recipeGridHeaderCols.getAt(3).text().trim() == "Editor"
+            recipeGridHeaderCols.getAt(4).text().trim() == "Last Updated"
+            recipeGridHeaderCols.getAt(5).text().trim() == "Version"
+            recipeGridHeaderCols.getAt(6).text().trim() == "WIP"
+            recipeGridHeaderCols.getAt(7).text().trim() == "Actions"
     }
-
 }
-
-

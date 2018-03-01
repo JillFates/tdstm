@@ -42,17 +42,15 @@
 					<!-- /.box-header -->
 					<div class="box-body no-padding">
 						<div class="table-responsive">
-							<div class="box-tools-actions pull-left" *ngIf="isCreateVisible() && isCreateAvailable()">
-								<button (click)="onCreateReport()" class="btn btn-primary">
-									<i class="fa fa-plus-square"></i> {{'ASSET_EXPLORER.CREATE' | translate}}</button>
-							</div>
 							<table class="table table-hover table-striped">
 								<thead>
 									<tr>
 										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
 										<th class="text-center">{{'ASSET_EXPLORER.INDEX.FAVORITE' | translate}}</th>
 										<th>{{'ASSET_EXPLORER.INDEX.NAME' | translate}}</th>
-                                        <th>{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}</th>
+										<th>{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}</th>
+										<th>{{'ASSET_EXPLORER.INDEX.CREATED_ON' | translate}}</th>
+										<th>{{'ASSET_EXPLORER.INDEX.UPDATED_ON' | translate}}</th>
 										<th class="text-center">{{'ASSET_EXPLORER.INDEX.SHARED' | translate}}</th>
 										<!-- <th class="text-center">Subscribe</th> -->
 									</tr>
@@ -75,9 +73,15 @@
 										<td>
 											<a uiSref="tds.assetexplorer_show" [uiParams]="{id:report.id}">{{report.name}}</a>
 										</td>
-                                        <td>
-                                            {{report.createdBy}}
-                                        </td>
+										<td>
+											{{report.createdBy}}
+										</td>
+										<td>
+											{{report.createdOn}}
+										</td>
+										<td>
+											{{report.updatedOn}}
+										</td>
 										<td class="text-center">
 											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared || report.isSystem"></span>
 										</td>

@@ -12,13 +12,12 @@ class TaskManagerPage extends Page{
     }
 
     static content = {
-
         //menu text to determine Event
         projEventUser               { $("a#nav-project-name")}
 
         // START Layout elements
-        tmHeaderTitle                 { $("section", class:"content-header").find("h1") }
-        tmJustRemainingCB             { $("input#justRemainingCB") }
+        tmHeaderTitle                 { $("section", class:"content-header").find("h1")}
+        tmJustRemainingCB             { $("input#justRemainingCB")}
         tmJustMyTasksCB               { $("input#justMyTasksCB")}
         tmViewUnpublishedCB           { $("input#viewUnpublishedCB")}
         tmCreateTaskBtn               { $("#createtask_text_createTask")}

@@ -1,7 +1,7 @@
 package pages.Assets
 import geb.Page
 
-class ApplicationCreationPage extends Page{
+class ApplicationCreationPage extends Page {
 
     static at = {
         waitFor {acModalWindow.displayed}
@@ -20,7 +20,8 @@ class ApplicationCreationPage extends Page{
         acModalSME1Selector(wait:true)  { acModalWindow.find("div#s2id_sme1")}
         acModalSME2Selector(wait:true)  { acModalWindow.find("div#s2id_sme2")}
         acModalAppOwnerSelector(wait:true) { acModalWindow.find("div#s2id_appOwner")}
-// TODO : The following element rasies when a modal dropdown is displayed  (eg: SME1,SM2, App Owner, etc) this should have a valid identifier
+
+        // TODO : The following element rasies when a modal dropdown is displayed  (eg: SME1,SM2, App Owner, etc) this should have a valid identifier
         acModalSelectorValues(wait:true, required:false) { $("div#select2-drop").find("li",class:"select2-results-dept-0 select2-result select2-result-selectable")}
 
         acModalBundleSelector           { acModalWindow.find("select#moveBundle")}
@@ -32,7 +33,5 @@ class ApplicationCreationPage extends Page{
         acModalSaveBtn                  { acModalWindow.find("button", "onclick":"EntityCrud.saveToShow(\$(this),'APPLICATION')")}
         acModalCancelBtn                { acModalWindow.find("button", "onclick":"EntityCrud.closeCreateModal();")}
         acModalCloseBtn                 { acModalWindow.find("button", class:"ui-dialog-titlebar-close")}
-
     }
-
 }

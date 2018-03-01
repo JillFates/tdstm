@@ -146,25 +146,41 @@ class JsonUtil {
     }
 
     /**
-     * Maps an JSONObject into a target object.
-     * Used in conjunction with controllers and request.JSON
-     * @param json - the JSON send as part of the request
-     * @param target
-     * @return
+     * Used to transform a JSON string into an object of a particular class
+     *
+     * @param json - Some JSON text
+     * @param target - a Class to be instantiated and populated appropriately
+     * @returns an instance of the target Class
+     * @throws InvalidParamException for syntax errors or if the Object structure doesn't match
      */
-    static <T> T readValue(JSONObject json, Class<T> target) {
-        if (json) {
-            try {
-                return new ObjectMapper().readValue(json.toString(), target)
-            } catch (Exception e) {
-                String msg
-                if (e instanceof java.lang.NullPointerException) {
-                    msg = "Unable to map Json into ${target.name} object"
-                }
-                throw new InvalidParamException("Invalid JSON : ${msg ?: e.message}")
-            }
-        } else {
-            throw new InvalidParamException("JSON value not present")
+    static <T> T mapToObject(String json, Class<T> target) throws InvalidParamException {
+        try {
+            return new ObjectMapper().readValue(json, target)
+        } catch (Exception e) {
+            logger.error(e.message)
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
         }
     }
+
+    /**
+     * Used to transform a JSONObject into a target object. This is primarily used in conjunction
+     * with controllers and request.JSON
+     *
+     * @param json - the JSON send as part of the request
+     * @param target - a Class to be instantiated and populated appropriately
+     * @returns an instance of the target Class
+     * @throws InvalidParamException for syntax errors or if the Object structure doesn't match
+     */
+    static <T> T mapToObject(JSONObject json, Class<T> target) {
+        String jsonStr
+        try {
+            // Convert the JSON object back to a String (seems silly but...)
+            jsonStr = toJson(json)
+        } catch (Exception e) {
+            logger.error("mapToObject() Failed to convert JSONObject to JSON Text: ${e.message}")
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
+        return mapToObject(jsonStr, target)
+    }
+
 }

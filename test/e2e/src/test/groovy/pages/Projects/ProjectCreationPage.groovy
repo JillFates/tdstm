@@ -10,8 +10,7 @@ class ProjectCreationPage extends Page{
     }
 
     static content = {
-
-        pcPageTitle         { $("section", class:"content-header").find("h1") }
+        pcPageTitle         { $("section", class:"content-header").find("h1")}
         pcPageMessage (required: false, wait:true) { $("div", class:"message")}
         pcPageForm          { $("form", id:"createProjectForm")}
         pcClientSelector    { pcPageForm.find("div#s2id_clientId")}
@@ -23,7 +22,7 @@ class ProjectCreationPage extends Page{
         pcComment           { pcPageForm.find("textarea#comment")}
         pcStartDate         { pcPageForm.find("input#startDateId")}
         pcCompletionDate    { pcPageForm.find("input#completionDateId")}
-        pcPartner           { pcPageForm.find("input", tyype:"button", value:"Add Partner" )}
+        pcPartner           { pcPageForm.find("input", tyype:"button", value:"Add Partner")}
         pcProjectLogoFile   { pcPageForm.find("input#projectLogo")}
         pcDefaultBundle     { pcPageForm.find("input#defaultBundle")}
         pcProjManSelector   { pcPageForm.find("div#s2id_projectManagerId")}
@@ -32,9 +31,6 @@ class ProjectCreationPage extends Page{
         pcworkflowSelector  { pcPageForm.find("div#s2id_workflowCode")}
         pcSaveBtn           { $("input", class:"save", value:"Save")} //TODO Save Button has no ID
         pcCancelBtn         { $("input", type:"button", class:"cancel", value:"Cancel")} //TODO Cancel Button has no ID
-//      pcPlanMethod        {} //TODO Plan Methodology label was wrong 'for='. Also value has no reference
+        // pcPlanMethod        {} //TODO Plan Methodology label was wrong 'for='. Also value has no reference
     }
-
-
-
 }

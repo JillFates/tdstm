@@ -41,7 +41,7 @@ trait ControllerMethods {
 	SecurityService securityService
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
-	
+
 	void renderAsJson(data) {
 		render(data as JSON)
 	}
@@ -95,7 +95,7 @@ trait ControllerMethods {
 		response.sendError(424, 'Method Failure')
 	}
 
-	@Deprecated 
+	@Deprecated
 	void sendInternalError(log, Exception e) {
 		log.error(e.message, e)
 		response.addHeader('errorMessage', e.message)
@@ -170,17 +170,17 @@ trait ControllerMethods {
 	 * @param validationErrors
 	 * @return List of locale specific error messages
 	 */
-	@Deprecated 
+	@Deprecated
 	List errorsInValidation(Errors validationErrors) {
 		validationErrors.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) }
 	}
-	@Deprecated 
+	@Deprecated
 	List errorsInValidation(List<Errors> validationErrors) {
 		validationErrors.findAll {it.allErrors}.collect {it.allErrors.collect { messageSource.getMessage(it, LocaleContextHolder.locale) }}.flatten()
 	}
 
 	/**
-	 * Various Exception Handlers that will catch each type of exception from the Controllers 
+	 * Various Exception Handlers that will catch each type of exception from the Controllers
 	 * and respond appropriately with various messages accordingly. This addresses both page and
 	 * Ajax calls by forwarding to certain pages or returning the standard error response JSON structure
 	 * with the appropriate message(s).
@@ -291,9 +291,9 @@ trait ControllerMethods {
 
 			forward controller: 'errorHandler', action: viewName, model: [exceptionLogged:true]
 		}
-	} 
+	}
 
-	/** 
+	/**
 	 * Used to fetch a domain class by the id property in the params
 	 */
 	def <T> T getFromParams(Class<T> clazz, Map params) {
@@ -354,7 +354,7 @@ trait ControllerMethods {
 	}
 
 	/**
-	 * This will validate a command object and if there is any error(s) it will throw an InvalidParamException 
+	 * This will validate a command object and if there is any error(s) it will throw an InvalidParamException
 	 * containing the message of the validation errors.
 	 *
 	 * @throws InvalidParamException
@@ -383,8 +383,8 @@ trait ControllerMethods {
 	def <T> T populateCommandObject(Class<T> commandObjectClass){
 		// NOTE: For PUT command does populate the command objects properly
 		// SEE: https://github.com/grails/grails-core/issues/9172
-		return JsonUtil.readValue(request.JSON, commandObjectClass)
 
+		return JsonUtil.mapToObject(request.reader.text, commandObjectClass)
 	}
 
 	// ----------------------

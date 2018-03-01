@@ -18,6 +18,7 @@ import {
 } from '../../../../shared/model/data-list-grid.model';
 import {CredentialViewEditComponent} from '../credential-view-edit/credential-view-edit.component';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'credential-list',
@@ -39,14 +40,15 @@ export class CredentialListComponent {
 			logic: 'and'
 		}
 	};
-
+	public skip = 0;
+	public pageSize = MAX_DEFAULT;
+	public defaultPageOptions = MAX_OPTIONS;
 	public credentialColumnModel = new CredentialColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: CredentialModel[];
 	public selectedRows = [];
-	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 
@@ -56,8 +58,10 @@ export class CredentialListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
-		credentials.subscribe(
-			(result) => {
+			this.state.take = this.pageSize;
+			this.state.skip = this.skip;
+			credentials
+			.subscribe((result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
 			},
@@ -65,7 +69,6 @@ export class CredentialListComponent {
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -222,5 +225,23 @@ export class CredentialListComponent {
 
 	protected isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ActionDelete);
+	}
+
+	/**
+	 * Make the entire header clickable on Grid
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
+	}
+
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.state.take = event.take || this.state.take;
+		this.pageSize = this.state.take;
+		this.gridData = process(this.resultSet, this.state);
 	}
 }

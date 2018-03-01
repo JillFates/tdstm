@@ -6,14 +6,13 @@ package net.transitionmanager.agent
  */
 enum ContextType {
 	APPLICATION,
-	ASSET,	// Any class of asset (App, DB, Server, Storage, etc)
+	ASSET,	// Any class of asset (App, DB, Device, Storage, etc)
 	BUNDLE,
 	DATABASE,
 	DEVICE,
 	EVENT,
 	PROJECT,
 	STORAGE,
-	//SERVER, TM-7692
 	TASK,
 	USER_DEF
 }

@@ -5,16 +5,35 @@ import com.tdssrc.grails.TimeUtil
 
 class DataTransferBatch {
 
-	Date dateCreated
+	// Current status of a batch
 	String statusCode = LOADING
-	Date lastModified
+
+	// JPM 2/2018 : Do not recall what transferMode is used for. The batch listing only
+	// searchs for 'I' that is the default.
+	String transferMode = 'I'
+
+	// JPM 2/2018 : Do not believe that versionNumber is used for anything
 	Integer versionNumber
-	String transferMode
-	String progressKey       // tracks which progress job is presenting processing a step on the batch
-	String importFilename    // The name of the import file
-	String importResults     // The results of the review and/or the posting results (text field)
+
+	// References the progress job (Quartz) that is presenting processing the batch
+	String progressKey
+
+	// The name of the import file for historical reference
+	String importFilename
+
+	// The results of the review and/or the posting results (text field)
+	String importResults
+
+	// Used by the import process to compare the time of the last change of the domain
+	// object to that of when the data was originally exported. If the exported time is
+	// earlier it will cause a change conflict to occur and the data will not be updated.
 	Date exportDatetime
+
+	// Flat that there is one or more errors in the batch
 	Integer hasErrors = 0
+
+	Date dateCreated = TimeUtil.nowGMT()
+	Date lastModified
 
 	public static final String LOADING   = 'LOADING'
 	public static final String PENDING   = 'PENDING'
@@ -41,22 +60,16 @@ class DataTransferBatch {
 	}
 
 	static constraints = {
-    userLogin nullable: true
+		userLogin nullable: true
 		dateCreated nullable: true
 		exportDatetime nullable: true
 		importFilename nullable: true
 		importResults nullable: true, maxSize: 16384000
 		lastModified nullable: true
 		progressKey nullable: true
-		statusCode blank: false, size: 0..20, inList: [LOADING, PENDING, POSTING, COMPLETED, ERROR]
+		statusCode blank: false, inList: [LOADING, PENDING, POSTING, COMPLETED, ERROR]
 		transferMode blank: false, inList: ['I', 'E', 'B']
 		versionNumber nullable: true
 	}
 
-	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-	}
-	def beforeUpdate = {
-		lastModified = TimeUtil.nowGMT()
-	}
 }

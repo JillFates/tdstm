@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class TaskEditionSpec extends GebReportingSpec{
+class TaskEditionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -34,10 +34,11 @@ class TaskEditionSpec extends GebReportingSpec{
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
+
+        // TODO Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
+        // TODO NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         at MenuPage
         menuModule.goToTasksManager()
         at TaskManagerPage
@@ -60,129 +61,139 @@ class TaskEditionSpec extends GebReportingSpec{
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Open Edit Task"() {
+    def "1. Opening the Edit Task Option"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskManagerPage
-        when:
-        waitFor {tmDescriptionTColFlt.click()}
-        tmDescriptionTColFlt = taskName
-        waitFor{tmFirstElementDesc.text() == taskName}
-        waitFor{tmFirstElementTaskTbl.click()}
-        then:
-        at TaskEditionPage
+        given: 'The User is on the Task Manager Section'
+            at TaskManagerPage
+        when: 'The User searches by a specific Task'
+            waitFor {tmDescriptionTColFlt.click()}
+            tmDescriptionTColFlt = taskName
+            waitFor{tmFirstElementDesc.text() == taskName}
+        and: 'The User Clicks the "Edit" Button'
+            waitFor{tmFirstElementTaskTbl.click()}
+
+        then: 'The Tasks Edition section should be Displayed'
+            at TaskEditionPage
     }
 
-    def "Edit Task - Change Fields and static Dropdowns"() {
+    def "2. Edit Task - Changing Fields and static Dropdowns"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskEditionPage
-        when:
-        waitFor {teModalLoading.hasClass("ng-hide")}
-        waitFor {teModalTaskName == taskName}
-        teModalTaskName = taskNameEdit
-        teModalPersonSelector = taskPerson
-        teModalTeamSelector = taskTeam
-        teModalEventSelector = taskEvent
-        teModalInstructionsLink = taskInsLink
-        teModalStatusSelector = taskStatus
-        teModalNote = taskNote
-        then:
-        at TaskEditionPage
+        given: 'The User is on the Task Edition Section'
+            at TaskEditionPage
+        when: 'The User Modifies some static values such as Name, Person, Team, Event, Link, Status, Note'
+            waitFor {teModalLoading.hasClass("ng-hide")}
+            waitFor {teModalTaskName == taskName}
+            teModalTaskName = taskNameEdit
+            teModalPersonSelector = taskPerson
+            teModalTeamSelector = taskTeam
+            teModalEventSelector = taskEvent
+            teModalInstructionsLink = taskInsLink
+            teModalStatusSelector = taskStatus
+            teModalNote = taskNote
 
+        then: 'The User should remain in the Taks Edition Section'
+            at TaskEditionPage
     }
 
-    def "Edit Task - Add Asset Type and Name"() {
+    def "3. Edit Task - Adding Asset Type and Name"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskEditionPage
-        when:
-        teModalAssetTypeSelector = taskAssetType
-        waitFor { teModalAssetNameSelector.find("span", text: "Please select") }
-        teModalAssetNameSelector.click()
-        waitFor { teModalAssetNameSelValues.size() > 1 }
-        waitFor { teModalAssetNameSelValues.find("div", class: "select2-result-label", text: taskAssetName).click() }
-        then:
-        at TaskEditionPage
+        given: 'The User is on the Task Edition Page'
+            at TaskEditionPage
+        when: 'The User modifies some values such as Asset Type, Asset Name'
+            teModalAssetTypeSelector = taskAssetType
+            waitFor { teModalAssetNameSelector.find("span", text: "Please select") }
+            teModalAssetNameSelector.click()
+            waitFor { teModalAssetNameSelValues.size() > 1 }
+            waitFor { teModalAssetNameSelValues.find("div", class: "select2-result-label", text: taskAssetName).click() }
+
+        then: 'The User should remain in the Taks Edition Section'
+            at TaskEditionPage
     }
 
-    def "Edit Task - Add Predeccessor and Successor"() {
+    def "4. Edit Task - Adding Predeccessor and Successor"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskEditionPage
-        when:
-        teModalAddPredecessorBtn.click()
-        waitFor {teModalPredecessorDD.click()}
-        waitFor {$("li",text:taskPredecessor).click()}
-        teModalAddSuccessorBtn.click()
-        waitFor {teModalSuccessorDD.click()}
-        waitFor {$("li",text:taskSuccessor).click()}
-        then:
-        at TaskEditionPage
+        given: 'The User is on the Task Edition Page'
+            at TaskEditionPage
+        when: 'The User adds some values such as Predecessor and Successor'
+            teModalAddPredecessorBtn.click()
+            waitFor {teModalPredecessorDD.click()}
+            waitFor {$("li",text:taskPredecessor).click()}
+            teModalAddSuccessorBtn.click()
+            waitFor {teModalSuccessorDD.click()}
+            waitFor {$("li",text:taskSuccessor).click()}
+
+        then: 'The User should remain in the Taks Edition Section'
+            at TaskEditionPage
     }
 
-    def "Save Task"() {
+    def "5. Saving the Edited Task"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskEditionPage
-        when:
-        waitFor { teModalSaveBtn.click() }
-        then:
-        at TaskDetailsPage
+        given: 'The User is on the Task Edition Page'
+            at TaskEditionPage
+        when: 'The User clicks the "Save" Button'
+            waitFor { teModalSaveBtn.click() }
+
+        then: 'The User should be redirected to the Task Details Section'
+            at TaskDetailsPage
     }
 
-    def "Validate Task Details"() {
+    def "6. Validating new Task Options"() {
         testKey = "TM-XXXX"
-        when:
-        at TaskDetailsPage
-        then:
-        waitFor{tdModalTaskName.text().trim() == taskNameEdit}
-        tdModalTaskPerson.text().trim() == taskPerson
-        tdModalTaskTeam.text().trim() == taskTeam
-        tdModalTaskEvent.text().trim() == taskEvent
-        tdModalTaskAssetName.text().trim() == taskAssetName
-        tdModalInstructionsLink.text().trim() == taskInsLink
-        tdModalTaskStatus.text().trim() == taskStatus
-        tdModalNoteLast.text().trim() == taskNote
-        waitFor { tdModalCloseBtn.click() }
-        at TaskManagerPage
+        when: 'The User is on the Task Details Page'
+            at TaskDetailsPage
+
+        then: 'Proper values should be shown'
+            waitFor{tdModalTaskName.text().trim() == taskNameEdit}
+            tdModalTaskPerson.text().trim() == taskPerson
+            tdModalTaskTeam.text().trim() == taskTeam
+            tdModalTaskEvent.text().trim() == taskEvent
+            tdModalTaskAssetName.text().trim() == taskAssetName
+            tdModalInstructionsLink.text().trim() == taskInsLink
+            tdModalTaskStatus.text().trim() == taskStatus
+            tdModalNoteLast.text().trim() == taskNote
+            waitFor { tdModalCloseBtn.click() }
+            at TaskManagerPage
     }
 
-    def "Assign task to me"() {
+    def "7. Assigning the Task to the Current User"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskManagerPage
-        when:
-        waitFor {tmDescriptionTColFlt.click()}
-        tmDescriptionTColFlt = taskNameEdit
-        waitFor{tmFirstElementDesc.text() == taskNameEdit}
-        waitFor{tmFirstElementDesc.click()}
-        waitFor{tmTaskAssignMeBtn.click()}
-        then:
-        at TaskManagerPage
+        given: 'The User is on the Task Manager Section'
+            at TaskManagerPage
+        when: 'The User searches by his/her own Name'
+            waitFor {tmDescriptionTColFlt.click()}
+            tmDescriptionTColFlt = taskNameEdit
+            waitFor{tmFirstElementDesc.text() == taskNameEdit}
+            waitFor{tmFirstElementDesc.click()}
+        and: 'Performs the Action'
+            waitFor{tmTaskAssignMeBtn.click()}
+
+        then: 'The User should be redirected to the Task Manager Section'
+            at TaskManagerPage
     }
 
-    def "Change to Done"() {
+    def "8. Changing the Task Status to Done"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskManagerPage
-        when:
-        waitFor{tmTaskDoneBtn.click()}
-        then:
-        at TaskManagerPage
-        waitFor{tmFirstElementStatus == "Completed"}
+        given: 'The User is on the Task Manager Section'
+            at TaskManagerPage
+        when: 'The user clicks the "Done" Status'
+            waitFor{tmTaskDoneBtn.click()}
+
+        then: 'The the Task Status should be shown as Completed'
+            at TaskManagerPage
+            waitFor{tmFirstElementStatus == "Completed"}
     }
 
-    def "Delete Task"() {
+    def "9. Deleting the  Task"() {
         testKey = "TM-XXXX"
-        given:
-        at TaskManagerPage
-        when:
-        waitFor{tmTaskDetailBtn.click()}
-        at TaskDetailsPage
-        withConfirm(true){waitFor {tdModalDeleteBtn.click() }}
-        then:
-        at TaskManagerPage
+        given: 'The User is on the Task Manager Section'
+            at TaskManagerPage
+        when: 'The User clicks the Option to Display the Task'
+            waitFor{tmTaskDetailBtn.click()}
+            at TaskDetailsPage
+        and: 'The User clicks the "Delete" Button'
+            withConfirm(true){waitFor {tdModalDeleteBtn.click() }}
+
+        then: 'The User should be redirected to the Task Manager Section'
+            at TaskManagerPage
     }
 }
-
