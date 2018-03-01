@@ -130,8 +130,11 @@ class ImportBatch {
 		Map dataScriptMap = dataScript ? dataScript.toMap(true) : null
 		Map dataMap = [
 			id: id,
-			status: status.name(),
-			domainClassName: domainClassName
+			status: [
+				code: status.name(),
+				label: status.toString()
+			],
+			domainClassName: domainClassName.name()
 		]
 		if (! minimalInfo) {
 			Map additionalFields = [
