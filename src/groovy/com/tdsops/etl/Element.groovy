@@ -251,10 +251,22 @@ class Element implements RangeChecker {
      * * @param variableName
      * @return
      */
-    Element set (String variableName) {
+    Element init (String variableName) {
         processor.addDynamicVariable(variableName, this)
     }
 
+    /**
+     * Saves a new variable in the binding context in order to use it later
+     * It's used in this ETL script command
+     * <code>
+     *     extract 3 transform with lowercase() initialize myVar
+     * </code>
+     * * @param variableName
+     * @return
+     */
+    Element initialize (String variableName) {
+        init(variableName)
+    }
     /**
      * Appends Element and String values from a ETL Script and assign result String value.
      * It's used in this ETL script command

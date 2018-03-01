@@ -300,14 +300,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform {
-										left(4)
-								  }
+					domain Device
+					read labels
+					iterate {
+					extract 'model name' transform {
+							left(4)
 						}
-					""".stripIndent(),
+					}   
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed to left 4 transformation'
@@ -325,12 +325,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with middle(3, 2) lowercase()
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(3, 2) lowercase()
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed with middle 2 transformation'
@@ -348,12 +348,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with middle(0, 2) lowercase()
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(0, 2) lowercase()
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
@@ -370,12 +370,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with middle(3, 2) lowercase()  
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with middle(3, 2) lowercase()  
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed with middle 2 transformation'
@@ -393,12 +393,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with uppercase() first('A')
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with uppercase() first('A')
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row striping first "A" character'
@@ -416,12 +416,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with uppercase() last('A')
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with uppercase() last('A')
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row striping last "A" character'
@@ -439,12 +439,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with uppercase() all('A')
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with uppercase() all('A')
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row striping all "A" characters'
@@ -462,12 +462,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with uppercase() all('A') lowercase()
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with uppercase() all('A') lowercase()
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row striping all "A" characters'
@@ -485,12 +485,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with right(4)
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with right(4)
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed with right 4 transformation'
@@ -508,12 +508,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with left(4) lowercase()
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with left(4) lowercase()
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed to uppercase'
@@ -530,12 +530,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with trim() replace(Inc, Incorporated) load appVendor
-						}
-					""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' transform with trim() replace(Inc, Incorporated) load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -561,12 +561,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with trim() replace(/a|b|c/, '') load appVendor
-						}
-					""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -593,12 +593,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Device
-						read labels
-						iterate {
-							extract 'model name' transform with uppercase() lowercase()
-						}
-					""".stripIndent(),
+					domain Device
+					read labels
+					iterate {
+						extract 'model name' transform with uppercase() lowercase()
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every column for every row is transformed to uppercase'
@@ -623,14 +623,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' transform with lowercase() set myVar
-									
-									extract 'location' transform with append(' - ', myVar) load description
-								  
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' transform with lowercase() init myVar
+						extract 'location' transform with append(' - ', myVar) load description
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -660,9 +659,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-							console open
-							domain Device
-					""".stripIndent(),
+					console open
+					domain Device
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
@@ -680,12 +679,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""domain Device
-							def final dictionary = [prod: 'Production', dev: 'Development']
-							read labels
-							iterate {
-								extract 'environment' transform with lowercase() translate(dictionary)
-							}""".stripIndent(),
+				.evaluate("""
+					domain Device
+					def final dictionary = [prod: 'Production', dev: 'Development']
+					read labels
+					iterate {
+						extract 'environment' transform with lowercase() translate(dictionary)
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'The column is trsanlated for every row'
@@ -709,15 +710,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
+					read labels
+					domain Application
 								
-								iterate {
-									extract 'vendor name' transform with lowercase() set myVar
-									
-									extract 'location' transform with append(myVar + ' - ' + CE) load description
-								  
-								}""".stripIndent(),
+					iterate {
+						extract 'vendor name' transform with lowercase() init myVar
+						extract 'location' transform with append(myVar + ' - ' + CE) load description
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -752,15 +752,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								
-								iterate {
-									extract 'vendor name' transform with lowercase() set myVar
-									
-									extract 'location' transform with append('-', myVar, '-' , CE ) load description
-								  
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+					extract 'vendor name' transform with lowercase() initialize myVar
+					extract 'location' transform with append('-', myVar, '-' , CE ) load description
+				}""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -795,14 +792,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' transform with lowercase() set myVar
-									
-									extract 'location' transform with append(' - ', myVar, ' - ') load description
-								  
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' transform with lowercase() initialize myVar
+						extract 'location' transform with append(' - ', myVar, ' - ') load description
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -837,14 +833,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'vendor name' transform with lowercase() set myVar
-									
-									extract 'location' transform with append(' - ', myVar) load description
-								  
-								}""".stripIndent(),
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' transform with lowercase() init myVar
+						extract 'location' transform with append(' - ', myVar) load description
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -879,14 +874,15 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								domain Application
-								iterate {
-									extract 'location' transform { 
-										lowercase() append('**') 
-								} load description
+					read labels
+					domain Application
+					iterate {
+						extract 'location' transform { 
+							lowercase() append('**') 
+						} load description
 								  
-								}""".stripIndent(),
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -913,12 +909,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with sanitize() load appVendor
-						}
-					""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' transform with sanitize() load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -938,12 +934,12 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' transform with trim() load appVendor
-						}
-					""".stripIndent(),
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' transform with trim() load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -963,14 +959,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						trim on
-						replace Inc, Incorporated
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' load appVendor
-						}
-					""".stripIndent(),
+					trim on
+					replace Inc, Incorporated
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -989,14 +985,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						trim on
-						replace ControlCharacters with '~'
-						domain Application
-						read labels
-						from 1 to 2 iterate {
-							extract 'vendor name' load appVendor
-						}
-					""".stripIndent(),
+					trim on
+					replace ControlCharacters with '~'
+					domain Application
+					read labels
+					from 1 to 2 iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -1038,13 +1034,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						trim on
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' load appVendor
-						}
-					""".stripIndent(),
+					trim on
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'
@@ -1064,13 +1060,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sanitize on
-						domain Application
-						read labels
-						iterate {
-							extract 'vendor name' load appVendor
-						}
-					""".stripIndent(),
+					sanitize on
+					domain Application
+					read labels
+					iterate {
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Every field property is assigned to the correct element'

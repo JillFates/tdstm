@@ -426,16 +426,16 @@ class ETLProcessor implements RangeChecker {
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		set environment with Production
-	 *		set environment with SOURCE.'application id'
-	 *		set environment with DOMAIN.id
+	 *		initialize environment with Production
+	 *		initialize environment with SOURCE.'application id'
+	 *		initialize environment with DOMAIN.id
 	 *		.....
 	 *	}
 	 * </pre>
 	 * @param field
 	 * @return
 	 */
-	def set(final String field) {
+	def initialize(final String field) {
 		[
 				with: { value ->
 
@@ -454,6 +454,25 @@ class ETLProcessor implements RangeChecker {
 		]
 	}
 
+	/**
+	 * Set field values in results. From an extracted value or just as a fixed new Element.
+	 * Set an Element that create new results loading values without extract previously
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		init environment with Production
+	 *		init environment with SOURCE.'application id'
+	 *		init environment with DOMAIN.id
+	 *		.....
+	 *	}
+	 * </pre>
+	 * @param field
+	 * @return
+	 * @see ETLProcessor#initialize(java.lang.String)
+	 */
+	def init(final String field) {
+		initialize(field)
+	}
 	/**
 	 * Create a Find object for a particular Domain instance.
 	 * If the String is an invalid Domain, it throws an Exception.

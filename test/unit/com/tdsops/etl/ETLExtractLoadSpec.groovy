@@ -848,13 +848,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						set environment with Production
+						init environment with Production
 						extract 1 load id
 						extract 'vendor name' load appVendor
 							
 						domain Device
 						extract 1 load id 
-						set location with 'Development'        
+						init location with 'Development'        
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1076,9 +1076,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (DOMAIN.appVendor.startsWith('Mi')){
-							set environment with 'Production'
+							init environment with 'Production'
 						} else {
-							set environment with 'Development'
+							init environment with 'Development'
 						}
 					}
 				""".stripIndent(),
@@ -1179,9 +1179,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (!SOURCE.technology.startsWith('NGM')){
-							set environment with 'Production'
+							init environment with 'Production'
 						} else {
-							set environment with 'Development'
+							init environment with 'Development'
 						}
 					}
 				""".stripIndent(),
