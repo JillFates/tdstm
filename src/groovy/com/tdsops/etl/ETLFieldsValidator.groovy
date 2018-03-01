@@ -28,28 +28,4 @@ interface ETLFieldsValidator {
      * @return an instance of ETLFieldSpec with field name, label and type
      */
 	ETLFieldSpec lookup (ETLDomain domain, String field)
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-    boolean isDomainProperty(Class domainClass, String propertyName)
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	boolean isDomainIdentifier(Class domainClass, String propertyName)
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	boolean isReferenceProperty(Class domainClass, String propertyName)
 }

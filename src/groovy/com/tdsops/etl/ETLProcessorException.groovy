@@ -95,8 +95,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('CE (current element) is not defined.')
     }
 
-	static ETLProcessorException findElementWithoutDependentIdDefinition (String... fields) {
-		new ETLProcessorException("Find commands does not have dependant definition using multiple field names ${fields.join(',')}".toString())
+	static ETLProcessorException findElementWithoutFindIdDefinition(String... fields) {
+		new ETLProcessorException("Find commands does not have find 'of' by default definition using multiple field names ${fields.join(',')}".toString())
 	}
 
     static ETLProcessorException invalidFindCommand (String dependentId) {

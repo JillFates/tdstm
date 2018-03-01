@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 
 class DomainClassFieldsValidator implements ETLFieldsValidator {
@@ -27,7 +27,7 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 		if(domain.isAsset()){
 			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
 		} else{
-			return isDomainProperty(domain.clazz, field)
+			return GormUtil.isDomainProperty(domain.clazz, field)
 		}
 	}
 
@@ -48,67 +48,8 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 			}
 		} else{
 			Class<?> domainClass = domain.clazz
-			GrailsDomainClassProperty domainProperty = getDomainProperty(domainClass, field)
+			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
 			return new ETLFieldSpec(domainProperty)
 		}
 	}
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	@Override
-	boolean isDomainProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
-		return grailsDomainClass.hasPersistentProperty(propertyName) ||
-			grailsDomainClass.identifier.name == propertyName
-	}
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	@Override
-	boolean isDomainIdentifier(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
-		return grailsDomainClass.identifier.name == propertyName
-	}
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	@Override
-	boolean isReferenceProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
-		GrailsDomainClassProperty grailsDomainClassProperty = grailsDomainClass.getPropertyByName(propertyName)
-		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
-	}
-
-	/**
-	 *
-	 * @param domainClass
-	 * @return
-	 */
-	private DefaultGrailsDomainClass grailsDomainClass(Class domainClass) {
-		return new DefaultGrailsDomainClass(domainClass)
-	}
-
-	/**
-	 *
-	 * @param domainClass
-	 * @param propertyName
-	 * @return
-	 */
-	GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
-		DefaultGrailsDomainClass grailsDomainClass = grailsDomainClass(domainClass)
-		return grailsDomainClass.getPropertyByName(propertyName)
-	}
-
 }
