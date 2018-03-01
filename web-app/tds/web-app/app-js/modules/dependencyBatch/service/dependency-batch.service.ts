@@ -154,30 +154,65 @@ export class DependencyBatchService {
 			.catch((error: any) => error.json());
 	}
 
+	private readonly mockBatchRecords: Array<ImportBatchRecordModel> = [
+		{
+			id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRow: 1,
+			fields: {
+				'Name (P)': 'pwebwp01',
+				'Type (P)': 'VM',
+				'Dep Type (P)': 'VM Runs On',
+				'Name (D)': 'VMClusterPCI01',
+				'Type (D)': 'Application'
+			}
+		},
+		{
+			id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRow: 2,
+			fields: {
+				'Name (P)': 'Batch Reporting',
+				'Type (P)': 'Application',
+				'Dep Type (P)': 'File',
+				'Name (D)': 'Ecommerce',
+				'Type (D)': 'Application'
+			}
+		},
+		{
+			id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRow: 3,
+			fields: {
+				'Name (P)': 'Batch Reporting',
+				'Type (P)': 'Application',
+				'Dep Type (P)': 'DB',
+				'Name (D)': null,
+				'Type (D)': null
+			}
+		},
+		{
+			id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRow: 4,
+			fields: {
+				'Name (P)': 'Online Banking',
+				'Type (P)': 'Application',
+				'Dep Type (P)': 'Web Service',
+				'Name (D)': 'RSA SecureID SaaS',
+				'Type (D)': 'Application'
+			}
+		}
+		// {id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
+	];
+
 	/**
 	 * TODO: document.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
 	getImportBatchRecords(id: number): Observable<any> {
-		const mockResult: Array<ImportBatchRecordModel> = [
-			{id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRow: 1, name: 'pwebwp01', type: 'VM', depType: 'VM Runs On', nameD: 'VMClusterPCI01', typeD: 'Application'},
-			{id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRow: 2, name: 'Batch Reporting', type: 'Application', depType: 'File', nameD: 'Ecommerce', typeD: 'Application'},
-			{id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRow: 3, name: 'Batch Reporting', type: 'Application', depType: 'DB', nameD: null, typeD: null},
-			{id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRow: 4, name: 'Online Banking', type: 'Application', depType: 'Web Service', nameD: 'RSA SecureID SaaS', typeD: 'Application'},
-			{id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
-		];
-		return Observable.of(mockResult);
+		return Observable.of(this.mockBatchRecords);
 	}
 
 	getImportBatchRecordFieldDetail(id: number): Observable<any> {
-		const mockResult: Array<any> = [
-			{name: 'Name (P)', currentValue: '', importValue: 'Online Banking', error: ''},
-			{name: 'Type (P)', currentValue: '', importValue: 'Application', error: ''},
-			{name: 'Dep Type (P)', currentValue: '', importValue: 'Web Service', error: 'Invalid Dep Type'},
-			{name: 'Name (D)', currentValue: '', importValue: 'RSA SecureID SaaS', error: 'Depends On Asset Not Found'},
-			{name: 'Type (D)', currentValue: '', importValue: 'Application', error: ''}
-		];
+		const matchedRecord = this.mockBatchRecords.find( record => record.id === id);
+		const mockResult: Array<any> = [];
+		Object.keys(matchedRecord.fields).forEach(key => {
+			mockResult.push({name: key, currentValue: '', importValue: matchedRecord.fields[key], error: ''});
+		});
 		return Observable.of(mockResult);
 	}
 }

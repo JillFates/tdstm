@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 
@@ -6,7 +6,7 @@ import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 	selector: 'dependency-batch-record-detail-fields',
 	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component.html'
 })
-export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
+export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnChanges {
 
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	@Output('onCancel') cancelEvent = new EventEmitter<any>();
@@ -28,13 +28,16 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.loadRecordFieldDetails();
 	}
 
+	ngOnChanges(changes: SimpleChanges): void {
+		this.loadRecordFieldDetails();
+	}
+
 	/**
 	 * TODO: document
 	 */
 	private onCancel(): void {
 		this.batchRecord = null;
 		this.cancelEvent.emit();
-		console.log('fields onCancel');
 	}
 
 	/**
