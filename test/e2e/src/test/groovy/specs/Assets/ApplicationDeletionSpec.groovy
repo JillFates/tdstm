@@ -9,7 +9,7 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ApplicationDeletionSpec extends GebReportingSpec{
+class ApplicationDeletionSpec extends GebReportingSpec {
 
     def testKey
     static testCount
@@ -31,92 +31,100 @@ class ApplicationDeletionSpec extends GebReportingSpec{
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Go To Asset Applications"() {
+    def "1. The User Navigates in the Assets Application List Section"() {
         testKey = "TM-XXXX"
-        given:
-        at MenuPage
-        when:
-        menuModule.goToApplications()
-        then:
-        at ApplicationListPage
+        given: 'The User searches in the menu page\''
+            at MenuPage
+        when: 'The User clicks in the Assets > Applications Menu option'
+            menuModule.goToApplications()
+
+        then: 'Application List should be displayed'
+            at ApplicationListPage
     }
 
-    def "Filter Applications on List and get first occurrence"() {
+    def "2. Filters out by Applications and gets the First occurrence"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = filterPattern
-        waitFor{alFirstAppName.text().trim().contains(filterPattern)}
-        appName = alFirstAppName.text().trim()
-        waitFor{alFirstAppName.click()}
-        then:
-        at ApplicationDetailsPage
-// TODO Following item fetch by data-content cannot be located as self (Label and Value have the same properties)
-        adModalAppName[1].text().trim() == appName
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User Click in The Filter Name Column'
+            waitFor {alNameFilter.click()}
+            alNameFilter = filterPattern
+        and: 'Adds the AppName in the Filter'
+            waitFor{alFirstAppName.text().trim().contains(filterPattern)}
+            appName = alFirstAppName.text().trim()
+        and: 'Clicks to Filter out'
+            waitFor{alFirstAppName.click()}
+
+        then: 'Application should be filtered out'
+            at ApplicationDetailsPage
+            // TODO The Following item fetched by data-content cannot be located as itself (Label and Value have the same properties)
+        and: 'The appName should be shown'
+            adModalAppName[1].text().trim() == appName
     }
 
-    def "Open Edit Application Modal Window by Edit Button"() {
+    def "3. Using the Edit and Cancel Buttons on dhe Application Modal Windows"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationDetailsPage
-        when:
-        waitFor {adModalEditBtn.click()}
-        then:
-        at ApplicationEditionPage
-        waitFor {aeModalAppName.value() ==  appName}
-        when:
-        waitFor {aeModalCancelBtn.click()}
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application Details Page'
+            at ApplicationDetailsPage
+        when: 'The User clicks the "Edit" Button'
+            waitFor {adModalEditBtn.click()}
+        then: 'The Option to edit every Option should be displayed'
+            at ApplicationEditionPage
+            waitFor {aeModalAppName.value() ==  appName}
+        when: 'The User clicks the "Cancel" Button'
+            waitFor {aeModalCancelBtn.click()}
+
+        then: 'The User should be redirected to the ApplicationListPage'
+            at ApplicationListPage
     }
 
-    def "Filter Applications on List again using the app name"() {
+    def "4. Filter Applications on the List by using the App name"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        waitFor{alFirstAppName.text().trim() == appName}
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User searches by the App Name'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+            waitFor{alFirstAppName.text().trim() == appName}
+
+        then: 'That App should be shown'
+            at ApplicationListPage
     }
 
-    def "Open Edit Application Modal Window By Edit Icon"() {
+    def "5. Opens up The Edit Application Modal Window By using the Edit Icon"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alFirstAppEdit.click()}
-        then:
-        at ApplicationEditionPage
-        aeModalAppName.value() ==  appName
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User clicks on the "Edit" Button right on the left'
+            waitFor {alFirstAppEdit.click()}
+
+        then: 'The Option to edit every Option should be displayed'
+            at ApplicationEditionPage
+        and: 'The appName should be displayed'
+            aeModalAppName.value() ==  appName
     }
 
-    def "Delete Application"() {
+    def "6. Delete the Application already displayed "() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationEditionPage
-        when:
-        withConfirm(true){waitFor {aeModalDeleteBtn.click() }}
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application Edition Section'
+            at ApplicationEditionPage
+        when: 'The User Deletes the Application'
+            withConfirm(true){waitFor {aeModalDeleteBtn.click() }}
+
+        then: 'The user should be redirected to the Application List Section'
+            at ApplicationListPage
     }
 
-    def "Validate Application is not on List"() {
+    def "7. Validating the Application is not on the List"() {
         testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        then:
-        at ApplicationListPage
-        waitFor{alGridRows.size() == 0}
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User searches by the App already deleted'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+
+        then: 'App should not be visible and Count should be equal to Zero'
+            at ApplicationListPage
+            waitFor{alGridRows.size() == 0}
     }
-
-
 }
-

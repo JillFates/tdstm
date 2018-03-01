@@ -10,7 +10,7 @@ class MenuPage extends Page {
     }
 
     static content = {
-        contextPath { $("input",id:"contextPath") }
-        menuModule { module MenuModule }
+        contextPath { $("input",id:"contextPath")}
+        menuModule { module MenuModule}
     }
 }

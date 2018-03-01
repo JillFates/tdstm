@@ -1,7 +1,7 @@
 package pages.Assets
 import geb.Page
 
-class AssetClonePage extends Page{
+class AssetClonePage extends Page {
 
     static at = {
         waitFor {asclModalWindow.displayed}
@@ -15,7 +15,7 @@ class AssetClonePage extends Page{
 
     static content = {
         asclModalWindow             (wait:true) { $("div","aria-describedby":"cloneEntityView", "aria-labelledby":"ui-id-5")}
-        asclModalTitle              { asclModalWindow.find("span#ui-id-5") }
+        asclModalTitle              { asclModalWindow.find("span#ui-id-5")}
         asclModalAssetCloneNameLbl  { asclModalWindow.find( "label", for:"newAssetName")}
         asclModalAssetCloneName     { asclModalWindow.find("input#newAssetName")}
         asclModalErrorMsg           { asclModalWindow.find("span", class:"lbl-error-text")}
@@ -27,13 +27,11 @@ class AssetClonePage extends Page{
         asclModalCancelBtn          { asclModalWindow.find("button", class:"btn btn-default close-clone-entity")}
         asclModalCloseBtn           { asclModalWindow.find("button", class:"ui-dialog-titlebar-close")}
 
-// TODO modal dialog its not unique. Located by CSS
-        asclModalDialog             (wait:true) { $("div","aria-describedby":"confirmationDialogOnClone","aria-labelledby":"ui-id-14" )}
+        // TODO modal dialog its not unique. Located by CSS
+        asclModalDialog             (wait:true) { $("div","aria-describedby":"confirmationDialogOnClone","aria-labelledby":"ui-id-14")}
         asclModalDialogTitle        { asclModalDialog.find("span#ui-id-14") }
         asclModalDialogText         { asclModalDialog.find("div#confirmationDialogOnClone").find("div",class:"box-body")}
-        asclModalDialogConfirmBtn   { asclModalDialog.find("button",class:"btn btn-primary pull-left accept-confirmation-btn") }
-        asclModalDialogCancelbtn    { asclModalDialog.find("button",class:"btn btn-default pull-right cancel-confirmation-btn") }
-
+        asclModalDialogConfirmBtn   { asclModalDialog.find("button",class:"btn btn-primary pull-left accept-confirmation-btn")}
+        asclModalDialogCancelbtn    { asclModalDialog.find("button",class:"btn btn-default pull-right cancel-confirmation-btn")}
     }
-
 }

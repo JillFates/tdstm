@@ -20,11 +20,10 @@ class LoginSpec extends GebReportingSpec {
         given:
         to LoginPage
         when:
-        loginModule.login(username,password)
+        //loginModule.login(username,password)
         then:
         at MenuPage
     }
-
 }
 
 

@@ -3,7 +3,6 @@ package pages.Login
 import geb.Page
 import utils.Login
 
-
 class LoginPage extends Page {
     static url = "/tdstm/auth/login"
 
@@ -15,8 +14,8 @@ class LoginPage extends Page {
         username        { $("#usernameid") }
         password        { $("input", name:"password") }
         submitButton    { $("#submitButton") }
-
     }
+
     /**
      * for TM-9332
      * <p>This method will log the user in. The credentials can be whichever desired by adding the
@@ -29,6 +28,7 @@ class LoginPage extends Page {
         String credentials=log.readCredentials()
         String usr = credentials.split(",")[0]
         String pass=credentials.split(",")[1]
+
         /**
          * The following two lines will use the credentials in te testData.txt file unless
          * different credentials are provided when executing.
