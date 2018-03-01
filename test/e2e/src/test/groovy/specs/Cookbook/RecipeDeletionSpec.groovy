@@ -29,21 +29,23 @@ class RecipeDeletionSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Delete Recipe"() {
+    def "1. Recipe deletion"() {
         testKey = "TM-7243"
-        given:
-        at CookbookPage
-        when: "Top most Geb Recipe is deleted"
-        def gebRecipeCountBeforeDelete = gebRecipes.size()
-        println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
-        withConfirm(true) { deleteRecipeButtons[0].click() }
-        println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
-        then: "Count of geb recipes is down by 1"
-        waitFor { successMessage.present}
-        waitFor { !successMessage.present}
-        waitFor { loadingIndicator.hasClass("ng-hide")}
-        waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
-        println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
+        given: 'The User is on the Cookbook Section'
+            at CookbookPage
+        when: 'The User searches by the Recipe'
+            def gebRecipeCountBeforeDelete = gebRecipes.size()
+            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipeCountBeforeDelete
+        and: 'The User clicks the "Delete" Button'
+            withConfirm(true) { deleteRecipeButtons[0].click() }
+            println "${gebReportingSpecTestName.methodName}: Deleting top most recipe."
+
+        then: 'Recipe count is reduced to 1'
+            waitFor { successMessage.present}
+            waitFor { !successMessage.present}
+            waitFor { loadingIndicator.hasClass("ng-hide")}
+            waitFor { gebRecipes.size() == gebRecipeCountBeforeDelete - 1 }
+            println "${gebReportingSpecTestName.methodName}: Geb Recipes count = " + gebRecipes.size()
     }
 }
 
