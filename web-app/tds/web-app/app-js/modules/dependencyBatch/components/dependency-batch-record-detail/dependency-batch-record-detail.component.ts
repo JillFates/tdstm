@@ -11,12 +11,7 @@ export class DependencyBatchRecordDetailComponent {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
-	private collapsed = false;
 
 	constructor(private dependencyBatchService: DependencyBatchService) {
-	}
-
-	private toggleSection(): void {
-		this.collapsed = !this.collapsed;
 	}
 }
