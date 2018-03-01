@@ -25,7 +25,7 @@ class TaskDeletionSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
-        loginModule.login(username,password)
+
         at MenuPage
         menuModule.goToTasksManager()
         at TaskManagerPage
