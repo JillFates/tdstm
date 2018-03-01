@@ -2,7 +2,7 @@ import {Component, Output, EventEmitter, AfterViewInit, ViewChild} from '@angula
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
-import {DataScriptModel} from '../../model/data-script.model';
+import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -23,6 +23,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	};
 	private script: string;
 	private filename: string;
+	private sampleDataModel: SampleDataModel = new SampleDataModel([], []);
+
 	private operationStatus = {
 		save: undefined,
 		test: new OperationStatusModel(),
@@ -152,12 +154,22 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		this.dialogService.extra(DataScriptSampleDataComponent, [])
 			.then((filename) => {
 				this.filename = filename;
+				this.extractSampleDataFromFile();
 			})
 			.catch((err) => {
 				console.log('SampleDataDialog error occurred..');
 				if (err) {
 					console.log(err);
 				}
+		});
+	}
+
+	/**
+	 * Call API and get the Sample Data based on the FileName already Uploaded
+	 */
+	private extractSampleDataFromFile() {
+		this.dataIngestionService.getSampleData(this.filename).subscribe((result) => {
+			this.sampleDataModel = result;
 		});
 	}
 

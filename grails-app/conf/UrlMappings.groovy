@@ -686,6 +686,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataScript/sampleData/$filename" {
+			controller = "wsDataScript"
+			action = [
+					  GET: "sampleData"
+			]
+		}
+
 		"/ws/dataingestion/provider/list" {
 			controller = "wsProvider"
 			action = [
