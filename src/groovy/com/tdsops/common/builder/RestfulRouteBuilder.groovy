@@ -1,9 +1,10 @@
 package com.tdsops.common.builder
 
-import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.service.CredentialService
@@ -21,8 +22,6 @@ import org.apache.http.client.utils.URIBuilder
  */
 class RestfulRouteBuilder extends RouteBuilder {
     private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
-    private static final String HTTP_PROTOCOL_REPLACE_REGEX = '(?i)(https:|http:)'
-    private static final String CAMEL_HTTP4_PROTOCOL = 'http4:'
 
     CredentialService credentialService
 
@@ -55,13 +54,14 @@ class RestfulRouteBuilder extends RouteBuilder {
         }
 
         if (actionRequest.config.hasProperty(Exchange.ACCEPT_CONTENT_TYPE)) {
-            routeDefinition.setHeader(Exchange.HTTP_METHOD, constant(actionRequest.config.getProperty(Exchange.CONTENT_TYPE)))
+            routeDefinition.setHeader(Exchange.ACCEPT_CONTENT_TYPE, constant(actionRequest.config.getProperty(Exchange.ACCEPT_CONTENT_TYPE)))
         }
 
         if (actionRequest.config.hasProperty(Exchange.CONTENT_TYPE)) {
-            routeDefinition.setHeader(Exchange.HTTP_METHOD, constant(actionRequest.config.getProperty(Exchange.ACCEPT_CONTENT_TYPE)))
+            routeDefinition.setHeader(Exchange.CONTENT_TYPE, constant(actionRequest.config.getProperty(Exchange.CONTENT_TYPE)))
         }
-        routeDefinition = routeDefinition.to(sanitizeHostname(buildUrl(actionRequest)))
+
+        routeDefinition = routeDefinition.to(UrlUtil.sanitizeUrlForCamel(buildUrl(routeDefinition, actionRequest)))
         routeDefinition = routeDefinition.to(buildRESTfulReactionEndpoint(actionRequest.param))
         routeDefinition = routeDefinition.routeId(routeId)
         routeDefinition = routeDefinition.stop()
@@ -75,16 +75,6 @@ class RestfulRouteBuilder extends RouteBuilder {
      */
     private String getRouteId(String apiActionId) {
         return ROUTE_ID_PREFIX + apiActionId
-    }
-
-    /**
-     * Replaces HTTP, HTTPS protocols from the hostname by Camel HTTP4
-     * @param hostname
-     * @return
-     */
-    private String sanitizeHostname(String hostname) {
-        // do this for http4 camel component
-        return hostname.replaceAll(HTTP_PROTOCOL_REPLACE_REGEX, CAMEL_HTTP4_PROTOCOL)
     }
 
     /**
@@ -107,28 +97,42 @@ class RestfulRouteBuilder extends RouteBuilder {
      * @param actionRequest
      * @return
      */
-    private String buildUrl(ActionRequest actionRequest) {
-        URIBuilder builder = new URIBuilder(actionRequest.config.getProperty(Exchange.HTTP_URL))
+    private String buildUrl(RouteDefinition routeDefinition, ActionRequest actionRequest) {
+		String endpointUrl = actionRequest.config.getProperty(Exchange.HTTP_URL)
+        URIBuilder builder = new URIBuilder(endpointUrl)
         builder.setPath(actionRequest.config.getProperty(Exchange.HTTP_PATH))
         // do not throw HttpOperationFailedException and instead return control to action invocation flow to eval result
         // see http://camel.apache.org/http4.html#HttpEndpoint Options
         builder.addParameter('throwExceptionOnFailure', 'false')
 
-        if (actionRequest.param.credentials) {
-            Credential credential = Credential.read(actionRequest.param.credentials.id)
+		// only provides a trust store if endpoint url is secure and credentials are nor for production
+		if (UrlUtil.isSecure(endpointUrl)) {
+			if (actionRequest.param.credentials && actionRequest.param.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
+				// for more details see CustomHttpClientConfigurer class
+				builder.addParameter('httpClientConfigurer', 'customHttpClientConfigurer')
+			}
+		}
 
-            if (credential.status == CredentialStatus.ACTIVE) {
-                switch (credential.authenticationMethod) {
-                    case AuthenticationMethod.BASIC_AUTH:
-                        builder.addParameter('authUsername', credential.username)
-                        builder.addParameter( 'authPassword', credentialService.decryptPassword(credential) )
-                        break;
-                    default:
-                        throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
-                }
-            } else {
-	            throw new InvalidRequestException("The Credential associated with API Action is disabled")
-            }
+        if (actionRequest.param.credentials) {
+			if (actionRequest.param.credentials.status == CredentialStatus.INACTIVE.name()) {
+				throw new InvalidRequestException("The Credential associated with API Action is disabled")
+			}
+
+			// fetch a fresh copy of the credentials to have access to password and salt when needed
+			// TODO use CredentialService if possible
+			Credential credential = Credential.read(actionRequest.param.credentials.id)
+			switch (credential.authenticationMethod) {
+				case AuthenticationMethod.BASIC_AUTH:
+					builder.addParameter('authUsername', credential.username)
+					builder.addParameter( 'authPassword', credentialService.decryptPassword(credential))
+					break;
+				case AuthenticationMethod.COOKIE:
+					Map<String, ?> authentication = credentialService.authenticate(credential)
+					routeDefinition.setHeader(authentication.sessionName, constant(authentication.sessionValue))
+					break;
+				default:
+					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
+			}
         }
 
         URL url = builder.build().toURL()

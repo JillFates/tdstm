@@ -1,3 +1,4 @@
+import com.tdsops.camel.CustomHttpClientConfigurer
 import com.tdsops.common.builder.RestfulRouteBuilder
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
@@ -192,4 +193,6 @@ beans = {
 	restfulRouteBuilder(RestfulRouteBuilder) {
 		credentialService = ref('credentialService')
 	}
+
+	customHttpClientConfigurer(CustomHttpClientConfigurer)
 }
