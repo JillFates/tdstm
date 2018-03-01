@@ -29,6 +29,8 @@ class ApplicationCloneSpec extends GebReportingSpec {
         to LoginPage
         login()
 
+        // Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
+        // NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
         at MenuPage
         waitFor { menuModule.goToApplications() }
         at ApplicationListPage
@@ -73,155 +75,166 @@ class ApplicationCloneSpec extends GebReportingSpec {
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
     }
 
-    def "Open Clone Application Modal Window by Clone Button"() {
+    def "1. To Open the Clone Application Modal Window"() {
         testKey = "TM-8494"
-        given:
-        at ApplicationDetailsPage
-        when:
-        waitFor { adModalCloneBtn.displayed }
-        waitFor { adModalCloneBtn.click() }
-        then:
-        at AssetClonePage
-        waitFor { asclModalTitle.text().trim() == "Clone " + appName }
+        given: 'The User is on the Application Details Page'
+            at ApplicationDetailsPage
+        when: 'The Clone Button is Displayed'
+            waitFor { adModalCloneBtn.displayed }
+        and: 'The User searches on It'
+            waitFor { adModalCloneBtn.click() }
+
+        then: 'Asset Clone Pop-Up should be displayed'
+            at AssetClonePage
+            waitFor { asclModalTitle.text().trim() == "Clone " + appName }
     }
 
-    def "Close Clone modal window and Application detail modal window"() {
+    def "2. Close Clone modal window and the Application detail modal Window"() {
         testKey = "TM-8494"
-        given:
-        at AssetClonePage
-        when:
-        waitFor {asclModalCloseBtn.click()}
-        then:
-        at ApplicationDetailsPage
-        adModalTitle.text() == appName + " Detail"
-        when:
-        waitFor {adModalCloseBtn.click()}
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+        when: 'The User clicks the "Close" button'
+            waitFor {asclModalCloseBtn.click()}
+
+        then: 'The User should be redirected to the Application Details Section'
+            at ApplicationDetailsPage
+        and: 'The App should be displayed'
+            adModalTitle.text() == appName + " Detail"
+        when: 'The User clicks the "Close" button'
+            waitFor {adModalCloseBtn.click()}
+
+        then: 'The User should be redirected to the Application List Section'
+            at ApplicationListPage
     }
 
-    def "Filter Applications on List again using the app name"() {
+    def "3. Filtering The Application on the List by using the App name"() {
         testKey = "TM-8494"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-        waitFor{alFirstAppName.text().trim() == appName}
-        then:
-        at ApplicationListPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User searches by the App Name'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+            waitFor {alLoadingGrid.displayed}
+            waitFor {!alLoadingGrid.displayed}
+            waitFor{alFirstAppName.text().trim() == appName}
+
+        then: 'That App should be shown'
+            at ApplicationListPage
     }
 
-    def "Open Clone Application Modal Window By Clone Icon"() {
+    def "4. Opens the Clone Application Modal Window By using the Clone Icon"() {
         testKey = "TM-8494"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alFirstAppClone.click()}
-        then:
-        at AssetClonePage
-        waitFor { asclModalTitle.text().trim() == "Clone " + appName }
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User clicks the "Clone" Button'
+            waitFor {alFirstAppClone.click()}
 
+        then: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+        and: 'The User certifies that the proper App Name should be displayed'
+            waitFor { asclModalTitle.text().trim() == "Clone " + appName }
     }
 
-    def "Verify Cloned Asset name and Error legend"() {
+    def "5. Verifying the Legend for a Duplicated Cloned Asset name"() {
         testKey = "TM-8494"
-        when:
-        at AssetClonePage
-        then:
-        asclModalAssetCloneName.value() == appName
-        asclModalErrorMsg.text().trim() == "Change name appropriately"
+        given: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+        when: 'The User adds the Same App Name'
+            asclModalAssetCloneName.value() == appName
+
+        then: 'Legend to change the Name should be displayed'
+            asclModalErrorMsg.text().trim() == "Change name appropriately"
     }
 
-    def "Click Clone & EditButton and verify confirm legend"() {
+    def "6. Clicking The Clone & Edit Button and verifying the Confirm legend"() {
         testKey = "TM-8494"
-        when:
-        at AssetClonePage
-        then:
-        asclModalCloneEditBtn.click()
-        asclModalDialogTitle.text().trim() == "Asset already exists"
-        asclModalDialogText.text().trim() == "The Asset Name you want to create already exists, do you want to proceed?"
+        given: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+
+        when: 'The User Clicks the "Clone and Edit Button"'
+            asclModalCloneEditBtn.click()
+
+        then: 'Legends to existing Name and a Question should be displayed'
+            asclModalDialogTitle.text().trim() == "Asset already exists"
+            asclModalDialogText.text().trim() == "The Asset Name you want to create already exists, do you want to proceed?"
     }
 
-    def "Cancel Assset Clone and verify the Asset is not cloned"() {
+    def "7. Cancels the Asset Clone and verifies the Asset is not cloned"() {
         testKey = "TM-8494"
-        given:
-        at AssetClonePage
-        when:
-        waitFor {asclModalDialogCancelbtn.click()}
-        waitFor {asclModalCancelBtn.click()}
-        then:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-        waitFor{alFirstAppName.text().trim() == appName}
-        then:
-        at ApplicationListPage
-        waitFor{alGridRows.size() == appCountBefore}
+        given: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+        when: 'The User clicks the "Cancel" button'
+            waitFor {asclModalDialogCancelbtn.click()}
+            waitFor {asclModalCancelBtn.click()}
+
+        then: 'The User should be redirected to the Application List Section'
+            at ApplicationListPage
+        when: 'The User searches by that App Name'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
+            waitFor {alLoadingGrid.displayed}
+            waitFor {!alLoadingGrid.displayed}
+            waitFor{alFirstAppName.text().trim() == appName}
+
+        then: 'App Name should be displayed'
+            at ApplicationListPage
+            waitFor{alGridRows.size() == appCountBefore}
     }
 
-    def "Open Clone Asset again and confirm the Clone & Edit with same name"() {
+    def "8. Opens up Clone Asset again and Clones the App with the Same Name"() {
         testKey = "TM-8494"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alFirstAppClone.click()}
-        then:
-        at AssetClonePage
-        waitFor { asclModalTitle.text().trim() == "Clone " + appName }
-        when:
-        waitFor {asclModalCloneEditBtn.click()}
-        then:
-        waitFor {asclModalDialog.displayed}
-        when:
-        waitFor {asclModalDialogConfirmBtn.click()}
-        then:
-        at ApplicationEditionPage
-        waitFor {aeModalAppName.value() == appName}
-        waitFor {!aeModalUpdateBtn.@disabled}
-        when:
-        waitFor {aeModalUpdateBtn.click()}
-        then:
-        at ApplicationDetailsPage
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User clicks the "Clone" Button'
+            waitFor {alFirstAppClone.click()}
+
+        then: 'The User is on the Clone Pop-Up section'
+            at AssetClonePage
+        when: 'The User Enters the App Name'
+            waitFor { asclModalTitle.text().trim() == "Clone " + appName }
+        and: 'The User Clicks the Clone & Edit Button'
+            waitFor {asclModalCloneEditBtn.click()}
+
+        then: 'A Dialog asking for permission should be displayed'
+            waitFor {asclModalDialog.displayed}
+
+        when: 'The User Confirms It'
+            waitFor {asclModalDialogConfirmBtn.click()}
+
+        then: 'The User should be redirected to the Application Edition Section'
+            at ApplicationEditionPage
+            waitFor {aeModalAppName.value() == appName}
+            waitFor {!aeModalUpdateBtn.@disabled}
+        when: 'The User clicks the "Update" Button'
+            waitFor {aeModalUpdateBtn.click()}
+
+        then: 'The User should be redirected to the Application Details Page'
+            at ApplicationDetailsPage
     }
 
-    def "Validate Application Details"() {
+    def "9. Validating Application Details Section"() {
         testKey = "TM-8494"
-        when:
-        at ApplicationDetailsPage
-        then:
-        // TODO some Application Detail items can be reached because cannot be identified by itself. Will chaneg this feature after FE code has reviewed
-        waitFor{adModalAppName[1].text().trim() == appName}
-        waitFor{adModalCloseBtn.click()}
+        when: 'The User is in the Application Details Page'
+            at ApplicationDetailsPage
+
+        then: 'App Name and Button to closed should be displayed'
+            // TODO Some Application Detail items can't be reached because cannot be identified by itself.
+            // TODO Will change this feature after FE code will be changed
+            waitFor{adModalAppName[1].text().trim() == appName}
+            waitFor{adModalCloseBtn.click()}
     }
 
-    def "Check App List the duplicated item"() {
+    def "10. Checking in the App List the duplicated item"() {
         testKey = "TM-8494"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alNameFilter.click()}
-        alNameFilter = appName
-        then:
-        waitFor {alLoadingGrid.displayed}
-        waitFor {!alLoadingGrid.displayed}
-        waitFor{alGridRows.size() == appCountBefore + 1}
-    }
+        given: 'The User is on the Application List Page'
+            at ApplicationListPage
+        when: 'The User searches by the App Name'
+            waitFor {alNameFilter.click()}
+            alNameFilter = appName
 
-    def "Open Cloned Application Modal Window By Edit Icon"() {
-        testKey = "TM-XXXX"
-        given:
-        at ApplicationListPage
-        when:
-        waitFor {alFirstAppEdit.click()}
-        then:
-        at ApplicationEditionPage
-        aeModalAppName.value() ==  appName
+        then: 'App Name should be duplicated'
+            waitFor {alLoadingGrid.displayed}
+            waitFor {!alLoadingGrid.displayed}
+            waitFor{alGridRows.size() == appCountBefore + 1}
     }
 }
-
