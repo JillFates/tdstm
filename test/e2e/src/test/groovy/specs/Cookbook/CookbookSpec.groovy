@@ -34,7 +34,7 @@ class CookbookSpec extends GebReportingSpec {
         when: 'The User Goes to the Tasks > Cookbook Section'
             menuModule.goToTasksCookbook()
 
-        then: 'Cookbook Secion should be displayed'
+        then: 'Cookbook Section should be displayed'
             at CookbookPage
             waitFor { recipeGridRows.size() > 0 }
     }
