@@ -32,3 +32,12 @@ export enum DIALOG_SIZE {
 export const ACTIVE_INACTIVE = ['Active', 'Inactive'];
 
 export const ERROR_STATUS = 'error';
+
+export enum DOMAIN {
+	APPLICATION = 'APPLICATION',
+	COMMON = 'COMMON',
+	DATABASE = 'DATABASE',
+	DEVICE = 'DEVICE',
+	STORAGE = 'STORAGE',
+	TASK = 'TASK'
+}

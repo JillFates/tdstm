@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {filterBy, CompositeFilterDescriptor} from '@progress/kendo-data-query';
-import {CellClickEvent, RowArgs} from '@progress/kendo-angular-grid';
+import {filterBy, CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult, RowArgs} from '@progress/kendo-angular-grid';
 
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -22,20 +22,25 @@ import {PageChangeEvent} from '@progress/kendo-angular-grid';
 })
 export class ProviderListComponent {
 
-	public filter: CompositeFilterDescriptor;
+	private state: State = {
+		sort: [{
+			dir: 'asc',
+			field: 'name'
+		}],
+		filter: {
+			filters: [],
+			logic: 'and'
+		}
+	};
+	public skip = 0;
+	public pageSize = MAX_DEFAULT;
+	public defaultPageOptions = MAX_OPTIONS;
 	public providerColumnModel = new ProviderColumnModel();
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
-	public gridData = {
-		data: [],
-		total: 0
-	};
+	public gridData: GridDataResult;
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
-	public defaultPageSize = MAX_DEFAULT;
-	public defaultPageOptions = MAX_OPTIONS;
-	public skip = 0;
-	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -43,21 +48,28 @@ export class ProviderListComponent {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataIngestionService,
 		private prompt: UIPromptService) {
+		this.state.take = this.pageSize;
+		this.state.skip = this.skip;
 		providers.subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.loadPageData();
+				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		this.filter = filter;
-		this.loadPageData();
+		this.state.filter = filter;
+		this.gridData = process(this.resultSet, this.state);
+	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.gridData = process(this.resultSet, this.state);
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.filter || { logic: 'and', filters: []};
+		let root = this.state.filter || { logic: 'and', filters: [] };
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
@@ -101,10 +113,10 @@ export class ProviderListComponent {
 
 	protected clearValue(column: any, value?: any): void {
 		column.filter = '';
-		if (this.filter && this.filter.filters.length > 0) {
-			const filterIndex = this.filter.filters.findIndex((r: any) => r.field === column.property);
-			this.filter.filters.splice(filterIndex, 1);
-			this.filterChange(this.filter);
+		if (this.state.filter && this.state.filter.filters.length > 0) {
+			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
+			this.state.filter.filters.splice(filterIndex, 1);
+			this.filterChange(this.state.filter);
 		}
 	}
 
@@ -121,7 +133,7 @@ export class ProviderListComponent {
 	 * Select the current element and open the Edit Dialog
 	 * @param dataItem
 	 */
-	protected onEditProvider(dataItem: any): void {
+	protected onEdit(dataItem: any): void {
 		this.openProviderDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
@@ -129,13 +141,13 @@ export class ProviderListComponent {
 	 * Delete the selected Provider
 	 * @param dataItem
 	 */
-	protected onDeleteProvider(dataItem: any): void {
+	protected onDelete(dataItem: any): void {
 		this.prompt.open('Confirmation Required', 'There are associated Datasources. Deleting this will not delete historical imports. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
 					this.dataIngestionService.deleteProvider(dataItem.id).subscribe(
 						(result) => {
-							this.reloadProviders();
+							this.reloadData();
 						},
 						(err) => console.log(err));
 				}
@@ -153,11 +165,11 @@ export class ProviderListComponent {
 		}
 	}
 
-	protected reloadProviders(): void {
+	protected reloadData(): void {
 		this.dataIngestionService.getProviders().subscribe(
 			(result) => {
 				this.resultSet = result;
-				this.loadPageData();
+				this.gridData = process(this.resultSet, this.state);
 			},
 			(err) => console.log(err));
 	}
@@ -173,7 +185,7 @@ export class ProviderListComponent {
 			{ provide: Number, useValue: actionType}
 		]).then(result => {
 			// update the list to reflect changes, it keeps the filter
-			this.reloadProviders();
+			this.reloadData();
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -185,27 +197,24 @@ export class ProviderListComponent {
 	}
 
 	/**
-	 * Manage Pagination
-	 * @param {PageChangeEvent} event
+	 * Make the entire header clickable on Grid
+	 * @param event: any
 	 */
-	public pageChange(event: PageChangeEvent): void {
-		this.skip = event.skip;
-		this.defaultPageSize = event.take || this.defaultPageSize;
-		this.loadPageData();
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 
 	/**
-	 * Change the Model to the Page + Filter
+	 * Manage Pagination
+	 * @param {PageChangeEvent} event
 	 */
-	public loadPageData(): void {
-		this.gridData = {
-			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.filter),
-			total: this.resultSet.length
-		};
-		// If we delete an item and it was the last element in the page, go one page back
-		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
-			this.skip -= this.defaultPageSize;
-			this.loadPageData();
-		}
+	public pageChange(event: any): void {
+		this.skip = event.skip;
+		this.state.skip = this.skip;
+		this.state.take = event.take || this.state.take;
+		this.pageSize = this.state.take;
+		this.gridData = process(this.resultSet, this.state);
 	}
 }

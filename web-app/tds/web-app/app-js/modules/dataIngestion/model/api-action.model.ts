@@ -10,48 +10,51 @@ export class APIActionColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 108,
+				width: 106,
 				locked: true
 			}, {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
+				width: 150,
 				locked: true
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
-				width: 200
+				width: 180
 			}, {
 				label: 'Description',
 				property: 'description',
-				type: 'text'
+				type: 'text',
+				width: 300
 			}, {
 				label: 'Method',
 				property: 'agentMethod.name',
 				type: 'text',
-				width: 200
+				width: 125
 			}, {
 				label: 'Data',
 				property: 'producesData',
 				type: 'boolean',
-				width: 100
+				width: 90
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
-				type: 'text'
+				type: 'text',
+				width: 180
 			}, {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: '{0:d}',
-				width: 170
+				width: 160
 			}, {
 				label: 'Last Modified',
 				property: 'lastModified',
 				type: 'date',
 				format: '{0:d}',
-				width: 170
+				width: 160
 			}
 		];
 	}
@@ -227,6 +230,7 @@ export class APIActionParameterModel {
 	property?: string;
 	value?: string;
 	currentFieldList?: Array<any>;
+	sourceFieldList?: Array<any>;
 }
 
 export enum EventReactionType {

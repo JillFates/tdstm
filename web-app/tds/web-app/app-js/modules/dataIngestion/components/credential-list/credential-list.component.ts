@@ -49,7 +49,6 @@ export class CredentialListComponent {
 	public gridData: GridDataResult;
 	public resultSet: CredentialModel[];
 	public selectedRows = [];
-	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 
@@ -70,7 +69,6 @@ export class CredentialListComponent {
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
-		console.log(filter);
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -227,6 +225,16 @@ export class CredentialListComponent {
 
 	protected isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ActionDelete);
+	}
+
+	/**
+	 * Make the entire header clickable on Grid
+	 * @param event: any
+	 */
+	public onClickTemplate(event: any): void {
+		if (event.target && event.target.parentNode) {
+			event.target.parentNode.click();
+		}
 	}
 
 	public pageChange(event: any): void {

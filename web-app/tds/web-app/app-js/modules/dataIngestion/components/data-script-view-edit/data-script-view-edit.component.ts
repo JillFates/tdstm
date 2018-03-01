@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -7,6 +7,7 @@ import { ProviderModel } from '../../model/provider.model';
 import { DataIngestionService } from '../../service/data-ingestion.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'data-script-view-edit',
@@ -107,6 +108,16 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	protected onValidateUniqueness(): void {
 		this.datasourceName.next(this.dataScriptModel.name);
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	/**
