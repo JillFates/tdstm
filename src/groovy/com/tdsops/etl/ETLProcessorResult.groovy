@@ -66,15 +66,15 @@ class ETLProcessorResult {
 	 */
 	void addFindElement(ETLFindElement findElement) {
 
-		String dependentId = findElement.currentFind.dependentId
+		String findId = findElement.currentFind.findId
 
 		Map<String, ?> data = currentData()
 
-		if(!data.fields.containsKey(dependentId)){
-			throw ETLProcessorException.invalidFindCommand(dependentId)
+		if(!data.fields.containsKey(findId)){
+			throw ETLProcessorException.invalidFindCommand(findId)
 		}
 
-		Map<String, ?> find = data.fields[dependentId].find
+		Map<String, ?> find = data.fields[findId].find
 
 		find.query.add(queryDataMap(findElement))
 
@@ -95,12 +95,12 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.objects){
 			Map<String, ?> data = reference.data.last()
-			addWarnMessageDataMap(data.fields[findElement.currentFind.dependentId], findElement)
+			addWarnMessageDataMap(data.fields[findElement.currentFind.findId], findElement)
 		}
 	}
 
 	/**
-	 * Add a FoundElement in the result based on its dependentId
+	 * Add a FoundElement in the result based on its findId
 	 * <pre>
 	 *		whenFound asset create {
 	 *			assetClass Application
@@ -136,15 +136,17 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Removes data from current row.
-	 * @param rowIndex
+	 * Mark as ignore the row number indicated by param
+	 * @see ETLProcessorResult#removeIgnoredRows()
+	 * @param rowIndex a row index number
 	 */
 	void ignoreCurrentRow(Integer rowIndex) {
 		reference.data.find{ it.rowNum == rowIndex}.ignore = true
 	}
 
 	/**
-	 * Removes ignore row in the current reference
+	 * Removes ignored rows in the current reference.
+	 *
 	 */
 	def removeIgnoredRows() {
 		reference.data.removeAll { it.ignore == true }
