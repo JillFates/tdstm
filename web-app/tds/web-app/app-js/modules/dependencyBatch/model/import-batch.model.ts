@@ -6,7 +6,7 @@ import {ProjectModel} from '../../../shared/model/project.model';
 export class ImportBatchModel {
 	id: number;
 	status: string;
-	domainClassName: string;
+	domainClassName: any;
 	project: ProjectModel;
 	provider: ProviderModel;
 	datascript: DataScriptModel;
@@ -80,7 +80,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Domain',
-				property: 'domainClassName',
+				property: 'domainClassName.name',
 				type: 'text',
 				width: 130,
 				locked: false
