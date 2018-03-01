@@ -36,7 +36,6 @@ class TaskEditionSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
-        loginModule.login(username,password)
 
         // TODO Note by CN: :'( We'd need to call the ApplicationCreationPage and send the Name we'd need to Edit via a Parameter!
         // TODO NOT to perform the Creation Option in the setupSpec() Method > A New Ticket will be handle separately
