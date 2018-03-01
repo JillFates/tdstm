@@ -790,55 +790,44 @@ class UrlMappings {
 		}
 
 		//
-		// Import
+		// Import Batch Actions
 		//
+
 		// List all Import Batches | Bulk Delete Import Batches
-		"/ws/import/batch" {
+		"/ws/import/batches" {
 			controller = "wsImportBatch"
 			action = [
-			        GET: "listImportBatches",
-					DELETE: "bulkDeleteImportBatches"
+					GET: "listImportBatches",
+					DELETE: "bulkDeleteImportBatches",
+					PATCH: "patchActionOnBatches"
 			]
 		}
 
-		// Fetch | Delete one import batches by id
-		"/ws/import/batch/$id?" {
+		// Get/Delete on a single ImportBatch
+		"/ws/import/batch/$id" {
 			controller = "wsImportBatch"
 			action = [
 					GET: "fetchImportBatch",
-					DELETE: "deleteImportBatch"
+					DELETE: "deleteImportBatch",
+					PUT: "updateImportBatch"
 			]
 		}
 
-		// Archive a single Import Batch
-		"/ws/import/batch/archive/$id?" {
-			controller = 'wsImportBatch'
-			action = [
-					PUT: 'archiveImportBatch'
-			]
-		}
-
-		// Unarchive a single Import Batch
-		"/ws/import/batch/unarchive/$id" {
+		// Get list of Batch Detail Records for a single batch
+		"/ws/import/batch/$id/records" {
 			controller = "wsImportBatch"
 			action = [
-					PUT: "unarchiveImportBatch"
+					GET: "listBatchRecords",
+					PATCH: "patchActionOnBatchRecords"
 			]
 		}
 
-		// Bulk Unarchive Import Batches
-		"/ws/import/batch/unarchive" {
+		// Dealing with individual ImportBatchRecord detail rows
+		"/ws/import/batch/$id/record/$recordId" {
 			controller = "wsImportBatch"
 			action = [
-					PUT: "bulkUnarchiveImportBatches"
-			]
-		}
-
-		// Bulk Archive Import Batches
-		"/ws/import/batch/archive" {
-			controller = "wsImportBatch"
-			action = [
-					PUT: "bulkArchiveImportBatches"
+					GET: "fetchImportBatchRecord",
+					PUT: "updateImportBatchRecord"
 			]
 		}
 
