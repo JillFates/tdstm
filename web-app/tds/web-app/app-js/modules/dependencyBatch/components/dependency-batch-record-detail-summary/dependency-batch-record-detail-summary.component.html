@@ -1,34 +1,44 @@
-<div>
-    <label> Batch Summary </label>
-    <div class="row header">
-        <div class="col-sm-2">Batch ID</div>
-        <div class="col-sm-2">Imported At</div>
-        <div class="col-sm-2">Imported By</div>
-        <div class="col-sm-2">Class</div>
-        <div class="col-sm-2">Data Script</div>
-        <div class="col-sm-2">Status</div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2">{{importBatch.id}}</div>
-        <div class="col-sm-2">{{importBatch.dateCreated}}</div>
-        <div class="col-sm-2">{{importBatch.createdBy}}</div>
-        <div class="col-sm-2">{{importBatch.domainClassName}}</div>
-        <div class="col-sm-2">{{importBatch.datascript?.name}}</div>
-        <div class="col-sm-2">{{importBatch.status}}</div>
-    </div>
+<hr style="margin-top: 0px; margin-bottom: 5px;">
+
+<div class="row" style="margin-bottom: 0px;">
+    <button class="pull-right btn btn-default" (click)="toggleSection()" style="font-size: 5px;">
+        <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed, 'fa-angle-double-up':collapsed}" style="padding-right:0px"></i>
+    </button>
 </div>
-<div>
-    <label> Record Summary </label>
-    <div class="row header">
-        <div class="col-sm-2">Status</div>
-        <div class="col-sm-2">Error Count</div>
-        <div class="col-sm-2">Import Operation</div>
-        <div class="col-sm-2">Source Row</div>
+
+<div *ngIf="!collapsed">
+    <div>
+        <label> Batch Summary </label>
+        <div class="row header">
+            <div class="col-sm-2">Batch ID</div>
+            <div class="col-sm-2">Imported At</div>
+            <div class="col-sm-2">Imported By</div>
+            <div class="col-sm-2">Class</div>
+            <div class="col-sm-2">Data Script</div>
+            <div class="col-sm-2">Status</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">{{importBatch.id}}</div>
+            <div class="col-sm-2">{{importBatch.dateCreated}}</div>
+            <div class="col-sm-2">{{importBatch.createdBy}}</div>
+            <div class="col-sm-2">{{importBatch.domainClassName}}</div>
+            <div class="col-sm-2">{{importBatch.datascript?.name}}</div>
+            <div class="col-sm-2">{{importBatch.status}}</div>
+        </div>
     </div>
-    <div class="row">
-        <div class="col-sm-2">{{batchRecord.status}}</div>
-        <div class="col-sm-2">{{batchRecord.errorCount}}</div>
-        <div class="col-sm-2">{{batchRecord.operation}}</div>
-        <div class="col-sm-2">{{batchRecord.sourceRow}}</div>
+    <div>
+        <label> Record Summary </label>
+        <div class="row header">
+            <div class="col-sm-2">Status</div>
+            <div class="col-sm-2">Error Count</div>
+            <div class="col-sm-2">Import Operation</div>
+            <div class="col-sm-2">Source Row</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">{{batchRecord.status}}</div>
+            <div class="col-sm-2">{{batchRecord.errorCount}}</div>
+            <div class="col-sm-2">{{batchRecord.operation}}</div>
+            <div class="col-sm-2">{{batchRecord.sourceRow}}</div>
+        </div>
     </div>
 </div>
