@@ -59,6 +59,14 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 
 	/**
 	 * TODO: document
+	 */
+	private closeBatchRecordDetail(): void {
+		this.selectedBatchRecord = null;
+		console.log('Dialog unselect batch record');
+	}
+
+	/**
+	 * TODO: document
 	 * @param error
 	 */
 	private handleError(error): void {

@@ -3,7 +3,7 @@
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
         </button>
-        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
+        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName.name}}</h4>
     </div>
     <div class="modal-body" style="height: 100%; overflow: auto;">
         <div class="modal-body-container">
@@ -30,15 +30,17 @@
                                  Toolbar Template
                             -->
                             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <div class="col-sm-1 toolbar-button">
-                                    <button (click)="onDeleteBatch()"
+                                <div class="col-sm-1 toolbar-button" style="margin-right: 10px;">
+                                    <button (click)="onRevalidate()"
                                             class="btn btn-default" type="button">
+                                        <i class="glyphicon glyphicon-thumbs-up"></i>
                                         Revalidate
                                     </button>
                                 </div>
                                 <div class="col-sm-1 toolbar-button">
-                                    <button (click)="onArchiveBatch()"
+                                    <button (click)="onIngore()"
                                             class="btn btn-default" type="button">
+                                        <i class="glyphicon glyphicon-eye-close"></i>
                                         Ignore
                                     </button>
                                 </div>
@@ -129,7 +131,8 @@
             <section *ngIf="selectedBatchRecord">
                 <div class="row">
                     <dependency-batch-record-detail [importBatch]="importBatchModel"
-                                                    [batchRecord]="selectedBatchRecord">
+                                                    [batchRecord]="selectedBatchRecord"
+                                                    (onCancel)="closeBatchRecordDetail()">
                     </dependency-batch-record-detail>
                 </div>
             </section>

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 
@@ -9,6 +9,7 @@ import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
+	@Output('onCancel') cancelEvent = new EventEmitter<any>();
 
 	private fields: Array<any> = [];
 	private fieldsFilter: any = {
@@ -25,6 +26,15 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadRecordFieldDetails();
+	}
+
+	/**
+	 * TODO: document
+	 */
+	private onCancel(): void {
+		this.batchRecord = null;
+		this.cancelEvent.emit();
+		console.log('fields onCancel');
 	}
 
 	/**

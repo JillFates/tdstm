@@ -1,5 +1,5 @@
 <div class="fields-filters row" style="margin-left: 10px;">
-    <label class="col-sm-1">Fields</label>
+    <label class="col-sm-1" style="width: 40px;">Fields</label>
     <div class="fieldsFilter col-sm-2">
         <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
                             [data]="fieldsFilter.options"
@@ -24,6 +24,50 @@
         <div class="col-sm-2">Current Value</div>
         <div class="col-sm-2">Import Value</div>
         <div class="col-sm-2">Override Value</div>
-        <div class="col-sm-2">Error</div>
+        <div class="col-sm-4">Error</div>
+    </div>
+    <div class="row body" style="margin-top: 10px;" *ngFor="let field of fields">
+        <div class="col-sm-2">{{field.name}}</div>
+        <div class="col-sm-2">{{field.currentValue}}</div>
+        <div class="col-sm-2">{{field.importValue}}</div>
+        <div class="col-sm-2"><input type="text"></div>
+        <div class="col-sm-4"><small><i>{{field.error}}</i></small></div>
+    </div>
+    <style>
+        .footer button {
+            margin-right: 5px;
+        }
+    </style>
+    <div class="row footer" style="margin-top: 30px;">
+        <button (click)="onUpdate()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-floppy-disk"></i>
+            Update
+        </button>
+        <button (click)="onRevalidate()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-thumbs-up"></i>
+            Revalidate
+        </button>
+        <button (click)="onInclude()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-plus"></i>
+            Include
+        </button>
+        <button (click)="onIgnore()"
+                class="btn btn-default btn-sm col-sm-1" type="button">
+            <i class="glyphicon glyphicon-eye-close"></i>
+            Ignore
+        </button>
+        <button (click)="onCancel()"
+                class="btn btn-default btn-sm col-sm-1 pull-right" type="button">
+            <i class="glyphicon glyphicon-remove-circle"></i>
+            Cancel
+        </button>
+        <!--<div class="col-sm-1 pull-right"></div>-->
+        <!--<button (click)="onCancel()"-->
+                <!--class="btn btn-default btn-sm col-sm-1 pull-right" type="button">-->
+            <!--Cancel-->
+        <!--</button>-->
     </div>
 </div>
