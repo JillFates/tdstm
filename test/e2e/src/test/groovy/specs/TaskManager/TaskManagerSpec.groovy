@@ -16,7 +16,6 @@ class TaskManagerSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
-        loginModule.login(username,password)
     }
 
     def setup() {
