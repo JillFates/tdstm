@@ -12,9 +12,9 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {DependencyBatchService} from './service/dependency-batch.service';
 import {DependencyBatchDetailDialogComponent} from './components/dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
-import {DependencyBatchRecordDetailComponent} from './components/dependency-batch-record-detail/dependency-batch-record-detail.component';
 import {DependencyBatchRecordDetailSummaryComponent} from './components/dependency-batch-record-detail-summary/dependency-batch-record-detail-summary.component';
 import {DependencyBatchRecordDetailFieldsComponent} from './components/dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component';
+import {DependencyBatchRecordDetailDialogComponent} from './components/dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 
 @NgModule({
 	imports: [
@@ -31,7 +31,7 @@ import {DependencyBatchRecordDetailFieldsComponent} from './components/dependenc
 	declarations: [
 		DependencyBatchListComponent,
 		DependencyBatchDetailDialogComponent,
-		DependencyBatchRecordDetailComponent,
+		DependencyBatchRecordDetailDialogComponent,
 		DependencyBatchRecordDetailSummaryComponent,
 		DependencyBatchRecordDetailFieldsComponent
 	],
@@ -43,7 +43,7 @@ import {DependencyBatchRecordDetailFieldsComponent} from './components/dependenc
 	],
 	entryComponents: [
 		DependencyBatchDetailDialogComponent,
-		DependencyBatchRecordDetailComponent,
+		DependencyBatchRecordDetailDialogComponent,
 	],
 })
 
