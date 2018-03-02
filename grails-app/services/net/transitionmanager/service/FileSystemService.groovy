@@ -1,13 +1,27 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.FileSystemUtil
+import getl.csv.CSVConnection
+import getl.csv.CSVDataset
+import getl.data.Dataset
+import getl.data.Field
+import getl.excel.ExcelConnection
+import getl.excel.ExcelDataset
+import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.InitializingBean
 
 import javax.management.RuntimeErrorException
@@ -27,7 +41,7 @@ class FileSystemService  implements InitializingBean {
     CoreService coreService
     SecurityService securityService
 
-    public void afterPropertiesSet() throws Exception {
+    void afterPropertiesSet() throws Exception {
         // Load the temporary directory name and make sure that it has the
         String appTempDirectory = coreService.getAppTempDirectory()
 
@@ -38,7 +52,91 @@ class FileSystemService  implements InitializingBean {
         }
     }
 
-    /**
+	 private void initCSV(OutputStream os, String dataSet) {
+		 os << dataSet
+		 os.close()
+	 }
+
+
+	private void initExcel(String ext, OutputStream os, String dataSet) {
+		List<String> csv = dataSet.split('\n')
+
+		Workbook workbook
+		if (ext == 'XLSX') {
+			workbook = new XSSFWorkbook()
+		} else if (ext == 'XLS') {
+			workbook = new HSSFWorkbook()
+		}
+
+		if (!workbook) {
+			throw new RuntimeException("Unsupported File Format $ext")
+		}
+
+		Sheet sheet = workbook.createSheet("Data Sheet")
+		int rowNum = 0
+		for (String line : csv) {
+			Row row = sheet.createRow(rowNum++)
+			int colNum = 0
+			List<String> cellValues = line.split(',')
+			for (String value : cellValues) {
+				Cell cell = row.createCell(colNum++)
+				cell.setCellValue(value)
+			}
+		}
+
+		workbook.write(os)
+		workbook.close()
+	}
+
+	void initFile(String filename, OutputStream os, String dataSet){
+		String ext = FilenameUtils.getExtension(filename)?.toUpperCase()
+
+		switch (ext) {
+			case 'CSV' :
+				initCSV(os, dataSet)
+				break
+
+			case ['XLS', 'XLSX'] :
+				initExcel(ext, os, dataSet)
+				break
+		}
+	}
+
+	static Dataset buildDataset(String fileName) {
+		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
+
+		Dataset dataset
+		if (ext == 'CSV'){
+			CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+			dataset = new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
+
+		} else if (ext == 'XLSX' || ext == 'XLS') {
+
+			ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
+
+			dataset = new ExcelDataset(connection: con, header: true)
+
+			dataset.field << new Field(name: 'device id', type: Field.Type.STRING)
+			dataset.field << new Field(name: 'model name', type: Field.Type.STRING)
+			dataset.field << new Field(name: 'manufacturer name', type: Field.Type.STRING)
+			dataset.field << new Field(name: 'environment', type: Field.Type.STRING)
+
+
+			dataset.connection.driver.metaClass.fields = { Dataset ds ->
+				// Monkeypatching to support getting the fields
+				return ds.field
+			}
+
+			// log.info "path: ${dataset.connection.params.path}"
+			// log.info "filename: ${dataset.connection.params.fileName}"
+		}
+
+		return dataset
+
+	}
+
+
+	/**
      * Used to create a temporary file where the name will consist of a prefix + random + extension
      * @param prefix
      * @param extension
