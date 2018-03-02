@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
-import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
+import {ImportBatchModel} from '../../model/import-batch.model';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
@@ -10,34 +10,24 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 })
 export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 
-	private batchRecordUpdatedFlag = false;
+	// @Input('importBatch') importBatch: ImportBatchModel;
+	// @Input('batchRecord') batchRecord: ImportBatchRecordModel;
+	// @Output('onCancel') cancelEvent = new EventEmitter<any>();
 
 	constructor(
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
-		private dependencyBatchService: DependencyBatchService) {
+		private dependencyBatchService: DependencyBatchService,
+		private dialogService: UIDialogService) {
 			super('#dependency-batch-record-detail');
 	}
 
 	/**
-	 * On close dialog.
+	 * TODO: document
 	 */
 	private onCancelCloseDialog(): void {
-		this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
-	}
-
-	/**
-	 * On Fields Values updated successfully.
-	 */
-	private onUpdateSuccess(): void {
-		this.batchRecordUpdatedFlag = true;
-		// this.close('reload');
-	}
-
-	/**
-	 * On Fields Values updated successfully.
-	 */
-	private onBatchRecordUpdated($event): void {
-		this.batchRecord = $event.batchRecord;
+		// this.cancelEvent.emit();
+		// this.batchRecord = null;
+		this.dismiss();
 	}
 }
