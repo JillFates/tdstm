@@ -42,7 +42,8 @@ import {DependencyBatchRecordDetailFieldsComponent} from './components/dependenc
 		DependencyBatchListComponent
 	],
 	entryComponents: [
-		DependencyBatchDetailDialogComponent
+		DependencyBatchDetailDialogComponent,
+		DependencyBatchRecordDetailComponent,
 	],
 })
 

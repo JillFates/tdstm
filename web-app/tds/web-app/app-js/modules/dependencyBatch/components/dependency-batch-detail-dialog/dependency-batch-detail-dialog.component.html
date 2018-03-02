@@ -14,7 +14,7 @@
             <section>
                 <div class="box-body box-with-empty-header">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
-                                [height]="310"
+                                [height]="550"
                                 [data]="dataGridOperationsHelper.gridData"
                                 [filter]="dataGridOperationsHelper.state.filter"
                                 [filterable]="true"
@@ -156,14 +156,14 @@
             <!--
                 Batch Record Detail
             -->
-            <section *ngIf="selectedBatchRecord">
-                <div class="row">
-                    <dependency-batch-record-detail [importBatch]="importBatchModel"
-                                                    [batchRecord]="selectedBatchRecord"
-                                                    (onCancel)="closeBatchRecordDetail()">
-                    </dependency-batch-record-detail>
-                </div>
-            </section>
+            <!--<section *ngIf="selectedBatchRecord">-->
+                <!--<div class="row">-->
+                    <!--<dependency-batch-record-detail [importBatch]="importBatchModel"-->
+                                                    <!--[batchRecord]="selectedBatchRecord"-->
+                                                    <!--(onCancel)="closeBatchRecordDetail()">-->
+                    <!--</dependency-batch-record-detail>-->
+                <!--</div>-->
+            <!--</section>-->
         </div>
     </div>
     <div class="modal-footer">

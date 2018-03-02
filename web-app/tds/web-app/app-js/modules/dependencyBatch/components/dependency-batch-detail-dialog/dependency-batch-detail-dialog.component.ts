@@ -12,6 +12,7 @@ import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-opera
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {DependencyBatchRecordDetailComponent} from '../dependency-batch-record-detail/dependency-batch-record-detail.component';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -26,7 +27,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		useColumn: 'id'
 	};
 	private batchRecords: Array<ImportBatchRecordModel>;
-	private selectedBatchRecord: ImportBatchRecordModel;
+	// private selectedBatchRecord: ImportBatchRecordModel;
 	private batchRecordsFilter: any = {
 		options: [{id: 1, name: 'All'},
 			{id: 2, name: 'Pending'},
@@ -40,7 +41,8 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		private importBatchModel: ImportBatchModel,
 		private promptService: UIPromptService,
 		private dependencyBatchService: DependencyBatchService,
-		private activeDialog: UIActiveDialogService) {
+		private activeDialog: UIActiveDialogService,
+		private dialogService: UIDialogService) {
 			this.prepareColumnsModel();
 	}
 
@@ -81,24 +83,23 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 */
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
-		this.selectedBatchRecord = (cellClick as any).dataItem;
-		// this.dialogService.extra(DataScriptEtlBuilderComponent, [
-		// 		UIDialogService,
-		// 		{provide: DataScriptModel, useValue: this.dataScriptModel}
-		// 	]).then((result) => {
-		// 		if (result.updated) {
-		// 			this.etlScriptCode.updated = result.updated;
-		// 			this.etlScriptCode.code = result.newEtlScriptCode;
-		// 		}
-		// 	});
+		// this.selectedBatchRecord = (cellClick as any).dataItem;
+		let selectedBatchRecord = (cellClick as any).dataItem;
+		this.dialogService.extra(DependencyBatchRecordDetailComponent, [
+				UIDialogService,
+				{provide: ImportBatchModel, useValue: this.importBatchModel},
+				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
+			]).then((result) => {
+				// ???
+			});
 	}
 
 	/**
 	 * TODO: document
 	 */
-	private closeBatchRecordDetail(): void {
+	/*private closeBatchRecordDetail(): void {
 		this.selectedBatchRecord = null;
-	}
+	}*/
 
 	/**
 	 * TODO: document
