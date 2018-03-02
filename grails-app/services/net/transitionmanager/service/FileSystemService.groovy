@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.InitializingBean
 
@@ -114,21 +115,27 @@ class FileSystemService  implements InitializingBean {
 
 			ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
 
+			Workbook workbook = WorkbookFactory.create( new File(fileName) )
+			// Getting the Sheet at index zero
+			Sheet sheet = workbook.getSheetAt(0)
+			// Getting the first row for the header
+			Row row = sheet.getRow(0)
+
+
 			dataset = new ExcelDataset(connection: con, header: true)
 
-			dataset.field << new Field(name: 'device id', type: Field.Type.STRING)
-			dataset.field << new Field(name: 'model name', type: Field.Type.STRING)
-			dataset.field << new Field(name: 'manufacturer name', type: Field.Type.STRING)
-			dataset.field << new Field(name: 'environment', type: Field.Type.STRING)
-
+			Iterator<Cell> cellIterator = row.cellIterator()
+			while ( cellIterator.hasNext() ) {
+				Cell cell = cellIterator.next()
+				String value = cell.toString()
+				dataset.field << new Field(name: value, type: Field.Type.STRING)
+			}
 
 			dataset.connection.driver.metaClass.fields = { Dataset ds ->
 				// Monkeypatching to support getting the fields
 				return ds.field
 			}
 
-			// log.info "path: ${dataset.connection.params.path}"
-			// log.info "filename: ${dataset.connection.params.fileName}"
 		}
 
 		return dataset
