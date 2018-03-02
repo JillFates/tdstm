@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
+import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {ImportBatchModel} from '../../model/import-batch.model';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -8,10 +10,11 @@ import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 })
 export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnChanges {
 
+	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	@Output('onCancel') cancelEvent = new EventEmitter<any>();
 
-	private fields: Array<any> = [];
+	private fieldsInfo: Array<any>;
 	private fieldsFilter: any = {
 		options: [
 			{text: 'All', value: 1},
@@ -44,9 +47,16 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 	 * TODO: document
 	 */
 	private loadRecordFieldDetails(): void {
-		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.id).subscribe( result => {
-			this.fields = result;
-		}, error => this.handleError(error) );
+		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id).subscribe( (result: ApiReponseModel) => {
+			if (result.status === ApiReponseModel.API_SUCCESS) {
+				this.fieldsInfo = result.data.fieldsInfo;
+			} else {
+				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
+			}
+		}, error => {
+			this.fieldsInfo = [];
+			this.handleError(error);
+		});
 	}
 
 	/**

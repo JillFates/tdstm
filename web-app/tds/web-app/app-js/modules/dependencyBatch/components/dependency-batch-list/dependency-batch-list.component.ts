@@ -73,7 +73,7 @@ export class DependencyBatchListComponent {
 						return !item.archived;
 					});
 					for (let batch of batches ) {
-						if (batch.status === 'RUNNING') {
+						if (batch.status.code === 'RUNNING') {
 							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe(res => {
 								if (res.data.percentComp) {
 									batch.currentProgress =  res.data.percentComp;
@@ -86,11 +86,11 @@ export class DependencyBatchListComponent {
 					resolve(batches);
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
-					resolve(null);
+					resolve([]);
 				}
 			}, (err) => {
 				this.handleError(err);
-				resolve(null);
+				resolve([]);
 			});
 		});
 		return promise;

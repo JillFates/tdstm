@@ -1,12 +1,17 @@
 import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
+import {EnumModel} from '../../../shared/model/enum.model';
 
 export class ImportBatchRecordModel {
 	id: number;
-	status: string;
+	importBatch: any;
+	status: EnumModel;
 	errorCount: number;
-	operation: 'Update'|'Add'|'Undetermined';
-	sourceRow: number;
-	fields: any;
+	operation: string;
+	sourceRowId: number;
+	ignored: number;
+	lastUpdated: Date;
+	warn: number;
+	currentValues: any;
 	// name: string;
 	// type: string;
 	// depType: string;
@@ -21,7 +26,7 @@ export class ImportBatchRecordDetailColumnsModel {
 		this.columns = [
 			{
 				label: 'Status',
-				property: 'status',
+				property: 'status.label',
 				type: 'text',
 				width: 100,
 				locked: true,
@@ -42,7 +47,7 @@ export class ImportBatchRecordDetailColumnsModel {
 			},
 			{
 				label: 'Source Row',
-				property: 'sourceRow',
+				property: 'sourceRowId',
 				type: 'number',
 				width: 100,
 				locked: true

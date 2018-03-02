@@ -18,7 +18,7 @@
         <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
     </div>
 </div>
-<div class="fields-container row">
+<div class="fields-container row" *ngIf="fieldsInfo">
     <div class="row header">
         <div class="col-sm-2">Name</div>
         <div class="col-sm-2">Current Value</div>
@@ -26,12 +26,14 @@
         <div class="col-sm-2">Override Value</div>
         <div class="col-sm-4">Error</div>
     </div>
-    <div class="row body" style="margin-top: 10px;" *ngFor="let field of fields">
-        <div class="col-sm-2">{{field.name}}</div>
-        <div class="col-sm-2">{{field.currentValue}}</div>
-        <div class="col-sm-2">{{field.importValue}}</div>
-        <div class="col-sm-2"><input type="text"></div>
-        <div class="col-sm-4"><small><i>{{field.error}}</i></small></div>
+    <div style="height: 200px; overflow: scroll;">
+        <div class="row body" style="margin-top: 10px;" *ngFor="let fieldName of importBatch.fieldNameList">
+            <div class="col-sm-2">{{fieldName}}</div>
+            <div class="col-sm-2">{{fieldsInfo[fieldName].originalValue}}</div>
+            <div class="col-sm-2">{{fieldsInfo[fieldName].value}}</div>
+            <div class="col-sm-2"><input type="text"></div>
+            <div class="col-sm-4"><small><i>{{fieldsInfo[fieldName].error ? fieldsInfo[fieldName].error : '' }}</i></small></div>
+        </div>
     </div>
     <style>
         .footer button {

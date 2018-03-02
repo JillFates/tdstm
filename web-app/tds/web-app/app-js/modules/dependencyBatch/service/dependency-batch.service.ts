@@ -4,10 +4,12 @@ import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchModel} from '../model/import-batch.model';
 import {ImportBatchRecordModel} from '../model/import-batch-record.model';
+import {ApiReponseModel} from '../../../shared/model/ApiReponseModel';
 
 @Injectable()
 export class DependencyBatchService {
 
+	private readonly importBatchesUrl = '../ws/import/batches';
 	private readonly importBatchUrl = '../ws/import/batch';
 	private readonly batchProgressUrl = '../ws/progress';
 
@@ -19,7 +21,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	getImportBatches(): Observable<any> {
-		return this.http.get(this.importBatchUrl)
+		return this.http.get(this.importBatchesUrl)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -37,7 +39,7 @@ export class DependencyBatchService {
 			headers: headers,
 			body : body
 		});
-		return this.http.delete(this.importBatchUrl, options)
+		return this.http.delete(this.importBatchesUrl, options)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -63,7 +65,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	deleteImportBatch(id: number): Observable<any> {
-		return this.http.delete(`${this.importBatchUrl}/${id}`)
+		return this.http.delete(`${this.importBatchesUrl}/${id}`)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -76,7 +78,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	archiveImportBatch(id: number): Observable<any> {
-		return this.http.put(`${this.importBatchUrl}/archive/${id}`, null)
+		return this.http.put(`${this.importBatchesUrl}/archive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -92,7 +94,7 @@ export class DependencyBatchService {
 		const request = {
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchUrl}/archive`, JSON.stringify(request))
+		return this.http.put(`${this.importBatchesUrl}/archive`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -105,7 +107,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	unArchiveImportBatch(id: number): Observable<any> {
-		return this.http.put(`${this.importBatchUrl}/unarchive/${id}`, null)
+		return this.http.put(`${this.importBatchesUrl}/unarchive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -121,7 +123,7 @@ export class DependencyBatchService {
 		const request = {
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchUrl}/unarchive`, JSON.stringify(request))
+		return this.http.put(`${this.importBatchesUrl}/unarchive`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -154,65 +156,79 @@ export class DependencyBatchService {
 			.catch((error: any) => error.json());
 	}
 
-	private readonly mockBatchRecords: Array<ImportBatchRecordModel> = [
-		{
-			id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRow: 1,
-			fields: {
-				'Name (P)': 'pwebwp01',
-				'Type (P)': 'VM',
-				'Dep Type (P)': 'VM Runs On',
-				'Name (D)': 'VMClusterPCI01',
-				'Type (D)': 'Application'
-			}
-		},
-		{
-			id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRow: 2,
-			fields: {
-				'Name (P)': 'Batch Reporting',
-				'Type (P)': 'Application',
-				'Dep Type (P)': 'File',
-				'Name (D)': 'Ecommerce',
-				'Type (D)': 'Application'
-			}
-		},
-		{
-			id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRow: 3,
-			fields: {
-				'Name (P)': 'Batch Reporting',
-				'Type (P)': 'Application',
-				'Dep Type (P)': 'DB',
-				'Name (D)': null,
-				'Type (D)': null
-			}
-		},
-		{
-			id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRow: 4,
-			fields: {
-				'Name (P)': 'Online Banking',
-				'Type (P)': 'Application',
-				'Dep Type (P)': 'Web Service',
-				'Name (D)': 'RSA SecureID SaaS',
-				'Type (D)': 'Application'
-			}
-		}
-		// {id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
-	];
+	// private readonly mockBatchRecords: Array<ImportBatchRecordModel> = [
+	// 	{
+	// 		id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRowId: 1,
+	// 		currentValues: {
+	// 			'Name (P)': 'pwebwp01',
+	// 			'Type (P)': 'VM',
+	// 			'Dep Type (P)': 'VM Runs On',
+	// 			'Name (D)': 'VMClusterPCI01',
+	// 			'Type (D)': 'Application'
+	// 		}
+	// 	},
+	// 	{
+	// 		id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRowId: 2,
+	// 		currentValues: {
+	// 			'Name (P)': 'Batch Reporting',
+	// 			'Type (P)': 'Application',
+	// 			'Dep Type (P)': 'File',
+	// 			'Name (D)': 'Ecommerce',
+	// 			'Type (D)': 'Application'
+	// 		}
+	// 	},
+	// 	{
+	// 		id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRowId: 3,
+	// 		currentValues: {
+	// 			'Name (P)': 'Batch Reporting',
+	// 			'Type (P)': 'Application',
+	// 			'Dep Type (P)': 'DB',
+	// 			'Name (D)': null,
+	// 			'Type (D)': null
+	// 		}
+	// 	},
+	// 	{
+	// 		id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRowId: 4,
+	// 		currentValues: {
+	// 			'Name (P)': 'Online Banking',
+	// 			'Type (P)': 'Application',
+	// 			'Dep Type (P)': 'Web Service',
+	// 			'Name (D)': 'RSA SecureID SaaS',
+	// 			'Type (D)': 'Application'
+	// 		}
+	// 	}
+	// 	// {id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
+	// ];
 
 	/**
 	 * TODO: document.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	getImportBatchRecords(id: number): Observable<any> {
-		return Observable.of(this.mockBatchRecords);
+	getImportBatchRecords(id: number): Observable<ApiReponseModel> {
+		return this.http.get(this.importBatchUrl + `/${id}/records`)
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
 	}
 
-	getImportBatchRecordFieldDetail(id: number): Observable<any> {
-		const matchedRecord = this.mockBatchRecords.find( record => record.id === id);
-		const mockResult: Array<any> = [];
-		Object.keys(matchedRecord.fields).forEach(key => {
-			mockResult.push({name: key, currentValue: '', importValue: matchedRecord.fields[key], error: ''});
-		});
-		return Observable.of(mockResult);
+	/**
+	 * TODO: document.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	getImportBatchRecordFieldDetail(batchId: number, id: number): Observable<ApiReponseModel> {
+		return this.http.get(this.importBatchUrl + `/${batchId}/record/${id}`)
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+		// const matchedRecord = this.mockBatchRecords.find( record => record.id === id);
+		// const mockResult: Array<any> = [];
+		// Object.keys(matchedRecord.currentValues).forEach(key => {
+		// 	mockResult.push({name: key, currentValue: '', importValue: matchedRecord.fields[key], error: ''});
+		// });
+		// return Observable.of(mockResult);
 	}
 }
