@@ -156,6 +156,8 @@ class FileSystemService  implements InitializingBean {
 		}
 
 		// TODO: Need to fix column name lookup - see ticket TM-9584
+        // This will need to be moved to a function that will evetunally get context of the sheet name and
+        // the row that the labels reside on and compute dynamically instead of this statically built list.
 		// currently adding Monkey-patching to support getting the fields since the original behaviour is not supported
 		dataset.connection.driver.metaClass.fields = { Dataset ds ->
 			return ds.field
