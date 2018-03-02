@@ -755,7 +755,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	boolean hasSelectedDomain() {
-		return selectedDomain != null && selectedDomain.clazz != null
+		return selectedDomain != null
 	}
 
 }
