@@ -130,5 +130,13 @@ class ETLProcessorException extends GroovyRuntimeException {
 	static ETLProcessorException unknownAssetControlType (String controlType) {
 		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
 	}
+
+    /**
+     * Exception being thrown when no domain is specified upon load clause
+     * @return
+     */
+	static ETLProcessorException domainMustBeSpecified () {
+		new ETLProcessorException('A domain must be specified')
+	}
 }
 

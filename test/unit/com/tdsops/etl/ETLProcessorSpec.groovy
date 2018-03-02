@@ -1673,6 +1673,29 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can throw an exception if an domain is not specified'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+id
+1""".stripIndent())
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					
+					iterate {
+						extract 1 load id
+					}						
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown()
+			e.message == 'A domain must be specified'
+	}
+
 	/**
 	 * Builds a list of Mock Room using this fields order
 	 * ['id', 'project', 'roomName', 'location', 'roomDepth', 'roomWidth', 'address', 'city', 'stateProv', 'postalCode']

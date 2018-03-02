@@ -47,9 +47,13 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element load (String fieldName) {
-        this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-        processor.addElementLoaded(processor.selectedDomain, this)
-        this
+        if (processor.hasSelectedDomain()) {
+            this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+            processor.addElementLoaded(processor.selectedDomain, this)
+            this
+        } else {
+            throw ETLProcessorException.domainMustBeSpecified()
+        }
     }
 
     /**
