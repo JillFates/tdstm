@@ -1675,7 +1675,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 	void 'test can throw an exception if an domain is not specified'() {
 		given:
-		def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 id
 1""".stripIndent())
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
