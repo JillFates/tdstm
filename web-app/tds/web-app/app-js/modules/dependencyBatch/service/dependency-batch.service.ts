@@ -86,15 +86,16 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * PUT - Bulk Archive Import Batches.
+	 * PATCH - Bulk Archive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	archiveImportBatches(ids: Array<number>): Observable<any> {
+	archiveImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
 		const request = {
+			action: 'ARCHIVE',
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchesUrl}/archive`, JSON.stringify(request))
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -115,15 +116,50 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * PUT - Bulk Unarchive Import Batches.
+	 * PATCH - Bulk Unarchive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	unArchiveImportBatches(ids: Array<number>): Observable<any> {
+	unArchiveImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
 		const request = {
+			action: 'UNARCHIVE',
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchesUrl}/unarchive`, JSON.stringify(request))
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Bulk EJECT Import Batches.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	ejectImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+		const request = {
+			action: 'EJECT',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Bulk QUEUE Import Batches.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	queueImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+		const request = {
+			action: 'QUEUE',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -155,50 +191,6 @@ export class DependencyBatchService {
 			})
 			.catch((error: any) => error.json());
 	}
-
-	// private readonly mockBatchRecords: Array<ImportBatchRecordModel> = [
-	// 	{
-	// 		id: 1, status: 'Pending', errorCount: 1, operation: 'Update', sourceRowId: 1,
-	// 		currentValues: {
-	// 			'Name (P)': 'pwebwp01',
-	// 			'Type (P)': 'VM',
-	// 			'Dep Type (P)': 'VM Runs On',
-	// 			'Name (D)': 'VMClusterPCI01',
-	// 			'Type (D)': 'Application'
-	// 		}
-	// 	},
-	// 	{
-	// 		id: 2, status: 'Pending', errorCount: 2, operation: 'Add', sourceRowId: 2,
-	// 		currentValues: {
-	// 			'Name (P)': 'Batch Reporting',
-	// 			'Type (P)': 'Application',
-	// 			'Dep Type (P)': 'File',
-	// 			'Name (D)': 'Ecommerce',
-	// 			'Type (D)': 'Application'
-	// 		}
-	// 	},
-	// 	{
-	// 		id: 3, status: 'Pending', errorCount: 1, operation: 'Undetermined', sourceRowId: 3,
-	// 		currentValues: {
-	// 			'Name (P)': 'Batch Reporting',
-	// 			'Type (P)': 'Application',
-	// 			'Dep Type (P)': 'DB',
-	// 			'Name (D)': null,
-	// 			'Type (D)': null
-	// 		}
-	// 	},
-	// 	{
-	// 		id: 4, status: 'Ignored', errorCount: 2, operation: 'Add', sourceRowId: 4,
-	// 		currentValues: {
-	// 			'Name (P)': 'Online Banking',
-	// 			'Type (P)': 'Application',
-	// 			'Dep Type (P)': 'Web Service',
-	// 			'Name (D)': 'RSA SecureID SaaS',
-	// 			'Type (D)': 'Application'
-	// 		}
-	// 	}
-	// 	// {id: 5, status: 'Completed', errorCount: 0, operation: 'Add', sourceRow: 5, name: 'Azure ADSync', type: 'Application', depType: 'Runs On', nameD: 'usmd1nis015', typeD: 'VM'}
-	// ];
 
 	/**
 	 * TODO: document.

@@ -127,7 +127,9 @@
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
                                         <i class="fa fa-stop"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status.code === 'QUEUED'" class="btn btn-action btn-default"
+                                    <button *ngIf="dataItem.status.code === 'QUEUED'"
+                                            (click)="onEjectButton(dataItem)"
+                                            class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
                                         <i class="fa fa-eject"></i>
                                     </button>
