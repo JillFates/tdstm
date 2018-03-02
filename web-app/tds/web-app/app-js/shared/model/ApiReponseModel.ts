@@ -2,7 +2,11 @@
  * Represents the standard response model structure of the API calls.
  */
 export class ApiReponseModel {
+
+	public static readonly API_SUCCESS = 'success';
+	public static readonly API_ERROR = 'error';
+
 	data: any;
-	status: 'success'|'error';
+	status: 'success' | 'error';
 	errors?: Array<any>;
 }

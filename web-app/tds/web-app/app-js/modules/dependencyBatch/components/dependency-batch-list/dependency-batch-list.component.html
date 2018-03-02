@@ -79,7 +79,7 @@
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
                                                name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
                                                (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])"
-                                               [disabled]="dataItem.status === 'RUNNING'">
+                                               [disabled]="dataItem.status.code === 'RUNNING'">
                                     </label>
                                 </div>
                             </ng-template>
@@ -115,19 +115,19 @@
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
-                                    <button *ngIf="dataItem.status === 'PENDING'"
+                                    <button *ngIf="dataItem.status.code === 'PENDING'"
                                             (click)="onPlayButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status === 'RUNNING'"
+                                    <button *ngIf="dataItem.status.code === 'RUNNING'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
                                         <i class="fa fa-stop"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status === 'QUEUED'" class="btn btn-action btn-default"
+                                    <button *ngIf="dataItem.status.code === 'QUEUED'" class="btn btn-action btn-default"
                                             title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
                                         <i class="fa fa-eject"></i>
                                     </button>
@@ -135,10 +135,10 @@
                             </ng-template>
                             <!-- Status -->
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-                                <div *ngIf="dataItem.status !== 'RUNNING'; then statusTemplate else statusProgressTemplate;"></div>
+                                <div *ngIf="dataItem.status.code !== 'RUNNING'; then statusTemplate else statusProgressTemplate;"></div>
                                 <ng-template #statusTemplate>
                                      <div [ngClass]="{ 'status-with-errors' : dataItem.errors > 0 }" class="status-text">
-                                        {{ dataItem.status }}
+                                        {{ dataItem.status.label }}
                                      </div>
                                 </ng-template>
                                 <ng-template #statusProgressTemplate>
