@@ -27,7 +27,8 @@ export enum DIALOG_SIZE {
 	SM = 'sm',
 	MD = 'md',
 	LG = 'lg',
-	XLG = 'xlg'
+	XLG = 'xlg',
+	XXL = 'xxl'
 };
 export const ACTIVE_INACTIVE = ['Active', 'Inactive'];
 
