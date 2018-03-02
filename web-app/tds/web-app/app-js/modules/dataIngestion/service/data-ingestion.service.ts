@@ -292,7 +292,7 @@ export class DataIngestionService {
 
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
-		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
+		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1) ? model.defaultDataScript.id : null) };
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
 			parameterList.data.forEach( (param) => {
