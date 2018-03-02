@@ -53,12 +53,23 @@ class FileSystemService  implements InitializingBean {
         }
     }
 
+	/**
+	 * Initialize a CSV file
+	 * @param os   OutputStream to the File
+	 * @param dataSet String of comma separated values
+	 */
 	 private void initCSV(OutputStream os, String dataSet) {
 		 os << dataSet
 		 os.close()
 	 }
 
-
+	/**
+	 * Initialize an Excel file using the passed data
+	 * This is mostly used in MockETLController for testing
+	 * @param ext  Extension of the file to create
+	 * @param os   OutputStream to the File
+	 * @param dataSet String of comma separated values
+	 */
 	private void initExcel(String ext, OutputStream os, String dataSet) {
 		List<String> csv = dataSet.split('\n')
 
@@ -87,8 +98,15 @@ class FileSystemService  implements InitializingBean {
 
 		workbook.write(os)
 		workbook.close()
+		os.close()
 	}
 
+	/**
+	 * Initialize a file with the dataSet String passed
+	 * @param filename   File name
+	 * @param os         Output Stream
+	 * @param dataSet    String of comma separated values
+	 */
 	void initFile(String filename, OutputStream os, String dataSet){
 		String ext = FilenameUtils.getExtension(filename)?.toUpperCase()
 
@@ -103,38 +121,63 @@ class FileSystemService  implements InitializingBean {
 		}
 	}
 
+	/**
+	 * Build a CVSDataset from the given fileName
+	 * @param fileName
+	 * @return
+	 */
+	static CSVDataset buildCVSDataset(String fileName) {
+		CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+		return new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
+	}
+
+	/**
+	 * Build a ExcelDataset from the given fileName
+	 * @param fileName
+	 * @return
+	 */
+	static ExcelDataset buildExcelDataset(String fileName){
+		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
+		Workbook workbook = WorkbookFactory.create( new File(fileName) )
+		// Getting the Sheet at index zero
+		Sheet sheet = workbook.getSheetAt(0)
+		// Getting the first row for the header
+		Row row = sheet.getRow(0)
+
+		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
+		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
+
+		// Iterate over the Header Row to build the Header fields
+		Iterator<Cell> cellIterator = row.cellIterator()
+		while ( cellIterator.hasNext() ) {
+			Cell cell = cellIterator.next()
+			String value = cell.toString()
+			dataset.field << new Field(name: value, type: Field.Type.STRING)
+		}
+
+		// TODO: Need to fix column name lookup - see ticket TM-9584
+		// currently adding Monkey-patching to support getting the fields since the original behaviour is not supported
+		dataset.connection.driver.metaClass.fields = { Dataset ds ->
+			return ds.field
+		}
+
+		return dataset
+	}
+
+	/**
+	 * Build a getl.data.Dataset using the file name
+	 * @param fileName it can be a type CSV, XLSX or XLS
+	 * @return
+	 */
 	static Dataset buildDataset(String fileName) {
 		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
 
 		Dataset dataset
 		if (ext == 'CSV'){
-			CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
-			dataset = new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
+			dataset = buildCVSDataset(fileName)
 
-		} else if (ext == 'XLSX' || ext == 'XLS') {
-
-			ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
-
-			Workbook workbook = WorkbookFactory.create( new File(fileName) )
-			// Getting the Sheet at index zero
-			Sheet sheet = workbook.getSheetAt(0)
-			// Getting the first row for the header
-			Row row = sheet.getRow(0)
-
-
-			dataset = new ExcelDataset(connection: con, header: true)
-
-			Iterator<Cell> cellIterator = row.cellIterator()
-			while ( cellIterator.hasNext() ) {
-				Cell cell = cellIterator.next()
-				String value = cell.toString()
-				dataset.field << new Field(name: value, type: Field.Type.STRING)
-			}
-
-			dataset.connection.driver.metaClass.fields = { Dataset ds ->
-				// Monkeypatching to support getting the fields
-				return ds.field
-			}
+		} else if ( ['XLSX', 'XLS'].contains(ext) ) {
+			dataset = buildExcelDataset(fileName)
 
 		}
 
