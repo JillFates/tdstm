@@ -11,6 +11,7 @@
     <hr>
     <dependency-batch-record-detail-fields
             *ngIf="batchRecord"
+            [importBatch]="importBatch"
             [batchRecord]="batchRecord"
             (onCancel)="onCancel()">
     </dependency-batch-record-detail-fields>
