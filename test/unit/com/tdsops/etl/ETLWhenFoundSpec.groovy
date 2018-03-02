@@ -143,8 +143,8 @@ application id,vendor name,technology,location
 							
 							extract AssetDependencyId load id
     						extract AssetId load asset
-							extract AssetName initialize primaryName
-							extract AssetType init primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
@@ -268,8 +268,8 @@ application id,vendor name,technology,location
 							
 							extract AssetDependencyId load id
     						extract AssetId load asset
-							extract AssetName initialize primaryName
-							extract AssetType init primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
@@ -352,8 +352,8 @@ application id,vendor name,technology,location
 							
 							extract AssetDependencyId load id
     						extract AssetId load asset
-							extract AssetName initialize primaryName
-							extract AssetType init primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
@@ -433,8 +433,8 @@ application id,vendor name,technology,location
 							
 							extract AssetDependencyId load id
     						extract AssetId load asset
-							extract AssetName initialize primaryName
-							extract AssetType init primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
@@ -518,8 +518,8 @@ application id,vendor name,technology,location
 							
 							extract AssetDependencyId load id
     						extract AssetId load asset
-							extract AssetName initialize primaryName
-							extract AssetType initialize primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType

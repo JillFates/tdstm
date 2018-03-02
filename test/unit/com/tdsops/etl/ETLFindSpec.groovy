@@ -131,7 +131,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							init environment with Production
+							set environment with Production
 							extract 'application id' load id
 							
 							find Application of id by id with SOURCE.'application id'
@@ -222,7 +222,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							init environment with Production
+							set environment with Production
 							extract 'application id' load id
 							
 							find Application by id with SOURCE.'application id'
@@ -481,8 +481,8 @@ application id,vendor name,technology,location
     						extract AssetId load asset
 							
 							// Set some local variables to be reused
-							extract AssetName init primaryName
-							extract AssetType initialize primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
 							find Application of asset by id with DOMAIN.asset 
    							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
@@ -634,8 +634,8 @@ application id,vendor name,technology,location
     						extract AssetId load asset
 							
 							// Set some local variables to be reused
-							extract AssetName initialize primaryName
-							extract AssetType init primaryType
+							extract AssetName set primaryName
+							extract AssetType set primaryType
     
    							find Application by assetName, assetType with SOURCE.AssetName, primaryType
        						elseFind Application of asset by assetName with SOURCE.DependentName
@@ -735,9 +735,9 @@ application id,vendor name,technology,location
 							def primaryFindings = FINDINGS
 	
 							if (primaryFindings.size() > 0 ){
-							 	init comment with 'Asset results found'		
+							 	set comment with 'Asset results found'		
 							} else {
-							 	init comment with 'Asset results not found'
+							 	set comment with 'Asset results not found'
 							}
 						}
 						""".stripIndent(),
@@ -864,7 +864,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							init environment with Production
+							set environment with Production
 							extract 'application id' load id
 							find Application of id by id with id
 						}
@@ -926,7 +926,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							init environment with Production
+							set environment with Production
 							extract 'vendor name' load Vendor
 							extract 'application id' load id
 							

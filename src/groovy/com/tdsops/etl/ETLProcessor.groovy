@@ -426,44 +426,40 @@ class ETLProcessor implements RangeChecker {
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		initialize environment with Production
-	 *		initialize environment with SOURCE.'application id'
-	 *		initialize environment with DOMAIN.id
+	 *		set environment with Production
+	 *		set environment with SOURCE.'application id'
+	 *		set environment with DOMAIN.id
 	 *		.....
 	 *	}
 	 * </pre>
 	 * @param field
 	 * @return
 	 */
-	def initialize(final String field) {
+	def set(final String field) {
 		[
-				with: { value ->
+			with: { value ->
 
-					ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
-					Element newElement = currentRow.addNewElement(value, this)
-					if (fieldSpec) {
-						newElement.fieldSpec = fieldSpec
-						newElement.fieldSpec.label = fieldSpec.label
-						newElement.fieldSpec.type = fieldSpec.type
-					}
-
-					addElementLoaded(selectedDomain, newElement)
-					newElement
+				Element newElement = currentRow.addNewElement(value, this)
+				if(fieldSpec){
+					newElement.fieldSpec = fieldSpec
+					newElement.fieldSpec.label = fieldSpec.label
+					newElement.fieldSpec.type = fieldSpec.type
 				}
+
+				addElementLoaded(selectedDomain, newElement)
+				newElement
+			}
 		]
 	}
 
 	/**
-	 * Set field values in results. From an extracted value or just as a fixed new Element.
-	 * Set an Element that create new results loading values without extract previously
+	 * Initialize a property using a default value
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		init environment with Production
-	 *		init environment with SOURCE.'application id'
-	 *		init environment with DOMAIN.id
-	 *		.....
+	 *		init environment with 'Production'
 	 *	}
 	 * </pre>
 	 * @param field
@@ -473,6 +469,26 @@ class ETLProcessor implements RangeChecker {
 	def init(final String field) {
 		initialize(field)
 	}
+
+	/**
+	 * Initialize a property using a default value
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		initialize environment with 'Production'
+	 *	}
+	 * </pre>
+	 * @param field
+	 * @return
+	 */
+	ETLProcessor initialize(String defaultValue){
+		[
+			with: { value ->
+
+			}
+		]
+	}
+
 	/**
 	 * Create a Find object for a particular Domain instance.
 	 * If the String is an invalid Domain, it throws an Exception.

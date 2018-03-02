@@ -208,7 +208,9 @@ class ETLProcessorResult {
 	 * Prepares some of the fields result in the data result.
 	 * <pre>
 	 *	"asset": {
-	 *	    "value":null,
+	 *	    "value": "",
+	 *	    "originalValue": "",
+	 *	    "init": "Default Value"
 	 *		"warn":true,
 	 *		"warnMsg": "found with wrong asset class",
 	 *		"duplicate": true,
@@ -229,7 +231,7 @@ class ETLProcessorResult {
 	 * @return a Map that contains a final structure of the field node in ETLProcessorResult
 	 */
 	private Map<String, ?> initialFieldDataMap(Element element) {
-		return [
+		Map<String, ?> dataMap = [
 			value: element.value,
 			originalValue: element.originalValue,
 			error: false,
@@ -238,6 +240,11 @@ class ETLProcessorResult {
 				query: []
 			]
 		]
+
+		if(element.initValue){
+			dataMap.init = element.initValue
+		}
+		return dataMap
 	}
 
 	/**

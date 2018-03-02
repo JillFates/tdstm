@@ -848,13 +848,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						init environment with Production
+						set environment with Production
 						extract 1 load id
 						extract 'vendor name' load appVendor
 							
 						domain Device
 						extract 1 load id 
-						init location with 'Development'        
+						set location with 'Development'        
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -948,6 +948,107 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(fields.location) {
 						originalValue == 'Development'
 						value == 'Development'
+					}
+				}
+			}
+	}
+
+	void 'test can initialize field with defined value'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						initialize appVendor with 'Apple' 
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						init == 'Apple'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						init == 'Apple'
+					}
+				}
+			}
+	}
+
+	void 'test can initialize an element with defined value'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' initialize 'Apple' load appVendor
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						init == 'Apple'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						init == 'Apple'
 					}
 				}
 			}
@@ -1076,9 +1177,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (DOMAIN.appVendor.startsWith('Mi')){
-							init environment with 'Production'
+							set environment with 'Production'
 						} else {
-							init environment with 'Development'
+							set environment with 'Development'
 						}
 					}
 				""".stripIndent(),
@@ -1179,9 +1280,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (!SOURCE.technology.startsWith('NGM')){
-							init environment with 'Production'
+							set environment with 'Production'
 						} else {
-							init environment with 'Development'
+							set environment with 'Development'
 						}
 					}
 				""".stripIndent(),

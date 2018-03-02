@@ -3,9 +3,18 @@ package com.tdsops.etl
 import com.tdssrc.grails.StringUtil
 
 class Element implements RangeChecker {
-
+	/**
+	 * Original value extracted from Dataset and used to create an instance of Element
+	 */
     String originalValue
+	/**
+	 * Value with transformations applied
+	 */
     String value
+	/**
+	 * Default o initialize value
+	 */
+	String initValue
     Integer rowIndex
     Integer columnIndex
     ETLDomain domain
@@ -22,7 +31,7 @@ class Element implements RangeChecker {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
-        this
+	    return this
     }
 
     /**
@@ -34,7 +43,7 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element transform (String command) {
-        this
+	    return this
     }
 
     /**
@@ -49,7 +58,7 @@ class Element implements RangeChecker {
     Element load (String fieldName) {
         this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
         processor.addElementLoaded(processor.selectedDomain, this)
-        this
+	    return this
     }
 
     /**
@@ -88,7 +97,7 @@ class Element implements RangeChecker {
         int to = (start + take - 1)
         subListRangeCheck(start, start + to, value.size())
         value = value[start..to]
-        this
+	    return this
     }
 
     /**
@@ -105,7 +114,7 @@ class Element implements RangeChecker {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
-        this
+	    return this
     }
 
     /**
@@ -118,7 +127,7 @@ class Element implements RangeChecker {
      */
     Element sanitize () {
         value = StringUtil.sanitizeAndStripSpaces(value)
-        this
+	    return this
     }
 
     /**
@@ -130,7 +139,7 @@ class Element implements RangeChecker {
      */
     Element trim () {
         value = value.trim()
-        this
+	    return this
     }
 
     /**
@@ -143,7 +152,7 @@ class Element implements RangeChecker {
      */
     Element first (String content) {
         value = value.replaceFirst(content, '')
-        this
+	    return this
     }
 
     /**
@@ -156,7 +165,7 @@ class Element implements RangeChecker {
      */
     Element all (String content) {
         value = value.replaceAll(content, '')
-        this
+	    return this
     }
 
     /**
@@ -169,7 +178,7 @@ class Element implements RangeChecker {
      */
     Element last (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
-        this
+	    return this
     }
 
     /**
@@ -182,7 +191,7 @@ class Element implements RangeChecker {
      */
     Element uppercase () {
         value = value.toUpperCase()
-        this
+	    return this
     }
 
     /**
@@ -195,7 +204,7 @@ class Element implements RangeChecker {
      */
     Element lowercase () {
         value = value.toLowerCase()
-        this
+	    return this
     }
 
     /**
@@ -209,7 +218,7 @@ class Element implements RangeChecker {
      */
     Element left (Integer amount) {
         value = value.take(amount)
-        this
+	    return this
     }
 
     /**
@@ -223,7 +232,7 @@ class Element implements RangeChecker {
      */
     Element right (Integer amount) {
         value = value.reverse().take(amount).reverse()
-        this
+	    return this
     }
 
     /**
@@ -239,7 +248,7 @@ class Element implements RangeChecker {
      */
     Element replace (String regex, String replacement) {
         value = value.replaceAll(regex, replacement)
-        this
+	    return this
     }
 
     /**
@@ -251,22 +260,37 @@ class Element implements RangeChecker {
      * * @param variableName
      * @return
      */
-    Element init (String variableName) {
+    Element set (String variableName) {
         processor.addDynamicVariable(variableName, this)
+	    return this
     }
 
     /**
-     * Saves a new variable in the binding context in order to use it later
-     * It's used in this ETL script command
+     * Initialize an Element with a particular value
      * <code>
-     *     extract 3 transform with lowercase() initialize myVar
+     *     extract dependencyType initialize 'Runs On'
      * </code>
-     * * @param variableName
+     * * @param initValue
      * @return
      */
-    Element initialize (String variableName) {
-        init(variableName)
+    Element initialize (String initValue) {
+	    this.initValue = initValue
+	    return this
     }
+
+    /**
+     * Initialize an Element with a particular value
+     * <code>
+     *     extract dependencyType init 'Runs On'
+     * </code>
+     * * @param initValue
+     * @return
+     * @see Element#initialize(java.lang.String)
+     */
+    Element init (String initValue) {
+        return initialize(initValue)
+    }
+
     /**
      * Appends Element and String values from a ETL Script and assign result String value.
      * It's used in this ETL script command
@@ -286,7 +310,7 @@ class Element implements RangeChecker {
             }
         }
         this.value += newValue
-        this
+	    return this
     }
 
     /**
@@ -300,7 +324,7 @@ class Element implements RangeChecker {
      */
     Element plus (Element anotherElement) {
         this.value += anotherElement?.value
-        this
+	    return this
     }
 
     /**
@@ -314,7 +338,7 @@ class Element implements RangeChecker {
      */
     Element plus (String value) {
         this.value += value
-        this
+	    return this
     }
 
     /**

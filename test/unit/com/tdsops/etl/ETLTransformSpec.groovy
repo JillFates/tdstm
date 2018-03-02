@@ -626,7 +626,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() init myVar
+						extract 'vendor name' transform with lowercase() set myVar
 						extract 'location' transform with append(' - ', myVar) load description
 					}
 				""".stripIndent(),
@@ -714,7 +714,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 								
 					iterate {
-						extract 'vendor name' transform with lowercase() init myVar
+						extract 'vendor name' transform with lowercase() set myVar
 						extract 'location' transform with append(myVar + ' - ' + CE) load description
 					}
 				""".stripIndent(),
@@ -755,7 +755,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-					extract 'vendor name' transform with lowercase() initialize myVar
+					extract 'vendor name' transform with lowercase() set myVar
 					extract 'location' transform with append('-', myVar, '-' , CE ) load description
 				}""".stripIndent(),
 				ETLProcessor.class.name)
@@ -795,7 +795,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() initialize myVar
+						extract 'vendor name' transform with lowercase() set myVar
 						extract 'location' transform with append(' - ', myVar, ' - ') load description
 					}
 				""".stripIndent(),
@@ -836,7 +836,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() init myVar
+						extract 'vendor name' transform with lowercase() set myVar
 						extract 'location' transform with append(' - ', myVar) load description
 					}
 				""".stripIndent(),
