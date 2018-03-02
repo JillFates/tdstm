@@ -12,7 +12,7 @@ import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-opera
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
-import {DependencyBatchRecordDetailComponent} from '../dependency-batch-record-detail/dependency-batch-record-detail.component';
+import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -85,11 +85,10 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
 		// this.selectedBatchRecord = (cellClick as any).dataItem;
 		let selectedBatchRecord = (cellClick as any).dataItem;
-		this.dialogService.extra(DependencyBatchRecordDetailComponent, [
-				UIDialogService,
+		this.dialogService.extra(DependencyBatchRecordDetailDialogComponent, [
 				{provide: ImportBatchModel, useValue: this.importBatchModel},
 				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
-			]).then((result) => {
+			], false, false).then((result) => {
 				// ???
 			});
 	}

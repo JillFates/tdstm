@@ -120,7 +120,7 @@ export class DependencyBatchListComponent {
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		this.dialogService.open(DependencyBatchDetailDialogComponent, [
 			{ provide: ImportBatchModel, useValue: (cellClick as any).dataItem}
-		], DIALOG_SIZE.XLG, false).then(result => {
+		], DIALOG_SIZE.XXL, false).then(result => {
 			// silence is golden
 		}).catch(result => {
 			console.log('Dismissed Dialog');

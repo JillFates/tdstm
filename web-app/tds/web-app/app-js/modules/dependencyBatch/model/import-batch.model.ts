@@ -47,7 +47,7 @@ export class DependencyBatchColumnsModel {
 				property: 'action',
 				type: 'action',
 				width: 70,
-				locked: true,
+				locked: false,
 				cellStyle: {'text-align': 'center'}
 			},
 			{

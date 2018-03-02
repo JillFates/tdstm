@@ -6,19 +6,19 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 
 @Component({
 	selector: 'dependency-batch-record-detail',
-	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail/dependency-batch-record-detail.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component.html'
 })
-export class DependencyBatchRecordDetailComponent extends UIExtraDialog {
+export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 
 	// @Input('importBatch') importBatch: ImportBatchModel;
 	// @Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	// @Output('onCancel') cancelEvent = new EventEmitter<any>();
 
 	constructor(
-		private dialogService: UIDialogService,
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
-		private dependencyBatchService: DependencyBatchService) {
+		private dependencyBatchService: DependencyBatchService,
+		private dialogService: UIDialogService) {
 			super('#dependency-batch-record-detail');
 	}
 

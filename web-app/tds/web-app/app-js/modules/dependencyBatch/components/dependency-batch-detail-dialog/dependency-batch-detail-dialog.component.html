@@ -34,8 +34,9 @@
                                  Toolbar Template
                             -->
                             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <div class="col-sm-1 toolbar-button" style="margin-right: 10px;">
+                                <div class="col-sm-1 toolbar-button">
                                     <button (click)="onRevalidate()"
+                                            [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                             class="btn btn-default" type="button">
                                         <i class="glyphicon glyphicon-thumbs-up"></i>
                                         Revalidate
@@ -43,6 +44,7 @@
                                 </div>
                                 <div class="col-sm-1 toolbar-button">
                                     <button (click)="onIngore()"
+                                            [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                             class="btn btn-default" type="button">
                                         <i class="glyphicon glyphicon-eye-close"></i>
                                         Ignore
