@@ -1,4 +1,4 @@
-<div class="fields-filters row" style="margin-left: 10px;">
+<!--<div class="fields-filters row" style="margin-left: 10px;">
     <label class="col-sm-1" style="width: 40px;">Fields</label>
     <div class="fieldsFilter col-sm-2">
         <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
@@ -17,9 +17,61 @@
                placeholder="Filter on field name">
         <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
     </div>
-</div>
+</div>-->
 <div class="fields-container row" *ngIf="fieldsInfo">
-    <div class="row header">
+
+    <kendo-grid
+            [data]="importBatch.fieldNameList"
+            [pageSize]="25"
+            [height]="350">
+        <ng-template kendoGridToolbarTemplate [position]="'top'">
+            <label class="col-sm-1 text-left" style="margin-top: 5px; padding-right: 0px;">Fields</label>
+            <div class="fieldsFilter col-sm-2" style="padding-left: 0px; padding-right: 0px;">
+                <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
+                                    [data]="fieldsFilter.options"
+                                    [textField]="'text'"
+                                    [valueField]="'value'"
+                                    [(ngModel)]="fieldsFilter.selected"
+                                    placeholder="Filter"
+                                    class="form-control input-sm"></kendo-dropdownlist>
+            </div>
+            <div class="fieldsFilterText col-sm-3">
+                <input [(ngModel)]="fieldsFilter.text"
+                       type="text"
+                       class="form-control"
+                       name="fieldsFilterText"
+                       placeholder="Filter on field name">
+                <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+            </div>
+        </ng-template>
+        <kendo-grid-column title="Name">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <span>{{dataItem}}</span>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Current Value">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <span>{{fieldsInfo[dataItem].originalValue}}</span>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Import Value">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <span>{{fieldsInfo[dataItem].value}}</span>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Override Value">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <input type="text" style="width: 100%; height: 30px;" />
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Error">
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <span>{{fieldsInfo[dataItem].error ? fieldsInfo[dataItem].error : '' }}</span>
+            </ng-template>
+        </kendo-grid-column>
+    </kendo-grid>
+
+    <!--<div class="row header">
         <div class="col-sm-2">Name</div>
         <div class="col-sm-2">Current Value</div>
         <div class="col-sm-2">Import Value</div>
@@ -35,6 +87,7 @@
             <div class="col-sm-4"><small><i>{{fieldsInfo[fieldName].error ? fieldsInfo[fieldName].error : '' }}</i></small></div>
         </div>
     </div>
+    -->
     <style>
         .footer button {
             margin-right: 5px;
@@ -66,10 +119,6 @@
             <i class="glyphicon glyphicon-remove-circle"></i>
             Cancel
         </button>
-        <!--<div class="col-sm-1 pull-right"></div>-->
-        <!--<button (click)="onCancel()"-->
-                <!--class="btn btn-default btn-sm col-sm-1 pull-right" type="button">-->
-            <!--Cancel-->
-        <!--</button>-->
     </div>
+
 </div>

@@ -11,6 +11,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {Observable} from 'rxjs/Observable';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -131,8 +132,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.archiveImportBatches(ids).subscribe( result => {
-				if (result.status === 'success') {
+		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiReponseModel) => {
+				if (result.status === ApiReponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -147,8 +148,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onUnArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( result => {
-				if (result.status === 'success') {
+		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiReponseModel) => {
+				if (result.status === ApiReponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -163,8 +164,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onDeleteBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.deleteImportBatches(ids).subscribe( result => {
-				if (result.status === 'success') {
+		this.dependencyBatchService.deleteImportBatches(ids).subscribe( (result: ApiReponseModel) => {
+				if (result.status === ApiReponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
 					} else {
@@ -206,7 +207,33 @@ export class DependencyBatchListComponent {
 	 * @param item
 	 */
 	private onPlayButton(item: any): void {
-		// Not yet implemented ..
+		const ids = [item.id];
+		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiReponseModel) => {
+				if (result.status === ApiReponseModel.API_SUCCESS) {
+					this.reloadBatchList();
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+				}
+			},
+			(err) => this.handleError(err)
+		);
+	}
+
+	/**
+	 * On Eject action button clicked, start import batch.
+	 * @param item
+	 */
+	private onEjectButton(item: any): void {
+		const ids = [item.id];
+		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiReponseModel) => {
+				if (result.status === ApiReponseModel.API_SUCCESS) {
+					this.reloadBatchList();
+				} else {
+					this.handleError(result.errors ? result.errors[0] : null);
+				}
+			},
+			(err) => this.handleError(err)
+		);
 	}
 
 	/**
