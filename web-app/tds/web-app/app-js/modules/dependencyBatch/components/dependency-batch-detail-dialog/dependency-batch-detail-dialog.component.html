@@ -3,7 +3,7 @@
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
         </button>
-        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName.name}}</h4>
+        <h4 class="modal-title">Batch Detail - {{importBatchModel.id}} - {{importBatchModel.domainClassName}}</h4>
     </div>
     <div class="modal-body" style="height: 100%; overflow: auto;">
         <div class="modal-body-container">
@@ -14,6 +14,7 @@
             <section>
                 <div class="box-body box-with-empty-header">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
+                                [height]="310"
                                 [data]="dataGridOperationsHelper.gridData"
                                 [filter]="dataGridOperationsHelper.state.filter"
                                 [filterable]="true"

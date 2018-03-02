@@ -11,6 +11,7 @@ import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
 
 @Component({
 	selector: 'dependency-batch-detail-dialog',
@@ -44,10 +45,18 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( result => {
-			this.batchRecords = result;
-			this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
-		}, error => this.handleError(error));
+		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiReponseModel) => {
+			if (result.status === ApiReponseModel.API_SUCCESS) {
+				this.batchRecords = result.data;
+				this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
+			} else {
+				this.batchRecords = [];
+				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
+			}
+		}, error => {
+			this.batchRecords = [];
+			this.handleError(error);
+		});
 	}
 
 	/**
@@ -55,13 +64,13 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private prepareColumnsModel(): void {
 		this.columnsModel = new ImportBatchRecordDetailColumnsModel();
-		// TODO: use --> this.importBatchModel.fieldNameList;
-		const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
-		let fieldColumns: Array<GridColumnModel> = mock.map( field => {
+		// const mock: Array<string> = [ 'Name (P)', 'Type (P)', 'Dep Type (P)', 'Name (D)', 'Type (D)'];
+		let fieldColumns: Array<GridColumnModel> = this.importBatchModel.fieldNameList.map( field => {
 			const column: GridColumnModel = new GridColumnModel();
 			column.label = field;
-			column.property = `fields.${field}`;
+			column.property = `currentValues.${field}`;
 			column.width = 130;
+			column.cellStyle = {'max-height': '20px'};
 			return column;
 		});
 		this.columnsModel.columns = this.columnsModel.columns.concat(fieldColumns);
@@ -73,6 +82,15 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 */
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
 		this.selectedBatchRecord = (cellClick as any).dataItem;
+		// this.dialogService.extra(DataScriptEtlBuilderComponent, [
+		// 		UIDialogService,
+		// 		{provide: DataScriptModel, useValue: this.dataScriptModel}
+		// 	]).then((result) => {
+		// 		if (result.updated) {
+		// 			this.etlScriptCode.updated = result.updated;
+		// 			this.etlScriptCode.code = result.newEtlScriptCode;
+		// 		}
+		// 	});
 	}
 
 	/**

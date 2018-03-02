@@ -21,9 +21,9 @@
             <div class="col-sm-2">{{importBatch.id}}</div>
             <div class="col-sm-2">{{importBatch.dateCreated}}</div>
             <div class="col-sm-2">{{importBatch.createdBy}}</div>
-            <div class="col-sm-2">{{importBatch.domainClassName.name}}</div>
+            <div class="col-sm-2">{{importBatch.domainClassName}}</div>
             <div class="col-sm-2">{{importBatch.datascript?.name}}</div>
-            <div class="col-sm-2">{{importBatch.status}}</div>
+            <div class="col-sm-2">{{importBatch.status.label}}</div>
         </div>
     </div>
     <div>
@@ -35,10 +35,10 @@
             <div class="col-sm-2">Source Row</div>
         </div>
         <div class="row">
-            <div class="col-sm-2">{{batchRecord.status}}</div>
+            <div class="col-sm-2">{{batchRecord.status.label}}</div>
             <div class="col-sm-2">{{batchRecord.errorCount}}</div>
             <div class="col-sm-2">{{batchRecord.operation}}</div>
-            <div class="col-sm-2">{{batchRecord.sourceRow}}</div>
+            <div class="col-sm-2">{{batchRecord.sourceRowId}}</div>
         </div>
     </div>
 </div>
