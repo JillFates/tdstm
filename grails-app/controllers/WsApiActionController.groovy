@@ -76,14 +76,13 @@ class WsApiActionController implements ControllerMethods {
     }
 
     /**
-     * Update the corresponding ApiAction.
+     * Update the ApiAction domain object with values present in the ApiActionCommand object
+     * @return a Map of the ApiAction record that was updated
      */
     @HasPermission(Permission.ActionEdit)
     def update(Long id) {
-        // TODO: DMC For PUT command does populate the command objects properly
-        // SEE: https://github.com/grails/grails-core/issues/9172
-        ApiActionCommand apiActionCommand = populateCommandObject(ApiActionCommand)
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand, id)
+        ApiActionCommand command = populateCommandObject(ApiActionCommand)
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(command, id, domainVersion)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 

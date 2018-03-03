@@ -21,6 +21,10 @@ String appName = this.appName ?: null
 
 grails.config.locations = []
 
+// Change the bindData default so that it doesn't automatically convert blanks to null when storing in the database
+// See http://docs.grails.org/latest/guide/theWebLayer.html#dataBinding
+grails.databinding.convertEmptyStringsToNull = false
+
 List candidates = []
 String configManagerFile = null
 String configFileFromJavaOpts = System.getProperty("${appName}.config.location")
@@ -349,7 +353,7 @@ tdsops.buildFile = "/build.txt"
 //tdstm.security.auditLogging = "access"
 
 tdstm {
-	
+
 }
 
 grails {
