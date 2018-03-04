@@ -22,10 +22,10 @@ id
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					read labels
-					
+
 					iterate {
 						extract 1 load id
-					}						
+					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
