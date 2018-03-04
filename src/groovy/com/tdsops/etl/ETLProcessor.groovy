@@ -181,7 +181,7 @@ class ETLProcessor implements RangeChecker {
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
-				to--
+				to
 				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
@@ -222,6 +222,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
+		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))

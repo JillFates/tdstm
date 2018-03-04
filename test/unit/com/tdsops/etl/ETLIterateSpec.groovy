@@ -226,7 +226,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
-			etlProcessor.currentRowIndex == 2
+			etlProcessor.currentRowIndex == 3
 	}
 
 	void 'test can throw an exception when iterates over an invalid range of data source rows'() {
@@ -264,7 +264,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			e = thrown ETLProcessorException
-			e.message == "Invalid to parameter = 8"
+			e.message == "Invalid to parameter = 9"
 
 	}
 
@@ -335,16 +335,16 @@ class ETLIterateSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-								read labels
-								iterate {
-									domain Application
-									extract 'application id' load id
-									extract 'vendor name' load appVendor
+					read labels
+					iterate {
+						domain Application
+						extract 'application id' load id
+						extract 'vendor name' load appVendor
 									
-									domain Device
-									extract 'device id' load id
-									extract 'model name' load name
-								}""".stripIndent(),
+						domain Device
+						extract 'device id' load id
+						extract 'model name' load name
+					}""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain domain results associated'
@@ -396,6 +396,195 @@ class ETLIterateSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
+
+	void 'test can load fields with more than one iteration'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,technology,location,device id,model name,manufacturer name
+				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
+				152256,Mozilla,NGM,ACME Data Center,1523,ZPHA MODULE,TippingPoint
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						extract 'application id' load id
+						extract 'vendor name' load appVendor
+					}
+
+					iterate {
+						domain Device
+						extract 'device id' load id
+						extract 'model name' load name
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 2
+			with(etlProcessor.result.domains[0]) {
+				domain == 'Application'
+				with(data[0].fields.id) {
+					value == '152255'
+					originalValue == '152255'
+				}
+
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
+				}
+
+				with(data[1].fields.id) {
+					value == '152256'
+					originalValue == '152256'
+				}
+
+				with(data[1].fields.appVendor) {
+					value == 'Mozilla'
+					originalValue == 'Mozilla'
+				}
+			}
+
+			with(etlProcessor.result.domains[1]) {
+				domain == 'Device'
+				with(data[0].fields.id) {
+					value == '1522'
+					originalValue == '1522'
+				}
+
+				with(data[0].fields.name) {
+					value == 'SRW24G1'
+					originalValue == 'SRW24G1'
+				}
+
+				with(data[1].fields.id) {
+					value == '1523'
+					originalValue == '1523'
+				}
+
+				with(data[1].fields.name) {
+					value == 'ZPHA MODULE'
+					originalValue == 'ZPHA MODULE'
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can load fields combining iterators'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,technology,location,device id,model name,manufacturer name
+				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
+				152256,Mozilla,NGM,ACME Data Center,1523,ZPHA MODULE,TippingPoint
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						extract 'application id' load id
+						extract 'vendor name' load appVendor
+					}
+
+					from 1 to 2 iterate {
+						domain Device
+						extract 'device id' load id
+						extract 'model name' load name
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 2
+			with(etlProcessor.result.domains[0]) {
+				domain == 'Application'
+				with(data[0].fields.id) {
+					value == '152255'
+					originalValue == '152255'
+				}
+
+				with(data[0].fields.appVendor) {
+					value == 'Microsoft'
+					originalValue == 'Microsoft'
+				}
+
+				with(data[1].fields.id) {
+					value == '152256'
+					originalValue == '152256'
+				}
+
+				with(data[1].fields.appVendor) {
+					value == 'Mozilla'
+					originalValue == 'Mozilla'
+				}
+			}
+
+			with(etlProcessor.result.domains[1]) {
+				domain == 'Device'
+				with(data[0].fields.id) {
+					value == '1522'
+					originalValue == '1522'
+				}
+
+				with(data[0].fields.name) {
+					value == 'SRW24G1'
+					originalValue == 'SRW24G1'
+				}
+
+				with(data[1].fields.id) {
+					value == '1523'
+					originalValue == '1523'
+				}
+
+				with(data[1].fields.name) {
+					value == 'ZPHA MODULE'
+					originalValue == 'ZPHA MODULE'
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
 }
