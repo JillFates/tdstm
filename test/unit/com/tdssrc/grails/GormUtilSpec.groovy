@@ -21,16 +21,23 @@ import spock.lang.Unroll
  */
 class GormUtilSpec extends Specification {
 
-	void 'Test isDomainProperty'() {
+	void '1. Test isDomainProperty'() {
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:
 			GormUtil.isDomainProperty(asset, 'assetName')
 			GormUtil.isDomainProperty(asset, 'id')
 			!GormUtil.isDomainProperty(asset, 'bogusPropertyName')
+			GormUtil.isDomainProperty(AssetEntity, 'assetName')
+			!GormUtil.isDomainProperty(AssetEntity, 'bogusPropertyName')
+
+		when: 'called with a non-domain class'
+			GormUtil.isDomainProperty(Specification, 'NotADomainClass')
+		then: 'an exception is thrown'
+			thrown RuntimeException
 	}
 
-	void 'Test getDomainPropertyType'() {
+	void '2. Test getDomainPropertyType'() {
 		when:
 			AssetEntity asset = new AssetEntity()
 		then:
@@ -43,7 +50,7 @@ class GormUtilSpec extends Specification {
 			!GormUtil.getDomainPropertyType(asset, 'bogusPropertyName')
 	}
 
-	void 'Test getDomainPropertyType for a Class.'() {
+	void '3. Test getDomainPropertyType for a Class.'() {
 		expect:
 			GormUtil.getDomainPropertyType(clazz, property) == type
 		where:
@@ -55,7 +62,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #clazz is a DomainClass'() {
+	void '4. test if #clazz is a DomainClass'() {
 		expect:
 			GormUtil.isDomainClass(clazz) == isDomainClass
 
@@ -72,7 +79,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #instance instance is a DomainClass'() {
+	void '5. test if #instance instance is a DomainClass'() {
 		expect:
 			GormUtil.isDomainClass(instance) == isDomainClass
 
@@ -89,7 +96,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a valid property for a DomainClass'() {
+	void '6. test if #propertyName is a valid property for a DomainClass'() {
 		expect:
 			GormUtil.isDomainProperty(instance, propertyName) == isDomainClass
 
@@ -103,7 +110,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a valid property for #clazz DomainClass'() {
+	void '7. test if #propertyName is a valid property for #clazz DomainClass'() {
 		expect:
 			GormUtil.isDomainProperty(clazz, propertyName) == isDomainClass
 
@@ -116,29 +123,25 @@ class GormUtilSpec extends Specification {
 			Person      | 'firstName'  || true
 	}
 
-	void 'test can throw an exception if it ask for a property in a not DomainClass'() {
+	void '8. test can throw an exception if it ask for a property in a not DomainClass'() {
 
 		given:
 			Class clazz = ApiActionResponse.class
 
-		when: 'It tries to evaluate a property for a clazz'
+		when: 'trying to evaluate a property for a non-domain Class'
 			GormUtil.isDomainProperty(clazz, 'assetType')
+		then: 'an exception should be thrown'
+			thrown RuntimeException
 
-		then: 'An exception is thrown'
-			GrailsDomainException e = thrown GrailsDomainException
-			e.message == 'Identity property not found, but required in domain class [net.transitionmanager.integration.ApiActionResponse]'
-
-		when: 'It tries to evaluate a property for an clazz'
+		when: 'trying to evaluate a property for non-domain class instance'
 			GormUtil.isDomainProperty(new ApiActionResponse(), 'assetType')
-
-		then: 'An exception is thrown'
-			e = thrown GrailsDomainException
-			e.message == 'Identity property not found, but required in domain class [net.transitionmanager.integration.ApiActionResponse]'
+		then: 'an exception should be thrown'
+			thrown RuntimeException
 
 	}
 
 	@Unroll
-	void 'test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
+	void '9. test can return a GrailsDomainClassProperty for #propertyName and #clazz DomainClass'() {
 		expect:
 			GrailsDomainClassProperty grailsDomainClassProperty = GormUtil.getDomainProperty(clazz, propertyName)
 			grailsDomainClassProperty.name == name
@@ -155,7 +158,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a property for a and instance of a DomainClass is an identifier'() {
+	void '10. test if #propertyName is a property for an instance of a DomainClass and is an identifier'() {
 		expect:
 			GormUtil.isDomainIdentifier(instance, propertyName) == isDomainIdentifier
 
@@ -169,7 +172,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a property for a DomainClass is an identifier'() {
+	void '11. test if #propertyName is a property for a DomainClass is an identifier'() {
 		expect:
 			GormUtil.isDomainIdentifier(clazz, propertyName) == isDomainIdentifier
 
@@ -183,7 +186,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a property for a and instance of a DomainClass is a reference'() {
+	void '12. test if #propertyName is a property for a and instance of a DomainClass is a reference'() {
 		expect:
 			GormUtil.isReferenceProperty(instance, propertyName) == isReferenceProperty
 
@@ -197,7 +200,7 @@ class GormUtilSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test if #propertyName is a property for a #clazz DomainClass is a reference'() {
+	void '13. test if #propertyName is a property for a #clazz DomainClass is a reference'() {
 		expect:
 			GormUtil.isReferenceProperty(clazz, propertyName) == isReferenceProperty
 
@@ -210,4 +213,19 @@ class GormUtilSpec extends Specification {
 			Room        | 'roomName'   || false
 			Person      | 'id'         || false
 	}
+
+	void '14. test the getDomainClass'() {
+		when: 'getDomainClass is called for a domain class'
+			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+		then: 'a DefaultGrailsDomainClass should be returned'
+			'org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass' == dc.getClass().getName()
+		and: 'the name should be AssetEntity'
+			'AssetEntity' == dc.name
+
+		when: 'getDomainClass is called for a non-domain class'
+			dc = GormUtil.getDomainClass(spock.lang.Specification)
+		then: 'an exception should occur'
+			thrown RuntimeException
+	}
+
 }
