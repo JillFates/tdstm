@@ -394,20 +394,34 @@ public class GormUtil {
 	/**
 	 * Validates if a property is an identifier for a domain class
 	 * @param clazz a Class to be used in the identifier detection
-	 * @param propertyName a String with the peroperty name to be used in the validation
+	 * @param propertyName a String with the property name to be used in the validation
 	 * @return tru if property is an identifier for clazz parameter
 	 */
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
 		getDomainClass(clazz)?.identifier.name == propertyName
 	}
 
+	/**
+	 * Validates if a property is an identifier for a domain class instance
+	 * @param clazz a Class to be used in the identifier detection
+	 * @param propertyName a String with the property name to be used in the validation
+	 * @return tru if property is an identifier for clazz parameter
+	 */
+	static boolean isDomainIdentifier(Object domainInstance, String propertyName){
+		getDomainClass(domainInstance.getClass())?.identifier.name == propertyName
+	}
+
 	static boolean hasStringId(Class clazz) {
 		getDomainClass(clazz).identifier.type == String
 	}
 
-	static GrailsDomainClass getDomainClass(Class clazz) {
-		// TODO Assert.isTrue(app.isDomainClass(clazz))
-		(GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, clazz.name)
+	/**
+	 *
+	 * @param domainClass
+	 * @return
+	 */
+	static GrailsDomainClass getDomainClass(Class domainClass) {
+		return new DefaultGrailsDomainClass(domainClass)
 	}
 
 	private static GrailsApplication getGrailsApplication() {
@@ -421,11 +435,21 @@ public class GormUtil {
 	 * @return true if the property exists otherwise false
 	 */
 	static boolean isDomainProperty(Object domainObject, String propertyName) {
-		boolean valid=false
-		if (propertyName && domainObject) {
-			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
-		}
-		return valid
+		return isDomainProperty(domainObject.getClass(), propertyName)
+	}
+
+	/**
+	 * Checks if a property name is a valid domain property.
+	 * It could be part of the persistent property or an indentifier.
+	 * In both cases it returs null. Otherwise it returns false.
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isDomainProperty(Class domainClass, String propertyName) {
+		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
+		return grailsDomainClass.hasPersistentProperty(propertyName) ||
+			grailsDomainClass.identifier.name == propertyName
 	}
 
 	/**
@@ -434,10 +458,8 @@ public class GormUtil {
 	 * @return true if the object is a Domain class otherwise false
 	 */
 	static boolean isDomainClass(Class domainClass) {
-		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
-		return grailsApp.isDomainClass( domainClass )
-//		return grailsApp.isDomainClass( domainObj.getClass() )
-		//org.codehaus.groovy.grails.commons.isDomainClass(domainClass)
+		return DomainClassArtefactHandler.isDomainClass(domainClass)
+
 	}
 
 	/**
@@ -475,10 +497,8 @@ public class GormUtil {
 			println "getDomainProperty() domainClass=${domainClass.getName()}"
 			throw new RuntimeException('Called with non-domain class parameter')
 		}
-
-		def d = new DefaultGrailsDomainClass(domainClass)
+		def d = getDomainClass(domainClass)
 		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
-
 		return cp
 	}
 
@@ -1053,7 +1073,7 @@ public class GormUtil {
 	 * Determine if a domain property represents a referenced class type or if the property is an association
 	 * @param domainObject
 	 * @param propertyName
-	 * @return
+	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
 	 */
 	static boolean isReferenceProperty(Object domainObject, String propertyName) {
 		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
