@@ -369,7 +369,7 @@ trait ControllerMethods {
 		if (! co.validate()) {
 			String msg = GormUtil.allErrorsString(co)
 			// Call the invalidParamExceptionHandler
-			invalidParamExceptionHandler(new InvalidParamException(msg))
+			throw new InvalidParamException(msg)
 		}
 	}
 	/**
