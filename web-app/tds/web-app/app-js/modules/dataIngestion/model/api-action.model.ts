@@ -50,8 +50,8 @@ export class APIActionColumnModel {
 				format: '{0:d}',
 				width: 160
 			}, {
-				label: 'Last Modified',
-				property: 'lastModified',
+				label: 'Last Updated',
+				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
 				width: 160
@@ -138,7 +138,7 @@ export class APIActionModel {
 	};
 	producesData?: boolean;
 	dateCreated?: Date;
-	lastModified?: Date;
+	lastUpdated?: Date;
 	credential?: {
 		id?: number,
 		name?: string

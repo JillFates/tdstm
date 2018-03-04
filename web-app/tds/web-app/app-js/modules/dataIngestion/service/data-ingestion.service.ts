@@ -66,7 +66,7 @@ export class DataIngestionService {
 				dataScriptModels.forEach((r) => {
 					r.agentMethod = {name: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 					r.producesData = (r.producesData === 1);
 					r.polling = {
 						frequency: {
