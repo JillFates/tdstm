@@ -597,6 +597,26 @@ class GormUtilIntegrationSpec extends Specification {
 
 	}
 
+	void '24. test the getDomainClass'() {
+		// Note that these are duplicated in Unit since this method works differently in Unit vs all other modes
+		when: 'getDomainClass is called for a domain class'
+			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+		then: 'a DefaultGrailsDomainClass should be returned'
+			'org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass' == dc.getClass().getName()
+		and: 'the name should be AssetEntity'
+			'AssetEntity' == dc.name
+
+		when: 'getDomainClass is called for a non-domain class'
+			GormUtil.getDomainClass(spock.lang.Specification)
+		then: 'an exception should occur'
+			thrown RuntimeException
+
+		when: 'getDomainClass is called with a null value'
+			GormUtil.getDomainClass(null)
+		then: 'an exception should occur'
+			thrown RuntimeException
+	}
+
 }
 
 /**

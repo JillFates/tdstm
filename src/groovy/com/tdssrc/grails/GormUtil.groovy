@@ -423,6 +423,9 @@ public class GormUtil {
 	 * @return
 	 */
 	static GrailsDomainClass getDomainClass(Class domainClass) {
+		if (domainClass == null) {
+			thrown RuntimeException('getDomainClass() called with null class argument')
+		}
 		def ctx = ApplicationContextHolder.getApplicationContext()
 		if (ctx) {
 			String name = domainClass.getName() + 'DomainClass'

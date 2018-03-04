@@ -19,7 +19,7 @@ import spock.lang.Unroll
 /**
  * Unit test cases for the GormUtil class
  */
-class GormUtilSpec extends Specification {
+class GormUtilUnitSpec extends Specification {
 
 	void '1. Test isDomainProperty'() {
 		when:
@@ -223,9 +223,15 @@ class GormUtilSpec extends Specification {
 			'AssetEntity' == dc.name
 
 		when: 'getDomainClass is called for a non-domain class'
-			dc = GormUtil.getDomainClass(spock.lang.Specification)
+			GormUtil.getDomainClass(spock.lang.Specification)
 		then: 'an exception should occur'
 			thrown RuntimeException
+
+		when: 'getDomainClass is called with a null value'
+			GormUtil.getDomainClass(null)
+		then: 'an exception should occur'
+			thrown RuntimeException
+
 	}
 
 }
