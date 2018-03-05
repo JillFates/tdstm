@@ -7,15 +7,24 @@ import net.transitionmanager.service.InvalidParamException
 import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
+import spock.lang.Unroll
+
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.codehaus.groovy.grails.exceptions.GrailsDomainException
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
 import com.tds.asset.AssetDependency
 import net.transitionmanager.domain.PartyRelationship
 
+import com.tds.asset.Database
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.domain.Notice
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Rack
+import net.transitionmanager.domain.Room
 import net.transitionmanager.domain.Workflow
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import grails.validation.Validateable
@@ -46,22 +55,18 @@ class GormUtilIntegrationSpec extends Specification {
 
 	def "2. Test the getConstraintMaxSize"() {
 		// Positive test first
-		when:
-			AssetDependency domain = new AssetDependency()
-			String prop = 'comment'
-
-		then: 'Accessing a property that has the constraint should return a value'
-			0 < GormUtil.getConstraintMaxSize(domain, prop)
+		expect: 'Accessing a property that has the constraint should return a value'
+			65535 == GormUtil.getConstraintMaxSize(Notice, 'rawText')
 
 		//
 		when: 'testing the various negative test cases'
-			size = GormUtil.getConstraintMaxSize(AssetDependency, 'asset')
+			def size = GormUtil.getConstraintMaxSize(AssetDependency, 'asset')
 		then: 'Passing a property that does not have the maxSize constraint should return a null'
 			size == null
 		//	ex = thrown()
 		//	ex.message.contains('does not have the maxSize constraint')
 
-// TODO : Burt rewrote the above test case that needs to be validated
+		// TODO : Burt rewrote the above test case that needs to be validated
 		/*
 		when:
 			GormUtil.getConstraintMaxSize(AssetDependency, 'nonExistentProperty')
@@ -73,10 +78,9 @@ class GormUtilIntegrationSpec extends Specification {
 		when: 'Passing a non-domain'
 			GormUtil.getConstraintMaxSize(Date, 'foo')
 		then: 'an exception should thrown'
-			ex = thrown()
-			ex.message.contains('A non-domain class parameter was provided')
+			def ex = thrown(RuntimeException)
+			//ex.message.contains('A non-domain class parameter was provided')
 
-		then: 'Passing a property that does not have the maxSize constraint should throw an exception'
 
 	}
 	/*
@@ -169,16 +173,16 @@ class GormUtilIntegrationSpec extends Specification {
 
 	def '9. Test getConstrainedProperty'() {
 		when:
-			ConstrainedProperty cp = GormUtil.getConstrainedProperty(Person, 'firstName')
+			ConstrainedProperty cp = GormUtil.getConstrainedProperty(Credential, 'name')
 			Range range = cp.getAppliedConstraint('size').getRange()
 		then:
 			range.from == 1
-			range.to > 1
-
-			cp.getAppliedConstraint('blank').isBlank() == false
+			range.to == 255
+		and: 'property does not have blank constraint'
+			cp.getAppliedConstraint('blank') == null
 
 		when:
-			cp = GormUtil.getConstrainedProperty(Person, 'lastName')
+			cp = GormUtil.getConstrainedProperty(Credential, 'description')
 		then:
 			cp.getAppliedConstraint('blank').isBlank() == true
 
@@ -204,10 +208,10 @@ class GormUtilIntegrationSpec extends Specification {
 			props.contains('type')
 
 		when: 'Checking the maxSize Constraint'
-			cp = GormUtil.getConstraint(DataTransferBatch, 'importResults', 'maxSize')
+			cp = GormUtil.getConstraint(Notice, 'rawText', 'maxSize')
 		then:
 			cp != null
-			cp.getMaxSize() > 16380000
+			cp.getMaxSize() == 65535
 	}
 
 	def '11. Test getConstraintUniqueProperties'() {
@@ -231,7 +235,7 @@ class GormUtilIntegrationSpec extends Specification {
 			GormUtil.canDomainPropertyBeReplaced(PartyRelationship, 'partyIdFrom') == false
 
 			// Test a property that has a unique constraint on it
-			GormUtil.canDomainPropertyBeReplaced(MoveEventStaff, 'person') == false
+			GormUtil.canDomainPropertyBeReplaced(Credential, 'name') == false
 
 	}
 
@@ -580,19 +584,40 @@ class GormUtilIntegrationSpec extends Specification {
         then: 'it should have errors'
             ! tvc.validate() & tvc.hasErrors()
 		and: 'the error message should be about the age being out of range, defaulting to US'
-            ['Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'] == 
-				GormUtil.validateErrorsI18n(tvc)
+			GormUtil.validateErrorsI18n(tvc).contains(
+				'Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'
+			)
 		and: 'the error should also translate to Spanish'
-			['Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'] == 
-				GormUtil.validateErrorsI18n(tvc, new Locale('es'))
+			GormUtil.validateErrorsI18n(tvc, new Locale('es')).contains(
+				'Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'
+			)
 			// TODO : JM 2/2018 : TM-9197 : Fix to support proper localization
-			// ['La propiedad age de la clase TestValidatableCommand con valor [120] no entra en el rango válido de [1] a [110]'] == 
+			// ['La propiedad age de la clase TestValidatableCommand con valor [120] no entra en el rango válido de [1] a [110]'] ==
 			// 	GormUtil.validateErrorsI18n(tvc, new Locale('es'))
 
 	}
 
-}
+	void '24. test the getDomainClass'() {
+		// Note that these are duplicated in Unit since this method works differently in Unit vs all other modes
+		when: 'getDomainClass is called for a domain class'
+			def dc = GormUtil.getDomainClass(com.tds.asset.AssetEntity)
+		then: 'a DefaultGrailsDomainClass should be returned'
+			'org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass' == dc.getClass().getName()
+		and: 'the name should be AssetEntity'
+			'AssetEntity' == dc.name
 
+		when: 'getDomainClass is called for a non-domain class'
+			GormUtil.getDomainClass(spock.lang.Specification)
+		then: 'an exception should occur'
+			thrown RuntimeException
+
+		when: 'getDomainClass is called with a null value'
+			GormUtil.getDomainClass(null)
+		then: 'an exception should occur'
+			thrown RuntimeException
+	}
+
+}
 
 /**
  * used in conjunction with the validation function tests
@@ -600,10 +625,14 @@ class GormUtilIntegrationSpec extends Specification {
 @Validateable
 class TestValidatableCommand {
     String name
+	String title
     Integer age
+	Integer maxSizeProp
 
     static constraints = {
         name blank:false, inList:['Tom', 'Dick', 'Harry']
+		title blank: true
         age range:1..110
+		maxSizeProp maxSize:500
     }
 }

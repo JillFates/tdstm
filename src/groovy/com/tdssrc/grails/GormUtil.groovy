@@ -387,7 +387,7 @@ public class GormUtil {
 		getDomainClass(clazz).persistentProperties.findAll { it.isPersistent() && !notToUpdateNames.contains(it.name) }
 	}
 
-// TODO : JPM copyUnsetValues - reverse the from/to parameters
+	// TODO : JPM copyUnsetValues - reverse the from/to parameters
 
 	/**
 	 * Used to clone persistent properties from one domain object to another with ability to
@@ -424,7 +424,7 @@ public class GormUtil {
 	 * @return tru if property is an identifier for clazz parameter
 	 */
 	static boolean isDomainIdentifier(Object domainInstance, String propertyName){
-		getDomainClass(domainInstance.getClass())?.identifier.name == propertyName
+		isDomainIdentifier(domainInstance.getClass(), propertyName)
 	}
 
 	static boolean hasStringId(Class clazz) {
@@ -432,11 +432,21 @@ public class GormUtil {
 	}
 
 	/**
-	 *
+	 * Used to retrieve an instance of the specified Domain class. This will work differently
+	 * in Unit tests than in Integration or production. In the latter two, there is an instance of the
+	 * domain class loaded as a bean so that is used but for Unit tests a new instance is created for each invocation.
 	 * @param domainClass
 	 * @return
 	 */
 	static GrailsDomainClass getDomainClass(Class domainClass) {
+		if (domainClass == null) {
+			throw new RuntimeException('getDomainClass() called with null class argument')
+		}
+		def ctx = ApplicationContextHolder.getApplicationContext()
+		if (ctx) {
+			String name = domainClass.getName() + 'DomainClass'
+			return ctx.getBean(name)
+		}
 		return new DefaultGrailsDomainClass(domainClass)
 	}
 
@@ -497,9 +507,7 @@ public class GormUtil {
 			throw new RuntimeException('persistentProperties called with non-domain object')
 		}
 
-		def d = new DefaultGrailsDomainClass(domain.class)
-
-		return d.persistentProperties.name
+		return getDomainClass(domain.class).persistentProperties.name
 	}
 
 	/**
@@ -530,7 +538,7 @@ public class GormUtil {
 	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
 		List<GrailsDomainClassProperty> domainProperties = []
 		boolean allProperties = false
-		DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+		DefaultGrailsDomainClass dfdc = getDomainClass(domainClass)
 		if (properties) {
 			for (String property in properties) {
 				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
