@@ -380,9 +380,6 @@ export class APIActionViewEditComponent implements OnInit {
 			this.validInfoForm = this.apiActionForm.valid &&
 				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
 
-			if (this.apiActionModel.producesData) {
-				this.validInfoForm = this.validInfoForm && this.apiActionModel.defaultDataScript.id !== 0;
-			}
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {
 					if (this.apiActionForm.controls[i]) {
