@@ -219,6 +219,7 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetDependency, global: true)
+			AssetDependency.getName() >> { 'com.tds.asset.AssetDependency' }
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
 			}
@@ -1173,6 +1174,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() { 'AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}

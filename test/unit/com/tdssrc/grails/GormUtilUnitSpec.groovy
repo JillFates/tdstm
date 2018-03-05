@@ -225,12 +225,15 @@ class GormUtilUnitSpec extends Specification {
 		when: 'getDomainClass is called for a non-domain class'
 			GormUtil.getDomainClass(spock.lang.Specification)
 		then: 'an exception should occur'
-			thrown RuntimeException
+			RuntimeException e = thrown RuntimeException
+			e.message == 'Identity property not found, but required in domain class [spock.lang.Specification]'
 
 		when: 'getDomainClass is called with a null value'
 			GormUtil.getDomainClass(null)
 		then: 'an exception should occur'
-			thrown RuntimeException
+			e = thrown RuntimeException
+			e.message == 'getDomainClass() called with null class argument'
+
 
 	}
 
