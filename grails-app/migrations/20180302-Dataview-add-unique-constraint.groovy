@@ -8,7 +8,6 @@ databaseChangeLog = {
 		comment("If there are already duplicated records for the same name + project_id, rename after applying the constraint.")
 		grailsChange{
 			change{
-				println 'THIS IS INNNNN'
 				// Check for duplicate records for name and project_id
 				List duplicateRecords = sql.rows('''
 					select count(*), name 
@@ -17,7 +16,6 @@ databaseChangeLog = {
 					having count(*) > 1
 					''')
 				if (duplicateRecords.size() > 0) {
-					println ${duplicateRecords}
 					// This logic will rename duplicates, so we can apply the constraint after
 					int i = 1
 					for (data in duplicateRecords) {
@@ -48,8 +46,7 @@ databaseChangeLog = {
  * @param sql
  */
 void renameDuplicateColumns(sql) {
-
-	println 'THIS IS INNNNN'
+	
 	// Check for duplicate records for name and project_id
 	List duplicateRecords = sql.rows('''
 					select count(*), name 
@@ -58,7 +55,6 @@ void renameDuplicateColumns(sql) {
 					having count(*) > 1
 					''')
 	if (duplicateRecords.size() > 0) {
-		println ${duplicateRecords}
 		// This logic will rename duplicates, so we can apply the constraint after
 		int i = 1
 		for (data in duplicateRecords) {
