@@ -574,11 +574,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
+					
 						extract 'vendor name' 
+						
 						if ( CE == 'Microsoft'){
-							load appVendor
+							load appVendor with CE
 						} else {
-							load environment
+							load environment with 'Production'
 						}
 					}
 				""".stripIndent(),
@@ -970,9 +972,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					read labels
-					domain Application
 					iterate {
-						initialize appVendor with 'Apple' 
+						domain Application
+						initialize appVendor with 'Apple'
 						extract 'vendor name' load appVendor
 					}
 				""".stripIndent(),
@@ -1021,9 +1023,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					read labels
-					domain Application
 					iterate {
-						extract 'vendor name' initialize 'Apple' load appVendor
+						domain Application
+						extract 'vendor name' initialize 'Apple'
+						 
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
