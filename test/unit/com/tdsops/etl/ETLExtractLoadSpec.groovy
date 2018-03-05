@@ -967,9 +967,8 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 		then: 'Results should contain Rack domain results associated'
 			etlProcessor.result.domains.size() == 1
 
-
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can evaluate a value loaded into the DOMAIN.property'() {
@@ -1028,6 +1027,43 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					originalValue == 'Development'
 				}
 			}
+	}
+
+	void 'test can throw an exception if an domain is not specified'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator)
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+
+					iterate {
+						extract 1 load id
+					}
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown()
+			e.message == 'A domain must be specified'
+
+		cleanup:
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
