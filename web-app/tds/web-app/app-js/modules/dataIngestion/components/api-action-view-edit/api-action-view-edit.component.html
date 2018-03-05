@@ -236,7 +236,7 @@
 											<popup-provides-data></popup-provides-data>
 										</div>
 										<div class="form-group intervals-content">
-											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}: <span style="color: red;" *ngIf="modalType !== actionTypes.VIEW && apiActionModel.producesData">*</span></label>
+											<label for="apiActionDefaultDataScript" class="col-sm-4 control-label">Default {{'DATA_INGESTION.DATA_SCRIPT' | translate }}:</label>
 											<div class="col-sm-7" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist
 																	id="apiActionDefaultDataScript" name="apiActionDefaultDataScript" class="form-control"
@@ -245,8 +245,8 @@
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
 																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
-																	[required]="apiActionModel.producesData && apiActionModel.defaultDataScript && apiActionModel.defaultDataScript.id != 0"
-																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript && apiActionModel.defaultDataScript.id == 0}"></kendo-dropdownlist>
+																	[required]="apiActionModel.producesData"
+																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
                                                 <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
