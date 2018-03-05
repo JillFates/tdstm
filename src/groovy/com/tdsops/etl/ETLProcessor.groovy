@@ -227,7 +227,7 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor ignore (String label) {
 
 		if('row'.equalsIgnoreCase(label)){
-			result.ignoreCurrentRow(currentRowIndex)
+			result.ignoreCurrentRow()
 			debugConsole.info("Ignore rows for ${currentRowIndex}")
 		}
 
