@@ -498,4 +498,162 @@ class DataImportService implements ServiceMethods {
 		return DataImportHelper.getAndValidateDomainId(rowData, importContext)
 	}
 
+	/**
+	 * Used to update the ImportBatch to the Running status
+	 * @param id - the ID of the batch to be updated
+	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
+	 */
+	@NotTransactional()
+	private void setBatchToRunning(ImportBatch batch) {
+		ImportBatch.withNewTransaction { session ->
+
+			// Let's lock the batch for a moment so we can check out if it is okay to start
+			// processing this batch.
+			batch.project.lock()
+
+			// Now make sure nobody altered the batch in the meantime
+			// Can only start running a batch if it was QUEUED or PENDING
+			if ( [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.PENDING].contains(batch.status) ) {
+				throw new DomainUpdateException('Unable to process batch due to change in status')
+			}
+
+			// Check to see if there are any other batches in the RUNNING state
+			int count = ImportBatch.where{
+				project.id == batch.project.id
+				status == ImportBatchStatusEnum.RUNNING
+			}.count()
+
+			if (count > 0) {
+				throw new DomainUpdateException('Another batch is running, please try again later')
+			}
+
+			// Update the batch to the RUNNING state
+			batch.with {
+				status = ImportBatchStatusEnum.RUNNING
+				processProgress = 0
+				processLastUpdated = new Date()
+				processStopFlag = 0
+			}
+			batch.save(failOnError:true)
+		}
+	}
+
+	/**
+	 * Used to update the progress of ImportBatch being processed. This will also determine if the
+	 * processing should stop. The processStopFlag will be set to 1 to signalthat the processing should stop.
+	 * @param batchId - the batch to be updated
+	 * @param rowsProcessed - count of the rows that have been processed
+	 * @param totalRows - the total number of rows being processed
+	 * @param status - the status to set the batch to when the processing has been completed.
+	 * @return false if the processing should be stopped.
+	 */
+	@NotTransactional()
+	private boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
+		ImportBatch batch = ImportBatch.get(batchId)
+		if (!batch) {
+			log.error "ImportBatch($batchId) disappeared during batch processing process"
+			throw DomainUpdateException('The import batch was deleted while being processed')
+		}
+
+		Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
+
+		batch.processProgress = percComplete
+		batch.processLastUpdated = new Date()
+		if (status) {
+			batch.status = status
+		}
+		batch.save(failOnError:true)
+
+		return (1 == batch.processStopFlag)
+	}
+
+	/**
+	 * Used to process a batch of import records
+	 * @param project
+	 * @param id - the id of the batch
+	 * @param specifiedRecordIds - an optional list of ImportBatchRecord IDs to process
+	 * @return TBD
+	 */
+	void processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
+		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+
+		setBatchToRunning(batch)
+
+		// Get the list of the ImportBatchRecord IDs to be processed
+		List<Long> recordIds = ImportBatchRecord.where {
+			importBatch.id == batchId
+			status == ImportBatchStatusEnum.PENDING
+		}
+		.projections { property('id') }
+		.list(sortBy: id)
+
+		Map context = []
+
+		int totalRowCount = recordIds.size()
+		int rowsProcessed = 0
+		int offset = 0
+		int setSize = 100
+		boolean aborted = false
+		// Now iterate over the list in sets of 100 rows
+		while (! aborted && recordIds) {
+			List recordSetIds = recordIds.take(setSize)
+			recordIds = recordIds.drop(setSize)
+
+			List records =  ImportBatchRecord.where {
+				id in recordSetIds
+			}.list(sortBy: id)
+
+			for (record in records) {
+				processBatchRecord(batch, record, context)
+
+				rowsProcessed += setSize
+
+				aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
+
+				if (! aborted) {
+					GormUtil.flushAndClearSession()
+				}
+			}
+		}
+
+		// Now update the status of the ImportBatch based on
+		int remaining = ImportBatchRecord.where {
+			importBatch.id == batchId
+			status == ImportBatchStatusEnum.PENDING
+		}.count()
+
+		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
+
+		updateBatchProgress(batchId, 1, 1, status)
+	}
+
+	/**
+	 * Used to process a single record of an ImportBatch
+	 * @param batch - the batch that the ImportBatchRecord
+	 * @param record - the ImportBatchRecord to be processed
+	 * @param context - the batch processing context that contains objects used throughout the process
+	 */
+	private void processBatchRecord(ImportBatch batch, ImportBatchRecord record, Map context) {
+		switch (batch.domainClassName) {
+			case ETLDomain.Dependency:
+				processDependencyRecord(batch, record, context)
+				break
+
+			default:
+				String domain = batch.domainClassName.name()
+				log.error "Batch Import process called for unsupported domain $domain in batch ${batch.id} in project ${batch.project}"
+				throw new InvalidRequestException("Batch process not supported for domain ${domain}")
+		}
+	}
+
+
+	/**
+	 * Used to process a single AssetDependency ImportBatchRecord
+	 * @param batch - the batch that the ImportBatchRecord
+	 * @param record - the ImportBatchRecord to be processed
+	 * @param context - the batch processing context that contains objects used throughout the process
+	 */
+	def processDependencyRecord = {ImportBatch batch, ImportBatchRecord record, Map context->
+		record.status = ImportBatchStatusEnum.COMPLETED
+	}
 }

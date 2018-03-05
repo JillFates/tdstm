@@ -51,6 +51,15 @@ class ImportBatch {
 	// The reference to the job that which is assigned when Quartz begins processing the batch
 	String progressInfoJob
 
+	// Will contain the percentage complete for the process posting progress (0..100)
+	Integer processProgress
+
+	// Will contain the last time that the processProgress was last updated
+	Date processLastUpdated
+
+	// Is used to trigger the halting of a batch being processed
+	Integer processStopFlag
+
 	// The filename that was originally uploaded to the application
 	String originalFilename = ''
 
@@ -90,6 +99,9 @@ class ImportBatch {
 		lastUpdated nullable: true
 		originalFilename blank:true, size: 0..255
 		nullIndicator nullable:true, blank:true, size: 0..255
+		processProgress nullable: true, size: 0..100
+		processLastUpdated nullable: true
+		processStopFlag nullable: true, range: 0..1
 		progressInfoJob nullable: true
 		provider nullable: true
 		timezone size: 1..255
@@ -103,9 +115,12 @@ class ImportBatch {
 		dateFormat sqltype: 'VARCHAR(32)'
 		domainClassName sqltype: 'VARCHAR(32)', enumType: 'String'
 		fieldNameList sqltype: 'TEXT'	// JSON
-		progressInfoJob sqltype: 'VARCHAR(255)'
 		overwriteWithBlanks sqltype: 'TINYINT(1)'
 		originalFilename sqltype: 'VARCHAR(255)'
+		processProgress sqltype: 'TINYINT(3)'
+		processLastUpdated sqltype: 'DATETIME'
+		processStopFlag sqltype: 'TINYINT(1)'
+		progressInfoJob sqltype: 'VARCHAR(255)'
 		nullIndicator sqltype: 'VARCHAR(255)'
 		status sqltype: 'VARCHAR(32)', enumType: "String"
 		timezone sqltype: 'VARCHAR(255)'
