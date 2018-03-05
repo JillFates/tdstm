@@ -10,14 +10,11 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.ApiActionService
 
-import net.transitionmanager.i18n.Message
-
 /**
- * Command Object for handling API Action endpoints
- */
+* Command Object for handling API Action endpoints
+*/
 @Validateable
-class ApiActionCommand {
-
+class ApiActionCommand implements CommandObject {
     String name
     String description=''
     Provider provider
@@ -40,14 +37,4 @@ class ApiActionCommand {
     Integer timeout=0
     Integer useWithAsset = 0
     Integer useWithTask = 0
-    Integer version=0
-
-    static constraints = {
-        callbackMethod nullable: true
-        callbackMode nullable: true
-        credential nullable: true
-        defaultDataScript nullable:true
-        version nullable:true
-    }
-
 }

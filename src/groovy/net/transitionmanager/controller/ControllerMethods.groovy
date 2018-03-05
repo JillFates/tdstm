@@ -6,6 +6,7 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
@@ -384,7 +385,30 @@ trait ControllerMethods {
 		// NOTE: For PUT command does populate the command objects properly
 		// SEE: https://github.com/grails/grails-core/issues/9172
 
-		return JsonUtil.mapToObject(request.reader.text, commandObjectClass)
+		def cmd = commandObjectClass.newInstance()
+		if (request.JSON) {
+			// Request was JSON in the body
+			bindData(cmd, request.JSON)
+		} else {
+			// Request contained query parameters
+			bindData(cmd, params)
+		}
+		return cmd
+	}
+
+	/**
+	 * Used to retrieve the version number that should be passed along with any domain attributes that are
+	 * going to be updated.
+	 * This is separated out from the Command objects because the Grails bindData ignores version and we want
+	 * to avoid setting the version on the domain when assigning the command to the domain.
+	 * @return the version number passed as a parameter or more likely in the body as JSON
+	 */
+	Long getDomainVersion() {
+		Long version = NumberUtil.toLong(request.JSON?.version)
+		if (version == null) {
+			version = params.version?.toLong()
+		}
+		return version
 	}
 
 	// ----------------------

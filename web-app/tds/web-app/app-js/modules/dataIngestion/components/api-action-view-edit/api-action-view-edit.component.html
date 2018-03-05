@@ -245,7 +245,6 @@
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
 																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
-																	[required]="apiActionModel.producesData"
 																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">

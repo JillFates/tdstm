@@ -19,7 +19,7 @@ trait CommandObject {
 	 * @param skipEmptyProperties - flag (true|false) to indicate if empty properties of the command object should be skipped over (default false)
 	 * @param ignoreProperties - an optional list of properties to not copy over
 	 */
-	void populateDomain(Object domain, boolean skipEmptyProperties=false, List<String> ignoreProperties=[]) {
+	void populateDomain(Object domain, Boolean skipEmptyProperties=false, List<String> ignoreProperties=null) {
 		if (ignoreProperties == null) {
 			ignoreProperties = []
 		}
@@ -39,7 +39,6 @@ trait CommandObject {
 				domain[prop.key] = prop.value
 			}
 		}
-		// println "populateDomain() $domain dirty: ${domain.dirtyPropertyNames}"
 	}
 
 	/**

@@ -73,22 +73,22 @@ class CredentialService implements ServiceMethods {
      * @param credential - a Command object with values to update with
      * @return the updated Credential
      */
-    Credential update(Long id, CredentialCommand credentialCO) {
-        Credential credentialInstance = findById(id)
-        
-        GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
+    Credential update(Long id, CredentialCommand command, Long version) {
+        Credential domain = findById(id)
+
+        GormUtil.optimisticLockCheck(domain, version, 'Credential')
 
         Project project = securityService.getUserCurrentProject()
 
-        validateBeforeSave(project, id, credentialCO)
+        validateBeforeSave(project, id, command)
 
-        credentialCO.populateDomain(credentialInstance, false, ['password', 'version'] )
+        command.populateDomain(domain, false, ['password', 'version'] )
 
-        setEncryptedPassword(credentialInstance, credentialCO.password)
+        setEncryptedPassword(domain, command.password)
 
-        credentialInstance.save(failOnError: true)
+        domain.save(failOnError: true)
 
-        return credentialInstance
+        return domain
     }
 
     /**

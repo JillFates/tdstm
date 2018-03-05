@@ -6,6 +6,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidRequestException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -55,7 +56,7 @@ public class GormUtil {
 	}
 
 	/**
-	 * Used to internationalize the validation errors from a Validatable object 
+	 * Used to internationalize the validation errors from a Validatable object
 	 * @param object - a domain or command object that has validation errors
 	 * @param locale - the locale to set the messages to (default US)
 	 * @return a list of the messages
@@ -70,7 +71,7 @@ public class GormUtil {
 		}
 		return errors
 	}
-	
+
 	/**
 	 * Output GORM Domain constraints and update errors in human readable HTML Unordered List
 	 * @param domain  the domain instance that has errors
@@ -201,23 +202,38 @@ public class GormUtil {
 		return constraint.getAppliedConstraint(constraintName)
 	}
 
-
 	/**
 	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
 	 * @param domainObj - the domain object to check the version on
 	 * @param versionFromForm - the original value of the domain version when it was originally read
 	 * @param label - the text to indicate the domain object in error message
+	 * @throws InvalidRequestException if there no initialVersion value
+	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
+	 */
+	@Deprecated
+	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+		if ( ! params?.containsKey('version')) {
+			throw new InvalidRequestException("The $label version property was missing from request")
+		}
+		Long version = NumberUtil.toLong(params.version)
+		if (version == null) {
+			throw new InvalidRequestException("The $label version property has an invalid value")
+		} else {
+			optimisticLockCheck(domainObj, version, label)
+		}
+	}
+
+	/**
+	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
+	 * @param domainObj - the domain object to check the version on
+	 * @param version - the original value of the domain version when it was originally read as a Long
+	 * @param label - the text to indicate the domain object in error message
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
-	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
-		Long version = NumberUtil.toLong(params.version)
-		if (version == null) {
-			throw new DomainUpdateException("The $label version was missing from request")
-		} else {
-			if (domainObj.version > version) {
-				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
-			}
+	public static void optimisticLockCheck(Object domainObj, Long version, String label) {
+		if (domainObj.version > version) {
+			throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 		}
 	}
 

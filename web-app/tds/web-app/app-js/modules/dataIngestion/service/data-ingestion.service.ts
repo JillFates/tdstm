@@ -292,7 +292,7 @@ export class DataIngestionService {
 
 		postRequest['reactionScripts'] = JSON.stringify(reaction);
 
-		postRequest['defaultDataScript'] = ((postRequest.producesData === 1) ? model.defaultDataScript.id : null);
+		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
 			parameterList.data.forEach( (param) => {
@@ -346,7 +346,7 @@ export class DataIngestionService {
 			renewTokenUrl: (model.renewTokenUrl) ? model.renewTokenUrl : '',
 			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
 			httpMethod: model.httpMethod.toUpperCase(),
-			sessionName: model.sessionName,
+			sessionName: (model.sessionName) ? model.sessionName  : '',
 		};
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it

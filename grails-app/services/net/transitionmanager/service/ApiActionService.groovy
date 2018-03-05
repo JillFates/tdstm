@@ -205,7 +205,7 @@ class ApiActionService implements ServiceMethods {
 			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
 				// add additional data to the api action execution to have it available when needed
 				remoteMethodParams << [
-						actionId: action.id, 
+						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
 						credentials: action.credential?.toMap()
@@ -382,18 +382,18 @@ class ApiActionService implements ServiceMethods {
 	/**
 	 * Create or Update an API Action based on a JSON Object.
 	 * @param apiActionCommand - the command object containing the values loaded by controller
-	 * @param apiActionId - the id of the ApiAction to update 
+	 * @param apiActionId - the id of the ApiAction to update
 	 * @param project - the project that the ApiAction should belong to (optional)
 	 * @return the ApiAction instance that was created or updated
 	 */
-	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Project project = null) {
-		ApiAction apiAction = null
-
+	ApiAction saveOrUpdateApiAction (ApiActionCommand apiActionCommand, Long apiActionId = null, Long version = null, Project project = null) {
 		if (!project) {
 			project = securityService.userCurrentProject
 		}
 
 		validateBeforeSave(project, apiActionId, apiActionCommand)
+
+		ApiAction apiAction = null
 
 		// If there's an apiActionId then it's an update operation.
 		if (apiActionId) {
@@ -401,17 +401,16 @@ class ApiActionService implements ServiceMethods {
 			apiAction = GormUtil.findInProject(project, ApiAction, apiActionId, true)
 
 			// Make sure nobody changed it while the user was editting the data
-			GormUtil.optimisticLockCheck(apiAction, apiActionCommand, "API Action")
+			GormUtil.optimisticLockCheck(apiAction, version, 'API Action')
 		} else {
 			apiAction = new ApiAction(project: project)
 		}
 
 		// Populate the apiAction with the properties from the command object
-		// TODO : JPM 2/2018 : replace the properties setting as this causes the version to tick when nothing else has chanaged
-		// apiActionCommand.populateDomain(apiAction, false, ['version'])
-		apiAction.properties = apiActionCommand.properties
+		apiActionCommand.populateDomain(apiAction, false)
 
 		apiAction.save(failOnError: true)
+
 		return apiAction
 	}
 

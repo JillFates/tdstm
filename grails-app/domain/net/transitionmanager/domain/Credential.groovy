@@ -98,7 +98,7 @@ class Credential {
 	 */
 	static Closure sessionNameValidator = { value, target ->
 		// TODO : JPM 2/2018 : Need to validate if JWT token name is ALWAYS the same name
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (value == null || value.trim() == '') {
 				return 'default.blank.message'
