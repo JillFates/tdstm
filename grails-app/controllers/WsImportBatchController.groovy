@@ -10,6 +10,7 @@ import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ImportBatchService
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.InvalidRequestException
 
 import grails.plugin.springsecurity.annotation.Secured
@@ -158,8 +159,18 @@ class WsImportBatchController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.DataTransferBatchProcess)
-	def updateImportBatchRecord(Long id) {
-		renderErrorJson( 'Currently not implemented' )
+	def updateImportBatchRecord(Long id, Long recordId) {
+
+		// Temporary code
+		ImportBatchRecord record = ImportBatchRecord.where {
+			importBatch.id == id
+			id == recordId
+		}.find()
+
+		if (!record) {
+			throw new EmptyResultException()
+		}
+		renderSuccessJson(record.toMap())
 	}
 
 }

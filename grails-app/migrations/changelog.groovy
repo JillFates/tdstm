@@ -219,7 +219,8 @@ databaseChangeLog = {
 	include file: '20180213-change-credential-and-add-credential-permission.groovy'
 	include file: '20180216-additional-changes-to-credential.groovy'
 	include file: '20180225-changes-to-import-batch.groovy'
-	include file: '20180228-alter-table-api-action-change-last-modified-column-name-to-last-updated.groovy'
+	// TODO JPM 3/5/2018 This was merged incorrectly on this branch apparently...
+	// include file: '20180228-alter-table-api-action-change-last-modified-column-name-to-last-updated.groovy'
 	include file: '20180302-Dataview-add-unique-constraint.groovy'
     include file: '20180304-changes-for-batch-processing.groovy'
 	include file: '20180308-alter-table-credential-add-validation-expression-column.groovy'
