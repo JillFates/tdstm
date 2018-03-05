@@ -118,7 +118,7 @@ class ProviderService implements ServiceMethods {
     List<Provider> getProviders() {
         return Provider.where {
             project == securityService.userCurrentProject
-        }.list()
+        }.list([sort:'name',order:'asc'])
     }
 
     /**
