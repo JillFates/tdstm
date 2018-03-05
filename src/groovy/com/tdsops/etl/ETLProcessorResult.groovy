@@ -141,6 +141,10 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#removeIgnoredRows()
 	 */
 	void ignoreCurrentRow() {
+		List<?> currentRowData = reference.data
+		if(!currentRowData || currentRowData.isEmpty()){
+			throw ETLProcessorException.invalidIgnoreCommand()
+		}
 		reference.data.last().ignore = true
 	}
 

@@ -131,6 +131,10 @@ class ETLProcessorException extends GroovyRuntimeException {
 		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
 	}
 
+    static ETLProcessorException invalidIgnoreCommand () {
+        new ETLProcessorException('You cannot use ignore rows in an empty results')
+    }
+
     /**
      * Exception being thrown when no domain is specified upon load clause
      * @return

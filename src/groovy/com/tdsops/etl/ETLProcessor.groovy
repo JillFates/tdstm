@@ -155,7 +155,6 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor read (String dataPart) {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
-
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: field.name, index: index)
 				columns.add(column)
@@ -227,6 +226,9 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor ignore (String label) {
 
 		if('row'.equalsIgnoreCase(label)){
+			if (!hasSelectedDomain()) {
+				throw ETLProcessorException.domainMustBeSpecified()
+			}
 			result.ignoreCurrentRow()
 			debugConsole.info("Ignore rows for ${currentRowIndex}")
 		}
