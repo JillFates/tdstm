@@ -3,16 +3,18 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
-import {DataScriptModel, DataScriptMode} from '../model/data-script.model';
+import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
 import {AgentModel, AgentMethodModel} from '../model/agent.model';
 import {AUTH_METHODS, ENVIRONMENT, CREDENTIAL_STATUS, REQUEST_MODE} from '../model/credential.model';
 import {INTERVAL} from '../../../shared/model/constants';
 import {DateUtils} from '../../../shared/utils/date.utils';
+import {HttpResponse} from '@angular/common/http';
+import {StringUtils} from '../../../shared/utils/string.utils';
+import {DOMAIN} from '../../../shared/model/constants';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {HttpResponse} from '@angular/common/http';
 
 @Injectable()
 export class DataIngestionService {
@@ -64,7 +66,7 @@ export class DataIngestionService {
 				dataScriptModels.forEach((r) => {
 					r.agentMethod = {name: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.lastModified = ((r.lastModified) ? new Date(r.lastModified) : '');
+					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 					r.producesData = (r.producesData === 1);
 					r.polling = {
 						frequency: {
@@ -140,10 +142,54 @@ export class DataIngestionService {
 	getParameters(model: APIActionModel): Observable<APIActionParameterModel[]> {
 		return new Observable(observer => {
 			if (model.methodParams && model.methodParams !== null && model.methodParams !== '') {
-				observer.next(JSON.parse(model.methodParams));
+				let parameterList = JSON.parse(model.methodParams);
+				parameterList.forEach( (param) => {
+					if (param.property && param.property.field) {
+						param.property = param.property.field;
+					}
+					if (param.context === 'ASSET') {
+						param.context = DOMAIN.COMMON;
+					}
+					delete param.sourceFieldList;
+					delete param.currentFieldList;
+				});
+
+				observer.next(parameterList);
 			}
 			observer.complete();
 		});
+	}
+
+	/**
+	 * Get Sample Data of a File by passing the FileName to the server
+	 * @param {string} fileName
+	 * @returns {Observable<SampleDataModel>}
+	 */
+	getSampleData(fileName: string): Observable<SampleDataModel> {
+		return this.http.get(`${this.dataScriptUrl}/sampleData/${fileName}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let data: any = (result && result.status === 'success' && result.data);
+				let columns: any = [];
+				let sampleDataModel;
+				if (data.config) {
+					for (let property in data.config) {
+						if (data.config.hasOwnProperty(property)) {
+							let column = {
+								label: StringUtils.toCapitalCase(data.config[property].property, true),
+								property: data.config[property].property,
+								type: data.config[property].type,
+								width: 140
+							};
+							columns.push(column);
+						}
+					}
+					sampleDataModel = new SampleDataModel(columns, data.rows);
+					sampleDataModel.gridHeight = 300;
+				}
+				return sampleDataModel;
+			})
+			.catch((error: any) => error.json());
 	}
 
 	getActionMethodById(agentId: number): Observable<AgentMethodModel[]> {
@@ -250,6 +296,13 @@ export class DataIngestionService {
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
 			parameterList.data.forEach( (param) => {
+				if (param.property && param.property.field) {
+					param.property = param.property.field;
+				}
+				if (param.context === DOMAIN.COMMON) {
+					param.context = 'ASSET';
+				}
+				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
 			postRequest['methodParams'] = JSON.stringify(parameterList.data);

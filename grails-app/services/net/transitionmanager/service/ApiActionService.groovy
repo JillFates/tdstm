@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
+import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -43,7 +44,11 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 @Slf4j
 @Transactional
 class ApiActionService implements ServiceMethods {
-	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [ThreadLocalVariable.ACTION_REQUEST, ThreadLocalVariable.TASK_FACADE, ThreadLocalVariable.REACTION_SCRIPTS]
+	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [
+			ThreadLocalVariable.ACTION_REQUEST,
+			ThreadLocalVariable.TASK_FACADE,
+			ThreadLocalVariable.REACTION_SCRIPTS
+	]
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
@@ -163,9 +168,10 @@ class ApiActionService implements ServiceMethods {
 
 		if (context instanceof AssetComment) {
 			// Validate that the method is still invocable
-			if (! context.isActionInvocable() ) {
-				throw new InvalidRequestException('Task state does not permit action to be invoked')
-			}
+			// sl : this is already verified in TaskService
+			//if (! context.isActionInvocable() ) {
+			//	throw new InvalidRequestException('Task state does not permit action to be invoked')
+			//}
 
 			// Get the method definition of the Agent method
 			DictionaryItem methodDef = methodDefinition(action)
@@ -196,7 +202,7 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method
 				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', agent.name, action.agentMethod, action.asyncQueue, remoteMethodParams
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
-			} else if (CallbackMode.DIRECT == action.callbackMode) {
+			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
 				// add additional data to the api action execution to have it available when needed
 				remoteMethodParams << [
 						actionId: action.id, 
@@ -204,6 +210,8 @@ class ApiActionService implements ServiceMethods {
 						producesData: action.producesData,
 						credentials: action.credential?.toMap()
 				]
+
+				// get api action agent instance
 				def agent = agentInstanceForAction(action)
 
 				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
@@ -213,6 +221,18 @@ class ApiActionService implements ServiceMethods {
 				// set config data
 				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
 				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
+
+				// POC if credential authentication method is COOKIE (vcenter)
+				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
+				// TODO use a method in Credential domain to determine if the call requires pre-authentication
+//				if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
+//					Map authentication = credentialService.authenticate(action.credential)
+//					if (authentication) {
+//						// TODO this needs to come from CredentialService according to the authenticationMethod being used
+//						actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
+//						actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
+//					}
+//				}
 
 				// check pre script
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)

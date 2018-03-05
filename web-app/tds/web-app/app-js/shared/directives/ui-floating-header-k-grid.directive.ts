@@ -6,6 +6,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {NotifierService} from '../services/notifier.service';
+import {Observable} from 'rxjs/Rx';
 
 declare var jQuery: any;
 
@@ -26,7 +27,6 @@ export class UIFloatingHeaderKGridDirective implements OnInit {
 	 */
 	ngOnInit() {
 		setTimeout(() => this.getAllGridHeaders(), 1000);
-
 	}
 
 	/**
@@ -34,9 +34,21 @@ export class UIFloatingHeaderKGridDirective implements OnInit {
 	 */
 	private registerListeners(): void {
 		this.createHeaderGridWatcher = this.notifierService.on('grid.header.position.change', event => {
-			this.getAllGridHeaders();
+			this.destroyScrollChangeBinds().subscribe(() => this.getAllGridHeaders());
 		});
 	};
+
+	/**
+	 * Destroy all existing binding to scroll, this helper is being used when there are changes in the UI
+	 * like adding a new Grid or changing it positions
+	 * @returns {Observable<any>}
+	 */
+	private destroyScrollChangeBinds() {
+		return new Observable(observer => {
+			observer.next(jQuery(window).unbind('scroll'));
+			observer.complete();
+		});
+	}
 
 	/**
 	 * Get all Grid Headers from the page.
@@ -59,7 +71,7 @@ export class UIFloatingHeaderKGridDirective implements OnInit {
 		jQuery(window).bind('scroll', function () {
 			if (this.pageYOffset >= offSet.top) {
 				jQuery('.k-grid-header').addClass('k-grid-dynamic-header');
-			} else {
+			} else if (jQuery('.k-grid-header').hasClass('k-grid-dynamic-header')) {
 				jQuery('.k-grid-header').removeClass('k-grid-dynamic-header');
 			}
 		});

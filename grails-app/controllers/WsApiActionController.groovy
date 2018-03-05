@@ -91,13 +91,10 @@ class WsApiActionController implements ControllerMethods {
      * Used to validate that the API Reaction Scripts have the proper syntax
      */
 	@HasPermission(Permission.ActionInvoke)
-	def validateSyntax(ApiActionValidateScriptCommand command) {
-        // TODO : JPM 2/2018 : TM-9414 Revisit the script validation - this doesn't look quite right
-		if (!command.validate() || command.scripts.collect { it.validate() }.any {!it}) {
-			renderErrorJson( errorsInValidation([command.errors] + command.scripts.collect {it.errors}) )
-		} else {
-			renderSuccessJson(apiActionService.validateSyntax(command.scripts))
-		}
+	def validateSyntax() {
+		ApiActionValidateScriptCommand commandObject = populateCommandObject(ApiActionValidateScriptCommand)
+		validateCommandObject(commandObject)
+		renderSuccessJson(apiActionService.validateSyntax(commandObject.scripts))
 	}
 
     /**

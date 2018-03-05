@@ -1,12 +1,25 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import getl.csv.CSVConnection
+import getl.csv.CSVDataset
+import getl.data.Field
+import groovy.json.JsonSlurper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import org.apache.commons.io.FilenameUtils
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
+
+import java.text.DecimalFormat
+import java.text.Format
 
 class DataScriptService implements ServiceMethods{
 
@@ -228,4 +241,155 @@ class DataScriptService implements ServiceMethods{
 
         return [canDelete: !foundReferences, references: foundReferences]
     }
+
+	/**
+	* Parse a file that represent a MAP of data
+	* Current Formats supported:
+	*   JSON, CSV, EXCEL
+	* @param fileName
+	* @return
+	*/
+	Map parseDataFromFile (String fileName) {
+		try{
+			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
+
+			switch (extension) {
+			case 'JSON':
+				return parseDataFromJSON(fileName)
+
+			case 'CSV':
+				return parseDataFromCSV(fileName)
+
+			case ['XLS', 'XLSX'] :
+				return parseDataFromXLS(fileName)
+
+			default :
+			   throw new RuntimeException("Format ($extension) not supported")
+			}
+
+		} catch (ex) {
+			log.error(ex.message, ex)
+			throw ex
+		}
+	}
+
+	/**
+	 * Check that the File with the JSON data is ok and return the map
+	 * @param jsonFile
+	 * @return
+	 * @throws RuntimeException
+	 */
+	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
+		def inputFile = new File(FileSystemService.temporaryDirectory, jsonFile)
+		def jsonObject = new JsonSlurper().parseText(inputFile.text)
+
+		def jsonMap = [
+				  status: 'success',
+				  data  : jsonObject
+		]
+
+		return jsonMap
+	}
+
+	/**
+	 * PArse CSV file to get the
+	 * @param csvFile
+	 * @return
+	 * @throws RuntimeException
+	 */
+	Map parseDataFromCSV (String csvFile) throws RuntimeException {
+		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
+		def csv = new CSVDataset(connection: con, fileName: csvFile, header: true)
+
+		List<Field> fields = csv.connection.driver.fields(csv)
+
+		List<Map<String, String>> config = fields.collect {
+			def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+			[
+				property : it.name,
+				type     : type
+			]
+	  }
+
+		def jsonMap = [
+			status: 'success',
+			data  : [
+				config: config,
+				rows  : csv.rows()
+			]
+		]
+
+		return jsonMap
+	}
+
+	/**
+	 * Parse Excel file to generate the JSON datafile
+	 * @param xlsFile
+	 * @param sheetNumber
+	 * @param headerRowIndex
+	 * @return
+	 * @throws RuntimeException
+	 */
+	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0) throws RuntimeException {
+
+		DecimalFormat df = new DecimalFormat('#.#########')
+
+		Workbook workbook = WorkbookFactory.create(new File(FileSystemService.temporaryDirectory, xlsFile))
+		Sheet sheet = workbook.getSheetAt(sheetNumber)
+		Row header = sheet.getRow(headerRowIndex)
+		Iterator<Cell> headerCells = header.cellIterator()
+
+		List<Map<String, String>> config = []
+		Map<Integer, String> headerMap = [:]
+
+		while (headerCells.hasNext()) {
+			Cell cell = headerCells.next()
+			String type = 'text'
+			String value = cell.toString()
+
+			headerMap[cell.columnIndex] = value
+
+			config << [
+					property: value,
+					type    : type
+			]
+		}
+
+
+		List<Map> data = []
+		int lastRowNum = sheet.getLastRowNum()
+
+		for( int r = headerRowIndex + 1; r <= lastRowNum; r++ ) {
+			Row row = sheet.getRow(r)
+
+			Map object = [:]
+			data << object
+			Iterator<Row>cellIterator = row.cellIterator()
+
+			int c = 0
+			while (cellIterator.hasNext()) {
+				Cell cell = cellIterator.next()
+				String key = headerMap[ cell.columnIndex ]
+				String value = ''
+				if (cell.cellType== Cell.CELL_TYPE_NUMERIC) {
+					value =  df.format( cell.numericCellValue )
+				} else {
+					value = cell.toString()
+				}
+
+				object[ key ] = value
+				c ++
+			}
+		}
+
+		def jsonMap = [
+				status: 'success',
+				data  : [
+						 config: config,
+						 rows  : data
+				]
+		]
+
+		return jsonMap
+	}
 }

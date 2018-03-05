@@ -4,7 +4,7 @@ import geb.Page
 
 class TaskDetailsPage extends Page {
 
-// TODO The TaskDetailsPage from Task Manager should be used
+    // TODO The TaskDetailsPage from Task Manager should be used
 
     static at = {
         taskDetailsModalWindow.isDisplayed()
@@ -16,13 +16,13 @@ class TaskDetailsPage extends Page {
 
     static content = {
 
-        loadingIndicator(wait:true)             { $("div", "ng-show": "isLoading") }
+        loadingIndicator(wait:true)             { $("div", "ng-show": "isLoading")}
         taskDetailsModalWindow(wait:true)       { $("div", "window-class":"modal-task")}
-        taskDetailsNumberLabel(wait:true)       { $("label", for:"contextSelector2").text() }
+        taskDetailsNumberLabel(wait:true)       { $("label", for:"contextSelector2").text()}
         taskDetailsNumber                       { $("span#taskNumberId").find("b",class:"ng-binding")}
         taskDetailsTaskName                     { $("textarea#commentTdId")}
-        taskDetailsModalCloseBtn(wait:true)     { $("button", "ng-click": "close()") }
-        taskDetailsModalEditBtn(wait:true)      { $("button", "ng-click": "editComment();") }
-        taskDetailsModalDeleteBtn(wait:true)    { $("button", "ng-click": "deleteComment()") }
+        taskDetailsModalCloseBtn(wait:true)     { $("button", "ng-click": "close()")}
+        taskDetailsModalEditBtn(wait:true)      { $("button", "ng-click": "editComment();")}
+        taskDetailsModalDeleteBtn(wait:true)    { $("button", "ng-click": "deleteComment()")}
     }
 }

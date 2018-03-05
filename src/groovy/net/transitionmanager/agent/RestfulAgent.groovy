@@ -19,9 +19,9 @@ class RestfulAgent extends AbstractAgent {
         setDictionary( [
                 executeCall: new DictionaryItem([
                         name: 'executeCall',
-                        description: 'Fetch assets from ServiceNow',
+                        description: 'Execute RESTful call against desired end-point.',
                         method: 'executeCall',
-                        params: restfulParams(),
+                        params: [:],
                         results: invokeResults()
                 ])
         ].asImmutable() )

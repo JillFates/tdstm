@@ -58,7 +58,10 @@ class AbstractAgent {
 					methodParams << [ (param.param) : task[param.property] ]
 					break
 				case ContextType.ASSET:
-				//case ContextType.SERVER:
+				case ContextType.APPLICATION:
+				case ContextType.DATABASE:
+				case ContextType.DEVICE:
+				case ContextType.STORAGE:
 					if (task.assetEntity) {
 						methodParams << [(param.param): task.assetEntity[param.property]]
 					}
@@ -96,10 +99,4 @@ class AbstractAgent {
 		]
 	}
 
-	// Build of some of the standard interfaces for RESTful agent methods
-	protected LinkedHashMap restfulParams() {
-		[
-			callbackMethod: callbackMethodParam()
-		]
-	}
 }

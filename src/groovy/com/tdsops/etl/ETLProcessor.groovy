@@ -774,4 +774,12 @@ class ETLProcessor implements RangeChecker {
 		['id', 'assetName', 'moveBundle']
 	}
 
+	/**
+	 * Checks if there is a domain entity being specified within the script
+	 * @return
+	 */
+	boolean hasSelectedDomain() {
+		return selectedDomain != null
+	}
+
 }

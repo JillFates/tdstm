@@ -17,7 +17,7 @@ class Credential {
 	// Used to indicate what environment that particular credential is meant to be used for
 	CredentialEnvironment environment
 
-	// Indicates the type of authencation that this Credential will use (e.g. BasicAuth, JWT, OAuth, etc)
+	// Indicates the type of authentication that this Credential will use (e.g. BasicAuth, JWT, OAuth, etc)
 	AuthenticationMethod authenticationMethod
 
 	// When issuing the authentication request this will be used to determine if it is Form Variables or Basic Auth
