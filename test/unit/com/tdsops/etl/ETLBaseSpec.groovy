@@ -4,35 +4,13 @@ import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
+import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import spock.lang.Specification
 
 abstract class ETLBaseSpec extends Specification {
-
-	void 'test can throw an exception if an domain is not specified'() {
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-id
-1""".stripIndent())
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), dataSet, GroovyMock(DebugConsole), GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-
-					iterate {
-						extract 1 load id
-					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown()
-			e.message == 'A domain must be specified'
-	}
 
 	/**
 	 * Builds a list of Mock Room using this fields order
