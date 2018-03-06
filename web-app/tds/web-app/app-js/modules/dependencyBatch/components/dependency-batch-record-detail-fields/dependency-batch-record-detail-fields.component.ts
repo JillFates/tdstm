@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {ImportBatchModel} from '../../model/import-batch.model';
+import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
@@ -43,14 +43,6 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 	}
 
 	/**
-	 * On Cancel.
-	 */
-	private onCancel(): void {
-		// this.batchRecord = null;
-		this.cancelEvent.emit();
-	}
-
-	/**
 	 * Gets the Batch Record Field Details from API.
 	 */
 	private loadRecordFieldDetails(): void {
@@ -87,6 +79,30 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
 				}
 		}, error => this.handleError(error));
+	}
+
+	/**
+	 * Determine if Ignore button should be showed on UI.
+	 * @returns {boolean}
+	 */
+	private showIgnoreButton(): boolean {
+		return this.batchRecord.status.code === BatchStatus.PENDING;
+	}
+
+	/**
+	 * Determine if Include button should be showed on UI.
+	 * @returns {boolean}
+	 */
+	private showIncludeButton(): boolean {
+		return this.batchRecord.status.code === BatchStatus.IGNORED;
+	}
+
+	/**
+	 * On Cancel.
+	 */
+	private onCancel(): void {
+		// this.batchRecord = null;
+		this.cancelEvent.emit();
 	}
 
 	/**
