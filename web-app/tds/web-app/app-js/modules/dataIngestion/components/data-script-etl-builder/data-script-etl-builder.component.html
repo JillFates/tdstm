@@ -30,7 +30,7 @@
                                 {{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.VIEW_CONSOLE' | translate}}
                             </button>
                             <button class="pull-right btn btn-default" (click)="toggleSection('code')">
-                                <i class="fa " [ngClass]="{'fa-angle-double-down':!collapsed.code,'fa-angle-double-up':collapsed.code}" style="padding-right:0px"></i>
+                                <i class="fa " [ngClass]="{'fa-angle-double-down':!collapsed.code,'fa-angle-double-right':collapsed.code}" style="padding-right:0px"></i>
                             </button>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                         <div class="col-md-12">
                             <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
                             <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
-                                <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-up':collapsed.sample}" style="padding-right:0px"></i>
+                                <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-right':collapsed.sample}" style="padding-right:0px"></i>
                             </button>
                         </div>
                         <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="overflow-y: scroll;">
