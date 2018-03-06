@@ -168,4 +168,30 @@ class ImportBatchService implements ServiceMethods {
 		record.save(failOnError: true)
 		return record
 	}
+
+	/**
+	 * Return a map with information about the corresponding Import Batch.
+	 * @param project - user's current project
+	 * @param batchId - the id of the batch
+	 * @param info - a String with the type of information requested: only 'progress' supported at the moment.
+	 * @return
+	 */
+	Map getImportBatchInfo(Project project, Long batchId, String info) {
+		Map infoMap = [:]
+		if (info) {
+			ImportBatch importBatch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+			info = info.toLowerCase()
+			// Although only 'progress' is supported at the moment, I leave the code ready for future changes.
+			switch(info) {
+				case 'progress':
+					infoMap = importBatch.getProgressInfo()
+					break
+				default:
+					throw new InvalidParamException("Unsupported info requested $info.")
+					break
+			}
+			return infoMap
+		}
+
+	}
 }

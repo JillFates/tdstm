@@ -830,7 +830,13 @@ class UrlMappings {
 					PUT: "updateImportBatchRecord"
 			]
 		}
-
+		// Retrieve info of the Import Batch
+		"/ws/import/batch/$id/$info" {
+			controller = "wsImportBatch"
+			action = [
+				GET: "getInfoOfBatch"
+			]
+		}
 		//
 		// Credentials
 		//
