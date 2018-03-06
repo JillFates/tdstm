@@ -32,6 +32,8 @@ import spock.lang.Shared
  *     <li><b>domain</b></li>
  *     <li><b>extract</b></li>
  *     <li><b>load</b></li>
+ *     <li><b>read labels</b></li>
+ *     <li><b>ignore row</b></li>
  * </ul>
  */
 @TestFor(FileSystemService)
@@ -345,8 +347,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can read labels from dataSource and create a map of columns'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -1154,9 +1160,8 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 		then: 'Results should contain Rack domain results associated'
 			etlProcessor.result.domains.size() == 1
 
-
 		cleanup:
-			service.deleteTemporaryFile(fileName)
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can evaluate a value loaded into the DOMAIN.property'() {
@@ -1226,6 +1231,43 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					}
 				}
 			}
+	}
+
+	void 'test can throw an exception if an domain is not specified'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator)
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+
+					iterate {
+						extract 1 load id
+					}
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown()
+			e.message == 'A domain must be specified'
+
+		cleanup:
+			if (fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
@@ -1498,4 +1540,126 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 				data.isEmpty()
 			}
 	}
+
+	void 'test can throw and exception when script tries to ignore a row and there isn not a domain already defined'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						ignore row
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'A domain must be specified'
+	}
+
+	void 'test can throw and exception when script tries to ignore an empty results'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						ignore row
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'You cannot use ignore rows in an empty results'
+	}
+
+	void 'test can ignore rows in the middle of a data set'() {
+
+//		updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
+				validator
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					console on
+					read labels
+					iterate {
+					    domain Device
+					    extract 'device id' load id
+					    extract 'model name' transform with lowercase() load Name
+					
+					    if( SOURCE.'device id'.startsWith('152253') ){
+					        ignore row
+					    }
+					   
+					}
+				""".stripIndent(), ETLProcessor.class.name)
+
+		then: 'A row was removed from the domain results'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['id', 'name'] as Set
+				data.size() == 5
+
+				data*.rowNum == [1, 2, 4, 5, 6]
+				data.collect{ it.fields.id.value } == [
+					'152251', '152252', '152254', '152255', '152256'
+				]
+				data.collect{ it.fields.name.value } == [
+					'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
+				]
+				data.collect{ it.fields.name.originalValue } == [
+					'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
+				]
+			}
+	}
+
 }

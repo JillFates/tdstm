@@ -1,6 +1,7 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -11,6 +12,7 @@ import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import org.springframework.http.HttpStatus
 
 /**
  * Provide the endpoints for working with DataScripts.
@@ -56,7 +58,7 @@ class WsDataScriptController implements ControllerMethods {
         renderSuccessJson(dataScript: dataScript.toMap())
     }
 
-   /**
+    /**
      * Endpoint for searching for a particular DataScript.
      *
      * @param id - DataScript id
@@ -168,6 +170,17 @@ class WsDataScriptController implements ControllerMethods {
         Map<String, ?> result = scriptProcessorService.checkSyntax(project, command.script, fullName)
 
         renderSuccessJson(result)
+    }
+
+    @HasPermission(Permission.DataScriptCreate)
+    def sampleData (String filename) {
+	    try {
+		    Map jsonMap = dataScriptService.parseDataFromFile(filename)
+
+		    render jsonMap as JSON
+	    }catch ( ex ) {
+		    render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
+	    }
     }
 
 }

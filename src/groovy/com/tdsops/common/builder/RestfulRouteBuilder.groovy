@@ -7,6 +7,7 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import org.apache.camel.Exchange
@@ -83,13 +84,14 @@ class RestfulRouteBuilder extends RouteBuilder {
      * @param payload
      * @return
      */
-    private String buildRESTfulReactionEndpoint(Object payload) {
+    private String buildRESTfulReactionEndpoint(ActionRequestParameter payload) {
         StringBuilder restfulEndpoint = new StringBuilder()
-        if (payload.callbackMethod) {
-            restfulEndpoint.append("bean:restfulProducerService?method=").append(payload.callbackMethod)
-        } else {
+		// TODO <SL> Uncomment when callbackMethod and callbackMode gets implemented
+//        if (payload.callbackMethod) {
+//            restfulEndpoint.append("bean:restfulProducerService?method=").append(payload.callbackMethod)
+//        } else {
             restfulEndpoint.append("bean:restfulProducerService?method=reaction")
-        }
+//        }
     }
 
     /**

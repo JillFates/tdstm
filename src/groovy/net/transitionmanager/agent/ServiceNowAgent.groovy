@@ -24,7 +24,7 @@ class ServiceNowAgent extends AbstractAgent {
                         name: 'fetchAssets',
                         description: 'Fetch assets from ServiceNow',
                         method: 'fetchAssets',
-                        params: restfulParams(),
+                        params: [:],
                         results: invokeResults()
                 ])
         ].asImmutable() )

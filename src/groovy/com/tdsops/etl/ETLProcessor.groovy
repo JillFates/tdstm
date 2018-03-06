@@ -155,7 +155,6 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor read (String dataPart) {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
-
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: field.name, index: index)
 				columns.add(column)
@@ -227,8 +226,11 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor ignore (String label) {
 
 		if('row'.equalsIgnoreCase(label)){
-			result.ignoreCurrentRow(currentRowIndex)
-			debugConsole.info("Ignore rows for ${currentRowIndex}")
+			if (!hasSelectedDomain()) {
+				throw ETLProcessorException.domainMustBeSpecified()
+			}
+			result.ignoreCurrentRow()
+			debugConsole.info("Ignore row ${currentRowIndex}")
 		}
 
 		return this
@@ -807,6 +809,14 @@ class ETLProcessor implements RangeChecker {
 
 	List<String> getAssetFields () {
 		['id', 'assetName', 'moveBundle']
+	}
+
+	/**
+	 * Checks if there is a domain entity being specified within the script
+	 * @return
+	 */
+	boolean hasSelectedDomain() {
+		return selectedDomain != null
 	}
 
 }

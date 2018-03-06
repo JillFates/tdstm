@@ -202,7 +202,7 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method
 				log.debug 'About to invoke the following command: {}.{}, queue: {}, params: {}', agent.name, action.agentMethod, action.asyncQueue, remoteMethodParams
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
-			} else if (CallbackMode.DIRECT == action.callbackMode) {
+			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
 				// add additional data to the api action execution to have it available when needed
 				remoteMethodParams << [
 						actionId: action.id, 

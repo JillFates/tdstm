@@ -21,37 +21,44 @@ class MockETLController implements ControllerMethods {
     ScriptProcessorService scriptProcessorService
     FileSystemService fileSystemService
 
-    String exampleDataSet = """device id,model name,manufacturer name,environment
-152254,SRW24G4,LINKSYS,Prod
-152255,ZPHA MODULE,TippingPoint,Dev
-152256,Slideaway,ATEN,Prod
-152258,CCM4850,Avocent,Prod
-152259,DSR2035,Avocent,Dev
-152266,2U Cable Management,Generic,Prod
-152275,ProLiant BL465c G7,HP,Dev"""
-
-    String exampleScript = """console on
-read labels
-
-iterate {
-    domain Application
-
-    extract 1 load id
-    extract 'model name' transform with lowercase() load Name
-    extract 3 transform with uppercase() load description
-
-    set environment with 'Production'
-    find Application of id by id with SOURCE.'device id'
-
-    domain Device
-
-    extract 1 load id
-    extract 'model name' transform with uppercase() load Name
-    find Device of id by id with SOURCE.'device id'
-}""".stripIndent()
+    String exampleDataSet = """\
+            device id,model name,manufacturer name,environment
+            152254,SRW24G4,LINKSYS,Prod
+            152255,ZPHA MODULE,TippingPoint,Dev
+            152256,Slideaway,ATEN,Prod
+            152258,CCM4850,Avocent,Prod
+            152259,DSR2035,Avocent,Dev
+            152266,2U Cable Management,Generic,Prod
+            152275,ProLiant BL465c G7,HP,Dev\
+    """.stripIndent().trim()
 
 
-    def index () {
+	String exampleScript = """\
+        console on
+        read labels
+        
+        iterate {
+            domain Application
+        
+            extract 1 load id
+            extract 'model name' transform with lowercase() load Name
+            extract 3 transform with uppercase() load description
+        
+            set environment with 'Production'
+            // find Application 'for' id by id with SOURCE.'device id'
+            find Application of id by id with SOURCE.'device id'
+        
+            domain Device
+        
+            extract 1 load id
+            extract 'model name' transform with uppercase() load Name
+            // find Device 'for' id by id with SOURCE.'device id'
+            find Device of id by id with SOURCE.'device id'
+        }\
+    """.stripIndent().trim()
+
+
+	def index () {
 
         Project project = securityService.userCurrentProject
         ErrorCollector errorCollector
@@ -83,9 +90,18 @@ iterate {
                 script = params.script ?: exampleScript
             }
 
-            def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', 'csv')
-            os << dataSet
-            os.close()
+	         String fileType = 'csv'
+	         if ( params.filetype ) {
+		         fileType = params.filetype
+	         }
+
+	         log.debug("Filetype to use: {}", fileType)
+
+				def (String fileName, OutputStream os) = fileSystemService.createTemporaryFile('import-', fileType)
+
+
+	         fileSystemService.initFile(fileName, os, dataSet)
+
 
             etlProcessor = scriptProcessorService.execute(project, script, fileSystemService.getTemporaryFullFilename(fileName))
 
@@ -99,7 +115,8 @@ iterate {
         } catch (ETLProcessorException pe) {
             missingPropertyError = pe.getMessage()
         } catch (Exception ioe) {
-            missingPropertyError = ioe.getMessage()
+	        log.error(ioe.message, ioe)
+	        missingPropertyError = ioe.getMessage()
         }
 
         [

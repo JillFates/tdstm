@@ -136,17 +136,20 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Mark as ignore the row number indicated by param
+	 * Mark as ignore the current row.
+	 * Current row is determined by reference.data.last()
 	 * @see ETLProcessorResult#removeIgnoredRows()
-	 * @param rowIndex a row index number
 	 */
-	void ignoreCurrentRow(Integer rowIndex) {
-		reference.data.find{ it.rowNum == rowIndex}.ignore = true
+	void ignoreCurrentRow() {
+		List<?> currentRowData = reference.data
+		if(!currentRowData || currentRowData.isEmpty()){
+			throw ETLProcessorException.invalidIgnoreCommand()
+		}
+		reference.data.last().ignore = true
 	}
 
 	/**
 	 * Removes ignored rows in the current reference.
-	 *
 	 */
 	def removeIgnoredRows() {
 		reference.data.removeAll { it.ignore == true }
@@ -154,10 +157,14 @@ class ETLProcessorResult {
 
 	/**
 	 * Calculates the current data map based on row index
+	 * It check if it isn necessary to init a new row
+	 * based on the latest data in the current reference
+	 * and the 'currentRowIndex'
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-		if(reference.data.size() < processor.currentRowIndex){
+		if(reference.data.last().rowNum &&
+				reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
 		}
 		return reference.data.last()
@@ -172,8 +179,6 @@ class ETLProcessorResult {
 	 */
 	Map<String, ?> toMap() {
 		return [
-			// should this be this.ETLInfo ?
-
 			ETLInfo: this.ETLInfo,
 			domains: this.domains
 		]
