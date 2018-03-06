@@ -11,7 +11,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
 import {Observable} from 'rxjs/Observable';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
-import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -132,8 +132,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiReponseModel) => {
-				if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -148,8 +148,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onUnArchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiReponseModel) => {
-				if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -164,8 +164,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onDeleteBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
-		this.dependencyBatchService.deleteImportBatches(ids).subscribe( (result: ApiReponseModel) => {
-				if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.deleteImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
 					} else {
@@ -208,8 +208,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onPlayButton(item: any): void {
 		const ids = [item.id];
-		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiReponseModel) => {
-				if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -225,8 +225,8 @@ export class DependencyBatchListComponent {
 	 */
 	private onEjectButton(item: any): void {
 		const ids = [item.id];
-		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiReponseModel) => {
-				if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.ejectImportBatches(ids).subscribe( (result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);

@@ -1,7 +1,8 @@
 /**
  * Represents the standard response model structure of the API calls.
  */
-export class ApiReponseModel {
+
+export class ApiResponseModel {
 
 	public static readonly API_SUCCESS = 'success';
 	public static readonly API_ERROR = 'error';

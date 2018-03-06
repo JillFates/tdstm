@@ -17,8 +17,7 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	constructor(
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
-		private dependencyBatchService: DependencyBatchService,
-		private dialogService: UIDialogService) {
+		private dependencyBatchService: DependencyBatchService) {
 			super('#dependency-batch-record-detail');
 	}
 
@@ -29,5 +28,12 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 		// this.cancelEvent.emit();
 		// this.batchRecord = null;
 		this.dismiss();
+	}
+
+	/**
+	 * On Fields Values updated successfully.
+	 */
+	private onUpdateSuccess(): void {
+		this.close('reload');
 	}
 }

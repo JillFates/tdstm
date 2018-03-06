@@ -1,8 +1,9 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
-import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportBatchModel} from '../../model/import-batch.model';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -13,6 +14,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 	@Output('onCancel') cancelEvent = new EventEmitter<any>();
+	@Output('onUpdateSuccess') updateSuccessEvent = new EventEmitter<any>();
 
 	private fieldsInfo: Array<any>;
 	private fieldsFilter: any = {
@@ -23,7 +25,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 		selected: {text: 'All', value: 1}
 	};
 
-	constructor(private dependencyBatchService: DependencyBatchService) {
+	constructor(
+		private dependencyBatchService: DependencyBatchService) {
 		// Silence is golden
 	}
 
@@ -51,8 +54,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 	 * Gets the Batch Record Field Details from API.
 	 */
 	private loadRecordFieldDetails(): void {
-		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id).subscribe( (result: ApiReponseModel) => {
-			if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.fieldsInfo = result.data.fieldsInfo;
 			} else {
 				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
@@ -61,6 +64,29 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 			this.fieldsInfo = [];
 			this.handleError(error);
 		});
+	}
+
+	/**
+	 * On Update button click.
+	 */
+	private onUpdate(): void {
+		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
+		for (let field in this.fieldsInfo) {
+			if (this.fieldsInfo.hasOwnProperty(field) && this.fieldsInfo[field].overridedValue) {
+				// console.log(this.fieldsInfo[field]);
+				const newFieldValue = {fieldName: field, value: this.fieldsInfo[field].overridedValue};
+				newFieldsValues.push(newFieldValue);
+			}
+		}
+		console.log(newFieldsValues);
+		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.updateSuccessEvent.emit();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
+				}
+		}, error => this.handleError(error));
 	}
 
 	/**
