@@ -54,8 +54,23 @@ export class DataGridOperationsHelper {
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
-		if (!column.filter) {
+		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
 			column.filter = '';
+		}
+
+		if (column.type === 'number') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: column.filter
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
 		}
 
 		if (column.type === 'text') {
