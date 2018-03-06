@@ -31,20 +31,24 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 		this.loadRecordFieldDetails();
 	}
 
+	/**
+	 * On Changes detected Batch Record selection reload it's Fields info.
+	 * @param {SimpleChanges} changes
+	 */
 	ngOnChanges(changes: SimpleChanges): void {
 		this.loadRecordFieldDetails();
 	}
 
 	/**
-	 * TODO: document
+	 * On Cancel.
 	 */
 	private onCancel(): void {
-		this.batchRecord = null;
+		// this.batchRecord = null;
 		this.cancelEvent.emit();
 	}
 
 	/**
-	 * TODO: document
+	 * Gets the Batch Record Field Details from API.
 	 */
 	private loadRecordFieldDetails(): void {
 		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id).subscribe( (result: ApiReponseModel) => {
@@ -60,7 +64,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit, OnCha
 	}
 
 	/**
-	 * TODO: document
+	 * Handles any API error and displays it on UI.
 	 * @param e
 	 */
 	private handleError(e): void {
