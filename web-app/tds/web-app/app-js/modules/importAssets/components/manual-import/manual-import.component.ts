@@ -4,7 +4,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {RemoveEvent, SuccessEvent, UploadComponent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
-import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 @Component({
 	selector: 'manual-import',
@@ -21,7 +21,7 @@ export class ManualImportComponent implements OnInit {
 	private fetchResult: any;
 	private fetchInProcess = false;
 	private fetchInputUsed: 'action' | 'file' = 'action';
-	private transformResult: ApiReponseModel;
+	private transformResult: ApiResponseModel;
 	private transformInProcess = false;
 	private importResult: any;
 	private importInProcess = false;
