@@ -23,7 +23,7 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * TODO: document
+	 * On close dialog.
 	 */
 	private onCancelCloseDialog(): void {
 		// this.cancelEvent.emit();
