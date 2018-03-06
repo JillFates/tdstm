@@ -230,7 +230,7 @@ class ETLProcessor implements RangeChecker {
 				throw ETLProcessorException.domainMustBeSpecified()
 			}
 			result.ignoreCurrentRow()
-			debugConsole.info("Ignore rows for ${currentRowIndex}")
+			debugConsole.info("Ignore row ${currentRowIndex}")
 		}
 
 		return this
