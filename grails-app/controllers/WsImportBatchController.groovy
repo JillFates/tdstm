@@ -169,4 +169,16 @@ class WsImportBatchController implements ControllerMethods {
 		renderSuccessJson(record.toMap())
 	}
 
+	/**
+	 * Retrieve progress info of a given batch
+	 * @param id
+	 * @param info
+	 */
+	@HasPermission(Permission.DataTransferBatchProcess)
+	def getInfoOfBatch(Long id, String info) {
+		Project project = getProjectForWs()
+		Map infoMap = importBatchService.getImportBatchInfo(project, id, info)
+		renderSuccessJson(infoMap)
+	}
+
 }
