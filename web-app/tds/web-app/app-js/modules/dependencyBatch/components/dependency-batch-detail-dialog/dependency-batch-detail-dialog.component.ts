@@ -7,7 +7,7 @@ import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
-import {ApiReponseModel} from '../../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-record-detail-dialog/dependency-batch-record-detail-dialog.component';
 
 @Component({
@@ -35,7 +35,6 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
-		private promptService: UIPromptService,
 		private dependencyBatchService: DependencyBatchService,
 		private activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService) {
@@ -46,8 +45,15 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * On Component Init get Import Batch Records.
 	 */
 	ngOnInit(): void {
-		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiReponseModel) => {
-			if (result.status === ApiReponseModel.API_SUCCESS) {
+		this.loadImportBatchRecords();
+	}
+
+	/**
+	 * Load Import Batch Records from API.
+	 */
+	private loadImportBatchRecords(): void {
+		this.dependencyBatchService.getImportBatchRecords(this.importBatchModel.id).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.batchRecords = result.data;
 				this.dataGridOperationsHelper = new DataGridOperationsHelper(this.batchRecords, [], this.selectableSettings, this.checkboxSelectionConfig);
 			} else {
@@ -87,9 +93,13 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		this.dialogService.extra(DependencyBatchRecordDetailDialogComponent, [
 				{provide: ImportBatchModel, useValue: this.importBatchModel},
 				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
-			], false, false).then((result) => {
-				// ???
-			});
+			], false, false)
+			.then((result) => {
+				console.log('closed');
+				if (result === 'reload') {
+					this.loadImportBatchRecords();
+				}
+			}).catch( result => { console.log('dismissed'); });
 	}
 
 	/**

@@ -18,7 +18,8 @@
                                 *ngIf="batchRecord"
                                 [importBatch]="importBatch"
                                 [batchRecord]="batchRecord"
-                                (onCancel)="onCancelCloseDialog()">
+                                (onCancel)="onCancelCloseDialog()"
+                                (onUpdateSuccess)="onUpdateSuccess()">
                         </dependency-batch-record-detail-fields>
                     </section>
                 </div>

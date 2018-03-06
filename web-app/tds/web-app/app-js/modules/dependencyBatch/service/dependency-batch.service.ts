@@ -4,7 +4,7 @@ import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchModel} from '../model/import-batch.model';
 import {ImportBatchRecordModel} from '../model/import-batch-record.model';
-import {ApiReponseModel} from '../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
 export class DependencyBatchService {
@@ -90,7 +90,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	archiveImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+	archiveImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
 			action: 'ARCHIVE',
 			ids: ids
@@ -120,7 +120,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	unArchiveImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+	unArchiveImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
 			action: 'UNARCHIVE',
 			ids: ids
@@ -137,7 +137,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	ejectImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+	ejectImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
 			action: 'EJECT',
 			ids: ids
@@ -154,7 +154,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	queueImportBatches(ids: Array<number>): Observable<ApiReponseModel> {
+	queueImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
 			action: 'QUEUE',
 			ids: ids
@@ -197,7 +197,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	getImportBatchRecords(id: number): Observable<ApiReponseModel> {
+	getImportBatchRecords(id: number): Observable<ApiResponseModel> {
 		return this.http.get(this.importBatchUrl + `/${id}/records`)
 			.map( (res: Response) => {
 				return res.json();
@@ -210,7 +210,7 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	getImportBatchRecordFieldDetail(batchId: number, id: number): Observable<ApiReponseModel> {
+	getImportBatchRecordFieldDetail(batchId: number, id: number): Observable<ApiResponseModel> {
 		return this.http.get(this.importBatchUrl + `/${batchId}/record/${id}`)
 			.map( (res: Response) => {
 				return res.json();
@@ -231,11 +231,14 @@ export class DependencyBatchService {
 	 */
 	updateBatchRecordFieldsValues(batchId: number, id: number, fieldsValues: Array<{fieldName: string, value: string}>): Observable<any> {
 		const request = {
-			fields: fieldsValues
+			fieldsInfo: fieldsValues
 		};
 		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
 			.map((res: Response) => {
-				return res.json();
+				// return res.json();
+				let mockResponse = new ApiResponseModel();
+				mockResponse.status = ApiResponseModel.API_SUCCESS;
+				return mockResponse;
 			})
 			.catch((error: any) => error.json());
 	}
