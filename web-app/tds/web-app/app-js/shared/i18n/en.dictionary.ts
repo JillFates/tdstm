@@ -35,7 +35,7 @@ export const en_DICTIONARY: Object = {
 		'SYSTEM_VIEW': 'System View'
 	},
 	'DATA_INGESTION': {
-		'ADD_ARGUMENT': 'Add Argument',
+		'ADD_PARAMETER': 'Add Parameter',
 		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
