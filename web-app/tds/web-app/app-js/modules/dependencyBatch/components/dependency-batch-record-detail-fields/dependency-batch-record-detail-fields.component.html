@@ -104,12 +104,14 @@
             <i class="glyphicon glyphicon-thumbs-up"></i>
             Revalidate
         </button>
-        <button (click)="onInclude()"
+        <button *ngIf="showIncludeButton()"
+                (click)="onInclude()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-plus"></i>
             Include
         </button>
-        <button (click)="onIgnore()"
+        <button *ngIf="showIgnoreButton()"
+                (click)="onIgnore()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-eye-close"></i>
             Ignore

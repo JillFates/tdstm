@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
+import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
 import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -74,7 +74,7 @@ export class DependencyBatchListComponent {
 						return !item.archived;
 					});
 					for (let batch of batches ) {
-						if (batch.status.code === 'RUNNING') {
+						if (batch.status.code === BatchStatus.RUNNING) {
 							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe(res => {
 								if (res.data.percentComp) {
 									batch.currentProgress =  res.data.percentComp;

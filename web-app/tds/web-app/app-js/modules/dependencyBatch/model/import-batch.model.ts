@@ -4,6 +4,13 @@ import {DataScriptModel} from '../../dataIngestion/model/data-script.model';
 import {ProjectModel} from '../../../shared/model/project.model';
 import {EnumModel} from '../../../shared/model/enum.model';
 
+export enum BatchStatus {
+	RUNNING = 'RUNNING',
+	PENDING = 'PENDING',
+	QUEUED = 'QUEUED',
+	IGNORED = 'IGNORED'
+};
+
 export class ImportBatchModel {
 	id: number;
 	status: EnumModel;
