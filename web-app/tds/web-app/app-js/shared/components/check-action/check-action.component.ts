@@ -34,7 +34,7 @@ export class CheckActionComponent implements DoCheck {
 	private dataSignature = '';
 
 	constructor(private differs: KeyValueDiffers) {
-		this.differ = differs.find({}).create(null);
+		this.differ = differs.find({}).create();
 	}
 
 	ngDoCheck(): void {

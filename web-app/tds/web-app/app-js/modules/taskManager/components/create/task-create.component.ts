@@ -3,7 +3,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {FormlyFieldConfig} from 'ng-formly';
 import {FormGroup} from '@angular/forms';
 import {StateService} from '@uirouter/angular';
 import {TaskStates} from '../../task-manager-routing.states';
@@ -18,7 +17,6 @@ export class TaskCreateComponent implements OnInit {
 	private moduleName = '';
 
 	public form: FormGroup = new FormGroup({});
-	public userFields: FormlyFieldConfig[];
 
 	public user = {
 		email: 'email@gmail.com',
@@ -31,38 +29,6 @@ export class TaskCreateComponent implements OnInit {
 	 */
 	constructor(private stateService: StateService) {
 		this.moduleName = 'Task Manager List';
-	}
-
-	prepareUserFields(): void {
-		this.userFields = [
-			{
-				id: 'taskName',
-				key: 'taskName',
-				type: 'formlyInputHorizontalWrapper',
-				templateOptions: {
-					label: 'Task',
-					placeholder: 'Task Name',
-					validate: true,
-					required: true,
-					options: [{maxWidth: 500}]
-				},
-				validation: {
-					show: true
-				}
-			},
-			{
-				fieldGroup: [
-					{
-						id: 'personTeam',
-						key: 'personTeam',
-						type: 'formlySelectHorizontalWrapper',
-						templateOptions: {
-							label: 'Person/Team',
-							options: [{maxWidth: 300}]
-						}
-					}
-				]
-			}];
 	}
 
 	createTask(): void {
@@ -82,6 +48,5 @@ export class TaskCreateComponent implements OnInit {
 	 */
 	ngOnInit(): void {
 		console.log('Init');
-		this.prepareUserFields();
 	}
 }

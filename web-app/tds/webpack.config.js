@@ -14,6 +14,7 @@ module.exports = function (env, argv) {
 	console.log('Production Environment: ' + (!devEnv));
 
 	return {
+		mode: 'development',
 		entry: {
 			app: './web-app/app-js/main.ts',
 			vendor: Object.keys(pkg.dependencies) //get npm vendors deps from config
@@ -24,7 +25,7 @@ module.exports = function (env, argv) {
 		},
 		module: {
 			rules: [
-				{ test: /\.tsx?$/, loader: 'ts-loader' },
+				{test: /\.tsx?$/, loader: 'ts-loader'},
 				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'}
 			]
 		},
@@ -34,23 +35,15 @@ module.exports = function (env, argv) {
 		},
 		plugins: [
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map',
-				exclude: ['vendor.js']
+				filename: '[name].js.map'
 			}),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: ['app', 'vendor']
-			}),
-			new webpack.optimize.UglifyJsPlugin({
-				comments: false,
-				sourceMap: devEnv,
-				exclude: [/\.min\.js$/gi] // skip pre-minified libs
-			}),
-			new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
-				/angular(\\|\/)core(\\|\/)@angular/,
-				path.resolve(__dirname, "app-js")
-			),
 			//new BundleAnalyzerPlugin()
 		],
+		optimization: {
+			splitChunks: {
+				name: true
+			}
+		},
 		cache: true,
 		context: __dirname,
 		watch: devEnv,
