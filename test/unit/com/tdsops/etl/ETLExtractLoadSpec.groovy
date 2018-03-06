@@ -347,8 +347,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can read labels from dataSource and create a map of columns'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -1492,6 +1496,66 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'You cannot use ignore rows in an empty results'
+	}
+
+	void 'test can ignore rows in the middle of a data set'() {
+
+//		updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
+//		updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				sixRowsDataSet,
+				GroovyMock(DebugConsole),
+				validator
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					console on
+					read labels
+					iterate {
+					    domain Device
+					    extract 'device id' load id
+					    extract 'model name' transform with lowercase() load Name
+					
+					    if( SOURCE.'device id'.startsWith('152253') ){
+					        ignore row
+					    }
+					   
+					}
+				""".stripIndent(), ETLProcessor.class.name)
+
+		then: 'A row was removed from the domain results'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['id', 'name'] as Set
+				data.size() == 5
+
+				data*.rowNum == [1, 2, 4, 5, 6]
+				data.collect{ it.fields.id.value } == [
+					'152251', '152252', '152254', '152255', '152256'
+				]
+				data.collect{ it.fields.name.value } == [
+					'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
+				]
+				data.collect{ it.fields.name.originalValue } == [
+					'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
+				]
+			}
 	}
 
 }

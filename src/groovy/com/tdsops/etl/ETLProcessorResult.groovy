@@ -157,10 +157,14 @@ class ETLProcessorResult {
 
 	/**
 	 * Calculates the current data map based on row index
+	 * It check if it isn necessary to init a new row
+	 * based on the latest data in the current reference
+	 * and the 'currentRowIndex'
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-		if(reference.data.size() < processor.currentRowIndex){
+		if(reference.data.last().rowNum &&
+				reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
 		}
 		return reference.data.last()
