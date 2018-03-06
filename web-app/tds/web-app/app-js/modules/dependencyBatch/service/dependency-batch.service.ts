@@ -302,4 +302,20 @@ export class DependencyBatchService {
 		];
 		return Observable.of(mockResult);
 	}
+
+	/**
+	 * PUT - Updates the batch record fields values of a batch record.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	updateBatchRecordFieldsValues(batchId: number, id: number, fieldsValues: Array<{fieldName: string, value: string}>): Observable<any> {
+		const request = {
+			fields: fieldsValues
+		};
+		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
 }
