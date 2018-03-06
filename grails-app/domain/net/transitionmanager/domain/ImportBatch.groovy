@@ -1,11 +1,9 @@
 package net.transitionmanager.domain
 
+import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.etl.ETLDomain
-
 /**
  * ImportBatch
  *
@@ -187,5 +185,14 @@ class ImportBatch {
 	// void setFieldNameList(Object value) {
 	// 	this.fieldNameList = JsonUtil.toJson(value)
 	// }
+
+	def beforeInsert = {
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = dateCreated
+	}
+
+	def beforeUpdate = {
+		lastUpdated = TimeUtil.nowGMT()
+	}
 
 }

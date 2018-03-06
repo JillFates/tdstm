@@ -2,14 +2,15 @@ package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
+import groovy.util.logging.Slf4j
+import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
-import net.transitionmanager.service.EmptyResultException
-
 import org.apache.commons.lang3.BooleanUtils
-import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
 class ImportBatchService implements ServiceMethods {
@@ -143,5 +144,28 @@ class ImportBatchService implements ServiceMethods {
 		Integer updated = ImportBatch.executeUpdate(hql, params)
 
 		return updated
+	}
+
+	/**
+	 *
+	 * @param project - current project
+	 * @param importBatchId - Id of the batch the record belongs to.
+	 * @param recordId - the id of the record being updated.
+	 * @param command - ImportBatchRecordUpdateCommand with the fieldsInfo JSON from the request.
+	 * @return
+	 */
+	ImportBatchRecord updateBatchRecord(Project project, Long importBatchId, Long recordId, ImportBatchRecordUpdateCommand command) {
+		ImportBatchRecord record = fetchImportBatchRecord(project, importBatchId, recordId)
+		// get the fieldInfo from the record as a Json Map (create an empty map if fieldInfo is null).
+		Map fieldInfoRecordJson = record.fieldsInfoAsMap() ?: [:]
+		// Shortcut to the JSON in the command
+		JSONObject fieldsInfoCmdJson = command.fieldsInfo
+		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
+		for (String key in fieldsInfoCmdJson.keySet()) {
+			fieldInfoRecordJson[key] = fieldsInfoCmdJson[key]
+		}
+		record.fieldsInfo = JsonUtil.convertMapToJsonString(fieldInfoRecordJson)
+		record.save(failOnError: true)
+		return record
 	}
 }
