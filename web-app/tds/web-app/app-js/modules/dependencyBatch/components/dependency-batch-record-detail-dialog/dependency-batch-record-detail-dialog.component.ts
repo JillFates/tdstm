@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
-import {ImportBatchModel} from '../../model/import-batch.model';
+import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
