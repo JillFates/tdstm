@@ -1120,19 +1120,3 @@ div.dialog input#description {
 .k-grid-content tr td {
 	padding: 2px 6px;
 }
-
-
-.dates-info {
-	border: none;
-	font-size: 10px;
-	padding-top: 0!important;
-}
-
-	.dates-info .date-created {
-        font-size: inherit;
-	}
-
-	.dates-info .last-updated {
-		font-size: inherit;
-        text-align: right;
-	}

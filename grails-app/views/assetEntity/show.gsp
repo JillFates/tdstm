@@ -234,11 +234,11 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2">
+			<td colspan="2" class="dates-info-container">
 				<table class="dates-info" >
 					<tr>
-						<td class="date-created">Date created: ${dateCreated}</td>
-						<td class="last-updated">Last updated: ${lastUpdated}</td>
+						<td class="date-created date-info">Date created: ${dateCreated}</td>
+						<td class="last-updated date-info">Last updated: ${lastUpdated}</td>
 					</tr>
 				</table>
 			</td>
