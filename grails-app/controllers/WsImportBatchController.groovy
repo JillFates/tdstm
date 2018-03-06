@@ -1,6 +1,8 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.JsonUtil
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
 import net.transitionmanager.command.IdsCommand
+import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.command.PatchActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ImportBatch
@@ -10,11 +12,6 @@ import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ImportBatchService
-import net.transitionmanager.service.EmptyResultException
-import net.transitionmanager.service.InvalidRequestException
-
-import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
 
 @Secured("isAuthenticated()")
 @Slf4j
@@ -158,18 +155,17 @@ class WsImportBatchController implements ControllerMethods {
 		renderSuccessJson( [deleted: true] )
 	}
 
+	/**
+	 * Update the Import Batch Record with new values for the given fields.
+	 * @param id: ImportBatch id
+	 * @param recordId: ImportBatchRecord id
+	 * @return
+	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
 	def updateImportBatchRecord(Long id, Long recordId) {
-
-		// Temporary code
-		ImportBatchRecord record = ImportBatchRecord.where {
-			importBatch.id == id
-			id == recordId
-		}.find()
-
-		if (!record) {
-			throw new EmptyResultException()
-		}
+		Project project = getProjectForWs()
+		ImportBatchRecordUpdateCommand command = populateCommandObject(ImportBatchRecordUpdateCommand)
+		ImportBatchRecord record = importBatchService.updateBatchRecord(project, id, recordId, command)
 		renderSuccessJson(record.toMap())
 	}
 
