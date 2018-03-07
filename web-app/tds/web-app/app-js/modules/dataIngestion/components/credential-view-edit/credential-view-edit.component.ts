@@ -26,7 +26,6 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
-		
 		.script-error {
 			margin-bottom: 18px;
 		}

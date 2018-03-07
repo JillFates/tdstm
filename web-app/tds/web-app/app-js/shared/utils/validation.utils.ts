@@ -11,7 +11,7 @@ import {Injectable} from '@angular/core';
 @Injectable()
 export class ValidationUtils {
 
-	public static NOT_FOUND: number = -1;
+	public static NOT_FOUND = -1;
 
 	/**
 	 *
