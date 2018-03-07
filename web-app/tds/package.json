@@ -86,7 +86,7 @@
     "tslint-loader": "3.6.0",
     "typescript": "2.7.2",
     "watchify": "3.7.0",
-    "webpack": "4.1.0",
+    "webpack": "4.1.1",
     "webpack-bundle-analyzer": "2.11.1",
     "webpack-cli": "2.0.10"
   }
