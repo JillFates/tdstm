@@ -163,7 +163,7 @@
                                               style="left:106px;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
                                     </ng-template>
                                     <ng-template #stringFilter>
-                                        <input [(ngModel)]="column.filter" (keyup)="dataGridOperationsHelper.onFilter(column)"
+                                        <input [(ngModel)]="column.filter" (keyup)="preProcessFilter(column)"
                                                type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
                                         <span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
                                     </ng-template>
