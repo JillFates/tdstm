@@ -17,7 +17,7 @@ class DomainFacade {
 
 	Object getProperty(String name) {
 
-		Map<String,?> currentDataFields = result.currentData().fields
+		Map<String,?> currentDataFields = result.reference.data.last().fields
 
 		if(!currentDataFields.containsKey(name)) {
 			throw ETLProcessorException.unknownDomainProperty(name)

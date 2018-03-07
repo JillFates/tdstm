@@ -580,7 +580,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
+					
 						extract 'vendor name' 
+						
 						if ( CE == 'Microsoft'){
 							load appVendor
 						} else {
@@ -1292,7 +1294,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
 	}
 
-	void 'test can abort current row based on some condition'() {
+	void 'test can ignore current row based on some condition'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1367,7 +1369,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			}
 	}
 
-	void 'test can abort current row more than once in the same iteration'() {
+	void 'test can ignore current row more than once in the same iteration'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1467,7 +1469,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			e.message == 'A domain must be specified'
 	}
 
-	void 'test can throw and exception when script tries to ignore an empty results'() {
+	void 'test can ignore even if results are empty'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1488,24 +1490,66 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					read labels
 					domain Application
 					iterate {
-						ignore row
+						extract technology
+						if( CE == 'NGM') {
+							ignore row
+						} else {
+							load Name
+						}
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'You cannot use ignore rows in an empty results'
+		then: 'Results will ignore a row'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['assetName'] as Set
+				data.size() == 1
+			}
+	}
+
+	void 'test can ignore rows without loading values previously'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract technology
+						if( CE != 'NGM') {
+							ignore row
+						} else {
+							load Name
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results will ignore a row'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['assetName'] as Set
+				data.size() == 1
+			}
 	}
 
 	void 'test can ignore rows in the middle of a data set'() {
-
-//		updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
-//		updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
-//		updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
-//		updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
-//		updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
-//		updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1538,7 +1582,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					}
 				""".stripIndent(), ETLProcessor.class.name)
 
-		then: 'A row was removed from the domain results'
+		then: 'Third row was removed from the domain results'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()

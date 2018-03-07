@@ -312,9 +312,11 @@ class Element implements RangeChecker {
     /**
      * Overriding Equals method for this command in an ETL script.
      * <code>
-     *     .....
-     *     if (myVar == 'Cool Stuff') {*          .....
-     *}* </code>
+     *      .....
+     *      if (myVar == 'Cool Stuff') {
+     *          .....
+     *      }
+     *  </code>
      * @param otherObject
      * @return
      */

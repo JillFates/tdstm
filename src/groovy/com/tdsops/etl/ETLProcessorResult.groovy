@@ -129,10 +129,23 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
+
 		reference.fields.add(element.fieldSpec.name)
 		Map<String, ?> currentData = currentData()
 		currentData.rowNum = element.rowIndex
-		currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+
+		if(currentData.fields[element.fieldSpec.name]) {
+			Map<String, ?> field = currentData.fields[element.fieldSpec.name]
+			if(element.initValue){
+				field.initValue = element.initValue
+			} else {
+				field.value = element.value
+				field.originalValue = element.originalValue
+			}
+		} else {
+			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+		}
+
 	}
 
 	/**
@@ -141,18 +154,16 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#removeIgnoredRows()
 	 */
 	void ignoreCurrentRow() {
-		List<?> currentRowData = reference.data
-		if(!currentRowData || currentRowData.isEmpty()){
-			throw ETLProcessorException.invalidIgnoreCommand()
-		}
-		reference.data.last().ignore = true
+		currentData().ignore = true
 	}
 
 	/**
 	 * Removes ignored rows in the current reference.
 	 */
 	def removeIgnoredRows() {
-		reference.data.removeAll { it.ignore == true }
+		if(reference.data.last().ignore) {
+			reference.data = reference.data.dropRight(1)
+		}
 	}
 
 	/**
@@ -163,8 +174,10 @@ class ETLProcessorResult {
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-		if(reference.data.last().rowNum &&
-				reference.data.last().rowNum  < processor.currentRowIndex){
+		if(reference.data.isEmpty()){
+			reference.data.add(initialRowDataMap())
+		} else if (reference.data.last().rowNum &&
+			reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
 		}
 		return reference.data.last()
