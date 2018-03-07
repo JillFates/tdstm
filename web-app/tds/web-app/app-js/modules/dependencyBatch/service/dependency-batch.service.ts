@@ -171,8 +171,8 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	getImportBatchProgress(id: number): Observable<any> {
-		return this.http.get(`${this.batchProgressUrl}/${id}`)
+	getImportBatchProgress(id: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.importBatchUrl}/${id}/progress`)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -184,8 +184,12 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	stopImportBatch(id: number): Observable<any> {
-		return this.http.delete(`${this.batchProgressUrl}/${id}`)
+	stopImportBatch(ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'STOP',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
