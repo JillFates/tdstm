@@ -12,6 +12,7 @@ import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-d
 import {Observable} from 'rxjs/Observable';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -273,5 +274,19 @@ export class DependencyBatchListComponent {
 	 */
 	private canBulkArchive(): boolean {
 		return this.permissionService.hasPermission(Permission.DataTransferBatchProcess);
+	}
+
+	/**
+	 * Add modifications to the params send to filter if needed.
+	 * @param {GridColumnModel} column
+	 */
+	private preProcessFilter(column: GridColumnModel): void {
+		if (column.property === 'status') {
+			let columnCopy = {...column};
+			columnCopy.property = 'status.label';
+			this.dataGridOperationsHelper.onFilter(columnCopy);
+		} else {
+			this.dataGridOperationsHelper.onFilter(column);
+		}
 	}
 }

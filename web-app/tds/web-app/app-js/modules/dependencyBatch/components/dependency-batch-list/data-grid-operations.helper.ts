@@ -1,4 +1,4 @@
-import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
+import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	CompositeFilterDescriptor, filterBy, FilterDescriptor, process, SortDescriptor,
 	State
@@ -52,7 +52,7 @@ export class DataGridOperationsHelper {
 	 * On Filter column event.
 	 * @param column
 	 */
-	public onFilter(column: any): void {
+	public onFilter(column: GridColumnModel): void {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
