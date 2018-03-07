@@ -6,6 +6,7 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.ImportBatchService
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
 
 class ImportBatchServiceIntegrationTests extends Specification {
@@ -29,8 +30,9 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			String field1 = 'field1'
 			String field1Value = 'some value'
 			ImportBatchRecordUpdateCommand cmd = new ImportBatchRecordUpdateCommand()
-			Map newValues = [fieldName: field1, value: field1Value]
-			cmd.fieldsInfo = [newValues]
+			Map newValues = [:]
+			newValues[field1] = field1Value
+			cmd.fieldsInfo = new JSONObject(newValues)
 		when: 'Updating the record with some new values'
 			importBatchService.updateBatchRecord(project, batch.id, record.id, cmd)
 			Map fieldsInfo = record.fieldsInfoAsMap()
@@ -38,8 +40,8 @@ class ImportBatchServiceIntegrationTests extends Specification {
 			fieldsInfo[field1] == field1Value
 		when: 'Overriding the previous value'
 			String field1UpdatedValue = 'some other value'
-			newValues = [fieldName: field1, value: field1UpdatedValue]
-			cmd.fieldsInfo = [newValues]
+			newValues[field1] = field1UpdatedValue
+			cmd.fieldsInfo = new JSONObject(newValues)
 			importBatchService.updateBatchRecord(project, batch.id, record.id, cmd)
 			fieldsInfo = record.fieldsInfoAsMap()
 		then: 'The record was successfully updated again.'
