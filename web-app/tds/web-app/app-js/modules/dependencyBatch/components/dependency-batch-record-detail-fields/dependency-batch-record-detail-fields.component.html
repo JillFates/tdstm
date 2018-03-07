@@ -1,27 +1,7 @@
-<!--<div class="fields-filters row" style="margin-left: 10px;">
-    <label class="col-sm-1" style="width: 40px;">Fields</label>
-    <div class="fieldsFilter col-sm-2">
-        <kendo-dropdownlist id="fieldsFilter" name="fieldsFilter"
-                            [data]="fieldsFilter.options"
-                            [textField]="'text'"
-                            [valueField]="'value'"
-                            [(ngModel)]="fieldsFilter.selected"
-                            placeholder="Filter"
-                            class="form-control input-sm"></kendo-dropdownlist>
-    </div>
-    <div class="fieldsFilterText col-sm-2">
-        <input [(ngModel)]="fieldsFilter.text"
-               type="text"
-               class="form-control"
-               name="fieldsFilterText"
-               placeholder="Filter on field name">
-        <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
-    </div>
-</div>-->
 <div class="fields-container row" *ngIf="fieldsInfo">
 
     <kendo-grid
-            [data]="importBatch.fieldNameList"
+            [data]="gridData"
             [pageSize]="25"
             [height]="400">
         <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -37,57 +17,29 @@
             </div>
             <div class="fieldsFilterText col-sm-3">
                 <input [(ngModel)]="fieldsFilter.text"
-                       type="text"
-                       class="form-control"
-                       name="fieldsFilterText"
-                       placeholder="Filter on field name">
-                <span *ngIf="fieldsFilter.text" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+                       type="text" class="form-control"
+                       name="fieldsFilterText" placeholder="Filter on field name"
+                       (keyup)="onTextFilter()">
+                <span *ngIf="fieldsFilter.text"
+                      style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 25px;width: 10px;"
+                      class="fa fa-times form-control-feedback" (click)="clearTextFilter()"></span>
             </div>
         </ng-template>
-        <kendo-grid-column title="Name">
-            <ng-template kendoGridCellTemplate let-dataItem >
-                <span>{{dataItem}}</span>
-            </ng-template>
-        </kendo-grid-column>
-        <kendo-grid-column title="Current Value">
-            <ng-template kendoGridCellTemplate let-dataItem >
-                <span>{{fieldsInfo[dataItem].originalValue}}</span>
-            </ng-template>
-        </kendo-grid-column>
-        <kendo-grid-column title="Import Value">
-            <ng-template kendoGridCellTemplate let-dataItem >
-                <span>{{fieldsInfo[dataItem].value}}</span>
-            </ng-template>
-        </kendo-grid-column>
+        <kendo-grid-column title="Name" field="name"></kendo-grid-column>
+        <kendo-grid-column title="Current Value" field="currentValue"></kendo-grid-column>
+        <kendo-grid-column title="Import Value" field="importValue"></kendo-grid-column>
         <kendo-grid-column title="Override Value">
             <ng-template kendoGridCellTemplate let-dataItem >
-                <input type="text" style="width: 100%; height: 30px;" [(ngModel)]="fieldsInfo[dataItem].overridedValue"/>
+                <input type="text" style="width: 100%; height: 30px;" [(ngModel)]="dataItem.overridedValue"/>
             </ng-template>
         </kendo-grid-column>
         <kendo-grid-column title="Error">
             <ng-template kendoGridCellTemplate let-dataItem >
-                <span>{{fieldsInfo[dataItem].error ? fieldsInfo[dataItem].error : '' }}</span>
+                <span>{{dataItem.error ? dataItem.error : '' }}</span>
             </ng-template>
         </kendo-grid-column>
     </kendo-grid>
 
-    <!--<div class="row header">
-        <div class="col-sm-2">Name</div>
-        <div class="col-sm-2">Current Value</div>
-        <div class="col-sm-2">Import Value</div>
-        <div class="col-sm-2">Override Value</div>
-        <div class="col-sm-4">Error</div>
-    </div>
-    <div style="height: 200px; overflow: scroll;">
-        <div class="row body" style="margin-top: 10px;" *ngFor="let fieldName of importBatch.fieldNameList">
-            <div class="col-sm-2">{{fieldName}}</div>
-            <div class="col-sm-2">{{fieldsInfo[fieldName].originalValue}}</div>
-            <div class="col-sm-2">{{fieldsInfo[fieldName].value}}</div>
-            <div class="col-sm-2"><input type="text"></div>
-            <div class="col-sm-4"><small><i>{{fieldsInfo[fieldName].error ? fieldsInfo[fieldName].error : '' }}</i></small></div>
-        </div>
-    </div>
-    -->
     <style>
         .footer button {
             margin-right: 5px;
