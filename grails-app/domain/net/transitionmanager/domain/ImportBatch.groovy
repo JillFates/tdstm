@@ -195,17 +195,4 @@ class ImportBatch {
 		lastUpdated = TimeUtil.nowGMT()
 	}
 
-	/**
-	 * Return a map with the progress information for this batch, including:
-	 *      progress -> processProgress
-	 *      lastUpdated -> processLastUpdated
-	 * @return
-	 */
-	Map getProgressInfo() {
-		return [
-		    progress: processProgress,
-			lastUpdated: processLastUpdated
-		]
-	}
-
 }
