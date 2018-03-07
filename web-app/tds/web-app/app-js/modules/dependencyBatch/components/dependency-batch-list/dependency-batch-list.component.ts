@@ -75,13 +75,13 @@ export class DependencyBatchListComponent {
 					});
 					for (let batch of batches ) {
 						if (batch.status.code === BatchStatus.RUNNING) {
-							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe(res => {
-								if (res.data.percentComp) {
-									batch.currentProgress =  res.data.percentComp;
+							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
+								if (response.status === ApiResponseModel.API_SUCCESS) {
+									batch.currentProgress =  response.data.progress ? response.data.progress : 0;
 								} else {
-									batch.currentProgress = 80;
+									this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
 								}
-							}, error => console.log(error));
+							}, error => this.handleError(error));
 						}
 					}
 					resolve(batches);
@@ -241,11 +241,12 @@ export class DependencyBatchListComponent {
 	 * @param item
 	 */
 	private onStopButton(batch: ImportBatchModel): void {
-		this.dependencyBatchService.stopImportBatch(batch.id).subscribe( (result) => {
-			if (result.status === 'success') {
+		const ids = [batch.id];
+		this.dependencyBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
+			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.reloadBatchList();
 			} else {
-				this.handleError(result.errors ? result.errors[0] : null);
+				this.handleError(result.errors[0] ? result.errors[0] : 'Error on stop import batch endpoint.');
 			}
 		}, error => this.handleError(error));
 	}
