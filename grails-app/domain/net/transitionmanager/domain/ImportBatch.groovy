@@ -204,7 +204,7 @@ class ImportBatch {
 	Map getProgressInfo() {
 		return [
 		    progress: processProgress,
-			lastupdated: processLastUpdated
+			lastUpdated: processLastUpdated
 		]
 	}
 
