@@ -157,9 +157,18 @@ class ImportBatchService implements ServiceMethods {
 		ImportBatchRecord record = fetchImportBatchRecord(project, importBatchId, recordId)
 		// get the fieldInfo from the record as a Json Map (create an empty map if fieldInfo is null).
 		Map fieldsMap = record.fieldsInfoAsMap() ?: [:]
+		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, importBatchId, true)
+		// Retrieve the fields specified in the ImportBatch
+		List<String> validFields = batch.fieldNameListAsList()
 		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
 		for (field in command.fieldsInfo) {
-			fieldsMap[field.fieldName] = field.value
+			// Check that the fieldName provided is in the list of fields defined for the batch.
+			if (field.fieldName in validFields) {
+				// The field for the id has a different structure.
+				fieldsMap[field.fieldName]["value"] = field.value
+			} else {
+				throw new InvalidParamException("Cannot update Import Batch record because of invalid field $field.")
+			}
 		}
 		record.fieldsInfo = JsonUtil.convertMapToJsonString(fieldsMap)
 		record.save(failOnError: true)
