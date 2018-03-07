@@ -3,7 +3,7 @@
  */
 
 import {
-	Component, OnDestroy, AfterViewInit, Injectable
+	Component, OnDestroy, AfterViewInit, Injectable, HostListener
 } from '@angular/core';
 
 import { NotifierService } from '../services/notifier.service';
@@ -18,6 +18,15 @@ declare var jQuery: any;
 	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
+	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		// prevent press any key on this component
+		if (this.tdsUiPrompt && this.tdsUiPrompt.length > 0) {
+			if (this.tdsUiPrompt[0].id === (<HTMLTextAreaElement>event.target).id) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		}
+	}
 	title: string;
 	message: string;
 	confirmLabel: string;
@@ -25,6 +34,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	tdsUiPrompt: any;
 	resolve: any;
 	reject: any;
+	canExit: boolean ;
 
 	openNotifier: any;
 
@@ -35,10 +45,19 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	ngAfterViewInit(): void {
 		this.tdsUiPrompt = jQuery('#tdsUiPrompt');
 		this.tdsUiPrompt.on('hide.bs.modal', () => {
-			if (this.reject) {
+			if (this.canExit && this.reject) {
 				this.reject();
 			}
 		});
+
+		// prevent closing
+		this.tdsUiPrompt.on('hide.bs.modal.prevent', (event) => {
+			if (!this.canExit) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		});
+
 	}
 
 	/**
@@ -55,6 +74,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	private registerListeners(): void {
 		this.openNotifier = this.notifierService.on('prompt.open', event => {
 			// make sure UI has no other open dialog
+			this.canExit = false;
 			this.tdsUiPrompt.modal('hide');
 			this.reject = event.reject;
 			this.resolve = event.resolve;
@@ -67,16 +87,19 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	protected cancel(): void {
+		this.canExit = true;
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	protected dismiss(): void {
+		this.canExit = true;
 		this.reject();
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	protected confirm(): void {
+		this.canExit = true;
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
 	}
