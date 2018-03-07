@@ -17,6 +17,8 @@ import {SharedModule} from '../../shared/shared.module';
 import {TaskService} from './service/task.service';
 // Import Kendo Modules
 import {GridModule} from '@progress/kendo-angular-grid';
+import {DynamicFormsCoreModule} from '@ng-dynamic-forms/core';
+import {DynamicFormsKendoUIModule} from '@ng-dynamic-forms/ui-kendo';
 
 @NgModule({
 	imports: [
@@ -25,6 +27,8 @@ import {GridModule} from '@progress/kendo-angular-grid';
 		GridModule,
 		FormsModule,
 		ReactiveFormsModule,
+		DynamicFormsCoreModule.forRoot(),
+		DynamicFormsKendoUIModule,
 		UIRouterModule.forChild({states: TASK_MANAGER_STATES}), // Same as { states: [state1, state2 ] }
 	],
 	providers: [TaskService],
