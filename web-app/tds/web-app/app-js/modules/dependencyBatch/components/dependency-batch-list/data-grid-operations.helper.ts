@@ -138,7 +138,7 @@ export class DataGridOperationsHelper {
 	 * On Clear Value for filter event.
 	 * @param column
 	 */
-	public clearValue(column: any): void {
+	public clearValue(column: GridColumnModel): void {
 		column.filter = '';
 		if (this.state.filter && this.state.filter.filters.length > 0) {
 			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
