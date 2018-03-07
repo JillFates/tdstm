@@ -259,7 +259,6 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
-
 		currentRowIndex--
 		return this
 	}

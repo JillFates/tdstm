@@ -154,18 +154,16 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#removeIgnoredRows()
 	 */
 	void ignoreCurrentRow() {
-		List<?> currentRowData = reference.data
-		if(!currentRowData || currentRowData.isEmpty()){
-			throw ETLProcessorException.invalidIgnoreCommand()
-		}
-		reference.data.last().ignore = true
+		currentData().ignore = true
 	}
 
 	/**
 	 * Removes ignored rows in the current reference.
 	 */
 	def removeIgnoredRows() {
-		reference.data.removeAll { it.ignore == true }
+		if(reference.data.last().ignore) {
+			reference.data = reference.data.dropRight(1)
+		}
 	}
 
 	/**
@@ -176,8 +174,10 @@ class ETLProcessorResult {
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-		if(reference.data.last().rowNum &&
-				reference.data.last().rowNum  < processor.currentRowIndex){
+		if(reference.data.isEmpty()){
+			reference.data.add(initialRowDataMap())
+		} else if (reference.data.last().rowNum &&
+					reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
 		}
 		return reference.data.last()
