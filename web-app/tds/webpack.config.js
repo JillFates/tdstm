@@ -14,7 +14,7 @@ module.exports = function (env, argv) {
 	console.log('Production Environment: ' + (!devEnv));
 
 	return {
-		mode: 'development',
+		mode: (devEnv)? 'development' : 'production',
 		entry: {
 			app: './web-app/app-js/main.ts',
 			vendor: Object.keys(pkg.dependencies) //get npm vendors deps from config
@@ -35,13 +35,20 @@ module.exports = function (env, argv) {
 		},
 		plugins: [
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map'
+				filename: '[name].js.map',
 			}),
 			//new BundleAnalyzerPlugin()
 		],
 		optimization: {
 			splitChunks: {
-				name: true
+				name: true,
+				cacheGroups: {
+					commons: {
+						test: /[\\/]node_modules[\\/]/,
+						name: "vendor",
+						chunks: "all"
+					}
+				}
 			}
 		},
 		cache: true,
