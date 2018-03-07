@@ -129,10 +129,23 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
+
 		reference.fields.add(element.fieldSpec.name)
 		Map<String, ?> currentData = currentData()
 		currentData.rowNum = element.rowIndex
-		currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+
+		if(currentData.fields[element.fieldSpec.name]) {
+			Map<String, ?> field = currentData.fields[element.fieldSpec.name]
+			if(element.initValue){
+				field.initValue = element.initValue
+			} else {
+				field.value = element.value
+				field.originalValue = element.originalValue
+			}
+		} else {
+			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+		}
+
 	}
 
 	/**
@@ -247,7 +260,7 @@ class ETLProcessorResult {
 		]
 
 		if(element.initValue){
-			dataMap.init = element.initValue
+			dataMap.initValue = element.initValue
 		}
 		return dataMap
 	}

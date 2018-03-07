@@ -65,7 +65,44 @@ class Element implements RangeChecker {
         }
     }
 
-    /**
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name initialize custom1
+	 * </code>
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 */
+	Element initialize (String fieldName) {
+		if (processor.hasSelectedDomain()) {
+			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.initValue = this.value
+			this.originalValue = ''
+			this.value = ''
+			processor.addElementLoaded(processor.selectedDomain, this)
+			return this
+		} else {
+			throw ETLProcessorException.domainMustBeSpecified()
+		}
+	}
+
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name init custom1
+	 * </code>
+	 * * @param initValue
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 * @see Element#initialize(java.lang.String)
+	 */
+	Element init (String initValue) {
+		return initialize(initValue)
+	}
+
+	/**
      * Validation for incorrect methods on script content
      * @param methodName
      * @param args
@@ -267,32 +304,6 @@ class Element implements RangeChecker {
     Element set (String variableName) {
         processor.addDynamicVariable(variableName, this)
 	    return this
-    }
-
-    /**
-     * Initialize an Element with a particular value
-     * <code>
-     *     extract dependencyType initialize 'Runs On'
-     * </code>
-     * * @param initValue
-     * @return
-     */
-    Element initialize (String initValue) {
-	    this.initValue = initValue
-	    return this
-    }
-
-    /**
-     * Initialize an Element with a particular value
-     * <code>
-     *     extract dependencyType init 'Runs On'
-     * </code>
-     * * @param initValue
-     * @return
-     * @see Element#initialize(java.lang.String)
-     */
-    Element init (String initValue) {
-        return initialize(initValue)
     }
 
     /**

@@ -483,10 +483,22 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	ETLProcessor initialize(String defaultValue){
+	def initialize(String field){
 		[
-			with: { value ->
+			with: { defaultValue ->
 
+				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+
+				Element newElement = currentRow.addNewElement("", this)
+				if(fieldSpec){
+					newElement.initValue = defaultValue
+					newElement.fieldSpec = fieldSpec
+					newElement.fieldSpec.label = fieldSpec.label
+					newElement.fieldSpec.type = fieldSpec.type
+				}
+
+				addElementLoaded(selectedDomain, newElement)
+				newElement
 			}
 		]
 	}

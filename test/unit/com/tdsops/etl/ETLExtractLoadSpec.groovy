@@ -584,9 +584,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						extract 'vendor name' 
 						
 						if ( CE == 'Microsoft'){
-							load appVendor with CE
+							load appVendor
 						} else {
-							load environment with 'Production'
+							load environment
 						}
 					}
 				""".stripIndent(),
@@ -961,7 +961,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can initialize field with defined value'() {
+	void 'test can initialize field defined before the load command'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -997,7 +997,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(fields.appVendor) {
 						value == 'Microsoft'
 						originalValue == 'Microsoft'
-						init == 'Apple'
+						initValue == 'Apple'
 					}
 				}
 
@@ -1006,7 +1006,160 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					with(fields.appVendor) {
 						value == 'Mozilla'
 						originalValue == 'Mozilla'
-						init == 'Apple'
+						initValue == 'Apple'
+					}
+				}
+			}
+	}
+
+	void 'test can initialize field defined after the load command'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						extract 'vendor name' load appVendor
+						initialize appVendor with 'Apple'
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						initValue == 'Apple'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						initValue == 'Apple'
+					}
+				}
+			}
+	}
+
+	void 'test can init field defined before the load command'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						init appVendor with 'Apple'
+						extract 'vendor name' load appVendor
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						initValue == 'Apple'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						initValue == 'Apple'
+					}
+				}
+			}
+	}
+
+	void 'test can init field defined after the load command'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					iterate {
+						domain Application
+						extract 'vendor name' load appVendor
+						init appVendor with 'Apple'
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+						initValue == 'Apple'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+						initValue == 'Apple'
 					}
 				}
 			}
@@ -1031,8 +1184,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						extract 'vendor name' initialize 'Apple'
-						 
+						extract 'vendor name' initialize appVendor
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1046,18 +1198,18 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				with(data[0]){
 					rowNum == 1
 					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+						value == ''
+						originalValue == ''
+						initValue == 'Microsoft'
 					}
 				}
 
 				with(data[1]){
 					rowNum == 2
 					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+						value == ''
+						originalValue == ''
+						initValue == 'Mozilla'
 					}
 				}
 			}
