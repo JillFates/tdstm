@@ -10,10 +10,6 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 })
 export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 
-	// @Input('importBatch') importBatch: ImportBatchModel;
-	// @Input('batchRecord') batchRecord: ImportBatchRecordModel;
-	// @Output('onCancel') cancelEvent = new EventEmitter<any>();
-
 	constructor(
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
@@ -25,8 +21,6 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	 * On close dialog.
 	 */
 	private onCancelCloseDialog(): void {
-		// this.cancelEvent.emit();
-		// this.batchRecord = null;
 		this.dismiss();
 	}
 
