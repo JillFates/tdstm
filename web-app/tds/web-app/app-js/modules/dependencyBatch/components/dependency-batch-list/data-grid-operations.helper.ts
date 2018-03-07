@@ -1,5 +1,8 @@
 import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
-import {CompositeFilterDescriptor, filterBy, process, SortDescriptor, State} from '@progress/kendo-data-query';
+import {
+	CompositeFilterDescriptor, filterBy, FilterDescriptor, process, SortDescriptor,
+	State
+} from '@progress/kendo-data-query';
 import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
@@ -67,7 +70,7 @@ export class DataGridOperationsHelper {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
-					operator: 'eq',
+					operator: 'gte',
 					value: column.filter
 				});
 			} else {
