@@ -313,9 +313,13 @@ class ApiAction {
 		try {
 			JsonUtil.parseJsonList(value)
 		} catch (e) {
-			return [Message.InvalidJsonFormat]
+			return Message.InvalidJsonFormat
 		}
 
+		/*
+		 * returning true to avoid groovy from taking the "parseJsonList" as an implicit return value
+		 * that will make the Validation strategy to fail
+		 */
 		return true
 	}
 
