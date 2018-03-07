@@ -10,7 +10,6 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
 import org.apache.commons.lang3.BooleanUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 @Slf4j
 class ImportBatchService implements ServiceMethods {
@@ -157,14 +156,12 @@ class ImportBatchService implements ServiceMethods {
 	ImportBatchRecord updateBatchRecord(Project project, Long importBatchId, Long recordId, ImportBatchRecordUpdateCommand command) {
 		ImportBatchRecord record = fetchImportBatchRecord(project, importBatchId, recordId)
 		// get the fieldInfo from the record as a Json Map (create an empty map if fieldInfo is null).
-		Map fieldInfoRecordJson = record.fieldsInfoAsMap() ?: [:]
-		// Shortcut to the JSON in the command
-		JSONObject fieldsInfoCmdJson = command.fieldsInfo
+		Map fieldsMap = record.fieldsInfoAsMap() ?: [:]
 		// Iterate over all the keys in the map of fields to be updated, copying the values to the json in the object.
-		for (String key in fieldsInfoCmdJson.keySet()) {
-			fieldInfoRecordJson[key] = fieldsInfoCmdJson[key]
+		for (field in command.fieldsInfo) {
+			fieldsMap[field.fieldName] = field.value
 		}
-		record.fieldsInfo = JsonUtil.convertMapToJsonString(fieldInfoRecordJson)
+		record.fieldsInfo = JsonUtil.convertMapToJsonString(fieldsMap)
 		record.save(failOnError: true)
 		return record
 	}
@@ -184,7 +181,7 @@ class ImportBatchService implements ServiceMethods {
 			// Although only 'progress' is supported at the moment, I leave the code ready for future changes.
 			switch(info) {
 				case 'progress':
-					infoMap = importBatch.getProgressInfo()
+					infoMap = [progress: importBatch.processProgress, lastUpdated: importBatch.processLastUpdated]
 					break
 				default:
 					throw new InvalidParamException("Unsupported info requested $info.")
