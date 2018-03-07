@@ -23,13 +23,21 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 		useColumn: 'id'
 	};
 	private batchRecords: Array<ImportBatchRecordModel>;
-	// private selectedBatchRecord: ImportBatchRecordModel;
 	private batchRecordsFilter: any = {
-		options: [{id: 1, name: 'All', filter: {}},
-			{id: 2, name: 'Pending'},
-			{id: 3, name: 'Pending with Errors'},
-			{id: 4, name: 'Ignored'},
-			{id: 5, name: 'Completed'}],
+		options: [{id: 1, name: 'All'},
+			{id: 2, name: 'Pending', filters: [
+				{column: 'status.label', value: 'Pending'},
+			]},
+			{id: 3, name: 'Pending with Errors', filters: [
+				{column: 'status.label', value: 'Pending'},
+				{column: 'errorCount', value: 1},
+			]},
+			{id: 4, name: 'Ignored', filters: [
+				{column: 'status.label', value: 'Ignored'},
+			]},
+			{id: 5, name: 'Completed', filters: [
+				{column: 'status.label', value: 'Completed'},
+			]}],
 		selected: {id: 1, name: 'All'}
 	};
 
@@ -88,8 +96,11 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 */
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
-		// this.selectedBatchRecord = (cellClick as any).dataItem;
 		let selectedBatchRecord = (cellClick as any).dataItem;
+		// prevent errors when clicking empty rows ..
+		if (!selectedBatchRecord || !selectedBatchRecord.id) {
+			return;
+		}
 		this.dialogService.extra(DependencyBatchRecordDetailDialogComponent, [
 				{provide: ImportBatchModel, useValue: this.importBatchModel},
 				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
@@ -118,10 +129,51 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	}
 
 	/**
+	 * Clear the batchRecordsFilter if needed (depending on column that was changed)
+	 * @param {GridColumnModel} column
+	 */
+	private preProcessFilter(column: GridColumnModel): void {
+		this.clearStatusFilter(column);
+		this.dataGridOperationsHelper.onFilter(column);
+	}
+
+	/**
+	 * Clear the batchRecordsFilter if needed (depending on column that was changed)
+	 */
+	private preProcessClear(column: GridColumnModel): void {
+		this.clearStatusFilter(column);
+		this.dataGridOperationsHelper.clearValue(column);
+	}
+
+	/**
+	 * Clear batchRecordsFilter to default All option.
+	 * @param {GridColumnModel} column
+	 */
+	private clearStatusFilter(column: GridColumnModel): void {
+		if (column.property === 'status.label' || column.property === 'errorCount') {
+			this.batchRecordsFilter.selected = {id: 1, name: 'All'};
+		}
+	}
+
+	/**
 	 * On Status Select Filter Select handle the multi filter on status + errors.
 	 * @param $event
 	 */
 	private onStatusFilter($event) {
-		console.log($event);
+		if ($event.id === 1) { // clear filters case
+			for (const columnProperty of ['status.label', 'errorCount']) {
+				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
+				foundMatch.filter = null;
+				this.dataGridOperationsHelper.clearValue(foundMatch);
+			}
+		} else { // apply specific filters case
+			for (const filter of $event.filters) {
+				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
+				if (foundMatch) {
+					foundMatch.filter = filter.value;
+					this.dataGridOperationsHelper.onFilter(foundMatch);
+				}
+			}
+		}
 	}
 }
