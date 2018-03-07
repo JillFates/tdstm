@@ -43,6 +43,7 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	@Ignore
+	// This test is ignored since the Dataview update does not update the name
 	void '3. test update dataview with duplicate name within same project throws exception'() {
 		setup:
 			Project project = projectTestHelper.createProject()
