@@ -57,6 +57,11 @@ export class DataGridOperationsHelper {
 		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
 			column.filter = '';
 		}
+		// check for number types and null value (clear out the filters)
+		if (column.type === 'number' && column.filter === null) {
+			this.clearValue(column);
+			return; // exit
+		}
 
 		if (column.type === 'number') {
 			if (!filter) {
