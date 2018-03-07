@@ -4,7 +4,7 @@
  */
 databaseChangeLog = {
 	changeSet(author: "ecantu", id: "TM-8310-1") {
-		comment("If there are already duplicated records for the same name + it.id, rename after applying the constraint.")
+		comment("If there are already duplicated records for the same name + it.id, rename before applying the constraint.")
 		grailsChange{
 			change {
 				def duplicatedDataViews = sql.rows('''
@@ -27,7 +27,7 @@ databaseChangeLog = {
 		comment("Add unique constraint to Dataview table on name and project_id fields.")
 
 		addUniqueConstraint(
-			constraintName: 'uq_dataview_name_project_id',
+			constraintName: 'UK_dataview_project_name',
 			tableName: 'dataview',
 			columnNames: 'name, project_id'
 		)
