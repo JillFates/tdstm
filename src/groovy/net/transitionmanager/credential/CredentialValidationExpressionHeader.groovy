@@ -2,7 +2,7 @@ package net.transitionmanager.credential
 
 import net.transitionmanager.service.InvalidSyntaxException
 
-class CredentialValidationExpressionHeader implements CredentialValidationExpressionContainsMissing {
+class CredentialValidationExpressionHeader implements CredentialValidationExpressionTraits {
 
 	/**
 	 * Process the 'header' command that expects a header name as an argument

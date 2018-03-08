@@ -13,11 +13,11 @@ import net.transitionmanager.service.InvalidSyntaxException
 class CredentialValidationExpression {
 
 	private ExpressionAttributeEnum attribute = null
-	private ExpressionEvaluation evaluation = null
+	private ExpressionEvaluationEnum evaluation = null
 	private String headerName = null
 	private String value = null
 
-	static final String INVALID_EXPRESSION_MSG = 'Invalid expression (e.g. contains|missing "some text)"'
+	static final String INVALID_EXPRESSION_MSG = 'Invalid expression (e.g. contains|equal|missing "some text)"'
 	static final String UNRECOGNIZED_EXPRESSION_MSG = 'Unrecognized expression'
 	static final String INVALID_BODY_EXPRESSION_MSG = 'Invalid body expression (e.g. body content contains "Welcome")'
 	static final String INVALID_HEADER_EXPRESSION_MSG = 'Invalid header expression (e.g. header Location contains "/welcome")'
@@ -34,7 +34,28 @@ class CredentialValidationExpression {
 	 * @parameter response - the HTTP response that was received from the authentication call
 	 * @return true if the evaluation matched otherwise false
 	 */
+	// boolean evaluate(HttpResponse response) {
 	boolean evaluate() {
+		String comparer = 'blah'
+		/*
+		switch (attribute) {
+			case ExpressionAttributeEnum.BODY:
+
+			case ExpressionAttributeEnum.HEADER:
+				// get header with headerName
+				comparer = response.getHeader(headerName)
+				break
+			case ExpressionAttributeEnum.STATUS:
+		}
+
+		switch (evaluation) {
+			case ExpressionEvaluation.EQUAL:
+				return comparer == this.value
+			case ExpressionEvaluation.CONTAINS:
+
+			ExpressionEvaluation.MISSING:
+		}
+		*/
 	}
 
 	/**
@@ -73,14 +94,14 @@ class CredentialValidationExpression {
 
 		script.run()
 
-		println this.dump()
+		// println this.dump()
 
 		// Blow up if any of the require attributes were not specified
 		if (! attribute )  {
 			throw new InvalidSyntaxException(UNRECOGNIZED_EXPRESSION_MSG)
 		}
 
-		// Blow up if header is missing the headerName
+		// Blow up if header is missing the headerName (e.g. header '' contains '')
 		if (attribute == ExpressionAttributeEnum.HEADER && !headerName) {
 			throw new InvalidSyntaxException(INVALID_HEADER_EXPRESSION_MSG)
 		}

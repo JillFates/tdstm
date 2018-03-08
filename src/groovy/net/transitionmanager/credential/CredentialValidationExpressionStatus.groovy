@@ -2,7 +2,7 @@ package net.transitionmanager.credential
 
 import net.transitionmanager.service.InvalidSyntaxException
 
-class CredentialValidationExpressionStatus implements CredentialValidationExpressionContainsMissing {
+class CredentialValidationExpressionStatus implements CredentialValidationExpressionTraits {
 
 	/**
 	 * Process the 'status' command that requires the 'content' argument which is just a place holder for the

@@ -9,7 +9,11 @@ import net.transitionmanager.service.InvalidSyntaxException
  * with one of the three methods.
  */
 class CredentialValidationExpressionDelegator {
+
+	// Only expose the three DSL methods on the CredentialValidationExpression that
+	// are allow in the DSL syntax
 	@Delegate(includes=['body', 'header' ,'status'])
+
 	CredentialValidationExpression cve
 
 	CredentialValidationExpressionDelegator(CredentialValidationExpression cve) {

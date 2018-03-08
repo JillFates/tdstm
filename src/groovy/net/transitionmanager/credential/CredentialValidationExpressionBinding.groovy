@@ -16,7 +16,8 @@ class CredentialValidationExpressionBinding extends Binding {
      * @return See the constructor
      */
     @Override
-    Object getVariable (String name) {
+    Object getVariable(String name) {
         return name
     }
+
 }
