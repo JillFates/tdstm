@@ -26,6 +26,15 @@ class CredentialValidationExpressionUnitSpec extends Specification {
 			null == result.headerName
 			'Password:' == result.value
 
+
+		when: 'called with a valid expression where value equal'
+			result = new CredentialValidationExpression('body content equal "Hello World"')
+		then:
+			ExpressionAttributeEnum.BODY == result.attribute
+			ExpressionEvaluationEnum.EQUAL == result.evaluation
+			null == result.headerName
+			'Hello World' == result.value
+
 		when: 'called with "content" missing'
 			new CredentialValidationExpression('body contains "Password:"')
 		then:
@@ -72,6 +81,14 @@ class CredentialValidationExpressionUnitSpec extends Specification {
 			ExpressionEvaluationEnum.MISSING == result.evaluation
 			'Location' == result.headerName
 			'/login' == result.value
+
+		when: 'called with a valid expression where value equal'
+			result = new CredentialValidationExpression('header "Location" equal "Hello World"')
+		then:
+			ExpressionAttributeEnum.HEADER == result.attribute
+			ExpressionEvaluationEnum.EQUAL == result.evaluation
+			'Location' == result.headerName
+			'Hello World' == result.value
 
 		when: 'called with missing elements'
 			new CredentialValidationExpression('header')
@@ -122,6 +139,22 @@ class CredentialValidationExpressionUnitSpec extends Specification {
 		then:
 			ExpressionAttributeEnum.STATUS == result.attribute
 			ExpressionEvaluationEnum.MISSING == result.evaluation
+			null == result.headerName
+			'200' == result.value
+
+		when: 'called with a valid expression where value equal'
+			result = new CredentialValidationExpression('status code equal "200"')
+		then:
+			ExpressionAttributeEnum.STATUS == result.attribute
+			ExpressionEvaluationEnum.EQUAL == result.evaluation
+			null == result.headerName
+			'200' == result.value
+
+		when: 'called with a valid expression where value equal to a number'
+			result = new CredentialValidationExpression('status code equal 200')
+		then:
+			ExpressionAttributeEnum.STATUS == result.attribute
+			ExpressionEvaluationEnum.EQUAL == result.evaluation
 			null == result.headerName
 			'200' == result.value
 

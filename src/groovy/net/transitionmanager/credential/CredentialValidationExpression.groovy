@@ -17,7 +17,7 @@ class CredentialValidationExpression {
 	private String headerName = null
 	private String value = null
 
-	static final String INVALID_EXPRESSION_MSG = 'Invalid expression (e.g. contains|missing "some text)"'
+	static final String INVALID_EXPRESSION_MSG = 'Invalid expression (e.g. contains|equal|missing "some text)"'
 	static final String UNRECOGNIZED_EXPRESSION_MSG = 'Unrecognized expression'
 	static final String INVALID_BODY_EXPRESSION_MSG = 'Invalid body expression (e.g. body content contains "Welcome")'
 	static final String INVALID_HEADER_EXPRESSION_MSG = 'Invalid header expression (e.g. header Location contains "/welcome")'
@@ -94,7 +94,7 @@ class CredentialValidationExpression {
 
 		script.run()
 
-		println this.dump()
+		// println this.dump()
 
 		// Blow up if any of the require attributes were not specified
 		if (! attribute )  {

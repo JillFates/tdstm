@@ -26,6 +26,12 @@ trait CredentialValidationExpressionTraits {
 		return this
 	}
 
+	Object equal(Integer value) {
+		credentialValidationExpression.evaluation = ExpressionEvaluationEnum.EQUAL
+		credentialValidationExpression.value = value.toString()
+		return this
+	}
+
 	def methodMissing(String methodName, args) {
 		throw new InvalidSyntaxException( CredentialValidationExpression.INVALID_EXPRESSION_MSG )
 	}
