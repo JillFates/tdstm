@@ -1,10 +1,10 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
-import groovy.json.JsonSlurper
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person
@@ -19,7 +19,6 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 import java.text.DecimalFormat
-import java.text.Format
 
 class DataScriptService implements ServiceMethods{
 
@@ -276,25 +275,18 @@ class DataScriptService implements ServiceMethods{
 	/**
 	 * Check that the File with the JSON data is ok and return the map
 	 * @param jsonFile
-	 * @return
+	 * @return Map with the description of JSON data in the File
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
 		def inputFile = new File(FileSystemService.temporaryDirectory, jsonFile)
-		def jsonObject = new JsonSlurper().parseText(inputFile.text)
-
-		def jsonMap = [
-				  status: 'success',
-				  data  : jsonObject
-		]
-
-		return jsonMap
+		return JsonUtil.parseJson(inputFile.text)
 	}
 
 	/**
 	 * PArse CSV file to get the
 	 * @param csvFile
-	 * @return
+	 * @return Map with the description of the CSV File Data
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromCSV (String csvFile) throws RuntimeException {
@@ -309,17 +301,12 @@ class DataScriptService implements ServiceMethods{
 				property : it.name,
 				type     : type
 			]
-	  }
+		}
 
-		def jsonMap = [
-			status: 'success',
-			data  : [
-				config: config,
-				rows  : csv.rows()
-			]
+		return [
+				  config: config,
+				  rows  : csv.rows()
 		]
-
-		return jsonMap
 	}
 
 	/**
@@ -327,7 +314,7 @@ class DataScriptService implements ServiceMethods{
 	 * @param xlsFile
 	 * @param sheetNumber
 	 * @param headerRowIndex
-	 * @return
+	 * @return Map with the description of the Excel File Data
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0) throws RuntimeException {
@@ -382,14 +369,10 @@ class DataScriptService implements ServiceMethods{
 			}
 		}
 
-		def jsonMap = [
-				status: 'success',
-				data  : [
-						 config: config,
-						 rows  : data
-				]
+		return [
+				  config: config,
+				  rows  : data
 		]
 
-		return jsonMap
 	}
 }

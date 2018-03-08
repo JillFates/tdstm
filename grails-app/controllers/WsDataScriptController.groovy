@@ -1,7 +1,6 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -175,11 +174,10 @@ class WsDataScriptController implements ControllerMethods {
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
 	    try {
-		    Map jsonMap = dataScriptService.parseDataFromFile(filename)
-
-		    render jsonMap as JSON
+           Map jsonMap = dataScriptService.parseDataFromFile(filename)
+           renderSuccessJson(jsonMap)
 	    }catch ( ex ) {
-		    render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
+           render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
 	    }
     }
 
