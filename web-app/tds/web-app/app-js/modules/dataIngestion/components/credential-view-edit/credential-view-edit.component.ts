@@ -27,10 +27,6 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
-		
-		.script-error {
-			margin-bottom: 18px;
-		}
 		#httpMethod {
 			width: 75px;
 		}
@@ -76,6 +72,10 @@ export class CredentialViewEditComponent {
 	public isEditing = false;
 	public checkActionModel = CHECK_ACTION;
 	public operationStatusModel = new OperationStatusModel();
+	public validExpressionResult = {
+		valid: true,
+		error: ''
+	};
 	constructor(
 		public originalModel: CredentialModel,
 		public modalType: ActionType,
@@ -172,7 +172,10 @@ export class CredentialViewEditComponent {
 		if (this.credentialModel.authMethod === this.authMethods.COOKIE || this.credentialModel.authMethod === this.authMethods.HEADER) {
 			this.validateExpressionCheck().subscribe((result) => {
 				if (result) {
-					this.saveCredential();
+					this.validExpressionResult = result;
+					if (this.validExpressionResult.valid) {
+						this.saveCredential();
+					}
 				}
 			});
 		} else {
@@ -281,6 +284,7 @@ export class CredentialViewEditComponent {
 		return new Observable(observer => {
 		this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
 			(result: any) => {
+				this.validExpressionResult = result;
 				observer.next(result);
 			},
 			(err) => console.log(err));
