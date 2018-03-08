@@ -21,6 +21,7 @@ import { PopupPollingComponent } from './components/popups/popup-polling.compone
 import { PopupProvidesDataComponent } from './components/popups/popup-provides-data.component';
 import { CredentialListComponent } from './components/credential-list/credential-list.component';
 import { CredentialViewEditComponent } from './components/credential-view-edit/credential-view-edit.component';
+import { PopupValidateExpressionComponent } from './components/popups/popup-validate-expression.component';
 // Import Kendo Modules
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { GridModule } from '@progress/kendo-angular-grid';
@@ -67,6 +68,7 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		APIActionViewEditComponent,
 		PopupPollingComponent,
 		PopupProvidesDataComponent,
+		PopupValidateExpressionComponent,
 		CredentialListComponent,
 		CredentialViewEditComponent
 	],

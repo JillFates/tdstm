@@ -347,6 +347,7 @@ export class DataIngestionService {
 			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
 			httpMethod: model.httpMethod.toUpperCase(),
 			sessionName: (model.sessionName) ? model.sessionName  : '',
+			validationExpression: (model.validationExpression) ? model.validationExpression  : '',
 		};
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it
