@@ -97,7 +97,11 @@ class WsCredentialController implements ControllerMethods {
 			new CredentialValidationExpression(expression)
 			renderSuccessJson(valid:true)
 		} catch (e) {
-			renderErrorJson(e.getMessage())
+			Map data = [
+				valid: false,
+				errors: [ e.getMessage() ]
+			]
+			renderSuccessJson(data)
 		}
 	}
 
