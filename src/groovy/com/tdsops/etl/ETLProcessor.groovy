@@ -460,23 +460,13 @@ class ETLProcessor implements RangeChecker {
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		init environment with 'Production'
-	 *	}
-	 * </pre>
-	 * @param field
-	 * @return
-	 * @see ETLProcessor#initialize(java.lang.String)
-	 */
-	def init(final String field) {
-		initialize(field)
-	}
-
-	/**
-	 * Initialize a property using a default value
-	 * <pre>
-	 *	iterate {
-	 *		domain Application
 	 *		initialize environment with 'Production'
+	 *	    initialize environment with Production
+	 *	    initialize environment with SOURCE.'application id'
+	 *	    initialize environment with DOMAIN.id
+	 *
+	 *	    extract 'application id'
+	 *	    initialize environment with CE
 	 *	}
 	 * </pre>
 	 * @param field
@@ -490,7 +480,7 @@ class ETLProcessor implements RangeChecker {
 
 				Element newElement = currentRow.addNewElement("", this)
 				if(fieldSpec){
-					newElement.initValue = defaultValue
+					newElement.init = ETLValueHelper.stringValueOf(defaultValue)
 					newElement.fieldSpec = fieldSpec
 					newElement.fieldSpec.label = fieldSpec.label
 					newElement.fieldSpec.type = fieldSpec.type
@@ -500,6 +490,22 @@ class ETLProcessor implements RangeChecker {
 				newElement
 			}
 		]
+	}
+
+	/**
+	 * Initialize a property using a default value
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		init environment with 'Production'
+	 *	}
+	 * </pre>
+	 * @param field
+	 * @return
+	 * @see ETLProcessor#initialize(java.lang.String)
+	 */
+	def init(final String field) {
+		initialize(field)
 	}
 
 	/**

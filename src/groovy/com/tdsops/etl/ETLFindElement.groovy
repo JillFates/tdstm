@@ -135,26 +135,7 @@ class ETLFindElement {
 				values)
 		}
 
-		return values.collect { def value ->
-			def fieldValue
-
-			switch(value){
-				case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
-					fieldValue = ((DomainField)value).value
-					break
-				case Element:            // LocalVariable
-					fieldValue = ((Element)value).value
-					break
-				case SourceField:
-					fieldValue = ((SourceField)value).value // SOURCE.'application id'
-					break
-				default:
-					fieldValue = value
-					break
-			}
-
-			return fieldValue
-		}
+		return values.collect { ETLValueHelper.stringValueOf(it) }
 	}
 
 	/**

@@ -14,7 +14,7 @@ class Element implements RangeChecker {
 	/**
 	 * Default o initialize value
 	 */
-	String initValue
+	String init
     Integer rowIndex
     Integer columnIndex
     ETLDomain domain
@@ -77,7 +77,7 @@ class Element implements RangeChecker {
 	Element initialize (String fieldName) {
 		if (processor.hasSelectedDomain()) {
 			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-			this.initValue = this.value
+			this.init = this.value
 			this.originalValue = ''
 			this.value = ''
 			processor.addElementLoaded(processor.selectedDomain, this)
@@ -93,7 +93,7 @@ class Element implements RangeChecker {
 	 *     domain Device
 	 *     extract name init custom1
 	 * </code>
-	 * * @param initValue
+	 * * @param init
 	 * @param fieldName
 	 * @return the element instance that received this command
 	 * @see Element#initialize(java.lang.String)

@@ -18,7 +18,7 @@ import net.transitionmanager.domain.Room
  * For example it transform:
  *
  * <pre>
- *     find Application by id with SOURCE.'application id'
+ *     find Application of id by id with SOURCE.'application id'
  * </pre>
  *
  * In to this HQL query:

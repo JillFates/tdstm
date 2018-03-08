@@ -136,8 +136,8 @@ class ETLProcessorResult {
 
 		if(currentData.fields[element.fieldSpec.name]) {
 			Map<String, ?> field = currentData.fields[element.fieldSpec.name]
-			if(element.initValue){
-				field.initValue = element.initValue
+			if(element.init){
+				field.init = element.init
 			} else {
 				field.value = element.value
 				field.originalValue = element.originalValue
@@ -259,8 +259,8 @@ class ETLProcessorResult {
 			]
 		]
 
-		if(element.initValue){
-			dataMap.initValue = element.initValue
+		if(element.init){
+			dataMap.init = element.init
 		}
 		return dataMap
 	}
