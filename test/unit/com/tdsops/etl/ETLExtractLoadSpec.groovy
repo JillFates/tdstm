@@ -1548,7 +1548,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
 	}
 
-	void 'test can abort current row based on some condition'() {
+	void 'test can ignore current row based on some condition'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1623,7 +1623,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			}
 	}
 
-	void 'test can abort current row more than once in the same iteration'() {
+	void 'test can ignore current row more than once in the same iteration'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1836,7 +1836,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					}
 				""".stripIndent(), ETLProcessor.class.name)
 
-		then: 'A row was removed from the domain results'
+		then: 'Third row was removed from the domain results'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
