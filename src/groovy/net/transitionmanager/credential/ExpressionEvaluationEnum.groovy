@@ -1,5 +1,5 @@
 package net.transitionmanager.credential
 
-enum ExpressionEvaluation {
-	CONTAINS, MISSING
+enum ExpressionEvaluationEnum {
+	CONTAINS, MISSING, EQUAL
 }

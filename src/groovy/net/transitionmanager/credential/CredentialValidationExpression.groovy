@@ -13,7 +13,7 @@ import net.transitionmanager.service.InvalidSyntaxException
 class CredentialValidationExpression {
 
 	private ExpressionAttributeEnum attribute = null
-	private ExpressionEvaluation evaluation = null
+	private ExpressionEvaluationEnum evaluation = null
 	private String headerName = null
 	private String value = null
 
@@ -34,7 +34,28 @@ class CredentialValidationExpression {
 	 * @parameter response - the HTTP response that was received from the authentication call
 	 * @return true if the evaluation matched otherwise false
 	 */
+	// boolean evaluate(HttpResponse response) {
 	boolean evaluate() {
+		String comparer = 'blah'
+		/*
+		switch (attribute) {
+			case ExpressionAttributeEnum.BODY:
+
+			case ExpressionAttributeEnum.HEADER:
+				// get header with headerName
+				comparer = response.getHeader(headerName)
+				break
+			case ExpressionAttributeEnum.STATUS:
+		}
+
+		switch (evaluation) {
+			case ExpressionEvaluation.EQUAL:
+				return comparer == this.value
+			case ExpressionEvaluation.CONTAINS:
+
+			ExpressionEvaluation.MISSING:
+		}
+		*/
 	}
 
 	/**
@@ -80,7 +101,7 @@ class CredentialValidationExpression {
 			throw new InvalidSyntaxException(UNRECOGNIZED_EXPRESSION_MSG)
 		}
 
-		// Blow up if header is missing the headerName
+		// Blow up if header is missing the headerName (e.g. header '' contains '')
 		if (attribute == ExpressionAttributeEnum.HEADER && !headerName) {
 			throw new InvalidSyntaxException(INVALID_HEADER_EXPRESSION_MSG)
 		}
