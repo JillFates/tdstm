@@ -28,7 +28,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	private state: State = {
 		filter: {
 			filters: [],
-			logic: 'or'
+			logic: 'and'
 		}
 	};
 	private gridData: GridDataResult;
@@ -38,12 +38,17 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 			{text: 'With Errors', value: 2}
 			],
 		selected: {text: 'All', value: 1},
-		text: ''
+		nameFilter: {
+			field: 'name',
+			value: '',
+			operator: 'contains',
+			ignoreCase: true
+		}
 	};
 
 	constructor(
 		private dependencyBatchService: DependencyBatchService) {
-		// Silence is golden
+			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 	}
 
 	/**
@@ -52,14 +57,6 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	ngOnInit(): void {
 		this.loadRecordFieldDetails();
 	}
-
-	/**
-	 * On Changes detected Batch Record selection reload it's Fields info.
-	 * @param {SimpleChanges} changes
-	ngOnChanges(changes: SimpleChanges): void {
-		this.loadRecordFieldDetails();
-	}
-	 */
 
 	/**
 	 * Gets the Batch Record Field Details from API.
@@ -93,25 +90,36 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	}
 
 	/**
+	 * Checks if input overrided values are not empty or with a text value.
+	 */
+	private areOverrideValuesDirty(): boolean {
+		for (let field of this.fieldsInfo) {
+			if (field.overridedValue && field.overridedValue.length > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * On Update button click.
 	 */
 	private onUpdate(): void {
 		let newFieldsValues: Array<{fieldName: string, value: string}> = [];
-		// for (let field in this.fieldsInfo) {
-		// 	if (this.fieldsInfo.hasOwnProperty(field) && this.fieldsInfo.overridedValue) {
-		// 		// console.log(this.fieldsInfo[field]);
-		// 		const newFieldValue = {fieldName: field, value: this.fieldsInfo.overridedValue};
-		// 		newFieldsValues.push(newFieldValue);
-		// 	}
-		// }
-		// this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
-		// 	.subscribe((result: ApiResponseModel) => {
-		// 		if (result.status === ApiResponseModel.API_SUCCESS) {
-		// 			this.updateSuccessEvent.emit();
-		// 		} else {
-		// 			this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
-		// 		}
-		// }, error => this.handleError(error));
+		for (let field of this.fieldsInfo) {
+			if (field.overridedValue) {
+				const newFieldValue = {fieldName: field.name, value: field.overridedValue};
+				newFieldsValues.push(newFieldValue);
+			}
+		}
+		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.updateSuccessEvent.emit();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
+				}
+		}, error => this.handleError(error));
 	}
 
 	/**
@@ -131,6 +139,21 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	}
 
 	/**
+	 * On Text Filter input change it's value.
+	 */
+	private onTextFilter(): void {
+		this.gridData = process(this.fieldsInfo, this.state);
+	}
+
+	/**
+	 * On Text Filter input clear icon click.
+	 */
+	private clearTextFilter(): void {
+		this.fieldsFilter.text = '';
+		this.onTextFilter();
+	}
+
+	/**
 	 * On Cancel.
 	 */
 	private onCancel(): void {
@@ -144,29 +167,5 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	private handleError(e): void {
 		console.log(e);
-	}
-
-	private onTextFilter(): void {
-		let foundedMatch = this.state.filter.filters.find((r: any) => r.field === 'name');
-		if (foundedMatch) {
-			(foundedMatch as FilterDescriptor).value = this.fieldsFilter.text;
-		} else {
-			let nameFilter: FilterDescriptor = {
-				field: 'name',
-				value: this.fieldsFilter.text,
-				operator: 'contains',
-				ignoreCase: true
-			};
-			this.state.filter.filters = [nameFilter];
-		}
-		this.gridData = process(this.fieldsInfo, this.state);
-	}
-
-	private clearTextFilter(): void {
-		this.fieldsFilter.text = '';
-		this.onTextFilter();
-		// const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === 'name');
-		// this.state.filter.filters.splice(filterIndex, 1);
-		// this.gridData = process(this.fieldsInfo, this.state);
 	}
 }

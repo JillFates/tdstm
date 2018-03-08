@@ -16,7 +16,7 @@
                                     class="form-control input-sm"></kendo-dropdownlist>
             </div>
             <div class="fieldsFilterText col-sm-3">
-                <input [(ngModel)]="fieldsFilter.text"
+                <input [(ngModel)]="this.fieldsFilter.nameFilter.value"
                        type="text" class="form-control"
                        name="fieldsFilterText" placeholder="Filter on field name"
                        (keyup)="onTextFilter()">
@@ -46,7 +46,8 @@
         }
     </style>
     <div class="row footer" style="margin-top: 30px;">
-        <button (click)="onUpdate()"
+        <button [disabled]="!areOverrideValuesDirty()"
+                (click)="onUpdate()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-floppy-disk"></i>
             Update
