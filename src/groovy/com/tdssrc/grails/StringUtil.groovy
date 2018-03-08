@@ -55,6 +55,15 @@ class StringUtil {
 	}
 
 	/**
+	 * Determine if a string is not null, empty of just whitespace
+	 * @param subject - the string to check
+	 * @return true if not blank
+	 */
+	static boolean isNotBlank(CharSequence subject) {
+		return StringUtils.isNotBlank(subject)
+	}
+
+	/**
 	 * Set a string to a default if the subject is blank
 	 * @param subject - the string to check to see if it is blank
 	 * @param defStr - the value to set the string to if it is blank

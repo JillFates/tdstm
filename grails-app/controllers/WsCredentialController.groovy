@@ -93,7 +93,6 @@ class WsCredentialController implements ControllerMethods {
 	def checkValidExprSyntax() {
 		try {
 			String expression = request.JSON.expression
-			println "expression=$expression"
 			new CredentialValidationExpression(expression)
 			renderSuccessJson(valid:true)
 		} catch (e) {
