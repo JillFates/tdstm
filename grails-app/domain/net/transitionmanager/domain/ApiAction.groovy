@@ -258,7 +258,7 @@ class ApiAction {
 		if (providerObject.project) {
 			providerProjectId = providerObject.project.id
 		} else {
-			// Need to use a new session to fetch the Provider so as not to mess up the current 
+			// Need to use a new session to fetch the Provider so as not to mess up the current
 			// objects in the session.
 			Provider.withNewSession {
 				Provider p = Provider.read(providerObject.id)
@@ -288,7 +288,7 @@ class ApiAction {
 		if (value.provider) {
 			valueProviderId = value.provider.id
 		} else {
-			// Need to use a new session to fetch the Domain so as not to mess up the current 
+			// Need to use a new session to fetch the Domain so as not to mess up the current
 			// objects in the session.
 			value.class.withNewSession {
 				def obj = value.class.read(value.id)
@@ -312,15 +312,10 @@ class ApiAction {
 	static methodParamsValidator (value, ApiAction object) {
 		try {
 			JsonUtil.parseJsonList(value)
+			return true
 		} catch (e) {
 			return Message.InvalidJsonFormat
 		}
-
-		/*
-		 * returning true to avoid groovy from taking the "parseJsonList" as an implicit return value
-		 * that will make the Validation strategy to fail
-		 */
-		return true
 	}
 
 }
