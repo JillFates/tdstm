@@ -10,6 +10,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CredentialService
@@ -82,4 +83,22 @@ class WsCredentialController implements ControllerMethods {
 			renderSuccessJson(authentication)
 		}
 	}
+
+	/**
+	 * Used to validate that a Credential Validation Expression has correct syntax
+	 * @param expression as JSON
+	 * @return success or error message from the DSL parser
+	 */
+	@HasPermission(Permission.CredentialEdit)
+	def checkValidExprSyntax() {
+		try {
+			String expression = request.JSON.expression
+			println "expression=$expression"
+			new CredentialValidationExpression(expression)
+			renderSuccessJson(valid:true)
+		} catch (e) {
+			renderErrorJson(e.getMessage())
+		}
+	}
+
 }

@@ -19,7 +19,7 @@ class CredentialValidationExpression {
 
 	static final String INVALID_EXPRESSION_MSG = 'Invalid expression (e.g. contains|missing "some text)"'
 	static final String UNRECOGNIZED_EXPRESSION_MSG = 'Unrecognized expression'
-	static final String INVALID_BODY_EXPRESSION_MSG = 'Invalid body expression (e.g. body content Location contains "Welcome")'
+	static final String INVALID_BODY_EXPRESSION_MSG = 'Invalid body expression (e.g. body content contains "Welcome")'
 	static final String INVALID_HEADER_EXPRESSION_MSG = 'Invalid header expression (e.g. header Location contains "/welcome")'
 	static final String INVALID_STATUS_EXPRESSION_MSG = 'Invalid status expression (e.g. status code contains "200")'
 	static final String EMPTY_EXPRESSION_MSG = 'An expression is required'
