@@ -441,6 +441,23 @@ export class DataIngestionService {
 	}
 
 	/**
+	 * Validate if the expression executed is correct
+	 * @param {string} validateExpression
+	 * @returns {Observable<any>}
+	 */
+	validateExpressionCheck(validateExpression: string): Observable<any> {
+		let postRequest = {
+			expression: validateExpression
+		};
+		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * Validate if the current DataScript is being or not used somewhere
 	 * @param {number} id
 	 * @returns {Observable<string>}

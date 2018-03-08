@@ -12,6 +12,7 @@ import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
+import {Observable} from 'rxjs/Observable';
 
 declare var jQuery: any;
 
@@ -164,9 +165,26 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
-	 * Create a new DataScript
+	 * Execute the flow to create/save/update a credential
 	 */
 	protected onSaveCredential(): void {
+		// Cookie and Header requires an extra validation before to save the credential
+		if (this.credentialModel.authMethod === this.authMethods.COOKIE || this.credentialModel.authMethod === this.authMethods.HEADER) {
+			this.validateExpressionCheck().subscribe((result) => {
+				if (result) {
+					this.saveCredential();
+				}
+			});
+		} else {
+			// For other Auth methods rather than Cookie or Header
+			this.saveCredential();
+		}
+	}
+
+	/**
+	 * Createm Save or Update the Credential forom the model
+	 */
+	private saveCredential(): void {
 		this.dataIngestionService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
 				if (result && result.id) {
@@ -174,7 +192,6 @@ export class CredentialViewEditComponent {
 				}
 			},
 			(err) => console.log(err));
-
 	}
 
 	/**
@@ -247,6 +264,27 @@ export class CredentialViewEditComponent {
 				}
 			},
 			(err) => console.log(err));
+	}
+
+	/**
+	 * Listener that wait a subscribe, so it can be attached as a callback-promise to the save of the credential.
+	 */
+	protected onValidateExpression(): void {
+		this.validateExpressionCheck().subscribe();
+	}
+
+	/**
+	 * Verify against the endpoint if the expression is valid.
+	 * @returns {Observable<any>}
+	 */
+	private validateExpressionCheck(): Observable<any> {
+		return new Observable(observer => {
+		this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
+			(result: any) => {
+				observer.next(result);
+			},
+			(err) => console.log(err));
+		});
 	}
 
 	/**
