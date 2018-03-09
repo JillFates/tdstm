@@ -132,13 +132,14 @@ class ETLProcessorResult {
 	 */
 	void loadElement(Element element) {
 
-		reference.fields.add(element.fieldSpec.name)
 		Map<String, ?> currentData = currentData()
 		currentData.rowNum = element.rowIndex
 
 		if(currentData.fields[element.fieldSpec.name]) {
 			updateFieldDataMap(currentData, element)
+
 		} else {
+			reference.fields.add(element.fieldSpec.name)
 			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
 		}
 
