@@ -504,8 +504,9 @@ class DataImportService implements ServiceMethods {
 	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
 	 */
 	@NotTransactional()
-	private void setBatchToRunning(ImportBatch batch) {
+	private void setBatchToRunning(Long batchId) {
 		ImportBatch.withNewTransaction { session ->
+			ImportBatch batch = ImportBatch.get(batchId)
 
 			// Let's lock the batch for a moment so we can check out if it is okay to start
 			// processing this batch.
@@ -513,14 +514,22 @@ class DataImportService implements ServiceMethods {
 
 			// Now make sure nobody altered the batch in the meantime
 			// Can only start running a batch if it was QUEUED or PENDING
-			if ( [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.PENDING].contains(batch.status) ) {
+			if ( ! [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.PENDING].contains(batch.status) ) {
 				throw new DomainUpdateException('Unable to process batch due to change in status')
 			}
 
+			Date noProgressInPast2Min = new Date()
+			use( groovy.time.TimeCategory ) {
+				noProgressInPast2Min = noProgressInPast2Min - 2.minutes
+				// noProgressInPast2Min = noProgressInPast2Min - 6.hours
+			}
+
 			// Check to see if there are any other batches in the RUNNING state
+			// that show progress in the past two minutes.
 			int count = ImportBatch.where{
 				project.id == batch.project.id
 				status == ImportBatchStatusEnum.RUNNING
+				processLastUpdated > noProgressInPast2Min
 			}.count()
 
 			if (count > 0) {
@@ -549,22 +558,24 @@ class DataImportService implements ServiceMethods {
 	 */
 	@NotTransactional()
 	private boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
-		ImportBatch batch = ImportBatch.get(batchId)
-		if (!batch) {
-			log.error "ImportBatch($batchId) disappeared during batch processing process"
-			throw DomainUpdateException('The import batch was deleted while being processed')
+		ImportBatch.withNewTransaction { session ->
+			ImportBatch batch = ImportBatch.get(batchId)
+			if (!batch) {
+				log.error "ImportBatch($batchId) disappeared during batch processing process"
+				throw DomainUpdateException('The import batch was deleted while being processed')
+			}
+
+			// Calculate the % completed and update the batch appropriately
+			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
+			batch.processProgress = percComplete
+			batch.processLastUpdated = new Date()
+			if (status) {
+				batch.status = status
+			}
+			batch.save(failOnError:true)
+
+			return (1 == batch.processStopFlag)
 		}
-
-		Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
-
-		batch.processProgress = percComplete
-		batch.processLastUpdated = new Date()
-		if (status) {
-			batch.status = status
-		}
-		batch.save(failOnError:true)
-
-		return (1 == batch.processStopFlag)
 	}
 
 	/**
@@ -572,59 +583,72 @@ class DataImportService implements ServiceMethods {
 	 * @param project
 	 * @param id - the id of the batch
 	 * @param specifiedRecordIds - an optional list of ImportBatchRecord IDs to process
-	 * @return TBD
+	 * @return the number of rows that were processed
 	 */
-	void processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		Exception ex = null
+		try {
+			setBatchToRunning(batch.id)
 
-		setBatchToRunning(batch)
+			// Get the list of the ImportBatchRecord IDs to be processed
+			List<Long> recordIds = ImportBatchRecord.where {
+				importBatch.id == batch.id
+				status == ImportBatchStatusEnum.PENDING
+			}
+			.projections { property('id') }
+			.list(sortBy: 'id')
 
-		// Get the list of the ImportBatchRecord IDs to be processed
-		List<Long> recordIds = ImportBatchRecord.where {
-			importBatch.id == batchId
-			status == ImportBatchStatusEnum.PENDING
-		}
-		.projections { property('id') }
-		.list(sortBy: id)
+			Map context = [:]
 
-		Map context = []
+			int totalRowCount = recordIds.size()
+			int rowsProcessed = 0
+			int offset = 0
+			int setSize = 100
+			boolean aborted = false
+			// Now iterate over the list in sets of 100 rows
+			while (! aborted && recordIds) {
+				List recordSetIds = recordIds.take(setSize)
+				recordIds = recordIds.drop(setSize)
 
-		int totalRowCount = recordIds.size()
-		int rowsProcessed = 0
-		int offset = 0
-		int setSize = 100
-		boolean aborted = false
-		// Now iterate over the list in sets of 100 rows
-		while (! aborted && recordIds) {
-			List recordSetIds = recordIds.take(setSize)
-			recordIds = recordIds.drop(setSize)
+				List records =  ImportBatchRecord.where {
+					id in recordSetIds
+				}.list(sortBy: 'id')
 
-			List records =  ImportBatchRecord.where {
-				id in recordSetIds
-			}.list(sortBy: id)
-
-			for (record in records) {
-				processBatchRecord(batch, record, context)
-
-				rowsProcessed += setSize
+				for (record in records) {
+					processBatchRecord(batch, record, context)
+					rowsProcessed++
+				}
 
 				aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
-
-				if (! aborted) {
-					GormUtil.flushAndClearSession()
-				}
+				GormUtil.flushAndClearSession()
 			}
+			GormUtil.flushAndClearSession()
+
+		} catch(e) {
+			// If an exception happened to occur during this process then we'll save it for the moment
+			ex = e
+
 		}
 
-		// Now update the status of the ImportBatch based on
+		// Now update the status of the ImportBatch based on the number of records still in the
+		// PENDING status. If there are any remaining then the batch will return to the PENDING status
+		// otherwise will be set to COMPLETED.
 		int remaining = ImportBatchRecord.where {
 			importBatch.id == batchId
 			status == ImportBatchStatusEnum.PENDING
 		}.count()
 
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
-
 		updateBatchProgress(batchId, 1, 1, status)
+
+		if (ex) {
+			// Now we send the exception back to the user interface
+			throw ex
+		}
+
+		return rowsProcessed
 	}
 
 	/**
@@ -646,7 +670,6 @@ class DataImportService implements ServiceMethods {
 		}
 	}
 
-
 	/**
 	 * Used to process a single AssetDependency ImportBatchRecord
 	 * @param batch - the batch that the ImportBatchRecord
@@ -656,4 +679,5 @@ class DataImportService implements ServiceMethods {
 	def processDependencyRecord = {ImportBatch batch, ImportBatchRecord record, Map context->
 		record.status = ImportBatchStatusEnum.COMPLETED
 	}
+
 }

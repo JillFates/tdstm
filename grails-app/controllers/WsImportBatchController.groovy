@@ -11,6 +11,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.ImportBatchService
 
 @Secured("isAuthenticated()")
@@ -18,6 +19,7 @@ import net.transitionmanager.service.ImportBatchService
 class WsImportBatchController implements ControllerMethods {
 
 	ImportBatchService importBatchService
+	DataImportService dataImportService
 
 	/**
 	 * Return all the Import Batches for the current project
@@ -90,7 +92,11 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				impacted = importBatchService.queueBatchesForProcessing(project, actionCmd.ids)
+				// impacted = importBatchService.queueBatchesForProcessing(project, actionCmd.ids)
+				//
+				// For the time being we are calling the process batch directly but this eventually will be done by
+				// triggering a Quartz job.
+				impacted = dataImportService.processBatch(project, actionCmd.ids[0])
 				break
 
 			case ImportBatchActionEnum.EJECT:
