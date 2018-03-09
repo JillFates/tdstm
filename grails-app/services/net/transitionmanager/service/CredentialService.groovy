@@ -328,7 +328,8 @@ class CredentialService implements ServiceMethods {
                     break
                 case AuthenticationMethod.HEADER:
                     // pull out session header data
-                    String sessionHeader = resp.getHeaders().get(credential.sessionName)
+                    // returning first header since response.getHeaders().get() returns a list
+                    String sessionHeader = resp.getHeaders().getFirst(credential.sessionName)
                     if (sessionHeader) {
                         authenticationResponse = ['sessionName': credential.sessionName, 'sessionValue': sessionHeader]
                     }
