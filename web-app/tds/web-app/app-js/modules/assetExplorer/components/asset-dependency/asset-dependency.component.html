@@ -1,4 +1,4 @@
-<div class="modal fade in" id="assetDependency" data-backdrop="static" tabindex="-1" role="dialog">
+<div class="modal fade in asset-dependency-component" id="assetDependency" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -45,6 +45,7 @@
                         </tr>
                     </tbody>
                 </table>
+
                 <form class="form-horizontal dependency-edit-fields" *ngIf="assetDependency?.assetA?.dependency?.id || assetDependency?.assetB?.dependency?.id">
                     <table ng-class="{ 'half-size': !assetDependency.assetB.dependency}">
                         <tr *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id">
@@ -103,65 +104,67 @@
                                     <label style="padding-top: 33px;" class="col-sm-4 control-label control-label-title"></label>
                                 </div>
                             </td>
+
                             <td style="width: 232px; vertical-align: top;">
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.dataFlowFreq}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.dataFlowFreq}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.type}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.type}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.status}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.status}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.dataFlowDirection}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.dataFlowDirection}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.c1}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.c1}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.c2}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.c2}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.c3}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.c3}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dependency?.c4}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dependency?.c4}}</label>
                                 </div>
                                 <div class="form-group" style="height: 50px;">
                                     <label style="height: 70px; overflow: auto; width: 222px;" class=" control-label">{{assetDependency?.assetA?.dependency?.comment}}</label>
                                 </div>
                                 <div class="form-group" style="margin-top:20px">
-                                    <label class=" control-label">{{assetDependency?.assetA?.dateCreated}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.dateCreated}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetA?.lastUpdated}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetA?.lastUpdated}}</label>
                                 </div>
                             </td>
+
                             <td *ngIf="assetDependency?.assetA?.dependency?.id && assetDependency?.assetB?.dependency?.id" style="width: 200px; vertical-align: baseline;">
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.dataFlowFreq}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.dataFlowFreq}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.type}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.type}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.status}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.status}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.dataFlowDirection}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.dataFlowDirection}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.c1}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.c1}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.c2}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.c2}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.c3}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.c3}}</label>
                                 </div>
                                 <div class="form-group">
-                                    <label class=" control-label">{{assetDependency?.assetB?.dependency?.c4}}</label>
+                                    <label class=" control-label dependency-label">{{assetDependency?.assetB?.dependency?.c4}}</label>
                                 </div>
 
                                 <div class="form-group" style="height: 50px;">
@@ -176,6 +179,7 @@
                                 </div>
                             </td>
                         </tr>
+
                     </table>
                     <br />
                 </form>

@@ -1,8 +1,6 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
-import com.tdssrc.grails.TimeUtil
-import groovy.json.JsonSlurper
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AgentClass
@@ -78,7 +76,7 @@ class ApiAction {
 
 	Date dateCreated
 
-	Date lastModified
+	Date lastUpdated
 
 	// The URL to the endpoint
 	String endpointUrl
@@ -124,8 +122,8 @@ class ApiAction {
 		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
 		isPolling range: 0..1
-		lastModified nullable: true
-		methodParams nullable: true
+		lastUpdated nullable: true
+		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
 		name size: 1..64, unique: 'project'
 		pollingLapsedAfter min: 0
 		pollingStalledAfter min: 0
@@ -175,9 +173,8 @@ class ApiAction {
 	List<Map> getMethodParamsList(){
 		List<Map> list = []
 		if (methodParams) {
-			JsonSlurper slurper = new groovy.json.JsonSlurper()
 			try {
-				list = slurper.parseText(methodParams)
+				list = JsonUtil.parseJsonList(methodParams)
 			} catch (e) {
 				log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 			}
@@ -192,8 +189,7 @@ class ApiAction {
 	List<ApiActionMethodParam> getListMethodParams() {
 		List<ApiActionMethodParam> list = []
 		if (methodParams) {
-			JsonSlurper slurper = new groovy.json.JsonSlurper()
-			def listJson = slurper.parseText(methodParams)
+			def listJson = JsonUtil.parseJsonList(methodParams)
 			if(!(listJson instanceof List)){
 				listJson = [listJson]
 			}
@@ -201,16 +197,6 @@ class ApiAction {
 			list = listJson.collect { new ApiActionMethodParam(it) }
 		}
 		return list
-	}
-
-	def beforeValidate() {
-		// validate methodParams
-		try {
-			getListMethodParams()
-		} catch (e) {
-			this.errors.rejectValue('methodParams', e.getMessage())
-		}
-
 	}
 
 	/**
@@ -272,7 +258,7 @@ class ApiAction {
 		if (providerObject.project) {
 			providerProjectId = providerObject.project.id
 		} else {
-			// Need to use a new session to fetch the Provider so as not to mess up the current 
+			// Need to use a new session to fetch the Provider so as not to mess up the current
 			// objects in the session.
 			Provider.withNewSession {
 				Provider p = Provider.read(providerObject.id)
@@ -299,10 +285,10 @@ class ApiAction {
 
 		Long valueProviderId = 0
 
-        if (value.provider) {
+		if (value.provider) {
 			valueProviderId = value.provider.id
 		} else {
-			// Need to use a new session to fetch the Domain so as not to mess up the current 
+			// Need to use a new session to fetch the Domain so as not to mess up the current
 			// objects in the session.
 			value.class.withNewSession {
 				def obj = value.class.read(value.id)
@@ -310,11 +296,26 @@ class ApiAction {
 					valueProviderId = obj.provider.id
 				}
 			}
-        }
+		}
 
-        if ( valueProviderId !=  domainObject.provider.id) {
+		if ( valueProviderId !=  domainObject.provider.id) {
 			return Message.InvalidFieldForDomain
-        }
+		}
+	}
+
+	/**
+	 * Used to validate that the field methodParams is a well-formed JSON
+	 * @param value
+	 * @param object
+	 * @return
+	 */
+	static methodParamsValidator (value, ApiAction object) {
+		try {
+			JsonUtil.parseJsonList(value)
+			return true
+		} catch (e) {
+			return Message.InvalidJsonFormat
+		}
 	}
 
 }

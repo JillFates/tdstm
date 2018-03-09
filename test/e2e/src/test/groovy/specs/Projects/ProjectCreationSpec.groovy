@@ -19,7 +19,7 @@ class ProjectCreationSpec extends GebReportingSpec {
     static testCount
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
 
-    //Define the names for the Staffq you will Create and Edit
+    //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
     static projName = baseName +" "+ randStr
     static projDesc = "Descrition of the project "+ projName +" created by QA E2E Geb Scripts"
@@ -28,10 +28,8 @@ class ProjectCreationSpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
-        def username = "e2e_test_user"
-        def password = "e2e_password"
         to LoginPage
-        loginModule.login(username,password)
+        login()
     }
 
     def setup() {
@@ -102,7 +100,4 @@ class ProjectCreationSpec extends GebReportingSpec {
         then:
         waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
     }
-
 }
-
-

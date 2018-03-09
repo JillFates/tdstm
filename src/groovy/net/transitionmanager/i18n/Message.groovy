@@ -15,11 +15,11 @@ interface Message {
 			ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
 			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
 			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
-			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
-			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
-			DomainFailureBulk					= 'domain.failure.bulk',
-			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
-			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
+			ApiActionTaskMessageStalled 		   = 'apiAction.task.message.stalled',
+			ApiActionTaskMessageTimedout 		   = 'apiAction.task.message.timedout',
+			DomainFailureBulk					      = 'domain.failure.bulk',
+			FileSystemFileDeleted	 			   = 'fileSystem.file.deleted',
+			FileSystemFileNotExists 			   = 'fileSystem.file.notExists',
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
 			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
 			ValidationMissingIds                = 'validation.missing.ids'
@@ -28,6 +28,7 @@ interface Message {
 		i18N messages for working with API Action endpoints.
 	 */
 	String InvalidFieldForDomain = "domain.invalid.field"
+	String InvalidJsonFormat = "default.invalid.json.message"
 
 
 	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"

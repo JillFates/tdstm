@@ -474,7 +474,7 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 
 	def "13. Merge Person with no user login accounts"() {
-		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
+		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
 			String extraTeam = 'DB_ADMIN'
@@ -533,7 +533,7 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 
 	def "14. Merge Person with login account only associated with From person"() {
-		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
+		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
 
@@ -576,7 +576,7 @@ class PersonServiceIntegrationTests extends Specification {
 	}
 
 	def "15. Merge Person with login accounts associated with both persons"() {
-		// Note that there maybe some overlap of this test and GormUtilTests.mergeDomainReferences
+		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 
 		when: 'getting the Person userLogin property'
 			def domainProp = GormUtil.getDomainProperty(Person, 'userLogin')

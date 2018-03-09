@@ -175,7 +175,7 @@ class JsonUtil {
         String jsonStr
         try {
             // Convert the JSON object back to a String (seems silly but...)
-            jsonStr = JsonUtil.toJson(json)
+            jsonStr = toJson(json)
         } catch (Exception e) {
             logger.error("mapToObject() Failed to convert JSONObject to JSON Text: ${e.message}")
             throw new InvalidParamException("Invalid JSON : ${e.message}")

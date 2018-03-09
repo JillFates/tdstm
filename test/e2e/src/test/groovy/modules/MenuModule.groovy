@@ -5,7 +5,6 @@ import geb.Module
 class MenuModule extends Module {
 
     static at = {
-        
         adminItem.text().trim()         == "Admin"
         adminSections[0].text().trim()  == "Administration"
         adminSections[1].text().trim()  == "Manage Clients"
@@ -28,7 +27,7 @@ class MenuModule extends Module {
 
         projectsItem.text().trim()          == "Projects"
         projectsActiveItem.text().trim()    == "Active Projects"
-        projectsCurrentItem.text().contains() == "Details" //      TODO add the project name as test property
+        projectsCurrentItem.text().contains() == "Details" // TODO add the project name as test property
         projectsMailItem.text().trim()      == "User Activation Emails"
         projectsStaffItem.text().trim()     == "Project Staff"
         projectsFieldsSetItem.text().trim() == "Asset Field Settings"
@@ -61,15 +60,13 @@ class MenuModule extends Module {
         tasksCookbookItem.text().trim()     == "Cookbook"
         tasksGenHistoryItem.text().trim()   == "Generation History"
         tasksImportItem.text().trim()       == "Import Tasks"
-
     }
 
     static content = {
-
         menuContainer       { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
-        menuBar             { menuContainer.find("div#navbar-collapse") }
+        menuBar             { menuContainer.find("div#navbar-collapse")}
 
-        adminItem               { menuBar.find("li.menu-parent-admin") }
+        adminItem               { menuBar.find("li.menu-parent-admin")}
         adminMenu               { adminItem.find("ul",class:"dropdown-menu menu-item-expand")}
         adminSections           { adminMenu.find("li",class:"menu-parent-item")}
         adminPortalItem         { adminMenu.find("li.menu-admin-portal")}
@@ -95,7 +92,7 @@ class MenuModule extends Module {
         projectsMailItem        { projectsMenu.find("li.menu-projects-user-activation")}
         projectsFieldsSetItem   { projectsMenu.find("li.menu-projects-field-settings")}
 
-        assetsItem              { menuBar.find("li.menu-parent-assets") }
+        assetsItem              { menuBar.find("li.menu-parent-assets")}
         assetsMenu              { assetsItem.find("ul",class:"dropdown-menu menu-item-expand")}
         assetsSections          { assetsMenu.find("li",class:"menu-parent-item")}
         assetsSummaryItem       { assetsMenu.find("li.menu-parent-assets-summary-table")}
@@ -115,7 +112,7 @@ class MenuModule extends Module {
         assetsExportItem        { assetsMenu.find("li.menu-parent-assets-export-assets")}
         assetsViewManagerItem   { assetsMenu.find("li.menu-parent-assets-asset-manager")}
 
-        tasksItem               { menuBar.find("li.menu-parent-tasks") }
+        tasksItem               { menuBar.find("li.menu-parent-tasks")}
         tasksMenu               { tasksItem.find("ul",class:"dropdown-menu menu-item-expand")}
         tasksSections           { tasksMenu.find("li",class:"menu-parent-item")}
         taskCount               { tasksMenu.find("span#todoCountProjectId")}
@@ -126,7 +123,6 @@ class MenuModule extends Module {
         tasksCookbookItem       { tasksMenu.find("li.menu-parent-tasks-cookbook")}
         tasksGenHistoryItem     { tasksMenu.find("li.menu-parent-tasks-generation-history")}
         tasksImportItem         { tasksMenu.find("li.menu-parent-tasks-import-tasks")}
-
     }
 
     def selectMenu(menuItem) {
@@ -142,7 +138,7 @@ class MenuModule extends Module {
     def selectItem(item){
         if (item.present) {
             if(item.isDisplayed()) {
-                waitFor { item.click() }
+                waitFor { item.click()}
             }
         }
     }
@@ -181,7 +177,5 @@ class MenuModule extends Module {
         selectItem(assetsViewManagerItem)
     }
 
-// TODO Add remains menu items here
-
-
+    // TODO Add remains menu items here
 }

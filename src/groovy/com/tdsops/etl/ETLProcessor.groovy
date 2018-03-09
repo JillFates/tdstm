@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
 /**
@@ -143,7 +144,7 @@ class ETLProcessor implements RangeChecker {
 
 		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
-		this
+		return this
 	}
 
 	/**
@@ -153,8 +154,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor read (String dataPart) {
 
-		if ("labels".equalsIgnoreCase(dataPart)) {
-
+		if ('labels'.equalsIgnoreCase(dataPart)) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: field.name, index: index)
 				columns.add(column)
@@ -163,7 +163,7 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
 		}
-		this
+		return this
 	}
 
 	/**
@@ -180,7 +180,7 @@ class ETLProcessor implements RangeChecker {
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
-				to--
+				to
 				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
@@ -214,6 +214,29 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
+	 * Aborts processing of the current row for the domain in the context
+	 * <pre>
+	 *   if (SOURCE.Env == 'Development) {
+	 *      ignore row
+	 *   }
+	 * </pre>
+	 * @param label just a label to detect if the command was used with 'row' label
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor ignore (String label) {
+
+		if('row'.equalsIgnoreCase(label)){
+			if (!hasSelectedDomain()) {
+				throw ETLProcessorException.domainMustBeSpecified()
+			}
+			result.ignoreCurrentRow()
+			debugConsole.info("Ignore row ${currentRowIndex}")
+		}
+
+		return this
+	}
+
+	/**
 	 * Iterates a list of rows applying a closure
 	 * @param rows
 	 * @param closure
@@ -221,6 +244,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
+		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
@@ -229,13 +253,15 @@ class ETLProcessor implements RangeChecker {
 
 			closure(addCrudRowData(currentRowIndex, row))
 
+			result.removeIgnoredRows()
+
 			currentRowResult = [:]
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
 
 		currentRowIndex--
-		this
+		return this
 	}
 
 	/**
@@ -278,7 +304,7 @@ class ETLProcessor implements RangeChecker {
 		}
 
 		debugConsole.info "Global trim status changed: $status"
-		this
+		return this
 	}
 
 	/**
@@ -295,7 +321,7 @@ class ETLProcessor implements RangeChecker {
 		}
 
 		debugConsole.info "Global sanitize status changed: $status"
-		this
+		return this
 	}
 
 	/**
@@ -308,7 +334,7 @@ class ETLProcessor implements RangeChecker {
 
 		globalTransformers.add(Replacer(regex, replacement))
 		debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
-		this
+		return this
 	}
 
 	/**
@@ -339,7 +365,7 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.invalidSkipStep(amount)
 		}
-		this
+		return this
 	}
 
 	/**
@@ -547,7 +573,7 @@ class ETLProcessor implements RangeChecker {
 				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
 		}
-		fieldSpec
+		return fieldSpec
 	}
 
 	/**
@@ -562,11 +588,11 @@ class ETLProcessor implements RangeChecker {
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
 		Class<?> clazz = selectedDomain.clazz
 
-		if(!fieldsValidator.isDomainProperty(clazz, property)) {
+		if(!GormUtil.isDomainProperty(clazz, property)) {
 			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain, property)
 		}
-		if(!fieldsValidator.isDomainIdentifier(clazz, property) &&
-			!fieldsValidator.isReferenceProperty(clazz, property)){
+		if(!GormUtil.isDomainIdentifier(clazz, property) &&
+			!GormUtil.isReferenceProperty(clazz, property)){
 			throw ETLProcessorException.invalidDomainReference(selectedDomain, property)
 		}
 	}
@@ -595,10 +621,10 @@ class ETLProcessor implements RangeChecker {
 	 * @param rowIndex
 	 * @param row
 	 */
-	private void addCrudRowData (Integer rowIndex, Map row) {
+	private Row addCrudRowData (Integer rowIndex, Map row) {
 		currentRow = new Row(rowIndex, dataSetFacade.fields().collect { row[it.name] }, this)
 		rows.add(currentRow)
-		currentRow
+		return currentRow
 	}
 
 	/**
@@ -612,7 +638,7 @@ class ETLProcessor implements RangeChecker {
 
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
-		element
+		return element
 	}
 
 	/**
@@ -690,10 +716,10 @@ class ETLProcessor implements RangeChecker {
 	 * @param element a selected Element
 	 * @return the curent element selected in ETLProcessor
 	 */
-	private void addCurrentElementToBinding (Element element) {
+	private Element addCurrentElementToBinding (Element element) {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
-		currentElement
+		return currentElement
 	}
 
 	/**
@@ -707,40 +733,40 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	ETLDomain getSelectedDomain () {
-		selectedDomain
+		return selectedDomain
 	}
 
 	Column column (String columnName) {
-		columnsMap[columnName]
+		return columnsMap[columnName]
 	}
 
 	Column column (Integer columnName) {
-		columns[columnName]
+		return columns[columnName]
 	}
 
 	Set getColumnNames () {
-		columnsMap.keySet()
+		return columnsMap.keySet()
 	}
 
 	Row getCurrentRow () {
-		currentRow
+		return currentRow
 	}
 
 	Row getRow (Integer index) {
-		rows[index]
+		return rows[index]
 	}
 
 	Element getCurrentElement () {
-		currentElement
+		return currentElement
 	}
 
 	Element getElement (Integer rowIndex, Integer columnIndex) {
-		rows[rowIndex].getElement(columnIndex)
+		return rows[rowIndex].getElement(columnIndex)
 	}
 
 
 	List<String> getAvailableMethods () {
-		['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
+		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
 		 'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
 		 'uppercase()', 'lowercase()', 'first(content)', 'last(content)', 'all(content)',
 		 'left(amount)', 'right(amount)', 'replace(regex, replacement)']
@@ -748,6 +774,14 @@ class ETLProcessor implements RangeChecker {
 
 	List<String> getAssetFields () {
 		['id', 'assetName', 'moveBundle']
+	}
+
+	/**
+	 * Checks if there is a domain entity being specified within the script
+	 * @return
+	 */
+	boolean hasSelectedDomain() {
+		return selectedDomain != null
 	}
 
 }

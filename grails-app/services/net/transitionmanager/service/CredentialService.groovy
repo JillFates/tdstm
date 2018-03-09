@@ -1,22 +1,40 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.security.AESCodec
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.AuthenticationRequestMode
+import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import com.tdsops.common.security.AESCodec
-import com.tdsops.common.security.SecurityUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.UrlUtil
 import grails.plugins.rest.client.RestBuilder
+import grails.plugins.rest.client.RestResponse
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
+import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
-import net.transitionmanager.service.ProjectRequiredException
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.impl.client.CloseableHttpClient
+import org.apache.http.impl.client.HttpClients
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
+import org.springframework.web.client.RestTemplate
 
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
+import java.security.SecureRandom
+import java.security.cert.CertificateException
+import java.security.cert.X509Certificate
 
 @Transactional
 @Slf4j
@@ -59,22 +77,22 @@ class CredentialService implements ServiceMethods {
      * @param credential - a Command object with values to update with
      * @return the updated Credential
      */
-    Credential update(Long id, CredentialCommand credentialCO) {
-        Credential credentialInstance = findById(id)
-        
-        GormUtil.optimisticLockCheck(credentialInstance, credentialCO.properties, 'Credential')
+    Credential update(Long id, CredentialCommand command, Long version) {
+        Credential domain = findById(id)
+
+        GormUtil.optimisticLockCheck(domain, version, 'Credential')
 
         Project project = securityService.getUserCurrentProject()
 
-        validateBeforeSave(project, id, credentialCO)
+        validateBeforeSave(project, id, command)
 
-        credentialCO.populateDomain(credentialInstance, false, ['password', 'version'] )
+        command.populateDomain(domain, false, ['password', 'version'] )
 
-        setEncryptedPassword(credentialInstance, credentialCO.password)
+        setEncryptedPassword(domain, command.password)
 
-        credentialInstance.save(failOnError: true)
+        domain.save(failOnError: true)
 
-        return credentialInstance
+        return domain
     }
 
     /**
@@ -111,13 +129,25 @@ class CredentialService implements ServiceMethods {
      * @param credential
      * @return
      */
-    Map authenticate(Credential credential) {
+    Map<String, ?> authenticate(Credential credential) {
         assert credential != null : 'Invalid credential information provided.'
 
-        Map authenticationResponse = null
+        // TODO look for authentication in cache by credential ID, if there is one
+        // we shouldn't be doing re-authentication
+
+        Map<String, ?> authenticationResponse
         switch (credential.authenticationMethod) {
+			case AuthenticationMethod.BASIC_AUTH:
+				authenticationResponse = doBasicAuthentication(credential)
+				break;
             case AuthenticationMethod.JWT:
                 authenticationResponse = doJWTTokenAuthentication(credential)
+                break
+            case AuthenticationMethod.COOKIE:
+                authenticationResponse = doCookieAuthentication(credential)
+                break
+            case AuthenticationMethod.HEADER:
+                authenticationResponse = doHeaderAuthentication(credential)
                 break
             default:
                 authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
@@ -127,19 +157,191 @@ class CredentialService implements ServiceMethods {
     }
 
     /**
-     * Issue an JWT authentication process using provided credentials
+     * Issue a Basic authentication process using provided credentials
      * @param credential
      * @return
      */
-    private Map doJWTTokenAuthentication(Credential credential) {
+    private Map<String, ?> doBasicAuthentication(Credential credential) {
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        def resp = rest.get(credential.getAuthenticationUrl()) {
+            // TODO TM-9609 Change the Cookie Authentication to support POST/PUT
+            auth credential.username, decryptPassword(credential)
+            header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+        }
+        return getAuthenticationResponse(credential, resp)
+    }
+
+    /**
+     * Issue a JWT authentication process using provided credentials
+     * @param credential
+     * @return
+     */
+    private Map<String, ?> doJWTTokenAuthentication(Credential credential) {
         String jsonString = JsonUtil.convertMapToJsonString([username: credential.getUsername(), password: decryptPassword(credential)])
-        RestBuilder rest = new RestBuilder()
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
         def resp = rest.post(credential.getAuthenticationUrl()) {
+            // TODO determine the httpMethod is GET, POST or PUT
+            // verify if we need to parse parameters out of the URL
             header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             json jsonString
         }
-        return JsonUtil.convertJsonToMap(resp.json)
+        return getAuthenticationResponse(credential, resp)
+    }
+
+    /**
+     * Issue a COOKIE authentication process using provided credentials
+     * @param credential
+     * @return
+     */
+    private Map<String, ?> doCookieAuthentication(Credential credential) {
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        def resp = rest.post(credential.getAuthenticationUrl()) {
+            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
+            // verify if we need to parse parameters out of the URL
+            switch (credential.requestMode) {
+                case AuthenticationRequestMode.BASIC_AUTH:
+                    auth credential.username, decryptPassword(credential)
+                    break
+                case AuthenticationRequestMode.FORM_VARS:
+                    MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>()
+                    form.add('username', credential.username)
+                    form.add('password', decryptPassword(credential))
+                    header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    body(form)
+                    break
+            }
+            header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+        }
+
+        return getAuthenticationResponse(credential, resp)
+    }
+
+    /**
+     * Issue a HEADER authentication process using provided credentials
+     * @param credential
+     * @return
+     */
+    private Map<String, ?> doHeaderAuthentication(Credential credential) {
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        def resp = rest.post(credential.getAuthenticationUrl()) {
+            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
+            // verify if we need to parse parameters out of the URL
+            switch (credential.requestMode) {
+                case AuthenticationRequestMode.BASIC_AUTH:
+                    auth credential.username, decryptPassword(credential)
+                    break
+                case AuthenticationRequestMode.FORM_VARS:
+                    MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>()
+                    form.add('username', credential.username)
+                    form.add('password', decryptPassword(credential))
+                    header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    body(form)
+                    break
+            }
+            header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+        }
+
+        return getAuthenticationResponse(credential, resp)
+    }
+
+    /**
+     * Gets the RestTemplate for the RestBuilder according to the environment
+     * For PRODUCTION we should trust SSL certificates as they come but for
+     * other environments some certificates are self-signed so HTTPClient needs
+     * some help to trust them, so the custom trust store is doing that.
+     *
+     * @param environment - the credential environment
+     * @return
+     */
+    private RestBuilder getRestBuilderForCredentialEnvironment(String url, CredentialEnvironment environment) {
+        if (UrlUtil.isSecure(url) && environment != CredentialEnvironment.PRODUCTION) {
+            return new RestBuilder(getRestTemplateWithTrustStore())
+        } else {
+            return new RestBuilder()
+        }
+    }
+
+    /**
+     * Trust Store logic for verifying certificates from root ca by java itself
+     * Security note: Use this only for non-production environments and end-points
+     *
+     * @return a RestTemplate configured with a Allow All Trust Store
+     */
+    private RestTemplate getRestTemplateWithTrustStore() {
+        TrustManager[] trustAllCerts = [
+                new X509TrustManager() {
+                    X509Certificate[] getAcceptedIssuers() { return [] }
+                    void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+                    void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+                }
+        ] as TrustManager[]
+
+        SSLContext sslContext = SSLContext.getInstance('TLS')
+        sslContext.init(null, trustAllCerts, new SecureRandom())
+        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(connectionSocketFactory)
+                .build()
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory()
+        requestFactory.setHttpClient(httpClient)
+        return new RestTemplate(requestFactory)
+    }
+
+    /**
+     * Inspects the authentication response and constructs a map with the expected information
+     * needed by the app.
+     * It checks the response status to determine whether the authentication succeeded or not
+     * based on a HttpStatus code equals 200.
+
+     * @param credential - the credentials
+     * @param resp - the authentication call response
+     * @return a Map with the expected fields required by the authentication method
+     */
+    private Map<String, ?> getAuthenticationResponse(Credential credential, RestResponse resp) {
+        if (!resp) {
+            throw new RuntimeException('No response trying to authenticate.')
+        }
+
+        boolean authenticationSucceeded = true
+        if (StringUtil.isNotBlank(credential.validationExpression)) {
+            CredentialValidationExpression credentialValidationExpression = new CredentialValidationExpression(credential.validationExpression)
+            authenticationSucceeded = credentialValidationExpression.evaluate(resp)
+        }
+
+        Map<String, ?> authenticationResponse = [:]
+        if (authenticationSucceeded) {
+            switch (credential.authenticationMethod) {
+                case AuthenticationMethod.BASIC_AUTH:
+                case AuthenticationMethod.JWT:
+                    authenticationResponse = JsonUtil.convertJsonToMap(resp.json)
+                    break;
+                case AuthenticationMethod.COOKIE:
+                    // pull out session header data
+                    for (String header : resp.getHeaders().get(HttpHeaders.SET_COOKIE)) {
+                        if (header.contains(credential.sessionName)) {
+                            String sessionHeader = header.split(';')[0]
+                            String[] sessionName = sessionHeader.split('=')
+                            authenticationResponse = ['sessionName': sessionName[0], 'sessionValue': sessionName[1]]
+                        }
+                    }
+                    break
+                case AuthenticationMethod.HEADER:
+                    // pull out session header data
+                    String sessionHeader = resp.getHeaders().get(credential.sessionName)
+                    if (sessionHeader) {
+                        authenticationResponse = ['sessionName': credential.sessionName, 'sessionValue': sessionHeader]
+                    }
+                    break
+                default:
+                    authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet"]
+                    break
+            }
+        } else {
+            log.debug('Error during credential authentication: {}', resp.text)
+            throw new RuntimeException('Error during credential authentication, not expected response: ' + resp.text)
+        }
+        return authenticationResponse
     }
 
     /**
@@ -189,9 +391,9 @@ class CredentialService implements ServiceMethods {
         }.list()
     }
 
-    /** 
+    /**
      * Used to encrypt the password when the password has a value. Passwords have a limit of 60 characters
-     * due to the encoded value is 2.5x bigger. 
+     * due to the encoded value is 2.5x bigger.
      * @param credential - the domain instance to set the password on
      * @param password - the cleartext password to encrypt
      * @throws InvalidParamException if password is more than 60 characters
@@ -212,7 +414,7 @@ class CredentialService implements ServiceMethods {
      * Used to decrypt a password from a Credential record
      * @param credential - a Credential object with a password to be decrypted
      * @return the unencrypted password
-     */ 
+     */
     String decryptPassword(Credential credential) {
         return AESCodec.instance.decode(
                 credential.password,
@@ -250,7 +452,7 @@ class CredentialService implements ServiceMethods {
      */
     private void validateBeforeSave(Project project, Long id, Object cmdObj) {
         // Make certain that the provider specified is associated to the project
-        // TODO : JPM 2/2018 : to be replace by ofSameProject constraint when ready        
+        // TODO : JPM 2/2018 : to be replace by ofSameProject constraint when ready
         Long providerProjectId = 0
         if (cmdObj.provider.project) {
             providerProjectId = cmdObj.provider.project.id

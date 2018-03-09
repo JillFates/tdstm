@@ -73,6 +73,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public parameterList: GridDataResult;
 	public apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	public modalTitle: string;
+	public editModeFromView = false;
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
 	private dataSignature: string;
@@ -99,6 +100,9 @@ export class APIActionViewEditComponent implements OnInit {
 		}, {
 			assetClass: 'STORAGE',
 			value: 'Storage'
+		}, {
+			assetClass: 'TASK',
+			value: 'Task'
 		}, {
 			assetClass: 'USER_DEFINED',
 			value: 'User Defined'
@@ -210,7 +214,7 @@ export class APIActionViewEditComponent implements OnInit {
 	getCredentials(): void {
 		this.dataIngestionService.getCredentials().subscribe(
 			(result: any) => {
-				if (this.modalType === ActionType.CREATE) {
+				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
 					this.agentCredentialList.push({ id: 0, name: 'Select...' });
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
@@ -258,7 +262,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Preload the list of Common Fields Specs
 	 */
 	getCommonFieldSpecs(): void {
-		this.customDomainService.getCommonFieldSpecs().subscribe(
+		this.customDomainService.getCommonFieldSpecsWithShared().subscribe(
 			(result: any) => {
 				this.commonFieldSpecs = result;
 				if (this.modalType !== ActionType.CREATE) {
@@ -321,7 +325,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Change the View Mode to Edit Mode
 	 */
 	protected changeToEditApiAction(): void {
+		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
+		this.verifyIsValidForm();
 	}
 
 	/**
@@ -346,6 +352,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	protected setCurrentTab(num: number): void {
+		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();
 		}
@@ -373,9 +380,6 @@ export class APIActionViewEditComponent implements OnInit {
 			this.validInfoForm = this.apiActionForm.valid &&
 				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
 
-			if (this.apiActionModel.producesData) {
-				this.validInfoForm = this.validInfoForm && this.apiActionModel.defaultDataScript.id !== 0;
-			}
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {
 					if (this.apiActionForm.controls[i]) {
@@ -384,6 +388,9 @@ export class APIActionViewEditComponent implements OnInit {
 				}
 			}
 			this.initFormLoad = false;
+		}
+		if (this.editModeFromView) {
+			this.validInfoForm = this.editModeFromView;
 		}
 
 		if (this.apiActionParametersForm) {
@@ -530,11 +537,12 @@ export class APIActionViewEditComponent implements OnInit {
 		});
 		if (fieldSpecs) {
 			dataItem.currentFieldList = fieldSpecs.fields;
+			dataItem.sourceFieldList = fieldSpecs.fields;
 			let property = dataItem.currentFieldList.find((field) => {
 				return field.field === dataItem.property;
 			});
 			if (property) {
-				dataItem.property = property.field;
+				dataItem.property = property;
 			}
 		}
 
@@ -542,10 +550,18 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 * Make the Field from Context, filterable
+	 * @param filter
+	 */
+	public filterChange(filter: any, dataItem: any): void {
+		dataItem.currentFieldList = dataItem.sourceFieldList.filter((s) => s.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
+	}
+
+	/**
 	 * Delete from the paramaters the argument passed.
 	 * @param dataItem
 	 */
-	onDeleteParameter(dataItem: APIActionParameterModel): void {
+	onDeleteParameter(event: any, dataItem: APIActionParameterModel): void {
 		let parameterIndex = this.parameterList.data.indexOf(dataItem);
 		if (parameterIndex >= 0) {
 			this.parameterList.data.splice(parameterIndex, 1);
@@ -655,4 +671,16 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 		return context;
 	};
+
+	/**
+	 * Workaround to stop propagation on shared events on Kendo
+	 * Clicking on enter was causing other events to execute
+	 * @param event
+	 */
+	public getOnInputKey(event: any): void {
+		if (event.key === KEYSTROKE.ENTER) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	}
 }

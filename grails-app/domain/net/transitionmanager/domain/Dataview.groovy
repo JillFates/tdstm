@@ -1,6 +1,3 @@
-/**
- * @author David Ontiveros
- */
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
@@ -23,9 +20,9 @@ class Dataview {
 	Date lastModified
 
     static constraints = {
-    	name size: 1..255
-		person nullable: true
-		lastModified nullable: true
+			name size: 1..255, unique: 'project', validator: uniqueNameValidator
+			person nullable: true
+			lastModified nullable: true
     }
 
 	static mapping = {
@@ -99,4 +96,20 @@ class Dataview {
 		lastModified = TimeUtil.nowGMT()
 	}
 
+	/**
+	 * Used to validate that name is unique within the project
+	 */
+	static Closure uniqueNameValidator = { value, target ->
+		int count = Dataview.where {
+			project == target.project
+			name == value
+			if (id) {
+				id != target.id
+			}
+		}.count()
+
+		if (count > 0) {
+			return 'default.not.unique.message'
+		}
+	}
 }

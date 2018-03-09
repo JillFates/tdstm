@@ -4,12 +4,18 @@ import com.tdsops.etl.*
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.data.Dataset
+import getl.data.Field
+import getl.excel.ExcelConnection
+import getl.excel.ExcelDataset
+import getl.exception.ExceptionGETL
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 
@@ -29,8 +35,7 @@ class ScriptProcessorService {
      */
     ETLProcessor execute (Project project, String scriptContent, String fileName) {
 
-        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
-        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
+        Dataset dataset = FileSystemService.buildDataset(fileName)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 

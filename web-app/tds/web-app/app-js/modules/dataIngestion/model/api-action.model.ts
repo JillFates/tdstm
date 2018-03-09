@@ -10,48 +10,51 @@ export class APIActionColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 108,
+				width: 106,
 				locked: true
 			}, {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
+				width: 150,
 				locked: true
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
 				type: 'text',
-				width: 200
+				width: 180
 			}, {
 				label: 'Description',
 				property: 'description',
-				type: 'text'
+				type: 'text',
+				width: 300
 			}, {
 				label: 'Method',
 				property: 'agentMethod.name',
 				type: 'text',
-				width: 200
+				width: 125
 			}, {
 				label: 'Data',
 				property: 'producesData',
 				type: 'boolean',
-				width: 100
+				width: 90
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
-				type: 'text'
+				type: 'text',
+				width: 180
 			}, {
 				label: 'Created',
 				property: 'dateCreated',
 				type: 'date',
 				format: '{0:d}',
-				width: 170
+				width: 160
 			}, {
-				label: 'Last Modified',
-				property: 'lastModified',
+				label: 'Last Updated',
+				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
-				width: 170
+				width: 160
 			}
 		];
 	}
@@ -135,7 +138,7 @@ export class APIActionModel {
 	};
 	producesData?: boolean;
 	dateCreated?: Date;
-	lastModified?: Date;
+	lastUpdated?: Date;
 	credential?: {
 		id?: number,
 		name?: string
@@ -175,7 +178,7 @@ export class APIActionModel {
 
 	public static createBasicReactions(apiActionModel: APIActionModel): void {
 		apiActionModel.eventReactions = [];
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC_OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC.OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
@@ -227,6 +230,7 @@ export class APIActionParameterModel {
 	property?: string;
 	value?: string;
 	currentFieldList?: Array<any>;
+	sourceFieldList?: Array<any>;
 }
 
 export enum EventReactionType {

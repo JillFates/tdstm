@@ -109,7 +109,7 @@ class UrlMappings {
 			action = [
 			        POST: "deleteAssets"
 			]
-		}		
+		}
 		/******************************************************/
 
 		"/ws/moveEventNews/$id?" {
@@ -362,7 +362,7 @@ class UrlMappings {
 				GET: "home"
 			]
 		}
-		
+
 		"/admin/restart" {
 			controller = "admin"
 			action = [
@@ -686,6 +686,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/dataScript/sampleData/$filename" {
+			controller = "wsDataScript"
+			action = [
+					  GET: "sampleData"
+			]
+		}
+
 		"/ws/dataingestion/provider/list" {
 			controller = "wsProvider"
 			action = [
@@ -866,6 +873,13 @@ class UrlMappings {
 			controller = "wsCredential"
 			action = [
 				POST: "testAuthentication"
+			]
+		}
+
+		"/ws/credential/checkValidExprSyntax" {
+			controller = "wsCredential"
+			action = [
+				POST: "checkValidExprSyntax"
 			]
 		}
 

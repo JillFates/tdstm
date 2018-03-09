@@ -48,13 +48,13 @@ class ETLFindElement {
 	}
 
 	/**
-	 * Defines the dependentId for the current find element
-	 * @param dependentId
+	 * Defines the findId for the current find element
+	 * @param findId
 	 * @return
 	 */
-	ETLFindElement of(String dependentId) {
-		validateReference(dependentId)
-		currentFind.dependentId = dependentId
+	ETLFindElement of(String findId) {
+		validateReference(findId)
+		currentFind.findId = findId
 		this
 	}
 
@@ -68,11 +68,11 @@ class ETLFindElement {
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
 		}
-		if(!currentFind.dependentId){
+		if(!currentFind.findId){
 			if(fields.size() != 1){
-				throw ETLProcessorException.findElementWithoutDependentIdDefinition(fields)
+				throw ETLProcessorException.findElementWithoutFindIdDefinition(fields)
 			}
-			currentFind.dependentId = fields[0]
+			currentFind.findId = fields[0]
 		}
 		this
 	}
@@ -171,15 +171,6 @@ class ETLFindElement {
 		this.warnMessage = message
 		this.processor.addFindWarnMessage(this)
 		this
-	}
-
-	/**
-	 * Returns {@code true} if, and only if, {@link #currentFind} has a dependentId as {@code dependentId}.
-	 * @return {@code true} if {@link #currentFind} has dependentId as {@code dependentId}, otherwise
-	 * {@code false}
-	 */
-	boolean hasDependentId(String dependentId) {
-		return this.currentFind.dependentId == dependentId
 	}
 
 	/**

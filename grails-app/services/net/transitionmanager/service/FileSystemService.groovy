@@ -1,13 +1,28 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.FileSystemUtil
+import getl.csv.CSVConnection
+import getl.csv.CSVDataset
+import getl.data.Dataset
+import getl.data.Field
+import getl.excel.ExcelConnection
+import getl.excel.ExcelDataset
+import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.beans.factory.InitializingBean
 
 import javax.management.RuntimeErrorException
@@ -27,7 +42,7 @@ class FileSystemService  implements InitializingBean {
     CoreService coreService
     SecurityService securityService
 
-    public void afterPropertiesSet() throws Exception {
+    void afterPropertiesSet() throws Exception {
         // Load the temporary directory name and make sure that it has the
         String appTempDirectory = coreService.getAppTempDirectory()
 
@@ -38,7 +53,142 @@ class FileSystemService  implements InitializingBean {
         }
     }
 
-    /**
+	/**
+	 * Initialize a CSV file
+	 * @param os   OutputStream to the File
+	 * @param dataSet String of comma separated values
+	 */
+	 private void initCSV(OutputStream os, String dataSet) {
+		 os << dataSet
+		 os.close()
+	 }
+
+	/**
+	 * Initialize an Excel file using the passed data
+	 * This is mostly used in MockETLController for testing
+	 * @param ext  Extension of the file to create
+	 * @param os   OutputStream to the File
+	 * @param dataSet String of comma separated values
+	 */
+	private void initExcel(String ext, OutputStream os, String dataSet) {
+		List<String> csv = dataSet.split('\n')
+
+		Workbook workbook
+		if (ext == 'XLSX') {
+			workbook = new XSSFWorkbook()
+		} else if (ext == 'XLS') {
+			workbook = new HSSFWorkbook()
+		}
+
+		if (!workbook) {
+			throw new RuntimeException("Unsupported File Format $ext")
+		}
+
+		Sheet sheet = workbook.createSheet("Data Sheet")
+		int rowNum = 0
+		for (String line : csv) {
+			Row row = sheet.createRow(rowNum++)
+			int colNum = 0
+			List<String> cellValues = line.split(',')
+			for (String value : cellValues) {
+				Cell cell = row.createCell(colNum++)
+				cell.setCellValue(value)
+			}
+		}
+
+		workbook.write(os)
+		workbook.close()
+		os.close()
+	}
+
+	/**
+	 * Initialize a file with the dataSet String passed
+	 * @param filename   File name
+	 * @param os         Output Stream
+	 * @param dataSet    String of comma separated values
+	 */
+	void initFile(String filename, OutputStream os, String dataSet){
+		String ext = FilenameUtils.getExtension(filename)?.toUpperCase()
+
+		switch (ext) {
+			case 'CSV' :
+				initCSV(os, dataSet)
+				break
+
+			case ['XLS', 'XLSX'] :
+				initExcel(ext, os, dataSet)
+				break
+		}
+	}
+
+	/**
+	 * Build a CVSDataset from the given fileName
+	 * @param fileName
+	 * @return
+	 */
+	static CSVDataset buildCVSDataset(String fileName) {
+		CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+		return new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
+	}
+
+	/**
+	 * Build a ExcelDataset from the given fileName
+	 * @param fileName
+	 * @return
+	 */
+	static ExcelDataset buildExcelDataset(String fileName){
+		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
+		Workbook workbook = WorkbookFactory.create( new File(fileName) )
+		// Getting the Sheet at index zero
+		Sheet sheet = workbook.getSheetAt(0)
+		// Getting the first row for the header
+		Row row = sheet.getRow(0)
+
+		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
+		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
+
+		// Iterate over the Header Row to build the Header fields
+		Iterator<Cell> cellIterator = row.cellIterator()
+		while ( cellIterator.hasNext() ) {
+			Cell cell = cellIterator.next()
+			String value = cell.toString()
+			dataset.field << new Field(name: value, type: Field.Type.STRING)
+		}
+
+		// TODO: Need to fix column name lookup - see ticket TM-9584
+        // This will need to be moved to a function that will evetunally get context of the sheet name and
+        // the row that the labels reside on and compute dynamically instead of this statically built list.
+		// currently adding Monkey-patching to support getting the fields since the original behaviour is not supported
+		dataset.connection.driver.metaClass.fields = { Dataset ds ->
+			return ds.field
+		}
+
+		return dataset
+	}
+
+	/**
+	 * Build a getl.data.Dataset using the file name
+	 * @param fileName it can be a type CSV, XLSX or XLS
+	 * @return
+	 */
+	static Dataset buildDataset(String fileName) {
+		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
+
+		Dataset dataset
+		if (ext == 'CSV'){
+			dataset = buildCVSDataset(fileName)
+
+		} else if ( ['XLSX', 'XLS'].contains(ext) ) {
+			dataset = buildExcelDataset(fileName)
+
+		}
+
+		return dataset
+
+	}
+
+
+	/**
      * Used to create a temporary file where the name will consist of a prefix + random + extension
      * @param prefix
      * @param extension

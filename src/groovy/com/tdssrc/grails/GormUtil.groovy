@@ -6,6 +6,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DomainUpdateException
 import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.InvalidRequestException
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -55,7 +56,7 @@ public class GormUtil {
 	}
 
 	/**
-	 * Used to internationalize the validation errors from a Validatable object 
+	 * Used to internationalize the validation errors from a Validatable object
 	 * @param object - a domain or command object that has validation errors
 	 * @param locale - the locale to set the messages to (default US)
 	 * @return a list of the messages
@@ -70,7 +71,7 @@ public class GormUtil {
 		}
 		return errors
 	}
-	
+
 	/**
 	 * Output GORM Domain constraints and update errors in human readable HTML Unordered List
 	 * @param domain  the domain instance that has errors
@@ -201,23 +202,38 @@ public class GormUtil {
 		return constraint.getAppliedConstraint(constraintName)
 	}
 
-
 	/**
 	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
 	 * @param domainObj - the domain object to check the version on
 	 * @param versionFromForm - the original value of the domain version when it was originally read
 	 * @param label - the text to indicate the domain object in error message
+	 * @throws InvalidRequestException if there no initialVersion value
+	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
+	 */
+	@Deprecated
+	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+		if ( ! params?.containsKey('version')) {
+			throw new InvalidRequestException("The $label version property was missing from request")
+		}
+		Long version = NumberUtil.toLong(params.version)
+		if (version == null) {
+			throw new InvalidRequestException("The $label version property has an invalid value")
+		} else {
+			optimisticLockCheck(domainObj, version, label)
+		}
+	}
+
+	/**
+	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
+	 * @param domainObj - the domain object to check the version on
+	 * @param version - the original value of the domain version when it was originally read as a Long
+	 * @param label - the text to indicate the domain object in error message
 	 * @throws RuntimeException if there no initialVersion value
 	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
 	 */
-	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
-		Long version = NumberUtil.toLong(params.version)
-		if (version == null) {
-			throw new DomainUpdateException("The $label version was missing from request")
-		} else {
-			if (domainObj.version > version) {
-				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
-			}
+	public static void optimisticLockCheck(Object domainObj, Long version, String label) {
+		if (domainObj.version > version) {
+			throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 		}
 	}
 
@@ -371,7 +387,7 @@ public class GormUtil {
 		getDomainClass(clazz).persistentProperties.findAll { it.isPersistent() && !notToUpdateNames.contains(it.name) }
 	}
 
-// TODO : JPM copyUnsetValues - reverse the from/to parameters
+	// TODO : JPM copyUnsetValues - reverse the from/to parameters
 
 	/**
 	 * Used to clone persistent properties from one domain object to another with ability to
@@ -394,20 +410,44 @@ public class GormUtil {
 	/**
 	 * Validates if a property is an identifier for a domain class
 	 * @param clazz a Class to be used in the identifier detection
-	 * @param propertyName a String with the peroperty name to be used in the validation
+	 * @param propertyName a String with the property name to be used in the validation
 	 * @return tru if property is an identifier for clazz parameter
 	 */
 	static boolean isDomainIdentifier(Class clazz, String propertyName){
 		getDomainClass(clazz)?.identifier.name == propertyName
 	}
 
+	/**
+	 * Validates if a property is an identifier for a domain class instance
+	 * @param clazz a Class to be used in the identifier detection
+	 * @param propertyName a String with the property name to be used in the validation
+	 * @return tru if property is an identifier for clazz parameter
+	 */
+	static boolean isDomainIdentifier(Object domainInstance, String propertyName){
+		isDomainIdentifier(domainInstance.getClass(), propertyName)
+	}
+
 	static boolean hasStringId(Class clazz) {
 		getDomainClass(clazz).identifier.type == String
 	}
 
-	static GrailsDomainClass getDomainClass(Class clazz) {
-		// TODO Assert.isTrue(app.isDomainClass(clazz))
-		(GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, clazz.name)
+	/**
+	 * Used to retrieve an instance of the specified Domain class. This will work differently
+	 * in Unit tests than in Integration or production. In the latter two, there is an instance of the
+	 * domain class loaded as a bean so that is used but for Unit tests a new instance is created for each invocation.
+	 * @param domainClass
+	 * @return
+	 */
+	static GrailsDomainClass getDomainClass(Class domainClass) {
+		if (domainClass == null) {
+			throw new RuntimeException('getDomainClass() called with null class argument')
+		}
+		def ctx = ApplicationContextHolder.getApplicationContext()
+		if (ctx) {
+			String name = domainClass.getName() + 'DomainClass'
+			return ctx.getBean(name)
+		}
+		return new DefaultGrailsDomainClass(domainClass)
 	}
 
 	private static GrailsApplication getGrailsApplication() {
@@ -421,11 +461,21 @@ public class GormUtil {
 	 * @return true if the property exists otherwise false
 	 */
 	static boolean isDomainProperty(Object domainObject, String propertyName) {
-		boolean valid=false
-		if (propertyName && domainObject) {
-			valid = domainObject.metaClass.hasProperty(domainObject.getClass(), propertyName)
-		}
-		return valid
+		return isDomainProperty(domainObject.getClass(), propertyName)
+	}
+
+	/**
+	 * Checks if a property name is a valid domain property.
+	 * It could be part of the persistent property or an indentifier.
+	 * In both cases it returs null. Otherwise it returns false.
+	 * @param domainClass
+	 * @param propertyName
+	 * @return
+	 */
+	static boolean isDomainProperty(Class domainClass, String propertyName) {
+		DefaultGrailsDomainClass grailsDomainClass = getDomainClass(domainClass)
+		return grailsDomainClass.hasPersistentProperty(propertyName) ||
+			grailsDomainClass.identifier.name == propertyName
 	}
 
 	/**
@@ -434,10 +484,8 @@ public class GormUtil {
 	 * @return true if the object is a Domain class otherwise false
 	 */
 	static boolean isDomainClass(Class domainClass) {
-		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
-		return grailsApp.isDomainClass( domainClass )
-//		return grailsApp.isDomainClass( domainObj.getClass() )
-		//org.codehaus.groovy.grails.commons.isDomainClass(domainClass)
+		return DomainClassArtefactHandler.isDomainClass(domainClass)
+
 	}
 
 	/**
@@ -459,9 +507,7 @@ public class GormUtil {
 			throw new RuntimeException('persistentProperties called with non-domain object')
 		}
 
-		def d = new DefaultGrailsDomainClass(domain.class)
-
-		return d.persistentProperties.name
+		return getDomainClass(domain.class).persistentProperties.name
 	}
 
 	/**
@@ -475,10 +521,8 @@ public class GormUtil {
 			println "getDomainProperty() domainClass=${domainClass.getName()}"
 			throw new RuntimeException('Called with non-domain class parameter')
 		}
-
-		def d = new DefaultGrailsDomainClass(domainClass)
+		def d = getDomainClass(domainClass)
 		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
-
 		return cp
 	}
 
@@ -494,7 +538,7 @@ public class GormUtil {
 	static List<GrailsDomainClassProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
 		List<GrailsDomainClassProperty> domainProperties = []
 		boolean allProperties = false
-		DefaultGrailsDomainClass dfdc = new DefaultGrailsDomainClass(domainClass)
+		DefaultGrailsDomainClass dfdc = getDomainClass(domainClass)
 		if (properties) {
 			for (String property in properties) {
 				GrailsDomainClassProperty domainProperty = dfdc.getPersistentProperty(property)
@@ -1053,7 +1097,7 @@ public class GormUtil {
 	 * Determine if a domain property represents a referenced class type or if the property is an association
 	 * @param domainObject
 	 * @param propertyName
-	 * @return
+	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
 	 */
 	static boolean isReferenceProperty(Object domainObject, String propertyName) {
 		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)

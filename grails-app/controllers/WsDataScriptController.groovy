@@ -11,6 +11,7 @@ import net.transitionmanager.service.DataScriptService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import org.springframework.http.HttpStatus
 
 /**
  * Provide the endpoints for working with DataScripts.
@@ -56,7 +57,7 @@ class WsDataScriptController implements ControllerMethods {
         renderSuccessJson(dataScript: dataScript.toMap())
     }
 
-   /**
+    /**
      * Endpoint for searching for a particular DataScript.
      *
      * @param id - DataScript id
@@ -168,6 +169,16 @@ class WsDataScriptController implements ControllerMethods {
         Map<String, ?> result = scriptProcessorService.checkSyntax(project, command.script, fullName)
 
         renderSuccessJson(result)
+    }
+
+    @HasPermission(Permission.DataScriptCreate)
+    def sampleData (String filename) {
+	    try {
+           Map jsonMap = dataScriptService.parseDataFromFile(filename)
+           renderSuccessJson(jsonMap)
+	    }catch ( ex ) {
+           render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
+	    }
     }
 
 }

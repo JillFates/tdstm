@@ -9,7 +9,6 @@ import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.utils.FileUtils
@@ -220,6 +219,7 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetDependency, global: true)
+			AssetDependency.getName() >> { 'com.tds.asset.AssetDependency' }
 			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
 				assetDependencies.findAll { it.id == args.id }
 			}
@@ -1174,6 +1174,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.getName() { 'AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}

@@ -234,9 +234,9 @@ class DataImportHelper {
 		Long id = null
 
 		// TODO : JPM 2/2018 : CRITICAL - this method is not working properly at this point
-
 		if (idField?.value) {
-			id = NumberUtil.toPositiveLong(idField)
+			id = NumberUtil.toPositiveLong(idField.value)
+
 			if (id < 1) {
 				importContext.errors << "The $ID_FIELD must be a numeric value on row ${importContext.rowNumber}"
 				return -1
