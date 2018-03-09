@@ -830,6 +830,7 @@ class UrlMappings {
 				GET: "getInfoOfBatch"
 			]
 		}
+
 		//
 		// Credentials
 		//
