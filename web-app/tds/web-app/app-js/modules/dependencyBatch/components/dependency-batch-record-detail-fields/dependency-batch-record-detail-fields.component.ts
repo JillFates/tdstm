@@ -102,6 +102,36 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	}
 
 	/**
+	 * On Ignore button click.
+	 */
+	private onIgnore(): void {
+		const ids = [this.batchRecord.id];
+		this.dependencyBatchService.ignoreBatchRecords(this.importBatch.id, ids)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.updateSuccessEvent.emit();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error on ignore batch record.');
+				}
+			}, error => this.handleError(error));
+	}
+
+	/**
+	 * On Include button click.
+	 */
+	private onInclude(): void {
+		const ids = [this.batchRecord.id];
+		this.dependencyBatchService.includeBatchRecords(this.importBatch.id, ids)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.updateSuccessEvent.emit();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error on include batch record.');
+				}
+			}, error => this.handleError(error));
+	}
+
+	/**
 	 * On Update button click.
 	 */
 	private onUpdate(): void {

@@ -211,6 +211,14 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * Get all checkbox selected as an array of numbers
+	 * @returns {Array<number>}
+	 */
+	public getCheckboxSelectedItemsAsNumbers(): Array<number> {
+		return this.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+	}
+
+	/**
 	 * On checkbox change event.
 	 * @param key
 	 */
