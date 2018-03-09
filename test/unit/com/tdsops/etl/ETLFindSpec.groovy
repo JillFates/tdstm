@@ -133,10 +133,100 @@ application id,vendor name,technology,location
 							domain Application
 							set environment with Production
 							extract 'application id' load id
-							find Application by id with SOURCE.'application id'
+							find Application of id by id with SOURCE.'application id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == '152254'
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: '152254']
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == '152255'
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: '152255']
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find a domain Property Name with loaded Data Value without defining the of parameter'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							set environment with Production
+							extract 'application id' load id
+							find Application by id with SOURCE.'application id'
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -455,6 +545,112 @@ application id,vendor name,technology,location
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
 
+	void "test can throw an Exception if find command does not define 'of' parameter by default when it has multiple fields"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.moveBundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+				[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			GroovySpy(AssetDependency, global: true)
+			AssetDependency.executeQuery(_, _) >> { String query, Map args ->
+				assetDependencies.findAll { it.id == args.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						domain Dependency
+						iterate {
+						
+							extract AssetDependencyId load id
+							find Dependency of id by id with DOMAIN.id
+							
+							// Process the PRIMARY asset in the dependency
+    						extract AssetId load asset
+							
+							// Set some local variables to be reused
+							extract AssetName set primaryName
+							extract AssetType set primaryType
+    
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType
+       						elseFind Application of asset by assetName with SOURCE.DependentName
+    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+    						
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'Find commands does not have find \'of\' by default definition using multiple field names assetName,assetType'
+
+		cleanup:
+			if(fileName)  service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
 		given:
@@ -558,7 +754,7 @@ application id,vendor name,technology,location
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value for a dependent'() {
+	void 'test can find a domain Property Name with loaded Data Value for a findId'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)

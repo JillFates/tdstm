@@ -66,15 +66,15 @@ class ETLProcessorResult {
 	 */
 	void addFindElement(ETLFindElement findElement) {
 
-		String dependentId = findElement.currentFind.dependentId
+		String findId = findElement.currentFind.findId
 
 		Map<String, ?> data = currentData()
 
-		if(!data.fields.containsKey(dependentId)){
-			throw ETLProcessorException.invalidFindCommand(dependentId)
+		if(!data.fields.containsKey(findId)){
+			throw ETLProcessorException.invalidFindCommand(findId)
 		}
 
-		Map<String, ?> find = data.fields[dependentId].find
+		Map<String, ?> find = data.fields[findId].find
 
 		find.query.add(queryDataMap(findElement))
 
@@ -95,12 +95,12 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.objects){
 			Map<String, ?> data = reference.data.last()
-			addWarnMessageDataMap(data.fields[findElement.currentFind.dependentId], findElement)
+			addWarnMessageDataMap(data.fields[findElement.currentFind.findId], findElement)
 		}
 	}
 
 	/**
-	 * Add a FoundElement in the result based on its dependentId
+	 * Add a FoundElement in the result based on its findId
 	 * <pre>
 	 *		whenFound asset create {
 	 *			assetClass Application
@@ -129,16 +129,55 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
+
 		reference.fields.add(element.fieldSpec.name)
-		currentData().fields[element.fieldSpec.name] = initialFieldDataMap(element)
+		Map<String, ?> currentData = currentData()
+		currentData.rowNum = element.rowIndex
+
+		if(currentData.fields[element.fieldSpec.name]) {
+			Map<String, ?> field = currentData.fields[element.fieldSpec.name]
+			if(element.initValue){
+				field.initValue = element.initValue
+			} else {
+				field.value = element.value
+				field.originalValue = element.originalValue
+			}
+		} else {
+			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+		}
+
+	}
+
+	/**
+	 * Mark as ignore the current row.
+	 * Current row is determined by reference.data.last()
+	 * @see ETLProcessorResult#removeIgnoredRows()
+	 */
+	void ignoreCurrentRow() {
+		currentData().ignore = true
+	}
+
+	/**
+	 * Removes ignored rows in the current reference.
+	 */
+	def removeIgnoredRows() {
+		if(reference.data.last().ignore) {
+			reference.data = reference.data.dropRight(1)
+		}
 	}
 
 	/**
 	 * Calculates the current data map based on row index
+	 * It check if it isn necessary to init a new row
+	 * based on the latest data in the current reference
+	 * and the 'currentRowIndex'
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
-		if(reference.data.size() < processor.currentRowIndex){
+		if(reference.data.isEmpty()){
+			reference.data.add(initialRowDataMap())
+		} else if (reference.data.last().rowNum &&
+			reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
 		}
 		return reference.data.last()
@@ -153,8 +192,6 @@ class ETLProcessorResult {
 	 */
 	Map<String, ?> toMap() {
 		return [
-			// should this be this.ETLInfo ?
-
 			ETLInfo: this.ETLInfo,
 			domains: this.domains
 		]

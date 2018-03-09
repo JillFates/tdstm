@@ -95,8 +95,8 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('CE (current element) is not defined.')
     }
 
-	static ETLProcessorException findElementWithoutDependentIdDefinition (String... fields) {
-		new ETLProcessorException("Find commands does not have dependant definition using multiple field names ${fields.join(',')}".toString())
+	static ETLProcessorException findElementWithoutFindIdDefinition(String... fields) {
+		new ETLProcessorException("Find commands does not have find 'of' by default definition using multiple field names ${fields.join(',')}".toString())
 	}
 
     static ETLProcessorException invalidFindCommand (String dependentId) {
@@ -130,6 +130,10 @@ class ETLProcessorException extends GroovyRuntimeException {
 	static ETLProcessorException unknownAssetControlType (String controlType) {
 		new ETLProcessorException("Unknown AssetControlType: ${controlType}".toString())
 	}
+
+    static ETLProcessorException invalidIgnoreCommand () {
+        new ETLProcessorException('You cannot use ignore rows in an empty results')
+    }
 
     /**
      * Exception being thrown when no domain is specified upon load clause
