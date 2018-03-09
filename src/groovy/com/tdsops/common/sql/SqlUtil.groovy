@@ -475,7 +475,7 @@ class SqlUtil {
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
 		}
-
+	}
 	/**
 	 * Escape the parameter to avoid SQL Injection attacks.
 	 * @param parameter
