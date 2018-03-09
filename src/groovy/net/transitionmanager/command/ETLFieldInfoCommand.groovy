@@ -3,15 +3,15 @@ package net.transitionmanager.command
 import grails.validation.Validateable
 
 /**
- * General purpose command object for updating an individual field.
+ * General purpose command object for updating an individual field
  */
 @Validateable
 class ETLFieldInfoCommand{
 
-	// Field Name.
+	// Field Name
 	String fieldName
 
-	// Value for the field.
+	// Value for the field
 	Object value
 
 	static constraints = {
