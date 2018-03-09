@@ -132,7 +132,7 @@ export class DependencyBatchListComponent {
 	 * On Archive batch button click.
 	 */
 	private onArchiveBatch(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
 		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
@@ -148,7 +148,7 @@ export class DependencyBatchListComponent {
 	 * On UnArchive batch button click.
 	 */
 	private onUnArchiveBatch(): void {
-		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
 		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
