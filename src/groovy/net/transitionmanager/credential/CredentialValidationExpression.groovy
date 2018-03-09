@@ -1,5 +1,6 @@
 package net.transitionmanager.credential
 
+import grails.plugins.rest.client.RestResponse
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
@@ -34,28 +35,35 @@ class CredentialValidationExpression {
 	 * @parameter response - the HTTP response that was received from the authentication call
 	 * @return true if the evaluation matched otherwise false
 	 */
-	// boolean evaluate(HttpResponse response) {
-	boolean evaluate() {
-		String comparer = 'blah'
-		/*
+	boolean evaluate(RestResponse response) {
+		String comparator
 		switch (attribute) {
 			case ExpressionAttributeEnum.BODY:
-
+				if (response.hasBody()) {
+					comparator = response.getBody()
+				}
+				break
 			case ExpressionAttributeEnum.HEADER:
-				// get header with headerName
-				comparer = response.getHeader(headerName)
+				if (response.getHeaders()) {
+					comparator = response.getHeaders().get(headerName)
+				}
 				break
 			case ExpressionAttributeEnum.STATUS:
+				comparator = response.getStatus() as String
+				break
 		}
 
-		switch (evaluation) {
-			case ExpressionEvaluation.EQUAL:
-				return comparer == this.value
-			case ExpressionEvaluation.CONTAINS:
-
-			ExpressionEvaluation.MISSING:
+		if (comparator) {
+			switch (evaluation) {
+				case ExpressionEvaluationEnum.EQUAL:
+					return comparator == this.value
+				case ExpressionEvaluationEnum.CONTAINS:
+					return comparator.contains(this.value)
+				case ExpressionEvaluationEnum.MISSING:
+					return !comparator.contains(this.value)
+			}
 		}
-		*/
+		return false
 	}
 
 	/**
@@ -93,8 +101,6 @@ class CredentialValidationExpression {
 		script.setDelegate(new CredentialValidationExpressionDelegator(this))
 
 		script.run()
-
-		// println this.dump()
 
 		// Blow up if any of the require attributes were not specified
 		if (! attribute )  {

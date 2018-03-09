@@ -452,7 +452,17 @@ export class DataIngestionService {
 		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				let errorResult = result && result.status === 'success' && result.data;
+				let errors = '';
+				if (errorResult['errors']) {
+					errorResult['errors'].forEach((error: string) => {
+						errors += error + '\n';
+					});
+				}
+				return {
+					valid: errorResult.valid,
+					error: errors
+				};
 			})
 			.catch((error: any) => error.json());
 	}

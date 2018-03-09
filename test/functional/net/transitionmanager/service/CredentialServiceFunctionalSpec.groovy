@@ -44,9 +44,13 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 
     def "1. credentialService validate successful authentication using JWT using TDSTM as token issuer"() {
         given: 'a credential'
+			final String sessionName = 'access_token'
+			final String validationExpression = 'status code equal "200"'
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
-            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, JWT_LOGIN_ENDPOINT, AuthenticationMethod.JWT, 'access_token', AuthenticationRequestMode.FORM_VARS)
+            Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME,
+					TEST_PASSWORD, JWT_LOGIN_ENDPOINT, AuthenticationMethod.JWT,
+					sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
 
         when: 'authenticate using provided credentials for a JWT token'
             def authentication = credentialService.authenticate(credential)
@@ -74,9 +78,12 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 	def "3. credentialService validate successful authentication using FORM VARS using TDSTM as session issuer"() {
 		given: 'a credential'
 			final String sessionName = 'JSESSIONID'
+			final String validationExpression = 'header Location contains "/tdstm/dashboard/userPortal"'
 			Project project = projectTestHelper.createProject()
 			Provider provider = providerTestHelper.createProvider(project)
-			Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME, TEST_PASSWORD, FORM_LOGIN_ENDPOINT, AuthenticationMethod.COOKIE, sessionName, AuthenticationRequestMode.FORM_VARS)
+			Credential credential = credentialTestHelper.createAndSaveCredential(project, provider, TEST_USERNAME,
+					TEST_PASSWORD, FORM_LOGIN_ENDPOINT, AuthenticationMethod.COOKIE,
+					sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
 
 		when: 'authenticate using provided credentials for a FORM VARS login'
 			def authentication = credentialService.authenticate(credential)

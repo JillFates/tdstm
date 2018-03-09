@@ -5,6 +5,8 @@ import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialHttpMethod
 import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdsops.tm.enums.domain.CredentialEnvironment
+import com.tdssrc.grails.StringUtil
+import net.transitionmanager.credential.CredentialValidationExpression
 
 class Credential {
 	Project project
@@ -50,6 +52,8 @@ class Credential {
 	// The HTTP Header token or Cookie name used to reference the session token
 	String sessionName=''
 
+	String validationExpression=''
+
 	Date dateCreated
 	Date lastUpdated
 
@@ -68,6 +72,7 @@ class Credential {
 		password size:1..255
 		salt size:1..16
 		sessionName size:0..255, blank:true, validator: sessionNameValidator
+		validationExpression size: 0..255, blank: true, validator: validationExpressionValidator
 		httpMethod  nullable: true, validator: httpMethodValidator
 		requestMode nullable: true, validator: requestModeValidator
 		lastUpdated nullable: true
@@ -88,6 +93,7 @@ class Credential {
 		httpMethod enumType: 'String'
 		status enumType: 'String'
 		sessionName sqlType: 'VARCHAR(255)'
+		validationExpression sqlType: 'VARCHAR(255)'
 
 		// TODO : JPM 2/2018 : Would like to sort on Provider name + Credential name
 		sort 'name'
@@ -103,6 +109,22 @@ class Credential {
 			if (value == null || value.trim() == '') {
 				return 'default.blank.message'
 			}
+		}
+	}
+
+	/**
+	 * Used to validate if the validationExpression is syntactically correct
+	 */
+	static Closure validationExpressionValidator = { value, target ->
+		if (StringUtil.isBlank(value)) {
+			return true
+		}
+
+		try {
+			new CredentialValidationExpression(value)
+			return true
+		} catch (e) {
+			return 'credential.invalid.validation.expression'
 		}
 	}
 
@@ -178,6 +200,7 @@ class Credential {
 				terminateUrl            : terminateUrl,
 				renewTokenUrl           : renewTokenUrl,
 				sessionName             : sessionName,
+				validationExpression	: validationExpression,
 				dateCreated     		: dateCreated,
 				lastUpdated     		: lastUpdated,
 				version                 : version

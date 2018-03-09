@@ -6,12 +6,14 @@ import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import com.tdsops.tm.enums.domain.CredentialEnvironment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
+import net.transitionmanager.credential.CredentialValidationExpression
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
@@ -144,6 +146,9 @@ class CredentialService implements ServiceMethods {
             case AuthenticationMethod.COOKIE:
                 authenticationResponse = doCookieAuthentication(credential)
                 break
+            case AuthenticationMethod.HEADER:
+                authenticationResponse = doHeaderAuthentication(credential)
+                break
             default:
                 authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
                 break
@@ -190,6 +195,34 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     private Map<String, ?> doCookieAuthentication(Credential credential) {
+        RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
+        def resp = rest.post(credential.getAuthenticationUrl()) {
+            // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
+            // verify if we need to parse parameters out of the URL
+            switch (credential.requestMode) {
+                case AuthenticationRequestMode.BASIC_AUTH:
+                    auth credential.username, decryptPassword(credential)
+                    break
+                case AuthenticationRequestMode.FORM_VARS:
+                    MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>()
+                    form.add('username', credential.username)
+                    form.add('password', decryptPassword(credential))
+                    header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    body(form)
+                    break
+            }
+            header(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+        }
+
+        return getAuthenticationResponse(credential, resp)
+    }
+
+    /**
+     * Issue a HEADER authentication process using provided credentials
+     * @param credential
+     * @return
+     */
+    private Map<String, ?> doHeaderAuthentication(Credential credential) {
         RestBuilder rest = getRestBuilderForCredentialEnvironment(credential.authenticationUrl, credential.environment)
         def resp = rest.post(credential.getAuthenticationUrl()) {
             // TODO TM-9609 Change the Cookie Authentication to support GET/PUT
@@ -270,8 +303,14 @@ class CredentialService implements ServiceMethods {
             throw new RuntimeException('No response trying to authenticate.')
         }
 
+        boolean authenticationSucceeded = true
+        if (StringUtil.isNotBlank(credential.validationExpression)) {
+            CredentialValidationExpression credentialValidationExpression = new CredentialValidationExpression(credential.validationExpression)
+            authenticationSucceeded = credentialValidationExpression.evaluate(resp)
+        }
+
         Map<String, ?> authenticationResponse = [:]
-        if (resp.status == HttpStatus.OK.value() || resp.status == HttpStatus.FOUND.value()) {
+        if (authenticationSucceeded) {
             switch (credential.authenticationMethod) {
                 case AuthenticationMethod.BASIC_AUTH:
                 case AuthenticationMethod.JWT:
@@ -287,13 +326,20 @@ class CredentialService implements ServiceMethods {
                         }
                     }
                     break
+                case AuthenticationMethod.HEADER:
+                    // pull out session header data
+                    String sessionHeader = resp.getHeaders().get(credential.sessionName)
+                    if (sessionHeader) {
+                        authenticationResponse = ['sessionName': credential.sessionName, 'sessionValue': sessionHeader]
+                    }
+                    break
                 default:
                     authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet"]
                     break
             }
         } else {
             log.debug('Error during credential authentication: {}', resp.text)
-            authenticationResponse['error'] = resp.text
+            throw new RuntimeException('Error during credential authentication, not expected response: ' + resp.text)
         }
         return authenticationResponse
     }
