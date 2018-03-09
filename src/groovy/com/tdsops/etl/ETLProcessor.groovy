@@ -85,7 +85,6 @@ class ETLProcessor implements RangeChecker {
 
 	ETLDomain selectedDomain
 	ETLFindElement currentFindElement
-	Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
 	/**
 	 * A set of Global transformations that will be apply over each iteration
@@ -255,7 +254,6 @@ class ETLProcessor implements RangeChecker {
 
 			result.removeIgnoredRows()
 
-			currentRowResult = [:]
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
@@ -443,11 +441,9 @@ class ETLProcessor implements RangeChecker {
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
 				Element newElement = currentRow.addNewElement(value, this)
-				if(fieldSpec){
-					newElement.fieldSpec = fieldSpec
-					newElement.fieldSpec.label = fieldSpec.label
-					newElement.fieldSpec.type = fieldSpec.type
-				}
+				newElement.fieldSpec = fieldSpec
+				newElement.fieldSpec.label = fieldSpec.label
+				newElement.fieldSpec.type = fieldSpec.type
 
 				addElementLoaded(selectedDomain, newElement)
 				newElement
@@ -479,12 +475,10 @@ class ETLProcessor implements RangeChecker {
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
 				Element newElement = currentRow.addNewElement("", this)
-				if(fieldSpec){
-					newElement.init = ETLValueHelper.stringValueOf(defaultValue)
-					newElement.fieldSpec = fieldSpec
-					newElement.fieldSpec.label = fieldSpec.label
-					newElement.fieldSpec.type = fieldSpec.type
-				}
+				newElement.init = ETLValueHelper.stringValueOf(defaultValue)
+				newElement.fieldSpec = fieldSpec
+				newElement.fieldSpec.label = fieldSpec.label
+				newElement.fieldSpec.type = fieldSpec.type
 
 				addElementLoaded(selectedDomain, newElement)
 				newElement
@@ -605,10 +599,17 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * It looks up the field Spec for Domain by fieldName
-	 * @param domain
-	 * @param fieldName
-	 * @return
+	 * It looks up the field Spec for Domain by fieldName.
+	 * It is in charge of validating if a field belongs to a domain class.
+	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
+	 * <br>
+	 * Validation is based on the transformation from {@link ETLDomain#clazz} field.
+	 * Then it builds an instance of ETLFieldSpec with all the necessary data used in ETLProcessorResult
+	 * @param an instance of ETLDomain used to validate fieldName parameter
+	 * @param fieldName field name used in the lookup process
+	 * @return an instance of {@link  ETLFieldSpec}
+	 * @see ETLFieldSpec
+	 * @see ETLProcessorResult
 	 */
 	ETLFieldSpec lookUpFieldSpecs (ETLDomain domain, String field) {
 
@@ -624,6 +625,8 @@ class ETLProcessor implements RangeChecker {
 			if (!fieldSpec) {
 				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
+
+			//TODO: dcorrea@ What are going to do with non domain classes? How we are going to prepare the FieldsSpec
 		}
 		return fieldSpec
 	}
@@ -700,40 +703,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-
 		result.loadElement(element)
-
-		if(!currentRowResult.containsKey(selectedDomain)){
-			currentRowResult[selectedDomain] = new ReferenceResult()
-		}
-
-		currentRowResult[selectedDomain].elements.add([
-			originalValue: element.originalValue,
-			value: element.value,
-			field: [
-				name: element.fieldSpec.name,
-				label: element.fieldSpec.label
-			]
-		])
-
 		debugConsole.info "Adding element ${element} in results for domain ${domain}"
-	}
-
-	/**
-	 * Adds an asset entity instance referenced from a datasource field
-	 * @param assetEntity
-	 * @param row
-	 */
-	void addAssetEntityReferenced (AssetEntity assetEntity) {
-
-		if (!currentRowResult.containsKey(selectedDomain)) {
-			currentRowResult[selectedDomain] = new ReferenceResult()
-		}
-
-		// Add the Asset ID number to the reference list if it isn't already there
-		if (!currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
-			currentRowResult[selectedDomain].reference << assetEntity.id
-		}
 	}
 
 	/**
@@ -796,20 +767,12 @@ class ETLProcessor implements RangeChecker {
 		return columns[columnName]
 	}
 
-	Set getColumnNames () {
-		return columnsMap.keySet()
-	}
-
 	Row getCurrentRow () {
 		return currentRow
 	}
 
 	Row getRow (Integer index) {
 		return rows[index]
-	}
-
-	Element getCurrentElement () {
-		return currentElement
 	}
 
 	Element getElement (Integer rowIndex, Integer columnIndex) {

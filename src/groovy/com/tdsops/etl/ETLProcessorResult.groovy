@@ -125,7 +125,9 @@ class ETLProcessorResult {
 	/**
 	 * Appends a loaded element in the results.
 	 * First It adds a new element.field.name in the current domain fields list
+	 * and if it already exits, updates that element with the element values.
 	 * After that, It saves the new element in the data results.
+	 *
 	 * @param element
 	 */
 	void loadElement(Element element) {
@@ -135,13 +137,7 @@ class ETLProcessorResult {
 		currentData.rowNum = element.rowIndex
 
 		if(currentData.fields[element.fieldSpec.name]) {
-			Map<String, ?> field = currentData.fields[element.fieldSpec.name]
-			if(element.init){
-				field.init = element.init
-			} else {
-				field.value = element.value
-				field.originalValue = element.originalValue
-			}
+			updateFieldDataMap(currentData, element)
 		} else {
 			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
 		}
@@ -336,5 +332,52 @@ class ETLProcessorResult {
 		fieldDataMap.size = findElement.results.size
 		fieldDataMap.results = findElement.results.objects.collect { it.id }
 		fieldDataMap.matchOn = findElement.results.matchOn
+	}
+
+	/**
+	 * Using the current field in data results it updates using element parameter
+	 * <pre>
+	 * "fields": {
+	 *      "appVendor": {
+	 *      "value": "Microsoft",
+	 *      "originalValue": "Microsoft",
+	 *      "init": "Apple",
+	 *      "error": false,
+	 *      "warn": false,
+	 *      "find": {
+	 *          "query": []
+	 *          }
+	 * }
+	 * </pre>
+	 * If element contains an init value then it a case of update an field
+	 * <pre>
+	 *  read labels
+	 *  iterate {
+	 *      domain Application
+	 *      extract 'vendor name' load appVendor
+	 *      initialize appVendor with 'Apple'
+	 *  }
+	 * </pre>
+	 * if not, then it is a case to update coming from an extract/load command
+	 * <pre>
+	 *  read labels
+	 *  iterate {
+	 *      domain Application
+	 *      initialize appVendor with 'Apple'
+	 *      extract 'vendor name' load appVendor
+	 *  }
+	 * </pre>
+	 * @param currentData
+	 * @param element
+	 */
+	private void updateFieldDataMap(Map<String, ?> currentData, Element element) {
+		Map<String, ?> field = currentData.fields[element.fieldSpec.name]
+
+		if(element.init){
+			field.init = element.init
+		} else{
+			field.value = element.value
+			field.originalValue = element.originalValue
+		}
 	}
 }
