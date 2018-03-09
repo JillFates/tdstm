@@ -98,6 +98,8 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.STOP:
+				impacted = importBatchService.signalStopProcessing(project, actionCmd.ids)
+				break
 			default:
 				renderErrorJson( 'Currently not implemented' )
 				return
@@ -188,5 +190,4 @@ class WsImportBatchController implements ControllerMethods {
 		Map infoMap = importBatchService.getImportBatchInfo(project, id, info)
 		renderSuccessJson(infoMap)
 	}
-
 }
