@@ -9,7 +9,6 @@ import pages.AssetViewManager.SaveViewPage
 import pages.AssetViewManager.ViewPage
 
 
-
 @Stepwise
 class AssetViewCreationSpec extends GebReportingSpec {
 
@@ -24,7 +23,6 @@ class AssetViewCreationSpec extends GebReportingSpec {
         login()
         at MenuPage
         waitFor { menuModule.goToAssetViewManager() }
-        println(">>> next is clicking on my views")
     }
 
     //validates I can reaach"my views"
@@ -131,13 +129,10 @@ class AssetViewCreationSpec extends GebReportingSpec {
     def "Created View Save and Validate"() {
         testKey = "TM-8500"
         given:
-            println(" I SAVE THE VIEW")
             waitFor{createViewModule.clickSave()}
-            println("clicked save 1")
             at SaveViewPage
             waitFor{enterName(viewName)}
             waitFor{clickSave()}
-
         when:
             waitFor { menuModule.goToAssetViewManager() }
             at AssetViewsPage
