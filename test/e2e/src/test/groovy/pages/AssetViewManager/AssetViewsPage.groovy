@@ -29,11 +29,8 @@ class AssetViewsPage extends Page{
         previewGrid                 {$("kendo-grid",class:"k-widget k-grid k-grid-lockedcolumns")}
         vwGrid                      (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows                  (required: false, wait:true) { vwGrid.find("tr","role":"row")}
-
-
     }
     def goToCreateView(){
-        println(">>> in asset view manager /go to create view")
         createViewBtn.click()
     }
     def goToMyViews(){
@@ -42,5 +39,4 @@ class AssetViewsPage extends Page{
     def filterViewByName(String name){
         filter=name
     }
-
 }

@@ -2,14 +2,10 @@ package pages.AssetViewManager
 import geb.Page
 import modules.MenuModule
 
-
-
 class SaveViewPage extends Page{
 
     static at = {
         waitFor {saveViewModal.displayed}
-        println (">>> method at, SAve view modal")
-
     }
 
     static content = {
@@ -21,7 +17,6 @@ class SaveViewPage extends Page{
 
     def enterName(String value){
         nameField.click()
-        println("clicked on field")
         nameField=value
     }
     def clickSave(){

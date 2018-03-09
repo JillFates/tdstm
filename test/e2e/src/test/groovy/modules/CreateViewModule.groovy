@@ -5,9 +5,7 @@ import geb.Module
 class CreateViewModule extends Module {
 
     static at = {
-        println(">>> in create view module ***")
         waitFor {crtViewPageWindow.displayed}
-        println(">>> title")
     }
 
     static content = {
@@ -44,13 +42,10 @@ class CreateViewModule extends Module {
 
     }
 
-
     def selectApplication(){
-        println(">>> checking Application")
         applicationOption.click()
     }
     def clickNext(){
-        println(">>> clicking next")
         nextBtn.click()
     }
     def selectCheckBoxes(){
@@ -67,15 +62,12 @@ class CreateViewModule extends Module {
         columns.click()
     }
     def clickPreview(){
-        println("clicking preview")
         previewBtn.click()
     }
     def filter(){
-        println("number of elements found")
         println(previewGrid.count())
     }
     def searchFieldName(){
-        println("filtering field name")
         searchField="bundle"
         filterBtn.click()
     }
@@ -83,12 +75,10 @@ class CreateViewModule extends Module {
         clearSearchBtn.click()
     }
     def filterFields(String value){
-        println("filtering selected")
         fieldsFilter="Selected"
     }
     def clickSave(){
         saveBtn.click()
     }
-
 
 }

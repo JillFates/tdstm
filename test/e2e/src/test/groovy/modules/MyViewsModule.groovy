@@ -5,8 +5,7 @@ import geb.Module
 class MyViewsModule extends Module {
 
     static at = {
-        println(">>> in my views module ***")
-        createViewButton.text().trim()      =="Create"
+        createViewButton.text().trim() =="Create"
     }
 
     static content = {
@@ -15,7 +14,6 @@ class MyViewsModule extends Module {
         createViewButton    {viewsContainer.find("button", text:"Create View")}
 
     }
-
 
     def clickCreateView(){
         println(">> clickcing create view")
