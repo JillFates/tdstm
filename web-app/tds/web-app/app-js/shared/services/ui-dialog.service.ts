@@ -126,7 +126,7 @@ export class UIExtraDialog {
 	 * This function should be overrided by child class if needed to perform specific actions.
 	 */
 	onEscKeyPressed(): void {
-		// override if needed
+		this.dismiss();
 	}
 
 	open(resolve, reject, comp: ComponentRef<{}>, enableEsc: boolean, draggable: boolean) {
@@ -137,7 +137,7 @@ export class UIExtraDialog {
 		this.enableEsc = enableEsc;
 		// enable/disable exit on ESCAPE key
 		this.modalIntance.modal({
-			keyboard: !enableEsc
+			keyboard: this.enableEsc
 		}).modal('show');
 		// make it draggable
 		if (draggable) {
