@@ -15,7 +15,7 @@
                         (filterChange)="dataGridOperationsHelper.filterChange($event)"
                         [sort]="dataGridOperationsHelper.state.sort"
                         [sortable]="{mode:'single'}"
-                        [pageSize]="dataGridOperationsHelper.defaultPageSize"
+                        [pageSize]="dataGridOperationsHelper.currentPageSize"
                         [skip]="dataGridOperationsHelper.skip"
                         [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
                         (pageChange)="dataGridOperationsHelper.pageChange($event)"
