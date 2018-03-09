@@ -347,6 +347,7 @@ export class DataIngestionService {
 			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
 			httpMethod: model.httpMethod.toUpperCase(),
 			sessionName: (model.sessionName) ? model.sessionName  : '',
+			validationExpression: (model.validationExpression) ? model.validationExpression  : '',
 		};
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it
@@ -435,6 +436,33 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Validate if the expression executed is correct
+	 * @param {string} validateExpression
+	 * @returns {Observable<any>}
+	 */
+	validateExpressionCheck(validateExpression: string): Observable<any> {
+		let postRequest = {
+			expression: validateExpression
+		};
+		return this.http.post(`${this.credentialUrl}/checkValidExprSyntax`, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				let errorResult = result && result.status === 'success' && result.data;
+				let errors = '';
+				if (errorResult['errors']) {
+					errorResult['errors'].forEach((error: string) => {
+						errors += error + '\n';
+					});
+				}
+				return {
+					valid: errorResult.valid,
+					error: errors
+				};
 			})
 			.catch((error: any) => error.json());
 	}

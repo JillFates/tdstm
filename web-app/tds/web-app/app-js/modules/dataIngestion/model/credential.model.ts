@@ -75,6 +75,7 @@ export class CredentialModel {
 	// Token / Cookie Session Name
 	sessionName?: string;
 	version?: number;
+	validationExpression?: string;
 
 	constructor() {
 		this.name = '';
@@ -90,6 +91,7 @@ export class CredentialModel {
 		this.terminateUrl = '';
 		this.httpMethod = '';
 		this.sessionName = '';
+		this.validationExpression = '';
 	}
 }
 

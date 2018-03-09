@@ -1,0 +1,16 @@
+<span style="cursor:pointer;" #popUpPolling (click)="onToggle()"><i class="fa  fa-question"></i></span>
+<kendo-popup [anchor]="popUpPolling" [popupClass]="'content popup'" *ngIf="show">
+    <div>
+        <label>
+            Used to determine if the API call to the Authentication endpoint was successful.
+        </label>
+        <label>
+            Examples:
+        </label>
+        <ul>
+            <li>body content contains 'Welcome back!'</li>
+            <li>header Location missing '/login/form'</li>
+            <li>status code equal '200'</li>
+        </ul>
+    </div>
+</kendo-popup>

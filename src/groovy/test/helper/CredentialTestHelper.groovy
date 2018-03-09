@@ -23,14 +23,15 @@ class CredentialTestHelper {
 	 * @param provider
 	 * @return
 	 */
-	CredentialCommand createCredentialCO(Provider provider, String username = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null, String sessionName = null, AuthenticationRequestMode requestMode = null) {
+	CredentialCommand createCredentialCO(Provider provider, String username = null, String password = null, String authenticationUrl = null, AuthenticationMethod authenticationMethod = null, String sessionName = null, AuthenticationRequestMode requestMode = null, String validationExpression = null) {
 		return new CredentialCommand(
 				environment: CredentialEnvironment.SANDBOX,
 				requestMode: requestMode == null ? AuthenticationRequestMode.FORM_VARS : requestMode,
 				httpMethod: CredentialHttpMethod.POST,
 				status: CredentialStatus.ACTIVE,
 				authenticationMethod: authenticationMethod == null ? AuthenticationMethod.BASIC_AUTH : authenticationMethod,
-				sessionName: sessionName,
+				sessionName: sessionName == null ? 'JSESSIONID' : sessionName,
+				validationExpression: validationExpression == null ? '' : validationExpression,
 				name: 'Test credential',
 				username: username == null ? 'key' : username,
 				authenticationUrl: authenticationUrl == null ? 'http://localhost' : authenticationUrl,
@@ -64,8 +65,8 @@ class CredentialTestHelper {
 	 * @param authenticationUrl
 	 * @return
 	 */
-	Credential createAndSaveCredential(Project project, Provider provider, String username, String password, String authenticationUrl, AuthenticationMethod authenticationMethod, String sessionName, AuthenticationRequestMode requestMode) {
-		CredentialCommand credentialCO = createCredentialCO(provider, username, password, authenticationUrl, authenticationMethod, sessionName, requestMode)
+	Credential createAndSaveCredential(Project project, Provider provider, String username, String password, String authenticationUrl, AuthenticationMethod authenticationMethod, String sessionName, AuthenticationRequestMode requestMode, String validationExpression) {
+		CredentialCommand credentialCO = createCredentialCO(provider, username, password, authenticationUrl, authenticationMethod, sessionName, requestMode, validationExpression)
 		Credential credential = new Credential()
 		credentialCO.populateDomain(credential)
 		credential.project = project

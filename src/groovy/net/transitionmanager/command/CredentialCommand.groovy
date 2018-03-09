@@ -28,4 +28,5 @@ class CredentialCommand implements CommandObject {
     String terminateUrl=''
     String renewTokenUrl = ''
     String sessionName=''
+    String validationExpression=''
 }
