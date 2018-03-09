@@ -287,6 +287,11 @@ class DataImportService implements ServiceMethods {
 			// Keep track of the row number for reporting
 			importContext.rowNumber++
 
+			// Do some initialization of the rowData object if necessary
+			if (! rowData.containsKey('errors')) {
+				rowData.errors = []
+			}
+
 			// Process the fields for this row
 			importRow(session, batch, rowData, importContext)
 		}
@@ -302,11 +307,10 @@ class DataImportService implements ServiceMethods {
 	private void importRow(session, Object batch, JSONObject rowData, Map importContext ) {
 		boolean canImportRow=false
 
-		// TODO : JPM 2/2018 : CRITICAL - presently getting error message that ID must be a numeric value
 		Long domainId = getAndValidateDomainId(rowData, importContext)
 
 		// Process the row as long as there wasn't an error with the ID reference
-		if (domainId == null || domainId > 0) {
+		// if (domainId == null || domainId > 0) {
 
 			// Validate that the row can be processed, any errors will be captured in importContext.errors
 			// TODO : JPM 2/2018 : MINOR - Review and fix the canRowDataBeImported logic, wait for Dependency imports
@@ -320,7 +324,8 @@ class DataImportService implements ServiceMethods {
 					canImportRow = insertRowDataIntoImportBatchRecord(session, batch, rowData, domainId, importContext )
 				}
 			}
-		}
+		// }
+
 		if (canImportRow) {
 			importContext.rowsCreated++
 		} else {
@@ -642,6 +647,13 @@ class DataImportService implements ServiceMethods {
 
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
+
+		// TODO : JPM 3/2018 : Fix the batch status update after processing
+		// It occurred to me that throwing the Exception is going to rollback the changes but that the
+		// update BatchProgress will be done in another transaction so the results won't be correct. A process needs to be
+		// triggered back at the Controller layer after the transaction was rolled back to update the batch status appropriately.
+		// Perhaps the above code can be broken out into a separate service call and called subsequent to this method so that the
+		// data would be committed appropriately and the the query will have the correct information.
 
 		if (ex) {
 			// Now we send the exception back to the user interface
