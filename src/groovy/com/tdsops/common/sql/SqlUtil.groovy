@@ -461,18 +461,20 @@ class SqlUtil {
 
 		Object paramValue
 
-		if (fieldSearchData.filter.isNumber() && isNumericField(fieldSearchData)) {
-			paramValue = parseNumberParameter(fieldSearchData.filter)
+		if (isNumericField(fieldSearchData)) {
+			if (fieldSearchData.filter.isNumber()) {
+				paramValue = parseNumberParameter(fieldSearchData.filter)
+			}
 		} else {
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
 
-		String expression = getSingleValueExpression(fieldSearchData.column, fieldSearchData.columnAlias, operator)
-		fieldSearchData.sqlSearchExpression = expression
-
-		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
-
-	}
+		// Calculate the expression only if there's a valid value to be added to the query.
+		if (paramValue) {
+			String expression = getSingleValueExpression(fieldSearchData.column, fieldSearchData.columnAlias, operator)
+			fieldSearchData.sqlSearchExpression = expression
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+		}
 
 	/**
 	 * Escape the parameter to avoid SQL Injection attacks.
