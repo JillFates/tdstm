@@ -1,6 +1,6 @@
 import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
-	CompositeFilterDescriptor, filterBy, FilterDescriptor, process, SortDescriptor,
+	CompositeFilterDescriptor, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
 	State
 } from '@progress/kendo-data-query';
 import {
@@ -29,7 +29,8 @@ export class DataGridOperationsHelper {
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
 	public skip = 0;
-	public defaultPageSize = MAX_DEFAULT;
+	// public defaultPageSize = MAX_DEFAULT;
+	public currentPageSize;
 	public defaultPageOptions = MAX_OPTIONS;
 
 	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
@@ -44,6 +45,7 @@ export class DataGridOperationsHelper {
 			}
 			this.checkboxSelectionConfig = checkboxSelectionConfig;
 		}
+		this.currentPageSize = MAX_DEFAULT;
 		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
@@ -234,20 +236,27 @@ export class DataGridOperationsHelper {
 	 */
 	public pageChange(event: PageChangeEvent): void {
 		this.skip = event.skip;
+		this.currentPageSize = event.take;
 		this.loadPageData();
 	}
 
 	/**
-	 * Change the Model to the Page + Filter
+	 * Change the Model to the Page + Filter + Sort
 	 */
 	public loadPageData(): void {
+		// Filter
 		this.gridData = {
-			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.state.filter),
+			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.currentPageSize), this.state.filter),
 			total: this.resultSet.length
+		};
+		// Sort
+		this.gridData = {
+			data: orderBy(this.gridData.data, this.state.sort),
+			total: this.gridData.total
 		};
 		// If we delete an item and it was the last element in the page, go one page back
 		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
-			this.skip -= this.defaultPageSize;
+			this.skip -= this.currentPageSize;
 			this.loadPageData();
 		}
 	}
