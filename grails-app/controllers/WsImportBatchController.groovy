@@ -119,17 +119,25 @@ class WsImportBatchController implements ControllerMethods {
 		validateCommandObject(actionCmd)
 
 		ImportBatch importBatch = fetchDomain(ImportBatch, [id:id]) as ImportBatch
+		Integer affected
 
-		switch (actionLookup(ImportRecordActionEnum, action)) {
-			case ImportBatchActionEnum.IGNORE:
-			case ImportBatchActionEnum.INCLUDE:
-			case ImportBatchActionEnum.PROCESS:
+		switch (actionCmd.actionLookup(ImportRecordActionEnum)) {
+			case ImportRecordActionEnum.IGNORE:
+				affected = importBatchService.toggleIgnoreOnRecords(importBatch, actionCmd.ids, true)
+				break
+
+			case ImportRecordActionEnum.INCLUDE:
+				affected = importBatchService.toggleIgnoreOnRecords(importBatch, actionCmd.ids, false)
+				break
+
+			case ImportRecordActionEnum.PROCESS:
+
 			default:
 				renderErrorJson( 'Currently not implemented' )
 				return
 		}
 
-		renderSuccessJson((action.toString):true)
+		renderSuccessJson( (actionCmd.action.toString()) : affected )
 	}
 
 	/**
@@ -170,9 +178,9 @@ class WsImportBatchController implements ControllerMethods {
 	}
 
 	/**
-	 * Retrieve progress info of a given batch
-	 * @param id
-	 * @param info
+	 * Used to fetch various sorts of information about a Batch
+	 * @param id - id number of the batch of interest
+	 * @param info - the type of information interested in (e.g. progress)
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
 	def getInfoOfBatch(Long id, String info) {
