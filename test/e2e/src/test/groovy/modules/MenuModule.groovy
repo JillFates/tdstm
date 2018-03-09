@@ -176,6 +176,10 @@ class MenuModule extends Module {
         selectMenu(tasksItem)
         selectItem(tasksCookbookItem)
     }
+    def goToAssetViewManager(){
+        selectMenu(assetsItem)
+        selectItem(assetsViewManagerItem)
+    }
 
 // TODO Add remains menu items here
 
