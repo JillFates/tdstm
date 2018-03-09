@@ -175,6 +175,20 @@ class ImportBatchService implements ServiceMethods {
 	}
 
 	/**
+	 * Set the Stop Processing flag to 1 for a list of Import Batch ids.
+	 * @param project - user current project
+	 * @param ids - ids of batches to be signaled.
+	 * @return number of batches updated.
+	 */
+	Integer signalStopProcessing(Project project, List<Long> ids) {
+		Integer updated = ImportBatch.where {
+			project == project
+			id in ids
+		}.updateAll([processStopFlag: 1])
+		return updated
+	}
+
+	/**
 	 * Used to update an Import Batch Record
 	 * @param project - current project
 	 * @param importBatchId - Id of the batch the record belongs to
