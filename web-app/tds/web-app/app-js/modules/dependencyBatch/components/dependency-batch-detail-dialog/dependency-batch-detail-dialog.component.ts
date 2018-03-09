@@ -176,4 +176,19 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			}
 		}
 	}
+
+	/**
+	 * On Ignore button click.
+	 */
+	private onIgnore(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
+		this.dependencyBatchService.ignoreBatchRecords(this.importBatchModel.id, ids)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.loadImportBatchRecords();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error on bulk ignore batch records.');
+				}
+			}, error => this.handleError(error));
+	}
 }

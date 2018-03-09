@@ -220,12 +220,40 @@ export class DependencyBatchService {
 				return res.json();
 			})
 			.catch((error: any) => error.json());
-		// const matchedRecord = this.mockBatchRecords.find( record => record.id === id);
-		// const mockResult: Array<any> = [];
-		// Object.keys(matchedRecord.currentValues).forEach(key => {
-		// 	mockResult.push({name: key, currentValue: '', importValue: matchedRecord.fields[key], error: ''});
-		// });
-		// return Observable.of(mockResult);
+	}
+
+	/**
+	 * PATCH - Ignore Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	ignoreBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'IGNORE',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Include Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	includeBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'INCLUDE',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
 	}
 
 	/**
