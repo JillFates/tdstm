@@ -232,13 +232,16 @@ class DataImportHelper {
 	static Long getAndValidateDomainId(JSONObject rowData, Map importContext) {
 		Map idField = rowData.fields[ID_FIELD]
 		Long id = null
+		String msg
 
 		// TODO : JPM 2/2018 : CRITICAL - this method is not working properly at this point
 		if (idField?.value) {
 			id = NumberUtil.toPositiveLong(idField.value)
 
 			if (id < 1) {
-				importContext.errors << "The $ID_FIELD must be a numeric value on row ${importContext.rowNumber}"
+				msg = "The $ID_FIELD must be a numeric value"
+				importContext.errors << msg + " on row ${importContext.rowNumber}"
+				rowData.errors << msg
 				return -1
 			}
 
@@ -246,6 +249,7 @@ class DataImportHelper {
 			String error = validDomainId(id, importContext.project)
 			if (error) {
 				importContext.errors << error + " on row ${importContext.rowNumber}"
+				rowData.errors << error
 				return -1
 			}
 		}
