@@ -5,14 +5,23 @@ import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.service.*
+import net.transitionmanager.service.DomainUpdateException
+import net.transitionmanager.service.EmptyResultException
+import net.transitionmanager.service.ErrorHandlerService
+import net.transitionmanager.service.InvalidConfigurationException
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.InvalidSyntaxException
+import net.transitionmanager.service.LicenseAdminService
+import net.transitionmanager.service.LogicException
+import net.transitionmanager.service.UnauthorizedException
+import net.transitionmanager.service.SecurityService
 import org.grails.databinding.bindingsource.InvalidRequestBodyException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
@@ -21,7 +30,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.Errors
 
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.FORBIDDEN
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 /**
  * This set of traits are intended to be used by the controller methods to respond to
