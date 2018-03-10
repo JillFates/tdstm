@@ -49,14 +49,14 @@ export class DependencyBatchColumnsModel {
 
 	constructor() {
 		this.columns = [
-			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 70,
-				locked: false,
-				cellStyle: {'text-align': 'center'}
-			},
+			// {
+			// 	label: 'Action',
+			// 	property: 'action',
+			// 	type: 'action',
+			// 	width: 70,
+			// 	locked: false,
+			// 	cellStyle: {'text-align': 'center'}
+			// },
 			{
 				label: 'Id',
 				property: 'id',
