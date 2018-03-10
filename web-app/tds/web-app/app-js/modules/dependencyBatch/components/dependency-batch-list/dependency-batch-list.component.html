@@ -84,6 +84,37 @@
                                 </div>
                             </ng-template>
                         </kendo-grid-column>
+
+                    <!-- Action -->
+                    <kendo-grid-column *ngIf="!viewArchived"
+                                       title="Action" [locked]="true" [filterable]="false" [width]="70">
+                        <ng-template kendoGridHeaderTemplate>
+                            <label class="action-header"> Action </label>
+                        </ng-template>
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                            <div class="k-grid-ignore-click text-center" style="cursor: default">
+                                <button *ngIf="dataItem.status.code === 'PENDING'"
+                                        (click)="onPlayButton(dataItem)"
+                                        class="btn btn-action btn-default"
+                                        title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
+                                    <i class="fa fa-play-circle-o"></i>
+                                </button>
+                                <button *ngIf="dataItem.status.code === 'RUNNING'"
+                                        (click)="onStopButton(dataItem)"
+                                        class="btn btn-action btn-default"
+                                        title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
+                                    <i class="fa fa-stop"></i>
+                                </button>
+                                <button *ngIf="dataItem.status.code === 'QUEUED'"
+                                        (click)="onEjectButton(dataItem)"
+                                        class="btn btn-action btn-default"
+                                        title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
+                                    <i class="fa fa-eject"></i>
+                                </button>
+                            </div>
+                        </ng-template>
+                    </kendo-grid-column>
+
                         <!--
                             Columns
                         -->
@@ -101,7 +132,7 @@
                                 Header Template
                              -->
                             <ng-template kendoGridHeaderTemplate>
-                                <label [ngClass]="{'action-header':column.type === 'action'}"> {{column.label}}</label>
+                                <label>{{column.label}}</label>
                             </ng-template>
 
                             <!--
@@ -113,7 +144,7 @@
                             </ng-template>
                             -->
                             <!-- Action -->
-                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+                            <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
                                     <button *ngIf="dataItem.status.code === 'PENDING'"
                                             (click)="onPlayButton(dataItem)"
