@@ -6,6 +6,7 @@ import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CompositeFilterDescriptor, FilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -80,8 +81,10 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		for (const fieldName of this.importBatch.fieldNameList) {
 			this.fieldsInfo.push({
 				name: fieldName,
-				currentValue: fields[fieldName].originalValue,
-				importValue: fields[fieldName].value,
+				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
+					? fields[fieldName].originalValue : '(null)',
+				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
+					? fields[fieldName].value : '(null)',
 				error: fields[fieldName].error,
 				overridedValue: null
 			});

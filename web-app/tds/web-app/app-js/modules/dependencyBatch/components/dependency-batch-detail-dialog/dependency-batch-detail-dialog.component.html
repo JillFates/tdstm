@@ -34,12 +34,12 @@
                                  Toolbar Template
                             -->
                             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <div class="col-sm-1 toolbar-button">
+                                <div class="col-sm-1 toolbar-button button-process">
                                     <button (click)="onRevalidate()"
                                             [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                             class="btn btn-default" type="button">
-                                        <i class="glyphicon glyphicon-thumbs-up"></i>
-                                        Revalidate
+                                        <i class="glyphicon glyphicon-retweet"></i>
+                                        Process
                                     </button>
                                 </div>
                                 <div class="col-sm-1 toolbar-button">
@@ -50,7 +50,7 @@
                                         Ignore
                                     </button>
                                 </div>
-                                <div class="col-sm-2 toolbar-button">
+                                <div class="col-sm-2 toolbar-dropdown">
                                     <kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
                                                         [data]="batchRecordsFilter.options"
                                                         [textField]="'name'"
