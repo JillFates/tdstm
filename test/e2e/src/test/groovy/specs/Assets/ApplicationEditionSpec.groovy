@@ -294,7 +294,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             waitFor {alNameFilter.click()}
             alNameFilter = appName
             waitFor{alFirstAppName.text().trim() == appName}
-        And: 'The User clicks on that Application'
+        and: 'The User clicks on that Application'
             waitFor{alFirstAppName.click()}
 
         then: 'The User should be redirected to the Application Details Page'
