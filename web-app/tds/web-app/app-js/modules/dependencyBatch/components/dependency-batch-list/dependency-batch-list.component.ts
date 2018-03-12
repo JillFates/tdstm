@@ -297,7 +297,6 @@ export class DependencyBatchListComponent {
 	 * Creates an interval loop to retreive batch current progress.
 	 */
 	private setBatchStatusLooper(): void {
-		// Set interval while batch is being executed
 		const runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
 			return item.status.code === BatchStatus.RUNNING;
 		});
