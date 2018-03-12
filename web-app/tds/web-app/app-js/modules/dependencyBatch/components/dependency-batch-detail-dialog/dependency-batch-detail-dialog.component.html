@@ -12,7 +12,7 @@
                 Batch Records Grid
             -->
             <section>
-                <div class="box-body box-with-empty-header">
+                <div class="box-body box-with-empty-header default-list-component">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
                                 [height]="550"
                                 [data]="dataGridOperationsHelper.gridData"
@@ -34,12 +34,12 @@
                                  Toolbar Template
                             -->
                             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                <div class="col-sm-1 toolbar-button">
+                                <div class="col-sm-1 toolbar-button button-process">
                                     <button (click)="onRevalidate()"
                                             [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                             class="btn btn-default" type="button">
-                                        <i class="glyphicon glyphicon-thumbs-up"></i>
-                                        Revalidate
+                                        <i class="glyphicon glyphicon-retweet"></i>
+                                        Process
                                     </button>
                                 </div>
                                 <div class="col-sm-1 toolbar-button">
@@ -50,7 +50,7 @@
                                         Ignore
                                     </button>
                                 </div>
-                                <div class="col-sm-2 toolbar-button">
+                                <div class="col-sm-2 toolbar-dropdown">
                                     <kendo-dropdownlist id="batchRecorsdFilter" name="batchRecordsFilter"
                                                         [data]="batchRecordsFilter.options"
                                                         [textField]="'name'"
@@ -80,7 +80,7 @@
                                     </div>
                                 </ng-template>
                                 <ng-template kendoGridCellTemplate let-dataItem>
-                                    <div class="text-center k-grid-ignore-click">
+                                    <div class="text-center k-grid-ignore-click" *ngIf="batchRecordCanAction(dataItem)">
                                         <label style="min-height: 15px;">
                                             <input type="checkbox"
                                                    [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
@@ -107,8 +107,17 @@
                                     Header Template
                                 -->
                                 <ng-template kendoGridHeaderTemplate>
-                                    <label> {{column.label}}</label>
+                                    <label>
+                                        {{column.label}}
+                                    </label>
                                 </ng-template>
+                                <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'status.label'">
+                                    <div>
+                                        {{dataItem.status.label}}
+                                        <small style="margin-left: 5px; font-weight: 700;" *ngIf="dataItem.ignored">(ignored)</small>
+                                    </div>
+                                </ng-template>
+
                                 <!--
                                     Filter Template
                                 -->
@@ -140,18 +149,6 @@
                     </kendo-grid>
                 </div>
             </section>
-
-            <!--
-                Batch Record Detail
-            -->
-            <!--<section *ngIf="selectedBatchRecord">-->
-                <!--<div class="row">-->
-                    <!--<dependency-batch-record-detail [importBatch]="importBatchModel"-->
-                                                    <!--[batchRecord]="selectedBatchRecord"-->
-                                                    <!--(onCancel)="closeBatchRecordDetail()">-->
-                    <!--</dependency-batch-record-detail>-->
-                <!--</div>-->
-            <!--</section>-->
         </div>
     </div>
     <div class="modal-footer">

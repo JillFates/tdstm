@@ -6,6 +6,7 @@ import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CompositeFilterDescriptor, FilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 @Component({
 	selector: 'dependency-batch-record-detail-fields',
@@ -24,7 +25,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		importValue: string,
 		error: boolean,
 		overridedValue: string
-	}> = [];
+	}>;
 	private state: State = {
 		filter: {
 			filters: [],
@@ -77,11 +78,14 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 
 	private buildGridData(fields): void {
 		// let data: Array<{name: string, currentValue: string, importValue: string, error: boolean}> = [];
+		this.fieldsInfo = [];
 		for (const fieldName of this.importBatch.fieldNameList) {
 			this.fieldsInfo.push({
 				name: fieldName,
-				currentValue: fields[fieldName].originalValue,
-				importValue: fields[fieldName].value,
+				currentValue: !ValidationUtils.isEmptyObject(fields[fieldName].value)
+					? fields[fieldName].value : '(null)',
+				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
+					? fields[fieldName].originalValue : '(null)',
 				error: fields[fieldName].error,
 				overridedValue: null
 			});
@@ -145,7 +149,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.updateSuccessEvent.emit();
+					// this.updateSuccessEvent.emit();
+					this.loadRecordFieldDetails();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
 				}
@@ -157,7 +162,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private showIgnoreButton(): boolean {
-		return this.batchRecord.status.code === BatchStatus.PENDING;
+		// return this.batchRecord.status.code === BatchStatus.PENDING;
+		return this.batchRecord.status.code === BatchStatus.PENDING && !this.batchRecord.ignored;
 	}
 
 	/**
@@ -165,7 +171,16 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private showIncludeButton(): boolean {
-		return this.batchRecord.status.code === BatchStatus.IGNORED;
+		// return this.batchRecord.status.code === BatchStatus.IGNORED;
+		return this.batchRecord.status.code === BatchStatus.PENDING && this.batchRecord.ignored;
+	}
+
+	/**
+	 * Hide Action buttons if Record is already completed.
+	 * @returns {boolean}
+	 */
+	private showActionButtons(): boolean {
+		return this.batchRecord.status.code !== BatchStatus.COMPLETED;
 	}
 
 	/**

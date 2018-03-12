@@ -26,14 +26,14 @@
             </div>
         </ng-template>
         <kendo-grid-column title="Name" field="name"></kendo-grid-column>
+        <kendo-grid-column title="Imported Value" field="importValue"></kendo-grid-column>
         <kendo-grid-column title="Current Value" field="currentValue"></kendo-grid-column>
-        <kendo-grid-column title="Import Value" field="importValue"></kendo-grid-column>
-        <kendo-grid-column title="Override Value">
+        <kendo-grid-column title="Override Value" *ngIf="showActionButtons()">
             <ng-template kendoGridCellTemplate let-dataItem >
                 <input type="text" style="width: 100%; height: 30px;" [(ngModel)]="dataItem.overridedValue"/>
             </ng-template>
         </kendo-grid-column>
-        <kendo-grid-column title="Error">
+        <kendo-grid-column title="Error(s)">
             <ng-template kendoGridCellTemplate let-dataItem >
                 <span>{{dataItem.error ? dataItem.error : '' }}</span>
             </ng-template>
@@ -46,24 +46,27 @@
         }
     </style>
     <div class="row footer" style="margin-top: 30px;">
-        <button [disabled]="!areOverrideValuesDirty()"
+        <button *ngIf="showActionButtons()"
+                [disabled]="!areOverrideValuesDirty()"
                 (click)="onUpdate()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-floppy-disk"></i>
-            Update
+            Save
         </button>
-        <button (click)="onRevalidate()"
+        <button *ngIf="showActionButtons()"
+                [disabled]="areOverrideValuesDirty()"
+                (click)="onRevalidate()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
-            <i class="glyphicon glyphicon-thumbs-up"></i>
-            Revalidate
+            <i class="glyphicon glyphicon-retweet"></i>
+            Process
         </button>
-        <button *ngIf="showIncludeButton()"
+        <button *ngIf="showActionButtons() && showIncludeButton()"
                 (click)="onInclude()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-plus"></i>
             Include
         </button>
-        <button *ngIf="showIgnoreButton()"
+        <button *ngIf="showActionButtons() && showIgnoreButton()"
                 (click)="onIgnore()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-eye-close"></i>
@@ -72,8 +75,7 @@
         <button (click)="onCancel()"
                 class="btn btn-default btn-sm col-sm-1 pull-right" type="button">
             <i class="glyphicon glyphicon-remove-circle"></i>
-            Cancel
+            <span>{{showActionButtons() ? 'Cancel' : 'Close'}}</span>
         </button>
     </div>
-
 </div>
