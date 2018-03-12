@@ -18,11 +18,11 @@ class LoginSpec extends GebReportingSpec {
 
     def loginTDS(){
         given:
-        to LoginPage
+            to LoginPage
         when:
-        //loginModule.login(username,password)
+            loginModule.login(username,password)
         then:
-        at MenuPage
+            at MenuPage
     }
 }
 
