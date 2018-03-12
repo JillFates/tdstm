@@ -163,7 +163,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 */
 	private showIgnoreButton(): boolean {
 		// return this.batchRecord.status.code === BatchStatus.PENDING;
-		return this.batchRecord.status.code === BatchStatus.PENDING && !this.batchRecord.ignored;
+		return this.batchRecord.status.code !== BatchStatus.IGNORED;
 	}
 
 	/**
@@ -171,8 +171,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private showIncludeButton(): boolean {
-		// return this.batchRecord.status.code === BatchStatus.IGNORED;
-		return this.batchRecord.status.code === BatchStatus.PENDING && this.batchRecord.ignored;
+		return this.batchRecord.status.code === BatchStatus.IGNORED;
 	}
 
 	/**
