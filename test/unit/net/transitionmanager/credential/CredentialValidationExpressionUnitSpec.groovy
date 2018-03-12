@@ -1,6 +1,11 @@
 package net.transitionmanager.credential
 
+import grails.plugins.rest.client.RestResponse
 import net.transitionmanager.service.InvalidSyntaxException
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.util.MultiValueMap
 import spock.lang.Specification
 
 class CredentialValidationExpressionUnitSpec extends Specification {
@@ -221,6 +226,78 @@ class CredentialValidationExpressionUnitSpec extends Specification {
 	}
 
 	def '5. Test the evaluate method'() {
-		// TODO : Implement this test case
+		given:
+			MultiValueMap<String, String> headers = new HttpHeaders()
+			ResponseEntity responseEntity
+			RestResponse resMock
+			boolean evaluation
+			CredentialValidationExpression credentialValidationExpression
+
+		when: 'evaluate status code equal 200'
+			responseEntity = new ResponseEntity(HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('status code equal "200"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate status code contains 200'
+			responseEntity = new ResponseEntity(HttpStatus.NO_CONTENT)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('status code contains "200"').evaluate(resMock)
+		then:
+			!evaluation
+
+		when: 'evalute status code missing 200'
+			responseEntity = new ResponseEntity(HttpStatus.NO_CONTENT)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('status code missing "200"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate header Location equal /test'
+			headers.set('Location', '/test')
+			responseEntity = new ResponseEntity(headers, HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('header Location equal "/test"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate header Location contains /test'
+			headers.set('Location', '/test')
+			responseEntity = new ResponseEntity(headers, HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('header Location contains "/test"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate header Location missing /test'
+			headers.set('Location', '/error')
+			responseEntity = new ResponseEntity(headers, HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('header Location missing "/test"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate body content equal Welcome user!'
+			responseEntity = new ResponseEntity('Welcome user!', HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('body content equal "Welcome user!"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate body content contains Welcome'
+			responseEntity = new ResponseEntity('Welcome user!', HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('body content contains "Welcome"').evaluate(resMock)
+		then:
+			evaluation
+
+		when: 'evaluate body content missing Sign in'
+			responseEntity = new ResponseEntity('Welcome user!', HttpStatus.OK)
+			resMock = new RestResponse(responseEntity)
+			evaluation =  new CredentialValidationExpression('body content missing "Sign in"').evaluate(resMock)
+		then:
+			evaluation
+
 	}
 }
