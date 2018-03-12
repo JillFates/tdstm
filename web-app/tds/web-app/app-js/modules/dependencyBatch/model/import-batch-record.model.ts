@@ -32,6 +32,13 @@ export class ImportBatchRecordDetailColumnsModel {
 				locked: true,
 			},
 			{
+				label: 'Ignored',
+				property: 'ignored',
+				type: 'number',
+				width: 100,
+				hidden: true,
+			},
+			{
 				label: 'Error Count',
 				property: 'errorCount',
 				type: 'number',
