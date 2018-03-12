@@ -33,7 +33,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 				{column: 'errorCount', value: 1},
 			]},
 			{id: 4, name: 'Ignored', filters: [
-				{column: 'status.label', value: 'Ignored'},
+				{column: 'ignored', value: 1},
 			]},
 			{id: 5, name: 'Completed', filters: [
 				{column: 'status.label', value: 'Completed'},
