@@ -24,6 +24,7 @@ export class GridColumnModel {
 	format?: string;
 	width: number;
 	locked? = false;
+	hidden? = false;
 	filter?: any;
 	headerStyle?: any;
 	headerClass?: Array<string>;
