@@ -19,7 +19,7 @@ class ETLFieldSpec {
 	 *  ],
 	 *  control: String,
 	 *  default: '',
-	 *  field: 'Name',
+	 *  field: 'name',
 	 *  imp: 'U',
 	 *  label: 'Name',
 	 *  order: 0,

@@ -3,9 +3,18 @@ package com.tdsops.etl
 import com.tdssrc.grails.StringUtil
 
 class Element implements RangeChecker {
-
+	/**
+	 * Original value extracted from Dataset and used to create an instance of Element
+	 */
     String originalValue
+	/**
+	 * Value with transformations applied
+	 */
     String value
+	/**
+	 * Default o initialize value
+	 */
+	String init
     Integer rowIndex
     Integer columnIndex
     ETLDomain domain
@@ -22,7 +31,7 @@ class Element implements RangeChecker {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
-        this
+	    return this
     }
 
     /**
@@ -34,7 +43,7 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element transform (String command) {
-        this
+	    return this
     }
 
     /**
@@ -50,13 +59,50 @@ class Element implements RangeChecker {
         if (processor.hasSelectedDomain()) {
             this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
             processor.addElementLoaded(processor.selectedDomain, this)
-            this
+            return this
         } else {
             throw ETLProcessorException.domainMustBeSpecified()
         }
     }
 
-    /**
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name initialize custom1
+	 * </code>
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 */
+	Element initialize (String fieldName) {
+		if (processor.hasSelectedDomain()) {
+			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.init = this.value
+			this.originalValue = ''
+			this.value = ''
+			processor.addElementLoaded(processor.selectedDomain, this)
+			return this
+		} else {
+			throw ETLProcessorException.domainMustBeSpecified()
+		}
+	}
+
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name init custom1
+	 * </code>
+	 * * @param init
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 * @see Element#initialize(java.lang.String)
+	 */
+	Element init (String initValue) {
+		return initialize(initValue)
+	}
+
+	/**
      * Validation for incorrect methods on script content
      * @param methodName
      * @param args
@@ -92,7 +138,7 @@ class Element implements RangeChecker {
         int to = (start + take - 1)
         subListRangeCheck(start, start + to, value.size())
         value = value[start..to]
-        this
+	    return this
     }
 
     /**
@@ -109,7 +155,7 @@ class Element implements RangeChecker {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
-        this
+	    return this
     }
 
     /**
@@ -122,7 +168,7 @@ class Element implements RangeChecker {
      */
     Element sanitize () {
         value = StringUtil.sanitizeAndStripSpaces(value)
-        this
+	    return this
     }
 
     /**
@@ -134,7 +180,7 @@ class Element implements RangeChecker {
      */
     Element trim () {
         value = value.trim()
-        this
+	    return this
     }
 
     /**
@@ -147,7 +193,7 @@ class Element implements RangeChecker {
      */
     Element first (String content) {
         value = value.replaceFirst(content, '')
-        this
+	    return this
     }
 
     /**
@@ -160,7 +206,7 @@ class Element implements RangeChecker {
      */
     Element all (String content) {
         value = value.replaceAll(content, '')
-        this
+	    return this
     }
 
     /**
@@ -173,7 +219,7 @@ class Element implements RangeChecker {
      */
     Element last (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
-        this
+	    return this
     }
 
     /**
@@ -186,7 +232,7 @@ class Element implements RangeChecker {
      */
     Element uppercase () {
         value = value.toUpperCase()
-        this
+	    return this
     }
 
     /**
@@ -199,7 +245,7 @@ class Element implements RangeChecker {
      */
     Element lowercase () {
         value = value.toLowerCase()
-        this
+	    return this
     }
 
     /**
@@ -213,7 +259,7 @@ class Element implements RangeChecker {
      */
     Element left (Integer amount) {
         value = value.take(amount)
-        this
+	    return this
     }
 
     /**
@@ -227,7 +273,7 @@ class Element implements RangeChecker {
      */
     Element right (Integer amount) {
         value = value.reverse().take(amount).reverse()
-        this
+	    return this
     }
 
     /**
@@ -243,7 +289,7 @@ class Element implements RangeChecker {
      */
     Element replace (String regex, String replacement) {
         value = value.replaceAll(regex, replacement)
-        this
+	    return this
     }
 
     /**
@@ -257,6 +303,7 @@ class Element implements RangeChecker {
      */
     Element set (String variableName) {
         processor.addDynamicVariable(variableName, this)
+	    return this
     }
 
     /**
@@ -278,7 +325,7 @@ class Element implements RangeChecker {
             }
         }
         this.value += newValue
-        this
+	    return this
     }
 
     /**
@@ -292,7 +339,7 @@ class Element implements RangeChecker {
      */
     Element plus (Element anotherElement) {
         this.value += anotherElement?.value
-        this
+	    return this
     }
 
     /**
@@ -306,7 +353,7 @@ class Element implements RangeChecker {
      */
     Element plus (String value) {
         this.value += value
-        this
+	    return this
     }
 
     /**

@@ -133,6 +133,7 @@ application id,vendor name,technology,location
 							domain Application
 							set environment with Production
 							extract 'application id' load id
+							
 							find Application of id by id with SOURCE.'application id'
 						}
 						""".stripIndent(),
@@ -223,6 +224,7 @@ application id,vendor name,technology,location
 							domain Application
 							set environment with Production
 							extract 'application id' load id
+							
 							find Application by id with SOURCE.'application id'
 						}
 						""".stripIndent(),
@@ -635,7 +637,7 @@ application id,vendor name,technology,location
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType
+   							find Application by assetName, assetType with SOURCE.AssetName, primaryType
        						elseFind Application of asset by assetName with SOURCE.DependentName
     						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
     						
@@ -927,6 +929,7 @@ application id,vendor name,technology,location
 							set environment with Production
 							extract 'vendor name' load Vendor
 							extract 'application id' load id
+							
 							find Application of id by id with SOURCE.'application id'
 							elseFind Application of id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
 						}
