@@ -8,7 +8,7 @@ export class ImportBatchRecordModel {
 	errorCount: number;
 	operation: string;
 	sourceRowId: number;
-	ignored: number;
+	ignored: boolean;
 	lastUpdated: Date;
 	warn: number;
 	currentValues: any;
@@ -28,7 +28,7 @@ export class ImportBatchRecordDetailColumnsModel {
 				label: 'Status',
 				property: 'status.label',
 				type: 'text',
-				width: 100,
+				width: 130,
 				locked: true,
 			},
 			{

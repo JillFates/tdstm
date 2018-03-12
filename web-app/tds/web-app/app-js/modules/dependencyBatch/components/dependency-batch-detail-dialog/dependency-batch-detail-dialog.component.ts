@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ImportBatchModel} from '../../model/import-batch.model';
+import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -190,5 +190,14 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on bulk ignore batch records.');
 				}
 			}, error => this.handleError(error));
+	}
+
+	/**
+	 * Can Batch Record perform any bulk operation? (PROCESS or IGNORE).
+	 * @param {ImportBatchRecordModel} batchRecord
+	 * @returns {boolean}
+	 */
+	private batchRecordCanAction(batchRecord: ImportBatchRecordModel): boolean {
+		return batchRecord.status.code !== BatchStatus.COMPLETED && !batchRecord.ignored;
 	}
 }
