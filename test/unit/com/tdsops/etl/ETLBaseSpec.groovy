@@ -130,7 +130,7 @@ abstract class ETLBaseSpec extends Specification {
 			case AssetClass.DATABASE:
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
@@ -140,7 +140,7 @@ abstract class ETLBaseSpec extends Specification {
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
 					buildFieldSpec('location', 'Location'),
-					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]

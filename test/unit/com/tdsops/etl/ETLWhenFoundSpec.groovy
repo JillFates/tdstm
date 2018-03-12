@@ -87,7 +87,7 @@ application id,vendor name,technology,location
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
 
-	void 'test can create a domain when not found a instance with find command'() {
+	void 'test can create a domain when not found a instance with find command using local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -212,7 +212,7 @@ application id,vendor name,technology,location
 			}
 	}
 
-	void 'test can throw an Exception if whenNotFound command defines an update action'() {
+	void 'test can throw an Exception if whenNotFound command defines an update action using local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -296,7 +296,7 @@ application id,vendor name,technology,location
 			}
 	}
 
-	void 'test can throw an Exception if whenFound command defines a create action'() {
+	void 'test can throw an Exception if whenFound command defines a create action using local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -377,7 +377,7 @@ application id,vendor name,technology,location
 			}
 	}
 
-	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
+	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain using local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -462,7 +462,7 @@ application id,vendor name,technology,location
 			}
 	}
 
-	void 'test can update a domain when found a instance with find command'() {
+	void 'test can update a domain when found a instance with find command using local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)

@@ -293,10 +293,10 @@ class Element implements RangeChecker {
     }
 
     /**
-     * Saves a new variable in the binding context in order to use it later
-     * It's used in this ETL script command
+     * Saves a new local variable in the binding context in order to use it later
+     * It's used in following ETL script command
      * <code>
-     *     extract 3 transform with lowercase() set myVar
+     *     extract 3 transform with lowercase() set myLocalVariable
      * </code>
      * * @param variableName
      * @return
