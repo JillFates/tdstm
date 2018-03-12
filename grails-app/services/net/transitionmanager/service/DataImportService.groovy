@@ -2,11 +2,14 @@ package net.transitionmanager.service
 
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.etl.DataImportHelper
+import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tds.asset.AssetDependency
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Person
@@ -22,6 +25,9 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.TransactionDefinition
+
+
+import com.tds.asset.AssetEntity
 
 // LEGACY
 import net.transitionmanager.domain.DataTransferBatch
@@ -90,6 +96,11 @@ class DataImportService implements ServiceMethods {
 			project: project,
 			userLogin: userLogin,
 			etlInfo: importJsonData.ETLInfo,
+
+			// The cache will be used to hold on to domain entity references when found or a String if there
+			// was an error when looking up the domain object. The key will be the md5hex of the query element
+			// of the field.
+			cache: [:],
 
 			// The following are reset per domain
 			domainClass: null,
@@ -437,9 +448,9 @@ class DataImportService implements ServiceMethods {
 
 		// TODO : JPM 2/2018 : TM-9598 Should be able drop this map
 		final Map operationMap = [
-			I:ImportOperationEnum.INSERT,
-			U:ImportOperationEnum.UPDATE,
-			D:ImportOperationEnum.DELETE
+			I: ImportOperationEnum.INSERT,
+			U: ImportOperationEnum.UPDATE,
+			D: ImportOperationEnum.DELETE
 		]
 		ImportOperationEnum OpValue = (operationMap.containsKey(rowData.op) ? operationMap[rowData.op] : ImportOperationEnum.UNDETERMINED)
 		// TODO : JPM 2/2018 : TM-9598 Should be able to use this command
@@ -689,7 +700,197 @@ class DataImportService implements ServiceMethods {
 	 * @param context - the batch processing context that contains objects used throughout the process
 	 */
 	def processDependencyRecord = {ImportBatch batch, ImportBatchRecord record, Map context->
+		AssetDependency ad
+
+		// Clear out the errors at the record level so that they can be reset if necessary
+		record.errors = []
+
+		// Check if referenced by id
+		if (record.containsKey('id')) {
+			if (record.id) {
+		 		// Let's try to find the record
+				ad = AssetDependency.where {
+					id == record.id
+				}.find()
+				if (! ad) {
+					record.errors << 'Dependency reference by ID unable to find record'
+					return
+				}
+
+				// Make sure that the record is associated to the project by checking the asset project reference
+				if (ad.asset.project.id != batch.project.id) {
+					record.errors << 'Dependency reference by ID unable to find record'
+					// Could record security violation
+					return
+				}
+
+				// Set operation for certain
+				record.operation = ImportOperationEnum.INSERT
+			}
+		}
+
+		// Try looking up both references
+		if (! record.containsKey('asset')) {
+
+		}
+
+
 		record.status = ImportBatchStatusEnum.COMPLETED
 	}
 
+
+
+	/**
+	 * This is used to attempt to lookup a domain record using the metadata that is provided by the
+	 * ETL process.  The structure looks like the following:
+	 *	{
+	 * 		op": "I",
+	 * 		warn": false,
+	 * 		duplicate": false,
+	 * 		errors": [],
+	 * 		fields": {
+	 * 			"id": {
+	 * 				"value": "114052",
+	 * 				"originalValue": "114052",
+	 * 				"error": false,
+	 * 				"warn": false,
+	 * 				"find": {
+	 * 					"query": [
+	 *						[
+	 *							domain: 'Device',
+	 *							kv: [
+	 *								assetName: 'xraysrv01',
+	 *								assetType: 'Server'
+	 *							]
+	 *						]
+	 *					]
+	 * 				}
+	 * 			},
+	 *
+	 * @param project - the project that the records should be validated against
+	 * @param domainClass - the class that should be returned
+	 * @param fieldEtl - the Map of the ETL meta data about the
+	 * @return <Object domain entity found ,String error> Object if found otherwise NULL
+	 */
+	List lookupDomainRecordByFieldMetaData(Project project, String domainClassName, String property, Map rowEtl, Map context) {
+		Object entity
+		String error
+		String md5
+
+		Map fieldEtl = rowEtl.fields[property]
+
+		while (true) {
+			if (! fieldEtl) {
+				// Shouldn't happen but just in case...
+				error "Reference property $property is missing ETL meta-data"
+				break
+			}
+
+			// Try looking up the domain entity by reference id
+			ETLDomain domain = ETLDomain.lookup(domainClassName)
+			Class domainClass = domain.getClazz()
+			println "domainClass isa ${domainClass.getName()}"
+			domainClass = AssetEntity
+			println "domainClass NOW isa ${domainClass.getName()}"
+
+			if (fieldEtl.value) {
+				// entity = domain.clazz.where {
+				// 	id == fieldEtl.value
+				// }.find()
+				Long id = NumberUtil.toPositiveLong(fieldEtl.value, -1)
+				println "Trying to find id = $id"
+				List entityList
+				if (id > 0) {
+					// entityList = domainClass.where {
+					// TODO : JPM 3/2018 : some fucking reason the WHERE will not work without specifying the class hardcoded
+					entityList = AssetEntity.where {
+						id == id
+						// TODO : JPM 3/2018 : enable after merging with Diego's change that has the class version of isDomainProperty
+						// if (GormUtil.isDomainProperty(domain.clazz, 'project')) {
+						// 	project.id == project.id
+						// }
+					}.findAll()
+				} else {
+					rowEtl.errors = ['Id value must be a positive integer value']
+					error = "Reference property $property has an invalid id value"
+					break
+				}
+
+				// if (entity) {
+				// 	md5 = StringUtil.md5Hex("${domainClass}:${fieldEtl.value}")
+				// } else {
+				// 	error = "Reference lookup by ID for property $property was not found"
+				// }
+				if (entityList) {
+					if (entityList.size() > 1) {
+						println "***** Received more than expected: ${entityList.size()}"
+					} else {
+						entity = entityList[0]
+						if (entity.project && entity.project.id != project.id) {
+							println "Reference of entity associated with another project ($id)"
+							error = "Reference lookup by ID for property $property was not found"
+							md5 = StringUtil.md5Hex("${domainClass}:${error}")
+						} else {
+							md5 = StringUtil.md5Hex("${domainClass}:${fieldEtl.value}")
+						}
+					}
+				} else {
+					error = "Reference lookup by ID for property $property was not found"
+				}
+
+				break
+			}
+
+			// Still haven't found it so let's try retrying the find/elseFind results if they were applied previously as the
+			// entity may have been created in the meantime.
+			if ( ! fieldEtl.find.query ) {
+				error = "Reference lookup for property $property has no find/elseFind criteria"
+				break
+			}
+
+			// Check to see if find query was used for a prior row and is the cache
+			md5 = StringUtil.md5Hex( fieldEtl.find.query.toString() )
+
+			if (context.cache.containsKey(md5)) {
+				def cacheResult = context.cache[md5]
+
+				// If the cache returns a String than there was an error otherwise the singluar reference domain entity was found previously
+				if (cacheResult instanceof String) {
+					error = cacheResult
+				} else {
+					entity = cacheResult
+				}
+				break
+			}
+
+			// Iterate over the list of Queries and use the ETL find logic to try searching for the domain entity
+			// until something is found
+			int cnt = 0
+			for (query in fieldEtl.find.query) {
+				ETLDomain whereDomain = ETLDomain.lookup(query.domain)
+				List entities = DomainClassQueryHelper.where(whereDomain, project, query.kv)
+				cnt = entities.size()
+				if (cnt == 1) {
+					entity = entities[0]
+					break
+				} else if (cnt > 1) {
+					error = "Found multiple references for property $property"
+					rowEtl.errors = [ 'Multiple references found']
+					break
+				}
+			}
+			if (cnt == 0) {
+				error = "No references found for property $property"
+				rowEtl.errors = [ 'No reference found']
+			}
+			break
+		}
+
+		if (md5) {
+			// Update the cache appropriately
+			context.cache[md5] = (error ?: entity)
+		}
+
+		return [entity, error]
+	}
 }
