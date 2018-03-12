@@ -1,6 +1,7 @@
 package net.transitionmanager.service
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import groovy.util.logging.Slf4j
