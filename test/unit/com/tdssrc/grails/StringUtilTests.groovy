@@ -298,4 +298,13 @@ class StringUtilTests extends Specification {
 
 	}
 
+	void 'Test the md5hex method'() {
+		expect:
+			result == StringUtil.md5Hex(value)
+		where:
+			value			| result
+			'Some text'		| '9db5682a4d778ca2cb79580bdb67083f'
+			''				| 'd41d8cd98f00b204e9800998ecf8427e'
+	}
+
 }

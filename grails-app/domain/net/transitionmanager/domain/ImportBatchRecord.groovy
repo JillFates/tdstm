@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.JsonUtil
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -15,7 +16,7 @@ class ImportBatchRecord {
 	ImportBatch importBatch
 
 	// The status of the individual record
-	ImportBatchStatusEnum status = ImportBatchStatusEnum.PENDING
+	ImportBatchRecordStatusEnum status = ImportBatchRecordStatusEnum.PENDING
 
 	// The type of operation that will/was performed on the record (Insert, Update, Delete, Undetermined)
 	ImportOperationEnum operation
