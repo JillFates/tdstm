@@ -61,7 +61,12 @@
 										<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset?.moveBundle}"/>
 										<td>
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-												<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${asset?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
+												<kendo-dropdownlist class="select"
+																	[data]="model.moveBundleList"
+																	[(ngModel)]="model.asset.moveBundle"
+																	[textField]="'name'"
+																	[valueField]="'id'">
+												</kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 										</td>
 									</tr>
@@ -79,7 +84,7 @@
 										<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
 										<td>
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">
-												<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${asset.planStatus}" tabindex="34"/>
+												<kendo-dropdownlist class="select" [data]="model.planStatusOptions" [(ngModel)]="model.asset.planStatus"></kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 										</td>
 									</tr>
@@ -92,8 +97,7 @@
 										<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
 										<td>
 											<tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">
-												<g:select from="${asset.constraints.validation.inList}" id="validation" name="validation"
-														  value="${asset.validation}" tabindex="35"/>
+												<kendo-dropdownlist class="select" [data]="${asset.constraints.validation.inList as JSON}" [(ngModel)]="model.asset.validation"></kendo-dropdownlist>
 											</tdsAngular:tooltipSpan>
 										</td>
 									</tr>

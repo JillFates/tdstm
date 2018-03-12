@@ -1,9 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
-import { DatabaseModel } from './database.model';
-import { ObjectUtils} from '../../../../shared/utils/object.utils';
 import { DateUtils} from '../../../../shared/utils/date.utils';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 
@@ -26,11 +25,9 @@ export function DatabaseEditComponent(template, editModel) {
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 
-			this.model.asset = ObjectUtils.compose(new DatabaseModel(), editModel.asset);
+			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-
-			console.log(this.model.asset);
 		}
 
 		/**
