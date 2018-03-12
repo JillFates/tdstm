@@ -139,13 +139,14 @@ class ImportBatchService implements ServiceMethods {
 			throw new DomainUpdateException('Can not update a batch that is being processed')
 		}
 
-		String hql = '''UPDATE ImportBatchRecord SET ignored=:ignored
+		String hql = '''UPDATE ImportBatchRecord SET ignored=:ignored, status=:status
 			WHERE importBatch.id=:batchId AND id in (:recordIds) AND ignored != :ignored'''
 
 		Map params = [
 			batchId: batch.id,
 			recordIds: recordIds,
-			ignored: (setToIgnore ? 1 : 0)
+			ignored: (setToIgnore ? 1 : 0),
+			status: (setToIgnore ? ImportBatchRecordStatusEnum.IGNORED : ImportBatchRecordStatusEnum.PENDING )
 		]
 
 		return ImportBatch.executeUpdate(hql, params)
