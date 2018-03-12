@@ -180,7 +180,7 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * DELETE - Stops current import batch in progress.
+	 * PATCH - Stops current import batch in progress.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
@@ -247,6 +247,23 @@ export class DependencyBatchService {
 	includeBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
 			action: 'INCLUDE',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Process/Revalidate Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	processBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'PROCESS',
 			ids: ids
 		};
 		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))

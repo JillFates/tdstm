@@ -31,6 +31,7 @@ export class DependencyBatchListComponent {
 		useColumn: 'id'
 	};
 	private viewArchived = false;
+	private batchStatusLooper: any;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -39,7 +40,6 @@ export class DependencyBatchListComponent {
 		private notifierService: NotifierService) {
 		this.onLoad();
 	}
-
 	/**
 	 * On Page Load.
 	 */
@@ -50,6 +50,7 @@ export class DependencyBatchListComponent {
 		}
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper = new DataGridOperationsHelper(batchList, this.initialSort, this.selectableSettings, this.checkboxSelectionConfig);
+			this.setBatchStatusLooper();
 		});
 	}
 
@@ -57,8 +58,10 @@ export class DependencyBatchListComponent {
 	 * Load all Import Batch Unarchived list
 	 */
 	private reloadBatchList(): void {
+		this.clearBatchStatusLooper();
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper.reloadData(batchList);
+			this.setBatchStatusLooper();
 		});
 	}
 
@@ -74,17 +77,6 @@ export class DependencyBatchListComponent {
 					let batches: Array<ImportBatchModel> = result.data.filter( item => {
 						return !item.archived;
 					});
-					for (let batch of batches ) {
-						if (batch.status.code === BatchStatus.RUNNING) {
-							this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
-								if (response.status === ApiResponseModel.API_SUCCESS) {
-									batch.currentProgress =  response.data.progress ? response.data.progress : 0;
-								} else {
-									this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
-								}
-							}, error => this.handleError(error));
-						}
-					}
 					resolve(batches);
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -102,12 +94,14 @@ export class DependencyBatchListComponent {
 	 * Load Archived Batches.
 	 */
 	private loadArchivedBatchList(): void {
+		this.clearBatchStatusLooper();
 		this.dependencyBatchService.getImportBatches().subscribe( result => {
 			if (result.status === 'success') {
 				let batches = result.data.filter( (item: ImportBatchModel) => {
 					return item.archived;
 				});
 				this.dataGridOperationsHelper.reloadData(batches);
+				this.setBatchStatusLooper();
 			} else {
 				this.handleError(result.errors ? result.errors[0] : null);
 			}
@@ -288,5 +282,51 @@ export class DependencyBatchListComponent {
 		} else {
 			this.dataGridOperationsHelper.onFilter(column);
 		}
+	}
+
+	/**
+	 * Clears out the Batch Status Interval if currently running.
+	 */
+	clearBatchStatusLooper(): void {
+		if (this.batchStatusLooper) {
+			clearInterval(this.batchStatusLooper);
+		}
+	}
+
+	/**
+	 * Creates an interval loop to retreive batch current progress.
+	 */
+	private setBatchStatusLooper(): void {
+		// Set interval while batch is being executed
+		const runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+			return item.status.code === BatchStatus.RUNNING;
+		});
+		this.getBatchesCurrentProgress(runningBatches);
+		this.batchStatusLooper = setInterval(() => {
+			this.getBatchesCurrentProgress(runningBatches);
+		}, 5000); // every 5 seconds
+	}
+
+	/**
+	 * Gets from API batch current progress.
+	 */
+	private getBatchesCurrentProgress(runningBatches: Array<ImportBatchModel>): void {
+		for (let batch of runningBatches ) {
+			this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
+				if (response.status === ApiResponseModel.API_SUCCESS) {
+					batch.currentProgress =  response.data.progress ? response.data.progress : 0;
+					if (batch.currentProgress === 100) {
+						if (this.viewArchived) {
+							this.loadArchivedBatchList();
+						} else {
+							this.reloadBatchList();
+						}
+					}
+				} else {
+					this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
+				}
+			}, error => this.handleError(error));
+		}
+		console.log(runningBatches);
 	}
 }
