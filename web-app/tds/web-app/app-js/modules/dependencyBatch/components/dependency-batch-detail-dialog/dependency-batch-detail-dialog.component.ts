@@ -33,7 +33,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 				{column: 'errorCount', value: 1},
 			]},
 			{id: 4, name: 'Ignored', filters: [
-				{column: 'status.label', value: 'Ignored'},
+				{column: 'ignored', value: 1},
 			]},
 			{id: 5, name: 'Completed', filters: [
 				{column: 'status.label', value: 'Completed'},
@@ -160,13 +160,12 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 */
 	private onStatusFilter($event) {
-		if ($event.id === 1) { // clear filters case
-			for (const columnProperty of ['status.label', 'errorCount']) {
-				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
-				foundMatch.filter = null;
-				this.dataGridOperationsHelper.clearValue(foundMatch);
-			}
-		} else { // apply specific filters case
+		for (const columnProperty of ['status.label', 'errorCount']) {
+			let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === columnProperty );
+			foundMatch.filter = null;
+			this.dataGridOperationsHelper.clearValue(foundMatch);
+		}
+		if ($event.id !== 1) {
 			for (const filter of $event.filters) {
 				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
 				if (foundMatch) {
