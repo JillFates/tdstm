@@ -8,7 +8,7 @@ export enum BatchStatus {
 	RUNNING = 'RUNNING',
 	PENDING = 'PENDING',
 	QUEUED = 'QUEUED',
-	IGNORED = 'IGNORED'
+	COMPLETED = 'COMPLETED',
 };
 
 export class ImportBatchModel {
