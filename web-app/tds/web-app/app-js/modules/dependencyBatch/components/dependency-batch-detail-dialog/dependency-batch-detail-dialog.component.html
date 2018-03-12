@@ -112,6 +112,13 @@
                                         {{column.label}}
                                     </label>
                                 </ng-template>
+                                <ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'status.label'">
+                                    <div>
+                                        {{dataItem.status.label}}
+                                        <small style="margin-left: 5px; font-weight: 700;" *ngIf="dataItem.ignored">(ignored)</small>
+                                    </div>
+                                </ng-template>
+
                                 <!--
                                     Filter Template
                                 -->
