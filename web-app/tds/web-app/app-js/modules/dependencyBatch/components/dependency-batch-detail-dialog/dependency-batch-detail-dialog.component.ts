@@ -106,7 +106,6 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 				{provide: ImportBatchRecordModel, useValue: selectedBatchRecord}
 			], false, false)
 			.then((result) => {
-				console.log('closed');
 				if (result === 'reload') {
 					this.loadImportBatchRecords();
 				}

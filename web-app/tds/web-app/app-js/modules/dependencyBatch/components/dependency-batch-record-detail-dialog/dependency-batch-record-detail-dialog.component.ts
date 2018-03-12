@@ -10,6 +10,8 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 })
 export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 
+	private batchRecordUpdatedFlag = false;
+
 	constructor(
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
@@ -21,13 +23,21 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	 * On close dialog.
 	 */
 	private onCancelCloseDialog(): void {
-		this.dismiss();
+		this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
 	}
 
 	/**
 	 * On Fields Values updated successfully.
 	 */
 	private onUpdateSuccess(): void {
-		this.close('reload');
+		this.batchRecordUpdatedFlag = true;
+		// this.close('reload');
+	}
+
+	/**
+	 * On Fields Values updated successfully.
+	 */
+	private onBatchRecordUpdated($event): void {
+		this.batchRecord = $event.batchRecord;
 	}
 }

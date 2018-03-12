@@ -16,8 +16,9 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
-	@Output('onCancel') cancelEvent = new EventEmitter<any>();
+	@Output('onClose') closeEvent = new EventEmitter<any>();
 	@Output('onUpdateSuccess') updateSuccessEvent = new EventEmitter<any>();
+	@Output('onBatchRecordUpdated') onBatchRecordUpdated = new EventEmitter<any>();
 
 	private fieldsInfo: Array<{
 		name: string,
@@ -66,6 +67,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.getImportBatchRecordFieldDetail(this.batchRecord.importBatch.id, this.batchRecord.id)
 			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
+				this.onBatchRecordUpdated.emit({batchRecord: result.data});
 				this.buildGridData(result.data.fieldsInfo);
 			} else {
 				this.handleError(result.errors[0] ? result.errors[0] : 'error calling endpoint');
@@ -113,6 +115,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.ignoreBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.loadRecordFieldDetails();
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on ignore batch record.');
@@ -128,6 +131,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.includeBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.loadRecordFieldDetails();
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on include batch record.');
@@ -149,8 +153,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.updateBatchRecordFieldsValues(this.importBatch.id, this.batchRecord.id, newFieldsValues)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
-					// this.updateSuccessEvent.emit();
 					this.loadRecordFieldDetails();
+					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
 				}
@@ -167,7 +171,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.updateSuccessEvent.emit();
 				} else {
-					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
+					this.handleError(result.errors[0] ? result.errors[0] : 'error on Process batch record.');
 				}
 			}, error => this.handleError(error));
 	}
@@ -177,8 +181,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private showIgnoreButton(): boolean {
-		// return this.batchRecord.status.code === BatchStatus.PENDING;
-		return this.batchRecord.status.code !== BatchStatus.IGNORED;
+		return this.batchRecord.status.code === BatchStatus.PENDING;
 	}
 
 	/**
@@ -194,7 +197,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private showActionButtons(): boolean {
-		return this.batchRecord.status.code !== BatchStatus.COMPLETED;
+		return this.batchRecord.status.code === BatchStatus.PENDING;
 	}
 
 	/**
@@ -216,8 +219,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Cancel.
 	 */
 	private onCancel(): void {
-		// this.batchRecord = null;
-		this.cancelEvent.emit();
+		this.closeEvent.emit();
 	}
 
 	/**
