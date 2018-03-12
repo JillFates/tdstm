@@ -55,7 +55,7 @@
         </button>
         <button *ngIf="showActionButtons()"
                 [disabled]="areOverrideValuesDirty()"
-                (click)="onRevalidate()"
+                (click)="onProcess()"
                 class="btn btn-default btn-sm col-sm-1" type="button">
             <i class="glyphicon glyphicon-retweet"></i>
             Process

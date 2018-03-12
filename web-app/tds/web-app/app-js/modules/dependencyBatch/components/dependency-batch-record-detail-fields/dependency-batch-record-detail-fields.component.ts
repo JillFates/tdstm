@@ -158,6 +158,21 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	}
 
 	/**
+	 * On Process button click.
+	 */
+	private onProcess(): void {
+		const ids = [this.batchRecord.id];
+		this.dependencyBatchService.processBatchRecords(this.importBatch.id, ids)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.updateSuccessEvent.emit();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error updating field values');
+				}
+			}, error => this.handleError(error));
+	}
+
+	/**
 	 * Determine if Ignore button should be showed on UI.
 	 * @returns {boolean}
 	 */
