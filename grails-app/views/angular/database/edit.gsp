@@ -8,7 +8,7 @@
 <div class="modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
-		<h4 class="modal-title">Database Detail</h4>
+		<h4 class="modal-title">Database Edit</h4>
 	</div>
 	<div class="modal-body">
 		<div>
@@ -107,7 +107,7 @@
 		</div>
 	</div>
 	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="glyphicon glyphicon-ok"></span> Update</button>
+		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 		</tds:hasPermission>

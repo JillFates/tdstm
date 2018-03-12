@@ -44,11 +44,10 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 				switch (this.asset) {
 					case 'APPLICATION':
 					case 'DATABASE':
-					case 'DEVICE':
-					case 'STORAGE':
-					default:
 						this.registerAndCreate(DatabaseEditComponent(template, model), this.view);
 						break;
+					case 'DEVICE':
+					case 'STORAGE':
 				}
 			});
 	}
