@@ -12,11 +12,6 @@ export class ImportBatchRecordModel {
 	lastUpdated: Date;
 	warn: number;
 	currentValues: any;
-	// name: string;
-	// type: string;
-	// depType: string;
-	// nameD: string;
-	// typeD: string;
 }
 
 export class ImportBatchRecordDetailColumnsModel {
