@@ -73,13 +73,12 @@
                                 </div>
                             </ng-template>
                             <ng-template kendoGridCellTemplate let-dataItem>
-                                <div class="text-center k-grid-ignore-click">
+                                <div class="text-center k-grid-ignore-click" *ngIf="dataItem.status.code !== 'RUNNING'">
                                     <label style="min-height: 15px;">
                                         <input type="checkbox"
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
                                                name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
-                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])"
-                                               [disabled]="dataItem.status.code === 'RUNNING'">
+                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
                                     </label>
                                 </div>
                             </ng-template>
