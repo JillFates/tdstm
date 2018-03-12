@@ -286,7 +286,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             at ApplicationListPage
     }
 
-    def "Filter edited Application on List"() {
+    def "9. Filter edited Application on List"() {
         testKey = "TM-8492"
         given: 'The User is on the Application List Page'
             at ApplicationListPage
@@ -301,7 +301,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             at ApplicationDetailsPage
     }
 
-    def "Validate Application Details"() {
+    def "10. Validate Application Details"() {
         testKey = "TM-8492"
         when: 'The User is on the Application Details Page'
             at ApplicationDetailsPage
