@@ -12,6 +12,7 @@ import { ComponentCreatorService } from '../shared/services/component-creator.se
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 // Shared Directives
+import {UIAutofocusDirective} from './directives/autofocus-directive';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
@@ -47,6 +48,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
+		UIAutofocusDirective,
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
@@ -84,6 +86,7 @@ import { DictionaryService } from './services/dictionary.service';
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
 	exports: [UILoaderDirective,
+		UIAutofocusDirective,
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
