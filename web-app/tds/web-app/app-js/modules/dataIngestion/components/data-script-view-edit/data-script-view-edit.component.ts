@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -19,7 +19,6 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 	`]
 })
 export class DataScriptViewEditComponent implements OnInit {
-
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
@@ -92,6 +91,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+
 		this.datasourceName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
@@ -114,7 +114,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -212,4 +212,5 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			});
 	}
+
 }
