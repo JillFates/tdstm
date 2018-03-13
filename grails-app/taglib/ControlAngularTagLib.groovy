@@ -575,14 +575,15 @@ class ControlAngularTagLib {
 	 * @param value - the current value to set on the select
 	 * @param label - an alternate label that user sees, if null then option is used
 	 */
-	private String selectOption(String option='', String value='', String label='') {
+	private Object selectOption(String option='', String value='', String label='') {
 		if (option==null) option = ''
 		if (value==null) value = ''
 		if (label==null) label = ''
 
 		boolean labelBlank = StringUtil.isBlank(label)
-
-		return [ 'value' : StringEscapeUtils.escapeHtml(option), 'text': labelBlank ? option : label]
+		String escapedvalue = StringEscapeUtils.escapeHtml(option)
+		String text = (labelBlank ? option : label)
+		return ["value": "$escapedvalue", "text": "$text"]
 	}
 
 }
