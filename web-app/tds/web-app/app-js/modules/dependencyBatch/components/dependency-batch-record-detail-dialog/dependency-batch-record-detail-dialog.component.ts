@@ -1,8 +1,12 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
 import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {DependencyBatchRecordDetailFieldsComponent} from '../dependency-batch-record-detail-fields/dependency-batch-record-detail-fields.component';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {PROMPT_DEFAULT_MESSAGE_KEY, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'dependency-batch-record-detail',
@@ -10,12 +14,14 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 })
 export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 
+	@ViewChild('detailFieldsComponent') detailFieldsComponent: DependencyBatchRecordDetailFieldsComponent;
 	private batchRecordUpdatedFlag = false;
 
 	constructor(
 		private importBatch: ImportBatchModel,
 		private batchRecord: ImportBatchRecordModel,
-		private dependencyBatchService: DependencyBatchService) {
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe) {
 			super('#dependency-batch-record-detail');
 	}
 
@@ -23,7 +29,18 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	 * On close dialog.
 	 */
 	private onCancelCloseDialog(): void {
-		this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
+		if (this.detailFieldsComponent.areOverrideValuesDirty()) {
+			this.promptService.open(
+				this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+				this.translatePipe.transform(PROMPT_DEFAULT_MESSAGE_KEY),
+				'Confirm', 'Cancel').then(result => {
+				if (result) {
+					this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
+				}
+			});
+		} else {
+			this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
+		}
 	}
 
 	/**
@@ -31,7 +48,6 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 	 */
 	private onUpdateSuccess(): void {
 		this.batchRecordUpdatedFlag = true;
-		// this.close('reload');
 	}
 
 	/**

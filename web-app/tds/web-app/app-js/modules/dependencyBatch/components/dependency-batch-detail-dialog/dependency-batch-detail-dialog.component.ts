@@ -191,6 +191,21 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	}
 
 	/**
+	 * On Process button click
+	 */
+	private onProcess(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
+		this.dependencyBatchService.processBatchRecords(this.importBatchModel.id, ids)
+			.subscribe((result: ApiResponseModel) => {
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.loadImportBatchRecords();
+				} else {
+					this.handleError(result.errors[0] ? result.errors[0] : 'error on bulk Process batch records.');
+				}
+			}, error => this.handleError(error));
+	}
+
+	/**
 	 * Can Batch Record perform any bulk operation? (PROCESS or IGNORE).
 	 * @param {ImportBatchRecordModel} batchRecord
 	 * @returns {boolean}

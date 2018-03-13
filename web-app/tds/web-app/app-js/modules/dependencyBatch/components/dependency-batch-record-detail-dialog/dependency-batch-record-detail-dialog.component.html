@@ -15,6 +15,7 @@
                                 [batchRecord]="batchRecord">
                         </dependency-batch-record-detail-summary>
                         <dependency-batch-record-detail-fields
+                                #detailFieldsComponent
                                 *ngIf="batchRecord"
                                 [importBatch]="importBatch"
                                 [batchRecord]="batchRecord"
