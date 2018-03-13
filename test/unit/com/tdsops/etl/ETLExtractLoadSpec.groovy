@@ -2025,7 +2025,7 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 							
 							extract mfg set myMfg
 							myMfg += " (" + extract(type) + ")"
-							load Manufacturer with myMfg.uppercase()
+							load Manufacturer with myMfg
 							
 							set anotherVar with 'xyzzy'
 							load custom2 with anotherVar
@@ -2050,8 +2050,8 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 						originalValue == 'abc'
 					}
 					with(fields.manufacturer){
-						value == 'DELL (SERVER)'
-						originalValue == 'DELL (SERVER)'
+						value == 'Dell (Server)'
+						originalValue == 'Dell (Server)'
 					}
 					with(fields.custom2){
 						value == 'xyzzy'
@@ -2070,8 +2070,8 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 						originalValue == 'abc'
 					}
 					with(fields.manufacturer){
-						value == 'HP (BLADE)'
-						originalValue == 'HP (BLADE)'
+						value == 'HP (Blade)'
+						originalValue == 'HP (Blade)'
 					}
 					with(fields.custom2){
 						value == 'xyzzy'
