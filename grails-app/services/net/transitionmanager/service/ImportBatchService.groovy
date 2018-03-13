@@ -15,6 +15,8 @@ import org.apache.commons.lang3.BooleanUtils
 @Slf4j
 class ImportBatchService implements ServiceMethods {
 
+	DataImportService dataImportService
+
 	/**
 	 * Return a list with the existing batches for the given project and with
 	 * the given status (optional).
@@ -183,10 +185,44 @@ class ImportBatchService implements ServiceMethods {
 	 * @return number of batches updated.
 	 */
 	Integer signalStopProcessing(Project project, List<Long> ids) {
-		Integer updated = ImportBatch.where {
+		Integer updated = 0
+		List remainingBatches = ids
+
+		// Look for stalled batches	where the progress hasn't budged in past 2 minutes
+		Date noProgressInPast2Min = new Date()
+		use( groovy.time.TimeCategory ) {
+			noProgressInPast2Min = noProgressInPast2Min - 2.minutes
+		}
+
+		List stalledBatches = ImportBatch.where {
 			project == project
 			id in ids
-		}.updateAll([processStopFlag: 1])
+			status == ImportBatchStatusEnum.RUNNING
+			processLastUpdated < noProgressInPast2Min
+		}.projections {
+			property('id')
+		}.list()
+
+		if (stalledBatches) {
+			updated = stalledBatches.size()
+			log.warn "signalStopProcessing() discovered $updated batches for project $project"
+
+			// Now set those batches to the proper status based on what was completed before the
+			// batch stalled (a.k.a. runtime error encountered and stopped)
+			stalledBatches.each { dataImportService.updateBatchProgress(it, 1, 1) }
+			remainingBatches = ids - stalledBatches
+		}
+
+		// Now update any remaining job that was not processed above by setting the stop flag
+		if (remainingBatches) {
+			log.debug "signalStopProcessing() Flagging batch(es) to stop: $remainingBatches for project $project"
+			updated += ImportBatch.where {
+				project == project
+				id in ids
+				status == ImportBatchStatusEnum.RUNNING
+			}.updateAll([processStopFlag: 1])
+		}
+
 		return updated
 	}
 
