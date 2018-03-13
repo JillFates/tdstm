@@ -8,6 +8,7 @@ import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tds.asset.AssetDependency
 import net.transitionmanager.domain.ImportBatch
@@ -16,7 +17,10 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
+import net.transitionmanager.command.ETLDataRecordFieldsCommand
+import net.transitionmanager.command.ETLDataRecordFieldsPropertyCommand
 
 import groovy.util.logging.Slf4j
 import grails.transaction.Transactional
@@ -28,6 +32,12 @@ import org.springframework.transaction.TransactionDefinition
 
 
 import com.tds.asset.AssetEntity
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 // LEGACY
 import net.transitionmanager.domain.DataTransferBatch
@@ -545,7 +555,7 @@ class DataImportService implements ServiceMethods {
 			int count = ImportBatch.where{
 				project.id == batch.project.id
 				status == ImportBatchStatusEnum.RUNNING
-				processLastUpdated > noProgressInPast2Min
+				processLastUpdated < noProgressInPast2Min
 			}.count()
 
 			if (count > 0) {
@@ -573,7 +583,7 @@ class DataImportService implements ServiceMethods {
 	 * @return false if the processing should be stopped.
 	 */
 	@NotTransactional()
-	private boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
+	boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
 		ImportBatch.withNewTransaction { session ->
 			ImportBatch batch = ImportBatch.get(batchId)
 			if (!batch) {
@@ -585,6 +595,7 @@ class DataImportService implements ServiceMethods {
 			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
 			batch.processProgress = percComplete
 			batch.processLastUpdated = new Date()
+			batch.processStopFlag = 0
 			if (status) {
 				batch.status = status
 			}
@@ -604,6 +615,10 @@ class DataImportService implements ServiceMethods {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		log.info "processBatch() for batch $batchId of project $project started"
+		def stopwatch = new StopWatch()
+		stopwatch.start()
+
 		Exception ex = null
 		try {
 			setBatchToRunning(batch.id)
@@ -635,10 +650,13 @@ class DataImportService implements ServiceMethods {
 				for (record in records) {
 					processBatchRecord(batch, record, context)
 					rowsProcessed++
+					break
 				}
 
 				aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
 				GormUtil.flushAndClearSession()
+
+				break
 			}
 			GormUtil.flushAndClearSession()
 
@@ -658,6 +676,8 @@ class DataImportService implements ServiceMethods {
 
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
+
+		log.info "processBatch() for batch $batchId finished and took ${stopwatch.endDuration()}"
 
 		// TODO : JPM 3/2018 : Fix the batch status update after processing
 		// It occurred to me that throwing the Exception is going to rollback the changes but that the
@@ -693,49 +713,112 @@ class DataImportService implements ServiceMethods {
 		}
 	}
 
+
+		// def bindData(def domainClass, def bindingSource, String filter) {
+		// 	return bindData(domainClass, bindingSource, Collections.EMPTY_MAP, filter)
+		// }
+		// def bindData(def domainClass, def bindingSource, Map includeExclude, String filter) {
+		// 	org.codehaus.groovy.grails.web.binding.DataBindingUtils
+		// 		.bindObjectToInstance(
+		// 			domainClass,
+		// 			bindingSource,
+		// 			convertToListIfString(includeExclude.get('include')),
+		// 			convertToListIfString(includeExclude.get('exclude')),
+		// 			filter);
+		// 	return domainClass;
+		// }
+
+		// @SuppressWarnings("unchecked")
+		// private List convertToListIfString(Object o) {
+		// 	if (o instanceof CharSequence) {
+		// 		List list = new ArrayList();
+		// 		list.add(o instanceof String ? o : o.toString());
+		// 		o = list;
+		// 	}
+		// 	return (List) o;
+		//  }
+
+
 	/**
 	 * Used to process a single AssetDependency ImportBatchRecord
 	 * @param batch - the batch that the ImportBatchRecord
 	 * @param record - the ImportBatchRecord to be processed
 	 * @param context - the batch processing context that contains objects used throughout the process
 	 */
-	def processDependencyRecord = {ImportBatch batch, ImportBatchRecord record, Map context->
+	def processDependencyRecord = { ImportBatch batch, ImportBatchRecord importBatchRecord, Map context ->
 		AssetDependency ad
+
+println "** processDependencyRecord() about to mapToObject"
+// println JsonUtil.toPrettyJson( JsonUtil.parseJson(importBatchRecord.fieldsInfo) )
+
+		//ETLDataRecordFieldsCommand record = JsonUtil.mapToObject(importBatchRecord.fieldsInfo, ETLDataRecordFieldsCommand)
+		// ETLDataRecordFieldsCommand record = JsonUtil.mapToObject(importBatchRecord.fieldsInfo, new TypeReference<Map<String, ETLDataRecordFieldsCommand>>(){} )
+		// new TypeReference<Map<String, String>>(){}
+
+		Map<String, ETLDataRecordFieldsPropertyCommand> record = new HashMap<String, ETLDataRecordFieldsPropertyCommand>();
+
+		try {
+
+			ObjectMapper mapper = new ObjectMapper();
+			map = mapper.readValue(importBatchRecord.fieldsInfo, new TypeReference<Map<String, ETLDataRecordFieldsPropertyCommand>>(){});
+		} catch (JsonGenerationException e) {
+			println "${e.getMessage()}"
+		} catch (JsonMappingException e) {
+			println "${e.getMessage()}"
+		} catch (IOException e) {
+			println "${e.getMessage()}"
+		}
+		//  def record = bindData( ETLDataRecordFieldsCommand, importBatchRecord.fieldsInfo, '')
+println "** processDependencyRecord() just finished mapToObject, record isa ${record.getClass().getName()}"
+//println "record = ${record.dump()}"
+println "record.keys() = ${record.fields.getClass().getName()}"
 
 		// Clear out the errors at the record level so that they can be reset if necessary
 		record.errors = []
+		int errorCnt = 0
 
-		// Check if referenced by id
-		if (record.containsKey('id')) {
-			if (record.id) {
-		 		// Let's try to find the record
-				ad = AssetDependency.where {
-					id == record.id
-				}.find()
-				if (! ad) {
-					record.errors << 'Dependency reference by ID unable to find record'
-					return
+		while (false) {
+			// Check if referenced by id
+			if (record.fields.containsKey('id')) {
+				if (record.fields.id) {
+					// Let's try to find the record
+					ad = AssetDependency.where {
+						id == record.fields.id
+					}.find()
+					if (! ad) {
+						record.fields.id.errors = [ 'Dependency reference by ID unable to find record' ]
+						errorCnt++
+						break
+					}
+
+					// Make sure that the record is associated to the project by checking the asset project reference
+					if (ad.asset.project.id != batch.project.id) {
+						record.fields.id.errors = [ 'Dependency reference by ID unable to find record' ]
+						// Could record security violation
+						errorCnt++
+						break
+					}
+
+					// Set operation for certain
+					record.operation = ImportOperationEnum.INSERT
 				}
-
-				// Make sure that the record is associated to the project by checking the asset project reference
-				if (ad.asset.project.id != batch.project.id) {
-					record.errors << 'Dependency reference by ID unable to find record'
-					// Could record security violation
-					return
-				}
-
-				// Set operation for certain
-				record.operation = ImportOperationEnum.INSERT
 			}
+
+			// Object entity
+			// String errorMsg
+			// // Try looking up both references
+			// if (! record.fields.containsKey('asset')) {
+			// 	(entity, errorMsg) = lookupDomainRecordByFieldMetaData(project, String domainClassName, 'asset', Map rowEtl, context)
+			// }
 		}
 
-		// Try looking up both references
-		if (! record.containsKey('asset')) {
+		//println JsonUtil.toPrettyJson(record)
+		if (errorCnt) {
 
 		}
 
+		record.status = ImportBatchRecordStatusEnum.COMPLETED
 
-		record.status = ImportBatchStatusEnum.COMPLETED
 	}
 
 
@@ -749,7 +832,7 @@ class DataImportService implements ServiceMethods {
 	 * 		duplicate": false,
 	 * 		errors": [],
 	 * 		fields": {
-	 * 			"id": {
+	 * 			"asset": {
 	 * 				"value": "114052",
 	 * 				"originalValue": "114052",
 	 * 				"error": false,
@@ -768,7 +851,7 @@ class DataImportService implements ServiceMethods {
 	 * 			},
 	 *
 	 * @param project - the project that the records should be validated against
-	 * @param domainClass - the class that should be returned
+	 * @param domainClassName - the domain class name used in the ETL script
 	 * @param fieldEtl - the Map of the ETL meta data about the
 	 * @return <Object domain entity found ,String error> Object if found otherwise NULL
 	 */

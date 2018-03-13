@@ -31,6 +31,7 @@ enum ImportBatchRecordStatusEnum {
 	 * @return
 	 */
 	static ImportBatchRecordStatusEnum lookup(String value) {
-		return ImportBatchRecordStatusEnum.enumConstantDirectory().get(value)
+		// return ImportBatchRecordStatusEnum.enumConstantDirectory().get(value)
+		ImportBatchRecordStatusEnum.valueOf(value)
 	}
 }
