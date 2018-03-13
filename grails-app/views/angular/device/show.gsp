@@ -241,7 +241,7 @@
 							</tr>
 
 							<tr>
-								<td colspan="2">
+								<td colspan="2" class="dates-info-container">
 									<table class="dates-info" >
 										<tr>
 											<td class="date-created">Date created: ${dateCreated}</td>
@@ -264,6 +264,6 @@
 				</div>
 				<div class="modal-footer form-group-center">
 					<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button">
-						<span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+						<span class="glyphicon glyphicon-ban-circle"></span> Close</button>
 				</div>
 			</div>
