@@ -1014,7 +1014,7 @@ class ImportService implements ServiceMethods {
 		//
 		def dtvList
 		def rowNum
-		def asset
+		AssetEntity asset
 
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++) {
 			try {
@@ -1042,7 +1042,36 @@ class ImportService implements ServiceMethods {
 				def isNewValidate = (!asset.id)
 
 				// This will hold any of the source/target location, room and rack information
-				def locRoomRack = [source: [:], target: [:] ]
+				def locRoomRack = [
+						  source: [:],
+						  target: [:]
+				]
+
+				/*
+				 * BEGIN: Initialize the SOURCE and TARGET location used to preserve missing values
+				 * we will override those that changed in the next block
+				 */
+				if ( asset.roomSource ) {
+					locRoomRack.source.sourceLocation = asset.roomSource.location
+					locRoomRack.source.sourceRoom = asset.roomSource.roomName
+				}
+
+				if ( asset.rackSource ) {
+					locRoomRack.source.sourceRack = asset.rackSource.tag
+				}
+
+				if ( asset.roomTarget ) {
+					locRoomRack.target.targetLocation = asset.roomTarget.location
+					locRoomRack.target.targetRoom = asset.roomTarget.roomName
+				}
+
+				if ( asset.rackTarget ) {
+					locRoomRack.target.targetRack = asset.rackTarget.tag
+				}
+
+				/*
+				 * END: Initialize SOURCE and TARGET location
+				 */
 
 				// Vars caught in the each loop below to be used to create mfg/model appropriately
 				String mfgName, modelName, usize, deviceType
