@@ -1991,4 +1991,96 @@ zuludb01,HP,BL380,Blade
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
+
+	void 'test can set a multiple local variables'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							extract name load Name
+							load custom1 with 'abc'
+							
+							extract mfg set myMfg
+							myMfg += " (" + extract(type) + ")"
+							load Manufacturer with myMfg.uppercase()
+							
+							set anotherVar with 'xyzzy'
+							load custom2 with anotherVar
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'xraysrv01'
+						originalValue == 'xraysrv01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'DELL (SERVER)'
+						originalValue == 'DELL (SERVER)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'zuludb01'
+						originalValue == 'zuludb01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'HP (BLADE)'
+						originalValue == 'HP (BLADE)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
 }

@@ -143,6 +143,9 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('manufacturer', 'Manufacturer'),
+					buildFieldSpec('custom1', 'Network Interfaces'),
+					buildFieldSpec('custom2', 'Cost Basis'),
 				]
 				break
 			case ETLDomain.Dependency:
