@@ -34,7 +34,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		this.tdsUiPrompt = jQuery('#tdsUiPrompt');
-		this.tdsUiPrompt.on('hide.bs.modal', (event) => {
+		this.tdsUiPrompt.on('hide.bs.modal', () => {
 			if (this.reject) {
 				this.reject();
 			}
