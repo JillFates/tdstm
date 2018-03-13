@@ -143,7 +143,11 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
 		'UPLOAD': 'Upload',
-		'FETCH': 'Fetch'
+		'FETCH': 'Fetch',
+		'CONFIRMATION_PROMPT' : {
+			'CONFIRMATION_REQUIRED': 'Confirmation Required',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?'
+		}
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

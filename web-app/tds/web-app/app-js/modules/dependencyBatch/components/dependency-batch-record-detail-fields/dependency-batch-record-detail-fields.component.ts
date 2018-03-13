@@ -3,8 +3,7 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {CompositeFilterDescriptor, FilterDescriptor, process, State} from '@progress/kendo-data-query';
+import {process, State} from '@progress/kendo-data-query';
 import {GridDataResult} from '@progress/kendo-angular-grid';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
@@ -48,8 +47,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		}
 	};
 
-	constructor(
-		private dependencyBatchService: DependencyBatchService) {
+	constructor(private dependencyBatchService: DependencyBatchService) {
 			this.state.filter.filters.push(this.fieldsFilter.nameFilter);
 	}
 
@@ -78,6 +76,10 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * Builds and prepares fieldInfo array to be display on the gridData.
+	 * @param fields
+	 */
 	private buildGridData(fields): void {
 		// let data: Array<{name: string, currentValue: string, importValue: string, error: boolean}> = [];
 		this.fieldsInfo = [];
@@ -98,7 +100,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	/**
 	 * Checks if input overrided values are not empty or with a text value.
 	 */
-	private areOverrideValuesDirty(): boolean {
+	public areOverrideValuesDirty(): boolean {
 		for (let field of this.fieldsInfo) {
 			if (field.overridedValue && field.overridedValue.length > 0) {
 				return true;
