@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, Renderer2} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -61,6 +61,7 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 
 	public codeMirrorComponent: CodeMirrorComponent;
+	private currentEditedField: EventTarget;
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -131,7 +132,8 @@ export class APIActionViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private customDomainService: CustomDomainService) {
+		private customDomainService: CustomDomainService,
+		private renderer: Renderer2) {
 
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
@@ -152,6 +154,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.currentEditedField = null;
 		this.prepareFormListener();
 	}
 
@@ -301,9 +304,18 @@ export class APIActionViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
+				'Confirm', 'Cancel')
+				.then(result => {
 					if (result) {
 						this.activeDialog.dismiss();
+					}
+				})
+				.catch((error) => {
+					// user canceled confirmation dialog
+					// return the focus to the control which user was editing
+					if (this.currentEditedField !== null) {
+						const currentField = this.renderer.selectRootElement(this.currentEditedField);
+						currentField.focus();
 					}
 				});
 		} else {
@@ -315,7 +327,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -683,4 +695,9 @@ export class APIActionViewEditComponent implements OnInit {
 			event.stopPropagation();
 		}
 	}
+
+	protected onFocus(event: FocusEvent) {
+		this.currentEditedField = (event && event.target) || null;
+	}
+
 }

@@ -1,4 +1,4 @@
-import {ElementRef, Component, OnInit, ViewChild, HostListener} from '@angular/core';
+import {ElementRef, Component, OnInit, ViewChild, HostListener, Renderer2} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../model/data-script.model';
@@ -19,6 +19,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 export class ProviderViewEditComponent implements OnInit {
 
 	@ViewChild('providerNameElement', {read: ElementRef}) providerNameElement: ElementRef;
+	private currentEditedField: EventTarget;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -32,7 +33,8 @@ export class ProviderViewEditComponent implements OnInit {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService) {
+		private dataIngestionService: DataIngestionService,
+		private renderer: Renderer2) {
 
 		this.providerModel = Object.assign({}, this.originalModel);
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Provider' : (this.modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
@@ -52,6 +54,7 @@ export class ProviderViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.currentEditedField = null;
 		this.providerName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
@@ -95,11 +98,20 @@ export class ProviderViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-				if (result) {
-					this.activeDialog.dismiss();
-				}
-			});
+				'Confirm', 'Cancel')
+				.then(result => {
+					if (result) {
+						this.activeDialog.dismiss();
+					}
+				})
+				.catch((error) => {
+					// user canceled confirmation dialog
+					// return the focus to the control which user was editing
+					if (this.currentEditedField !== null) {
+						const currentField = this.renderer.selectRootElement(this.currentEditedField);
+						currentField.focus();
+					}
+				});
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -133,7 +145,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -149,5 +161,9 @@ export class ProviderViewEditComponent implements OnInit {
 			term = this.providerModel.name.trim();
 		}
 		return term === '';
+	}
+
+	protected onFocus(event: FocusEvent) {
+		this.currentEditedField = (event && event.target) || null;
 	}
 }

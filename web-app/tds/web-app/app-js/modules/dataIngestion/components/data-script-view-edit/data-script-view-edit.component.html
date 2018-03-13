@@ -17,6 +17,7 @@
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 								<kendo-dropdownlist #dataScriptProvider id="dataScriptProvider" name="dataScriptProvider" class="form-control" [data]="providerList"
 								 [textField]="'name'" [valueField]="'id'" [(ngModel)]="dataScriptModel.provider" required
+								 (focus)="onFocus($event)"
 								 class="form-control"
 								 [ngClass]="{'has-error': dataScriptForm.touched && !dataScriptModel.provider.id}"></kendo-dropdownlist>
 							</div>
@@ -29,7 +30,7 @@
 								<span class="is-required" *ngIf="modalType !== actionTypes.VIEW">*</span>
 							</label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<input type="text" (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name"
+								<input type="text"  (focus)="onFocus($event)"  (keyup)="onValidateUniqueness()" id="dataScriptName" name="dataScriptName" class="form-control" [(ngModel)]="dataScriptModel.name"
 								 required
 								 [ngClass]="{'has-error': (!dataScriptForm.form.valid && dataScriptForm.touched) && dataScriptModel.name.length <= 0}"
 								/>
@@ -45,12 +46,12 @@
 								<div class="row" style="margin-top: 6px;" *ngIf="modalType !== actionTypes.VIEW">
 									<div class="col-sm-3">
 										<label class="label-detail">
-											<input type="radio" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.IMPORT" [(ngModel)]="dataScriptModel.mode" checked> Import
+											<input type="radio" (focus)="onFocus($event)" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.IMPORT" [(ngModel)]="dataScriptModel.mode" checked> Import
 										</label>
 									</div>
 									<div class="col-sm-3">
 										<label class="label-detail">
-											<input type="radio" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.EXPORT" [(ngModel)]="dataScriptModel.mode"> Export
+											<input type="radio" (focus)="onFocus($event)" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.EXPORT" [(ngModel)]="dataScriptModel.mode"> Export
 										</label>
 									</div>
 								</div>
@@ -71,7 +72,7 @@
 							<label class="control-label label-detail">{{dataScriptModel.description}}</label>
 						</div>
 						<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-							<textarea id="dataScriptDescription" name="dataScriptDescription" class="form-control" [(ngModel)]="dataScriptModel.description"></textarea>
+							<textarea (focus)="onFocus($event)" id="dataScriptDescription" name="dataScriptDescription" class="form-control" [(ngModel)]="dataScriptModel.description"></textarea>
 						</div>
 					</div>
 				</div>

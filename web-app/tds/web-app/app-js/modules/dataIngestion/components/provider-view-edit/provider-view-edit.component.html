@@ -1,6 +1,6 @@
-<div class="modal-content data-script-view-edit-component">
+<div class="modal-content data-script-view-edit-component" tabIndex="0">
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<button (click)="cancelCloseDialog()" type="button" class="close" tds-autofocus aria-label="Close"><span aria-hidden="true">×</span></button>
 		<h4 class="modal-title">{{modalTitle}}</h4>
 	</div>
 	<div class="modal-body">
@@ -11,7 +11,7 @@
 						<div class="form-group">
 							<label for="providerName" class="col-sm-2 control-label">Name:<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span></label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<input #providerNameElement type="text" (keyup)="onValidateUniqueness()" id="providerName" name="providerName" class="form-control" [(ngModel)]="providerModel.name" required [ngClass]="{'has-error': !providerForm.form.valid}"/>
+								<input #providerNameElement type="text"  (focus)="onFocus($event)" (keyup)="onValidateUniqueness()" id="providerName" name="providerName" class="form-control" [(ngModel)]="providerModel.name" required [ngClass]="{'has-error': !providerForm.form.valid}"/>
 								<span *ngIf="!isUnique && !isEmptyValue()" style="color: red; font-weight: bold;">Provider name must be unique</span>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
@@ -21,7 +21,7 @@
 						<div class="form-group">
 							<label for="providerDescription" class="col-sm-2 control-label">Description:</label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<input type="text" id="providerDescription" name="providerDescription" class="form-control" [(ngModel)]="providerModel.description" />
+								<input type="text"  (focus)="onFocus($event)"  id="providerDescription" name="providerDescription" class="form-control" [(ngModel)]="providerModel.description" />
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 								<label class="control-label label-detail">{{providerModel.description}}</label>
@@ -30,7 +30,7 @@
 						<div class="form-group">
 							<label for="providerComment" class="col-sm-2 control-label">Comment:</label>
 							<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-								<textarea id="providerComment" name="providerComment" class="form-control" [(ngModel)]="providerModel.comment"></textarea>
+								<textarea (focus)="onFocus($event)" id="providerComment" name="providerComment" class="form-control" [(ngModel)]="providerModel.comment"></textarea>
 							</div>
 							<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 								<label class="control-label label-detail">{{providerModel.comment}}</label>

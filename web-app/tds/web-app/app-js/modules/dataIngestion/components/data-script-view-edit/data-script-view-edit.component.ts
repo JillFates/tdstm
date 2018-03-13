@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, Renderer2 } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -21,6 +21,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 export class DataScriptViewEditComponent implements OnInit {
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
 	public dataScriptModel: DataScriptModel;
+	private currentEditedField: EventTarget;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
 	public dataScriptMode = DataScriptMode;
@@ -40,7 +41,8 @@ export class DataScriptViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private renderer: Renderer2) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
@@ -91,6 +93,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.currentEditedField = null;
 
 		this.datasourceName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
@@ -140,9 +143,18 @@ export class DataScriptViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
+				'Confirm', 'Cancel')
+				.then(result => {
 					if (result) {
 						this.activeDialog.dismiss();
+					}
+				})
+				.catch((error) => {
+					// user canceled confirmation dialog
+					// return the focus to the control which user was editing
+					if (this.currentEditedField !== null) {
+						const currentField = this.renderer.selectRootElement(this.currentEditedField);
+						currentField.focus();
 					}
 				});
 		} else {
@@ -211,6 +223,10 @@ export class DataScriptViewEditComponent implements OnInit {
 					this.etlScriptCode.code = result.newEtlScriptCode;
 				}
 			});
+	}
+
+	protected onFocus(event: FocusEvent) {
+		this.currentEditedField = (event && event.target) || null;
 	}
 
 }
