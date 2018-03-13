@@ -24,6 +24,12 @@ class Element implements RangeChecker {
 
     /**
      * Transform command on an element with a closure to be executed
+     * <pre>
+     *     domain Application
+     *     extract 'location' transform {
+     *          lowercase() append('**')
+     *     } load description
+     * </pre>
      * @param closure
      * @return the element instance that received this command
      */
@@ -37,7 +43,8 @@ class Element implements RangeChecker {
     /**
      * Transform command with a hack for this example:
      * <code>
-     *     extract .. transform with uppercase() lowercase()
+     *     domain Application
+     *     extract 'location' transform with uppercase() lowercase() load description
      * </code>
      * @param command
      * @return the element instance that received this command
@@ -226,7 +233,7 @@ class Element implements RangeChecker {
      * Converts all of the characters in this element value to upper
      * case using the rules of the default locale.
      * <code>
-     *      load ... transformation with uppercase()
+     *      load ... transform with uppercase()
      * <code>
      * @return the element instance that received this command
      */
@@ -293,10 +300,10 @@ class Element implements RangeChecker {
     }
 
     /**
-     * Saves a new variable in the binding context in order to use it later
-     * It's used in this ETL script command
+     * Saves a new local variable in the binding context in order to use it later
+     * It's used in following ETL script command
      * <code>
-     *     extract 3 transform with lowercase() set myVar
+     *     extract 3 transform with lowercase() set myLocalVariable
      * </code>
      * * @param variableName
      * @return

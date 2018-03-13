@@ -131,7 +131,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
+							load environment with 'Production'
 							extract 'application id' load id
 							
 							find Application of id by id with SOURCE.'application id'
@@ -222,7 +222,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
+							load environment with 'Production'
 							extract 'application id' load id
 							
 							find Application by id with SOURCE.'application id'
@@ -394,7 +394,7 @@ application id,vendor name,technology,location
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can find a domain Property Name with loaded Data Value using elseFind command'() {
+	void 'test can find a domain Property Name with loaded Data Value using elseFind command and local variables'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -477,10 +477,8 @@ application id,vendor name,technology,location
 							extract AssetDependencyId load id
 							find Dependency of id by id with DOMAIN.id
 							
-							// Process the PRIMARY asset in the dependency
     						extract AssetId load asset
 							
-							// Set some local variables to be reused
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
@@ -547,7 +545,7 @@ application id,vendor name,technology,location
 			if(fileName)  service.deleteTemporaryFile(fileName)
 	}
 
-	void "test can throw an Exception if find command does not define 'of' parameter by default when it has multiple fields"() {
+	void "test can throw an Exception if find command does not define 'of' parameter by default when it has multiple fields using local variables"() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
@@ -630,10 +628,7 @@ application id,vendor name,technology,location
 							extract AssetDependencyId load id
 							find Dependency of id by id with DOMAIN.id
 							
-							// Process the PRIMARY asset in the dependency
     						extract AssetId load asset
-							
-							// Set some local variables to be reused
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
@@ -735,9 +730,9 @@ application id,vendor name,technology,location
 							def primaryFindings = FINDINGS
 	
 							if (primaryFindings.size() > 0 ){
-							 	set comment with 'Asset results found'		
+							 	load comment with 'Asset results found'		
 							} else {
-							 	set comment with 'Asset results not found'
+							 	load comment with 'Asset results not found'
 							}
 						}
 						""".stripIndent(),
@@ -864,7 +859,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
+							load environment with 'Production'
 							extract 'application id' load id
 							find Application of id by id with id
 						}
@@ -926,7 +921,7 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
+							load environment with 'Production'
 							extract 'vendor name' load Vendor
 							extract 'application id' load id
 							
