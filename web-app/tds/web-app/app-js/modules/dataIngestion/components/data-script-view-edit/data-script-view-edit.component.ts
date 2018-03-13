@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -19,7 +19,6 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 	`]
 })
 export class DataScriptViewEditComponent implements OnInit {
-	@ViewChild('componentContainer') componentContainer: ElementRef;
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
