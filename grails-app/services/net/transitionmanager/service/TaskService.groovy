@@ -55,6 +55,7 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -422,26 +423,35 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+						AssetComment.withNewTransaction { TransactionStatus ts ->
+							log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
-						// Update the task so that the we track that the action was invoked
-						task.apiActionInvokedAt = new Date()
+							def taskWithLock = AssetComment.lock(task.id)
+							if (!taskWithLock.isActionable()) {
+								throw new Exception('Another user invoked the action before')
+							}
 
-						// Update the task so that we track the task started at
-						task.actStart = new Date()
+							// Update the task so that the we track that the action was invoked
+							taskWithLock.apiActionInvokedAt = new Date()
 
-						// Log a note that the API Action was called
-						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
-						addNote(task, whom, "Invoked action ${task.apiAction.name}")
+							// Update the task so that we track the task started at
+							taskWithLock.actStart = new Date()
 
-						// Make sure that the status is STARTED instead
-						status = AssetCommentStatus.STARTED
-						task.status = status
-						task.save(flush: true)
+							// Log a note that the API Action was called
+							// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
+							addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name}")
+
+							// Make sure that the status is STARTED instead
+							status = AssetCommentStatus.STARTED
+							taskWithLock.status = status
+							taskWithLock.save(flush: true, failOnError: true)
+						}
+
+						// Need to refresh the task with changes that were just committed in separate transaction
+						task.refresh()
 
 						// Kick of the async method and mark the task STARTED
 						apiActionService.invoke(task.apiAction, task)
-
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
 					} catch (InvalidConfigurationException e) {
