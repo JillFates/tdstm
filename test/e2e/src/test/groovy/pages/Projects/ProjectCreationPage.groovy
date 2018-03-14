@@ -14,7 +14,7 @@ class ProjectCreationPage extends Page{
         pcPageMessage (required: false, wait:true) { $("div", class:"message")}
         pcPageForm          { $("form", id:"createProjectForm")}
         pcClientSelector    { pcPageForm.find("div#s2id_clientId")}
-        pcClientItem        { $("li.select2-results-dept-0")}
+        pcClientItem        { $("li.select2-results-dept-0:nth-child(1)")}
         pcProjectCode       { pcPageForm.find("input#projectCode")}
         pcProjectName       { pcPageForm.find("input#name")}
         pcProjTypeSelector  { pcPageForm.find("div#s2id_projectType")}
