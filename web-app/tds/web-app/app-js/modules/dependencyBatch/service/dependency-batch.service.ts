@@ -291,34 +291,4 @@ export class DependencyBatchService {
 			})
 			.catch((error: any) => error.json());
 	}
-
-	getImportBatchRecordFieldDetail(id: number): Observable<any> {
-		const mockResult: Array<any> = [
-			{name: 'Name (P)', currentValue: '', importValue: 'Online Banking', error: ''},
-			{name: 'Type (P)', currentValue: '', importValue: 'Application', error: ''},
-			{name: 'Dep Type (P)', currentValue: '', importValue: 'Web Service', error: 'Invalid Dep Type'},
-			{name: 'Name (D)', currentValue: '', importValue: 'RSA SecureID SaaS', error: 'Depends On Asset Not Found'},
-			{name: 'Type (D)', currentValue: '', importValue: 'Application', error: ''}
-		];
-		return Observable.of(mockResult);
-	}
-
-	/**
-	 * PUT - Updates the batch record fields values of a batch record.
-	 * @param {number} id
-	 * @returns {Observable<any>}
-	 */
-	updateBatchRecordFieldsValues(batchId: number, id: number, fieldsValues: Array<{fieldName: string, value: string}>): Observable<any> {
-		const request = {
-			fieldsInfo: fieldsValues
-		};
-		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
-			.map((res: Response) => {
-				// return res.json();
-				let mockResponse = new ApiResponseModel();
-				mockResponse.status = ApiResponseModel.API_SUCCESS;
-				return mockResponse;
-			})
-			.catch((error: any) => error.json());
-	}
 }
