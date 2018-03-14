@@ -23,7 +23,6 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
@@ -1423,6 +1422,7 @@ class AssetEntityService implements ServiceMethods {
 		[	assetId: assetEntity?.id,
 			assetComment: assetComment,
 			assetCommentList: assetCommentList,
+			dateFormat: userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
 			dependentAssets: dependentAssets,
 			errors: params.errors,

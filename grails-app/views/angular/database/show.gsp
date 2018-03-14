@@ -52,7 +52,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.retireDate}">
-                                                <tds:convertDate date="${asset?.retireDate}" />
+                                                <tds:convertDate date="${asset?.retireDate}" endian = "${dateFormat}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
 																				<td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
@@ -72,7 +72,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-                                                <tds:convertDate date="${asset?.maintExpDate}" />
+                                                <tds:convertDate date="${asset?.maintExpDate}" endian="$dateFormat" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
