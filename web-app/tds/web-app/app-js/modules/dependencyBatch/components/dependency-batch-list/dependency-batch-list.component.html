@@ -49,12 +49,12 @@
                                     (click)="onUnArchiveBatch()"
                                     class="btn btn-default" id="btnBulkUnArchive" type="button">
                                 <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
-                                {{ 'DEPENDENCY_BATCH.LIST.UNARCHIVE' | translate }}
+                                {{ 'IMPORT_BATCH.LIST.UNARCHIVE' | translate }}
                             </button>
                             <label class="view-archived">
                                 <input name="viewArchived" type="checkbox" style="margin-right: 5px; margin-top: 2px;"
                                        (change)="onToggleViewArchived()" [(ngModel)]="viewArchived">
-                                {{'DEPENDENCY_BATCH.LIST.VIEW_ARCHIVED' | translate}}
+                                {{'IMPORT_BATCH.LIST.VIEW_ARCHIVED' | translate}}
                             </label>
                         </ng-template>
 
@@ -98,19 +98,19 @@
                                 <button *ngIf="dataItem.status.code === 'PENDING'"
                                         (click)="onPlayButton(dataItem)"
                                         class="btn btn-action btn-default"
-                                        title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
+                                        title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
                                     <i class="fa fa-play-circle-o"></i>
                                 </button>
                                 <button *ngIf="dataItem.status.code === 'RUNNING'"
                                         (click)="onStopButton(dataItem)"
                                         class="btn btn-action btn-default"
-                                        title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
+                                        title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
                                     <i class="fa fa-stop"></i>
                                 </button>
                                 <button *ngIf="dataItem.status.code === 'QUEUED'"
                                         (click)="onEjectButton(dataItem)"
                                         class="btn btn-action btn-default"
-                                        title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
+                                        title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
                                     <i class="fa fa-eject"></i>
                                 </button>
                             </div>
@@ -151,19 +151,19 @@
                                     <button *ngIf="dataItem.status.code === 'PENDING'"
                                             (click)="onPlayButton(dataItem)"
                                             class="btn btn-action btn-default"
-                                            title="{{ 'DEPENDENCY_BATCH.LIST.PENDING_TOOLTIP' | translate }}">
+                                            title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
                                     <button *ngIf="dataItem.status.code === 'RUNNING'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
-                                            title="{{ 'DEPENDENCY_BATCH.LIST.PROCESSING_TOOLTIP' | translate }}">
+                                            title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
                                         <i class="fa fa-stop"></i>
                                     </button>
                                     <button *ngIf="dataItem.status.code === 'QUEUED'"
                                             (click)="onEjectButton(dataItem)"
                                             class="btn btn-action btn-default"
-                                            title="{{ 'DEPENDENCY_BATCH.LIST.QUEUED_TOOLTIP' | translate }}">
+                                            title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
                                         <i class="fa fa-eject"></i>
                                     </button>
                                 </div>

@@ -106,15 +106,19 @@ export const en_DICTIONARY: Object = {
 			'VIEW_DATA': 'View Data'
 		}
 	},
-	'DEPENDENCY_BATCH': {
+	'IMPORT_BATCH': {
 		'MANAGE_LIST': 'Manage Dependency Batches',
 		'DEPENDENCY_BATCH': 'Dependency Batch',
 		'LIST': {
-			'PENDING_TOOLTIP': 'Queue to be processed',
-			'QUEUED_TOOLTIP': 'Remove from queue',
-			'PROCESSING_TOOLTIP': 'Stop processing',
+			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',
+			'REMOVE_FROM_QUEUE': 'Remove from queue',
+			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
-			'UNARCHIVE': 'Unarchive'
+			'UNARCHIVE': 'Unarchive',
+		},
+		'DETAIL': {
+			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
+			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
 	'GLOBAL': {

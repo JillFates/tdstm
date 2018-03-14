@@ -37,7 +37,8 @@
                                 <div class="col-sm-1 toolbar-button button-process">
                                     <button (click)="onProcess()"
                                             [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                            class="btn btn-default" type="button">
+                                            class="btn btn-default" type="button"
+                                            title="{{'IMPORT_BATCH.DETAIL.CLICK_TO_IMMEDIATE_PROCESS' | translate}}">
                                         <i class="glyphicon glyphicon-retweet"></i>
                                         Process
                                     </button>
@@ -45,7 +46,8 @@
                                 <div class="col-sm-1 toolbar-button">
                                     <button (click)="onIgnore()"
                                             [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                            class="btn btn-default" type="button">
+                                            class="btn btn-default" type="button"
+                                            title="{{'IMPORT_BATCH.DETAIL.CLICK_TO_TOGGLE_IGNORE' | translate}}">
                                         <i class="glyphicon glyphicon-eye-close"></i>
                                         Ignore
                                     </button>

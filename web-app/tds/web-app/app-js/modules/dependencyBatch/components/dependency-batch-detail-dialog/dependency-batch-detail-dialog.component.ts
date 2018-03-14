@@ -211,6 +211,6 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @returns {boolean}
 	 */
 	private batchRecordCanAction(batchRecord: ImportBatchRecordModel): boolean {
-		return batchRecord.status.code !== BatchStatus.COMPLETED && batchRecord.status.code !== BatchStatus.IGNORED;
+		return batchRecord.status.code === BatchStatus.PENDING || batchRecord.status.code === BatchStatus.IGNORED;
 	}
 }
