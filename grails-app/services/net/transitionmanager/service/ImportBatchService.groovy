@@ -125,8 +125,13 @@ class ImportBatchService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to set or clear the Ignore flag on individual batch records
-	 * @param project - current project
+	 * Used to set or clear the Ignore flag on individual batch records. The logic will be that
+	 * when setToIgnore is false, then it will explicitely clear the flag of all records. When set to
+	 * true then it will work as a group toggle with the following rules:
+	 *		When mix of ignored and not, then toggle to ignored
+	 *		When all not ignored then toggle to ignored
+	 * 		When all ignored the toggle to not ignored
+	 *
 	 * @param batchId - the Id of the ImportBatch for which the records being updated are assigned to
 	 * @param recordIds - the ids of the ImportBatchRecords to update
 	 * @param setToIgnore - a flag if set to true will update the Records to be ignored otherwise include them in the batch process
@@ -143,16 +148,58 @@ class ImportBatchService implements ServiceMethods {
 		}
 
 		String hql = '''UPDATE ImportBatchRecord SET ignored=:ignored, status=:status
-			WHERE importBatch.id=:batchId AND id in (:recordIds) AND ignored != :ignored'''
+			WHERE importBatch.id=:batchId AND id in (:recordIds) AND status != :status AND status != :completed'''
 
 		Map params = [
 			batchId: batch.id,
 			recordIds: recordIds,
 			ignored: (setToIgnore ? 1 : 0),
-			status: (setToIgnore ? ImportBatchRecordStatusEnum.IGNORED : ImportBatchRecordStatusEnum.PENDING )
+			status: determineIgnoreStatus(batch, recordIds, setToIgnore),
+			completed: ImportBatchRecordStatusEnum.COMPLETED
 		]
 
 		return ImportBatch.executeUpdate(hql, params)
+	}
+
+	/**
+	 * Used to determine the status that should be used to set the ImportBatchRecords based on the current status of the
+	 * list of records. The logic will be that when setToIgnore is false, then it will explicitely clear the flag of all
+	 * records. When set to true then it will work as a group toggle with the following rules:
+	 *		When mix of ignored and not, then toggle to ignored
+	 *		When all not ignored then toggle to ignored
+	 * 		When all ignored the toggle to not ignored
+	 *
+	 * @param batchId - the Id of the ImportBatch for which the records being updated are assigned to
+	 * @param recordIds - the ids of the ImportBatchRecords to update
+	 * @param setToIgnore - a flag if set to true will update the Records to be ignored otherwise include them in the batch process
+	 * @return status to set the records to
+	 */
+	private ImportBatchRecordStatusEnum determineIgnoreStatus(ImportBatch batch,  List<Long> recordIds, Boolean setToIgnore) {
+		if (setToIgnore) {
+			// Need to determine what the operation should be based on the three rules described in the javadoc
+			List results = ImportBatchRecord.executeQuery(
+				'select status, count(*) from ImportBatchRecord where importBatch.id = :batchId and id in :ids group by status',
+				[batchId: batch.id, ids:recordIds] )
+
+			int ignored = 0, included = 0
+			results.each { row ->
+				if (row[0] == ImportBatchStatusEnum.PENDING) {
+					included = row[1]
+				} else if ( row[0] == ImportBatchStatusEnum.IGNORED ) {
+					ignored = row[1]
+				}
+			}
+
+			if (ignored > 0 && included > 0) {
+				setToIgnore = true
+			} else if (ignored == 0 && included > 0) {
+				setToIgnore = true
+			} else {
+				setToIgnore = false
+			}
+		}
+
+		return (setToIgnore ? ImportBatchRecordStatusEnum.IGNORED : ImportBatchRecordStatusEnum.PENDING )
 	}
 
 	/**
