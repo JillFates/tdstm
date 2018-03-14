@@ -166,34 +166,40 @@ class ApiAction {
 		! isAsync()
 	}
 
+	/**
+	 * transforms the methodParams JSON Text to a list of objects of an Exception if the JSON is malformed
+	 * @return The methodParams JSON as Groovy List<Map>
+	 */
+	List<Map> getMethodParamsListOrException() throws RuntimeException {
+		List<Map> list = []
+		if (methodParams) {
+			list = JsonUtil.parseJsonList(methodParams)
+		}
+		return list
+	}
+
 	/*
 	 * Used to access the methodParams as a List of Map objects instead of JSON text
 	 * @return The methodParams JSON as Groovy List<Map>
 	 */
 	List<Map> getMethodParamsList(){
 		List<Map> list = []
-		if (methodParams) {
-			try {
-				list = JsonUtil.parseJsonList(methodParams)
-			} catch (e) {
-				log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
-			}
+		try {
+			list = getMethodParamsListOrException()
+		} catch (e) {
+			log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 		}
 		return list
 	}
 
 	/**
-	 * return a list of the ApiAction
+	 * return a list of ApiActionMethodParams from the methodParams JSON field
 	 * @return
 	 */
 	List<ApiActionMethodParam> getListMethodParams() {
 		List<ApiActionMethodParam> list = []
 		if (methodParams) {
-			def listJson = JsonUtil.parseJsonList(methodParams)
-			if(!(listJson instanceof List)){
-				listJson = [listJson]
-			}
-
+			List listJson = getMethodParamsListOrException()
 			list = listJson.collect { new ApiActionMethodParam(it) }
 		}
 		return list
@@ -312,7 +318,7 @@ class ApiAction {
 	static methodParamsValidator (value, ApiAction apiAction) {
 		try {
 			// delegate the validation to the List builder method
-			apiAction.methodParamsList
+			apiAction.methodParamsListOrException
 			return true
 		} catch (e) {
 			return Message.InvalidJsonFormat
