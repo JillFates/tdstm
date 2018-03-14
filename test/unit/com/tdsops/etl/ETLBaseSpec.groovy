@@ -3,11 +3,17 @@ package com.tdsops.etl
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.excel.ExcelConnection
+import getl.excel.ExcelDataset
 import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFRow
 import spock.lang.Specification
 
 abstract class ETLBaseSpec extends Specification {
@@ -88,6 +94,35 @@ abstract class ETLBaseSpec extends Specification {
 		]
 	}
 
+
+	/**
+	 * Builds a SpreadSheet dataSet from a csv content
+	 * @param csvContent
+	 * @return
+	 */
+	private List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+
+		String fileName = service.getTemporaryFilename('unit-test-', 'xlxs')
+		String fullFileName = service.getTemporaryFullFilename(fileName)
+		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
+		InputStream inputStream = service.openTemporaryFile(fileName)
+		Workbook workbook = WorkbookFactory.create(inputStream)
+		// Getting the Sheet at index zero
+		Sheet sheet = workbook.createSheet(sheetName)
+		sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
+			XSSFRow currentRow = sheet.createRow(rowNumber)
+			line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+				currentRow.createCell(columnNumber).setCellValue(cellContent)
+			}
+		}
+		inputStream.close()
+
+		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fullFileName), fileName: fileName)
+		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
+
+		return [fileName, new DataSetFacade(dataSet)]
+	}
+
 	/**
 	 * Builds a CSV dataSet from a csv content
 	 * @param csvContent
@@ -95,9 +130,9 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	private List buildCSVDataSet(String csvContent) {
 
-		def (String fileName, OutputStream sixRowsDataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
-		sixRowsDataSetOS << csvContent
-		sixRowsDataSetOS.close()
+		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
+		dataSetOS << csvContent
+		dataSetOS.close()
 
 		String fullName = service.getTemporaryFullFilename(fileName)
 
