@@ -224,4 +224,5 @@ databaseChangeLog = {
 	include file: '20180302-Dataview-add-unique-constraint.groovy'
     include file: '20180304-changes-for-batch-processing.groovy'
 	include file: '20180308-alter-table-credential-add-validation-expression-column.groovy'
+	include file: '20180304-changes-for-batch-processing.groovy'
 }
