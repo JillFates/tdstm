@@ -28,6 +28,13 @@ export function DatabaseEditComponent(template, editModel) {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+
+			// TODO: Create Object Util to initialiaze variables based on their class model definition
+			if (this.model.asset.scale === null) {
+				this.model.asset.scale = {
+					name: ''
+				};
+			}
 		}
 
 		/**
