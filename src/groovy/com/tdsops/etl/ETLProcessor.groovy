@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
@@ -40,6 +39,10 @@ class ETLProcessor implements RangeChecker {
 	 * Static variable name definition for NOW script variable
 	 */
 	static final String NOW_VARNAME = 'NOW'
+	/**
+	 * Static variable name definition for LOOKUP script variable
+	 */
+	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
 	 * Project used in some commands.
 	 */
@@ -454,13 +457,52 @@ class ETLProcessor implements RangeChecker {
 		[
 			with: { value ->
 				Element localVariable = currentRow.addNewElement(ETLValueHelper.stringValueOf(value))
-				addDynamicVariable(variableName, localVariable)
+				addVariableInBinding(variableName, localVariable)
 				localVariable
 			}
 		]
 	}
 
 	/**
+	 * Lookup ETL command implementation:
+	 * <pre>
+	 *  iterate {
+	 *      ...
+	 *      domain Device
+	 *      extract Vm load Name
+	 *      extract Cluster
+	 *      def clusterName = CE
+	 *
+	 *      lookup assetName with clusterName
+	 *  }
+	 * </pre>
+	 * @param fieldNames
+	 */
+	def lookup(final String fieldName){
+
+		lookUpFieldSpecs(selectedDomain, fieldName)
+		[
+		    with: { value ->
+			    String stringValue = ETLValueHelper.stringValueOf(value)
+			    boolean found = result.lookupInReference(fieldName, stringValue)
+			    addVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+		    }
+		]
+	}
+
+	/**
+	 * Validates if all the fieldNames are valid properties for a domain class.
+	 * It validates using a lookup fields method for each field name.
+	 * @param domain an instance of ETLDomanin
+	 * @param fieldNames a list of field names
+	 * @see ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 */
+	private void validateFields(ETLDomain domain, String...fieldNames) {
+		for(fieldName in fieldNames){
+			lookUpFieldSpecs(domain, fieldName)
+		}
+	}
+/**
 	 * Initialize a property using a default value
 	 * <pre>
 	 *	iterate {
@@ -668,12 +710,11 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Add a variable within the script as a dynamic variable.
-	 *
-	 * @param variableName
-	 * @param element
+	 * @param variableName binding name for a variable value
+	 * @param value an object to be binding in context
 	 */
-	void addDynamicVariable (String variableName, Element element) {
-		binding.addDynamicVariable(variableName, element)
+	void addVariableInBinding(String variableName, Object value) {
+		binding.addDynamicVariable(variableName, value)
 	}
 
 	/**

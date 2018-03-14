@@ -381,4 +381,15 @@ class ETLProcessorResult {
 			field.originalValue = element.originalValue
 		}
 	}
+
+	/**
+	 *
+	 * @param value
+	 * @return
+	 */
+	boolean lookupInReference(String fieldName, String value) {
+		return reference.data.any { Map<String, ?> dataRow ->
+			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName].value == value
+		}
+	}
 }
