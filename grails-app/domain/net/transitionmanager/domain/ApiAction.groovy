@@ -309,9 +309,10 @@ class ApiAction {
 	 * @param object
 	 * @return
 	 */
-	static methodParamsValidator (value, ApiAction object) {
+	static methodParamsValidator (value, ApiAction apiAction) {
 		try {
-			JsonUtil.parseJsonList(value)
+			// delegate the validation to the List builder method
+			apiAction.methodParamsList
 			return true
 		} catch (e) {
 			return Message.InvalidJsonFormat
