@@ -394,7 +394,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 			}
 
-			etlProcessor.debugConsole.content().count('Repeated asset') == 5
+			// Cound amount of row that weren't added
+			etlProcessor.debugConsole.content().count('Repeated asset') == 3
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -614,7 +615,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 			}
 
-			etlProcessor.debugConsole.content().count('Repeated asset') == 5
+			// Cound amount of row that weren't added
+			etlProcessor.debugConsole.content().count('Repeated asset') == 3
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
