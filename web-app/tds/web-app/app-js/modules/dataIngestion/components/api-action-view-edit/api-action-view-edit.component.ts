@@ -40,10 +40,15 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
-
 		.script-error {
 			margin-bottom: 18px;
 		}
+		label.url-label {
+            width: 146px;
+		}
+        .url-input {
+	        width: 82%;
+        }
 	`]
 })
 export class APIActionViewEditComponent implements OnInit {

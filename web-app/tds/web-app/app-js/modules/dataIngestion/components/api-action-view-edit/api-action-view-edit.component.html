@@ -121,24 +121,6 @@
 												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
 											</div>
 										</div>
-										<div class="form-group">
-											<label for="apiActionEndpointURL" class="col-sm-3 control-label">Endpoint URL:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionEndpointPath" class="col-sm-3 control-label">Endpoint Path:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiActionEndpointPath" name="apiActionEndpointPath" class="form-control" [(ngModel)]="apiActionModel.endpointPath" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointPath}}</label>
-											</div>
-										</div>
 									</div>
 									<div class="col-md-5">
 										<div class="form-check">
@@ -250,6 +232,19 @@
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
                                                 <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label for="apiURL" class="col-sm-3 control-label url-label">URL:</label>
+											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text" id="apiURL" name="apiURL" class="form-control" [(ngModel)]="apiActionModel.url" />
+											</div>
+											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.url}}</label>
 											</div>
 										</div>
 									</div>
