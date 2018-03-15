@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import getl.data.Dataset
 import getl.data.Field
+import getl.excel.ExcelDataset
 
 class DataSetFacade {
 
@@ -45,4 +46,12 @@ class DataSetFacade {
 	Dataset getDataSet() {
 		return dataSet
 	}
+
+	void setSheetName(String sheetName) {
+		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
+			throw ETLProcessorException.invalidSheetCommand()
+		}
+		((ExcelDataset)dataSet).setListName(sheetName)
+	}
+
 }

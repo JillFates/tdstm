@@ -366,6 +366,24 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
+	 *
+	 * @param sheetName
+	 * @return
+	 */
+	ETLProcessor sheet (String sheetName) {
+		dataSetFacade.setSheetName(sheetName)
+	}
+
+	/**
+	 *
+	 * @param sheetNumber
+	 * @return
+	 */
+	ETLProcessor sheet (Integer sheetNumber) {
+		dataSetFacade.setSheetNumber(sheetNumber)
+	}
+
+	/**
 	 * Extracts an element from dataSource by its index in the row
 	 * <code>
 	 *     domain Application

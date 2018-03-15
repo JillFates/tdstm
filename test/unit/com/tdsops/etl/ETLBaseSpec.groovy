@@ -1,10 +1,12 @@
 package com.tdsops.etl
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.WorkbookUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
+import getl.excel.ExcelDriver
 import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
@@ -102,11 +104,9 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	private List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
 
-		String fileName = service.getTemporaryFilename('unit-test-', 'xlxs')
-		String fullFileName = service.getTemporaryFullFilename(fileName)
-		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
-		InputStream inputStream = service.openTemporaryFile(fileName)
-		Workbook workbook = WorkbookFactory.create(inputStream)
+		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
+		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
+
 		// Getting the Sheet at index zero
 		Sheet sheet = workbook.createSheet(sheetName)
 		sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
@@ -115,9 +115,13 @@ abstract class ETLBaseSpec extends Specification {
 				currentRow.createCell(columnNumber).setCellValue(cellContent)
 			}
 		}
-		inputStream.close()
 
-		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fullFileName), fileName: fileName)
+		WorkbookUtil.saveToOutputStream(workbook, outputStream)
+
+		ExcelConnection con = new ExcelConnection(
+			path: service.temporaryDirectory,
+			fileName: fileName,
+			driver: TDSExcelDriver)
 		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
 
 		return [fileName, new DataSetFacade(dataSet)]
