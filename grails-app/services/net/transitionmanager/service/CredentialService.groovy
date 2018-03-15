@@ -328,7 +328,7 @@ class CredentialService implements ServiceMethods {
         Map<String, ?> sessionId = [:]
         def (String sessionHeaderName, String source, String propertyName) = sessionNameProperties.split(/[@:]/)
         switch (source) {
-            case ~/(?i)header/:
+            case 'header':
                 // pull out session header data
                 // returning first header since response.getHeaders().get() returns a list
                 String sessionHeader = resp.getHeaders().getFirst(propertyName)
@@ -336,7 +336,7 @@ class CredentialService implements ServiceMethods {
                     sessionId = ['sessionName': sessionHeaderName, 'sessionValue': sessionHeader]
                 }
                 break
-            case ~/(?i)cookie/:
+            case 'cookie':
                 // pull out cookies data
                 for (String header : resp.getHeaders().get(HttpHeaders.SET_COOKIE)) {
                     if (header.contains(propertyName)) {
@@ -346,7 +346,7 @@ class CredentialService implements ServiceMethods {
                     }
                 }
                 break
-            case ~/(?i)json/:
+            case 'json':
                 Map<String, ?> json = JsonUtil.convertJsonToMap(resp.json)
                 sessionId = ['sessionName': sessionHeaderName, 'sessionValue': json.get(propertyName)]
                 break

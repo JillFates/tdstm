@@ -189,7 +189,6 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             credentialService.create(credentialCO)
         then: 'validation exception is thrown'
             e = thrown()
-        and: 'e instance of ValidationException'
             e instanceof ValidationException
         when: 'save credential with valid sessionName'
             sessionName = 'JSESSIONID@cookie:JSESSIONID'
@@ -207,8 +206,15 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
             credentialService.create(credentialCO)
         then: 'validation exception is thrown'
             e = thrown()
-        and: 'e instance of ValidationException'
             e instanceof ValidationException
-
+        when: 'save credential with invalid source name "headers" instead of "header"'
+            sessionName = 'access_token@headers:access_token'
+            credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
+                'password', 'http://login.com', AuthenticationMethod.JWT,
+                sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
+            credentialService.create(credentialCO)
+        then: 'validation exception is thrown'
+            e = thrown()
+            e instanceof ValidationException
     }
 }

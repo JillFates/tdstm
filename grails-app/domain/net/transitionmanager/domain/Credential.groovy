@@ -108,7 +108,7 @@ class Credential {
 			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			} else {
-				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?[A-Za-z0-9_\-]+:{1}?[A-Za-z0-9_\-]+$/)) {
+				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/)) {
 					return 'credential.invalid.sessionName.value'
 				}
 			}
