@@ -104,7 +104,7 @@ export class APIActionViewEditComponent implements OnInit {
 			assetClass: 'TASK',
 			value: 'Task'
 		}, {
-			assetClass: 'USER_DEFINED',
+			assetClass: 'USER_DEF',
 			value: 'User Defined'
 		}
 	];
@@ -124,6 +124,8 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
+	private lastSelectedAgent;
+
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
@@ -428,6 +430,18 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
+	protected onMethodValueChange(event: any): void {
+		this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
+				if (res) {
+					console.log(res);
+				} else if (this.lastSelectedAgent) {
+					// Return the value to the previous one
+					this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+				}
+			});
+	}
+
 	/**
 	 *
 	 * @param pollingObject
@@ -467,7 +481,8 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
-	onOpenAgentMethod(): void {
+	protected onOpenAgentMethod(): void {
+		this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
 		setTimeout(() => {
 			jQuery('kendo-popup').css('width', 'auto');
 		}, 100);
@@ -529,7 +544,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 	/**
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
-	 * if the value is USER_DEFINED, the field will become a text input field
+	 * if the value is USER_DEF, the field will become a text input field
 	 */
 	onContextValueChange(dataItem: APIActionParameterModel): void {
 		let fieldSpecs = this.commonFieldSpecs.find((spec) => {

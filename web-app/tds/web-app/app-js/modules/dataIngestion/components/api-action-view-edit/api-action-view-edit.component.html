@@ -92,6 +92,7 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	(open)="onOpenAgentMethod()"
+																	(valueChange)="onMethodValueChange($event)"
 																	[(ngModel)]="apiActionModel.agentMethod"
 																	[disabled]="apiActionModel.agentClass.id === 0"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == 0}">
@@ -298,8 +299,8 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEFINED'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
-												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
+												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
@@ -325,8 +326,8 @@
 												<span>{{getAssetClassValue(dataItem.context)}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<span *ngIf="dataItem.context === 'USER_DEFINED'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property.label}}</span>
+												<span *ngIf="dataItem.context === 'USER_DEF'">{{dataItem.value}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEF'">{{dataItem.property.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
 												<span>{{dataItem.desc}}</span>
