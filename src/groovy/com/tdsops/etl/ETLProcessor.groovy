@@ -618,9 +618,9 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Add a message in console for an element from dataSource by its index in the row
 	 * @param index
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (Integer index) {
+	ETLProcessor debug (Integer index) {
 
 		if (index in (0..currentRow.size())) {
 			currentColumnIndex = index
@@ -628,14 +628,15 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(index)
 		}
+		return this
 	}
 
 	/**
 	 * Add a message in console for an element from dataSource by its column name
 	 * @param columnName
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (String columnName) {
+	ETLProcessor debug (String columnName) {
 
 		if (columnsMap.containsKey(columnName)) {
 			currentColumnIndex = columnsMap[columnName].index
@@ -643,6 +644,18 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(columnName)
 		}
+		return this
+	}
+
+	/**
+	 * Log a message using DebugConsole.LevelMessage type
+	 * @param message an String message to be logged
+	 * @param level level used to add a new message in debug console
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor log (String message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
+		debugConsole.append(level, message)
+		return this
 	}
 
 	/**

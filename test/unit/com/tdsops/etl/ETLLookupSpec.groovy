@@ -256,6 +256,150 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can lookup results and used LOOKUP.found() to check results'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		and:
+			GroovySpy(Application, global: true)
+			Application.executeQuery(_, _) >> { String query, Map args ->
+				return []
+			}
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						
+						// Set so variables that will be used by the script
+						def assetTypeVM = 'VM'
+						def appVendorVmWare = 'VMWare'
+						
+						iterate {
+							domain Device
+								extract Vm load Name
+								def vmName = CE
+								extract 'Vm Id' load externalRefId
+								extract 'Vm Uuid' load serialNumber
+								
+								extract Cluster
+								def clusterName = CE
+						
+							domain Application
+								
+								lookup assetName with clusterName
+								if ( LOOKUP.found() ) {
+										log 'Repeated asset'
+								} else {
+									extract Cluster load assetName
+									load id with ''
+									
+									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
+									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
+									
+									whenNotFound id create {
+										assetName clusterName
+										appVendor appVendorVmWare
+									}
+								}
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 2
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
+				data.size() == 5
+
+				data.collect { it.fields.assetName.value } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
+				data.collect { it.fields.assetName.originalValue } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
+				data.collect { it.fields.externalRefId.value } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
+				data.collect { it.fields.externalRefId.originalValue } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
+				data.collect { it.fields.serialNumber.value } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
+					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
+					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
+				data.collect { it.fields.serialNumber.originalValue } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
+					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
+					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
+			}
+
+			with(etlProcessor.result.domains[1]) {
+				domain == ETLDomain.Application.name()
+				fields == ['assetName', 'id'] as Set
+				data.size() == 2
+				data.collect { it.fields.assetName.value } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
+				data.collect { it.fields.assetName.originalValue } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
+				data.collect { it.fields.id.value } == ['', '']
+				data.collect { it.fields.id.originalValue } == ['', '']
+				with(data[0]){
+
+					with(fields.id){
+						value == ''
+						originalValue == ''
+						find.query.size() == 2
+
+						with(find.query[0]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_1'
+							kv.appVendor == 'VMWare'
+							!error
+						}
+
+						with(find.query[1]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_1'
+							!error
+						}
+
+						// whenNotFound create command assertions
+						create.assetName == 'MD_CLUSTER_1'
+						create.appVendor == 'VMWare'
+					}
+				}
+
+				with(data[1]){
+
+					with(fields.id){
+						value == ''
+						originalValue == ''
+						find.query.size() == 2
+
+						with(find.query[0]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_DEV'
+							kv.appVendor == 'VMWare'
+						}
+
+						with(find.query[1]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_DEV'
+						}
+
+						// whenNotFound create command assertions
+						create.assetName == 'MD_CLUSTER_DEV'
+						create.appVendor == 'VMWare'
+					}
+				}
+
+			}
+
+			etlProcessor.debugConsole.content().count('Repeated asset') == 5
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can lookup results and used !LOOKUP to check results'() {
 
 		given:
@@ -267,6 +411,12 @@ class ETLLookupSpec extends ETLBaseSpec {
 				dataSet,
 				debugConsole,
 				validator)
+
+		and:
+			GroovySpy(Application, global: true)
+			Application.executeQuery(_, _) >> { String query, Map args ->
+				return []
+			}
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -326,6 +476,150 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can lookup results and used LOOKUP to check results'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		and:
+			GroovySpy(Application, global: true)
+			Application.executeQuery(_, _) >> { String query, Map args ->
+				return []
+			}
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						
+						// Set so variables that will be used by the script
+						def assetTypeVM = 'VM'
+						def appVendorVmWare = 'VMWare'
+						
+						iterate {
+							domain Device
+								extract Vm load Name
+								def vmName = CE
+								extract 'Vm Id' load externalRefId
+								extract 'Vm Uuid' load serialNumber
+								
+								extract Cluster
+								def clusterName = CE
+						
+							domain Application
+								
+								lookup assetName with clusterName
+								if ( LOOKUP ) {
+										log 'Repeated asset'
+								} else {
+									extract Cluster load assetName
+									load id with ''
+									
+									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
+									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
+									
+									whenNotFound id create {
+										assetName clusterName
+										appVendor appVendorVmWare
+									}
+								}
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 2
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
+				data.size() == 5
+
+				data.collect { it.fields.assetName.value } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
+				data.collect { it.fields.assetName.originalValue } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
+				data.collect { it.fields.externalRefId.value } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
+				data.collect { it.fields.externalRefId.originalValue } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
+				data.collect { it.fields.serialNumber.value } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
+					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
+					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
+				data.collect { it.fields.serialNumber.originalValue } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
+					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
+					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
+			}
+
+			with(etlProcessor.result.domains[1]) {
+				domain == ETLDomain.Application.name()
+				fields == ['assetName', 'id'] as Set
+				data.size() == 2
+				data.collect { it.fields.assetName.value } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
+				data.collect { it.fields.assetName.originalValue } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
+				data.collect { it.fields.id.value } == ['', '']
+				data.collect { it.fields.id.originalValue } == ['', '']
+				with(data[0]){
+
+					with(fields.id){
+						value == ''
+						originalValue == ''
+						find.query.size() == 2
+
+						with(find.query[0]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_1'
+							kv.appVendor == 'VMWare'
+							!error
+						}
+
+						with(find.query[1]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_1'
+							!error
+						}
+
+						// whenNotFound create command assertions
+						create.assetName == 'MD_CLUSTER_1'
+						create.appVendor == 'VMWare'
+					}
+				}
+
+				with(data[1]){
+
+					with(fields.id){
+						value == ''
+						originalValue == ''
+						find.query.size() == 2
+
+						with(find.query[0]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_DEV'
+							kv.appVendor == 'VMWare'
+						}
+
+						with(find.query[1]){
+							domain ==  ETLDomain.Application.name()
+							kv.assetName == 'MD_CLUSTER_DEV'
+						}
+
+						// whenNotFound create command assertions
+						create.assetName == 'MD_CLUSTER_DEV'
+						create.appVendor == 'VMWare'
+					}
+				}
+
+			}
+
+			etlProcessor.debugConsole.content().count('Repeated asset') == 5
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can lookup results using RVTools Import Script'() {
 
 		given:
@@ -338,12 +632,17 @@ class ETLLookupSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
+		and:
+			GroovySpy(Application, global: true)
+			Application.executeQuery(_, _) >> { String query, Map args ->
+				return []
+			}
+
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
-					
 					
 					read labels
 					iterate {
