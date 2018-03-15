@@ -1,13 +1,13 @@
 <div class="modal fade in no-background data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content">
+	<div class="modal-dialog modal-lg ui-draggable" role="document">
+		<div class="modal-content resizable">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
 				</button>
 				<h4 class="modal-title">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
 			</div>
-			<div class="modal-body" style="height: 600px; overflow: auto;">
+			<div class="modal-body">
                 <div class="modal-body-container">
                     <div class="row">
                         <div class="col-md-12">
@@ -52,7 +52,6 @@
                                 <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}</button>
                         </div>
                     </div>
-                    <!-- -->
                     <div *ngIf="(testHasErrors() || syntaxHasErrors() ) && !closeErrorsSection" class="row" style="margin-top: 10px;">
                         <div class="col-md-12">
                             <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
@@ -80,7 +79,7 @@
                                 <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-right':collapsed.sample}" style="padding-right:0px"></i>
                             </button>
                         </div>
-                        <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="overflow-y: scroll;">
+                        <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="">
                             <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
                                 <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
                                     <ng-template kendoGridHeaderTemplate>
@@ -100,7 +99,7 @@
                                 <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                     <ng-template kendoTabContent>
                                         <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                           <kendo-grid [data]="domain.data">
+                                           <kendo-grid [data]="domain.data" [resizable]="true">
                                                 <kendo-grid-column *ngFor="let column of domain.fields;
                                                            let columnIndex = index;"
                                                                    title="{{column}}">
