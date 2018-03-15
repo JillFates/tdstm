@@ -20,6 +20,7 @@ enum UserPreferenceEnum {
 	CURR_TZ,
 	DASHBOARD_REFRESH,
 	Database_Columns,
+	DataScriptSize,
 	Dep_Columns,
 	DEP_CONSOLE_COMPACT('depConsoleCompact'),
 	DEP_GRAPH('depGraph'),
@@ -72,11 +73,11 @@ enum UserPreferenceEnum {
 
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportCabling,
-	                                                              ImportComment].asImmutable()
+	                                                              ImportComment, DataScriptSize].asImmutable()
 
 	static final List<UserPreferenceEnum> exportPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportRoom,
-	                                                              ImportRack, ImportCabling, ImportComment].asImmutable()
+	                                                              ImportRack, ImportCabling, ImportComment, DataScriptSize].asImmutable()
 
 	static final List<UserPreferenceEnum> sessionOnlyPreferences = [
 		TASK_CREATE_EVENT,

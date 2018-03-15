@@ -1,6 +1,6 @@
 <div class="modal fade in no-background data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg ui-draggable" role="document">
-		<div class="modal-content resizable">
+		<div class="modal-content resizable" #resizableForm  [style.width.px]="width" [style.height.px]="height">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 					<span aria-hidden="true">×</span>
