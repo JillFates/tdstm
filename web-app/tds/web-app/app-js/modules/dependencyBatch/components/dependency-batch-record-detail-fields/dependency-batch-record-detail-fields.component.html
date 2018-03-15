@@ -12,6 +12,7 @@
                                     [textField]="'text'"
                                     [valueField]="'value'"
                                     [(ngModel)]="fieldsFilter.selected"
+                                    (valueChange)="onFieldsFilter($event)"
                                     placeholder="Filter"
                                     class="form-control input-sm"></kendo-dropdownlist>
             </div>
@@ -35,7 +36,9 @@
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">
             <ng-template kendoGridCellTemplate let-dataItem >
-                <span>{{dataItem.error ? dataItem.error : '' }}</span>
+                <div *ngFor="let error of dataItem.errors" style="color: #a94442;">
+                    * {{error}}
+                </div>
             </ng-template>
         </kendo-grid-column>
     </kendo-grid>
