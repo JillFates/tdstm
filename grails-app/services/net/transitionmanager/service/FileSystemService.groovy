@@ -10,6 +10,7 @@ import getl.excel.ExcelDataset
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
@@ -81,7 +82,7 @@ class FileSystemService  implements InitializingBean {
 		}
 
 		if (!workbook) {
-			throw new RuntimeException("Unsupported File Format $ext")
+			throw new InvalidRequestException('Uploaded file does not appear to be in the Excel format')
 		}
 
 		Sheet sheet = workbook.createSheet("Data Sheet")

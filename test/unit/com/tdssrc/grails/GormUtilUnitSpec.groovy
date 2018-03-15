@@ -237,4 +237,8 @@ class GormUtilUnitSpec extends Specification {
 
 	}
 
+	void '15. Test the domainShortName method'() {
+		expect: 'shortname of net.transitionmanager.domain.Person should be Person'
+			'Person' == GormUtil.domainShortName(net.transitionmanager.domain.Person)
+	}
 }

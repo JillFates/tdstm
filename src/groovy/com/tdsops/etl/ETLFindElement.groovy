@@ -68,6 +68,8 @@ class ETLFindElement {
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
 		}
+
+		// When "of propertyName" is not specified, default to using "of id"
 		if(!currentFind.findId){
 			if(fields.size() != 1){
 				throw ETLProcessorException.findElementWithoutFindIdDefinition(fields)

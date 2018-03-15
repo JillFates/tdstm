@@ -202,4 +202,15 @@ class ImportBatchRecord {
 	// 	fieldsInfo = JsonUtil.toJson(value)
 	// }
 
+	// Used to clear out any existing errors on the record
+	void resetErrors() {
+		errorList = '[]'
+	}
+
+	// Used to add an error message to the list
+	void addError(String error) {
+		List errors = JsonUtil.parseJsonList(errorList)
+		errors << error
+		errorList = JsonUtil.toJson(errors)
+	}
 }

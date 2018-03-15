@@ -2654,7 +2654,7 @@ class AssetEntityService implements ServiceMethods {
 			query.append(whereAnd() + " assets.planStatus='$params.plannedStatus'")
 		}
 		query.append(" ORDER BY $sortIndex $sortOrder")
-		log.debug  "query = $query"
+		// log.debug  "query = $query"
 
 		def assetList = []
 		if (queryParams.size()) {

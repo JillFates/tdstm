@@ -617,6 +617,19 @@ class GormUtilIntegrationSpec extends Specification {
 			thrown RuntimeException
 	}
 
+	void '24. test the isReferenceProperty method'() {
+
+		expect: 'tests to succeed'
+			result == GormUtil.isReferenceProperty(object, property)
+
+		where:
+			object			| property		| result
+			Project			| 'client'		| true
+			Project			| 'description'	| false
+			new Project()	| 'client'		| true
+ 			new Project()	| 'description'	| false
+	}
+
 }
 
 /**

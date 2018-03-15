@@ -28,6 +28,7 @@ import org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsDomainBinder
 import org.codehaus.groovy.grails.orm.hibernate.cfg.Mapping
 import org.codehaus.groovy.grails.validation.ConstrainedProperty
 import org.codehaus.groovy.grails.validation.Constraint
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import grails.validation.Validateable
 
 
@@ -511,22 +512,6 @@ public class GormUtil {
 	}
 
 	/**
-	 * Used to get the list of persistent properties for a given domain class
-	 * @param domainClass - the Domain class to get the properties for
-	 * @param propertyName - the name of a property to retrieve
-	 * @return The GrailsDomainClassProperty object
-	 */
-	static GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
-		if (!isDomainClass(domainClass)) {
-			println "getDomainProperty() domainClass=${domainClass.getName()}"
-			throw new RuntimeException('Called with non-domain class parameter')
-		}
-		def d = getDomainClass(domainClass)
-		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
-		return cp
-	}
-
-	/**
 	 * Retrieve a list of domain properties. If a list of property names is given, only
 	 * those properties will be included. If a list of properties to be skipped is provided,
 	 * those properties will be excluded.
@@ -582,6 +567,21 @@ public class GormUtil {
 	}
 
 	/**
+	 * Used to get the list of persistent properties for a given domain class
+	 * @param domainClass - the Domain class to get the properties for
+	 * @param propertyName - the name of a property to retrieve
+	 * @return The GrailsDomainClassProperty object
+	 */
+	static GrailsDomainClassProperty getDomainProperty(Class domainClass, String propertyName) {
+		if (!isDomainClass(domainClass)) {
+			throw new RuntimeException('Called with non-domain class parameter')
+		}
+		def d = getDomainClass(domainClass)
+		GrailsDomainClassProperty cp = d.getPropertyByName(propertyName)
+		return cp
+	}
+
+	/**
 	 * Used to retrieve the Domain Binder Mapping of a domain which can then be interrogated
 	 * @param domainClass - the domain to integrate
 	 * @return true if it has a composite primary key
@@ -595,6 +595,32 @@ public class GormUtil {
 		//	throw new RuntimeException('Failed to load Grails domain mapping for ' + getDomainNameForClass(domainClass))
 		//}
 		return binderMapping
+	}
+
+	/**
+	 * Used to bind values from a Map of field name/values into a domain instance with the optional
+	 * list of field names to be excluded from the binding. Note that the id and version fields are
+	 * automatically excluded since this can not be set.
+	 *
+	 * @param domainObject - the domain object instance to bind the values to
+	 * @param fieldsValues - a map of the fields and their values
+	 * @param excludeFields - a list of field names to exclude from the mapping
+	 */
+	static void bindMapToDomain(Object domainObject, Map fieldsValues, List<String>excludeFields=[]) {
+		if (excludeFields == null) {
+			excludeFields = ['id', 'version']
+		} else {
+			if (! excludeFields.contains('id')) {
+				excludeFields << ['id']
+			}
+			if (! excludeFields.contains('version')) {
+				excludeFields << ['version']
+			}
+		}
+
+ 		BindDynamicMethod bind = new BindDynamicMethod()
+		List args = [domainObject, fieldsValues, [exclude: excludeFields]]
+		bind.invoke(domainObject,'bind',(Object[]) args)
 	}
 
 	/**
@@ -1100,7 +1126,17 @@ public class GormUtil {
 	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
 	 */
 	static boolean isReferenceProperty(Object domainObject, String propertyName) {
-		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainObject, propertyName)
+		return isReferenceProperty(domainObject.getClass(), propertyName)
+	}
+
+	/**
+	 * Determine if a domain property represents a referenced class type or if the property is an association
+	 * @param domainClazz - the class of the Domain object to examine
+	 * @param propertyName
+	 * @return true if propertyName is a valid property reference for domainObject class. False in other case.
+	 */
+	static boolean isReferenceProperty(Class domainClazz, String propertyName) {
+		GrailsDomainClassProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
 		return grailsDomainClassProperty.getReferencedDomainClass() != null || grailsDomainClassProperty.isAssociation()
 	}
 
@@ -1153,5 +1189,16 @@ public class GormUtil {
 		}
 
 		return domainMap
+	}
+
+	/**
+	 * Used to get the short name of the domain class
+	 *    domainShortName(net.transitionmanager.domain.Person) == 'Person'
+	 *
+	 * @param domainClass
+	 * @return the short name of the class name
+	 */
+	static String domainShortName(Class domainClass) {
+		return domainClass.getName().split(/\./)[-1]
 	}
 }

@@ -139,6 +139,8 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportRecordActionEnum.PROCESS:
+				affected = importBatchService.dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
+				break
 
 			default:
 				renderErrorJson( 'Currently not implemented' )

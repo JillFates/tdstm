@@ -155,7 +155,9 @@ class ImportBatchService implements ServiceMethods {
 			recordIds: recordIds,
 			ignored: (setToIgnore ? 1 : 0),
 			status: determineIgnoreStatus(batch, recordIds, setToIgnore),
-			completed: ImportBatchRecordStatusEnum.COMPLETED
+// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum
+//			completed: ImportBatchRecordStatusEnum.COMPLETED
+			completed: ImportBatchStatusEnum.COMPLETED
 		]
 
 		return ImportBatch.executeUpdate(hql, params)
