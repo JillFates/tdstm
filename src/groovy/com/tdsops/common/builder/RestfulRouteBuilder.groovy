@@ -126,12 +126,18 @@ class RestfulRouteBuilder extends RouteBuilder {
 			switch (credential.authenticationMethod) {
 				case AuthenticationMethod.BASIC_AUTH:
 					builder.addParameter('authUsername', credential.username)
-					builder.addParameter( 'authPassword', credentialService.decryptPassword(credential))
-					break;
-				case AuthenticationMethod.COOKIE:
+					builder.addParameter('authPassword', credentialService.decryptPassword(credential))
+					break
+				case AuthenticationMethod.HEADER:
+					// TODO <SL> need to find a way to determine when to pass "Bearer" as part of the header value
+					// e.g. Authentication: Bearer VERTIFRyYW5zaXRpb24gTWFuYWdlcg==
 					Map<String, ?> authentication = credentialService.authenticate(credential)
 					routeDefinition.setHeader(authentication.sessionName, constant(authentication.sessionValue))
-					break;
+					break
+				case AuthenticationMethod.COOKIE:
+					Map<String, ?> authentication = credentialService.authenticate(credential)
+					routeDefinition.setHeader('Cookie', constant(authentication.sessionName + '=' + authentication.sessionValue))
+					break
 				default:
 					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
 			}

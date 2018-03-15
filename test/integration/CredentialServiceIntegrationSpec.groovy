@@ -1,3 +1,5 @@
+import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.AuthenticationRequestMode
 import grails.test.spock.IntegrationSpec
 import grails.validation.ValidationException
 import net.transitionmanager.service.InvalidParamException
@@ -167,4 +169,46 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
 
     // }
 
+    void '9. saving credential with valid and invalid sessionName property value'() {
+        setup:
+            String sessionName = 'JSESSIONID'
+            String validationExpression = 'body content equal "Welcome"'
+            Project project = projectTestHelper.createProject()
+            credentialService.securityService = [getUserCurrentProject: { return project }] as SecurityService
+
+            Provider provider = providerTestHelper.createProvider(project)
+
+            Credential credential
+            CredentialCommand credentialCO
+            ValidationException e
+
+        when: 'save credential with invalid sessionName'
+            credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
+                    'password', 'http://login.com', AuthenticationMethod.HEADER,
+                    sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
+            credentialService.create(credentialCO)
+        then: 'validation exception is thrown'
+            e = thrown()
+        and: 'e instance of ValidationException'
+            e instanceof ValidationException
+        when: 'save credential with valid sessionName'
+            sessionName = 'JSESSIONID@cookie:JSESSIONID'
+            credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
+                'password', 'http://login.com', AuthenticationMethod.COOKIE,
+                sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
+            credential = credentialService.create(credentialCO)
+        then: 'credential gets saved without validation errors'
+            credential
+        when: 'save credential with invalid sessionName'
+            sessionName = 'access_token @ cookie : JSESSIONID'
+            credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
+                'password', 'http://login.com', AuthenticationMethod.JWT,
+                sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
+            credentialService.create(credentialCO)
+        then: 'validation exception is thrown'
+            e = thrown()
+        and: 'e instance of ValidationException'
+            e instanceof ValidationException
+
+    }
 }

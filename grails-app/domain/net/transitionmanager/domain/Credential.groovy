@@ -103,11 +103,14 @@ class Credential {
 	 * Used to validate if the sessionName property is set for AuthenticationMethods that require a value
 	 */
 	static Closure sessionNameValidator = { value, target ->
-		// TODO : JPM 2/2018 : Need to validate if JWT token name is ALWAYS the same name
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null || value.trim() == '') {
+			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
+			} else {
+				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?[A-Za-z0-9_\-]+:{1}?[A-Za-z0-9_\-]+$/)) {
+					return 'credential.invalid.sessionName.value'
+				}
 			}
 		}
 	}

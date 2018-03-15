@@ -44,7 +44,7 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 
     def "1. credentialService validate successful authentication using JWT using TDSTM as token issuer"() {
         given: 'a credential'
-			final String sessionName = 'access_token'
+			final String sessionName = 'access_token@json:access_token'
 			final String validationExpression = 'status code equal "200"'
             Project project = projectTestHelper.createProject()
             Provider provider = providerTestHelper.createProvider(project)
@@ -56,11 +56,9 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
             def authentication = credentialService.authenticate(credential)
 
         then: 'the system must authenticate and return JWT basic token keys'
-            null != authentication
-            'access_token'      in authentication.keySet()
-            'refresh_token'     in authentication.keySet()
-            'token_type'        in authentication.keySet()
-            'expires_in'        in authentication.keySet()
+            null 			!= authentication
+            'access_token' 	== authentication.sessionName
+			null 			!= authentication.sessionValue
     }
 
     def '2. /ws/credential/enums call to get JSON map of Credential Enums'() {
@@ -77,7 +75,7 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 
 	def "3. credentialService validate successful authentication using FORM VARS using TDSTM as session issuer"() {
 		given: 'a credential'
-			final String sessionName = 'JSESSIONID'
+			final String sessionName = 'JSESSIONID@cookie:JSESSIONID'
 			final String validationExpression = 'header Location contains "/tdstm/dashboard/userPortal"'
 			Project project = projectTestHelper.createProject()
 			Provider provider = providerTestHelper.createProvider(project)
@@ -89,8 +87,9 @@ class CredentialServiceFunctionalSpec extends IntegrationSpec {
 			def authentication = credentialService.authenticate(credential)
 
 		then: 'the system must authenticate and return session cookie'
-			null != authentication
-			sessionName 	in authentication.values()
+			null 			!= authentication
+			'JSESSIONID' 	== authentication.sessionName
+			null 			!= authentication.sessionValue
 	}
 
 }

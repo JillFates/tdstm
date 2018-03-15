@@ -10,6 +10,7 @@ import net.transitionmanager.command.CredentialCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
+import org.apache.commons.lang3.RandomStringUtils
 
 /**
  * Use this class to create credential domain objects in your tests
@@ -32,8 +33,9 @@ class CredentialTestHelper {
 				authenticationMethod: authenticationMethod == null ? AuthenticationMethod.BASIC_AUTH : authenticationMethod,
 				sessionName: sessionName == null ? 'JSESSIONID' : sessionName,
 				validationExpression: validationExpression == null ? '' : validationExpression,
-				name: 'Test credential',
-				username: username == null ? 'key' : username,
+				name: RandomStringUtils.randomAlphanumeric(10),
+				username: username == null ? 'username' : username,
+				password: password == null ? 'password' : password,
 				authenticationUrl: authenticationUrl == null ? 'http://localhost' : authenticationUrl,
 				renewTokenUrl: 'http://localhost',
 				provider: provider
