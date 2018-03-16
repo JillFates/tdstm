@@ -352,13 +352,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
     }
 
 	@Ignore
-	void '4. test findDomainById method'() {
-		// findDomainById(Project project, Class domainClass, String propertyName, JSONObject fieldsInfo, Map context)
+	void '4. test searchForDomainById method'() {
+		// searchForDomainById(Project project, Class domainClass, String propertyName, JSONObject fieldsInfo, Map context)
 	}
 
 	@Ignore
 	void '5. test findDomainByAlternateProperty method'() {
-		// (Project project, Class domainClass, String propertyName, JSONObject fieldsInfo)
+		// (Project project, Class domainClass, String propertyName, JSONObject fieldsInfo, Map context)
 	}
 
 	@Ignore

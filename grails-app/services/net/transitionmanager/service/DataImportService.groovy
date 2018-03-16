@@ -801,10 +801,10 @@ class DataImportService implements ServiceMethods {
 
 		while (true) {
 			// Try finding the Dependency by it's id if specified in fieldsInfo
-			def findDomainByIdResult = findDomainById(project, context.domainClass, 'id', fieldsInfo, context)
+			def findDomainByIdResult = searchForDomainById(project, context.domainClass, 'id', fieldsInfo, context)
 			if (findDomainByIdResult == -1) {
 				// the fields.Info.id.value had a number but the id was not found which is an error
-				log.debug "processDependencyRecord() findDomainById() failed"
+				log.debug "processDependencyRecord() searchForDomainById() failed"
 				break
 			} else if (findDomainByIdResult) {
 				// Yes! Found the elusive sucker!
@@ -812,11 +812,22 @@ class DataImportService implements ServiceMethods {
 			}
 
 			// Try looking up both Asset References using the id and/or query elements in fieldsInfo
-			primary = lookupDomainRecordByFieldMetaData(project, context.domainClassName, 'asset', fieldsInfo, context)
-			supporting = lookupDomainRecordByFieldMetaData(project, context.domainClassName, 'dependent', fieldsInfo, context)
-			if ( primary < 0 || supporting < 0 || fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
+			primary = lookupDomainRecordByFieldMetaData(project, 'asset', fieldsInfo, context)
+			supporting = lookupDomainRecordByFieldMetaData(project, 'dependent', fieldsInfo, context)
+
+			log.debug 'processDependencyRecord() primary={}', primary
+			log.debug 'processDependencyRecord() primary errors={}', fieldsInfo['asset'].errors
+			log.debug 'processDependencyRecord() supporting={}', supporting
+			log.debug 'processDependencyRecord() supporting errors={}', fieldsInfo['dependent'].errors
+			if ( ! primary  || ! supporting || fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
+				if (! primary ) {
+					log.debug 'processDependencyRecord() primary create=', fieldsInfo['asset'].create
+				}
+				if (! supporting ) {
+					log.debug 'processDependencyRecord() supporting create=', fieldsInfo['dependent'].create
+				}
 				// If there were multiple assets found then we can't create/update the dependency
-				log.debug "processDependencyRecord() Match Conflict Encountered"
+				log.debug "processDependencyRecord() Abandoning the creation/updating of AssetDependency"
 				break
 			}
 
@@ -957,7 +968,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the fields map that came from the ETL process
 	 * @return the domain object if found; -1 of id is number and not found; otherwise null
 	 */
-	private Object findDomainById(Project project, Class domainClass, String propertyName, Map fieldsInfo, Map context) {
+	Object searchForDomainById(Project project, Class domainClass, String propertyName, JSONObject fieldsInfo, Map context) {
 		String notFoundByID = 'Entity was not found by ID'
 		Object domain=null
 
@@ -1007,12 +1018,15 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the fields map that came from the ETL process
 	 * @return the list of domain entities found for the property
 	 */
-	private List<Object> findDomainByAlternateProperty(Project project, Class domainClass, String propertyName, Map fieldsInfo) {
+	private List<Object> findDomainByAlternateProperty(Project project, Class domainClass, String propertyName, Map fieldsInfo, Map context) {
 		String notFoundByID = 'Entity was not found by ID'
 		List<Object> entities=[]
 
 		if ( fieldsInfo[propertyName]?.value && (fieldsInfo[propertyName]?.value instanceof CharSequence) ) {
-			String altPropertyName = context.domainClass.alternateLookup
+			String altPropertyName
+			if (GormUtil.isDomainProperty(context.domainClass, 'alternateLookup')) {
+				altPropertyName = context.domainClass.altPropertyName
+			}
 			if (altPropertyName) {
 				// Build the query
 				String domainName = GormUtil.domainShortName(domainClass)
@@ -1179,7 +1193,7 @@ class DataImportService implements ServiceMethods {
 			if (classOfProperty == null) break
 
 			// Try looking up the entity by ID
-			entity = findDomainById(project, classOfProperty, propertyName, fieldsInfo, context)
+			entity = searchForDomainById(project, classOfProperty, propertyName, fieldsInfo, context)
 			if (entity == -1) {
 				log.debug 'lookupDomainRecordByFieldMetaData() find by NUMERIC id ({}) failed', fieldsInfo[propertyName].value
 				break
@@ -1190,7 +1204,7 @@ class DataImportService implements ServiceMethods {
 
 			// Let's see if the value was a String and try looking up the entity by it's alternate key (e.g. assetName or name) if the
 			// domain has one specified
-			List entities = findDomainByAlternateProperty(project, classOfProperty, propertyName, fieldsInfo)
+			List entities = findDomainByAlternateProperty(project, classOfProperty, propertyName, fieldsInfo, context)
 			Integer qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
@@ -1268,7 +1282,7 @@ class DataImportService implements ServiceMethods {
 				fieldsInfo[propertyName].find.results = entities*.id
 			}
 
-			log.debug 'performQueryAndUpdateFindElement() for property={}, size={}, find={}, results={}', propertyName, recordsFound, fieldsInfo[propertyName].find, entities*.id
+			log.debug 'performQueryAndUpdateFindElement() for property={}, find={}', propertyName, fieldsInfo[propertyName].find
 			// Record error on the field if more than one entity was found
 			if (recordsFound > 1) {
 				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, FIND_FOUND_MULTIPLE_REFERENCES_MSG)

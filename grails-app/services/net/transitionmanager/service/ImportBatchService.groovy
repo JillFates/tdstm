@@ -53,7 +53,7 @@ class ImportBatchService implements ServiceMethods {
 	 */
 	ImportBatchRecord fetchImportBatchRecord(Project project, Long batchId, Long recordId) throws EmptyResultException {
 		ImportBatchRecord record = ImportBatchRecord.get(recordId)
-		if (! record || record.importBatch.id != batch.id || record.importBatch.project != project ) {
+		if (! record || record.importBatch.id != batchId || record.importBatch.project != project ) {
 			throw new EmptyResultException('Requested record was not found')
 		}
 		return record
