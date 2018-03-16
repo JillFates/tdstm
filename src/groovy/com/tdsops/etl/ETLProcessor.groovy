@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
@@ -357,7 +356,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor skip (Integer amount) {
-		if (amount + currentRowIndex <= this.dataSetFacade.readRows()) {
+		if (amount + currentRowIndex <= this.dataSetFacade.rowsSize()) {
 			currentRowIndex += amount
 		} else {
 			throw ETLProcessorException.invalidSkipStep(amount)

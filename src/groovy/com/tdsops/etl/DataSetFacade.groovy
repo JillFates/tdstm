@@ -23,8 +23,8 @@ class DataSetFacade {
 	/**
 	 * Count reading rows from dataset
 	 */
-	Long readRows() {
-		return dataSet.readRows
+	Long rowsSize() {
+		return dataSet.rows().size()
 	}
 
 	/**

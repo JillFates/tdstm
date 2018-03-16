@@ -98,7 +98,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can read labels in first row by default for a spreadSheet DataSet'(){
+	void 'test can read labels by default in first row by default for a spreadSheet DataSet'(){
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Devices',
@@ -143,6 +143,59 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		and:
 			etlProcessor.currentRowIndex == 1
+
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels skiping rows for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Devices',
+				"""application id,vendor name,technology,location
+				   152254,Microsoft,(xlsx updated),ACME Data Center
+				   152255,Mozilla,NGM,ACME Data Center
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						sheet Devices
+						skip 1
+						read labels
+						
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'A column map is created'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		and:
+			etlProcessor.currentRowIndex == 2
 
 
 		cleanup:

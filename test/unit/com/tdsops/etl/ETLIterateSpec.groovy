@@ -205,7 +205,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
-			etlProcessor.currentRowIndex == sixRowsDataSet.readRows()
+			etlProcessor.currentRowIndex == sixRowsDataSet.rowsSize()
 	}
 
 	void 'test can iterate over a range of data source rows'() {
