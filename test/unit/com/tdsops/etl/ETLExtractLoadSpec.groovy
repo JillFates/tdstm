@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -2171,5 +2172,59 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test NOW variable'() {
+
+		given:
+			String iso8601 = TimeUtil.FORMAT_DATE_TIME_ISO8601.replace("'", '')
+			def dataSetCSV = """
+				name
+				fubar
+			""".stripIndent().trim()
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(dataSetCSV)
+
+		and:
+			def scriptContent = """
+				console on
+				domain Device
+				read labels
+				iterate {
+				      extract name load Name
+						load 'Network Interfaces' with NOW
+				}
+			""".stripIndent().trim()
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent, ETLProcessor.class.name)
+
+		then:
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				with(data[0]) {
+					with(fields.assetName) {
+						value == 'fubar'
+						originalValue == 'fubar'
+					}
+
+					with(fields.custom1) {
+						value.indexOf('T') == iso8601.indexOf('T')
+						value.indexOf('Z') == iso8601.indexOf('Z')
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 }
