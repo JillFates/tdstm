@@ -439,7 +439,10 @@ export class APIActionViewEditComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					console.log(res);
+					this.apiActionModel.url = this.apiActionModel.agentMethod.url;
+					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
+					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
+					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
 				} else if (this.lastSelectedAgent) {
 					// Return the value to the previous one
 					this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);

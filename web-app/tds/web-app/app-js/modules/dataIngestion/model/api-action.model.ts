@@ -1,5 +1,6 @@
 import { INTERVAL } from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
+import {AgentMethodModel} from './agent.model';
 
 export class APIActionColumnModel {
 	columns: any[];
@@ -100,10 +101,7 @@ export class APIActionModel {
 	id?: number;
 	name: string;
 	description: string;
-	agentMethod?: {
-		id?: number,
-		name?: string
-	};
+	agentMethod?: AgentMethodModel;
 	agentClass?: {
 		id?: number,
 		name?: string
@@ -143,34 +141,34 @@ export class APIActionModel {
 		id?: number,
 		name?: string
 	};
-	url?: '';
+	url?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
 
 	constructor() {
 		this.name = '';
 		this.description = '';
-		this.provider = { id: null, name: '' };
-		this.agentClass = { id: null, name: '' };
-		this.agentMethod = { id: null, name: ''};
+		this.provider = {id: null, name: ''};
+		this.agentClass = {id: null, name: ''};
+		this.agentMethod = new AgentMethodModel();
 		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
 		this.url = '';
-		this.polling =  {
-				frequency: {
-					value: 0,
-					interval: INTERVAL.SECONDS
-				},
-				lapsedAfter: {
-					value: 0,
-					interval: INTERVAL.MINUTES
-				},
-				stalledAfter: {
-					value: 0,
-					interval: INTERVAL.MINUTES
-				}
-			};
+		this.polling = {
+			frequency: {
+				value: 0,
+				interval: INTERVAL.SECONDS
+			},
+			lapsedAfter: {
+				value: 0,
+				interval: INTERVAL.MINUTES
+			},
+			stalledAfter: {
+				value: 0,
+				interval: INTERVAL.MINUTES
+			}
+		};
 		APIActionModel.createBasicReactions(this);
 	}
 
