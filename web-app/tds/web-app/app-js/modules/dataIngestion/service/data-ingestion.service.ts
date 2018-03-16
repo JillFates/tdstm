@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
@@ -16,6 +17,9 @@ import {DOMAIN} from '../../../shared/model/constants';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
+const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
+const UNITS_SIZE_SEPARATOR = 'x';
+
 @Injectable()
 export class DataIngestionService {
 
@@ -26,7 +30,7 @@ export class DataIngestionService {
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
@@ -592,5 +596,25 @@ export class DataIngestionService {
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());
+	}
+	private getUserPreference(preferenceName: string): Observable<any> {
+		return this.preferenceService.getPreference(preferenceName);
+	}
+
+	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
+		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
+			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
+			.filter((size: string) => Boolean(size))
+			.map((size: string) => {
+				let measure: string[] = size.split(UNITS_SIZE_SEPARATOR);
+				let	width = Number(measure.length &&  measure.shift()) || null;
+				let height = Number(measure.length &&  measure.shift()) || null;
+				return { width, height };
+			})
+			.filter((size: any) =>  size.width !== null && size.height !== null);
+	}
+
+	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
+		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
 }

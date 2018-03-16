@@ -1,4 +1,6 @@
 import {Component, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import {Observable} from 'rxjs/Rx';
+
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
@@ -10,8 +12,6 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
-
-const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
 
 @Component({
 	selector: 'data-script-etl-builder',
@@ -44,22 +44,10 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.collapsed.code = false;
 		}, 300);
 
-		this.preferenceService.getPreference(DATA_SCRIPT_SIZE_PREFERENCE)
-			.subscribe((result: any) => {
-				try {
-					const size = this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE];
-					if (size) {
-						let measure: string[] = size.split('x');
-						if (measure.length) {
-							this.width = Number(measure.length &&  measure.shift() || this.width);
-							this.height = Number(measure.length &&  measure.shift() || this.height);
-						}
-					}
-				} catch (e) {
-					console.log(`Wrong format getting ${DATA_SCRIPT_SIZE_PREFERENCE}`);
-				}
-			}, (error) => {
-				console.log(error);
+		this.dataIngestionService.getDataScriptDesignerSize()
+			.subscribe((size: {width: number, height: number}) => {
+				this.width = size.width;
+				this.height = size.height;
 			});
 	}
 
@@ -133,21 +121,18 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				newEtlScriptCode: this.script
 			};
 			this.saveSizeDataScriptDesigner()
-				.then(() => this.close(result))
-				.catch((error) => console.log(error));
+				.subscribe(() => this.close(result), (error) => console.log(error));
 		}
 	}
 
-	private saveSizeDataScriptDesigner(): Promise<any> {
-		return new Promise((resolve, reject) => {
-			const unit = 'px';
-			const style = this.resizableForm.nativeElement.style;
-			const width = (style && style.width || this.width.toString()).replace(unit, '');
-			const height = (style && style.height || this.height.toString()).replace(unit, '');
-			this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}x${height}`)
-				.subscribe((data) => resolve(data),
-					(error) => reject(error));
-		});
+	private saveSizeDataScriptDesigner(): Observable<any> {
+		const { width, height } = this.resizableForm.nativeElement.style;
+
+		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
+			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
+			.shift();
+
+		return this.dataIngestionService.saveSizeDataScriptDesigner(sizeDataScript.width, sizeDataScript.height);
 	}
 
 	private onSave(): void {
