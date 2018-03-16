@@ -425,24 +425,40 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * Loads field values in results. From an extracted value or just as a fixed new Element
-	 * @param field
+	 * Load a domain property using an explicit value. It could be a simple String,
+	 * a DOMAIN or SOURCE reference, or a CE/local variable.
+	 * <pre>
+	 *    domain Application
+	 *    load assetName with 'Asset Name'
+	 *    load assetName with CE
+	 *    load assetName with myLocalVariable
+	 *    load assetName with DOMAIN.id
+	 *    load assetName with SOURCE.'data name'
+	 * </pre>
+	 * @param fieldName
 	 * @return
 	 */
-	def load (final String field) {
+	def load(final String fieldName) {
+		[
+			with: { value ->
 
-		if (currentElement) {
-			currentElement.load(field)
-		}
+				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
+				Element newElement = currentRow.addNewElement(ETLValueHelper.stringValueOf(value), fieldSpec, this)
+				addElementLoaded(selectedDomain, newElement)
+				newElement
+			}
+		]
+
 	}
 
 	/**
-	 * Set field values in results. From an extracted value or just as a fixed new Element.
-	 * Set an Element that create new results loading values without extract previously
+	 * Create a local variable using variableName parameter.
+	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		set environment with Production
+	 *	    ...
+	 *		set environment with 'Production'
 	 *		set environment with SOURCE.'application id'
 	 *		set environment with DOMAIN.id
 	 *		.....
@@ -451,19 +467,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def set(final String field) {
+	def set(final String variableName) {
 		[
 			with: { value ->
-
-				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
-
-				Element newElement = currentRow.addNewElement(value, this)
-				newElement.fieldSpec = fieldSpec
-				newElement.fieldSpec.label = fieldSpec.label
-				newElement.fieldSpec.type = fieldSpec.type
-
-				addElementLoaded(selectedDomain, newElement)
-				newElement
+				Element localVariable = currentRow.addNewElement(ETLValueHelper.stringValueOf(value))
+				addDynamicVariable(variableName, localVariable)
+				localVariable
 			}
 		]
 	}
@@ -491,12 +500,8 @@ class ETLProcessor implements RangeChecker {
 
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
-				Element newElement = currentRow.addNewElement("", this)
+				Element newElement = currentRow.addNewElement("", fieldSpec, this)
 				newElement.init = ETLValueHelper.stringValueOf(defaultValue)
-				newElement.fieldSpec = fieldSpec
-				newElement.fieldSpec.label = fieldSpec.label
-				newElement.fieldSpec.type = fieldSpec.type
-
 				addElementLoaded(selectedDomain, newElement)
 				newElement
 			}

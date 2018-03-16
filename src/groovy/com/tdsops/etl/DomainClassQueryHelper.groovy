@@ -23,10 +23,10 @@ import net.transitionmanager.domain.Room
  *
  * In to this HQL query:
  *  <pre>
- *      select AE
- *          from AssetEntity AE
- *          where  AE.project = :project
- *            and AE.id = : id
+ *      select D
+ *          from AssetEntity D
+ *          where  D.project = :project
+ *            and D.id = : id
  *  </pre>
  */
 class DomainClassQueryHelper {
@@ -57,13 +57,13 @@ class DomainClassQueryHelper {
 				assets = nonAssetEntities(Room, project, fieldsSpec)
 				break
 			case { Manufacturer.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Manufacturer, project, fieldsSpec)
+				assets = manufacturers(fieldsSpec)
 				break
 			case { MoveBundle.isAssignableFrom(it) }:
 				assets = nonAssetEntities(MoveBundle, project, fieldsSpec)
 				break
 			case { Model.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Model, project, fieldsSpec)
+				assets = models(fieldsSpec)
 				break
 			case { Person.isAssignableFrom(it) }:
 				assets = nonAssetEntities(Person, project, fieldsSpec)
@@ -88,10 +88,10 @@ class DomainClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select AE
-              from AssetEntity AE
-             where AE.project = :project
-               and AE.assetClass = :assetClass
+            select D
+              from AssetEntity D
+             where D.project = :project
+               and D.assetClass = :assetClass
 			   and $hqlWhere """.stripIndent()
 
 		return AssetEntity.executeQuery(hql, [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec))
@@ -131,13 +131,53 @@ class DomainClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select AE
-              from AssetDependency AE
+            select D
+              from AssetDependency D
              where $hqlWhere  
         """.stripIndent()
 
 		Map<String, ?> params = hqlParams(fieldsSpec)
 		return AssetDependency.executeQuery(hql, params)
+	}
+
+	/**
+	 * Executes an HQL query looking for those all models referenced by params.
+	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @return a list of Model returned by an HQL query
+	 * @see Model
+	 */
+	static List<Model> models(Map<String, ?> fieldsSpec) {
+
+		String hqlWhere = hqlWhere(fieldsSpec)
+
+		String hql = """
+            select D
+              from Model D
+             where $hqlWhere  
+        """.stripIndent()
+
+		Map<String, ?> params = hqlParams(fieldsSpec)
+		return Model.executeQuery(hql, params)
+	}
+
+	/**
+	 * Executes an HQL query looking for those all manufacturers referenced by params.
+	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @return a list of manufacturers returned by an HQL query
+	 * @see Model
+	 */
+	static List<Manufacturer> manufacturers(Map<String, ?> fieldsSpec) {
+
+		String hqlWhere = hqlWhere(fieldsSpec)
+
+		String hql = """
+            select D
+              from Manufacturer D
+             where $hqlWhere  
+        """.stripIndent()
+
+		Map<String, ?> params = hqlParams(fieldsSpec)
+		return Manufacturer.executeQuery(hql, params)
 	}
 
 	/**
@@ -169,7 +209,7 @@ class DomainClassQueryHelper {
 		"id": [transform: { String value -> NumberUtil.toLong(value) }]
 	].withDefault { String key ->
 		[
-			property: "AE." + key,
+			property: "D." + key,
 			namedParamter: key,
 			join: "",
 			transform: { String value -> value?.trim() }]
@@ -178,56 +218,56 @@ class DomainClassQueryHelper {
 	//TODO: Review this with John. Where I can put those commons configurations?
 	private static final Map<String, Map> assetEntityTransformations = [
 		"id": [
-			property: "AE.id",
+			property: "D.id",
 			namedParamter: "id",
 			join: "",
 			transform: { String value -> Long.parseLong(value) }
 		],
 		"moveBundle": [
-			property: "AE.moveBundle.name",
+			property: "D.moveBundle.name",
 			namedParamter: "moveBundleName",
-			join: "left outer join AE.moveBundle",
+			join: "left outer join D.moveBundle",
 			transform: { String value -> value?.trim() }
 		],
 		"project": [
-			property: "AE.project.description",
+			property: "D.project.description",
 			namedParamter: "projectDescription",
-			join: "left outer join AE.project",
+			join: "left outer join D.project",
 			transform: { String value -> value?.trim() }
 		],
 		"manufacturer": [
-			property: "AE.manufacturer.name",
+			property: "D.manufacturer.name",
 			namedParamter: "manufacturerName",
-			join: "left outer join AE.manufacturer",
+			join: "left outer join D.manufacturer",
 			transform: { String value -> value?.trim() }
 		],
 		"sme": [
-			property: "AE.sme.firstName",
+			property: "D.sme.firstName",
 			namedParamter: "smeFirstName",
-			join: "left outer join AE.sme",
+			join: "left outer join D.sme",
 			transform: { String value -> value?.trim() }
 		],
 		"sme2": [
-			property: "AE.sme2.firstName",
+			property: "D.sme2.firstName",
 			namedParamter: "sme2FirstName",
-			join: "left outer join AE.sme2",
+			join: "left outer join D.sme2",
 			transform: { String value -> value?.trim() }
 		],
 		"model": [
-			property: "AE.model.modelName",
+			property: "D.model.modelName",
 			namedParamter: "modelModelName",
-			join: "left outer join AE.model",
+			join: "left outer join D.model",
 			transform: { String value -> value?.trim() }
 		],
 		"appOwner": [
-			property: "AE.appOwner.firstName",
+			property: "D.appOwner.firstName",
 			namedParamter: "appOwnerFirstName",
-			join: "left outer join AE.appOwner",
+			join: "left outer join D.appOwner",
 			transform: { String value -> value?.trim() }
 		]
 	].withDefault { String key ->
 		[
-			property: "AE." + key,
+			property: "D." + key,
 			namedParamter: key,
 			join: "",
 			transform: { String value -> value?.trim() }]

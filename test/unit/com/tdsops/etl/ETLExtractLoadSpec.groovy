@@ -561,7 +561,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can use if else groovy clause to load a field with an extracted element value'() {
+	void 'test can load a field using a string literal'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -580,13 +580,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-					
 						extract 'vendor name' 
-						
 						if ( CE == 'Microsoft'){
-							load appVendor
+							load Name with 'This is a Microsoft Application'
 						} else {
-							load environment
+							load environment with 'This is not a Microsoft Application'
 						}
 					}
 				""".stripIndent(),
@@ -596,6 +594,60 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
+				fields == ['assetName', 'environment'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.assetName) {
+						value == 'This is a Microsoft Application'
+						originalValue == 'This is a Microsoft Application'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.environment) {
+						value == 'This is not a Microsoft Application'
+						originalValue == 'This is not a Microsoft Application'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field using CE'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' 
+						if ( CE == 'Microsoft'){
+							load appVendor with CE
+						} else {
+							load environment with CE
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment'] as Set
 				data.size() == 2
 				with(data[0]) {
 					rowNum == 1
@@ -615,7 +667,149 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can set a an extracted element in a variable'() {
+	void 'test can load a field using DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						extract 'location' load environment
+						
+						if ( CE == 'Microsoft'){
+							load Name with DOMAIN.appVendor
+						} else {
+							load Name with DOMAIN.environment
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field using SOURCE.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						extract 'location' load environment
+						
+						if ( CE == 'Microsoft'){
+							load Name with SOURCE.'vendor name'
+						} else {
+							load Name with SOURCE.'application id'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == '152254'
+						originalValue == '152254'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == '152255'
+						originalValue == '152255'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field with a local variable'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -635,11 +829,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myVar = CE
-						if ( myVar == 'Microsoft'){
-							load appVendor
+						def myLocalVariable = CE
+						
+						if ( myLocalVariable == 'Microsoft'){
+							load appVendor with myLocalVariable
 						} else {
-							load environment
+							load environment with myLocalVariable
 						}
 					}
 				""".stripIndent(),
@@ -856,13 +1051,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						set environment with Production
+						load environment with 'Production'
 						extract 1 load id
 						extract 'vendor name' load appVendor
 							
 						domain Device
 						extract 1 load id 
-						set location with 'Development'        
+						load location with 'Development'        
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1083,9 +1278,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (DOMAIN.appVendor.startsWith('Mi')){
-							set environment with 'Production'
+							load environment with 'Production'
 						} else {
-							set environment with 'Development'
+							load environment with 'Development'
 						}
 					}
 				""".stripIndent(),
@@ -1223,9 +1418,9 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 					iterate {
 						extract 'vendor name' load appVendor
 						if (!SOURCE.technology.startsWith('NGM')){
-							set environment with 'Production'
+							load environment with 'Production'
 						} else {
-							set environment with 'Development'
+							load environment with 'Development'
 						}
 					}
 				""".stripIndent(),
@@ -1352,7 +1547,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
+				fields == ['id', 'assetName'] as Set
 				data.size() == 1
 				with(data[0]){
 					rowNum == 1
@@ -1361,7 +1556,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 						originalValue == '152254'
 					}
 
-					with(fields.name) {
+					with(fields.assetName) {
 						value == '(xlsx updated)'
 						originalValue == '(xlsx updated)'
 					}
@@ -1400,7 +1595,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 							extract 'application id' load id
 							extract technology load Name
 							
-							if(DOMAIN.name.contains('updated')){
+							if(DOMAIN.assetName.contains('updated')){
 								ignore row
 							} else {
 								domain Database
@@ -1434,7 +1629,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
+				fields == ['id', 'assetName'] as Set
 				data.isEmpty()
 			}
 	}
@@ -1494,7 +1689,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 						if( CE == 'NGM') {
 							ignore row
 						} else {
-							load Name
+							load Name with CE
 						}
 					}
 				""".stripIndent(),
@@ -1534,7 +1729,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 						if( CE != 'NGM') {
 							ignore row
 						} else {
-							load Name
+							load Name with CE
 						}
 					}
 				""".stripIndent(),
@@ -1586,20 +1781,306 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
+				fields == ['id', 'assetName'] as Set
 				data.size() == 5
 
 				data*.rowNum == [1, 2, 4, 5, 6]
 				data.collect{ it.fields.id.value } == [
 					'152251', '152252', '152254', '152255', '152256'
 				]
-				data.collect{ it.fields.name.value } == [
+				data.collect{ it.fields.assetName.value } == [
 					'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
 				]
-				data.collect{ it.fields.name.originalValue } == [
+				data.collect{ it.fields.assetName.originalValue } == [
 					'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
 				]
 			}
 	}
 
+	void 'test can set a local variable with a string literal'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade
+""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							set myLocalVariable with 'Custom Name'
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can set a local variable with a SOURCE.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade
+""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							set myLocalVariable with SOURCE.'name'
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'xraysrv01'
+						originalValue == 'xraysrv01'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'zuludb01'
+						originalValue == 'zuludb01'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can set a local variable with a DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade
+""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							extract type load environment
+							set myLocalVariable with DOMAIN.environment
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.environment){
+						value == 'Server'
+						originalValue == 'Server'
+					}
+					with(fields.assetName){
+						value == 'Server'
+						originalValue == 'Server'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.environment){
+						value == 'Blade'
+						originalValue == 'Blade'
+					}
+					with(fields.assetName){
+						value == 'Blade'
+						originalValue == 'Blade'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can set a multiple local variables'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							extract name load Name
+							load custom1 with 'abc'
+							
+							extract mfg set myMfg
+							myMfg += " (" + extract(type) + ")"
+							load Manufacturer with myMfg
+							
+							set anotherVar with 'xyzzy'
+							load custom2 with anotherVar
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'xraysrv01'
+						originalValue == 'xraysrv01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'Dell (Server)'
+						originalValue == 'Dell (Server)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'zuludb01'
+						originalValue == 'zuludb01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'HP (Blade)'
+						originalValue == 'HP (Blade)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
 }

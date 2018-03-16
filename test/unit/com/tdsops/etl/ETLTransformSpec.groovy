@@ -607,7 +607,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 1).value == "slideaway"
 	}
 
-	void 'test can append strings and element in a transformation chain'() {
+	void 'test can append strings and element in a transformation chain using local variables'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -626,8 +626,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myVar
-						extract 'location' transform with append(' - ', myVar) load description
+						extract 'vendor name' transform with lowercase() set myLocalVariable
+						extract 'location' transform with append(' - ', myLocalVariable) load description
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -695,7 +695,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			etlProcessor.getElement(2, 3).value == "Development"
 	}
 
-	void 'test can plus strings, current element and a defined variable in a transformation'() {
+	void 'test can plus strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -714,8 +714,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 								
 					iterate {
-						extract 'vendor name' transform with lowercase() set myVar
-						extract 'location' transform with append(myVar + ' - ' + CE) load description
+						extract 'vendor name' transform with lowercase() set myLocalVariable
+						extract 'location' transform with append(myLocalVariable + ' - ' + CE) load description
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -736,7 +736,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can append strings, current element and a defined variable in a transformation'() {
+	void 'test can append strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -755,8 +755,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-					extract 'vendor name' transform with lowercase() set myVar
-					extract 'location' transform with append('-', myVar, '-' , CE ) load description
+					extract 'vendor name' transform with lowercase() set myLocalVariable
+					extract 'location' transform with append('-', myLocalVariable, '-' , CE ) load description
 				}""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -776,7 +776,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can append strings and elements in a transformation'() {
+	void 'test can append strings and elements in a transformation using local variables'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -795,8 +795,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myVar
-						extract 'location' transform with append(' - ', myVar, ' - ') load description
+						extract 'vendor name' transform with lowercase() set myLocalVariable
+						extract 'location' transform with append(' - ', myLocalVariable, ' - ') load description
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -817,7 +817,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can use a set element in a transformation'() {
+	void 'test can use a set element in a transformation using local variables'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -836,8 +836,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myVar
-						extract 'location' transform with append(' - ', myVar) load description
+						extract 'vendor name' transform with lowercase() set myLocalVariable
+						extract 'location' transform with append(' - ', myLocalVariable) load description
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
