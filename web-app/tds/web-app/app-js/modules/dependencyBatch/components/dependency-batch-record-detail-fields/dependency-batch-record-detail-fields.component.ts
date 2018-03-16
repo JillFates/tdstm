@@ -23,7 +23,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		name: string,
 		currentValue: string,
 		importValue: string,
-		error: boolean,
+		errors: Array<string>,
+		errorsAsString: string,
 		overridedValue: string
 	}>;
 	private state: State = {
@@ -43,6 +44,12 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 			field: 'name',
 			value: '',
 			operator: 'contains',
+			ignoreCase: true
+		},
+		errorsFilter: {
+			field: 'errorsAsString',
+			value: '',
+			operator: 'isnotempty',
 			ignoreCase: true
 		}
 	};
@@ -90,7 +97,8 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 					? fields[fieldName].value : '(null)',
 				importValue: !ValidationUtils.isEmptyObject(fields[fieldName].originalValue)
 					? fields[fieldName].originalValue : '(null)',
-				error: fields[fieldName].error,
+				errors: fields[fieldName].errors,
+				errorsAsString: fields[fieldName].errors ? fields[fieldName].errors.join() : '',
 				overridedValue: null
 			});
 		}
@@ -171,6 +179,7 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 		this.dependencyBatchService.processBatchRecords(this.importBatch.id, ids)
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.loadRecordFieldDetails();
 					this.updateSuccessEvent.emit();
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on Process batch record.');
@@ -206,6 +215,20 @@ export class DependencyBatchRecordDetailFieldsComponent implements OnInit {
 	 * On Text Filter input change it's value.
 	 */
 	private onTextFilter(): void {
+		this.gridData = process(this.fieldsInfo, this.state);
+	}
+
+	/**
+	 * On Fields Filter dropdown select change.
+	 * @param {{text: string; value: number}} $event
+	 */
+	private onFieldsFilter($event: {text: string, value: number}): void {
+		if ($event.value === 2) {
+			this.state.filter.filters.push(this.fieldsFilter.errorsFilter);
+		} else {
+			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === 'errorsAsString');
+			this.state.filter.filters.splice(filterIndex, 1);
+		}
 		this.gridData = process(this.fieldsInfo, this.state);
 	}
 

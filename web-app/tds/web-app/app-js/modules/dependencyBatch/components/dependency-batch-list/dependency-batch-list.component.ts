@@ -324,7 +324,10 @@ export class DependencyBatchListComponent {
 				} else {
 					this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
 				}
-			}, error => this.handleError(error));
+			}, error => {
+				this.clearBatchStatusLooper();
+				this.handleError(error);
+			});
 		}
 		console.log(runningBatches);
 	}
