@@ -356,11 +356,13 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor skip (Integer amount) {
-		if (amount + currentRowIndex <= this.dataSetFacade.rowsSize()) {
-			currentRowIndex += amount
-		} else {
-			throw ETLProcessorException.invalidSkipStep(amount)
-		}
+//		if (amount + currentRowIndex <= this.dataSetFacade.rowsSize()) {
+//			currentRowIndex += amount
+//		} else {
+//			throw ETLProcessorException.invalidSkipStep(amount)
+//		}
+		currentRowIndex += amount
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		return this
 	}
 

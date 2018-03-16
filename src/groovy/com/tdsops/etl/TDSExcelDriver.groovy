@@ -26,6 +26,7 @@ class TDSExcelDriver extends ExcelDriver {
 		String fullPath = FileUtils.ConvertToDefaultOSPath(path + File.separator + fileName)
 		boolean warnings = params.showWarnings
 
+		dataset.field = fields(dataset)
 		if (dataset.field.isEmpty()) throw new ExceptionGETL("Required fields description with dataset")
 		if (!path) throw new ExceptionGETL("Required \"path\" parameter with connection")
 		if (!fileName) throw new ExceptionGETL("Required \"fileName\" parameter with connection")
@@ -36,10 +37,8 @@ class TDSExcelDriver extends ExcelDriver {
 		def ln = datasetParams.listName?:0
 		def header = BoolUtils.IsValue([params.header, datasetParams.header], false)
 
-		def offset = params.offset?:datasetParams.offset
-
-		Number offsetRows = offset?.rows?:0
-		Number offsetCells = offset?.cells?:0
+		Number offsetRows = dataset.params.currentRowIndex?:0
+		Number offsetCells = 0
 
 		long countRec = 0
 
@@ -87,7 +86,7 @@ class TDSExcelDriver extends ExcelDriver {
 	protected List<Field> fields(Dataset dataset) {
 
 		Workbook workbook = getWorkbook(dataset)
-		Integer rowLabels = dataset.params.rowLabels ?:0
+		Integer currentRowIndex = dataset.params.currentRowIndex ?:0
 		String sheetName = ((ExcelDataset)dataset).listName
 		String sheetNumber = dataset.params.sheetNumber ?:0
 
@@ -96,7 +95,7 @@ class TDSExcelDriver extends ExcelDriver {
 		}
 
 		XSSFSheet sheet = WorkbookUtil.getSheetFromWorkbook(workbook, sheetName)
-		List<Cell> cells = WorkbookUtil.getCellsForSheet(rowLabels, sheet)
+		List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
 		List<Field> fields = []
 		cells.each { Cell cell ->
 			fields << new Field(name: cellValue(cell), type: cellType(cell))
@@ -112,7 +111,7 @@ class TDSExcelDriver extends ExcelDriver {
 	 */
 	private String cellValue(Cell cell){
 		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
-		return cell.toString()
+		return cell.toString().trim()
 	}
 
 	/**

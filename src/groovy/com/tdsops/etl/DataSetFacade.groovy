@@ -54,4 +54,7 @@ class DataSetFacade {
 		((ExcelDataset)dataSet).setListName(sheetName)
 	}
 
+	void setCurrentRowIndex(int currentRowIndex) {
+		dataSet.params.currentRowIndex = currentRowIndex
+	}
 }
