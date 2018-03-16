@@ -819,6 +819,8 @@ class DataImportService implements ServiceMethods {
 				}
 			}
 
+// TODO : JPM 3/2018 : Need to review the md5 / cache - Here we just created assets that should be cached.
+
 			if (dependency) {
 				// Now add/update the remaining properties on the domain entity appropriately
 				bindFieldsInfoValuesToEntity(dependency, fieldsInfo, ['asset', 'dependent'])
