@@ -123,6 +123,10 @@ class MenuModule extends Module {
         tasksCookbookItem       { tasksMenu.find("li.menu-parent-tasks-cookbook")}
         tasksGenHistoryItem     { tasksMenu.find("li.menu-parent-tasks-generation-history")}
         tasksImportItem         { tasksMenu.find("li.menu-parent-tasks-import-tasks")}
+
+        projectName             { menuContainer.find("li a#nav-project-name")}
+        projectLicenseIcon      { menuContainer.find("li a.licensing-error-warning i.fa-warning")}
+        projectLicenseIconHidden{ menuContainer.find("div.navbar-custom-menu li")[1]}
     }
 
     def selectMenu(menuItem) {
@@ -171,6 +175,18 @@ class MenuModule extends Module {
     def goToTasksCookbook(){
         selectMenu(tasksItem)
         selectItem(tasksCookbookItem)
+    }
+
+    def assertProjectName(name){
+        projectName.text() == name
+    }
+
+    def assertLicenseIconVisible(){
+        projectLicenseIcon.isDisplayed()
+    }
+
+    def assertLicenseIconNotVisible(){
+        projectLicenseIconHidden.text() == ""
     }
 
     // TODO Add remains menu items here
