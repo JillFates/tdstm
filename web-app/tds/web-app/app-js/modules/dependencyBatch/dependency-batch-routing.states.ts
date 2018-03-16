@@ -17,9 +17,9 @@ export const dependencyBatchList: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	url: DependencyBatchStates.DEPENDENCY_BATCH_LIST.url,
 	data: {
 		page: {
-			title: 'DEPENDENCY_BATCH.MANAGE_LIST',
+			title: 'IMPORT_BATCH.MANAGE_LIST',
 			instruction: '',
-			menu: ['DEPENDENCY_BATCH.DEPENDENCY_BATCH', 'DEPENDENCY_BATCH.MANAGE_LIST'],
+			menu: ['IMPORT_BATCH.DEPENDENCY_BATCH', 'IMPORT_BATCH.MANAGE_LIST'],
 			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-manage-dep-batches'}
 		},
 		requiresAuth: true,

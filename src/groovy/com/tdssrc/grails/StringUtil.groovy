@@ -4,6 +4,7 @@ import com.tdsops.common.lang.CollectionUtils
 import groovy.json.StringEscapeUtils
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.codec.digest.DigestUtils
 
 /**
  * String manipulation methods.
@@ -426,5 +427,14 @@ class StringUtil {
 			compareTo = compareTo.toUpperCase()
 		}
 		return compareTo.contains(str)
+	}
+
+	/**
+	 * Calculates the MD5 digest and returns the value as a 32 character hex string
+	 * @param text - the text to convert
+	 * @return the MD5 equivalent hash
+	 */
+	static String md5Hex(String text) {
+		return DigestUtils.md5Hex(text)
 	}
 }

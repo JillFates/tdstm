@@ -141,19 +141,33 @@ class ImportBatchRecord {
 	Map toMap(boolean minimalInfo = false) {
 		Map domainMap = [
 			id: id,
+			importBatch: [ id: importBatch.id ],
 			domainPrimaryId: domainPrimaryId,
 			duplicateReferences: duplicateReferences,
 			errorCount: errorCount,
 			ignored: ignored,
-			importBatch : importBatch.id,
 			lastUpdated: lastUpdated,
 			operation: operation.name(),
 			sourceRowId: sourceRowId,
-			status: status.name(),
+			status: [
+				code: status.name(),
+				label: status.toString()
+			],
 			warn: warn
 		]
 
-		if (! minimalInfo) {
+		if (minimalInfo) {
+			// Populate the currentValues map with the current values from the fieldsInfo
+			// for each field specified in the batch
+			//
+			domainMap.currentValues = [:]
+			Map info = fieldsInfoAsMap()
+			for ( fieldName in importBatch.fieldNameListAsList() ) {
+				def value = (info.containsKey(fieldName) ? info[fieldName].value : null)
+				domainMap.currentValues[fieldName] = value
+			}
+		} else {
+			// Populate the full errors and fieldsInfo sections instead of the currentValues
 			domainMap.errorList = errorListAsList()
 			domainMap.fieldsInfo = fieldsInfoAsMap()
 		}
@@ -165,7 +179,7 @@ class ImportBatchRecord {
 	 * Used to access the errors property as an Object instead of JSON
 	 */
 	List<Map> errorListAsList() {
-		return JsonUtil.parseJsonList(errors)
+		return JsonUtil.parseJsonList(errorList)
 	}
 
 	/**
@@ -188,4 +202,15 @@ class ImportBatchRecord {
 	// 	fieldsInfo = JsonUtil.toJson(value)
 	// }
 
+	// Used to clear out any existing errors on the record
+	void resetErrors() {
+		errorList = '[]'
+	}
+
+	// Used to add an error message to the list
+	void addError(String error) {
+		List errors = JsonUtil.parseJsonList(errorList)
+		errors << error
+		errorList = JsonUtil.toJson(errors)
+	}
 }
