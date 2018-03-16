@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils
 
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.lang.Ignore
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.exceptions.GrailsDomainException
@@ -628,6 +629,11 @@ class GormUtilIntegrationSpec extends Specification {
 			Project			| 'description'	| false
 			new Project()	| 'client'		| true
  			new Project()	| 'description'	| false
+	}
+
+	@Ignore
+	void '25. knock the crap out of this new bindMapToDomain method'() {
+
 	}
 
 }
