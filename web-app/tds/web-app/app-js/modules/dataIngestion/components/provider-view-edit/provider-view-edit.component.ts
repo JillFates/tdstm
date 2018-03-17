@@ -97,7 +97,7 @@ export class ProviderViewEditComponent implements OnInit {
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
 				'Confirm', 'Cancel')
-				.then(result => {
+				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();
 					} else {
