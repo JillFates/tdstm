@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild, Renderer2 } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -20,8 +20,8 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 })
 export class DataScriptViewEditComponent implements OnInit {
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptContainer') dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
-	private currentEditedField: EventTarget;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
 	public dataScriptMode = DataScriptMode;
@@ -41,8 +41,7 @@ export class DataScriptViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private dialogService: UIDialogService,
-		private renderer: Renderer2) {
+		private dialogService: UIDialogService) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
@@ -93,8 +92,6 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.currentEditedField = null;
-
 		this.datasourceName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
@@ -135,6 +132,10 @@ export class DataScriptViewEditComponent implements OnInit {
 		return this.dataSignature !== JSON.stringify(copy);
 	}
 
+	private focusForm() {
+		this.dataScriptContainer.nativeElement.focus();
+	}
+
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
@@ -144,19 +145,14 @@ export class DataScriptViewEditComponent implements OnInit {
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
 				'Confirm', 'Cancel')
-				.then(result => {
-					if (result) {
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
 				})
-				.catch((error) => {
-					// user canceled confirmation dialog
-					// return the focus to the control which user was editing
-					if (this.currentEditedField !== null) {
-						const currentField = this.renderer.selectRootElement(this.currentEditedField);
-						currentField.focus();
-					}
-				});
+				.catch((error) => console.log(error));
 		} else {
 			if (this.etlScriptCode.updated) {
 				this.activeDialog.close();
@@ -171,6 +167,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected changeToEditDataScript(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.focusForm();
 	}
 
 	/**
@@ -224,9 +221,4 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			});
 	}
-
-	protected onFocus(event: FocusEvent) {
-		this.currentEditedField = (event && event.target) || null;
-	}
-
 }

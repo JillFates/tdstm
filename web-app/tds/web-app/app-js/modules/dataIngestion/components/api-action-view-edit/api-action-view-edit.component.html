@@ -1,4 +1,4 @@
-<div class="modal-content api-action-view-edit-component" tabindex="0">
+<div class="modal-content api-action-view-edit-component"  #apiActionContainer tabindex="0">
 	<div class="modal-header">
 		<button (click)="cancelCloseDialog()" type="button"  tds-autofocus="" class="close" aria-label="Close">
 			<span aria-hidden="true">×</span>
@@ -30,7 +30,7 @@
 												<span style="color: red;" *ngIf="modalType !== actionTypes.VIEW">*</span>
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input (focus)="onFocus($event)" type="text" id="apiActionName" name="apiActionName" class="form-control" [(ngModel)]="apiActionModel.name"
+												<input type="text" id="apiActionName" name="apiActionName" class="form-control" [(ngModel)]="apiActionModel.name"
 													   required [ngClass]="{'has-error': (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.name.length <= 0}" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -48,7 +48,6 @@
 																	[data]="providerList"
 																	[textField]="'name'"
                                                                     [valueField]="'id'"
-																	(focus)="onFocus($event)"
 																	[(ngModel)]="apiActionModel.provider" required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.provider?.id == 0}"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -58,7 +57,7 @@
 										<div class="form-group">
 											<label for="apiActionDescription" class="col-sm-3 control-label">Description:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea (focus)="onFocus($event)" type="text" id="apiActionDescription" name="apiActionDescription" class="form-control" [(ngModel)]="apiActionModel.description"></textarea>
+												<textarea type="text" id="apiActionDescription" name="apiActionDescription" class="form-control" [(ngModel)]="apiActionModel.description"></textarea>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.description}}</label>
@@ -75,7 +74,6 @@
 																	(valueChange)="onAgentValueChange($event)"
 																	[textField]="'name'"
 																	[valueField]="'id'"
-																	(focus)="onFocus($event)"
 																	[(ngModel)]="apiActionModel.agentClass"
 																	required class="form-control" [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentClass?.id == 0}"></kendo-dropdownlist>
 											</div>
@@ -94,7 +92,6 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	(open)="onOpenAgentMethod()"
-																	(focus)="onFocus($event)"
 																	[(ngModel)]="apiActionModel.agentMethod"
 																	[disabled]="apiActionModel.agentClass.id === 0"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == 0}">
@@ -117,7 +114,6 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
                                                                     [disabled]="apiActionModel.provider.id === 0"
-																	(focus)="onFocus($event)"
 																	[(ngModel)]="apiActionModel.credential"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -127,7 +123,7 @@
 										<div class="form-group">
 											<label for="apiActionEndpointURL" class="col-sm-3 control-label">Endpoint URL:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input (focus)="onFocus($event)" type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
+												<input type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
@@ -136,7 +132,7 @@
 										<div class="form-group">
 											<label for="apiActionEndpointPath" class="col-sm-3 control-label">Endpoint Path:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input (focus)="onFocus($event)" type="text" id="apiActionEndpointPath" name="apiActionEndpointPath" class="form-control" [(ngModel)]="apiActionModel.endpointPath" />
+												<input type="text" id="apiActionEndpointPath" name="apiActionEndpointPath" class="form-control" [(ngModel)]="apiActionModel.endpointPath" />
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.endpointPath}}</label>
@@ -146,7 +142,7 @@
 									<div class="col-md-5">
 										<div class="form-check">
 											<label class="form-check-label aligned-label" for="apiActionPollingInterval">
-												<input (focus)="onFocus($event)" type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
+												<input type="checkbox" id="apiActionPollingInterval" name="apiActionPollingInterval" [(ngModel)]="apiActionModel.isPolling" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Polling
 											</label>
 											<popup-polling></popup-polling>
@@ -160,7 +156,6 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.frequency.value"
-														(focus)="onFocus($event)"
 														[disabled]="!apiActionModel.isPolling"
 														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
@@ -171,7 +166,6 @@
 														[data]="intervals"
 														[(ngModel)]="selectedInterval.interval"
 														[disabled]="!apiActionModel.isPolling"
-														(focus)="onFocus($event)"
 														(valueChange)="onIntervalChange(selectedInterval, apiActionModel.polling.frequency)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
@@ -189,7 +183,6 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.lapsedAfter.value"
-														(focus)="onFocus($event)"
 														[disabled]="!apiActionModel.isPolling"
 														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
@@ -200,7 +193,6 @@
 														[data]="intervals"
 														[(ngModel)]="selectedLapsed.interval"
 														[disabled]="!apiActionModel.isPolling"
-														(focus)="onFocus($event)"
 														(valueChange)="onIntervalChange(selectedLapsed, apiActionModel.polling.lapsedAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
@@ -218,7 +210,6 @@
 														[min]="0"
 														[max]="100"
 														[(ngModel)]="apiActionModel.polling.stalledAfter.value"
-														(focus)="onFocus($event)"
 														[disabled]="!apiActionModel.isPolling"
 														[required]="apiActionModel.isPolling">
 												</kendo-numerictextbox>
@@ -229,7 +220,6 @@
 														[data]="intervals"
 														[(ngModel)]="selectedStalled.interval"
 														[disabled]="!apiActionModel.isPolling"
-														(focus)="onFocus($event)"
 														(valueChange)="onIntervalChange(selectedStalled, apiActionModel.polling.stalledAfter)"
 														[required]="apiActionModel.isPolling">
 												</kendo-dropdownlist>
@@ -240,7 +230,7 @@
 										</div>
 										<div class="form-check">
 											<label for="apiActionProduceData" class="form-check-label aligned-label">
-												<input (focus)="onFocus($event)" id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
+												<input id="apiActionProduceData" type="checkbox" name="apiActionProduceData" [(ngModel)]="apiActionModel.producesData" [disabled]="modalType === actionTypes.VIEW" class="form-check-input aligned-checkbox">
 												Provides Data
 											</label>
 											<popup-provides-data></popup-provides-data>
@@ -254,7 +244,6 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	[(ngModel)]="apiActionModel.defaultDataScript"
-																	(focus)="onFocus($event)"
 																	[disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"
 																	[ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.producesData && apiActionModel.defaultDataScript?.id == 0}"></kendo-dropdownlist>
 											</div>
@@ -293,7 +282,7 @@
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
 											<div *ngIf="column.type === 'text' && column.property === 'param'">
-												<input (focus)="onFocus($event)" (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
@@ -309,7 +298,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (focus)="onFocus($event)" (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEFINED'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEFINED'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
 												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
@@ -325,7 +314,7 @@
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input (focus)="onFocus($event)" (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
+												<input  (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -358,35 +347,35 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="apiActionModel.eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"> Status
+														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="apiActionModel.eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"> Status
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="true"> Success
+														<input type="checkbox" name="apiActionSuccess" [(ngModel)]="apiActionModel.eventReactions[1].selected" [disabled]="true"> Success
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionDefault" [(ngModel)]="apiActionModel.eventReactions[2].selected" [disabled]="apiActionModel.eventReactions[2].value.length > 0 || modalType === actionTypes.VIEW"> Default
+														<input type="checkbox" name="apiActionDefault" [(ngModel)]="apiActionModel.eventReactions[2].selected" [disabled]="apiActionModel.eventReactions[2].value.length > 0 || modalType === actionTypes.VIEW"> Default
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0 || modalType === actionTypes.VIEW"> Error
+														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0 || modalType === actionTypes.VIEW"> Error
 													</label>
 												</div>
 											</div>
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0 || modalType === actionTypes.VIEW"> Failed
+														<input type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0 || modalType === actionTypes.VIEW"> Failed
 													</label>
 												</div>
 											</div>
@@ -394,14 +383,14 @@
 												<div class="col-md-2" style="width: 70px !important;">
 													<div class="checkbox">
 														<label>
-															<input (focus)="onFocus($event)" type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0 || modalType === actionTypes.VIEW"> Lapsed
+															<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0 || modalType === actionTypes.VIEW"> Lapsed
 														</label>
 													</div>
 												</div>
 												<div class="col-md-2">
 													<div class="checkbox">
 														<label>
-															<input (focus)="onFocus($event)" type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
+															<input  type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
 														</label>
 													</div>
 												</div>
@@ -410,14 +399,14 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
+														<input  type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input (focus)="onFocus($event)" type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Action
+														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Action
 													</label>
 												</div>
 											</div>
@@ -439,7 +428,7 @@
 													<code-mirror #codeMirror id="apiActionStatusDetermination" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[0].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[0].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[0].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -460,7 +449,7 @@
 													<code-mirror #codeMirror id="apiActionSuccess" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[1].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[1].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[1].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[1].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -480,7 +469,7 @@
 													<code-mirror #codeMirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[2].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -500,7 +489,7 @@
 													<code-mirror #codeMirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[3].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -520,7 +509,7 @@
 													<code-mirror #codeMirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[4].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -540,7 +529,7 @@
 													<code-mirror #codeMirror id="apiActionLapsed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[5].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[5].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[5].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -560,7 +549,7 @@
 													<code-mirror #codeMirror id="apiActionStalled" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[6].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[6].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[6].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -581,7 +570,7 @@
 													<code-mirror #codeMirror id="apiActionBeforeCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[7].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[7].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[7].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -601,7 +590,7 @@
 													<code-mirror #codeMirror id="apiActionAfterCall" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[8].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[8].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea (focus)="onFocus($event)" class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
+														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[8].error" readonly></textarea>
 													</div>
 												</div>
 											</div>

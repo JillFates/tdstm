@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, Renderer2} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -59,9 +59,9 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
-	private currentEditedField: EventTarget;
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -132,8 +132,7 @@ export class APIActionViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private dataIngestionService: DataIngestionService,
-		private customDomainService: CustomDomainService,
-		private renderer: Renderer2) {
+		private customDomainService: CustomDomainService) {
 
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
@@ -154,7 +153,6 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.currentEditedField = null;
 		this.prepareFormListener();
 	}
 
@@ -305,19 +303,14 @@ export class APIActionViewEditComponent implements OnInit {
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
 				'Confirm', 'Cancel')
-				.then(result => {
-					if (result) {
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
 				})
-				.catch((error) => {
-					// user canceled confirmation dialog
-					// return the focus to the control which user was editing
-					if (this.currentEditedField !== null) {
-						const currentField = this.renderer.selectRootElement(this.currentEditedField);
-						currentField.focus();
-					}
-				});
+				.catch((error) => console.log(error));
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -340,6 +333,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
 		this.verifyIsValidForm();
+		this.focusForm();
 	}
 
 	/**
@@ -696,8 +690,8 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
-	protected onFocus(event: FocusEvent) {
-		this.currentEditedField = (event && event.target) || null;
+	private focusForm() {
+		this.apiActionContainer.nativeElement.focus();
 	}
 
 }
