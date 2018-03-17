@@ -159,6 +159,7 @@ class ETLProcessor implements RangeChecker {
 				columnsMap[column.label] = column
 			}
 			currentRowIndex++
+			dataSetFacade.setCurrentRowIndex(currentRowIndex)
 			debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
 		}
 		return this
