@@ -37,7 +37,7 @@ export class DependencyBatchRecordDetailDialogComponent extends UIExtraDialog {
 				if (result) {
 					this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
 				}
-			});
+			}, (reason: any) => console.log('confirm rejected', reason));
 		} else {
 			this.close(this.batchRecordUpdatedFlag ? 'reload' : null);
 		}
