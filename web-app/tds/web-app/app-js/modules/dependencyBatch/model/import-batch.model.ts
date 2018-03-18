@@ -10,6 +10,7 @@ export enum BatchStatus {
 	QUEUED = 'QUEUED',
 	COMPLETED = 'COMPLETED',
 	IGNORED = 'IGNORED',
+	STALLED = 'STALLED',
 };
 
 export class ImportBatchModel {
@@ -39,6 +40,7 @@ export class ImportBatchModel {
 	processed: number;
 	ignored: number;
 	currentProgress?: number;
+	stalledCounter? = 0;
 }
 
 /**
