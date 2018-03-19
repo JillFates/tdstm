@@ -29,11 +29,10 @@
                                 (sortChange)="dataGridOperationsHelper.sortChange($event)"
                                 [selectable]="selectableSettings"
                                 [rowSelected]="dataGridOperationsHelper.isRowSelected"
-                                (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchRecordDetail($event)">
-                            <!--
-                                 Toolbar Template
-                            -->
-                            <ng-template kendoGridToolbarTemplate [position]="'top'">
+                                (cellClick)="openBatchRecordDetail($event)">
+
+                        <!-- Toolbar Template -->
+                        <ng-template kendoGridToolbarTemplate [position]="'top'">
                                 <div class="col-sm-1 toolbar-button button-process">
                                     <button (click)="onProcess()"
                                             [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
@@ -64,10 +63,8 @@
                                 </div>
                             </ng-template>
 
-                            <!--
-                                Checkbox Template (Select All & Cell Content)
-                            -->
-                            <kendo-grid-column [locked]="true" [filterable]="false" [width]="45">
+                        <!-- Checkbox Template (Select All & Cell Content) -->
+                        <kendo-grid-column [locked]="true" [filterable]="false" [width]="45">
                                 <ng-template kendoGridHeaderTemplate>
                                     <div class="row">
                                         <div class="col-md-12 text-center">
@@ -92,10 +89,9 @@
                                     </div>
                                 </ng-template>
                             </kendo-grid-column>
-                            <!--
-                                Batch Record - Static Columns
-                            -->
-                            <kendo-grid-column *ngFor="let column of columnsModel.columns"
+
+                        <!-- Batch Record - Dynamic Columns -->
+                        <kendo-grid-column *ngFor="let column of columnsModel.columns"
                                                field="{{column.property}}"
                                                [locked]="column.locked"
                                                [hidden]="column.hidden"
@@ -106,18 +102,23 @@
                                                [style]="column.cellStyle ? column.cellStyle : ''"
                                                [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 
-                                <!--
-                                    Header Template
-                                -->
-                                <ng-template kendoGridHeaderTemplate>
-                                    <label>
-                                        {{column.label}}
-                                    </label>
-                                </ng-template>
-                                <!--
-                                    Filter Template
-                                -->
-                                <ng-template kendoGridFilterCellTemplate let-filter>
+                            <!-- Header Template -->
+                            <ng-template kendoGridHeaderTemplate>
+                                <label>
+                                    {{column.label}}
+                                </label>
+                            </ng-template>
+
+                            <!-- Cell Templates -->
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'status.label'" let-dataItem>
+                                <span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.status.label}}</span>
+                            </ng-template>
+                            <ng-template kendoGridCellTemplate *ngIf="column.property === 'errorCount'" let-dataItem>
+                                <span [ngClass]="dataItem.errorCount > 0 ? 'error' : null">{{dataItem.errorCount}}</span>
+                            </ng-template>
+
+                            <!-- Filter Template -->
+                            <ng-template kendoGridFilterCellTemplate let-filter>
                                     <div class="has-feedback" *ngIf="column.property && (column.type !== 'action')" style="margin-bottom:0px;">
                                         <div *ngIf="column.type === 'date'; then dateFilter else numberFilter"></div>
                                         <ng-template #dateFilter>
@@ -141,7 +142,9 @@
                                         </ng-template>
                                     </div>
                                 </ng-template>
-                            </kendo-grid-column>
+
+                        </kendo-grid-column>
+
                     </kendo-grid>
                 </div>
             </section>

@@ -53,37 +53,7 @@ export class ImportBatchRecordDetailColumnsModel {
 				type: 'number',
 				width: 100,
 				locked: true
-			},
-			// {
-			// 	label: 'Name (P)',
-			// 	property: 'name',
-			// 	type: 'text',
-			// 	width: 130,
-			// },
-			// {
-			// 	label: 'Type (P)',
-			// 	property: 'type',
-			// 	type: 'text',
-			// 	width: 130
-			// },
-			// {
-			// 	label: 'Dep. Type',
-			// 	property: 'depType',
-			// 	type: 'text',
-			// 	width: 130
-			// },
-			// {
-			// 	label: 'Name (D)',
-			// 	property: 'nameD',
-			// 	type: 'text',
-			// 	width: 130,
-			// },
-			// {
-			// 	label: 'Type (D)',
-			// 	property: 'typeD',
-			// 	type: 'text',
-			// 	width: 130,
-			// },
+			}
 		];
 	}
 }
