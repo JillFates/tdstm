@@ -131,6 +131,7 @@ class RestfulRouteBuilder extends RouteBuilder {
 				case AuthenticationMethod.HEADER:
 					// TODO <SL> need to find a way to determine when to pass "Bearer" as part of the header value
 					// e.g. Authentication: Bearer VERTIFRyYW5zaXRpb24gTWFuYWdlcg==
+					// Ticket added for this TM-9868
 					Map<String, ?> authentication = credentialService.authenticate(credential)
 					routeDefinition.setHeader(authentication.sessionName, constant(authentication.sessionValue))
 					break

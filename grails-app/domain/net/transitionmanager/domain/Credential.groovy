@@ -101,6 +101,28 @@ class Credential {
 
 	/**
 	 * Used to validate if the sessionName property is set for AuthenticationMethods that require a value
+	 * Validation ensures that sessionName is not empty for COOKIE, HEADER, JWT authentication methods as well
+	 * as it matches the following pattern:
+	 * - SessionHeaderName @ source : propertyName
+	 *
+	 * Validation of sessionName regex includes:
+	 * - no white spaces
+	 * - only 1 @ (at) symbol
+	 * - only 1 : (colon) symbol
+	 * - any alphanumeric value
+	 * - underscores
+	 * - hyphens
+	 *
+	 * So valid entries could be:
+	 * - JSESSIONID@cookie:JSESSIONID
+	 * - Authentication@json:access_token
+	 * - api_key@header:WWW_Authenticate
+	 *
+	 * Examples:
+	 * - assert ('Authentication@cookie:access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == true
+	 * - assert ('white-spaces @ json : access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
+	 * - assert ('double-at@@json:access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
+	 * - assert ('double-colon@json::access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
 	 */
 	static Closure sessionNameValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
