@@ -40,7 +40,7 @@ export class AssetExplorerViewSaveComponent {
 
 	protected confirmCloseDialog() {
 		this.assetExpService.saveReport(this.model)
-			.subscribe(result => this.activeDialog.close(result),
+			.subscribe(result => result && this.activeDialog.close(result),
 			error => this.activeDialog.dismiss(error));
 	}
 
