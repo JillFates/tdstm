@@ -25,6 +25,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
 
@@ -2216,8 +2217,8 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 					}
 
 					with(fields.custom1) {
-						value.indexOf('T') == iso8601.indexOf('T')
-						value.indexOf('Z') == iso8601.indexOf('Z')
+						Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						assert date != null : "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
 					}
 				}
 			}
