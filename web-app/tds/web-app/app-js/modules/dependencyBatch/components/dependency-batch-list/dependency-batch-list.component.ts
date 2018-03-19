@@ -32,6 +32,8 @@ export class DependencyBatchListComponent {
 	};
 	private viewArchived = false;
 	private batchStatusLooper: any;
+	private readonly PROGRESS_MAX_TRIES = 10;
+	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -303,7 +305,7 @@ export class DependencyBatchListComponent {
 		this.getBatchesCurrentProgress(runningBatches);
 		this.batchStatusLooper = setInterval(() => {
 			this.getBatchesCurrentProgress(runningBatches);
-		}, 10000); // every 10 seconds
+		}, this.PROGRESS_CHECK_INTERVAL); // every 10 seconds
 	}
 
 	/**
@@ -318,7 +320,7 @@ export class DependencyBatchListComponent {
 					batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
 
 					// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
-					if (batch.stalledCounter >= 10) {
+					if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
 						batch.status.code = BatchStatus.STALLED;
 						batch.status.label = 'Stalled';
 						this.removeBatchFromLoop(batch, runningBatches);
