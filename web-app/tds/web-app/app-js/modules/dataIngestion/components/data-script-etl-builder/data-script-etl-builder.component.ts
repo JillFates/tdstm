@@ -20,8 +20,8 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
 	@ViewChild('resizableForm') resizableForm: ElementRef;
-	public width = 1120;
-	public height = 600;
+	private width = 0;
+	private height = 0;
 	private collapsed = {
 		code: true,
 		sample: false
