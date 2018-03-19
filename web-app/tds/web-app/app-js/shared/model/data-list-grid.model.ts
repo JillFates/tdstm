@@ -23,7 +23,8 @@ export class GridColumnModel {
 	type: string;
 	format?: string;
 	width: number;
-	locked: boolean;
+	locked? = false;
+	hidden? = false;
 	filter?: any;
 	headerStyle?: any;
 	headerClass?: Array<string>;
@@ -33,6 +34,5 @@ export class GridColumnModel {
 	constructor() {
 		this.type = 'text';
 		this.width = COLUMN_MIN_WIDTH;
-		this.locked = true;
 	}
 }

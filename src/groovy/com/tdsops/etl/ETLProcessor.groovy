@@ -154,7 +154,7 @@ class ETLProcessor implements RangeChecker {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
-				Column column = new Column(label: field.name, index: index)
+				Column column = new Column(label: field.name.trim(), index: index)
 				columns.add(column)
 				columnsMap[column.label] = column
 			}

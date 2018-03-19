@@ -76,8 +76,8 @@ class ErrorHandlerController implements ControllerMethods {
 				break
 			default:
 				try {
-					// Note that for some reason the TDS exception classes can not be constructed this way as the 
-					// classes are not found. Not sure why unless they need to be Java classes? 
+					// Note that for some reason the TDS exception classes can not be constructed this way as the
+					// classes are not found. Not sure why unless they need to be Java classes?
 					Class ec = (exceptionName as Class)
 					ex =  ec.newInstance(message)
 				} catch (e) {
@@ -181,13 +181,12 @@ class ErrorHandlerController implements ControllerMethods {
 	 * when a controller method is called where there is no Spring
 	 */
 	def error() {
-		log.debug "Hit error()"
+		def ex = errorHandlerService.getException(request)
+		log.error ExceptionUtil.stackTraceToString('error() was encountered', ex)
 
 		// Need to check for recursive errors stemming primarily from an error in the error gsp page
 		boolean beenHereBefore = request.getAttribute(SESSION_ATTR_ERROR)
 		if (beenHereBefore) {
-			def ex = errorHandlerService.getException(request)
-			log.error ExceptionUtil.stackTraceToString('error() The errorHandler got into recursive loop so we just stopped', ex)
 			render 'The application ran into a recursive loop trying to render this page so it was terminated.'
 			return
 		} else {
