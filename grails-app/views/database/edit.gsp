@@ -62,7 +62,7 @@
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance?.environment}"/>
 							<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
 								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Seb lect']}" tabindex="32" />
+									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" />
 								</tds:tooltipSpan>
 							</td>
 						</tr>
