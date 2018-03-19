@@ -30,6 +30,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
@@ -423,34 +424,17 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						AssetComment.withNewTransaction { TransactionStatus ts ->
-							log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+						markAssetCommentAsStarted(task.id)
 
-							def taskWithLock = AssetComment.lock(task.id)
-							if (!taskWithLock.isActionable()) {
-								throw new Exception('Another user invoked the action before')
-							}
-
-							// Update the task so that the we track that the action was invoked
-							taskWithLock.apiActionInvokedAt = new Date()
-
-							// Update the task so that we track the task started at
-							taskWithLock.actStart = new Date()
-
-							// Log a note that the API Action was called
-							// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
-							addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name}")
-
-							// Make sure that the status is STARTED instead
-							status = AssetCommentStatus.STARTED
-							taskWithLock.status = status
-							taskWithLock.save(flush: true, failOnError: true)
-						}
+						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
 						// Need to refresh the task with changes that were just committed in separate transaction
-						task.refresh()
+						//task.refresh()
+						task = task.get(task.id)
+						status = task.status
 
 						// Kick of the async method and mark the task STARTED
+						addNote(task, whom, "Invoked action ${task.apiAction.name}")
 						apiActionService.invoke(task.apiAction, task)
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
@@ -475,6 +459,42 @@ class TaskService implements ServiceMethods {
 			}
 		}
 		return status
+	}
+
+	/**
+	 * DOCUMENT ME !!!
+	 * @param id
+	 */
+	@NotTransactional
+	void markAssetCommentAsStarted(Long id) {
+		try {
+			//AssetComment.withNewTransaction { TransactionStatus ts ->
+				log.debug "Attempting to mark asset comment as started for task.id={}", id
+
+				def taskWithLock = AssetComment.lock(id)
+				log.debug 'Locked out AssetComment: {}', taskWithLock
+				//def taskWithLock = AssetComment.get(id)
+				//taskWithLock.lock()
+
+				if (!taskWithLock.isActionable()) {
+					//if (taskWithLock.status in ['Started', 'Hold', 'Completed']) {
+					throw new Exception('Another user invoked the action before')
+				}
+
+				// Update the task so that the we track that the action was invoked
+				taskWithLock.apiActionInvokedAt = new Date()
+
+				// Update the task so that we track the task started at
+				taskWithLock.actStart = new Date()
+
+				// Make sure that the status is STARTED instead
+				taskWithLock.status = AssetCommentStatus.STARTED
+				taskWithLock.save(flush: true, failOnError: true)
+			//}
+		} catch (Exception e) {
+			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
+			throw new Exception('Another user invoked the action before')
+		}
 	}
 
 	/**

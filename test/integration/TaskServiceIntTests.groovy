@@ -6,21 +6,30 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
+import grails.test.spock.IntegrationSpec
+import net.transitionmanager.agent.AgentClass
+import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.TaskService
-import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.hibernate.SessionFactory
+import spock.lang.Ignore
 import spock.lang.Specification
 
-class TaskServiceIntTests extends Specification {
+class TaskServiceIntTests extends IntegrationSpec {
 
     TaskService taskService
     AssetTestHelper assetTestHelper
     PersonTestHelper personTestHelper
     ProjectTestHelper projectTestHelper
     MoveBundleTestHelper moveBundleTestHelper
+    GrailsApplication grailsApplication
+    SessionFactory sessionFactory
 
     /* Test SetUp */
     void setup() {
@@ -28,8 +37,11 @@ class TaskServiceIntTests extends Specification {
         projectTestHelper = new ProjectTestHelper()
         assetTestHelper = new AssetTestHelper()
         moveBundleTestHelper = new MoveBundleTestHelper()
+
+        sessionFactory = grailsApplication.getMainContext().getBean('sessionFactory')
     }
 
+    @Ignore
     void "test clean task data"() {
         setup:
             prepareMoveEventData()
@@ -125,4 +137,60 @@ class TaskServiceIntTests extends Specification {
 
     }
 
+    void 'invocation of an api action show return status as started'() {
+        setup: 'giving an api action'
+            Person whom = taskService.getAutomaticPerson()
+            Project project = projectTestHelper.getProject()
+            Provider provider = new Provider(project: project, name: RandomStringUtils.randomAlphanumeric(10)).save(failOnError: true)
+            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
+            description: RandomStringUtils.randomAlphanumeric(10), agentClass: AgentClass.RESTFULL, agentMethod: 'executeCall',
+            methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
+            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+
+            AssetComment task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    apiAction: apiAction,
+                    status: 'Ready'
+            ).save(failOnError: true)
+            sessionFactory.getCurrentSession().flush()
+
+        when: 'invoking the api action'
+            def status = taskService.invokeAction(task, whom)
+
+        then: 'status should show task as started'
+            null != status
+            'Started'
+    }
+
+    void 'simultaneous invocations of an api action should throw error'() {
+        setup: 'giving an api action'
+            Person whom = taskService.getAutomaticPerson()
+            Project project = projectTestHelper.getProject()
+            Provider provider = new Provider(project: project, name: RandomStringUtils.randomAlphanumeric(10)).save(failOnError: true)
+            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
+            description: RandomStringUtils.randomAlphanumeric(10), agentClass: AgentClass.RESTFULL, agentMethod: 'executeCall',
+            methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
+            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
+
+            AssetComment task = new AssetComment(
+                    project: project,
+                    comment: RandomStringUtils.randomAlphanumeric(10),
+                    commentType: AssetCommentType.TASK,
+                    apiAction: apiAction,
+                    status: 'Ready'
+            ).save(failOnError: true)
+            sessionFactory.getCurrentSession().flush()
+
+        when: 'simulating invoking the api action at approximately the same time'
+            def status1 = taskService.invokeAction(task, whom)
+            def status2 = taskService.invokeAction(task, whom)
+
+        then: 'first invocation should show as started and second should show as hold'
+            null != status1
+            null != status2
+            'Started'   == status1
+            'Hold'      == status2
+    }
 }
