@@ -3,7 +3,6 @@ package com.tdsops.etl
 import com.tdssrc.grails.WorkbookUtil
 import getl.data.Dataset
 import getl.data.Field
-import getl.excel.ExcelDataset
 import getl.excel.ExcelDriver
 import getl.exception.ExceptionGETL
 import getl.utils.BoolUtils
@@ -58,7 +57,6 @@ class TDSExcelDriver extends ExcelDriver {
 
 		Iterator rows = sheet.rowIterator()
 
-//		if (header) rows.next()
 		if (offsetRows != 0) (1..offsetRows).each {
 			rows.next()
 		}
@@ -89,14 +87,9 @@ class TDSExcelDriver extends ExcelDriver {
 
 		Workbook workbook = getWorkbook(dataset)
 		Integer currentRowIndex = dataset.params.currentRowIndex ?:0
-		String sheetName = ((ExcelDataset)dataset).listName
-		String sheetNumber = dataset.params.sheetNumber ?:0
+		dataset.params.listName = dataset.params.listName?:0
 
-		if(!sheetName && !sheetNumber){
-			throw new ExceptionGETL("Required \"sheet name\" or \"sheet number\" parameter")
-		}
-
-		XSSFSheet sheet = WorkbookUtil.getSheetFromWorkbook(workbook, sheetName)
+		XSSFSheet sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
 		List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
 		List<Field> fields = []
 		cells.each { Cell cell ->
@@ -146,5 +139,27 @@ class TDSExcelDriver extends ExcelDriver {
 		}
 
 		return workbook
+	}
+
+	/**
+	 * Lookups a Sheet instance based on a listName
+	 * @param workbook
+	 * @param listName
+	 * @return
+	 */
+	XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, String listName) {
+		return WorkbookUtil.getSheetFromWorkbook(workbook, (listName as String))
+	}
+
+	/**
+	 * Lookups a Sheet instance based on a sheetNumber
+	 * @param workbook
+	 * @param listName
+	 * @return
+	 */
+	XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, int sheetNumer) {
+		XSSFSheet sheet = WorkbookUtil.getSheetFromWorkbookAt(workbook, sheetNumer)
+		dataset.params.listName = WorkbookUtil.getSheetName(workbook, sheetNumer)
+		return sheet
 	}
 }

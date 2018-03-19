@@ -633,6 +633,33 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Get a workbook sheet based on a sheetNumber
+	 * @param workbook
+	 * @param sheetName
+	 * @return Sheet
+	 */
+	static Sheet getSheetFromWorkbookAt(Workbook workbook, int sheetNumber) {
+		Sheet sheet = workbook.getSheetAt(sheetNumber)
+		if (!sheet) {
+			throw new RuntimeException("Unable to find sheet $sheetNumber in the uploaded spreadsheet")
+		}
+		if (sheet instanceof SXSSFSheet) {
+			((SXSSFSheet)sheet).setRandomAccessWindowSize(25)
+		}
+		return sheet
+	}
+
+	/**
+	 * Read sheet name using Workbook instance
+	 * @param workbook
+	 * @param sheetNumber
+	 * @return
+	 */
+	static String getSheetName(Workbook workbook, int sheetNumber) {
+		return workbook.getSheetName(sheetNumber)
+	}
+
+	/**
 	 * Get a workbook sheet
 	 * @param workbook
 	 * @param sheetName

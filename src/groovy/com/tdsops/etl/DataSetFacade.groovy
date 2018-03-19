@@ -47,11 +47,26 @@ class DataSetFacade {
 		return dataSet
 	}
 
+	/**
+	 *
+	 * @param sheetName
+	 */
 	void setSheetName(String sheetName) {
 		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
 			throw ETLProcessorException.invalidSheetCommand()
 		}
 		((ExcelDataset)dataSet).setListName(sheetName)
+	}
+
+	/**
+	 *
+	 * @param sheetNumber
+	 */
+	void setSheetNumber(Integer sheetNumber) {
+		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
+			throw ETLProcessorException.invalidSheetCommand()
+		}
+		((ExcelDataset)dataSet).params.listName = sheetNumber
 	}
 
 	void setCurrentRowIndex(int currentRowIndex) {

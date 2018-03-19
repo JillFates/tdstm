@@ -141,6 +141,143 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can define a quoted string sheet for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications Tab', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						sheet 'Applications Tab'
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'A column map is created'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		and:
+			etlProcessor.currentRowIndex == 1
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels by sheet number for a spreadSheet DataSet'(){
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						sheet 0
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'A column map is created'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		and:
+			etlProcessor.currentRowIndex == 1
+
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'A column map is created'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		and:
+			etlProcessor.currentRowIndex == 1
+
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can read labels skipping rows for a spreadSheet DataSet'(){
 
 		given:
