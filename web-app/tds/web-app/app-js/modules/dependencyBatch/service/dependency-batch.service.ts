@@ -210,6 +210,24 @@ export class DependencyBatchService {
 	}
 
 	/**
+	 * NOTE: Since there's no endpoint to retreive light information we need to make this call below to get all records.
+	 * GET - Returns a single batch record of an import batch by id.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	getImportBatchRecordUpdated(batchId: number, id: number): Observable<{} | ImportBatchRecordModel> {
+		return this.http.get(this.importBatchUrl + `/${batchId}/records`)
+			.map( (res: Response) => {
+				const batchRecords: Array<ImportBatchRecordModel> = res.json().data;
+				let match: ImportBatchRecordModel = batchRecords.find( (item: ImportBatchRecordModel) => {
+					return item.id === id;
+				});
+				return match;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
 	 * GET - Batch Record Fields details for a batch record.
 	 * @param {number} id
 	 * @returns {Observable<any>}

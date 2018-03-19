@@ -75,6 +75,19 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	}
 
 	/**
+	 * Load A Single Batch Record from API.
+	 */
+	private reloadSingleBatchRecord(batchRecord: ImportBatchRecordModel): void {
+		this.dependencyBatchService.getImportBatchRecordUpdated(this.importBatchModel.id, batchRecord.id).subscribe((result: ImportBatchRecordModel) => {
+			if (result) {
+				Object.assign(batchRecord, result);
+			} else {
+				this.loadImportBatchRecords();
+			}
+		});
+	}
+
+	/**
 	 * Get and add the dyanmic batch record field columns.
 	 */
 	private prepareColumnsModel(): void {
@@ -96,6 +109,8 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 */
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
+		this.dataGridOperationsHelper.selectCell(cellClick); // <-- first things first
+
 		let selectedBatchRecord = (cellClick as any).dataItem;
 		// prevent errors when clicking empty rows ..
 		if (!selectedBatchRecord || !selectedBatchRecord.id) {
@@ -107,7 +122,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			], false, false)
 			.then((result) => {
 				if (result === 'reload') {
-					this.loadImportBatchRecords();
+					this.reloadSingleBatchRecord(selectedBatchRecord);
 				}
 			}).catch( result => { console.log('dismissed'); });
 	}
