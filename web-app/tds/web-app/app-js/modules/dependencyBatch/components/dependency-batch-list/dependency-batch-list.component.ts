@@ -32,6 +32,8 @@ export class DependencyBatchListComponent {
 	};
 	private viewArchived = false;
 	private batchStatusLooper: any;
+	private readonly PROGRESS_MAX_TRIES = 10;
+	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -297,13 +299,13 @@ export class DependencyBatchListComponent {
 	 * Creates an interval loop to retreive batch current progress.
 	 */
 	private setBatchStatusLooper(): void {
-		const runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
+		let runningBatches = this.dataGridOperationsHelper.resultSet.filter( (item: ImportBatchModel) => {
 			return item.status.code === BatchStatus.RUNNING;
 		});
 		this.getBatchesCurrentProgress(runningBatches);
 		this.batchStatusLooper = setInterval(() => {
 			this.getBatchesCurrentProgress(runningBatches);
-		}, 5000); // every 5 seconds
+		}, this.PROGRESS_CHECK_INTERVAL); // every 10 seconds
 	}
 
 	/**
@@ -314,12 +316,20 @@ export class DependencyBatchListComponent {
 			this.dependencyBatchService.getImportBatchProgress(batch.id).subscribe((response: ApiResponseModel) => {
 				if (response.status === ApiResponseModel.API_SUCCESS) {
 					batch.currentProgress =  response.data.progress ? response.data.progress : 0;
-					if (batch.currentProgress === 100) {
-						if (this.viewArchived) {
-							this.loadArchivedBatchList();
-						} else {
-							this.reloadBatchList();
-						}
+					const lastUpdated = (response.data.lastUpdated as Date);
+					batch.stalledCounter = batch.lastUpdated === lastUpdated ? batch.stalledCounter += 1 : 0 ;
+
+					// If batch doesn't update after N times, then move to STALLED and remove it from the looper.
+					if (batch.stalledCounter >= this.PROGRESS_MAX_TRIES) {
+						batch.status.code = BatchStatus.STALLED;
+						batch.status.label = 'Stalled';
+						this.removeBatchFromLoop(batch, runningBatches);
+					} else if (batch.currentProgress >= 100) {
+						batch.status.code = BatchStatus.COMPLETED;
+						batch.status.label = 'Completed';
+						this.removeBatchFromLoop(batch, runningBatches);
+					} else {
+						batch.lastUpdated =  response.data.lastUpdated as Date;
 					}
 				} else {
 					this.handleError(response.errors[0] ? response.errors[0] : 'error on get batch progress');
@@ -330,5 +340,15 @@ export class DependencyBatchListComponent {
 			});
 		}
 		console.log(runningBatches);
+	}
+
+	/**
+	 * Removes a batch from Running Loop List.
+	 * @param {ImportBatchModel} batch
+	 * @param {Array} runningBatches
+	 */
+	private removeBatchFromLoop(batch: ImportBatchModel, runningBatches: Array<ImportBatchModel>): void {
+		const filterIndex = runningBatches.findIndex((item: ImportBatchModel) => item.id === batch.id);
+		runningBatches.splice(filterIndex, 1);
 	}
 }
