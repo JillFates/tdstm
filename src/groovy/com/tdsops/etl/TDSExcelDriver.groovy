@@ -58,8 +58,8 @@ class TDSExcelDriver extends ExcelDriver {
 
 		Iterator rows = sheet.rowIterator()
 
-		if (header) rows.next()
-		if (offsetRows != 0) (1..(offsetRows - 1)).each {
+//		if (header) rows.next()
+		if (offsetRows != 0) (1..offsetRows).each {
 			rows.next()
 		}
 		int additionalRows = limit + offsetRows + (header?(1 as int):(0 as int))
