@@ -141,6 +141,7 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('id', 'Id', 'Number'),
 					buildFieldSpec('location', 'Location'),
 					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('model', 'Model'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 					buildFieldSpec('manufacturer', 'Manufacturer'),

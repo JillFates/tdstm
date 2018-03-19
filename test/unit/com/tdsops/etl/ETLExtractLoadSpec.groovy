@@ -24,6 +24,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.See
 import spock.lang.Shared
 
 /**
@@ -1029,6 +1030,94 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 				}
 			}
+	}
+
+	@See('TM-9283')
+	void 'test correct trimming of spaces in column names'() {
+
+		given:
+		ETLFieldsValidator validator = new DomainClassFieldsValidator()
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+		and:
+		def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			name , mfg, model
+			xraysrv01,Dell,PE2950
+			oradbsrv02,HP,DL8150
+			oradbsrv03,HP,DL8155""".stripIndent())
+		and:
+		ETLProcessor etlProcessor = new ETLProcessor(
+						GroovyMock(Project),
+						dataSet,
+						new DebugConsole(buffer: new StringBuffer()),
+						validator)
+
+		when: 'The ETL script is evaluated'
+		new GroovyShell(this.class.classLoader, etlProcessor.binding)
+						.evaluate("""
+					read labels
+domain Device
+iterate {
+     extract name load assetName
+     extract mfg load manufacturer
+     extract 3 load model
+}
+				""".stripIndent(),
+						ETLProcessor.class.name)
+
+		then: 'Every field property is assigned to the correct element'
+		etlProcessor.result.domains.size() == 1
+		with(etlProcessor.result.domains[0]) {
+			domain == ETLDomain.Device.name()
+			with(data[0]) {
+				rowNum == 1
+				with (fields.assetName){
+					originalValue == "xraysrv01"
+					value == "xraysrv01"
+				}
+				with (fields.manufacturer){
+					originalValue == "Dell"
+					value == "Dell"
+				}
+				with (fields.model){
+					originalValue == "PE2950"
+					value == "PE2950"
+				}
+			}
+
+			with(data[1]) {
+				rowNum == 2
+				with (fields.assetName){
+					originalValue == "oradbsrv02"
+					value == "oradbsrv02"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8150"
+					value == "DL8150"
+				}
+			}
+
+			with(data[2]) {
+				rowNum == 3
+				with (fields.assetName){
+					originalValue == "oradbsrv03"
+					value == "oradbsrv03"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8155"
+					value == "DL8155"
+				}
+			}
+		}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can create new results loading values without extract previously'() {
