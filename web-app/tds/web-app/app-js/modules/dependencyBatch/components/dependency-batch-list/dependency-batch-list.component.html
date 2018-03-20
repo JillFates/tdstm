@@ -3,7 +3,7 @@
 </style>
 
 <!-- Main content -->
-<div class="content body default-list-component dependency-batch-list-component">
+<div class="content body tds-kendo-grid dependency-batch-list-component">
     <section>
         <div>
             <div class="box-body box-with-empty-header">
@@ -164,7 +164,7 @@
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
                                 <div *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
                                 <ng-template #progressBarTemplate>
-                                    <div class="text-center">{{ dataItem.status.label }}</div>
+                                    <div >{{ dataItem.status.label }}</div>
                                     <div class="progress" style="margin-bottom: 0px;">
                                         <div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
                                             {{dataItem.currentProgress}}%

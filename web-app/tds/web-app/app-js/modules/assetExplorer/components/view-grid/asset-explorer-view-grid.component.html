@@ -7,7 +7,7 @@
     }
 </style>
 
-<kendo-grid #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+<kendo-grid class="tds-kendo-grid" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
