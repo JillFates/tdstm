@@ -74,15 +74,8 @@ class ApiAction {
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
-	Date dateCreated
-
-	Date lastUpdated
-
-	// The URL to the endpoint
+	// The fully qualified URL to the endpoint
 	String endpointUrl
-
-	// The Path to the endpoint
-	String endpointPath
 
 	// A flag that indicates if the action will poll for a result
 	Integer isPolling = 0
@@ -105,6 +98,9 @@ class ApiAction {
 	// Flag indicating that the action interacts with an Asset.
 	Integer useWithTask = 0
 
+	Date dateCreated
+
+	Date lastUpdated
 
 	static belongsTo = [
 		project: Project,
@@ -119,7 +115,6 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointPath nullable: true, blank: true
 		endpointUrl nullable: true, blank: true
 		isPolling range: 0..1
 		lastUpdated nullable: true

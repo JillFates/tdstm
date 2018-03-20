@@ -27,7 +27,6 @@ class ApiActionCommand implements CommandObject {
     DataScript defaultDataScript
     String methodParams
     String reactionScripts
-    String endpointPath
     String endpointUrl
     Integer isPolling = 0
     Integer pollingInterval = 0

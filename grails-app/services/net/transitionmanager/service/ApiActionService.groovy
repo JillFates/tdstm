@@ -16,8 +16,7 @@ import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.AwsAgent
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.agent.DictionaryItem
-import net.transitionmanager.agent.RestfulAgent
-import net.transitionmanager.agent.RiverMeadowAgent
+import net.transitionmanager.agent.HttpAgent
 import net.transitionmanager.agent.ServiceNowAgent
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
@@ -56,10 +55,9 @@ class ApiActionService implements ServiceMethods {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS)         : AwsAgent,
-		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-		(AgentClass.SERVICE_NOW) : ServiceNowAgent,
-		(AgentClass.RESTFULL) 	 : RestfulAgent
+		(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
+		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
+		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent
 	].asImmutable()
 
 	/**
@@ -135,7 +133,6 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	List<Map> list (Project project, Boolean minimalInfo = true, Map filterParams = [:]) {
-
 		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
 
 		List<ApiAction> apiActions = ApiAction.where {
@@ -219,20 +216,21 @@ class ApiActionService implements ServiceMethods {
 				// headers?
 
 				// set config data
+	// TODO : JPM 3/2018 : Need to split URL and path here
 				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
 				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
 				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
 				// TODO use a method in Credential domain to determine if the call requires pre-authentication
-//				if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
-//					Map authentication = credentialService.authenticate(action.credential)
-//					if (authentication) {
-//						// TODO this needs to come from CredentialService according to the authenticationMethod being used
-//						actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
-//						actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
-//					}
-//				}
+				// if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
+				// 	Map authentication = credentialService.authenticate(action.credential)
+				// 	if (authentication) {
+				// 		// TODO this needs to come from CredentialService according to the authenticationMethod being used
+				// 		actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
+				// 		actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
+				// 	}
+				// }
 
 				// check pre script
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
@@ -361,11 +359,13 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
 	private Class agentClassForAction (ApiAction action) {
-		Class clazz = agentClassMap[action.agentClass]
-		if (!clazz) {
-			throw new InvalidRequestException("Action class ${action.agentClass} not implemented")
+		String clazzName = action.agentClass.name()
+		Class clazz = agentClassMap[clazzName]
+		if (clazz) {
+			return clazz
+		} else {
+			throw new InvalidRequestException("Action class ${clazzName} not implemented")
 		}
-		clazz
 	}
 
 	/**
@@ -673,7 +673,6 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
-
 		// Load just the minimal or all by setting properties to null
 		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
@@ -688,6 +687,21 @@ class ApiActionService implements ServiceMethods {
 		return apiActionMap
 	}
 
+	List apiActionMethodList(ApiAction apiAction, boolean minimalInfo = false) {
+		Map<String, Object> apiActionMap = null
+		// Load just the minimal or all by setting properties to null
+		List<String> properties = minimalInfo ? ["id", "name"] : null
+		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
+
+		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		if (!minimalInfo) {
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.version = apiAction.version
+		}
+
+		return apiActionMap
+	}
 	/**
 	 * Add task error message through the task facade
 	 * @param taskFacade - the task facade wrapper

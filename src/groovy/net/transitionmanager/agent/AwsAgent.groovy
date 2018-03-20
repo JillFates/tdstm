@@ -3,12 +3,14 @@ package net.transitionmanager.agent
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.AwsService
+import groovy.transform.CompileStatic
 
 /**
  * Methods to interact with the Amazon AWS services
  */
 @Slf4j(value='logger')
 @Singleton(strict=false)
+@CompileStatic
 class AwsAgent extends AbstractAgent {
 
 	public AwsService awsService
@@ -19,25 +21,56 @@ class AwsAgent extends AbstractAgent {
 	AwsAgent() {
 
 		setInfo(AgentClass.AWS, 'Amazon AWS API')
-
 		setDictionary( [
-				sendSnsNotification: new DictionaryItem([
-						name: 'sendSnsNotification',
-						description: 'Used to generate Simple Notification Service (SNS) messages',
-						method: 'sendSns',
-						params: queueParams(),
-						results: invokeResults()
-				]),
-				sendSqsMessage: new DictionaryItem([
-						name: 'sendSqsMessage',
-						description: 'Used to generate Simple Queue Service (SQS) messages',
-						method: 'sendSqs',
-						params: queueParams(),
-						results: invokeResults()
-				])
+			PublishSNS: new DictionaryItem( [
+				agentMethod: 'PublishSNS',
+				name: 'Publish SNS Notification',
+				description: 'Used to publish Simple Notification Service (SNS) messages',
+				endpointUrl: 'https://sns.{{region}}.amazonaws.com/',
+				docUrl: 'https://docs.aws.amazon.com/sns/latest/api/Welcome.html',
+				method: 'publishSnsNotification',
+				providesData: 0,
+				results: invokeResults(),
+				params: [
+					[
+						paramName: 'region',
+						desc: 'The AWS Region to publish the SNS notifications (e.g. us-east-1, us-west-2)',
+						type: 'String',
+						context: ContextType.USER_DEF,
+						fieldName: null,
+						value: '',
+						required:1,
+						readonly:0,
+						encoded: 1
+					]
+				] + queueParams()
+			] ),
+			SendSQS: new DictionaryItem([
+				agentMethod: 'SendSQS',
+				name: 'Send SQS Message',
+				description: 'Used to send Simple Queue Service (SQS) messages',
+				endpointUrl: 'https://sqs.{{region}}.amazonaws.com/',
+				docUrl: '',
+				method: 'sendSqsMessage',
+				providesData: 0,
+				results: invokeResults(),
+				params: [
+					[
+						paramName: 'region',
+						desc: 'The AWS Region to publish the SQS message (e.g. us-east-1, us-west-2)',
+						type: 'String',
+						context: ContextType.USER_DEF,
+						fieldName: null,
+						value: '',
+						required:1,
+						readonly:0,
+						encoded: 1
+					]
+				] + queueParams()
+			])
 		].asImmutable() )
 
-		awsService = ApplicationContextHolder.getBean('awsService')
+		awsService = (AwsService) ApplicationContextHolder.getBean('awsService')
 	}
 
 	/**
@@ -46,7 +79,7 @@ class AwsAgent extends AbstractAgent {
 	 * @param message - the message object to send to the queue
 	 * @return a map with the invocation results
 	 */
-	Map sendSnsNotification(String topicName, Object message) {
+	Map publishSnsNotification(String topicName, Object message) {
 		awsService.sendSnsMessage(topicName, message)
 	}
 
@@ -59,6 +92,5 @@ class AwsAgent extends AbstractAgent {
 	Map sendSqsMessage(String topicName, Object message) {
 		awsService.sendSqsMessage(topicName, message)
 	}
-
 
 }
