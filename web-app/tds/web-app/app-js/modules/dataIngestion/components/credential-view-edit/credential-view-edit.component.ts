@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, QueryList} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, QueryList, Renderer2, ElementRef} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
@@ -55,9 +55,9 @@ export class CredentialViewEditComponent {
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	@ViewChild('credentialsContainer') credentialsContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
-
 	public credentialModel: CredentialModel;
 	public providerList = new Array<ProviderModel>();
 	public statusList = new Array<any>();
@@ -82,7 +82,8 @@ export class CredentialViewEditComponent {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService) {
+		private dataIngestionService: DataIngestionService,
+		private renderer: Renderer2) {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
@@ -213,11 +214,15 @@ export class CredentialViewEditComponent {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
-				});
+				})
+				.catch((error) => console.log(error));
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -227,7 +232,7 @@ export class CredentialViewEditComponent {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -238,6 +243,7 @@ export class CredentialViewEditComponent {
 	 */
 	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.focusForm();
 	}
 
 	/**
@@ -298,5 +304,9 @@ export class CredentialViewEditComponent {
 	 */
 	private modifySignatureByProperty(property: any): void {
 		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.credentialModel[property]);
+	}
+
+	private focusForm() {
+		this.credentialsContainer.nativeElement.focus();
 	}
 }

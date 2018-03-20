@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -20,6 +20,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 })
 export class DataScriptViewEditComponent implements OnInit {
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptContainer') dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
@@ -91,7 +92,6 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-
 		this.datasourceName
 			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
 			.distinctUntilChanged()   // ignore if next search term is same as previous
@@ -132,6 +132,10 @@ export class DataScriptViewEditComponent implements OnInit {
 		return this.dataSignature !== JSON.stringify(copy);
 	}
 
+	private focusForm() {
+		this.dataScriptContainer.nativeElement.focus();
+	}
+
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
@@ -140,11 +144,15 @@ export class DataScriptViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
-				});
+				})
+				.catch((error) => console.log(error));
 		} else {
 			if (this.etlScriptCode.updated) {
 				this.activeDialog.close();
@@ -159,6 +167,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected changeToEditDataScript(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.focusForm();
 	}
 
 	/**
@@ -215,5 +224,4 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			});
 	}
-
 }
