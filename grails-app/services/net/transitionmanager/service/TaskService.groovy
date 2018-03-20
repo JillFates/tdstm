@@ -53,6 +53,7 @@ import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -408,6 +409,7 @@ class TaskService implements ServiceMethods {
 	 * @param task - the Task to invoke the method on
 	 * @return The status that the task should be set to
 	 */
+	@NotTransactional
 	String invokeAction(AssetComment task, Person whom) {
 		def status = task.status
 		//return status
@@ -424,21 +426,25 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						markAssetCommentAsStarted(task.id)
+						markTaskStarted(task.id)
 
 						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
 						// Need to refresh the task with changes that were just committed in separate transaction
-						//task.refresh()
-						task = task.get(task.id)
-						status = task.status
+						AssetComment.withTransaction { TransactionStatus ts ->
+							task.refresh()
+							status = task.status
 
-						// Kick of the async method and mark the task STARTED
-						addNote(task, whom, "Invoked action ${task.apiAction.name}")
-						apiActionService.invoke(task.apiAction, task)
+							// Kick of the async method and mark the task STARTED
+							addNote(task, whom, "Invoked action ${task.apiAction.name}")
+
+							apiActionService.invoke(task.apiAction, task)
+						}
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
 					} catch (InvalidConfigurationException e) {
+						errMsg = e.getMessage()
+					} catch (CannotAcquireLockException e) {
 						errMsg = e.getMessage()
 					} catch (e) {
 						errMsg = 'A runtime error occurred while attempting to process the action'
@@ -448,13 +454,7 @@ class TaskService implements ServiceMethods {
 
 				if (errMsg) {
 					log.warn "invokeAction() error $errMsg"
-					AssetComment.withNewTransaction {
-						AssetComment taskObj = AssetComment.get(task.id)
-						addNote(taskObj, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
-						status = ACS.HOLD
-						taskObj.status = status
-						taskObj.save(failOnError:true)
-					}
+					addNote(task, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
 				}
 			}
 		}
@@ -462,22 +462,21 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
-	 * DOCUMENT ME !!!
-	 * @param id
+	 * Try to mark a task as started by locking it before, if lock fails
+	 * or if the task was already started by another user, thows an exception
+	 * indicating it so
+	 * @param id - the id of the task to mark as started
 	 */
 	@NotTransactional
-	void markAssetCommentAsStarted(Long id) {
+	void markTaskStarted(Long id) {
 		try {
-			//AssetComment.withNewTransaction { TransactionStatus ts ->
+			AssetComment.withTransaction { TransactionStatus ts ->
 				log.debug "Attempting to mark asset comment as started for task.id={}", id
 
 				def taskWithLock = AssetComment.lock(id)
 				log.debug 'Locked out AssetComment: {}', taskWithLock
-				//def taskWithLock = AssetComment.get(id)
-				//taskWithLock.lock()
 
-				if (!taskWithLock.isActionable()) {
-					//if (taskWithLock.status in ['Started', 'Hold', 'Completed']) {
+				if (taskWithLock.status in [ACS.STARTED, ACS.HOLD, ACS.COMPLETED]) {
 					throw new Exception('Another user invoked the action before')
 				}
 
@@ -485,15 +484,15 @@ class TaskService implements ServiceMethods {
 				taskWithLock.apiActionInvokedAt = new Date()
 
 				// Update the task so that we track the task started at
-				taskWithLock.actStart = new Date()
+				taskWithLock.actStart = taskWithLock.apiActionInvokedAt
 
 				// Make sure that the status is STARTED instead
 				taskWithLock.status = AssetCommentStatus.STARTED
 				taskWithLock.save(flush: true, failOnError: true)
-			//}
+			}
 		} catch (Exception e) {
 			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
-			throw new Exception('Another user invoked the action before')
+			throw new CannotAcquireLockException('Another user invoked the action before')
 		}
 	}
 

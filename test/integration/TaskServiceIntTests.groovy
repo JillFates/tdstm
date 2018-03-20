@@ -7,6 +7,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import grails.test.spock.IntegrationSpec
+import groovyx.gpars.GParsPool
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
@@ -20,6 +21,8 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
 import spock.lang.Specification
+
+import java.util.concurrent.Future
 
 class TaskServiceIntTests extends IntegrationSpec {
 
@@ -171,11 +174,12 @@ class TaskServiceIntTests extends IntegrationSpec {
             Provider provider = new Provider(project: project, name: RandomStringUtils.randomAlphanumeric(10)).save(failOnError: true)
             ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
             description: RandomStringUtils.randomAlphanumeric(10), agentClass: AgentClass.RESTFULL, agentMethod: 'executeCall',
-            methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
+            methodParams: '[]', reactionScripts: '{"SUCCESS": "task.done()","STATUS": "return SUCCESS","ERROR": "task.error( response.error )", "DEFAULT": "task.error( response.error )"}', reactionScriptsValid: 1,
             callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save(failOnError: true)
 
             AssetComment task = new AssetComment(
                     project: project,
+                    taskNumber: RandomStringUtils.randomNumeric(5) as Integer,
                     comment: RandomStringUtils.randomAlphanumeric(10),
                     commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
@@ -184,13 +188,19 @@ class TaskServiceIntTests extends IntegrationSpec {
             sessionFactory.getCurrentSession().flush()
 
         when: 'simulating invoking the api action at approximately the same time'
-            def status1 = taskService.invokeAction(task, whom)
-            def status2 = taskService.invokeAction(task, whom)
+            def promises = []
+            GParsPool.withPool(2) {
+                promises << taskService.&invokeAction.callAsync(task, whom)
+                promises << taskService.&invokeAction.callAsync(task, whom)
+            }
 
-        then: 'first invocation should show as started and second should show as hold'
-            null != status1
-            null != status2
-            'Started'   == status1
-            'Hold'      == status2
+        then: 'transaction is rolled back and task status should show as ready for both invocations'
+            def results = []
+            promises.each { Future future ->
+                if (future) {
+                    results << future.get()
+                }
+            }
+            ['Ready', 'Ready'] == results
     }
 }
