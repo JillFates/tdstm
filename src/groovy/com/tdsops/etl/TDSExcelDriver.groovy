@@ -124,6 +124,19 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
+	 *
+	 * @param cell
+	 * @param dataset
+	 * @param columnIndex
+	 * @return
+	 */
+	@Override
+	private static getCellValue(final Cell cell, final Dataset dataset, final int columnIndex) {
+		cell.setCellType(Cell.CELL_TYPE_STRING)
+		return cell.stringCellValue
+	}
+
+	/**
 	 * Calculates String value of a Cell
 	 * @param cell
 	 * @return
