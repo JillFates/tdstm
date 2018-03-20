@@ -822,4 +822,5 @@ class WorkbookUtil {
 
 		return rowStyles
 	}
+
 }

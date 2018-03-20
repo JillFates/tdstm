@@ -139,6 +139,14 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('You cannot sheet command without an spreadsheet file')
     }
 
+    static ETLProcessorException invalidSheetName (String sheetName) {
+        new ETLProcessorException("Sheet '$sheetName' is not found in workbook".toString())
+    }
+
+    static ETLProcessorException invalidSheetNumber (Integer sheetNumber) {
+        new ETLProcessorException("Sheet $sheetNumber is not found in workbook".toString())
+    }
+
     /**
      * Exception being thrown when no domain is specified upon load clause
      * @return

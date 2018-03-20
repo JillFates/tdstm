@@ -186,7 +186,53 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can read labels by sheet number for a spreadSheet DataSet'(){
+	void 'test can read labels by an ordinal sheet number for a spreadSheet DataSet'(){
+				given:
+					def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+				and:
+					ETLProcessor etlProcessor = new ETLProcessor(
+						GMDEMO,
+						dataSet,
+						debugConsole,
+						validator)
+
+				when: 'The ETL script is evaluated'
+					new GroovyShell(this.class.classLoader, etlProcessor.binding)
+						.evaluate("""
+								sheet 0
+								read labels
+								""".stripIndent(),
+						ETLProcessor.class.name)
+
+				then: 'DataSet was modified by the ETL script'
+					etlProcessor.result.domains.size() == 0
+
+				and: 'A column map is created'
+					etlProcessor.column('application id').index == 0
+					etlProcessor.column(0).label == 'application id'
+
+				and:
+					etlProcessor.column('vendor name').index == 1
+					etlProcessor.column(1).label == 'vendor name'
+
+				and:
+					etlProcessor.column('technology').index == 2
+					etlProcessor.column(2).label == 'technology'
+
+				and:
+					etlProcessor.column('location').index == 3
+					etlProcessor.column(3).label == 'location'
+
+				and:
+					etlProcessor.currentRowIndex == 1
+
+
+				cleanup:
+					if(fileName) service.deleteTemporaryFile(fileName)
+			}
+
+	void 'test can throw an exception if sheet number is incorrect for a spreadSheet DataSet'(){
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
 
@@ -200,7 +246,61 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sheet 0
+						sheet 10
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Sheet 10 is not found in workbook"
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can throw an exception if sheet name is incorrect for a spreadSheet DataSet'(){
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						sheet 'Active Applications'
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Sheet 'Active Applications' is not found in workbook"
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
 						read labels
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -232,10 +332,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can read labels by default using sheet number zero for a spreadSheet DataSet'(){
+	void 'test can read labels using sheet number as a sheet name for a spreadSheet DataSet'(){
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('2', ApplicationDataSet)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -247,6 +347,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
+						sheet '2'
 						read labels
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -358,6 +459,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		and: 'Results contains values'
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
+				data.size() == 2
 				with(data[0].fields.appVendor) {
 					originalValue == 'Microsoft'
 					value == 'Microsoft'
@@ -368,6 +470,50 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 					value == 'Mozilla'
 				}
 			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels skipping rows before for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+				"invalid headers, are not part, of the valid\n" + ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						skip 1
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results contains'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'Results contains values'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -400,13 +546,13 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'Results contains'
 			etlProcessor.result.domains.size() == 1
 
 		and: 'Results contains values'
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-
+				data.size() == 1
 				with(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
@@ -446,13 +592,13 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'DataSet was modified by the ETL script'
+		then: 'Results contains'
 			etlProcessor.result.domains.size() == 1
 
 		and: 'Results contains values'
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-
+				data.size() == 1
 				with(data[0].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'

@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.WorkbookUtil
 import getl.data.Dataset
 import getl.data.Field
 import getl.excel.ExcelDataset
@@ -55,6 +56,20 @@ class DataSetFacade {
 		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
 			throw ETLProcessorException.invalidSheetCommand()
 		}
+
+		TDSExcelDriver excelDriver = (TDSExcelDriver)dataSet.connection.driver
+
+		boolean hasSheet = false
+		try {
+			hasSheet = excelDriver.hasSheet(dataSet, sheetName)
+		} catch (all) {
+			throw ETLProcessorException.invalidSheetName(sheetName)
+		}
+
+		if(!hasSheet){
+			throw ETLProcessorException.invalidSheetName(sheetName)
+		}
+
 		((ExcelDataset)dataSet).setListName(sheetName)
 	}
 
@@ -65,6 +80,18 @@ class DataSetFacade {
 	void setSheetNumber(Integer sheetNumber) {
 		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
 			throw ETLProcessorException.invalidSheetCommand()
+		}
+
+		TDSExcelDriver excelDriver = (TDSExcelDriver)dataSet.connection.driver
+		boolean hasSheet = false
+		try {
+			hasSheet = excelDriver.hasSheet(dataSet, sheetNumber)
+		} catch (all) {
+			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
+		}
+
+		if(!hasSheet){
+			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
 		}
 		((ExcelDataset)dataSet).params.listName = sheetNumber
 	}

@@ -9,7 +9,6 @@ import getl.utils.BoolUtils
 import getl.utils.FileUtils
 import getl.utils.ListUtils
 import getl.utils.Logs
-import org.apache.poi.sl.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFSheet
@@ -142,22 +141,45 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
+	 * Check if a Worknbook instance has a Sheet based on a sheet name
+	 * @param dataset
+	 * @param listName
+	 * @return
+	 */
+	boolean hasSheet(Dataset dataset, String listName) {
+		return WorkbookUtil.getSheetFromWorkbook(getWorkbook(dataset), listName) != null
+	}
+
+	/**
+	 * Check if a Worknbook instance has a Sheet based on an ordinal sheet number
+	 * @param dataset
+	 * @param listName
+	 * @return
+	 */
+	boolean hasSheet(Dataset dataset, int sheetNumber) {
+		return WorkbookUtil.getSheetFromWorkbookAt(getWorkbook(dataset), sheetNumber) != null
+	}
+
+
+	/**
 	 * Lookups a Sheet instance based on a listName
+	 * @param dataSet
 	 * @param workbook
 	 * @param listName
 	 * @return
 	 */
-	XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, String listName) {
-		return WorkbookUtil.getSheetFromWorkbook(workbook, (listName as String))
+	private XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, String listName) {
+		return WorkbookUtil.getSheetFromWorkbook(workbook, listName)
 	}
 
 	/**
 	 * Lookups a Sheet instance based on a sheetNumber
+	 * @param dataSet
 	 * @param workbook
 	 * @param listName
 	 * @return
 	 */
-	XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, int sheetNumer) {
+	private XSSFSheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, int sheetNumer) {
 		XSSFSheet sheet = WorkbookUtil.getSheetFromWorkbookAt(workbook, sheetNumer)
 		dataset.params.listName = WorkbookUtil.getSheetName(workbook, sheetNumer)
 		return sheet
