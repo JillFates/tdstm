@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
-    <title>Asset Export</title>
+    <title>Export Assets</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 	<g:javascript src="import.export.js"/>
 
@@ -48,7 +48,7 @@
 	</style>
 	</head>
 	<body>
-	<tds:subHeader title="Asset Export" crumbs="['Assets','Asset Export']"/>
+	<tds:subHeader title="Export Assets" crumbs="['Assets','Export Assets']"/>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
