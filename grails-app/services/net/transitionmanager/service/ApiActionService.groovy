@@ -13,11 +13,9 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.agent.AgentClass
-import net.transitionmanager.agent.AwsAgent
 import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.agent.ContextType
 import net.transitionmanager.agent.DictionaryItem
-import net.transitionmanager.agent.HttpAgent
-import net.transitionmanager.agent.ServiceNowAgent
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
