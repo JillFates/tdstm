@@ -443,7 +443,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
 					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
-					this.tempFixForContent();
+					this.guardParams();
 					this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
 				} else if (this.lastSelectedAgent) {
 					// Return the value to the previous one
@@ -456,13 +456,29 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Temp Fix to obtain the context, I need this just to procced with the TM-9849
 	 * @returns {any}
 	 */
-	private tempFixForContent(): any {
+	private guardParams(): any {
 		this.apiActionModel.agentMethod.methodParams.forEach((item, index) => {
 			if (item.context && item.context.name) {
 				item.context = item.context.name;
 			}
 			if (!item.context || item.context === 'null' || item.context === null) {
 				this.apiActionModel.agentMethod.methodParams.splice(index, 1);
+			}
+
+			if (item.param) {
+				if (item.param === 'null' || item.param === null) {
+					item.param = '';
+				}
+				item['paramName'] = item.param;
+				delete item.param;
+			}
+
+			if (item.property) {
+				if (item.property === 'null' || item.property === null) {
+					item.property = '';
+				}
+				item['fieldName'] = item.property;
+				delete item.property;
 			}
 		});
 		return this.apiActionModel.agentMethod.methodParams;

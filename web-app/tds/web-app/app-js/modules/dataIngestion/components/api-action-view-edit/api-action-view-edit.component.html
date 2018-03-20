@@ -299,7 +299,7 @@
                                                 <input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem[column.property]" />
                                             </div>
 											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.paramName" required [ngClass]="{'has-error': dataItem.paramName.length <= 0}" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.paramName" required [ngClass]="{'has-error': dataItem.paramName?.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
