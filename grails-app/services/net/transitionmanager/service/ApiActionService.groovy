@@ -106,7 +106,7 @@ class ApiActionService implements ServiceMethods {
 				DictionaryItem agentInfo = dictionary[key]
 				if (agentInfo.params) {
 					for (Map paramsMap in agentInfo.params)
-						if (paramsMap.containsKey('context') && paramsMap.context) {
+						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
 							paramsMap.context = paramsMap.context.name()
 						}
 				}
