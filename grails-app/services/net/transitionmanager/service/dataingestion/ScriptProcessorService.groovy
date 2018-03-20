@@ -3,6 +3,7 @@ package net.transitionmanager.service.dataingestion
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
@@ -101,8 +102,10 @@ class ScriptProcessorService {
             result.error = all.getMessage()
         }
 
-        result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = etlProcessor.result.toMap()
+	     if (etlProcessor) {
+		     result.consoleLog = etlProcessor?.debugConsole?.content()
+		     result.data = etlProcessor.result.toMap()
+	     }
 
         return result
     }
