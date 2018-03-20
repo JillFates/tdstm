@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -24,6 +25,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
 
@@ -2171,5 +2173,59 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test NOW variable'() {
+
+		given:
+			String iso8601 = TimeUtil.FORMAT_DATE_TIME_ISO8601.replace("'", '')
+			def dataSetCSV = """
+				name
+				fubar
+			""".stripIndent().trim()
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(dataSetCSV)
+
+		and:
+			def scriptContent = """
+				console on
+				domain Device
+				read labels
+				iterate {
+				      extract name load Name
+						load 'Network Interfaces' with NOW
+				}
+			""".stripIndent().trim()
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent, ETLProcessor.class.name)
+
+		then:
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				with(data[0]) {
+					with(fields.assetName) {
+						value == 'fubar'
+						originalValue == 'fubar'
+					}
+
+					with(fields.custom1) {
+						Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						assert date != null : "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 }
