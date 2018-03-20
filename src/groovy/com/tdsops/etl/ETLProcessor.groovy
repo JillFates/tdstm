@@ -248,7 +248,7 @@ class ETLProcessor implements RangeChecker {
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			binding.addDynamicVariable(NOW_VARNAME, new Date())
+			binding.addDynamicVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(currentRowIndex, row))
 

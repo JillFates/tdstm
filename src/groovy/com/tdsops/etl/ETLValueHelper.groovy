@@ -32,7 +32,7 @@ class ETLValueHelper {
 	 */
 	static String stringValueOf(def value) {
 
-		def fieldValue
+		String fieldValue
 
 		switch(value){
 			case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
@@ -45,7 +45,7 @@ class ETLValueHelper {
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'
 				break
 			default:
-				fieldValue = value
+				fieldValue = String.valueOf(value)
 				break
 		}
 

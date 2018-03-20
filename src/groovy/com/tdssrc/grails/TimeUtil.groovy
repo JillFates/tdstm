@@ -5,6 +5,7 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
 import net.transitionmanager.service.UserPreferenceService
+import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.util.Assert
 
 import javax.servlet.http.HttpSession
@@ -25,8 +26,8 @@ class TimeUtil {
 
 	static final String defaultTimeZone = 'GMT'
 
-	def static final String TIMEZONE_ATTR = 'CURR_TZ'
-	def static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
+	static final String TIMEZONE_ATTR = 'CURR_TZ'
+	static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
 
 	// Valid date time formats
 	static final String FORMAT_DATE         = "MM/dd/yyyy"
@@ -56,6 +57,8 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
 	static final String FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
 	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
+
+	static final String FORMAT_DATE_TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm'Z'" // Quoted "Z" to indicate UTC, no timezone offset
 
 	static final String SHORT = 'S'
 	static final String FULL = 'F'
@@ -839,7 +842,7 @@ class TimeUtil {
 	 * @param session - the HttpSession user session object
 	 * @return the timezone id string
 	 */
-	public static String getUserTimezone(HttpSession session) {
+	static String getUserTimezone(HttpSession session) {
 		return TimeUtil.getFromHttpSession(session, TIMEZONE_ATTR, defaultTimeZone)
 	}
 
@@ -848,7 +851,7 @@ class TimeUtil {
 	 * @param session - the HttpSession user session object
 	 * @return the timezone id string
 	 */
-	public static String getUserDateFormat(HttpSession session) {
+	static String getUserDateFormat(HttpSession session) {
 		return TimeUtil.getFromHttpSession(session, DATE_TIME_FORMAT_ATTR, getDefaultFormatType())
 	}
 
@@ -857,7 +860,7 @@ class TimeUtil {
 	 * This method should be called when the user has no Time Zone Id
 	 * it his preferences.
 	 */
-	public static String getDefaultTimeZoneId(){
+	static String getDefaultTimeZoneId(){
 		return 'GMT'
 	}
 
@@ -866,7 +869,16 @@ class TimeUtil {
 	 * @param date - the date to convert to minutes
 	 * @return a date in minutes or null if parameter is null
 	 */
-	public static Integer timeInMinutes(Date datetime) {
+	static Integer timeInMinutes(Date datetime) {
 		datetime ? datetime.getTime() / 1000 / 60 : null
+	}
+
+	/**
+	 * Formatting a Date to UTC and the standard ISO8601 date format
+	 * @param date
+	 * @return String ISO8601
+	 */
+	static String formatToISO8601DateTime(Date date) {
+		DateFormatUtils.formatUTC(date, FORMAT_DATE_TIME_ISO8601)
 	}
 }

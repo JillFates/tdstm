@@ -92,6 +92,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
+			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
 			'FETCH_WITH_DATA_ACTION': 'Fetch with Data Action:',
 			'FETCH_WITH_FILE_UPLOAD': 'Fetch with File Upload:',
