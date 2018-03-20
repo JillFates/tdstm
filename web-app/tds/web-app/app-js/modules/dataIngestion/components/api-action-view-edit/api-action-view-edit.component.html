@@ -249,6 +249,19 @@
 										</div>
 									</div>
 								</div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Doc. URL:</label>
+                                            <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+                                                <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUlr" />
+                                            </div>
+                                            <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+                                                <label class="control-label label-detail"><a [attr.href]="apiActionModel.docUlr" target="_blank">{{apiActionModel.docUlr}}</a></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 							</div>
 						</form>
 					</div>
@@ -271,14 +284,22 @@
 													   format="{{column.format}}"
                                                        title="{{column.label}}"
 													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+										<ng-template kendoGridHeaderTemplate *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+											<span title="Readonly Field" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
+											<span title="Required Field" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
+											<span title="An Encoded Field" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
+										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
 												<button class="btn btn-default" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'param'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
+                                            <div *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+                                                <input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem[column.property]" />
+                                            </div>
+											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.paramName" required [ngClass]="{'has-error': dataItem.paramName.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
@@ -302,11 +323,11 @@
 																(filterChange)="filterChange($event, dataItem)"
 																[textField]="'label'"
 																[valueField]="'field'"
-																[(ngModel)]="dataItem.property"
+																[(ngModel)]="dataItem.fieldName"
 																(keypress)="getOnInputKey($event)"
 																(valueChange)="verifyIsValidForm()"
 																required
-																[ngClass]="{'has-error': !dataItem.property}" >
+																[ngClass]="{'has-error': !dataItem.fieldName}" >
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
@@ -314,7 +335,7 @@
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'param'">
+											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 												<span>{{dataItem.param}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
@@ -322,7 +343,7 @@
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
 												<span *ngIf="dataItem.context === 'USER_DEF'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEF'">{{dataItem.property.label}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
 												<span>{{dataItem.desc}}</span>

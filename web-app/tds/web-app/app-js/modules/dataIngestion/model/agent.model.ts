@@ -39,6 +39,7 @@ export class AgentMethodModel {
 		}
 	};
 	producesData?: boolean;
+	methodParams?: Array<any>;
 
 	constructor() {
 		this.name = '';
@@ -60,5 +61,6 @@ export class AgentMethodModel {
 				interval: INTERVAL.MINUTES
 			}
 		};
+		this.methodParams = [];
 	}
 }

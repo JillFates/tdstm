@@ -4,6 +4,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
 import com.tdsops.tm.enums.domain.AuthenticationMethod
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil

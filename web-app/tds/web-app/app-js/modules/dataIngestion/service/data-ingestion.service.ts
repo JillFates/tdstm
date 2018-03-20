@@ -224,7 +224,8 @@ export class DataIngestionService {
 									}, INTERVAL.MINUTES),
 									interval: INTERVAL.MINUTES
 								}
-							}
+							},
+							methodParams: result[property].params
 						});
 					}
 				}
@@ -292,6 +293,7 @@ export class DataIngestionService {
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			url: model.url,
+			docUlr: model.docUlr,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
