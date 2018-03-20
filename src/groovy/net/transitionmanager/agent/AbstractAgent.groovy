@@ -6,6 +6,8 @@ import com.tds.asset.AssetComment
 
 import groovy.util.logging.Slf4j
 
+import java.util.regex.Matcher
+
 /**
  * Methods to interact with RiverMeadow 3rd Party Application API
  */
@@ -52,7 +54,7 @@ class AbstractAgent {
 	 */
 	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
-		for(param in action.methodParamsList) {
+		for(param in action.listMethodParams) {
 			switch (ContextType[param.context]) {
 				case ContextType.TASK:
 					methodParams << [ (param.param) : task[param.property] ]
@@ -73,7 +75,43 @@ class AbstractAgent {
 					throw new InvalidRequestException("Param context ${param.context} not supported")
 			}
 		}
+
+		def (epReplaced, paramsUsed) = AbstractAgent.replaceParameters(action.endpointPath, methodParams, true)
+		action.endpointPath = epReplaced
+		methodParams = paramsUsed
+
 		methodParams
+	}
+
+	/**
+	 * replace in a String mustache like parameters with the dictionary provided
+	 *
+	 * @param parametrizedStr  String with Mustache like parameters to be replaced
+	 * @param params Parameters Dictionary
+	 * @param discardMatchParams Indicate if the returned Dictionary should remove those parameters already replaced
+	 * @return a Tuple of the String with the parameters replaced with the values and a copy of the Params Map (with
+	 * with the used parameters removed from it if the discardMatchParams is set)
+	 */
+	static replaceParameters(String parametrizedStr, Map params, boolean discardMatchParams = false){
+		Map cpyParams = params.clone()
+
+		StringBuffer sb = new StringBuffer()
+		Matcher m = parametrizedStr =~ /\{\{([^\}]*)\}\}/
+
+		while(m.find()) {
+			String param = m.group(1)
+			String repString = params[param]
+			if(repString) {
+				m.appendReplacement(sb, repString)
+				if (discardMatchParams) {
+					cpyParams.remove(param)
+				}
+			}
+		}
+
+		m.appendTail(sb)
+
+		return [sb.toString(), cpyParams]
 	}
 
 	// A commonly used set of Maps used for varius parameters and results

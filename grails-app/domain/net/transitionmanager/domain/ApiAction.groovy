@@ -11,6 +11,8 @@ import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+import java.util.regex.Matcher
+
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
  * invoked by the TransitionManager application in Tasks and other places.
@@ -119,7 +121,7 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointPath nullable: true, blank: true
+		endpointPath nullable: true, blank: true, validator: ApiAction.&endpointPathValidator
 		endpointUrl nullable: true, blank: true
 		isPolling range: 0..1
 		lastUpdated nullable: true
@@ -325,4 +327,36 @@ class ApiAction {
 		}
 	}
 
+	/**
+	 * Validates that id the endpoint path has parameters they exist in the parameter list
+	 * @param value
+	 * @param apiAction
+	 */
+	static endpointPathValidator (value, ApiAction apiAction) {
+
+		if (! value) {
+			return true
+		}
+
+		Matcher m = value =~ /\{\{([^\}]*)\}\}/
+
+		List<String> params = []
+		while(m.find()) {
+			params << m.group(1)
+		}
+
+		HashSet<String> methodParamList = apiAction.listMethodParams.collect {
+			it.param
+		}
+
+		List paramsNotFound = params.findAll {
+			! methodParamList.contains(it)
+		}
+
+		if (paramsNotFound) {
+			return [Message.ParamReferenceInURINotFound, paramsNotFound.join(', ')]
+		}
+
+		return true
+	}
 }
