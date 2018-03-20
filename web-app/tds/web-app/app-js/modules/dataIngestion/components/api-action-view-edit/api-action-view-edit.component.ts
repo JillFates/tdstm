@@ -443,11 +443,29 @@ export class APIActionViewEditComponent implements OnInit {
 					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
 					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
+					this.tempFixForContent();
+					this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
 				} else if (this.lastSelectedAgent) {
 					// Return the value to the previous one
 					this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
 				}
 			});
+	}
+
+	/**
+	 * Temp Fix to obtain the context, I need this just to procced with the TM-9849
+	 * @returns {any}
+	 */
+	private tempFixForContent(): any {
+		this.apiActionModel.agentMethod.methodParams.forEach((item, index) => {
+			if (item.context && item.context.name) {
+				item.context = item.context.name;
+			}
+			if (!item.context || item.context === 'null' || item.context === null) {
+				this.apiActionModel.agentMethod.methodParams.splice(index, 1);
+			}
+		});
+		return this.apiActionModel.agentMethod.methodParams;
 	}
 
 	/**
@@ -539,13 +557,16 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	onAddParameter(): void {
 		this.parameterList.data.push({
-			param: '',
+			paramName: '',
 			desc: '',
 			type: 'string',
 			context: '',
-			property: '',
+			fieldName: '',
 			currentFieldList: [],
-			value: ''
+			value: '',
+			readonly: false,
+			required: false,
+			encoded: false
 		});
 		this.refreshParametersList();
 	}
@@ -562,10 +583,10 @@ export class APIActionViewEditComponent implements OnInit {
 			dataItem.currentFieldList = fieldSpecs.fields;
 			dataItem.sourceFieldList = fieldSpecs.fields;
 			let property = dataItem.currentFieldList.find((field) => {
-				return field.field === dataItem.property;
+				return field.field === dataItem.fieldName;
 			});
 			if (property) {
-				dataItem.property = property;
+				dataItem.fieldName = property;
 			}
 		}
 

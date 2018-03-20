@@ -70,28 +70,48 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 68,
+				width: 64,
 				locked: true
-			}, {
+			},
+			{
+				label: 'custom',
+				property: 'required',
+				type: 'boolean',
+				width: 44
+			},
+			{
+				label: 'custom',
+				property: 'readonly',
+				type: 'boolean',
+				width: 44
+			},
+			{
 				label: 'Name',
-				property: 'param',
+				property: 'paramName',
 				type: 'text',
-				width: 210
+				width: 190
 			}, {
 				label: 'Context',
 				property: 'context.value',
 				type: 'text',
-				width: 160
+				width: 140
 			}, {
 				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 265
-			}, {
+				width: 210
+			},
+			{
+				label: 'custom',
+				property: 'encoded',
+				type: 'boolean',
+				width: 44
+			},
+			{
 				label: 'Description',
 				property: 'desc',
 				type: 'text',
-				width: 310
+				width: 265
 			}
 		];
 	}
@@ -142,6 +162,7 @@ export class APIActionModel {
 		name?: string
 	};
 	url?: string;
+	docUlr?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
 
@@ -155,6 +176,7 @@ export class APIActionModel {
 		this.isPolling = false;
 		this.producesData = false;
 		this.url = '';
+		this.docUlr = '';
 		this.polling = {
 			frequency: {
 				value: 0,
@@ -219,11 +241,11 @@ export class EventReaction {
 }
 
 export class APIActionParameterModel {
-	param?: string;
+	paramName?: string;
 	desc?: string;
 	type?: string;
 	context?: string;
-	property?: string;
+	fieldName?: string;
 	value?: string;
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;
