@@ -1,6 +1,6 @@
-<div class="modal-content api-action-view-edit-component">
+<div class="modal-content api-action-view-edit-component"  #apiActionContainer tabindex="0">
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+		<button (click)="cancelCloseDialog()" type="button"  tds-autofocus="" class="close" aria-label="Close">
 			<span aria-hidden="true">×</span>
 		</button>
 		<h4 class="modal-title">{{modalTitle}}</h4>
@@ -314,7 +314,7 @@
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
+												<input  (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -390,7 +390,7 @@
 												<div class="col-md-2">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
+															<input  type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
 														</label>
 													</div>
 												</div>
@@ -399,7 +399,7 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
+														<input  type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>
@@ -469,7 +469,7 @@
 													<code-mirror #codeMirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[2].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -489,7 +489,7 @@
 													<code-mirror #codeMirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[3].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -509,7 +509,7 @@
 													<code-mirror #codeMirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[4].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
 													</div>
 												</div>
 											</div>

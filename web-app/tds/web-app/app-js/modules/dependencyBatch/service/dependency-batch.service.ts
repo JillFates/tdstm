@@ -3,13 +3,15 @@ import {Observable} from 'rxjs/Observable';
 import {Injectable} from '@angular/core';
 import {Headers, RequestOptions, Response} from '@angular/http';
 import {ImportBatchModel} from '../model/import-batch.model';
+import {ImportBatchRecordModel} from '../model/import-batch-record.model';
+import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
 export class DependencyBatchService {
 
+	private readonly importBatchesUrl = '../ws/import/batches';
 	private readonly importBatchUrl = '../ws/import/batch';
 	private readonly batchProgressUrl = '../ws/progress';
-	private mockRunningBatchFlag = false;
 
 	constructor(private http: HttpInterceptor) {
 	}
@@ -19,7 +21,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	getImportBatches(): Observable<any> {
-		return this.http.get(this.importBatchUrl)
+		return this.http.get(this.importBatchesUrl)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -37,7 +39,7 @@ export class DependencyBatchService {
 			headers: headers,
 			body : body
 		});
-		return this.http.delete(this.importBatchUrl, options)
+		return this.http.delete(this.importBatchesUrl, options)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -63,7 +65,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	deleteImportBatch(id: number): Observable<any> {
-		return this.http.delete(`${this.importBatchUrl}/${id}`)
+		return this.http.delete(`${this.importBatchesUrl}/${id}`)
 			.map( (res: Response) => {
 				return res.json();
 			})
@@ -76,7 +78,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	archiveImportBatch(id: number): Observable<any> {
-		return this.http.put(`${this.importBatchUrl}/archive/${id}`, null)
+		return this.http.put(`${this.importBatchesUrl}/archive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -84,15 +86,16 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * PUT - Bulk Archive Import Batches.
+	 * PATCH - Bulk Archive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	archiveImportBatches(ids: Array<number>): Observable<any> {
+	archiveImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
+			action: 'ARCHIVE',
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchUrl}/archive`, JSON.stringify(request))
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -105,7 +108,7 @@ export class DependencyBatchService {
 	 * @returns {Observable<any>}
 	 */
 	unArchiveImportBatch(id: number): Observable<any> {
-		return this.http.put(`${this.importBatchUrl}/unarchive/${id}`, null)
+		return this.http.put(`${this.importBatchesUrl}/unarchive/${id}`, null)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -113,15 +116,50 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * PUT - Bulk Unarchive Import Batches.
+	 * PATCH - Bulk Unarchive Import Batches.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	unArchiveImportBatches(ids: Array<number>): Observable<any> {
+	unArchiveImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
 		const request = {
+			action: 'UNARCHIVE',
 			ids: ids
 		};
-		return this.http.put(`${this.importBatchUrl}/unarchive`, JSON.stringify(request))
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Bulk EJECT Import Batches.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	ejectImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'EJECT',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Bulk QUEUE Import Batches.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	queueImportBatches(ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'QUEUE',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -133,8 +171,8 @@ export class DependencyBatchService {
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	getImportBatchProgress(id: number): Observable<any> {
-		return this.http.get(`${this.batchProgressUrl}/${id}`)
+	getImportBatchProgress(id: number): Observable<ApiResponseModel> {
+		return this.http.get(`${this.importBatchUrl}/${id}/progress`)
 			.map((res: Response) => {
 				return res.json();
 			})
@@ -142,14 +180,132 @@ export class DependencyBatchService {
 	}
 
 	/**
-	 * DELETE - Stops current import batch in progress.
+	 * PATCH - Stops current import batch in progress.
 	 * @param {number} id
 	 * @returns {Observable<any>}
 	 */
-	stopImportBatch(id: number): Observable<any> {
-		return this.http.delete(`${this.batchProgressUrl}/${id}`)
+	stopImportBatch(ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'STOP',
+			ids: ids
+		};
+		return this.http.patch(`${this.importBatchesUrl}`, JSON.stringify(request))
 			.map((res: Response) => {
 				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET - List of import batch records for an import batch.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	getImportBatchRecords(id: number): Observable<ApiResponseModel> {
+		return this.http.get(this.importBatchUrl + `/${id}/records`)
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * NOTE: Since there's no endpoint to retreive light information we need to make this call below to get all records.
+	 * GET - Returns a single batch record of an import batch by id.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	getImportBatchRecordUpdated(batchId: number, id: number): Observable<{} | ImportBatchRecordModel> {
+		return this.http.get(this.importBatchUrl + `/${batchId}/records`)
+			.map( (res: Response) => {
+				const batchRecords: Array<ImportBatchRecordModel> = res.json().data;
+				let match: ImportBatchRecordModel = batchRecords.find( (item: ImportBatchRecordModel) => {
+					return item.id === id;
+				});
+				return match;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET - Batch Record Fields details for a batch record.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	getImportBatchRecordFieldDetail(batchId: number, id: number): Observable<ApiResponseModel> {
+		return this.http.get(this.importBatchUrl + `/${batchId}/record/${id}`)
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Ignore Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	ignoreBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'IGNORE',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Include Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	includeBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'INCLUDE',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PATCH - Process/Revalidate Import Batch Records.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	processBatchRecords(batchId: number, ids: Array<number>): Observable<ApiResponseModel> {
+		const request = {
+			action: 'PROCESS',
+			ids: ids
+		};
+		return this.http.patch(this.importBatchUrl + `/${batchId}/records`, JSON.stringify(request))
+			.map( (res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * PUT - Updates the batch record fields values of a batch record.
+	 * @param {number} id
+	 * @returns {Observable<any>}
+	 */
+	updateBatchRecordFieldsValues(batchId: number, id: number, fieldsValues: Array<{fieldName: string, value: string}>): Observable<any> {
+		const request = {
+			fieldsInfo: fieldsValues
+		};
+		return this.http.put(this.importBatchUrl + `/${batchId}/record/${id}`, JSON.stringify(request))
+			.map((res: Response) => {
+				// return res.json();
+				let mockResponse = new ApiResponseModel();
+				mockResponse.status = ApiResponseModel.API_SUCCESS;
+				return mockResponse;
 			})
 			.catch((error: any) => error.json());
 	}

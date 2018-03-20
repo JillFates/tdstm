@@ -158,7 +158,7 @@ class ETLProcessor implements RangeChecker {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
-				Column column = new Column(label: field.name, index: index)
+				Column column = new Column(label: field.name.trim(), index: index)
 				columns.add(column)
 				columnsMap[column.label] = column
 			}
@@ -251,7 +251,7 @@ class ETLProcessor implements RangeChecker {
 			currentColumnIndex = 0
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			binding.addDynamicVariable(NOW_VARNAME, new Date())
+			binding.addDynamicVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(currentRowIndex, row))
 

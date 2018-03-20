@@ -50,26 +50,28 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	def setup() {
 
 		assetDependencyDataSetContent = """
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent()
+				AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+				1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+				2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+				3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+				4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+				5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+				6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+				7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+				8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+				9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+				10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+				11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+				12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+				13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+				14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File
+		""".stripIndent().trim()
 
 		applicationDataSetContent = """
-application id,vendor name,technology,location
-152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center""".stripIndent()
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+				152255,Mozilla,NGM,ACME Data Center
+		""".stripIndent().trim()
 
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
@@ -580,4 +582,5 @@ application id,vendor name,technology,location
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
 }
