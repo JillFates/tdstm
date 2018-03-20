@@ -49,54 +49,83 @@ class DataSetFacade {
 	}
 
 	/**
-	 *
-	 * @param sheetName
+	 * Set the sheet name in a TDSExcelDriver.
+	 * If workbook doesn't contains that sheet name it throws an ETLProcessorException
+	 * @param sheetName an string to be used in setting list name
 	 */
 	void setSheetName(String sheetName) {
-		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
-			throw ETLProcessorException.invalidSheetCommand()
-		}
-
-		TDSExcelDriver excelDriver = (TDSExcelDriver)dataSet.connection.driver
-
-		boolean hasSheet = false
-		try {
-			hasSheet = excelDriver.hasSheet(dataSet, sheetName)
-		} catch (all) {
-			throw ETLProcessorException.invalidSheetName(sheetName)
-		}
-
-		if(!hasSheet){
-			throw ETLProcessorException.invalidSheetName(sheetName)
-		}
-
+		validateSheetName(sheetName)
 		((ExcelDataset)dataSet).setListName(sheetName)
 	}
 
 	/**
-	 *
-	 * @param sheetNumber
+	 * Set the sheet number in a TDSExcelDriver.
+	 * If workbook doesn't contains a sheet in an ordinal position it throws an ETLProcessorException
+	 * @param sheetNumber an integer to be used in setting list name
 	 */
 	void setSheetNumber(Integer sheetNumber) {
+		validateSheetNumber(sheetNumber)
+		((ExcelDataset)dataSet).params.listName = sheetNumber
+	}
+
+	/**
+	 * Set the current row index in the params of the DataSet instance.
+	 * It will use to read labels or reading rows content
+	 * @param currentRowIndex
+	 */
+	void setCurrentRowIndex(int currentRowIndex) {
+		dataSet.params.currentRowIndex = currentRowIndex
+	}
+
+	/**
+	 * Validates if sheet name is correct.
+	 * It checks:
+	 * 1) if DataSetFacade was configured correctly with an instance of ExcelDataset
+	 * 2) If the Workboo in the Excel Driver contains a sheet with sheetName parameter
+	 * @param sheetName a string with the sheet name
+	 */
+	private void validateSheetName(String sheetName) {
 		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
 			throw ETLProcessorException.invalidSheetCommand()
 		}
 
 		TDSExcelDriver excelDriver = (TDSExcelDriver)dataSet.connection.driver
-		boolean hasSheet = false
-		try {
+
+		boolean hasSheet
+		try{
+			hasSheet = excelDriver.hasSheet(dataSet, sheetName)
+		} catch(all){
+			throw ETLProcessorException.invalidSheetName(sheetName)
+		}
+
+		if(!hasSheet){
+			throw ETLProcessorException.invalidSheetName(sheetName)
+		}
+	}
+
+	/**
+	 * Validates if sheet number is correct.
+	 * It checks:
+	 * 1) if DataSetFacade was configured correctly with an instance of ExcelDataset
+	 * 2) If the Workbook in the Excel Driver contains a sheet in the position
+	 * of the ordinal sheet number parameter
+	 * @param sheetNumber a integer with an ordinal sheet number
+	 */
+	private void validateSheetNumber(int sheetNumber) {
+		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
+			throw ETLProcessorException.invalidSheetCommand()
+		}
+
+		TDSExcelDriver excelDriver = (TDSExcelDriver)dataSet.connection.driver
+		boolean hasSheet
+		try{
 			hasSheet = excelDriver.hasSheet(dataSet, sheetNumber)
-		} catch (all) {
+		} catch(all){
 			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
 		}
 
 		if(!hasSheet){
 			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
 		}
-		((ExcelDataset)dataSet).params.listName = sheetNumber
-	}
-
-	void setCurrentRowIndex(int currentRowIndex) {
-		dataSet.params.currentRowIndex = currentRowIndex
 	}
 }

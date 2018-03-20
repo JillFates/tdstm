@@ -13,6 +13,31 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFSheet
 
+/**
+ * Custom implementation of ExcelDriver. It adds support for several ETL script commands.
+ * For example:
+ * <pre>
+ *  sheet 'Active Applications'
+ *  .....
+ *  sheet 4
+ *  .....
+ *  sheet '4'
+ *  ....
+ * </pre>
+ *  Is validated by @see TDSExcelDriver#hasSheet
+ * <br>
+ *  After that, reading workbook column headers
+ * <pre>
+ *  sheet 'Active Applications'
+ *  read labels
+ * </pre>
+ * It is implemented TDSExcelDriver#fields
+ *
+ * @see ExcelDriver
+ * @see TDSExcelDriver#fields(getl.data.Dataset)
+ * @see TDSExcelDriver#hasSheet(getl.data.Dataset, int)
+ * @see TDSExcelDriver#hasSheet(getl.data.Dataset, String)
+ */
 class TDSExcelDriver extends ExcelDriver {
 
 	Workbook workbook
@@ -159,7 +184,6 @@ class TDSExcelDriver extends ExcelDriver {
 	boolean hasSheet(Dataset dataset, int sheetNumber) {
 		return WorkbookUtil.getSheetFromWorkbookAt(getWorkbook(dataset), sheetNumber) != null
 	}
-
 
 	/**
 	 * Lookups a Sheet instance based on a listName
