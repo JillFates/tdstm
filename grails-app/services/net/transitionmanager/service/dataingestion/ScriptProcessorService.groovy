@@ -3,6 +3,7 @@ package net.transitionmanager.service.dataingestion
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
@@ -86,10 +87,10 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-            CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+	        Dataset dataset = FileSystemService.buildDataset(fileName)
 
             etlProcessor = new ETLProcessor(project,
-                    new DataSetFacade(new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)),
+                    new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
