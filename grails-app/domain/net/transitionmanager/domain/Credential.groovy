@@ -154,11 +154,11 @@ class Credential {
 	}
 
 	/**
-	 * Used to validate if the authenticationUrl property is set for AuthenticationMethods that require a value
-	 *      AWS - doen't need on since URL is predefined
+	 * Used to validate if the authenticationUrl property is set for AuthenticationMethods that is require a value
+	 * based on the authentication method. This propoerty is required for COOKIE, HEADER and JWT methods.
 	 */
 	static Closure authenticationUrlValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.BASIC_AUTH, AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (value == null || value.trim() == '') {
 				return 'default.blank.message'
