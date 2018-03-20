@@ -100,7 +100,20 @@ class ApiActionService implements ServiceMethods {
 
 		if (!dictionary) {
 			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
+		} else {
+			// Iterate over the dictionary replacing the enum in params.context with the enum's name
+			for (String key in dictionary.keySet()) {
+				DictionaryItem agentInfo = dictionary[key]
+				if (agentInfo.params) {
+					for (Map paramsMap in agentInfo.params)
+						if (paramsMap.containsKey('context') && paramsMap.context) {
+							paramsMap.context = paramsMap.context.name()
+						}
+				}
+			}
 		}
+
+
 
 		return dictionary
 	}

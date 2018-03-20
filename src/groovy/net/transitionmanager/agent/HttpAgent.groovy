@@ -30,7 +30,7 @@ class HttpAgent extends AbstractAgent {
 				providesData: 0,
 				params: queueParams()
             ])
-        ].asImmutable() )
+        ] )
 
         restfulProducerService = (RestfulProducerService) ApplicationContextHolder.getBean('restfulProducerService')
     }

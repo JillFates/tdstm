@@ -68,7 +68,7 @@ class AwsAgent extends AbstractAgent {
 					]
 				] + queueParams()
 			])
-		].asImmutable() )
+		] )
 
 		awsService = (AwsService) ApplicationContextHolder.getBean('awsService')
 	}

@@ -82,7 +82,7 @@ class ServiceNowAgent extends AbstractAgent {
 			readonly: 0,
 			encoded:1
 		]
-	].asImmutable()
+	]
 
 	/*
 	 * Constructor
@@ -169,7 +169,7 @@ class ServiceNowAgent extends AbstractAgent {
 
 					] + COMMON_PARAMS
 				] )
-		].asImmutable()
+		]
 
 		setDictionary( dictionary )
 
