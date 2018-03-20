@@ -106,49 +106,6 @@ class TDSExcelDriver extends ExcelDriver {
 		countRec
 	}
 
-	private static getCellValue(final Cell cell, final Dataset dataset, final int columnIndex) {
-		try{
-			Field.Type fieldType = dataset.field.get(columnIndex).type
-
-			switch (fieldType) {
-				case Field.Type.BIGINT:
-					if (cell.cellType == Cell.CELL_TYPE_STRING) (cell.stringCellValue.toBigInteger())
-					else cell.numericCellValue.toBigInteger()
-					break
-				case Field.Type.BOOLEAN:
-					cell.booleanCellValue
-					break
-				case Field.Type.DATE:
-					cell.dateCellValue
-					break
-				case Field.Type.DATETIME:
-					cell.dateCellValue
-					break
-				case Field.Type.DOUBLE:
-					if (cell.cellType == Cell.CELL_TYPE_STRING) (cell.stringCellValue.toDouble())
-					else cell.numericCellValue
-					break
-				case Field.Type.INTEGER:
-					if (cell.cellType == Cell.CELL_TYPE_STRING) (cell.stringCellValue.toInteger())
-					else cell.numericCellValue.toInteger()
-					break
-				case Field.Type.NUMERIC:
-					if (cell.cellType == Cell.CELL_TYPE_STRING) (cell.stringCellValue.toBigDecimal())
-					else cell.numericCellValue.toBigDecimal()
-					break
-				case Field.Type.STRING:
-					cell.stringCellValue
-					break
-				default:
-					throw new ExceptionGETL('Default field type not supported.')
-			}
-		} catch (e) {
-			Logs.Warning("Error in ${cell.rowIndex} row")
-			Logs.Exception(e)
-			throw e
-		}
-	}
-
 	@Override
 	protected List<Field> fields(Dataset dataset) {
 
