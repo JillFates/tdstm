@@ -378,17 +378,18 @@ export class DataIngestionService {
 		}
 	}
 
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
+	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
 		let postRequest = {
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			name: model.name
 		};
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				return result && result.status === 'success' && result.data && result.data.isUnique;
 			})
 			.catch((error: any) => error.json());
 	}
