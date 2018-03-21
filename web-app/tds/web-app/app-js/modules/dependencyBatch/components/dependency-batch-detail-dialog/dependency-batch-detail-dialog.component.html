@@ -12,7 +12,7 @@
                 Batch Records Grid
             -->
             <section>
-                <div class="box-body box-with-empty-header default-list-component">
+                <div class="box-body box-with-empty-header tds-kendo-grid">
                     <kendo-grid *ngIf="dataGridOperationsHelper"
                                 [height]="550"
                                 [data]="dataGridOperationsHelper.gridData"
@@ -79,14 +79,12 @@
                                     </div>
                                 </ng-template>
                                 <ng-template kendoGridCellTemplate let-dataItem>
-                                    <div class="text-center k-grid-ignore-click" *ngIf="batchRecordCanAction(dataItem)">
-                                        <label style="min-height: 15px;">
-                                            <input type="checkbox"
-                                                   [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
-                                                   name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
-                                                   (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                        <label class="selectall-checkbox-column text-center k-grid-ignore-click">
+                                        <input type="checkbox"
+                                               [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                               name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
                                         </label>
-                                    </div>
                                 </ng-template>
                             </kendo-grid-column>
 
