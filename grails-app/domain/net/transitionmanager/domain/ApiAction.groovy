@@ -338,35 +338,21 @@ class ApiAction {
 	}
 
 	/**
-	 * Validates that id the endpoint path has parameters they exist in the parameter list
+	 * Validate that all placeholders in the endpoint path exist in the methodParams list
 	 * @param value
 	 * @param apiAction
 	 */
-	static endpointPathValidator (value, ApiAction apiAction) {
+	static endpointPathValidator (String value, ApiAction apiAction) {
 
-		if (! value) {
-			return true
-		}
+		Set<String> placeholders = StringUtil.extractPlaceholders(value)
+		Set<String> methodParamNames = apiAction.listMethodParams.collect { it.param }
+		Set<String> missingPlaceholders = placeholders - methodParamNames
 
-		Matcher m = value =~ /\{\{([^\}]*)\}\}/
-
-		List<String> params = []
-		while(m.find()) {
-			params << m.group(1)
-		}
-
-		HashSet<String> methodParamList = apiAction.listMethodParams.collect {
-			it.param
-		}
-
-		List paramsNotFound = params.findAll {
-			! methodParamList.contains(it)
-		}
-
-		if (paramsNotFound) {
-			return [Message.ParamReferenceInURLNotFound, paramsNotFound.join(', ')]
+		if (missingPlaceholders) {
+			return [Message.ParamReferenceInURLNotFound, missingPlaceholders.join(', ')]
 		}
 
 		return true
+
 	}
 }

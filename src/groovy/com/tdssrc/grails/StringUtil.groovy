@@ -441,9 +441,9 @@ class StringUtil {
 	}
 
 	/**
-	 * replace in a String mustache like parameters with the dictionary provided
+	 * replace in a String mustache like placeholders with the dictionary provided
 	 *
-	 * @param text  String with Mustache like parameters to be replaced
+	 * @param text  String with Mustache like placeholders to be replaced
 	 * @param params Parameters Dictionary
 	 * @param encodeURL set if the substitution transformation should be encoded to URL
 	 * TODO: oluna, change the flag to pass an encoder object to reuse the substitution to different encoders: URL, JS, XML, etc
@@ -467,5 +467,24 @@ class StringUtil {
 		m.appendTail(sb)
 
 		return sb.toString()
+	}
+
+	/**
+	 * Extract a Set of String mustache like placeholders from another string (avoiding duplicated entries)
+	 * @param value String with the placeholders
+	 * @return Set of placeholders, empty set if null
+	 */
+	static Set<String> extractPlaceholders(String value) {
+		HashSet<String> placeholders = []
+
+		if (value) {
+			Matcher m = value =~ /\{\{([^\}]*)\}\}/
+
+			while (m.find()) {
+				placeholders << m.group(1)
+			}
+		}
+
+		return placeholders
 	}
 }
