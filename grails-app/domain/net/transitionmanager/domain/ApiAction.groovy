@@ -1,8 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
-import groovy.transform.ToString
-import groovy.util.logging.Slf4j
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
@@ -10,6 +10,8 @@ import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -77,6 +79,9 @@ class ApiAction {
 	// The fully qualified URL to the endpoint
 	String endpointUrl
 
+	// The URL of the documentation to the endpoint if available (this can be formatted title|url or just url)
+	String docUrl=''
+
 	// A flag that indicates if the action will poll for a result
 	Integer isPolling = 0
 
@@ -116,6 +121,7 @@ class ApiAction {
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
 		endpointUrl nullable: true, blank: true
+		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
@@ -140,6 +146,8 @@ class ApiAction {
 			asyncQueue 		sqlType: 'varchar(64)'
 			name 			sqlType: 'varchar(64)'
 			methodParams	sqlType: 'text'
+			endpointUrl		sqlType: 'varchar(255)'
+			docUrl			sqlType: 'varchar(255)'
 		}
 	}
 
@@ -317,6 +325,17 @@ class ApiAction {
 			return true
 		} catch (e) {
 			return Message.InvalidJsonFormat
+		}
+	}
+
+	/**
+	 * Used to validate the docUrl if it has a value that it is either a URL or a Markup URL (title|URL)
+	 */
+	static docUrlValidator(value, ApiAction apiAction) {
+		if (StringUtil.isNotBlank(value)) {
+			if (! (HtmlUtil.isUrl(value) || HtmlUtil.isMarkupURL(value) ) ) {
+				return Message.InvalidURLFormat
+			}
 		}
 	}
 
