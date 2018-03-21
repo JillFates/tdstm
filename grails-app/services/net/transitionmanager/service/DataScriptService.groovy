@@ -5,6 +5,7 @@ import com.tdssrc.grails.JsonUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
+import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person
@@ -113,6 +114,16 @@ class DataScriptService implements ServiceMethods{
 
         return dataScript
     }
+
+	/**
+	 * Validate if the name for the script is valid.
+	 * @param command
+	 * @return
+	 */
+	boolean validateUniqueName(DataScriptNameValidationCommand command) {
+		return validateUniqueName(command.name, command.dataScriptId, command.providerId)
+	}
+
 
     /**
      * Check if a given DataScript name is unique across project and provider.

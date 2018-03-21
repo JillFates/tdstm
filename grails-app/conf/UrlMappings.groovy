@@ -679,7 +679,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/datascript/validateunique/$name" {
+		"/ws/dataingestion/datascript/validateunique" {
 			controller = "wsDataScript"
 			action = [
 					POST: "validateUniqueName"
