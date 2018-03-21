@@ -28,6 +28,7 @@ class ApiActionCommand implements CommandObject {
     String methodParams
     String reactionScripts
     String endpointUrl
+    String docUrl
     Integer isPolling = 0
     Integer pollingInterval = 0
     Integer pollingLapsedAfter = 0
