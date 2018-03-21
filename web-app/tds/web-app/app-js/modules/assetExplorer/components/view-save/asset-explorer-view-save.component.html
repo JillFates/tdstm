@@ -13,7 +13,8 @@
 						<span class="required_field">*</span>
 					</label>
 					<div class="col-sm-9">
-						<input type="text" name="name" id="name" class="form-control" placeholder="View Name" [(ngModel)]="model.name" required>
+						<input type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control" placeholder="View Name" [(ngModel)]="model.name" required>
+						<span *ngIf="!isUnique" style="color: red; font-weight: bold;">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
 					</div>
 				</div>
 				<div class="form-group">
