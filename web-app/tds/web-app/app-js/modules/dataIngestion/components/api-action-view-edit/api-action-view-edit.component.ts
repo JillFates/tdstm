@@ -761,4 +761,9 @@ export class APIActionViewEditComponent implements OnInit {
 			event.stopPropagation();
 		}
 	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+	}
 }
