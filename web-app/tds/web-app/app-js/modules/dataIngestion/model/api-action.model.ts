@@ -162,7 +162,7 @@ export class APIActionModel {
 		name?: string
 	};
 	endpointUrl?: string;
-	docUlr?: string;
+	docUrl?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
 
@@ -176,7 +176,7 @@ export class APIActionModel {
 		this.isPolling = false;
 		this.producesData = false;
 		this.endpointUrl = '';
-		this.docUlr = '';
+		this.docUrl = '';
 		this.polling = {
 			frequency: {
 				value: 0,

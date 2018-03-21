@@ -204,6 +204,7 @@ export class DataIngestionService {
 							name: result[property].name,
 							description: result[property].description,
 							endpointUrl: result[property].endpointUrl,
+							docUrl: result[property].docUrl,
 							producesData: (result[property].producesData === 1),
 							polling: {
 								frequency: {
@@ -293,7 +294,7 @@ export class DataIngestionService {
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			endpointUrl: model.endpointUrl,
-			docUlr: model.docUlr,
+			docUrl: model.docUrl,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),

@@ -440,6 +440,7 @@ export class APIActionViewEditComponent implements OnInit {
 			.then((res) => {
 				if (res) {
 					this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+					this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
 					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
 					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
@@ -453,7 +454,7 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
-	 * Temp Fix to obtain the context, I need this just to procced with the TM-9849
+	 * Temp Fix to obtain the context, I need this just to proceed with the TM-9849
 	 * @returns {any}
 	 */
 	private guardParams(): any {

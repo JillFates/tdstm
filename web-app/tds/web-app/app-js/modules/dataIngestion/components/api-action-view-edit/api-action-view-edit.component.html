@@ -254,10 +254,10 @@
                                         <div class="form-group">
                                             <label for="apiDocURL" class="col-sm-3 control-label url-label">Doc. URL:</label>
                                             <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
-                                                <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUlr" />
+                                                <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUrl" />
                                             </div>
                                             <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail"><a [attr.href]="apiActionModel.docUlr" target="_blank">{{apiActionModel.docUlr}}</a></label>
+                                                <label class="control-label label-detail"><a [attr.href]="apiActionModel.docUrl" target="_blank">{{apiActionModel.docUrl}}</a></label>
                                             </div>
                                         </div>
                                     </div>

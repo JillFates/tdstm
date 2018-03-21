@@ -23,6 +23,7 @@ export class AgentMethodModel {
 	results?: {};
 	// To Pre-populate
 	endpointUrl?: string;
+	docUrl?: string;
 	isPolling?: boolean;
 	polling?: {
 		frequency?: {
