@@ -435,22 +435,39 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Listener for the Select when the Value Method Changes.
+	 * @param event
+	 */
 	protected onMethodValueChange(event: any): void {
-		this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
-					this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
-					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
-					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
-					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
-					this.guardParams();
-					this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
-				} else if (this.lastSelectedAgent) {
-					// Return the value to the previous one
-					this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
-				}
-			});
+		if (this.lastSelectedAgent && this.lastSelectedAgent.id !== 0) {
+			this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
+				.then((res) => {
+					this.loadAgentMethodModel(res);
+				});
+		} else {
+			this.loadAgentMethodModel(true);
+		}
+	}
+
+	/**
+	 * Pre-populate the values of the Agent and Params if the changeMethod is true
+	 * or if this is the firs time ( Create )
+	 * @param {boolean} changeMethod
+	 */
+	private loadAgentMethodModel(changeMethod: boolean): void {
+		if (changeMethod) {
+			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
+			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
+			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
+			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
+			this.guardParams();
+			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+		} else if (this.lastSelectedAgent) {
+			// Return the value to the previous one
+			this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+		}
 	}
 
 	/**

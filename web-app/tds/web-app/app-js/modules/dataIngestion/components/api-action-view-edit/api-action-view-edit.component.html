@@ -239,7 +239,7 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="form-group">
-											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">URL:</label>
+											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
 											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
 												<input type="text" id="apiEndpointURL" name="apiEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
 											</div>
@@ -252,12 +252,12 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Doc. URL:</label>
+                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
                                             <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
                                                 <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUrl" />
                                             </div>
                                             <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail"><a [attr.href]="apiActionModel.docUrl" target="_blank">{{apiActionModel.docUrl}}</a></label>
+                                                <label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
                                             </div>
                                         </div>
                                     </div>
@@ -285,9 +285,9 @@
                                                        title="{{column.label}}"
 													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 										<ng-template kendoGridHeaderTemplate *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-											<span title="Readonly Field" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
-											<span title="Required Field" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
-											<span title="An Encoded Field" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
+											<span title="Readonly Parameter" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
+											<span title="Required Parameter" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
+											<span title="An Encoded Parameter" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
