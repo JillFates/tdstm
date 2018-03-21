@@ -6,6 +6,7 @@ export class ImportBatchRecordModel {
 	importBatch: any;
 	status: EnumModel;
 	errorCount: number;
+	errorList: Array<string>;
 	operation: string;
 	sourceRowId: number;
 	ignored: boolean;
