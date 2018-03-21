@@ -335,7 +335,7 @@
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+											<div class="group-boolean-fields" *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
 												<span *ngIf="column.property === 'readonly'"><span *ngIf="dataItem.readonly === 1  || dataItem.readonly === true"><i class="fa fa-fw fa-check"></i></span></span>
 												<span *ngIf="column.property === 'required'"><span *ngIf="dataItem.required === 1  || dataItem.required === true"><i class="fa fa-fw fa-check"></i></span></span>
 												<span *ngIf="column.property === 'encoded'"><span *ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
