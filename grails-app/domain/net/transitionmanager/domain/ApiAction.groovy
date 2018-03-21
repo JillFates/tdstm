@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.StringUtil
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AgentClass
@@ -208,6 +209,15 @@ class ApiAction {
 	}
 
 	/**
+	 * TM-9758 replace placeholders to the correct params
+	 * @param params Map containing the placeholders to replace
+	 * @return
+	 */
+	String endpointPathWithPlaceholdersSubstituted(Map params) {
+		return StringUtil.replacePlaceholders(endpointPath, params, true)
+	}
+
+	/**
 	 * Custom validator for the reactionJson that evaluates that:
 	 * - The string is a valid JSON.
 	 * - EVALUATE and SUCCESS are present.
@@ -354,7 +364,7 @@ class ApiAction {
 		}
 
 		if (paramsNotFound) {
-			return [Message.ParamReferenceInURINotFound, paramsNotFound.join(', ')]
+			return [Message.ParamReferenceInURLNotFound, paramsNotFound.join(', ')]
 		}
 
 		return true

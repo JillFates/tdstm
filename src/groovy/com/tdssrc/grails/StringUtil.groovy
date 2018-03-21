@@ -6,6 +6,8 @@ import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.codec.digest.DigestUtils
 
+import java.util.regex.Matcher
+
 /**
  * String manipulation methods.
  */
@@ -436,5 +438,34 @@ class StringUtil {
 	 */
 	static String md5Hex(String text) {
 		return DigestUtils.md5Hex(text)
+	}
+
+	/**
+	 * replace in a String mustache like parameters with the dictionary provided
+	 *
+	 * @param text  String with Mustache like parameters to be replaced
+	 * @param params Parameters Dictionary
+	 * @param encodeURL set if the substitution transformation should be encoded to URL
+	 * TODO: oluna, change the flag to pass an encoder object to reuse the substitution to different encoders: URL, JS, XML, etc
+	 * @return the String with the parameters replaced with the values
+	 */
+	static String replacePlaceholders(String text, Map params, boolean encodeURL = false){
+		StringBuffer sb = new StringBuffer()
+		Matcher m = text =~ /\{\{([^\}]*)\}\}/
+
+		while(m.find()) {
+			String param = m.group(1)
+			String repString = params[param]
+			if(repString) {
+				if(encodeURL) {
+					repString = URLEncoder.encode(repString, 'UTF-8')
+				}
+				m.appendReplacement(sb, repString)
+			}
+		}
+
+		m.appendTail(sb)
+
+		return sb.toString()
 	}
 }

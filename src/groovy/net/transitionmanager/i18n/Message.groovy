@@ -29,7 +29,7 @@ interface Message {
 	 */
 	String InvalidFieldForDomain = "domain.invalid.field"
 	String InvalidJsonFormat = "default.invalid.json.message"
-	String ParamReferenceInURINotFound = "default.param.reference.in.uri.not.found"
+	String ParamReferenceInURLNotFound = "default.param.reference.in.url.not.found"
 
 
 	String ApiActionInvalidProviderPreventsDataScriptValidation = "apiActionCommand.defaultDataScriptId.cannotbevalidated"
