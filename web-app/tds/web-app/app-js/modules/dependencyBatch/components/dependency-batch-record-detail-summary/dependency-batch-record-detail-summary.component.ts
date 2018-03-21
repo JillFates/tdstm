@@ -11,7 +11,13 @@ export class DependencyBatchRecordDetailSummaryComponent {
 	@Input('importBatch') importBatch: ImportBatchModel;
 	@Input('batchRecord') batchRecord: ImportBatchRecordModel;
 
+	private summaryCollapsed = false;
+
 	constructor() {
 		// Silence is golden
+	}
+
+	private toggleSummary(): void {
+		this.summaryCollapsed = !this.summaryCollapsed;
 	}
 }
