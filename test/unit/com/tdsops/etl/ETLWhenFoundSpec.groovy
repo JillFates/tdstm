@@ -148,10 +148,10 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by id with DOMAIN.asset into asset 
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
+       						elseFind Application by assetName with SOURCE.DependentName into asset
+    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
     						
     						whenNotFound asset create {
     							assetClass Application
@@ -273,10 +273,9 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						//elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by id with DOMAIN.asset into asset 
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
+       						elseFind Application by assetName with SOURCE.DependentName into asset
     						
     						whenNotFound asset update {
     							assetClass Application
@@ -357,10 +356,10 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by id with DOMAIN.asset into asset 
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
+       						elseFind Application by assetName with SOURCE.DependentName into asset
+    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
     						
     						whenFound asset create {
     							"TN Last Seen" NOW
@@ -438,10 +437,10 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by id with DOMAIN.asset into asset 
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset 
+       						elseFind Application by assetName with SOURCE.DependentName into asset 
+    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
     						
 							whenNotFound asset create {
 								assetClass Unknown
@@ -523,10 +522,10 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract AssetName set primaryName
 							extract AssetType set primaryType
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by id with DOMAIN.asset into asset  
+   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset 
+       						elseFind Application by assetName with SOURCE.DependentName into asset
+    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
     						
     						whenFound asset update {
     							"TN Last Seen" NOW
