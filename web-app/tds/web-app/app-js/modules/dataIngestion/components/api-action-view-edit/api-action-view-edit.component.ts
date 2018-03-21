@@ -129,7 +129,10 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedAgent;
+	private lastSelectedAgent: AgentModel = {
+		id: 0,
+		name: 'Select...'
+	};
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -465,8 +468,15 @@ export class APIActionViewEditComponent implements OnInit {
 			this.guardParams();
 			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
 		} else if (this.lastSelectedAgent) {
-			// Return the value to the previous one
-			this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+			// Return the value to the previous one if is on the same List
+			let agentMethod = this.agentMethodList.find((method) => {
+				return method.id === this.lastSelectedAgent.id;
+			});
+			if (agentMethod) {
+				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+			} else {
+				this.apiActionModel.agentMethod = this.agentMethodList[0];
+			}
 		}
 	}
 
@@ -542,7 +552,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
-		this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== 0) {
+			this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+		}
 		setTimeout(() => {
 			jQuery('kendo-popup').css('width', 'auto');
 		}, 100);

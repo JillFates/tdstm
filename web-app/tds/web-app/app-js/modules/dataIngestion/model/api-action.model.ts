@@ -111,7 +111,7 @@ export class APIActionParameterColumnModel {
 				label: 'Description',
 				property: 'desc',
 				type: 'text',
-				width: 270
+				width: 268
 			}
 		];
 	}
