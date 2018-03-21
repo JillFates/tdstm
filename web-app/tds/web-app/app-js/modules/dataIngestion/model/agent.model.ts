@@ -22,7 +22,7 @@ export class AgentMethodModel {
 	params?: {};
 	results?: {};
 	// To Pre-populate
-	url?: string;
+	endpointUrl?: string;
 	isPolling?: boolean;
 	polling?: {
 		frequency?: {
@@ -46,7 +46,7 @@ export class AgentMethodModel {
 		this.description = '';
 		this.isPolling = false;
 		this.producesData = false;
-		this.url = '';
+		this.endpointUrl = '';
 		this.polling = {
 			frequency: {
 				value: 0,

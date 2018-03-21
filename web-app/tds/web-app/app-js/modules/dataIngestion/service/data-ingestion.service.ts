@@ -203,7 +203,7 @@ export class DataIngestionService {
 							id: result[property].name,
 							name: result[property].name,
 							description: result[property].description,
-							url: result[property].url,
+							endpointUrl: result[property].endpointUrl,
 							producesData: (result[property].producesData === 1),
 							polling: {
 								frequency: {
@@ -292,7 +292,7 @@ export class DataIngestionService {
 			provider: { id: model.provider.id },
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
-			url: model.url,
+			endpointUrl: model.endpointUrl,
 			docUlr: model.docUlr,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,

@@ -161,7 +161,7 @@ export class APIActionModel {
 		id?: number,
 		name?: string
 	};
-	url?: string;
+	endpointUrl?: string;
 	docUlr?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
@@ -175,7 +175,7 @@ export class APIActionModel {
 		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
-		this.url = '';
+		this.endpointUrl = '';
 		this.docUlr = '';
 		this.polling = {
 			frequency: {
