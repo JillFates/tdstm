@@ -396,7 +396,13 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Look up a field name that contain a value equals to the value
+	 * Look up a field name that contain a value equals to the value and if found then the current
+	 * result reference will be move back to a previously processed row for the domain. This is done
+	 * by setting the rowFoundInLookup to the data row reference in the in the results.
+	 *
+	 * If the object is not found then future references to current result should be referring to the
+	 * last row in the data result.
+	 *
 	 * For example the following command:
 	 * <pre>
 	 *  iterate {
@@ -425,16 +431,17 @@ class ETLProcessorResult {
 	 * </pre>
 	 * If the value is found, then it is used in the following commands during the iteration
 	 * @see ETLProcessorResult#rowFoundInLookup
-	 * @param value
-	 * @return
+	 * @param fieldName - the field to examine for a match
+	 * @param value - the value that the field should have
+	 * @return true if the data row was found otherwise false
 	 */
 	boolean lookupInReference(String fieldName, String value) {
-
+		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
 		rowFoundInLookup = reference.data.find { Map<String, ?> dataRow ->
-			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName].value == value
+			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
 		}
 
-		return rowFoundInLookup != null
+		return (rowFoundInLookup != null)
 	}
 
 	/**
