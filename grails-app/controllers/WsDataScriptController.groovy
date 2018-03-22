@@ -3,6 +3,7 @@ import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
@@ -81,9 +82,8 @@ class WsDataScriptController implements ControllerMethods {
      */
     @HasPermission(Permission.DataScriptView)
     def validateUniqueName (String name) {
-        Long providerId = NumberUtil.toLong(request.JSON.providerId)
-        Long dataScriptId = NumberUtil.toLong(request.JSON.dataScriptId)
-        boolean isUnique = dataScriptService.validateUniqueName(name, dataScriptId, providerId)
+        DataScriptNameValidationCommand cmd = populateCommandObject(DataScriptNameValidationCommand)
+        boolean isUnique = dataScriptService.validateUniqueName(cmd)
         renderSuccessJson([isUnique: isUnique])
     }
 

@@ -402,17 +402,18 @@ export class DataIngestionService {
 		}
 	}
 
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
+	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
 		let postRequest = {
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			name: model.name
 		};
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				return result && result.status === 'success' && result.data && result.data.isUnique;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -422,22 +423,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['providerId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
-		let postRequest = {
-			providerId: model.provider.id
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
