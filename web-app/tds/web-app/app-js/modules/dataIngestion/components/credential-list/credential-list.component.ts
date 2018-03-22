@@ -51,6 +51,7 @@ export class CredentialListComponent {
 	public selectedRows = [];
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	private lastCreatedRecordId = 0;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -180,6 +181,12 @@ export class CredentialListComponent {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
+				if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
+					this.selectRow(this.lastCreatedRecordId);
+					let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
+					this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
+					this.lastCreatedRecordId = 0;
+				}
 			},
 			(err) => console.log(err));
 	}
@@ -197,11 +204,7 @@ export class CredentialListComponent {
 			this.reloadData();
 			if (actionType === ActionType.CREATE) {
 				if (result && result.id) {
-					setTimeout(() => {
-						this.selectRow(result.id);
-						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === result.id);
-						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
-					}, 500);
+					this.lastCreatedRecordId = result.id;
 				}
 			}
 		}).catch(result => {
