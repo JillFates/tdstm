@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
+import net.transitionmanager.service.InvalidParamException
 import groovy.json.StringEscapeUtils
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
@@ -441,30 +442,39 @@ class StringUtil {
 	}
 
 	/**
-	 * replace in a String mustache like placeholders with the dictionary provided
+	 * Used to replace in a String mustache like placeholders with the name value map provided
 	 *
-	 * @param text  String with Mustache like placeholders to be replaced
+	 * @param text - String with Mustache like placeholders to be replaced
 	 * @param params Parameters Dictionary
-	 * @param encodeURL set if the substitution transformation should be encoded to URL
-	 * TODO: oluna, change the flag to pass an encoder object to reuse the substitution to different encoders: URL, JS, XML, etc
 	 * @return the String with the parameters replaced with the values
+	 * @throws InvalidParamException if isn't a parameter defined for one or more placeholders
 	 */
-	static String replacePlaceholders(String text, Map params, boolean encodeURL = false){
-		StringBuffer sb = new StringBuffer()
-		Matcher m = text =~ /\{\{([^\}]*)\}\}/
-
-		while(m.find()) {
-			String param = m.group(1)
-			String repString = params[param]
-			if(repString) {
-				if(encodeURL) {
-					repString = URLEncoder.encode(repString, 'UTF-8')
-				}
-				m.appendReplacement(sb, repString)
-			}
+	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
+		if (params == null) {
+			throw new InvalidParamException("Parameters map for placeholder replacement is null")
 		}
 
+		StringBuffer sb = new StringBuffer()
+		Matcher m = text =~ /\{\{([^\}]*)\}\}/
+		Set<String> missing = []
+
+		while (m.find()) {
+			String paramName = m.group(1).trim()
+			if (params.containsKey(paramName)) {
+				m.appendReplacement(sb, params[paramName])
+			} else {
+				missing << paramName
+			}
+		}
 		m.appendTail(sb)
+
+		if (missing) {
+			if (missing.size() == 1 ) {
+				throw new InvalidParamException("Missing parameter for placeholder ${missing[0]}")
+			} else {
+				throw new InvalidParamException("Missing parameters for placeholders ${missing.join(', ')}")
+			}
+		}
 
 		return sb.toString()
 	}
@@ -481,7 +491,7 @@ class StringUtil {
 			Matcher m = value =~ /\{\{([^\}]*)\}\}/
 
 			while (m.find()) {
-				placeholders << m.group(1)
+				placeholders << m.group(1).trim()
 			}
 		}
 
