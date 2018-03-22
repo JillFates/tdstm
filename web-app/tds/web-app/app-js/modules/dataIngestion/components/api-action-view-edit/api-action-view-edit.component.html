@@ -71,6 +71,7 @@
 												<kendo-dropdownlist #apiActionAgent
 																	id="apiActionAgent" name="apiActionAgent" class="form-control"
 																	[data]="agentList"
+																	(open)="onOpenAgent()"
 																	(valueChange)="onAgentValueChange($event)"
 																	[textField]="'name'"
 																	[valueField]="'id'"
