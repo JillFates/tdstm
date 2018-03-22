@@ -80,11 +80,12 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Get an agent details by agent name
-	 * @param agentCode
-	 * @return the method dictionary for a specified agent
+	 * Generates a detailed map of an agent and associated methods with all properties of the methods
+	 * @param id - the Agent code to look up (e.g. AWS)
+	 * @return the method dictionary for the specified agent code
+	 * @throws InvalidParamException when
 	 */
-	Map agentDictionary (String id) {
+	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []
 		agentClassMap.each { entry ->
@@ -104,15 +105,14 @@ class ApiActionService implements ServiceMethods {
 			for (String key in dictionary.keySet()) {
 				DictionaryItem agentInfo = dictionary[key]
 				if (agentInfo.params) {
-					for (Map paramsMap in agentInfo.params)
+					for (Map paramsMap in agentInfo.params) {
 						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
 							paramsMap.context = paramsMap.context.name()
 						}
+					}
 				}
 			}
 		}
-
-
 
 		return dictionary
 	}
