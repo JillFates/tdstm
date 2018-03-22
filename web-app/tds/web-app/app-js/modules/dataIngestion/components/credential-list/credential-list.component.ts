@@ -181,12 +181,14 @@ export class CredentialListComponent {
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
-				if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
-					this.selectRow(this.lastCreatedRecordId);
-					let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
-					this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
-					this.lastCreatedRecordId = 0;
-				}
+				setTimeout(() => {
+					if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
+						this.selectRow(this.lastCreatedRecordId);
+						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
+						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
+						this.lastCreatedRecordId = 0;
+					}
+				}, 500);
 			},
 			(err) => console.log(err));
 	}
