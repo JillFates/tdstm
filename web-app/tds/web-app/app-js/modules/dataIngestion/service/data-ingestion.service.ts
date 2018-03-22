@@ -407,21 +407,6 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
-	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
-		let postRequest = {
-			providerId: model.provider.id
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
 	validateCode(scripts: any): Observable<any> {
 		return this.http.post(`${this.dataApiActionUrl}/validateSyntax`, JSON.stringify({scripts: scripts}))
 			.map((res: Response) => {
