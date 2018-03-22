@@ -128,12 +128,12 @@
                             <g:each in="${resultsRow.data}" var="row" status="i">
                                 <tr>
                                     <g:each in="${resultsRow.fields}" var="fieldName">
-                                        <td>${row.fields[fieldName].value} <br>
-                                            ${row.fields[fieldName].find.query?:''} <br>
+                                        <td>${row.fields[fieldName]?.value} <br>
+                                            ${row.fields[fieldName]?.find?.query?:''} <br>
 
-                                            <g:if test="${(row.fields[fieldName].find.results)}">
+                                            <g:if test="${(row.fields[fieldName]?.find?.results)}">
                                                 <b>Results:</b>
-                                                ${row.fields[fieldName].find.results}
+                                                ${row.fields[fieldName]?.find?.results}
                                             </g:if>
                                         </td>
                                     </g:each>

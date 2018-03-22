@@ -139,9 +139,9 @@ class ImportBatchService implements ServiceMethods {
 	Integer toggleIgnoreOnRecords(ImportBatch batch, List<Long> recordIds, Boolean setToIgnore) {
 
 		// Fail this if the batch is COMPLETED or RUNNING
-		if (batch.status == ImportBatchStatusEnum.COMPLETED) {
-			throw new DomainUpdateException('Can not update a batch that has been completed')
-		}
+		// if (batch.status == ImportBatchStatusEnum.COMPLETED) {
+		// 	throw new DomainUpdateException('Can not update a batch that has been completed')
+		// }
 		if (batch.status == ImportBatchStatusEnum.RUNNING) {
 			throw new DomainUpdateException('Can not update a batch that is being processed')
 		}
@@ -154,12 +154,14 @@ class ImportBatchService implements ServiceMethods {
 			recordIds: recordIds,
 			ignored: (setToIgnore ? 1 : 0),
 			status: determineIgnoreStatus(batch, recordIds, setToIgnore),
-// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum
-//			completed: ImportBatchRecordStatusEnum.COMPLETED
+			// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum
+			// completed: ImportBatchRecordStatusEnum.COMPLETED
 			completed: ImportBatchStatusEnum.COMPLETED
 		]
 
-		return ImportBatch.executeUpdate(hql, params)
+		Integer affected = ImportBatch.executeUpdate(hql, params)
+
+		return affected
 	}
 
 	/**
