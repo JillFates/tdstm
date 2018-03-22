@@ -472,8 +472,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 								load assetName with clusterName
 						
 								load id with ''
-								find Application of id by assetName, appVendor with DOMAIN.assetName, vmWare
-								elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
+								find Application by assetName, appVendor with DOMAIN.assetName, vmWare into id
+								elseFind Application by assetName with DOMAIN.assetName into id warn 'Not sure about this match'
 						
 								whenNotFound id create {
 									assetName clusterName
@@ -491,7 +491,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							*/
 						
 							load asset with vmName
-							find Device of asset by assetName, assetType with vmName, assetTypeVM
+							find Device by assetName, assetType with vmName, assetTypeVM into asset
 							whenNotFound asset create {
 								assetName vmName
 								assetType assetTypeVM
@@ -500,7 +500,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							}
 						
 							load dependent with clusterName
-							find Application of dependent by assetName with clusterName
+							find Application by assetName with clusterName into dependent
 							whenNotFound dependent create {
 								assetName clusterName
 								appVendor 'VMWare'

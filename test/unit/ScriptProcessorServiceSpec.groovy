@@ -313,7 +313,7 @@ application id,vendor name,technology,location
                     extract 'vendor name' load Vendor
                     load environment with 'Production'
                     
-                    find Application of id by id with DOMAIN.id
+                    find Application by id with DOMAIN.id into id
                 }
             """.stripIndent()
 
