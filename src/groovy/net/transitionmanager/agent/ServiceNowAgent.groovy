@@ -58,7 +58,7 @@ class ServiceNowAgent extends AbstractAgent {
 			value: 'true',
 			required:1,
 			readonly:1,
-			encoded:0
+			encoded:1
 		],
 		[
 			paramName: 'sysparm_suppress_pagination_header',
@@ -67,7 +67,7 @@ class ServiceNowAgent extends AbstractAgent {
 			context: ContextType.USER_DEF,
 			required:1,
 			readonly:1,
-			encoded:0,
+			encoded:1,
 			fieldName: null,
 			value: 'true'
 		],
@@ -79,7 +79,7 @@ class ServiceNowAgent extends AbstractAgent {
 			fieldName: null,
 			value: 'true',
 			required: 1,
-			readonly: 0,
+			readonly: 1,
 			encoded:1
 		]
 	]
@@ -112,7 +112,7 @@ class ServiceNowAgent extends AbstractAgent {
 							value: 'name,short_description,used_for,sys_id,sys_updated_on,vendor,sys_class_name,department,supported_by,owned_by,warranty_expiration,fqdn',
 							required:1,
 							readonly:0,
-							encoded: 1
+							encoded: 0
 						]
 					] + COMMON_PARAMS
 				]),
@@ -138,7 +138,7 @@ class ServiceNowAgent extends AbstractAgent {
 							value: 'sys_id,host_name,short_description,asset_tag,chassis_type,location,os,vendor,manufacturer,model_id,serial_number,department,ip_address,cpu_count,ram,form_factor,classification',
 							required:1,
 							readonly:0,
-							encoded: 1
+							encoded: 0
 						]
 					] + COMMON_PARAMS
 				] ),
@@ -150,7 +150,7 @@ class ServiceNowAgent extends AbstractAgent {
 					description: 'Retrieves a list of Linux Servers from ServiceNow',
 					method: 'fetchAssets',
 					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_linux_server.do',
-					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
+					docUrl: 'ServiceNow REST API for Tables|https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
 					providesData: 1,
 					results: invokeResults(),
@@ -164,7 +164,7 @@ class ServiceNowAgent extends AbstractAgent {
 							value: 'sys_id,name,asset_tag,host_name,serial_number,short_description,classification,department,location,manufacturer,model_id,os,kernel_release,cpu_count,ram,disk_space,virtual,chassis_type,mac_address,ip_address',
 							required:1,
 							readonly:0,
-							encoded: 1
+							encoded: 0
 						]
 
 					] + COMMON_PARAMS
