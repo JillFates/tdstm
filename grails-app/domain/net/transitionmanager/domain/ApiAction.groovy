@@ -333,7 +333,7 @@ class ApiAction {
 	 */
 	static docUrlValidator(value, ApiAction apiAction) {
 		if (StringUtil.isNotBlank(value)) {
-			if (! (HtmlUtil.isUrl(value) || HtmlUtil.isMarkupURL(value) ) ) {
+			if (! (HtmlUtil.isURL(value) || HtmlUtil.isMarkupURL(value) ) ) {
 				return Message.InvalidURLFormat
 			}
 		}
