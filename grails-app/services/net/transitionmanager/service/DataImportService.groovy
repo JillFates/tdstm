@@ -779,7 +779,7 @@ class DataImportService implements ServiceMethods {
 	private void updateBatchStatus(ImportBatch batch) {
 		Integer count = ImportBatchRecord.where {
 			importBatch.id == batch.id
-			status ==  ImportBatchStatusEnum.PENDING
+			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
 		}.count()
 		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
 
