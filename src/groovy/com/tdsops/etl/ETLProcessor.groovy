@@ -249,6 +249,7 @@ class ETLProcessor implements RangeChecker {
 		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
+			result.releaseRowFoundInLookup()
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			binding.addDynamicVariable(NOW_VARNAME, new NOW())

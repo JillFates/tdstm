@@ -18,7 +18,6 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
-import spock.lang.Ignore
 
 /**
  * Test about ETLProcessor commands:
@@ -70,7 +69,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can throw an Exception if lookup does not contain a valid field name'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -78,179 +77,31 @@ class ETLLookupSpec extends ETLBaseSpec {
 				dataSet,
 				debugConsole,
 				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					console on
-					read labels
-					
-					// Set so variables that will be used by the script
-					def assetTypeVM = 'VM'
-					def appVendorVmWare = 'VMWare'
-					
-					iterate {
-						domain Device
-							extract Vm load Name
-							def vmName = CE
-							extract 'Vm Id' load externalRefId
-							extract 'Vm Uuid' load serialNumber
-							
-							extract Cluster
-							def clusterName = CE
-					
-						domain Application
-							
-							lookup unknown with clusterName
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "There is not validator for domain Application and field unknown"
-
-		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can lookup results and used LOOKUP.notFound() to check results'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		and:
-			GroovySpy(Application, global: true)
-			Application.executeQuery(_, _) >> { String query, Map args ->
-				return []
-			}
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						console on
 						read labels
-						
-						// Set so variables that will be used by the script
-						def assetTypeVM = 'VM'
-						def appVendorVmWare = 'VMWare'
-						
+						domain Device
 						iterate {
-							domain Device
-								extract Vm load Name
-								def vmName = CE
-								extract 'Vm Id' load externalRefId
-								extract 'Vm Uuid' load serialNumber
-								
-								extract Cluster
-								def clusterName = CE
-						
-							domain Application
-								
-								lookup assetName with clusterName
-								if ( LOOKUP.notFound() ) {
-									
-									extract Cluster load assetName
-									load id with ''
-									
-									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
-									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
-									
-									whenNotFound id create {
-										assetName clusterName
-										appVendor appVendorVmWare
-									}
-								}
-						
+							extract server load Name set nameVar
+							extract model load model
+							extract dependsOn set dependsOnVar
+							
+							lookup unknown with dependsOnVar
+							if ( LOOKUP ) {
+								load custom1 with dependsOnVar
+							} else {
+								log 'Repeated asset'
+							}
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
-				data.size() == 5
-
-				data.collect { it.fields.assetName.value } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.assetName.originalValue } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.externalRefId.value } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.externalRefId.originalValue } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.serialNumber.value } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
-				data.collect { it.fields.serialNumber.originalValue } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
-			}
-
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'id'] as Set
-				data.size() == 2
-				data.collect { it.fields.assetName.value } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.assetName.originalValue } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.id.value } == ['', '']
-				data.collect { it.fields.id.originalValue } == ['', '']
-				with(data[0]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							kv.appVendor == 'VMWare'
-							!error
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							!error
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_1'
-						create.appVendor == 'VMWare'
-					}
-				}
-
-				with(data[1]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-							kv.appVendor == 'VMWare'
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_DEV'
-						create.appVendor == 'VMWare'
-					}
-				}
-
-			}
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "There is not validator for domain Device and field unknown"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -259,7 +110,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can lookup results and used LOOKUP.found() to check results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -268,134 +119,232 @@ class ETLLookupSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		and:
-			GroovySpy(Application, global: true)
-			Application.executeQuery(_, _) >> { String query, Map args ->
-				return []
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						domain Device
+						iterate {
+							extract server load Name set nameVar
+							extract model load model
+							extract dependsOn set dependsOnVar
+							
+							lookup assetName with dependsOnVar
+							if ( LOOKUP.found() ) {
+								load custom1 with dependsOnVar
+							} else {
+								log 'Repeated asset'
+							}
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'model', 'custom1'] as Set
+				data.size() == 3
+				with(data[0]){
+					with(fields.assetName){
+						value == 'xray01'
+						originalValue == 'xray01'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+					with(fields.custom1){
+						value == 'xray01'
+						originalValue == 'xray01'
+					}
+				}
+
+				with(data[1]){
+					with(fields.assetName){
+						value == 'deltasrv03'
+						originalValue == 'deltasrv03'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
+
+				with(data[2]){
+					with(fields.assetName){
+						value == 'alpha'
+						originalValue == 'alpha'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
 			}
+
+			etlProcessor.debugConsole.content().count('Repeated asset') == 2
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can lookup results and used LOOKUP.notFound() to check results'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						console on
 						read labels
-						
-						// Set so variables that will be used by the script
-						def assetTypeVM = 'VM'
-						def appVendorVmWare = 'VMWare'
-						
+						domain Device
 						iterate {
-							domain Device
-								extract Vm load Name
-								def vmName = CE
-								extract 'Vm Id' load externalRefId
-								extract 'Vm Uuid' load serialNumber
-								
-								extract Cluster
-								def clusterName = CE
-						
-							domain Application
-								
-								lookup assetName with clusterName
-								if ( LOOKUP.found() ) {
-										log 'Repeated asset'
-								} else {
-									extract Cluster load assetName
-									load id with ''
-									
-									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
-									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
-									
-									whenNotFound id create {
-										assetName clusterName
-										appVendor appVendorVmWare
-									}
-								}
+							extract server load Name set nameVar
+							extract model load model
+							extract dependsOn set dependsOnVar
+							
+							lookup assetName with dependsOnVar
+							if ( LOOKUP.notFound() ) {
+								log 'Repeated asset'
+							}
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 2
+			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
-				data.size() == 5
+				fields == ['assetName', 'model'] as Set
+				data.size() == 3
+				with(data[0]){
+					with(fields.assetName){
+						value == 'xray01'
+						originalValue == 'xray01'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
 
-				data.collect { it.fields.assetName.value } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.assetName.originalValue } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.externalRefId.value } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.externalRefId.originalValue } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.serialNumber.value } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
-				data.collect { it.fields.serialNumber.originalValue } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
+				with(data[1]) {
+					with(fields.assetName) {
+						value == 'deltasrv03'
+						originalValue == 'deltasrv03'
+					}
+					with(fields.model) {
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
+
+				with(data[2]){
+					with(fields.assetName){
+						value == 'alpha'
+						originalValue == 'alpha'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
 			}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'id'] as Set
-				data.size() == 2
-				data.collect { it.fields.assetName.value } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.assetName.originalValue } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.id.value } == ['', '']
-				data.collect { it.fields.id.originalValue } == ['', '']
+			etlProcessor.debugConsole.content().count('Repeated asset') == 2
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test that when the lookup finds previous results that the current result is the earlier one'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						domain Device
+						iterate {
+							extract server load Name set nameVar
+							extract model load model
+							extract dependsOn set dependsOnVar
+							
+							lookup assetName with dependsOnVar
+							if ( LOOKUP ) {
+								load custom1 with dependsOnVar
+							} else {
+								log 'Repeated asset'
+							}
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'model', 'custom1'] as Set
+				data.size() == 3
 				with(data[0]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							kv.appVendor == 'VMWare'
-							!error
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							!error
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_1'
-						create.appVendor == 'VMWare'
+					with(fields.assetName){
+						value == 'xray01'
+						originalValue == 'xray01'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+					with(fields.custom1){
+						value == 'xray01'
+						originalValue == 'xray01'
 					}
 				}
 
 				with(data[1]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-							kv.appVendor == 'VMWare'
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_DEV'
-						create.appVendor == 'VMWare'
+					with(fields.assetName){
+						value == 'deltasrv03'
+						originalValue == 'deltasrv03'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
 					}
 				}
 
+				with(data[2]){
+					with(fields.assetName){
+						value == 'alpha'
+						originalValue == 'alpha'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
 			}
 
-			// Cound amount of row that weren't added
-			etlProcessor.debugConsole.content().count('Repeated asset') == 3
+			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -404,7 +353,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 	void 'test can lookup results and used !LOOKUP to check results'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -413,216 +362,73 @@ class ETLLookupSpec extends ETLBaseSpec {
 				debugConsole,
 				validator)
 
-		and:
-			GroovySpy(Application, global: true)
-			Application.executeQuery(_, _) >> { String query, Map args ->
-				return []
-			}
-
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						console on
 						read labels
-						
-						// Set so variables that will be used by the script
-						def assetTypeVM = 'VM'
-						def appVendorVmWare = 'VMWare'
-						
+						domain Device
 						iterate {
-							domain Device
-								extract Vm load Name
-								def vmName = CE
-								extract 'Vm Id' load externalRefId
-								extract 'Vm Uuid' load serialNumber
-								
-								extract Cluster
-								def clusterName = CE
-						
-							domain Application
-								
-								lookup assetName with clusterName
-								if ( !LOOKUP ) {
-									
-									extract Cluster load assetName
-									load id with ''
-									
-									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
-									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
-									
-									whenNotFound id create {
-										assetName clusterName
-										appVendor appVendorVmWare
-									}
-								}
-						
-						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
-		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
-				data.size() == 5
-			}
-
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'id'] as Set
-				data.size() == 2
-			}
-
-		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can lookup results and used LOOKUP to check results'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		and:
-			GroovySpy(Application, global: true)
-			Application.executeQuery(_, _) >> { String query, Map args ->
-				return []
-			}
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-						console on
-						read labels
-						
-						// Set so variables that will be used by the script
-						def assetTypeVM = 'VM'
-						def appVendorVmWare = 'VMWare'
-						
-						iterate {
-							domain Device
-								extract Vm load Name
-								def vmName = CE
-								extract 'Vm Id' load externalRefId
-								extract 'Vm Uuid' load serialNumber
-								
-								extract Cluster
-								def clusterName = CE
-						
-							domain Application
-								
-								lookup assetName with clusterName
-								if ( LOOKUP ) {
-										log 'Repeated asset'
-								} else {
-									extract Cluster load assetName
-									load id with ''
-									
-									find Application of id by assetName, appVendor with DOMAIN.assetName, appVendorVmWare
-									elseFind Application of id by assetName with DOMAIN.assetName warn 'Not sure about this match'
-									
-									whenNotFound id create {
-										assetName clusterName
-										appVendor appVendorVmWare
-									}
-								}
+							extract server load Name set nameVar
+							extract model load model
+							extract dependsOn set dependsOnVar
+							
+							lookup assetName with dependsOnVar
+							if ( !LOOKUP ) {
+								log 'Repeated asset'
+							}
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 2
+			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'externalRefId', 'serialNumber'] as Set
-				data.size() == 5
-
-				data.collect { it.fields.assetName.value } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.assetName.originalValue } == ['59', '59admin', 'APDC03', 'APESRS', 'APESX01-SCVM']
-				data.collect { it.fields.externalRefId.value } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.externalRefId.originalValue } == ['vm-98720', 'vm-98718', 'vm-44956', 'vm-67122', 'vm-100365']
-				data.collect { it.fields.serialNumber.value } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
-				data.collect { it.fields.serialNumber.originalValue } == ['422e6d92-22c1-c6c1-1de8-eceec50f94bc',
-					'422e2244-f78c-2012-b56a-e435d7519abf', '422ea90a-b80a-81de-0d4c-6f111142c4f7',
-					'422e1dd3-acd2-9e60-3720-2d69ba848df2', '422ed1b6-466d-8155-4483-fb786405a8a3']
-			}
-
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'id'] as Set
-				data.size() == 2
-				data.collect { it.fields.assetName.value } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.assetName.originalValue } == ['MD_CLUSTER_1', 'MD_CLUSTER_DEV']
-				data.collect { it.fields.id.value } == ['', '']
-				data.collect { it.fields.id.originalValue } == ['', '']
+				fields == ['assetName', 'model'] as Set
+				data.size() == 3
 				with(data[0]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							kv.appVendor == 'VMWare'
-							!error
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_1'
-							!error
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_1'
-						create.appVendor == 'VMWare'
+					with(fields.assetName){
+						value == 'xray01'
+						originalValue == 'xray01'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
 					}
 				}
 
 				with(data[1]){
-
-					with(fields.id){
-						value == ''
-						originalValue == ''
-						find.query.size() == 2
-
-						with(find.query[0]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-							kv.appVendor == 'VMWare'
-						}
-
-						with(find.query[1]){
-							domain ==  ETLDomain.Application.name()
-							kv.assetName == 'MD_CLUSTER_DEV'
-						}
-
-						// whenNotFound create command assertions
-						create.assetName == 'MD_CLUSTER_DEV'
-						create.appVendor == 'VMWare'
+					with(fields.assetName){
+						value == 'deltasrv03'
+						originalValue == 'deltasrv03'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
 					}
 				}
 
+				with(data[2]){
+					with(fields.assetName){
+						value == 'alpha'
+						originalValue == 'alpha'
+					}
+					with(fields.model){
+						value == 'VM'
+						originalValue == 'VM'
+					}
+				}
 			}
 
-			// Cound amount of row that weren't added
-			etlProcessor.debugConsole.content().count('Repeated asset') == 3
+			etlProcessor.debugConsole.content().count('Repeated asset') == 2
+
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can lookup results using RVTools Import Script'() {
+	void 'test when lookup does not find results that the current result is new.'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
@@ -707,6 +513,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
+
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 3
 			with(etlProcessor.result.domains[0]) {
@@ -724,13 +531,17 @@ class ETLLookupSpec extends ETLBaseSpec {
 			with(etlProcessor.result.domains[2]) {
 				domain == ETLDomain.Dependency.name()
 				fields == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
-				data.size() == 5
+				data.size() == 2
 			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	static final String DependencyDataSetContent = """server,model,dependsOn
+xray01,VM,
+deltasrv03,VM,xray01
+alpha,VM,""".stripIndent().trim()
 
 	static String RVToolsCSVContent = """VM,Powerstate,Template,Config status,DNS Name,Connection state,Guest state,Heartbeat,Consolidation Needed,PowerOn,Suspend time,Change Version,CPUs,Memory,NICs,Disks,Network #1,Network #2,Network #3,Network #4,Num Monitors,Video Ram KB,Resource pool,Folder,vApp,DAS protection,FT State,FT Latency,FT Bandwidth,FT Sec. Latency,Provisioned MB,In Use MB,Unshared MB,HA Restart Priority,HA Isolation Response,HA VM Monitoring,Cluster rule(s),Cluster rule name(s),Boot Required,Boot delay,Boot retry delay,Boot retry enabled,Boot BIOS setup,Firmware,HW version,HW upgrade status,HW upgrade policy,HW target,Path,Annotation,BridgeWays.VMware.ESX.CustomField.CollectCPUStatistics,BridgeWays.VMware.ESX.CustomField.CollectMemoryStatistics,BridgeWays.VMware.ESX.CustomField.CollectNetStatistics,BridgeWays.VMware.ESX.CustomField.WasteWhitelisted,NB_LAST_BACKUP,Datacenter,Cluster,Host,OS according to the configuration file,OS according to the VMware Tools,VM ID,VM UUID,VI SDK Server type,VI SDK API Version,VI SDK Server,VI SDK UUID
 59,poweredOff,False,green,,connected,notRunning,gray,False,,,2017-11-28T19:32:21.560802Z,2,"16,384",1,2,PROD_10_3_24,,,,1,"4,096",/MD_DATACENTER/MD_CLUSTER_1/Resources,,,,notConfigured,gray,-1,-1,"206,057","189,440","189,440",medium,none,vmMonitoringOnly,,,False,0,"10,000",True,True,bios,8,none,never,,[AP_VNX5400_ESX06_PROD] 59/59.vmx,,,,,,,MD_DATACENTER,MD_CLUSTER_1,apesx01.moredirect.com,Red Hat Enterprise Linux 6 (64-bit),Red Hat Enterprise Linux 6 (64-bit),vm-98720,422e6d92-22c1-c6c1-1de8-eceec50f94bc,VMware vCenter Server 5.1.0 build-880146,5.1,apvcenter.moredirect.com,258FD56F-AB48-4992-9D1D-8CED6C827CF0

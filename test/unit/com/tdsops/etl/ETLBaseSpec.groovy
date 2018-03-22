@@ -124,6 +124,7 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('description', 'Description'),
 					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('location', 'Location'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
