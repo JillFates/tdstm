@@ -451,7 +451,7 @@ class StringUtil {
 	 */
 	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
 		if (params == null) {
-			throw new InvalidParamException("Parameters map for placeholder replacement is null")
+			throw new InvalidParamException('Parameters map for placeholder replacement is null')
 		}
 
 		StringBuffer sb = new StringBuffer()
