@@ -52,7 +52,7 @@ class AbstractAgent {
 	 */
 	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
-		for(param in action.methodParamsList) {
+		for(param in action.listMethodParams) {
 			switch (ContextType[param.context]) {
 				case ContextType.TASK:
 					methodParams << [ (param.param) : task[param.property] ]
@@ -73,6 +73,7 @@ class AbstractAgent {
 					throw new InvalidRequestException("Param context ${param.context} not supported")
 			}
 		}
+
 		methodParams
 	}
 

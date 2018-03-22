@@ -1,6 +1,7 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.StringUtil
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AgentClass
@@ -10,6 +11,8 @@ import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+
+import java.util.regex.Matcher
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -119,7 +122,7 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointPath nullable: true, blank: true
+		endpointPath nullable: true, blank: true, validator: ApiAction.&endpointPathValidator
 		endpointUrl nullable: true, blank: true
 		isPolling range: 0..1
 		lastUpdated nullable: true
@@ -203,6 +206,15 @@ class ApiAction {
 			list = listJson.collect { new ApiActionMethodParam(it) }
 		}
 		return list
+	}
+
+	/**
+	 * TM-9758 replace placeholders to the correct params
+	 * @param params Map containing the placeholders to replace
+	 * @return
+	 */
+	String endpointPathWithPlaceholdersSubstituted(Map params) {
+		return StringUtil.replacePlaceholders(endpointPath, params, true)
 	}
 
 	/**
@@ -325,4 +337,22 @@ class ApiAction {
 		}
 	}
 
+	/**
+	 * Validate that all placeholders in the endpoint path exist in the methodParams list
+	 * @param value
+	 * @param apiAction
+	 */
+	static endpointPathValidator (String value, ApiAction apiAction) {
+
+		Set<String> placeholders = StringUtil.extractPlaceholders(value)
+		Set<String> methodParamNames = apiAction.listMethodParams.collect { it.param }
+		Set<String> missingPlaceholders = placeholders - methodParamNames
+
+		if (missingPlaceholders) {
+			return [Message.ParamReferenceInURLNotFound, missingPlaceholders.join(', ')]
+		}
+
+		return true
+
+	}
 }
