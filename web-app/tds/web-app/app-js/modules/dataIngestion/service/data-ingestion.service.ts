@@ -386,7 +386,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.isUnique;
@@ -399,7 +399,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['providerId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -414,7 +414,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
