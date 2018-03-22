@@ -42,4 +42,13 @@ export class ValidationUtils {
 		}
 		return false;
 	}
+
+	/**
+	 * Checks if object is empty.
+	 * @param object
+	 * @returns {boolean}
+	 */
+	public static isEmptyObject(object: any): boolean {
+		return Object.keys(object).length === 0 && object.constructor === Object;
+	}
 }

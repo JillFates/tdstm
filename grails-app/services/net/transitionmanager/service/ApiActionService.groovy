@@ -230,7 +230,7 @@ class ApiActionService implements ServiceMethods {
 				// set config data
 	// TODO : JPM 3/2018 : Need to split URL and path here
 				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
+				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPathWithPlaceholdersSubstituted(remoteMethodParams))
 
 				// POC if credential authentication method is COOKIE (vcenter)
 				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
@@ -744,4 +744,5 @@ class ApiActionService implements ServiceMethods {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
 		}
 	}
+
 }

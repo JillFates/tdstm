@@ -4,10 +4,10 @@ package com.tdsops.etl
  * <code>
  *     domain Dependency
  *  // Try to find the Application using different searches
- * 	find Application 	 for assetId by id 				     with assetId
- * 	elseFind Application for assetId by assetName, assetType with primaryName, primaryType
- * 	elseFind Application for assetId by assetName            with primaryName
- * 	elseFind Asset 		 for assetId by assetName            with primaryName              warn 'found with wrong asset class'
+ * 	find Application 	 by id 				     with assetId into assetId
+ * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
+ * 	elseFind Application by assetName            with primaryName into assetId
+ * 	elseFind Asset 		 by assetName            with primaryName into assetId warn 'found with wrong asset class'
  * </code>
  * @param values
  * @return
@@ -34,8 +34,8 @@ class ETLFindElement {
 	/**
 	 * Defines a new find option. See this code:
 	 * <pre>
-	 * 	find Application for assetId by id with assetId
-	 * 	elseFind Application for assetId by assetName, assetType with primaryName, primaryType
+	 * 	find Application by id with assetId into assetId
+	 * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
 	 * </pre>
 	 * @param domain
 	 * @return
@@ -52,9 +52,10 @@ class ETLFindElement {
 	 * @param findId
 	 * @return
 	 */
-	ETLFindElement of(String findId) {
+	ETLFindElement into(String findId) {
 		validateReference(findId)
 		currentFind.findId = findId
+		processor.addFindElement(this)
 		this
 	}
 
@@ -67,12 +68,6 @@ class ETLFindElement {
 		for(field in fields){
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
-		}
-		if(!currentFind.findId){
-			if(fields.size() != 1){
-				throw ETLProcessorException.findElementWithoutFindIdDefinition(fields)
-			}
-			currentFind.findId = fields[0]
 		}
 		this
 	}
@@ -116,7 +111,7 @@ class ETLFindElement {
 				]
 			}
 		}
-		processor.addFindElement(this)
+
 		this
 	}
 

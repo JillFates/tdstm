@@ -33,6 +33,12 @@ class ETLProcessorResult {
 	 */
 	List<Map<String, ?>> domains = []
 
+	/**
+	 * Defines if a <b>lookup</b> command found a result
+	 * @see ETLFindElement
+	 */
+	Map<String, ?> rowFoundInLookup = null
+
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
@@ -168,9 +174,16 @@ class ETLProcessorResult {
 	 * It check if it isn necessary to init a new row
 	 * based on the latest data in the current reference
 	 * and the 'currentRowIndex'
+	 * if in the current iteration there is a lookup result, then it returns the looked up row.
+	 * @see ETLProcessorResult#rowFoundInLookup
 	 * @return a map with the current data node
 	 */
 	Map<String, ?> currentData() {
+
+		if(rowFoundInLookup){
+			return rowFoundInLookup
+		}
+
 		if(reference.data.isEmpty()){
 			reference.data.add(initialRowDataMap())
 		} else if (reference.data.last().rowNum &&
@@ -380,5 +393,64 @@ class ETLProcessorResult {
 			field.value = element.value
 			field.originalValue = element.originalValue
 		}
+	}
+
+	/**
+	 * Look up a field name that contain a value equals to the value and if found then the current
+	 * result reference will be move back to a previously processed row for the domain. This is done
+	 * by setting the rowFoundInLookup to the data row reference in the in the results.
+	 *
+	 * If the object is not found then future references to current result should be referring to the
+	 * last row in the data result.
+	 *
+	 * For example the following command:
+	 * <pre>
+	 *  iterate {
+	 *    .....
+	 *    lookup appVendor with 'Microsoft'
+	 *    .....
+	 *    if(LOOKUP) {
+	 *        load custom1 with 'App Vendor Found'
+	 *    }
+	 *  }
+	 *
+	 * </pre>
+	 * <pre>
+	 *  "fields": {
+	 *     "appVendor": {
+	 *          "value": "Microsoft",
+	 *          .....
+	 *          }
+	 *     }
+	 *     "custom1": {
+	 *         "value": "App Vendor Found",
+	 *         "originalValue": "App Vendor Found",
+	 *         .....
+	 *     }
+	 *  }
+	 * </pre>
+	 * If the value is found, then it is used in the following commands during the iteration
+	 * @see ETLProcessorResult#rowFoundInLookup
+	 * @param fieldName - the field to examine for a match
+	 * @param value - the value that the field should have
+	 * @return true if the data row was found otherwise false
+	 */
+	boolean lookupInReference(String fieldName, String value) {
+		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
+		rowFoundInLookup = reference.data.find { Map<String, ?> dataRow ->
+			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
+		}
+
+		return (rowFoundInLookup != null)
+	}
+
+	/**
+	 * Release the reference to the current result
+	 * in the latest lookup command executed
+	 * In every iteration, every row to be processed cleans this out.
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 */
+	void releaseRowFoundInLookup(){
+		rowFoundInLookup = null
 	}
 }

@@ -32,4 +32,11 @@ databaseChangeLog = {
  		""")
 	}
 
+	changeSet(author: "jmartin", id: "TM-9523-04") {
+		comment('Change import_batch column date_format to nullable')
+		sql ("""
+                ALTER TABLE `import_batch`
+                    CHANGE `date_format` `date_format` VARCHAR(32) DEFAULT '';
+ 		""")
+	}
 }

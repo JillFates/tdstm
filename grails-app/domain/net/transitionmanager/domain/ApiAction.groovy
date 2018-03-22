@@ -1,8 +1,14 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
+<<<<<<< HEAD
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
+=======
+import com.tdssrc.grails.StringUtil
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
+>>>>>>> ee58389ae7c86f52e85215798982599cba9545ae
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
@@ -12,6 +18,8 @@ import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
+
+import java.util.regex.Matcher
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -120,6 +128,10 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
+<<<<<<< HEAD
+=======
+		endpointPath nullable: true, blank: true, validator: ApiAction.&endpointPathValidator
+>>>>>>> ee58389ae7c86f52e85215798982599cba9545ae
 		endpointUrl nullable: true, blank: true
 		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
@@ -206,6 +218,15 @@ class ApiAction {
 			list = listJson.collect { new ApiActionMethodParam(it) }
 		}
 		return list
+	}
+
+	/**
+	 * TM-9758 replace placeholders to the correct params
+	 * @param params Map containing the placeholders to replace
+	 * @return
+	 */
+	String endpointPathWithPlaceholdersSubstituted(Map params) {
+		return StringUtil.replacePlaceholders(endpointPath, params, true)
 	}
 
 	/**
@@ -337,6 +358,23 @@ class ApiAction {
 				return Message.InvalidURLFormat
 			}
 		}
+		return true
 	}
 
+	 * Validate that all placeholders in the endpoint path exist in the methodParams list
+	 * @param value
+	 * @param apiAction
+	 */
+	static endpointPathValidator (String value, ApiAction apiAction) {
+
+		Set<String> placeholders = StringUtil.extractPlaceholders(value)
+		Set<String> methodParamNames = apiAction.listMethodParams.collect { it.param }
+		Set<String> missingPlaceholders = placeholders - methodParamNames
+
+		if (missingPlaceholders) {
+			return [Message.ParamReferenceInURLNotFound, missingPlaceholders.join(', ')]
+		}
+
+		return true
+	}
 }

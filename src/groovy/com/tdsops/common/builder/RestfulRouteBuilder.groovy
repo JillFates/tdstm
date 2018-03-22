@@ -23,6 +23,13 @@ import org.apache.http.client.utils.URIBuilder
  */
 class RestfulRouteBuilder extends RouteBuilder {
     private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
+	private static final HTTP_METHOD = 'HttpMethod'
+	private static final VALID_HTTP_METHODS = /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$/
+	private static final CONTENT_TYPE_HEADER = 'Content-Type'
+	private static final ACCEPT_HEADER = 'Accept'
+	private static final DEFAULT_HTTP_METHOD = 'GET'
+	private static final DEFAULT_CONTENT_TYPE_HEADER = 'application/json'
+	private static final DEFAULT_ACCEPT_HEADER = 'application/json'
 
     CredentialService credentialService
 
@@ -50,17 +57,28 @@ class RestfulRouteBuilder extends RouteBuilder {
 
         routeDefinition = routeDefinition.setBody(constant(null))
 
-        if (actionRequest.config.hasProperty(Exchange.HTTP_METHOD)) {
-            routeDefinition.setHeader(Exchange.HTTP_METHOD, constant(actionRequest.config.getProperty(Exchange.HTTP_METHOD)))
-        }
+        if (actionRequest.config.hasProperty(HTTP_METHOD)) {
+			String httpMethod = actionRequest.config.getProperty(HTTP_METHOD)
+			if (httpMethod ==~ VALID_HTTP_METHODS) {
+				routeDefinition.setHeader(Exchange.HTTP_METHOD, constant(actionRequest.config.getProperty(HTTP_METHOD)))
+			} else {
+				throw new RuntimeException("Invalid HTTPMethod ${httpMethod} has not been provided in the PRE script")
+			}
+        } else {
+			routeDefinition.setHeader(Exchange.HTTP_METHOD, constant(DEFAULT_HTTP_METHOD))
+		}
 
-        if (actionRequest.config.hasProperty(Exchange.ACCEPT_CONTENT_TYPE)) {
-            routeDefinition.setHeader(Exchange.ACCEPT_CONTENT_TYPE, constant(actionRequest.config.getProperty(Exchange.ACCEPT_CONTENT_TYPE)))
-        }
+        if (actionRequest.config.hasProperty(ACCEPT_HEADER)) {
+            routeDefinition.setHeader(Exchange.ACCEPT_CONTENT_TYPE, constant(actionRequest.config.getProperty(ACCEPT_HEADER)))
+        } else {
+			routeDefinition.setHeader(Exchange.ACCEPT_CONTENT_TYPE, constant(DEFAULT_ACCEPT_HEADER))
+		}
 
-        if (actionRequest.config.hasProperty(Exchange.CONTENT_TYPE)) {
-            routeDefinition.setHeader(Exchange.CONTENT_TYPE, constant(actionRequest.config.getProperty(Exchange.CONTENT_TYPE)))
-        }
+        if (actionRequest.config.hasProperty(CONTENT_TYPE_HEADER)) {
+            routeDefinition.setHeader(Exchange.CONTENT_TYPE, constant(actionRequest.config.getProperty(CONTENT_TYPE_HEADER)))
+        } else {
+			routeDefinition.setHeader(Exchange.CONTENT_TYPE, constant(DEFAULT_CONTENT_TYPE_HEADER))
+		}
 
         routeDefinition = routeDefinition.to(UrlUtil.sanitizeUrlForCamel(buildUrl(routeDefinition, actionRequest)))
         routeDefinition = routeDefinition.to(buildRESTfulReactionEndpoint(actionRequest.param))
@@ -126,12 +144,19 @@ class RestfulRouteBuilder extends RouteBuilder {
 			switch (credential.authenticationMethod) {
 				case AuthenticationMethod.BASIC_AUTH:
 					builder.addParameter('authUsername', credential.username)
-					builder.addParameter( 'authPassword', credentialService.decryptPassword(credential))
-					break;
-				case AuthenticationMethod.COOKIE:
+					builder.addParameter('authPassword', credentialService.decryptPassword(credential))
+					break
+				case AuthenticationMethod.HEADER:
+					// TODO <SL> need to find a way to determine when to pass "Bearer" as part of the header value
+					// e.g. Authentication: Bearer VERTIFRyYW5zaXRpb24gTWFuYWdlcg==
+					// Ticket added for this TM-9868
 					Map<String, ?> authentication = credentialService.authenticate(credential)
 					routeDefinition.setHeader(authentication.sessionName, constant(authentication.sessionValue))
-					break;
+					break
+				case AuthenticationMethod.COOKIE:
+					Map<String, ?> authentication = credentialService.authenticate(credential)
+					routeDefinition.setHeader('Cookie', constant(authentication.sessionName + '=' + authentication.sessionValue))
+					break
 				default:
 					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
 			}

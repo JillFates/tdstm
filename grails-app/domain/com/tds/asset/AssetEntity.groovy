@@ -34,17 +34,19 @@ class AssetEntity extends EavEntity {
 	static final List<String> COMMON_FIELD_LIST = [
 		'assetClass',
 		'assetName',
-		'description', 
-		'environment', 
+		'description',
+		'environment',
 		'externalRefId',
-	    'id', 
+	    'id',
 		'lastUpdated',
 		'moveBundle',
-		'priority', 
-		'planStatus', 
-		'supportType', 
+		'priority',
+		'planStatus',
+		'supportType',
 		'validation'
 	]
+
+	static String alternateLookup = 'assetName'
 
 	AssetClass assetClass = DEVICE
 	String application = ''

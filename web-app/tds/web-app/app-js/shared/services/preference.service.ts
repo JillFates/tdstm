@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
+import { Response, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
@@ -10,6 +10,7 @@ import 'rxjs/add/operator/catch';
 export class PreferenceService {
 
 	private preferenceUrl = '../ws/user/preferences';
+	private preferenceUrlPost = '../ws/user/preference';
 
 	preferences: any = {};
 
@@ -26,4 +27,14 @@ export class PreferenceService {
 			})
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
+
+	setPreference(preferenceCode: string, value: string): Observable<any>  {
+		const headers = new Headers();
+		headers.append('Content-Type', 'application/x-www-form-urlencoded');
+		const requestOptions = new RequestOptions({headers: headers});
+
+		const body = `code=${preferenceCode}&value=${value}`;
+		return this.http.post(this.preferenceUrlPost, body, requestOptions);
+	}
+
 }
