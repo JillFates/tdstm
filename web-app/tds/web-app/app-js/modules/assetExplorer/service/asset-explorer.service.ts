@@ -16,6 +16,7 @@ export class AssetExplorerService {
 	private assetExplorerUrl = '../ws/assetExplorer';
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
+	private ALL_ASSETS = 'All Assets';
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
@@ -163,11 +164,11 @@ export class AssetExplorerService {
 	}
 
 	isAllAssets(model: ViewModel): boolean {
-		return Boolean(!model.createdBy);
+		return model.name === this.ALL_ASSETS;
 	}
 
 	isSaveAvailable(model: ViewModel): boolean {
-		return !this.isAllAssets(model) && this.hasSavePermission(model);
+		return model && !this.isAllAssets(model) && this.hasSavePermission(model);
 	}
 
 	hasSavePermission(model): boolean {
