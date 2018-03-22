@@ -5,11 +5,19 @@ import net.transitionmanager.service.InvalidRequestException
 import com.tds.asset.AssetComment
 
 import groovy.util.logging.Slf4j
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 /**
- * Methods to interact with RiverMeadow 3rd Party Application API
+ * AbstractAgent Class
+ *
+ * The AbstractAgent provides the base class that all API Action Agents will be derived from. The
+ * agent will represent a collection of API Action endpoints with the necessary attributes and parameters
+ * definitions to allow the corresponding service the ability to contact the endpoints appropriately.
+ *
  */
-@Slf4j(value='logger')
+@Slf4j()
+@CompileStatic
 class AbstractAgent {
 
 	private Map dict = [:]
@@ -50,12 +58,16 @@ class AbstractAgent {
 	 * @param context - the domain context that the data for the parameters will come from
 	 * @return the map of the parameters with the appropriate values
 	 */
+	@CompileStatic(TypeCheckingMode.SKIP)
 	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
-		for(param in action.listMethodParams) {
-			switch (ContextType[param.context]) {
+		for (param in action.methodParamsList) {
+
+			// TODO : JPM 3/2018 : Need to strip out URI Param Placeholders (not here actually)
+
+			switch (ContextType.lookup(param.context)) {
 				case ContextType.TASK:
-					methodParams << [ (param.param) : task[param.property] ]
+					methodParams.put(param.paramName, task[param.fieldName] )
 					break
 				case ContextType.ASSET:
 				case ContextType.APPLICATION:
@@ -63,40 +75,84 @@ class AbstractAgent {
 				case ContextType.DEVICE:
 				case ContextType.STORAGE:
 					if (task.assetEntity) {
-						methodParams << [(param.param): task.assetEntity[param.property]]
+						methodParams.put(param.paramName, task.assetEntity[param.fieldName] )
 					}
 					break
 				case ContextType.USER_DEF:
-					methodParams << [ (param.param) : param.value ]
+					methodParams.put(param.paramName, param.value)
 					break
 				default:
 					throw new InvalidRequestException("Param context ${param.context} not supported")
 			}
 		}
-
-		methodParams
+		return methodParams
 	}
 
 	// A commonly used set of Maps used for varius parameters and results
-	private Map taskIdParam() { [type:Integer, description: 'The task Id to reference the task'] }
-	private Map assetGuidParam() { [type:String, descrition: 'The globally unique reference id for an asset'] }
+	private LinkedHashMap taskIdParam() { [
+		paramName: 'taskId',
+		description: 'The task Id to reference the task',
+		type:Integer,
+		context: ContextType.TASK,
+		fieldName: 'id',
+		value: null,
+		required: 0,
+		readonly: 0,
+		encoded: 0
+	] }
 
-	private Map statusResult() { [type:String, description: 'Status of process (success|error|failed|running)'] }
-	private Map causeResult() { [type:String, description: 'The cause of an error or failure'] }
+	// private LinkedHashMap assetGuidParam() { [type:String, descrition: 'The globally unique reference id for an asset'] }
 
-	protected Map invokeResults() { [status: statusResult(), cause: causeResult() ] }
-	private Map notImplementedResults() { [status:'error', cause:'Method not implemented'] }
+	private LinkedHashMap statusResult() { [type:String, description: 'Status of process (success|error|failed|running)'] }
+
+	private LinkedHashMap causeResult() { [type:String, description: 'The cause of an error or failure'] }
+
+	protected LinkedHashMap invokeResults() { [status: statusResult(), cause: causeResult() ] }
+
+	private LinkedHashMap notImplementedResults() { [status:'error', cause:'Method not implemented'] }
 
 	// Define some of the standard parameters
-	private Map queueNameParam() { [type:String, description: 'The name of the queue/topic to send message to'] }
-	private Map callbackMethodParam() { [type:String, description: 'The name of the callback method that the async response should trigger'] }
-	private Map messageParam() { [type:Object, description: 'The data to pass to the message'] }
+	private LinkedHashMap queueNameParam() { [
+		paramName: 'queueName',
+		desc: 'The name of the queue/topic to send message to',
+		type: 'String',
+		context: ContextType.USER_DEF,
+		fieldName: null,
+		value: '',
+		required: 1,
+		readonly: 0,
+		encoded: 0
+	] }
+
+	private LinkedHashMap callbackMethodParam() { [
+		property: 'callbackMethod',
+		desc: 'The name of the callback method that the async response should trigger',
+		type: 'String',
+		context: ContextType.USER_DEF,
+		param: null,
+		value: '',
+		required: 1,
+		readonly: 0,
+		encoded: 0
+	] }
+	private LinkedHashMap messageParam() { [
+		property: 'message',
+		desc: 'The data that represents the message',
+		type: 'Object',
+		context: null,
+		param: null,
+		value: null,
+		required: 1,
+		readonly: 0,
+		encoded: 0
+	] }
 
 	// Build of some of the standard interfaces for agent methods
-	protected LinkedHashMap queueParams() {
-		[ 	queueName: queueNameParam(),
-			callbackMethod: callbackMethodParam(),
-			message: messageParam()
+	protected List<LinkedHashMap> queueParams() {
+		[
+			queueNameParam(),
+			callbackMethodParam(),
+			messageParam()
 		]
 	}
 

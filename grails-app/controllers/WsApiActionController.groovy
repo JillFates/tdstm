@@ -70,8 +70,9 @@ class WsApiActionController implements ControllerMethods {
      * Create a new ApiAction.
      */
     @HasPermission(Permission.ActionCreate)
-    def create(ApiActionCommand apiActionCommand) {
-        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(apiActionCommand)
+    def create() {
+        ApiActionCommand command = populateCommandObject(ApiActionCommand)
+        ApiAction apiAction = apiActionService.saveOrUpdateApiAction(command)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }
 
@@ -82,6 +83,7 @@ class WsApiActionController implements ControllerMethods {
     @HasPermission(Permission.ActionEdit)
     def update(Long id) {
         ApiActionCommand command = populateCommandObject(ApiActionCommand)
+        // TODO : JPM 3/2018 : where is domainVersion coming from?
         ApiAction apiAction = apiActionService.saveOrUpdateApiAction(command, id, domainVersion)
         renderSuccessJson(apiActionService.apiActionToMap(apiAction))
     }

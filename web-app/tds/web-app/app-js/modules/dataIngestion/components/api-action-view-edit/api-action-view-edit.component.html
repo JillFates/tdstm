@@ -92,6 +92,7 @@
 																	[textField]="'name'"
 																	[valueField]="'id'"
 																	(open)="onOpenAgentMethod()"
+																	(valueChange)="onMethodValueChange($event)"
 																	[(ngModel)]="apiActionModel.agentMethod"
 																	[disabled]="apiActionModel.agentClass.id === 0"
 																	required [ngClass]="{'has-error':  (!apiActionForm.form.valid && apiActionForm.touched) && apiActionModel.agentMethod?.id == 0}">
@@ -118,24 +119,6 @@
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{((apiActionModel.credential?.name !== 'Select...')? apiActionModel.credential?.name : '')}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionEndpointURL" class="col-sm-3 control-label">Endpoint URL:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiActionEndpointURL" name="apiActionEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="apiActionEndpointPath" class="col-sm-3 control-label">Endpoint Path:</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<input type="text" id="apiActionEndpointPath" name="apiActionEndpointPath" class="form-control" [(ngModel)]="apiActionModel.endpointPath" />
-											</div>
-											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail">{{apiActionModel.endpointPath}}</label>
 											</div>
 										</div>
 									</div>
@@ -253,6 +236,32 @@
 										</div>
 									</div>
 								</div>
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
+											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="text" id="apiEndpointURL" name="apiEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
+											</div>
+											<div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">{{apiActionModel.endpointUrl}}</label>
+											</div>
+										</div>
+									</div>
+								</div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
+                                            <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
+                                                <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUrl" />
+                                            </div>
+                                            <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
+                                                <label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 							</div>
 						</form>
 					</div>
@@ -275,14 +284,22 @@
 													   format="{{column.format}}"
                                                        title="{{column.label}}"
 													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+										<ng-template kendoGridHeaderTemplate *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+											<span title="Parameter is required" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
+											<span title="Parameter value read-only" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
+											<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
+										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
-												<button class="btn btn-default" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+												<button class="btn btn-default" *ngIf="dataItem.required === 0  || dataItem.required === false" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'param'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.param" required [ngClass]="{'has-error': dataItem.param.length <= 0}" />
+                                            <div *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+                                                <input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem[column.property]" />
+                                            </div>
+											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.paramName" required [ngClass]="{'has-error': dataItem.paramName?.length <= 0}" />
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<kendo-dropdownlist
@@ -298,35 +315,45 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEFINED'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
-												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEFINED'"
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF'" type="text" class="param-text-input"
+													   name="{{column.property + columnIndex + rowIndex}}-user-defined"
+													   (change)="verifyIsValidForm()"
+													   [(ngModel)]="dataItem.value"
+													   [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"/>
+												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
 																(filterChange)="filterChange($event, dataItem)"
 																[textField]="'label'"
 																[valueField]="'field'"
-																[(ngModel)]="dataItem.property"
+																[(ngModel)]="dataItem.fieldName"
 																(keypress)="getOnInputKey($event)"
 																(valueChange)="verifyIsValidForm()"
+                                                                [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"
 																required
-																[ngClass]="{'has-error': !dataItem.property}" >
+																[ngClass]="{'has-error': !dataItem.fieldName}" >
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input  (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc"/>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div *ngIf="column.type === 'text' && column.property === 'param'">
+											<div class="group-boolean-fields" *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+												<span *ngIf="column.property === 'required'"><span *ngIf="dataItem.required === 1  || dataItem.required === true"><i class="fa fa-fw fa-check"></i></span></span>
+												<span *ngIf="column.property === 'readonly'"><span *ngIf="dataItem.readonly === 1  || dataItem.readonly === true"><i class="fa fa-fw fa-check"></i></span></span>
+												<span *ngIf="column.property === 'encoded'"><span *ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
+											</div>
+											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 												<span>{{dataItem.param}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<span>{{getAssetClassValue(dataItem.context)}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<span *ngIf="dataItem.context === 'USER_DEFINED'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEFINED'">{{dataItem.property.label}}</span>
+												<span *ngIf="dataItem.context === 'USER_DEF'">{{dataItem.value}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
 												<span>{{dataItem.desc}}</span>

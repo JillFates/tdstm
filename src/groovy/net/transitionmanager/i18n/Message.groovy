@@ -15,12 +15,13 @@ interface Message {
 			ApiActionInvalidBindingParams 		= 'apiAction.invalid.binding.params.exception',
 			ApiActionMustReturnResults 			= 'apiAction.must.return.result.exception',
 			ApiActionTaskMessageLapsed 			= 'apiAction.task.message.lapsed',
-			ApiActionTaskMessageStalled 		   = 'apiAction.task.message.stalled',
-			ApiActionTaskMessageTimedout 		   = 'apiAction.task.message.timedout',
-			DomainFailureBulk					      = 'domain.failure.bulk',
-			FileSystemFileDeleted	 			   = 'fileSystem.file.deleted',
-			FileSystemFileNotExists 			   = 'fileSystem.file.notExists',
+			ApiActionTaskMessageStalled 		= 'apiAction.task.message.stalled',
+			ApiActionTaskMessageTimedout 		= 'apiAction.task.message.timedout',
+			DomainFailureBulk					= 'domain.failure.bulk',
+			FileSystemFileDeleted	 			= 'fileSystem.file.deleted',
+			FileSystemFileNotExists 			= 'fileSystem.file.notExists',
 			FileSystemInvalidFileExtension 		= 'fileSystem.invalid.fileExtension',
+			InvalidURLFormat					= 'typeMismatch.java.net.URL',
 			ProgressInfoUnableToStopRunningJob  = 'progressInfo.unableToStop',
 			ValidationMissingIds                = 'validation.missing.ids'
 
