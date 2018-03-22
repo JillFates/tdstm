@@ -185,13 +185,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	}
 
 	protected isSaveAvailable(): boolean {
-		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit) :
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
-				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		return this.assetService.isSaveAvailable(this.model);
 	}
 
 	protected isSaveAsAvailable(): boolean {

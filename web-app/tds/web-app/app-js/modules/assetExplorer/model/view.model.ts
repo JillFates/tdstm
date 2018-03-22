@@ -2,6 +2,7 @@ import { ViewSpec } from './view-spec.model';
 
 export class ViewModel {
 	id: number;
+	createdBy?: string;
 	name: string;
 	isOwner: boolean;
 	isSystem: boolean;

@@ -161,4 +161,32 @@ export class AssetExplorerService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	isAllAssets(model: ViewModel): boolean {
+		return Boolean(!model.createdBy);
+	}
+
+	isSaveAvailable(model: ViewModel): boolean {
+		return !this.isAllAssets(model) && this.hasSavePermission(model);
+	}
+
+	hasSavePermission(model): boolean {
+		const hasPermission = this.permissionService.hasPermission.bind(this.permissionService);
+		const {AssetExplorerSystemEdit, AssetExplorerEdit, AssetExplorerSystemCreate, AssetExplorerCreate } = Permission;
+
+		if (model.id && model.isSystem) {
+			return hasPermission(AssetExplorerSystemEdit);
+		}
+
+		if (model.id) {
+			return  model.isOwner && hasPermission(AssetExplorerEdit);
+		}
+
+		if (model.isSystem) {
+			return hasPermission(AssetExplorerSystemCreate);
+		}
+
+		return model.isOwner && hasPermission(AssetExplorerCreate);
+	}
+
 }
