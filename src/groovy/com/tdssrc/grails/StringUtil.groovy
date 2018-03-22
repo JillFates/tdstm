@@ -442,12 +442,16 @@ class StringUtil {
 	}
 
 	/**
-	 * Used to replace in a String mustache like placeholders with the name value map provided
-	 *
+	 * Used to replace in a String mustache like placeholders (e.g. {{ KEY }} ) with the name value map provided
 	 * @param text - String with Mustache like placeholders to be replaced
 	 * @param params Parameters Dictionary
 	 * @return the String with the parameters replaced with the values
 	 * @throws InvalidParamException if isn't a parameter defined for one or more placeholders
+	 *
+	 * @usage
+	 * <pre>
+	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {{COLOR}}', [COLOR:'Red'] )
+	 * </pre>
 	 */
 	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
 		if (params == null) {
