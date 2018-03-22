@@ -5,9 +5,9 @@ package net.transitionmanager.integration
  */
 class ActionRequest {
 	private boolean readonly = false
-	protected ActionRequestParameter param
-	protected ActionRequestHeader headers
-	protected ActionRequestConfig config
+	ActionRequestParameter param
+	ActionRequestHeader headers
+	ActionRequestConfig config
 
 	ActionRequest() {
 		this([:])

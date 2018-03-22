@@ -2,6 +2,8 @@ package net.transitionmanager.service
 
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.integration.ActionRequest
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.auth.AuthScope
@@ -19,22 +21,21 @@ import org.apache.http.util.EntityUtils
 @Slf4j
 class ServiceNowService {
     private static final String DEFAULT_CHARACTER_ENCODING = 'UTF-8'
-    private static final String USERNAME = "Dcorrea"
-    private static final String PASSWORD = "boston2004"
     private static final String FILENAME_PREFIX='servicenow-'
 
+    CredentialService credentialService
     FileSystemService fileSystemService
     SecurityService securityService
 
     /**
      * Fetch assets from ServiceNow
-     * @param payload
+     * @param actionRequest
      * @return
      */
-    Map fetchAssetList(Object payload) {
-        log.debug 'Fetching ServiceNow assets: {}', payload
+    Map fetchAssetList(ActionRequest actionRequest) {
+        log.debug 'Fetching ServiceNow assets: {}', actionRequest
         Map result
-        Map map =  downloadAndSaveAssetsFile(payload)
+        Map map =  downloadAndSaveAssetsFile(actionRequest)
         if (map.error) {
             result = [status: 'error', cause: map.error]
         } else {
@@ -44,34 +45,27 @@ class ServiceNowService {
     }
 
     /**
-     * Construct service url from payload
-     * @param payload
+     * Retrieve the URL for the service call.
+     * TODO: As we're using the endpointUrl as is, we could probably remove this method.
+     * @param apiActionMap
      * @return
      */
-    private String serviceUrl(Map payload) {
-        StringBuilder url
-        url = new StringBuilder()
-        url.append(payload['url'])
-        url.append('/')
-        url.append(payload['path'])
-        url.append('?')
-        url.append(payload['format'])
-        url.append('&sysparm_query=')
-        url.append(URLEncoder.encode(payload['query'], DEFAULT_CHARACTER_ENCODING))
-        url.append('&sysparm_fields=')
-        url.append(URLEncoder.encode(payload['fieldNames'], DEFAULT_CHARACTER_ENCODING))
-        String u = url.toString()
-        log.debug 'serviceUrl={}', u
-        return u
+    private String serviceUrl(Map apiActionMap) {
+        String url = apiActionMap['endpointUrl']
+        log.debug 'serviceUrl={}', url
+        return url
     }
 
     /**
-     * THIS SHOULD BE DICTATED BY THE CREDENTIAL
+     * Create a CredentialsProvider based on the given credentialId
+     * @param crendentialId
      * @return
      */
-    private CredentialsProvider getBasicAuth() {
+    private CredentialsProvider getBasicAuth(Long credentialId) {
+        Credential credential = credentialService.findById(credentialId)
+        String password = credentialService.decryptPassword(credential)
         CredentialsProvider provider = new BasicCredentialsProvider()
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(USERNAME, PASSWORD)
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(credential.username, password)
         provider.setCredentials(AuthScope.ANY, credentials)
 
         return provider
@@ -79,12 +73,12 @@ class ServiceNowService {
 
     /**
      * Download file and save it using the file system service
-     * @param payload
+     * @param actionRequest
      * @return Map
      *      filename <String> - the temporary filename
      *      error <String> - the cause of the failure
      */
-    private Map downloadAndSaveAssetsFile(Map payload) throws ClientProtocolException, IOException {
+    private Map downloadAndSaveAssetsFile(ActionRequest actionRequest) throws ClientProtocolException, IOException {
         HttpResponse response = null
         String filename = null
         String error = null
@@ -93,9 +87,10 @@ class ServiceNowService {
 
         try {
             byte[] buffer = new byte[1024]
-
-            HttpClient httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth()).build()
-            HttpGet httpGet = new HttpGet(serviceUrl(payload))
+            Map apiActionMap = actionRequest.param.getProperty('apiAction')
+            Long credentialId = apiActionMap.credential.id
+            HttpClient httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(getBasicAuth(credentialId)).build()
+            HttpGet httpGet = new HttpGet(serviceUrl(apiActionMap))
             response = httpClient.execute(httpGet)
 
             log.debug(response.getStatusLine().toString())
@@ -129,7 +124,7 @@ class ServiceNowService {
             OutputStream output = null
 
             try {
-                String extension = getFilenameExtension(response, payload)
+                String extension = getFilenameExtension(response, actionRequest)
                 (filename, output) = fileSystemService.createTemporaryFile(FILENAME_PREFIX, extension)
                 input = entity.getContent()
                 for (int length; (length = input.read(buffer)) > 0;) {
@@ -194,7 +189,7 @@ class ServiceNowService {
 
         // Fall back to the payload setting
         if (! extension) {
-            extension = (payload.format ? payload.format.toLowerCase() : 'csv')
+            extension = (payload.format ? payload.format.toLowerCase() : 'csv') // TODO: What is this format? where should it come from?
         }
 
         return extension
