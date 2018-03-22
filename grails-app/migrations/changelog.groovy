@@ -224,4 +224,5 @@ databaseChangeLog = {
 	include file: '20180308-alter-table-credential-add-validation-expression-column.groovy'
 	include file: '20180304-changes-for-batch-processing.groovy'
 	include file: '20180319-alter-table-apiaction-consolidate-url-and-path.groovy'
+	include file: '20180322-remove-recipe-version-tombstones.groovy'
 }

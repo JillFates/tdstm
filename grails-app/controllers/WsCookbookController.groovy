@@ -6,6 +6,7 @@ import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CookbookService
+import net.transitionmanager.service.InvalidParamException
 
 /**
  * Handles WS calls of the CookbookService.
@@ -33,8 +34,9 @@ class WsCookbookController implements ControllerMethods {
 	@HasPermission(Permission.RecipeDelete)
 	def deleteRecipeOrVersion(Long id) {
 		def version = params.version
-		if (version == null) {
-			cookbookService.deleteRecipe(id)
+		if (version == null || version == 0) {
+			// The front-end prevents this situation. This is just being extra cautious.
+			throw new InvalidParamException('Cannot delete recipe with an invalid version.')
 		} else {
 			cookbookService.deleteRecipeVersion(params.id, version)
 		}
