@@ -206,7 +206,31 @@ export class DataIngestionService {
 						agentMethodModel.push({
 							id: result[property].name,
 							name: result[property].name,
-							description: result[property].description
+							description: result[property].description,
+							endpointUrl: result[property].endpointUrl,
+							docUrl: result[property].docUrl,
+							producesData: (result[property].producesData === 1),
+							polling: {
+								frequency: {
+									value: ((result[property].pollingInterval) ? result[property].pollingInterval : 0),
+									interval: INTERVAL.SECONDS
+								},
+								lapsedAfter: {
+									value: DateUtils.convertInterval({
+										value: ((result[property].pollingLapsedAfter) ? result[property].pollingLapsedAfter : 0),
+										interval: INTERVAL.SECONDS
+									}, INTERVAL.MINUTES),
+									interval: INTERVAL.MINUTES
+								},
+								stalledAfter: {
+									value: DateUtils.convertInterval({
+										value: ((result[property].pollingStalledAfter) ? result[property].pollingStalledAfter : 0),
+										interval: INTERVAL.SECONDS
+									}, INTERVAL.MINUTES),
+									interval: INTERVAL.MINUTES
+								}
+							},
+							methodParams: result[property].params
 						});
 					}
 				}
@@ -274,7 +298,7 @@ export class DataIngestionService {
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			endpointUrl: model.endpointUrl,
-			endpointPath: model.endpointPath,
+			docUrl: model.docUrl,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),

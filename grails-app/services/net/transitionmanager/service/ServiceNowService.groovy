@@ -31,7 +31,7 @@ class ServiceNowService {
      * @param payload
      * @return
      */
-    Map fetchAssets(Object payload) {
+    Map fetchAssetList(Object payload) {
         log.debug 'Fetching ServiceNow assets: {}', payload
         Map result
         Map map =  downloadAndSaveAssetsFile(payload)

@@ -309,7 +309,7 @@ class Element implements RangeChecker {
      * @return
      */
     Element set (String variableName) {
-        processor.addDynamicVariable(variableName, this)
+        processor.addVariableInBinding(variableName, this)
 	    return this
     }
 

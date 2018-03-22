@@ -115,6 +115,11 @@ export class DependencyBatchListComponent {
 	 * @param {CellClickEvent} cellClick
 	 */
 	private openBatchDetail(cellClick: CellClickEvent): void {
+		// prevent open detail on column 0
+		if (cellClick.columnIndex === 0 ) {
+			return;
+		}
+		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
 		this.dialogService.open(DependencyBatchDetailDialogComponent, [
 			{ provide: ImportBatchModel, useValue: (cellClick as any).dataItem}
 		], DIALOG_SIZE.XXL, true).then(result => {

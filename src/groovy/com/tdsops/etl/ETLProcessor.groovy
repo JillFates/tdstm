@@ -40,6 +40,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	static final String NOW_VARNAME = 'NOW'
 	/**
+	 * Static variable name definition for LOOKUP script variable
+	 */
+	static final String LOOKUP_VARNAME = 'LOOKUP'
+	/**
 	 * Project used in some commands.
 	 */
 	Project project
@@ -246,6 +250,7 @@ class ETLProcessor implements RangeChecker {
 		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
+			result.releaseRowFoundInLookup()
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			binding.addDynamicVariable(NOW_VARNAME, new NOW())
@@ -474,13 +479,52 @@ class ETLProcessor implements RangeChecker {
 		[
 			with: { value ->
 				Element localVariable = currentRow.addNewElement(ETLValueHelper.stringValueOf(value))
-				addDynamicVariable(variableName, localVariable)
+				addVariableInBinding(variableName, localVariable)
 				localVariable
 			}
 		]
 	}
 
 	/**
+	 * Lookup ETL command implementation:
+	 * <pre>
+	 *  iterate {
+	 *      ...
+	 *      domain Device
+	 *      extract Vm load Name
+	 *      extract Cluster
+	 *      def clusterName = CE
+	 *
+	 *      lookup assetName with clusterName
+	 *  }
+	 * </pre>
+	 * @param fieldNames
+	 */
+	def lookup(final String fieldName){
+
+		lookUpFieldSpecs(selectedDomain, fieldName)
+		[
+		    with: { value ->
+			    String stringValue = ETLValueHelper.stringValueOf(value)
+			    boolean found = result.lookupInReference(fieldName, stringValue)
+			    addVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+		    }
+		]
+	}
+
+	/**
+	 * Validates if all the fieldNames are valid properties for a domain class.
+	 * It validates using a lookup fields method for each field name.
+	 * @param domain an instance of ETLDomanin
+	 * @param fieldNames a list of field names
+	 * @see ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 */
+	private void validateFields(ETLDomain domain, String...fieldNames) {
+		for(fieldName in fieldNames){
+			lookUpFieldSpecs(domain, fieldName)
+		}
+	}
+/**
 	 * Initialize a property using a default value
 	 * <pre>
 	 *	iterate {
@@ -596,9 +640,9 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Add a message in console for an element from dataSource by its index in the row
 	 * @param index
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (Integer index) {
+	ETLProcessor debug (Integer index) {
 
 		if (index in (0..currentRow.size())) {
 			currentColumnIndex = index
@@ -606,14 +650,15 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(index)
 		}
+		return this
 	}
 
 	/**
 	 * Add a message in console for an element from dataSource by its column name
 	 * @param columnName
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (String columnName) {
+	ETLProcessor debug (String columnName) {
 
 		if (columnsMap.containsKey(columnName)) {
 			currentColumnIndex = columnsMap[columnName].index
@@ -621,6 +666,18 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(columnName)
 		}
+		return this
+	}
+
+	/**
+	 * Log a message using DebugConsole.LevelMessage type
+	 * @param message an String message to be logged
+	 * @param level level used to add a new message in debug console
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor log (String message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
+		debugConsole.append(level, message)
+		return this
 	}
 
 	/**
@@ -688,12 +745,11 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Add a variable within the script as a dynamic variable.
-	 *
-	 * @param variableName
-	 * @param element
+	 * @param variableName binding name for a variable value
+	 * @param value an object to be binding in context
 	 */
-	void addDynamicVariable (String variableName, Element element) {
-		binding.addDynamicVariable(variableName, element)
+	void addVariableInBinding(String variableName, Object value) {
+		binding.addDynamicVariable(variableName, value)
 	}
 
 	/**

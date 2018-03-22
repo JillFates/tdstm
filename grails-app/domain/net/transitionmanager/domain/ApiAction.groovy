@@ -1,8 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
-import groovy.transform.ToString
-import groovy.util.logging.Slf4j
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
@@ -10,6 +10,10 @@ import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
+
+import java.util.regex.Matcher
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -74,15 +78,11 @@ class ApiAction {
 	// Determines how async API calls notify the completion of an action invocation
 	CallbackMode callbackMode = CallbackMode.NA
 
-	Date dateCreated
-
-	Date lastUpdated
-
-	// The URL to the endpoint
+	// The fully qualified URL to the endpoint
 	String endpointUrl
 
-	// The Path to the endpoint
-	String endpointPath
+	// The URL of the documentation to the endpoint if available (this can be formatted title|url or just url)
+	String docUrl=''
 
 	// A flag that indicates if the action will poll for a result
 	Integer isPolling = 0
@@ -105,6 +105,9 @@ class ApiAction {
 	// Flag indicating that the action interacts with an Asset.
 	Integer useWithTask = 0
 
+	Date dateCreated
+
+	Date lastUpdated
 
 	static belongsTo = [
 		project: Project,
@@ -119,8 +122,8 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-		endpointPath nullable: true, blank: true
-		endpointUrl nullable: true, blank: true
+		endpointUrl nullable: true, blank: true, validator: ApiAction.&endpointUrlValidator
+		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
 		methodParams nullable: true, validator: ApiAction.&methodParamsValidator
@@ -145,6 +148,8 @@ class ApiAction {
 			asyncQueue 		sqlType: 'varchar(64)'
 			name 			sqlType: 'varchar(64)'
 			methodParams	sqlType: 'text'
+			endpointUrl		sqlType: 'varchar(255)'
+			docUrl			sqlType: 'varchar(255)'
 		}
 	}
 
@@ -187,10 +192,15 @@ class ApiAction {
 		try {
 			list = getMethodParamsListOrException()
 		} catch (e) {
+// TODO : JPM 3/2018 : DO NOT trap exceptions like this and pretend that it didn't happen. Users have no clue what went wrong
 			log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 		}
 		return list
 	}
+
+//
+// TODO : JPM 3/2018 : The getListMethodParams method name is really confusing with getMethodParamsList. Naming needs to be sorted out to be more intuitive.
+//		getMethodParamsAsListOfMap and getMethodParamsAsListOfObject ??
 
 	/**
 	 * return a list of ApiActionMethodParams from the methodParams JSON field
@@ -203,6 +213,15 @@ class ApiAction {
 			list = listJson.collect { new ApiActionMethodParam(it) }
 		}
 		return list
+	}
+
+	/**
+	 * TM-9758 replace placeholders to the correct params
+	 * @param params Map containing the placeholders to replace
+	 * @return
+	 */
+	String endpointUrlWithPlaceholdersSubstituted(Map params) {
+		return StringUtil.replacePlaceholders(endpointPath, params, true)
 	}
 
 	/**
@@ -325,4 +344,33 @@ class ApiAction {
 		}
 	}
 
+	/**
+	 * Used to validate the docUrl if it has a value that it is either a URL or a Markup URL (title|URL)
+	 */
+	static docUrlValidator(value, ApiAction apiAction) {
+		if (StringUtil.isNotBlank(value)) {
+			if (! (HtmlUtil.isURL(value) || HtmlUtil.isMarkupURL(value) ) ) {
+				return Message.InvalidURLFormat
+			}
+		}
+		return true
+	}
+
+	/**
+	 * Validate that all placeholders in the endpoint path exist in the methodParams list
+	 * @param value
+	 * @param apiAction
+	 */
+	static endpointUrlValidator (String value, ApiAction apiAction) {
+
+		Set<String> placeholders = StringUtil.extractPlaceholders(value)
+		Set<String> methodParamNames = apiAction.getMethodParamsListOrException().collect { it.paramName }
+		Set<String> missingPlaceholders = placeholders - methodParamNames
+
+		if (missingPlaceholders) {
+			return [Message.ParamReferenceInURLNotFound, missingPlaceholders.join(', ')]
+		}
+
+		return true
+	}
 }

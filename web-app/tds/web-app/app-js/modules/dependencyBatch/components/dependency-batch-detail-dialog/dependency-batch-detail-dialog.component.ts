@@ -109,8 +109,11 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * @param $event
 	 */
 	private openBatchRecordDetail(cellClick: CellClickEvent): void {
-		this.dataGridOperationsHelper.selectCell(cellClick); // <-- first things first
-
+		// prevent open detail on column 0
+		if (cellClick.columnIndex === 0 ) {
+			return;
+		}
+		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
 		let selectedBatchRecord = (cellClick as any).dataItem;
 		// prevent errors when clicking empty rows ..
 		if (!selectedBatchRecord || !selectedBatchRecord.id) {

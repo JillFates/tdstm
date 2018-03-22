@@ -1,6 +1,13 @@
 package com.tdsops.etl
 
 class DebugConsole {
+
+	/**
+	 * Debug message Level
+	 */
+    static enum LevelMessage {
+        INFO, DEBUG, WARN, ERROR
+    }
     /**
      *
      * Console Status defines if the debug console is enable or not
@@ -14,22 +21,22 @@ class DebugConsole {
     StringBuffer buffer = new StringBuffer()
 
     void info (def content) {
-        append("INFO", content)
+        append(LevelMessage.INFO, content)
     }
 
     void debug (def content) {
-        append("DEBUG", content)
+        append(LevelMessage.DEBUG, content)
     }
 
     void warn (def content) {
-        append("WARN", content)
+        append(LevelMessage.WARN, content)
     }
 
     void error (def content) {
-        append("ERROR", content)
+        append(LevelMessage.ERROR, content)
     }
 
-    private void append (String level, def content) {
+    void append (LevelMessage level, def content) {
         if (status == ConsoleStatus.on) {
             buffer.append(level)
             buffer.append(" - ")

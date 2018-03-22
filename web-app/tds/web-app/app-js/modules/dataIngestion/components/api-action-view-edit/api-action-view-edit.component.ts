@@ -40,10 +40,15 @@ declare var jQuery: any;
 			color: red;
 			font-weight: bold;
 		}
-
 		.script-error {
 			margin-bottom: 18px;
 		}
+		label.url-label {
+            width: 146px;
+		}
+        .url-input {
+	        width: 82%;
+        }
 	`]
 })
 export class APIActionViewEditComponent implements OnInit {
@@ -105,7 +110,7 @@ export class APIActionViewEditComponent implements OnInit {
 			assetClass: 'TASK',
 			value: 'Task'
 		}, {
-			assetClass: 'USER_DEFINED',
+			assetClass: 'USER_DEF',
 			value: 'User Defined'
 		}
 	];
@@ -125,6 +130,11 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
+	private lastSelectedAgent: AgentModel = {
+		id: 0,
+		name: 'Select...'
+	};
+
 	constructor(
 		public originalModel: APIActionModel,
 		public modalType: ActionType,
@@ -435,6 +445,80 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 * Listener for the Select when the Value Method Changes.
+	 * @param event
+	 */
+	protected onMethodValueChange(event: any): void {
+		if (this.lastSelectedAgent && this.lastSelectedAgent.id !== 0) {
+			this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
+				.then((res) => {
+					this.loadAgentMethodModel(res);
+				});
+		} else {
+			this.loadAgentMethodModel(true);
+		}
+	}
+
+	/**
+	 * Pre-populate the values of the Agent and Params if the changeMethod is true
+	 * or if this is the firs time ( Create )
+	 * @param {boolean} changeMethod
+	 */
+	private loadAgentMethodModel(changeMethod: boolean): void {
+		if (changeMethod) {
+			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
+			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
+			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
+			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
+			this.guardParams();
+			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+		} else if (this.lastSelectedAgent) {
+			// Return the value to the previous one if is on the same List
+			let agentMethod = this.agentMethodList.find((method) => {
+				return method.id === this.lastSelectedAgent.id;
+			});
+			if (agentMethod) {
+				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+			} else {
+				this.apiActionModel.agentMethod = this.agentMethodList[0];
+			}
+		}
+	}
+
+	/**
+	 * Temp Fix to obtain the context, I need this just to proceed with the TM-9849
+	 * @returns {any}
+	 */
+	private guardParams(): any {
+		this.apiActionModel.agentMethod.methodParams.forEach((item, index) => {
+			if (item.context && item.context.name) {
+				item.context = item.context.name;
+			}
+			if (!item.context || item.context === 'null' || item.context === null) {
+				this.apiActionModel.agentMethod.methodParams.splice(index, 1);
+			}
+
+			if (item.param) {
+				if (item.param === 'null' || item.param === null) {
+					item.param = '';
+				}
+				item['paramName'] = item.param;
+				delete item.param;
+			}
+
+			if (item.property) {
+				if (item.property === 'null' || item.property === null) {
+					item.property = '';
+				}
+				item['fieldName'] = item.property;
+				delete item.property;
+			}
+		});
+		return this.apiActionModel.agentMethod.methodParams;
+	}
+
+	/**
 	 *
 	 * @param pollingObject
 	 */
@@ -473,7 +557,10 @@ export class APIActionViewEditComponent implements OnInit {
 	/**
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
-	onOpenAgentMethod(): void {
+	protected onOpenAgentMethod(): void {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== 0) {
+			this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+		}
 		setTimeout(() => {
 			jQuery('kendo-popup').css('width', 'auto');
 		}, 100);
@@ -522,20 +609,23 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	onAddParameter(): void {
 		this.parameterList.data.push({
-			param: '',
+			paramName: '',
 			desc: '',
 			type: 'string',
 			context: '',
-			property: '',
+			fieldName: '',
 			currentFieldList: [],
-			value: ''
+			value: '',
+			readonly: false,
+			required: false,
+			encoded: false
 		});
 		this.refreshParametersList();
 	}
 
 	/**
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
-	 * if the value is USER_DEFINED, the field will become a text input field
+	 * if the value is USER_DEF, the field will become a text input field
 	 */
 	onContextValueChange(dataItem: APIActionParameterModel): void {
 		let fieldSpecs = this.commonFieldSpecs.find((spec) => {
@@ -545,10 +635,10 @@ export class APIActionViewEditComponent implements OnInit {
 			dataItem.currentFieldList = fieldSpecs.fields;
 			dataItem.sourceFieldList = fieldSpecs.fields;
 			let property = dataItem.currentFieldList.find((field) => {
-				return field.field === dataItem.property;
+				return field.field === dataItem.fieldName;
 			});
 			if (property) {
-				dataItem.property = property;
+				dataItem.fieldName = property;
 			}
 		}
 
@@ -688,6 +778,11 @@ export class APIActionViewEditComponent implements OnInit {
 			event.preventDefault();
 			event.stopPropagation();
 		}
+	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
 	}
 
 	private focusForm() {
