@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -64,6 +64,7 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
 
@@ -129,7 +130,10 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedAgent;
+	private lastSelectedAgent: AgentModel = {
+		id: 0,
+		name: 'Select...'
+	};
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -308,11 +312,15 @@ export class APIActionViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
-				});
+				})
+				.catch((error) => console.log(error));
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -322,7 +330,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -335,6 +343,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
 		this.verifyIsValidForm();
+		this.focusForm();
 	}
 
 	/**
@@ -435,22 +444,46 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Listener for the Select when the Value Method Changes.
+	 * @param event
+	 */
 	protected onMethodValueChange(event: any): void {
-		this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
-			.then((res) => {
-				if (res) {
-					this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
-					this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
-					this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
-					this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
-					this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
-					this.guardParams();
-					this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
-				} else if (this.lastSelectedAgent) {
-					// Return the value to the previous one
-					this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
-				}
+		if (this.lastSelectedAgent && this.lastSelectedAgent.id !== 0) {
+			this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
+				.then((res) => {
+					this.loadAgentMethodModel(res);
+				});
+		} else {
+			this.loadAgentMethodModel(true);
+		}
+	}
+
+	/**
+	 * Pre-populate the values of the Agent and Params if the changeMethod is true
+	 * or if this is the firs time ( Create )
+	 * @param {boolean} changeMethod
+	 */
+	private loadAgentMethodModel(changeMethod: boolean): void {
+		if (changeMethod) {
+			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
+			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
+			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
+			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
+			this.guardParams();
+			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+		} else if (this.lastSelectedAgent) {
+			// Return the value to the previous one if is on the same List
+			let agentMethod = this.agentMethodList.find((method) => {
+				return method.id === this.lastSelectedAgent.id;
 			});
+			if (agentMethod) {
+				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+			} else {
+				this.apiActionModel.agentMethod = this.agentMethodList[0];
+			}
+		}
 	}
 
 	/**
@@ -525,7 +558,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
-		this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== 0) {
+			this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+		}
 		setTimeout(() => {
 			jQuery('kendo-popup').css('width', 'auto');
 		}, 100);
@@ -744,4 +779,14 @@ export class APIActionViewEditComponent implements OnInit {
 			event.stopPropagation();
 		}
 	}
+
+	protected sortChange(sort): void {
+		this.state.sort = sort;
+		this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+	}
+
+	private focusForm() {
+		this.apiActionContainer.nativeElement.focus();
+	}
+
 }

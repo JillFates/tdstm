@@ -92,6 +92,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
+			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
 			'FETCH_WITH_DATA_ACTION': 'Fetch with Data Action:',
 			'FETCH_WITH_FILE_UPLOAD': 'Fetch with File Upload:',
@@ -106,15 +107,19 @@ export const en_DICTIONARY: Object = {
 			'VIEW_DATA': 'View Data'
 		}
 	},
-	'DEPENDENCY_BATCH': {
+	'IMPORT_BATCH': {
 		'MANAGE_LIST': 'Manage Dependency Batches',
 		'DEPENDENCY_BATCH': 'Dependency Batch',
 		'LIST': {
-			'PENDING_TOOLTIP': 'Queue to be processed',
-			'QUEUED_TOOLTIP': 'Remove from queue',
-			'PROCESSING_TOOLTIP': 'Stop processing',
+			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',
+			'REMOVE_FROM_QUEUE': 'Remove from queue',
+			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
-			'UNARCHIVE': 'Unarchive'
+			'UNARCHIVE': 'Unarchive',
+		},
+		'DETAIL': {
+			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
+			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
 	'GLOBAL': {
@@ -143,7 +148,11 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
 		'UPLOAD': 'Upload',
-		'FETCH': 'Fetch'
+		'FETCH': 'Fetch',
+		'CONFIRMATION_PROMPT' : {
+			'CONFIRMATION_REQUIRED': 'Confirmation Required',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?'
+		}
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

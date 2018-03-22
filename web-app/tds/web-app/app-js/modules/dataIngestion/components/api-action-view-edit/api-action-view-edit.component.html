@@ -1,6 +1,6 @@
-<div class="modal-content api-action-view-edit-component">
+<div class="modal-content api-action-view-edit-component"  #apiActionContainer tabindex="0">
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+		<button (click)="cancelCloseDialog()" type="button"  tds-autofocus="" class="close" aria-label="Close">
 			<span aria-hidden="true">×</span>
 		</button>
 		<h4 class="modal-title">{{modalTitle}}</h4>
@@ -239,7 +239,7 @@
 								<div class="row">
 									<div class="col-md-12">
 										<div class="form-group">
-											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">URL:</label>
+											<label for="apiEndpointURL" class="col-sm-3 control-label url-label">Endpoint URL:</label>
 											<div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
 												<input type="text" id="apiEndpointURL" name="apiEndpointURL" class="form-control" [(ngModel)]="apiActionModel.endpointUrl" />
 											</div>
@@ -252,12 +252,12 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Doc. URL:</label>
+                                            <label for="apiDocURL" class="col-sm-3 control-label url-label">Documentation URL:</label>
                                             <div class="col-sm-9 url-input" *ngIf="modalType !== actionTypes.VIEW">
                                                 <input type="text" id="apiDocURL" name="apiDocURL" class="form-control" [(ngModel)]="apiActionModel.docUrl" />
                                             </div>
                                             <div class="col-sm-9 url-input" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail"><a [attr.href]="apiActionModel.docUrl" target="_blank">{{apiActionModel.docUrl}}</a></label>
+                                                <label class="control-label label-detail"><tds-url-viewer [model]="apiActionModel.docUrl"></tds-url-viewer></label>
                                             </div>
                                         </div>
                                     </div>
@@ -285,13 +285,13 @@
                                                        title="{{column.label}}"
 													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
 										<ng-template kendoGridHeaderTemplate *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-											<span title="Readonly Field" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
-											<span title="Required Field" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
-											<span title="An Encoded Field" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
+											<span title="Parameter is required" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
+											<span title="Parameter value read-only" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
+											<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
 											<div class="text-center">
-												<button class="btn btn-default" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+												<button class="btn btn-default" *ngIf="dataItem.required === 0  || dataItem.required === false" (click)="onDeleteParameter($event, dataItem)"><span class="fa fa-fw fa-trash"></span></button>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
@@ -315,7 +315,11 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF'" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-user-defined" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.value" />
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF'" type="text" class="param-text-input"
+													   name="{{column.property + columnIndex + rowIndex}}-user-defined"
+													   (change)="verifyIsValidForm()"
+													   [(ngModel)]="dataItem.value"
+													   [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"/>
 												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
@@ -326,15 +330,21 @@
 																[(ngModel)]="dataItem.fieldName"
 																(keypress)="getOnInputKey($event)"
 																(valueChange)="verifyIsValidForm()"
+                                                                [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"
 																required
 																[ngClass]="{'has-error': !dataItem.fieldName}" >
 												</kendo-combobox>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc" />
+												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.desc"/>
 											</div>
 										</ng-template>
 										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+											<div class="group-boolean-fields" *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
+												<span *ngIf="column.property === 'required'"><span *ngIf="dataItem.required === 1  || dataItem.required === true"><i class="fa fa-fw fa-check"></i></span></span>
+												<span *ngIf="column.property === 'readonly'"><span *ngIf="dataItem.readonly === 1  || dataItem.readonly === true"><i class="fa fa-fw fa-check"></i></span></span>
+												<span *ngIf="column.property === 'encoded'"><span *ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
+											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 												<span>{{dataItem.param}}</span>
 											</div>
@@ -407,7 +417,7 @@
 												<div class="col-md-2">
 													<div class="checkbox">
 														<label>
-															<input type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
+															<input  type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
 														</label>
 													</div>
 												</div>
@@ -416,7 +426,7 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
+														<input  type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>
@@ -486,7 +496,7 @@
 													<code-mirror #codeMirror id="apiActionDefault" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[2].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[2].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[2].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -506,7 +516,7 @@
 													<code-mirror #codeMirror id="apiActionError" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[3].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[3].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[3].error" readonly></textarea>
 													</div>
 												</div>
 											</div>
@@ -526,7 +536,7 @@
 													<code-mirror #codeMirror id="apiActionFailed" [mode]="codeMirror.mode" [(model)]="apiActionModel.eventReactions[4].value"></code-mirror>
 													<div *ngIf="apiActionModel.eventReactions[4].state === checkActionModel.INVALID" style="margin-left: 50px;">
 														<label class="control-label" style="color:darkred;">Syntax Error</label>
-														<textarea class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
+														<textarea  class="form-control script-error" name="apiActionSyntaxStatusDetermination" [ngModel]="apiActionModel.eventReactions[4].error" readonly></textarea>
 													</div>
 												</div>
 											</div>

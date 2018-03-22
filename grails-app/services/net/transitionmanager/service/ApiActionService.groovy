@@ -227,11 +227,11 @@ class ApiActionService implements ServiceMethods {
 				// headers?
 
 				// set config data
-				// Fetch the Path
-				String endpointPath = new URL(action.endpointUrl).getPath()
-				// Endpoint URL without the path
-				String endpointUrl = action.endpointUrl.substring(0, action.endpointUrl.indexOf(endpointPath))
-
+	// TODO : JPM 3/2018 : Need to get the parameters and encode correctly - need to talk with Sidar
+	// TODO : JPM 3/2018 : Refactor this code out to a separate function so it can be tested easily
+				String endpointFullUrl = action.endpointUrlWithPlaceholdersSubstituted(remoteMethodParams)
+				String endpointPath = new java.net.URL(endpointFullUrl).getPath()
+				String endpointUrl = endpointFullUrl - endpointPath
 				actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
 				actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
 

@@ -17,4 +17,10 @@ databaseChangeLog = {
             column(name: 'doc_url', type: 'varchar(255)', defaultValue: '')
         }
 	}
+
+	changeSet(author: 'jmartin', id: 'TM-TM-9849-03') {
+		comment('Clear out old ApiAction domain records to avoid any errors')
+		sql('UPDATE asset_comment set api_action_id=null, api_action_settings=null;')
+		sql('DELETE from api_action;')
+	}
 }

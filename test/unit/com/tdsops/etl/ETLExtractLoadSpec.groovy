@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -24,6 +25,8 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.http.client.utils.DateUtils
+import spock.lang.See
 import spock.lang.Shared
 
 /**
@@ -1029,6 +1032,94 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 				}
 			}
+	}
+
+	@See('TM-9283')
+	void 'test correct trimming of spaces in column names'() {
+
+		given:
+		ETLFieldsValidator validator = new DomainClassFieldsValidator()
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+		and:
+		def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			name , mfg, model
+			xraysrv01,Dell,PE2950
+			oradbsrv02,HP,DL8150
+			oradbsrv03,HP,DL8155""".stripIndent())
+		and:
+		ETLProcessor etlProcessor = new ETLProcessor(
+						GroovyMock(Project),
+						dataSet,
+						new DebugConsole(buffer: new StringBuffer()),
+						validator)
+
+		when: 'The ETL script is evaluated'
+		new GroovyShell(this.class.classLoader, etlProcessor.binding)
+						.evaluate("""
+					read labels
+domain Device
+iterate {
+     extract name load assetName
+     extract mfg load manufacturer
+     extract 3 load model
+}
+				""".stripIndent(),
+						ETLProcessor.class.name)
+
+		then: 'Every field property is assigned to the correct element'
+		etlProcessor.result.domains.size() == 1
+		with(etlProcessor.result.domains[0]) {
+			domain == ETLDomain.Device.name()
+			with(data[0]) {
+				rowNum == 1
+				with (fields.assetName){
+					originalValue == "xraysrv01"
+					value == "xraysrv01"
+				}
+				with (fields.manufacturer){
+					originalValue == "Dell"
+					value == "Dell"
+				}
+				with (fields.model){
+					originalValue == "PE2950"
+					value == "PE2950"
+				}
+			}
+
+			with(data[1]) {
+				rowNum == 2
+				with (fields.assetName){
+					originalValue == "oradbsrv02"
+					value == "oradbsrv02"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8150"
+					value == "DL8150"
+				}
+			}
+
+			with(data[2]) {
+				rowNum == 3
+				with (fields.assetName){
+					originalValue == "oradbsrv03"
+					value == "oradbsrv03"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8155"
+					value == "DL8155"
+				}
+			}
+		}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can create new results loading values without extract previously'() {
@@ -2082,5 +2173,59 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test NOW variable'() {
+
+		given:
+			String iso8601 = TimeUtil.FORMAT_DATE_TIME_ISO8601.replace("'", '')
+			def dataSetCSV = """
+				name
+				fubar
+			""".stripIndent().trim()
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(dataSetCSV)
+
+		and:
+			def scriptContent = """
+				console on
+				domain Device
+				read labels
+				iterate {
+				      extract name load Name
+						load 'Network Interfaces' with NOW
+				}
+			""".stripIndent().trim()
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator
+			)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent, ETLProcessor.class.name)
+
+		then:
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				with(data[0]) {
+					with(fields.assetName) {
+						value == 'fubar'
+						originalValue == 'fubar'
+					}
+
+					with(fields.custom1) {
+						Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						assert date != null : "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
 	}
 }

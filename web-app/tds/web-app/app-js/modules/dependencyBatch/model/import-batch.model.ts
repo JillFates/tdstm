@@ -2,11 +2,21 @@ import {GridColumnModel} from '../../../shared/model/data-list-grid.model';
 import {ProviderModel} from '../../dataIngestion/model/provider.model';
 import {DataScriptModel} from '../../dataIngestion/model/data-script.model';
 import {ProjectModel} from '../../../shared/model/project.model';
+import {EnumModel} from '../../../shared/model/enum.model';
+
+export enum BatchStatus {
+	RUNNING = 'RUNNING',
+	PENDING = 'PENDING',
+	QUEUED = 'QUEUED',
+	COMPLETED = 'COMPLETED',
+	IGNORED = 'IGNORED',
+	STALLED = 'STALLED',
+};
 
 export class ImportBatchModel {
 	id: number;
-	status: string;
-	domainClassName: string;
+	status: EnumModel;
+	domainClassName: any;
 	project: ProjectModel;
 	provider: ProviderModel;
 	datascript: DataScriptModel;
@@ -30,6 +40,7 @@ export class ImportBatchModel {
 	processed: number;
 	ignored: number;
 	currentProgress?: number;
+	stalledCounter? = 0;
 }
 
 /**
@@ -41,14 +52,14 @@ export class DependencyBatchColumnsModel {
 
 	constructor() {
 		this.columns = [
-			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 70,
-				locked: true,
-				cellStyle: {'text-align': 'center'}
-			},
+			// {
+			// 	label: 'Action',
+			// 	property: 'action',
+			// 	type: 'action',
+			// 	width: 70,
+			// 	locked: false,
+			// 	cellStyle: {'text-align': 'center'}
+			// },
 			{
 				label: 'Id',
 				property: 'id',
@@ -80,7 +91,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Domain',
-				property: 'domainClassName',
+				property: 'domainClassName.name',
 				type: 'text',
 				width: 130,
 				locked: false

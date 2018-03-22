@@ -1,5 +1,8 @@
-import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
-import {CompositeFilterDescriptor, filterBy, process, SortDescriptor, State} from '@progress/kendo-data-query';
+import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {
+	CompositeFilterDescriptor, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
+	State
+} from '@progress/kendo-data-query';
 import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
@@ -26,7 +29,8 @@ export class DataGridOperationsHelper {
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
 	public skip = 0;
-	public defaultPageSize = MAX_DEFAULT;
+	// public defaultPageSize = MAX_DEFAULT;
+	public currentPageSize;
 	public defaultPageOptions = MAX_OPTIONS;
 
 	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
@@ -41,6 +45,7 @@ export class DataGridOperationsHelper {
 			}
 			this.checkboxSelectionConfig = checkboxSelectionConfig;
 		}
+		this.currentPageSize = MAX_DEFAULT;
 		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
@@ -49,13 +54,33 @@ export class DataGridOperationsHelper {
 	 * On Filter column event.
 	 * @param column
 	 */
-	public onFilter(column: any): void {
+	public onFilter(column: GridColumnModel): void {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
-		if (!column.filter) {
+		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
 			column.filter = '';
+		}
+		// check for number types and null value (clear out the filters)
+		if (column.type === 'number' && column.filter === null) {
+			this.clearValue(column);
+			return; // exit
+		}
+
+		if (column.type === 'number') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'gte',
+					value: column.filter
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
 		}
 
 		if (column.type === 'text') {
@@ -115,7 +140,7 @@ export class DataGridOperationsHelper {
 	 * On Clear Value for filter event.
 	 * @param column
 	 */
-	public clearValue(column: any): void {
+	public clearValue(column: GridColumnModel): void {
 		column.filter = '';
 		if (this.state.filter && this.state.filter.filters.length > 0) {
 			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
@@ -186,6 +211,14 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * Get all checkbox selected as an array of numbers
+	 * @returns {Array<number>}
+	 */
+	public getCheckboxSelectedItemsAsNumbers(): Array<number> {
+		return this.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+	}
+
+	/**
 	 * On checkbox change event.
 	 * @param key
 	 */
@@ -211,20 +244,27 @@ export class DataGridOperationsHelper {
 	 */
 	public pageChange(event: PageChangeEvent): void {
 		this.skip = event.skip;
+		this.currentPageSize = event.take;
 		this.loadPageData();
 	}
 
 	/**
-	 * Change the Model to the Page + Filter
+	 * Change the Model to the Page + Filter + Sort
 	 */
 	public loadPageData(): void {
+		// Filter
 		this.gridData = {
-			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.state.filter),
+			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.currentPageSize), this.state.filter),
 			total: this.resultSet.length
+		};
+		// Sort
+		this.gridData = {
+			data: orderBy(this.gridData.data, this.state.sort),
+			total: this.gridData.total
 		};
 		// If we delete an item and it was the last element in the page, go one page back
 		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
-			this.skip -= this.defaultPageSize;
+			this.skip -= this.currentPageSize;
 			this.loadPageData();
 		}
 	}

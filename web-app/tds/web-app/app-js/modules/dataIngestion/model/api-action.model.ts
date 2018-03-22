@@ -77,19 +77,19 @@ export class APIActionParameterColumnModel {
 				label: 'custom',
 				property: 'required',
 				type: 'boolean',
-				width: 44
+				width: 42
 			},
 			{
 				label: 'custom',
 				property: 'readonly',
 				type: 'boolean',
-				width: 44
+				width: 42
 			},
 			{
 				label: 'Name',
 				property: 'paramName',
 				type: 'text',
-				width: 190
+				width: 198
 			}, {
 				label: 'Context',
 				property: 'context.value',
@@ -99,19 +99,19 @@ export class APIActionParameterColumnModel {
 				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 210
+				width: 218
 			},
 			{
 				label: 'custom',
 				property: 'encoded',
 				type: 'boolean',
-				width: 44
+				width: 42
 			},
 			{
 				label: 'Description',
 				property: 'desc',
 				type: 'text',
-				width: 265
+				width: 268
 			}
 		];
 	}

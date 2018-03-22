@@ -21,7 +21,7 @@ export class TranslatePipe implements PipeTransform {
 	 * @param key
 	 * @param value
 	 */
-	traverse(key, value): void {
+	private traverse(key, value): void {
 
 		if (typeof value === 'object') {
 			for (let property of Object.keys(value)) {
@@ -38,7 +38,7 @@ export class TranslatePipe implements PipeTransform {
 	 * @param args param strings to be replaced on translated text.
 	 * @returns {string} Returns localized message from dictionary, if not founded returns key.
 	 */
-	transform(value: string, args: any[]): string {
+	transform(value: string, args?: any[]): string {
 
 		let translatedValue: string;
 

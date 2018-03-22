@@ -41,8 +41,12 @@ class JsonUtil {
      */
     static List parseJsonList(String jsonText) {
         // TODO : JPM 2/2018 : Need to add try/catch
-        JsonSlurper jsonSlurper = new JsonSlurper()
-        return (List)jsonSlurper.parseText(jsonText)
+        try {
+            JsonSlurper jsonSlurper = new JsonSlurper()
+            return jsonSlurper.parseText(jsonText) as List
+        } catch (e) {
+            throw new InvalidParamException("Invalid JSON : ${e.message}")
+        }
     }
 
     /**
