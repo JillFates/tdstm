@@ -228,9 +228,13 @@ class ApiActionService implements ServiceMethods {
 				// headers?
 
 				// set config data
-	// TODO : JPM 3/2018 : Need to split URL and path here
-				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPathWithPlaceholdersSubstituted(remoteMethodParams))
+	// TODO : JPM 3/2018 : Need to get the parameters and encode correctly - need to talk with Sidar
+	// TODO : JPM 3/2018 : Refactor this code out to a separate function so it can be tested easily
+				String endpointFullUrl = action.endpointUrlWithPlaceholdersSubstituted(remoteMethodParams)
+				String endpointPath = new java.net.URL(endpointFullUrl).getPath()
+				String endpointUrl = endpointFullUrl - endpointPath
+				actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
+				actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
 				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT

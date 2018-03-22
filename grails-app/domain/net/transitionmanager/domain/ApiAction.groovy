@@ -1,14 +1,8 @@
 package net.transitionmanager.domain
 
 import com.tdssrc.grails.JsonUtil
-<<<<<<< HEAD
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
-=======
-import com.tdssrc.grails.StringUtil
-import groovy.transform.ToString
-import groovy.util.logging.Slf4j
->>>>>>> ee58389ae7c86f52e85215798982599cba9545ae
 import net.transitionmanager.agent.AgentClass
 import net.transitionmanager.agent.CallbackMode
 import net.transitionmanager.command.ApiActionMethodParam
@@ -128,11 +122,7 @@ class ApiAction {
 		credential nullable: true, validator: crossProviderValidator
 		defaultDataScript nullable: true, validator: crossProviderValidator
 		description nullable: true
-<<<<<<< HEAD
-=======
-		endpointPath nullable: true, blank: true, validator: ApiAction.&endpointPathValidator
->>>>>>> ee58389ae7c86f52e85215798982599cba9545ae
-		endpointUrl nullable: true, blank: true
+		endpointUrl nullable: true, blank: true, validator: ApiAction.&endpointUrlValidator
 		docUrl nullable: true, blank: true, validator: ApiAction.&docUrlValidator
 		isPolling range: 0..1
 		lastUpdated nullable: true
@@ -202,10 +192,15 @@ class ApiAction {
 		try {
 			list = getMethodParamsListOrException()
 		} catch (e) {
+// TODO : JPM 3/2018 : DO NOT trap exceptions like this and pretend that it didn't happen. Users have no clue what went wrong
 			log.warn 'getMethodParamsList() methodParams impropertly formed JSON (value={}) : {}', methodParams, e.getMessage()
 		}
 		return list
 	}
+
+//
+// TODO : JPM 3/2018 : The getListMethodParams method name is really confusing with getMethodParamsList. Naming needs to be sorted out to be more intuitive.
+//		getMethodParamsAsListOfMap and getMethodParamsAsListOfObject ??
 
 	/**
 	 * return a list of ApiActionMethodParams from the methodParams JSON field
@@ -225,7 +220,7 @@ class ApiAction {
 	 * @param params Map containing the placeholders to replace
 	 * @return
 	 */
-	String endpointPathWithPlaceholdersSubstituted(Map params) {
+	String endpointUrlWithPlaceholdersSubstituted(Map params) {
 		return StringUtil.replacePlaceholders(endpointPath, params, true)
 	}
 
@@ -361,14 +356,15 @@ class ApiAction {
 		return true
 	}
 
+	/**
 	 * Validate that all placeholders in the endpoint path exist in the methodParams list
 	 * @param value
 	 * @param apiAction
 	 */
-	static endpointPathValidator (String value, ApiAction apiAction) {
+	static endpointUrlValidator (String value, ApiAction apiAction) {
 
 		Set<String> placeholders = StringUtil.extractPlaceholders(value)
-		Set<String> methodParamNames = apiAction.listMethodParams.collect { it.param }
+		Set<String> methodParamNames = apiAction.getMethodParamsListOrException().collect { it.paramName }
 		Set<String> missingPlaceholders = placeholders - methodParamNames
 
 		if (missingPlaceholders) {
