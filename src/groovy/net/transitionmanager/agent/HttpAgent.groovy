@@ -27,7 +27,7 @@ class HttpAgent extends AbstractAgent {
 				endpointUrl: 'https://SOME-DOMAIN/SOME/PATH',
 				docUrl: '',
 				method: 'invokeHttpRequest',
-				providesData: 0,
+				producesData: 0,
 				params: queueParams()
             ])
         ] )
