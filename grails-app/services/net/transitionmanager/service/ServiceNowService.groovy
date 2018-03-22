@@ -21,8 +21,6 @@ import org.apache.http.util.EntityUtils
 @Slf4j
 class ServiceNowService {
     private static final String DEFAULT_CHARACTER_ENCODING = 'UTF-8'
-    private static final String USERNAME = "Dcorrea"
-    private static final String PASSWORD = "boston2004"
     private static final String FILENAME_PREFIX='servicenow-'
 
     CredentialService credentialService
