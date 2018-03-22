@@ -3,8 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdsops.tm.enums.domain.AuthenticationMethod
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -217,7 +215,8 @@ class ApiActionService implements ServiceMethods {
 						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
-						credentials: action.credential?.toMap()
+						credentials: action.credential?.toMap(),
+						apiAction: apiActionToMap(action)
 				]
 
 				// get api action agent instance
@@ -228,9 +227,13 @@ class ApiActionService implements ServiceMethods {
 				// headers?
 
 				// set config data
-	// TODO : JPM 3/2018 : Need to split URL and path here
-				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
+				// Fetch the Path
+				String endpointPath = new URL(action.endpointUrl).getPath()
+				// Endpoint URL without the path
+				String endpointUrl = action.endpointUrl.substring(0, action.endpointUrl.indexOf(endpointPath))
+
+				actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
+				actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
 				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
