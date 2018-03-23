@@ -291,16 +291,16 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
-					agent."${action.agentMethod}"(actionRequest)
+					agent.invoke(action.agentMethod, actionRequest)
 				} finally {
+					// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 				}
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
 		} else {
-			throw new InvalidRequestException(
-					'invoke() not implemented for class ' + context.getClass().getName() )
+			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
@@ -329,7 +329,7 @@ class ApiActionService implements ServiceMethods {
 
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
-		// execute action and return any result coming
+		// execute action and return any result that were returned
 		return agent.invoke(action.agentMethod, actionRequest)
 	}
 
