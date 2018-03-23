@@ -649,7 +649,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/assetExplorer/validateunique" {
+		"/ws/assetExplorer/validateUnique" {
 			controller = "wsAssetExplorer"
 			action = [
 							POST: "validateUniqueName",
