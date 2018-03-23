@@ -161,6 +161,13 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
+	 * Going to iterate over all of the the ApiAction params and agr
+	 */
+	Map<String, ?> buildParamValuesFromContext() {
+
+	}
+
+	/**
 	 * Used to invoke an agent method with a given context
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
@@ -227,14 +234,15 @@ class ApiActionService implements ServiceMethods {
 				// params?
 				// headers?
 
-				// set config data
-	// TODO : JPM 3/2018 : Need to get the parameters and encode correctly - need to talk with Sidar
-	// TODO : JPM 3/2018 : Refactor this code out to a separate function so it can be tested easily
-				String endpointFullUrl = action.endpointUrlWithPlaceholdersSubstituted(remoteMethodParams)
-				String endpointPath = new java.net.URL(endpointFullUrl).getPath()
-				String endpointUrl = endpointFullUrl - endpointPath
-				actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
+	// 			// set config data
+	// // TODO : JPM 3/2018 : Need to get the parameters and encode correctly - need to talk with Sidar
+	// // TODO : JPM 3/2018 : Refactor this code out to a separate function so it can be tested easily
+	// 			// String endpointFullUrl = action.endpointUrlWithPlaceholdersSubstituted(remoteMethodParams)
+	// 			String endpointPath = new java.net.URL(action.endpointUrl).getPath()
+	// 			// This logic is NOT considering the query params
+	// 			String endpointUrl = endpointFullUrl - endpointPath
+	// 			actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
+	// 			actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
 				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT

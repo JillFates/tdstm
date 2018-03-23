@@ -3,6 +3,7 @@ package net.transitionmanager.agent
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.service.InvalidRequestException
 import com.tds.asset.AssetComment
+import com.tdssrc.grails.UrlUtil
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
@@ -53,7 +54,9 @@ class AbstractAgent {
 	}
 
 	/**
-	 * Used to construct the Map of parameters that will be used to call the remote method
+	 * Used to construct the Map of parameters that will be used to call the remote method. Note
+	 * that the values are not URL encoded.
+	 *
 	 * @param action - the ApiAction that contains the methodParams
 	 * @param context - the domain context that the data for the parameters will come from
 	 * @return the map of the parameters with the appropriate values
@@ -61,13 +64,13 @@ class AbstractAgent {
 	@CompileStatic(TypeCheckingMode.SKIP)
 	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
-		for (param in action.methodParamsList) {
 
-			// TODO : JPM 3/2018 : Need to strip out URI Param Placeholders (not here actually)
+		String value
+		for (param in action.methodParamsList) {
 
 			switch (ContextType.lookup(param.context)) {
 				case ContextType.TASK:
-					methodParams.put(param.paramName, task[param.fieldName] )
+					value = task[param.fieldName]
 					break
 				case ContextType.ASSET:
 				case ContextType.APPLICATION:
@@ -75,15 +78,21 @@ class AbstractAgent {
 				case ContextType.DEVICE:
 				case ContextType.STORAGE:
 					if (task.assetEntity) {
-						methodParams.put(param.paramName, task.assetEntity[param.fieldName] )
+						// This line prevents the @CompileStatic
+						value = task.assetEntity[param.fieldName]
 					}
 					break
 				case ContextType.USER_DEF:
-					methodParams.put(param.paramName, param.value)
+					value = param.value
 					break
 				default:
-					throw new InvalidRequestException("Param context ${param.context} not supported")
+					// Shouldn't actually ever get here but just in case - put a bullet in this execution
+					throw new InvalidRequestException("Parameter context ${param.context} is not supported")
 			}
+			if (param.encoded == 1) {
+				value = UrlUtil.decode(value)
+			}
+			methodParams.put(param.paramName,value)
 		}
 		return methodParams
 	}
