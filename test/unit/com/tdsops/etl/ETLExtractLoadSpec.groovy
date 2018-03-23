@@ -146,8 +146,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+			updater(['application id': 152254, 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+			updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
@@ -789,8 +789,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						originalValue == 'ACME Data Center'
 					}
 					with(fields.assetName) {
-						value == '152254'
-						originalValue == '152254'
+						value == 152254
+						originalValue == 152254
 					}
 				}
 
