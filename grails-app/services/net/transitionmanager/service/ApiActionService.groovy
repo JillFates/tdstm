@@ -190,7 +190,9 @@ class ApiActionService implements ServiceMethods {
 			// add Camel hostname message identifier
 			remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
 
-			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
+			// TODO : SL 3/2018 : callback method needs to be revisited and/or implemented correctly
+			//boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
+			boolean methodRequiresCallbackMethod = false
 
 			if (methodRequiresCallbackMethod) {
 				if (! action.callbackMethod) {
@@ -298,7 +300,11 @@ class ApiActionService implements ServiceMethods {
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
-				agent."${action.agentMethod}"(actionRequest)
+				// TODO : SL 3/2018 : UI still need to send the dictionary key as the action.methodName instead of the agent method name
+				// this will prevent InvalidRequestException("Action class ${action.agentClass} method ${action.agentMethod} not implemented")
+				// from happening
+				//agent."${action.agentMethod}"(actionRequest)
+				agent."${methodDef.method}"(actionRequest)
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
