@@ -291,7 +291,7 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
-					agent."${action.agentMethod}"(actionRequest)
+					agent.invoke(action.agentMethod, actionRequest)
 				} finally {
 					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 				}
