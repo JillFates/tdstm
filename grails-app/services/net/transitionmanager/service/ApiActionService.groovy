@@ -52,9 +52,10 @@ class ApiActionService implements ServiceMethods {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
+		//(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
-		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent
+		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent,
+		(AgentClass.VCENTER.name())		: net.transitionmanager.agent.VMwarevCenterAgent
 	].asImmutable()
 
 	/**
