@@ -789,4 +789,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionContainer.nativeElement.focus();
 	}
 
+	protected isCheckSyntaxSectionDisabled(sectionIndex: number): boolean {
+		const eventReaction: EventReaction = this.apiActionModel.eventReactions[sectionIndex];
+		return eventReaction.value === '' || eventReaction.state === CHECK_ACTION.VALID;
+	}
+
 }

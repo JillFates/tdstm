@@ -38,6 +38,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private consoleSettings: ScriptConsoleSettingsModel = new ScriptConsoleSettingsModel();
 	private scriptTestResult: ScriptTestResultModel = new ScriptTestResultModel();
 	private scriptValidSyntaxResult: ScriptValidSyntaxResultModel = new ScriptValidSyntaxResultModel();
+	private isRunningTestingScript  = false;
 
 	ngAfterViewInit(): void {
 		setTimeout(() => {
@@ -74,7 +75,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 */
 	private onTestScript(): void {
 		this.clearLogVariables('test');
-		this.dataIngestionService.testScript(this.script, this.filename).subscribe( result => {
+		this.isRunningTestingScript = true;
+		const testScript$ =  this.dataIngestionService.testScript(this.script, this.filename)
+			.finally(() => this.isRunningTestingScript = false);
+
+		testScript$.subscribe( result => {
 			this.scriptTestResult = result.data;
 			this.scriptTestResult.domains = result.data.data.domains;
 			this.operationStatus.test.state = this.scriptTestResult.isValid ? CHECK_ACTION.VALID : CHECK_ACTION.INVALID;
@@ -244,4 +249,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 	}
+
+	protected isCheckSyntaxDisabled(): boolean {
+		return !this.script || !this.filename;
+	}
+
+	protected isTestDisabled(): boolean {
+		return !this.script || !this.filename || this.isRunningTestingScript;
+	}
+
 }
