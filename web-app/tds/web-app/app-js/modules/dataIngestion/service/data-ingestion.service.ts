@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {Headers, Http, RequestOptions, Response} from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
+import {PreferenceService} from '../../../shared/services/preference.service';
 import {DataScriptModel, DataScriptMode, SampleDataModel} from '../model/data-script.model';
 import {ProviderModel} from '../model/provider.model';
 import {APIActionModel, APIActionParameterModel} from '../model/api-action.model';
@@ -13,8 +14,12 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
+import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+
+const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
+const UNITS_SIZE_SEPARATOR = 'x';
 
 @Injectable()
 export class DataIngestionService {
@@ -26,7 +31,7 @@ export class DataIngestionService {
 	private credentialUrl = '../ws/credential';
 	private fileSystemUrl = '../ws/fileSystem';
 
-	constructor(private http: HttpInterceptor) {
+	constructor(private http: HttpInterceptor, private preferenceService: PreferenceService) {
 	}
 
 	getDataScripts(): Observable<DataScriptModel[]> {
@@ -64,7 +69,7 @@ export class DataIngestionService {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
 				dataScriptModels.forEach((r) => {
-					r.agentMethod = {name: r.agentMethod};
+					r.agentMethod = {id: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 					r.producesData = (r.producesData === 1);
@@ -98,7 +103,7 @@ export class DataIngestionService {
 		return this.http.get(`${this.dataApiActionUrl}/agent`)
 			.map((res: Response) => {
 				let result = res.json();
-				let agentModels = result; // && result.status === 'success' && result.data;
+				let agentModels = result;
 				return agentModels;
 			})
 			.catch((error: any) => error.json());
@@ -200,9 +205,33 @@ export class DataIngestionService {
 				for (let property in result) {
 					if (result.hasOwnProperty(property)) {
 						agentMethodModel.push({
-							id: result[property].name,
+							id: result[property].agentMethod,
 							name: result[property].name,
-							description: result[property].description
+							description: result[property].description,
+							endpointUrl: result[property].endpointUrl,
+							docUrl: result[property].docUrl,
+							producesData: (result[property].producesData === 1),
+							polling: {
+								frequency: {
+									value: ((result[property].pollingInterval) ? result[property].pollingInterval : 0),
+									interval: INTERVAL.SECONDS
+								},
+								lapsedAfter: {
+									value: DateUtils.convertInterval({
+										value: ((result[property].pollingLapsedAfter) ? result[property].pollingLapsedAfter : 0),
+										interval: INTERVAL.SECONDS
+									}, INTERVAL.MINUTES),
+									interval: INTERVAL.MINUTES
+								},
+								stalledAfter: {
+									value: DateUtils.convertInterval({
+										value: ((result[property].pollingStalledAfter) ? result[property].pollingStalledAfter : 0),
+										interval: INTERVAL.SECONDS
+									}, INTERVAL.MINUTES),
+									interval: INTERVAL.MINUTES
+								}
+							},
+							methodParams: result[property].params
 						});
 					}
 				}
@@ -270,7 +299,7 @@ export class DataIngestionService {
 			agentClass: model.agentClass.id,
 			agentMethod: model.agentMethod.id,
 			endpointUrl: model.endpointUrl,
-			endpointPath: model.endpointPath,
+			docUrl: model.docUrl,
 			producesData: (model.producesData) ? 1 : 0,
 			isPolling: (model.isPolling) ? 1 : 0,
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
@@ -295,7 +324,8 @@ export class DataIngestionService {
 		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
-			parameterList.data.forEach( (param) => {
+			let requestParameterListData = R.clone(parameterList.data);
+			requestParameterListData.forEach( (param) => {
 				if (param.property && param.property.field) {
 					param.property = param.property.field;
 				}
@@ -305,7 +335,7 @@ export class DataIngestionService {
 				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
-			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}
 
 		if (model.credential && model.credential.id && model.credential.id !== 0) {
@@ -374,17 +404,18 @@ export class DataIngestionService {
 		}
 	}
 
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
+	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
 		let postRequest = {
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			name: model.name
 		};
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				return result && result.status === 'success' && result.data && result.data.isUnique;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -394,22 +425,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['providerId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
-		let postRequest = {
-			providerId: model.provider.id
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
@@ -592,5 +608,25 @@ export class DataIngestionService {
 				return new HttpResponse({status: 200, body: { data : response } });
 			})
 			.catch((error: any) => error.json());
+	}
+	private getUserPreference(preferenceName: string): Observable<any> {
+		return this.preferenceService.getPreference(preferenceName);
+	}
+
+	getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
+		return this.getUserPreference(DATA_SCRIPT_SIZE_PREFERENCE)
+			.map(() => this.preferenceService.preferences[DATA_SCRIPT_SIZE_PREFERENCE] || '')
+			.filter((size: string) => Boolean(size))
+			.map((size: string) => {
+				let measure: string[] = size.split(UNITS_SIZE_SEPARATOR);
+				let	width = Number(measure.length &&  measure.shift()) || null;
+				let height = Number(measure.length &&  measure.shift()) || null;
+				return { width, height };
+			})
+			.filter((size: any) =>  size.width !== null && size.height !== null);
+	}
+
+	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
+		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
 }

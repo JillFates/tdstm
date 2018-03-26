@@ -1,6 +1,5 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
@@ -40,6 +39,10 @@ class ETLProcessor implements RangeChecker {
 	 * Static variable name definition for NOW script variable
 	 */
 	static final String NOW_VARNAME = 'NOW'
+	/**
+	 * Static variable name definition for LOOKUP script variable
+	 */
+	static final String LOOKUP_VARNAME = 'LOOKUP'
 	/**
 	 * Project used in some commands.
 	 */
@@ -85,7 +88,6 @@ class ETLProcessor implements RangeChecker {
 
 	ETLDomain selectedDomain
 	ETLFindElement currentFindElement
-	Map<ETLDomain, ReferenceResult> currentRowResult = [:]
 
 	/**
 	 * A set of Global transformations that will be apply over each iteration
@@ -156,7 +158,7 @@ class ETLProcessor implements RangeChecker {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
-				Column column = new Column(label: field.name, index: index)
+				Column column = new Column(label: field.name.trim(), index: index)
 				columns.add(column)
 				columnsMap[column.label] = column
 			}
@@ -247,19 +249,18 @@ class ETLProcessor implements RangeChecker {
 		currentRowIndex = 1
 		rows.each { def row ->
 			currentColumnIndex = 0
+			result.releaseRowFoundInLookup()
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			binding.addDynamicVariable(NOW_VARNAME, new Date())
+			binding.addDynamicVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(currentRowIndex, row))
 
 			result.removeIgnoredRows()
 
-			currentRowResult = [:]
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
-
 		currentRowIndex--
 		return this
 	}
@@ -411,24 +412,40 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 * Loads field values in results. From an extracted value or just as a fixed new Element
-	 * @param field
+	 * Load a domain property using an explicit value. It could be a simple String,
+	 * a DOMAIN or SOURCE reference, or a CE/local variable.
+	 * <pre>
+	 *    domain Application
+	 *    load assetName with 'Asset Name'
+	 *    load assetName with CE
+	 *    load assetName with myLocalVariable
+	 *    load assetName with DOMAIN.id
+	 *    load assetName with SOURCE.'data name'
+	 * </pre>
+	 * @param fieldName
 	 * @return
 	 */
-	def load (final String field) {
+	def load(final String fieldName) {
+		[
+			with: { value ->
 
-		if (currentElement) {
-			currentElement.load(field)
-		}
+				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
+				Element newElement = currentRow.addNewElement(ETLValueHelper.stringValueOf(value), fieldSpec, this)
+				addElementLoaded(selectedDomain, newElement)
+				newElement
+			}
+		]
+
 	}
 
 	/**
-	 * Set field values in results. From an extracted value or just as a fixed new Element.
-	 * Set an Element that create new results loading values without extract previously
+	 * Create a local variable using variableName parameter.
+	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		set environment with Production
+	 *	    ...
+	 *		set environment with 'Production'
 	 *		set environment with SOURCE.'application id'
 	 *		set environment with DOMAIN.id
 	 *		.....
@@ -437,23 +454,100 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def set(final String field) {
+	def set(final String variableName) {
 		[
-				with: { value ->
-
-					ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
-
-					Element newElement = currentRow.addNewElement(value, this)
-					if (fieldSpec) {
-						newElement.fieldSpec = fieldSpec
-						newElement.fieldSpec.label = fieldSpec.label
-						newElement.fieldSpec.type = fieldSpec.type
-					}
-
-					addElementLoaded(selectedDomain, newElement)
-					newElement
-				}
+			with: { value ->
+				Element localVariable = currentRow.addNewElement(ETLValueHelper.stringValueOf(value))
+				addVariableInBinding(variableName, localVariable)
+				localVariable
+			}
 		]
+	}
+
+	/**
+	 * Lookup ETL command implementation:
+	 * <pre>
+	 *  iterate {
+	 *      ...
+	 *      domain Device
+	 *      extract Vm load Name
+	 *      extract Cluster
+	 *      def clusterName = CE
+	 *
+	 *      lookup assetName with clusterName
+	 *  }
+	 * </pre>
+	 * @param fieldNames
+	 */
+	def lookup(final String fieldName){
+
+		lookUpFieldSpecs(selectedDomain, fieldName)
+		[
+		    with: { value ->
+			    String stringValue = ETLValueHelper.stringValueOf(value)
+			    boolean found = result.lookupInReference(fieldName, stringValue)
+			    addVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+		    }
+		]
+	}
+
+	/**
+	 * Validates if all the fieldNames are valid properties for a domain class.
+	 * It validates using a lookup fields method for each field name.
+	 * @param domain an instance of ETLDomanin
+	 * @param fieldNames a list of field names
+	 * @see ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
+	 */
+	private void validateFields(ETLDomain domain, String...fieldNames) {
+		for(fieldName in fieldNames){
+			lookUpFieldSpecs(domain, fieldName)
+		}
+	}
+/**
+	 * Initialize a property using a default value
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		initialize environment with 'Production'
+	 *	    initialize environment with Production
+	 *	    initialize environment with SOURCE.'application id'
+	 *	    initialize environment with DOMAIN.id
+	 *
+	 *	    extract 'application id'
+	 *	    initialize environment with CE
+	 *	}
+	 * </pre>
+	 * @param field
+	 * @return
+	 */
+	def initialize(String field){
+		[
+			with: { defaultValue ->
+
+				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
+
+				Element newElement = currentRow.addNewElement("", fieldSpec, this)
+				newElement.init = ETLValueHelper.stringValueOf(defaultValue)
+				addElementLoaded(selectedDomain, newElement)
+				newElement
+			}
+		]
+	}
+
+	/**
+	 * Initialize a property using a default value
+	 * <pre>
+	 *	iterate {
+	 *		domain Application
+	 *		init environment with 'Production'
+	 *	}
+	 * </pre>
+	 * @param field
+	 * @return
+	 * @see ETLProcessor#initialize(java.lang.String)
+	 */
+	def init(final String field) {
+		initialize(field)
 	}
 
 	/**
@@ -525,9 +619,9 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Add a message in console for an element from dataSource by its index in the row
 	 * @param index
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (Integer index) {
+	ETLProcessor debug (Integer index) {
 
 		if (index in (0..currentRow.size())) {
 			currentColumnIndex = index
@@ -535,14 +629,15 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(index)
 		}
+		return this
 	}
 
 	/**
 	 * Add a message in console for an element from dataSource by its column name
 	 * @param columnName
-	 * @return
+	 * @return current instance of ETLProcessor
 	 */
-	def debug (String columnName) {
+	ETLProcessor debug (String columnName) {
 
 		if (columnsMap.containsKey(columnName)) {
 			currentColumnIndex = columnsMap[columnName].index
@@ -550,13 +645,32 @@ class ETLProcessor implements RangeChecker {
 		} else {
 			throw ETLProcessorException.missingColumn(columnName)
 		}
+		return this
 	}
 
 	/**
-	 * It looks up the field Spec for Domain by fieldName
-	 * @param domain
-	 * @param fieldName
-	 * @return
+	 * Log a message using DebugConsole.LevelMessage type
+	 * @param message an String message to be logged
+	 * @param level level used to add a new message in debug console
+	 * @return current instance of ETLProcessor
+	 */
+	ETLProcessor log (String message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
+		debugConsole.append(level, message)
+		return this
+	}
+
+	/**
+	 * It looks up the field Spec for Domain by fieldName.
+	 * It is in charge of validating if a field belongs to a domain class.
+	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
+	 * <br>
+	 * Validation is based on the transformation from {@link ETLDomain#clazz} field.
+	 * Then it builds an instance of ETLFieldSpec with all the necessary data used in ETLProcessorResult
+	 * @param an instance of ETLDomain used to validate fieldName parameter
+	 * @param fieldName field name used in the lookup process
+	 * @return an instance of {@link  ETLFieldSpec}
+	 * @see ETLFieldSpec
+	 * @see ETLProcessorResult
 	 */
 	ETLFieldSpec lookUpFieldSpecs (ETLDomain domain, String field) {
 
@@ -572,6 +686,8 @@ class ETLProcessor implements RangeChecker {
 			if (!fieldSpec) {
 				throw ETLProcessorException.domainWithoutFieldsSpec(domain, field)
 			}
+
+			//TODO: dcorrea@ What are going to do with non domain classes? How we are going to prepare the FieldsSpec
 		}
 		return fieldSpec
 	}
@@ -608,12 +724,11 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Add a variable within the script as a dynamic variable.
-	 *
-	 * @param variableName
-	 * @param element
+	 * @param variableName binding name for a variable value
+	 * @param value an object to be binding in context
 	 */
-	void addDynamicVariable (String variableName, Element element) {
-		binding.addDynamicVariable(variableName, element)
+	void addVariableInBinding(String variableName, Object value) {
+		binding.addDynamicVariable(variableName, value)
 	}
 
 	/**
@@ -648,40 +763,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-
 		result.loadElement(element)
-
-		if(!currentRowResult.containsKey(selectedDomain)){
-			currentRowResult[selectedDomain] = new ReferenceResult()
-		}
-
-		currentRowResult[selectedDomain].elements.add([
-			originalValue: element.originalValue,
-			value: element.value,
-			field: [
-				name: element.fieldSpec.name,
-				label: element.fieldSpec.label
-			]
-		])
-
 		debugConsole.info "Adding element ${element} in results for domain ${domain}"
-	}
-
-	/**
-	 * Adds an asset entity instance referenced from a datasource field
-	 * @param assetEntity
-	 * @param row
-	 */
-	void addAssetEntityReferenced (AssetEntity assetEntity) {
-
-		if (!currentRowResult.containsKey(selectedDomain)) {
-			currentRowResult[selectedDomain] = new ReferenceResult()
-		}
-
-		// Add the Asset ID number to the reference list if it isn't already there
-		if (!currentRowResult[selectedDomain].reference.contains(assetEntity.id)) {
-			currentRowResult[selectedDomain].reference << assetEntity.id
-		}
 	}
 
 	/**
@@ -744,20 +827,12 @@ class ETLProcessor implements RangeChecker {
 		return columns[columnName]
 	}
 
-	Set getColumnNames () {
-		return columnsMap.keySet()
-	}
-
 	Row getCurrentRow () {
 		return currentRow
 	}
 
 	Row getRow (Integer index) {
 		return rows[index]
-	}
-
-	Element getCurrentElement () {
-		return currentElement
 	}
 
 	Element getElement (Integer rowIndex, Integer columnIndex) {

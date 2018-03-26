@@ -1,4 +1,6 @@
-import {Component, Output, EventEmitter, AfterViewInit, ViewChild} from '@angular/core';
+import {Component, Output, EventEmitter, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import {Observable} from 'rxjs/Rx';
+
 import { UIExtraDialog, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptSampleDataComponent } from '../data-script-sample-data/data-script-sample-data.component';
 import { DataScriptConsoleComponent } from '../data-script-console/data-script-console.component';
@@ -6,6 +8,7 @@ import {DataScriptModel, SampleDataModel} from '../../model/data-script.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { PreferenceService } from '../../../../shared/services/preference.service';
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
@@ -15,8 +18,10 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-etl-builder/data-script-etl-builder.component.html'
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
-
 	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
+	@ViewChild('resizableForm') resizableForm: ElementRef;
+	private width = 0;
+	private height = 0;
 	private collapsed = {
 		code: true,
 		sample: false
@@ -38,6 +43,12 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
+
+		this.dataIngestionService.getDataScriptDesignerSize()
+			.subscribe((size: {width: number, height: number}) => {
+				this.width = size.width;
+				this.height = size.height;
+			});
 	}
 
 	constructor(
@@ -45,7 +56,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataIngestionService,
 		private notifierService: NotifierService,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private preferenceService: PreferenceService) {
 		super('#etlBuilder');
 		this.script =  this.dataScriptModel.etlSourceCode ? this.dataScriptModel.etlSourceCode.slice(0) : '';
 	}
@@ -108,8 +120,19 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 				updated: this.operationStatus.save === 'success',
 				newEtlScriptCode: this.script
 			};
-			this.close(result);
+			this.saveSizeDataScriptDesigner()
+				.subscribe(() => this.close(result), (error) => console.log(error));
 		}
+	}
+
+	private saveSizeDataScriptDesigner(): Observable<any> {
+		const { width, height } = this.resizableForm.nativeElement.style;
+
+		const sizeDataScript = [{width: width || 0,  height: height ||  0}]
+			.map((size: {width: string, height: string}) => ({ width: parseInt(size.width, 10), height: parseInt(size.height, 10) }))
+			.shift();
+
+		return this.dataIngestionService.saveSizeDataScriptDesigner(sizeDataScript.width, sizeDataScript.height);
 	}
 
 	private onSave(): void {
@@ -221,5 +244,4 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 			this.scriptValidSyntaxResult = new ScriptValidSyntaxResultModel();
 		}
 	}
-
 }

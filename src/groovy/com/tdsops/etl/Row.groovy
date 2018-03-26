@@ -24,17 +24,26 @@ class Row {
         }
     }
 
-    Element addNewElement (String value, ETLProcessor processor) {
+    Element addNewElement (String value) {
         Element newElement = new Element(originalValue: value,
                 value: value,
                 rowIndex: index,
-                columnIndex: elements.size(),
-                processor: processor)
+                columnIndex: elements.size())
         elements.add(newElement)
         newElement
     }
 
-    Element getElement (Integer index) {
+	Element addNewElement (String value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
+		Element newElement = new Element(originalValue: value,
+			value: value,
+			rowIndex: index,
+			columnIndex: elements.size(),
+			fieldSpec: fieldSpec,
+			processor: processor)
+		elements.add(newElement)
+		newElement
+	}
+	Element getElement (Integer index) {
         elements[index]
     }
 

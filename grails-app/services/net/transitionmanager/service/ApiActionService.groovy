@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -13,12 +12,9 @@ import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.agent.AbstractAgent
 import net.transitionmanager.agent.AgentClass
-import net.transitionmanager.agent.AwsAgent
 import net.transitionmanager.agent.CallbackMode
+import net.transitionmanager.agent.ContextType
 import net.transitionmanager.agent.DictionaryItem
-import net.transitionmanager.agent.RestfulAgent
-import net.transitionmanager.agent.RiverMeadowAgent
-import net.transitionmanager.agent.ServiceNowAgent
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
@@ -56,10 +52,9 @@ class ApiActionService implements ServiceMethods {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS)         : AwsAgent,
-		(AgentClass.RIVER_MEADOW): RiverMeadowAgent,
-		(AgentClass.SERVICE_NOW) : ServiceNowAgent,
-		(AgentClass.RESTFULL) 	 : RestfulAgent
+		(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
+		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
+		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent
 	].asImmutable()
 
 	/**
@@ -83,11 +78,12 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Get an agent details by agent name
-	 * @param agentCode
-	 * @return the method dictionary for a specified agent
+	 * Generates a detailed map of an agent and associated methods with all properties of the methods
+	 * @param id - the Agent code to look up (e.g. AWS)
+	 * @return the method dictionary for the specified agent code
+	 * @throws InvalidParamException when
 	 */
-	Map agentDictionary (String id) {
+	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []
 		agentClassMap.each { entry ->
@@ -102,8 +98,19 @@ class ApiActionService implements ServiceMethods {
 
 		if (!dictionary) {
 			throw new InvalidParamException("Invalid agent ID $id, options are $agentIds")
+		} else {
+			// Iterate over the dictionary replacing the enum in params.context with the enum's name
+			for (String key in dictionary.keySet()) {
+				DictionaryItem agentInfo = dictionary[key]
+				if (agentInfo.params) {
+					for (Map paramsMap in agentInfo.params) {
+						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
+							paramsMap.context = paramsMap.context.name()
+						}
+					}
+				}
+			}
 		}
-
 		return dictionary
 	}
 
@@ -135,7 +142,6 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	List<Map> list (Project project, Boolean minimalInfo = true, Map filterParams = [:]) {
-
 		Integer producesDataFilter = NumberUtil.toZeroOrOne(filterParams["producesData"])
 
 		List<ApiAction> apiActions = ApiAction.where {
@@ -179,18 +185,21 @@ class ApiActionService implements ServiceMethods {
 			// We only need to implement Task for the moment
 			remoteMethodParams = buildMethodParamsWithContext(action, context)
 
-			// add Camel hostname message identifier
-			remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
+			//
+			// This is disabled for the time being until we reimplement messaging
+			//
+			// // add Camel hostname message identifier
+			// remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
 
-			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
+			// boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
 
-			if (methodRequiresCallbackMethod) {
-				if (! action.callbackMethod) {
-					log.warn 'Action is missing required callback: {}', action.toString()
-					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
-				}
-				remoteMethodParams << [callbackMethod: action.callbackMethod]
-			}
+			// if (methodRequiresCallbackMethod) {
+			// 	if (! action.callbackMethod) {
+			// 		log.warn 'Action is missing required callback: {}', action.toString()
+			// 		throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
+			// 	}
+			// 	remoteMethodParams << [callbackMethod: action.callbackMethod]
+			// }
 
 			if (CallbackMode.MESSAGE == action.callbackMode) {
 				// We're going to perform an Async Message Invocation
@@ -208,31 +217,26 @@ class ApiActionService implements ServiceMethods {
 						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
-						credentials: action.credential?.toMap()
+						credentials: action.credential?.toMap(),
+						apiAction: apiActionToMap(action)
 				]
 
 				// get api action agent instance
 				def agent = agentInstanceForAction(action)
 
 				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
-				// params?
-				// headers?
-
-				// set config data
-				actionRequest.config.setProperty(Exchange.HTTP_URL, action.endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, action.endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
-				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
-				// TODO use a method in Credential domain to determine if the call requires pre-authentication
-//				if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
-//					Map authentication = credentialService.authenticate(action.credential)
-//					if (authentication) {
-//						// TODO this needs to come from CredentialService according to the authenticationMethod being used
-//						actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
-//						actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
-//					}
-//				}
+				// TODO : SL 2/2018 : use case statement to handle COOKIE, HTTP_SESSION, JWT
+				// TODO  : SL 2/2018 : use a method in Credential domain to determine if the call requires pre-authentication
+				// if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
+				// 	Map authentication = credentialService.authenticate(action.credential)
+				// 	if (authentication) {
+				// 		// TODO  : SL 2/2018 : this needs to come from CredentialService according to the authenticationMethod being used
+				// 		actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
+				// 		actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
+				// 	}
+				// }
 
 				// check pre script
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
@@ -277,6 +281,7 @@ class ApiActionService implements ServiceMethods {
 								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
 							}
 						}
+
 						ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 						return
 					}
@@ -284,7 +289,11 @@ class ApiActionService implements ServiceMethods {
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
-				agent."${action.agentMethod}"(actionRequest)
+				try {
+					agent."${action.agentMethod}"(actionRequest)
+				} finally {
+					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+				}
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
@@ -300,7 +309,7 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	Map invoke (ApiAction action) {
-		assert action != null: 'No action provided.'
+		assert action != null: 'No action provided'
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
@@ -308,10 +317,19 @@ class ApiActionService implements ServiceMethods {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
+		// TODO : JPM 3/2018 : TM-9936 Move these vars to new property in ActionRequest
+		remoteMethodParams << [
+			actionId: action.id,
+			producesData: action.producesData,
+			credentials: action.credential?.toMap()
+		]
+
+		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
 		// execute action and return any result coming
-		return agent."${action.agentMethod}"(remoteMethodParams)
+		return agent.invoke(action.agentMethod, actionRequest)
 	}
 
 	/**
@@ -361,11 +379,13 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the class is not implemented or invalid method specified
 	 */
 	private Class agentClassForAction (ApiAction action) {
-		Class clazz = agentClassMap[action.agentClass]
-		if (!clazz) {
-			throw new InvalidRequestException("Action class ${action.agentClass} not implemented")
+		String clazzName = action.agentClass.name()
+		Class clazz = agentClassMap[clazzName]
+		if (clazz) {
+			return clazz
+		} else {
+			throw new InvalidRequestException("Action class ${clazzName} not implemented")
 		}
-		clazz
 	}
 
 	/**
@@ -673,7 +693,6 @@ class ApiActionService implements ServiceMethods {
 	 */
 	Map<String, Object> apiActionToMap(ApiAction apiAction, boolean minimalInfo = false) {
 		Map<String, Object> apiActionMap = null
-
 		// Load just the minimal or all by setting properties to null
 		List<String> properties = minimalInfo ? ["id", "name"] : null
 		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
@@ -688,6 +707,21 @@ class ApiActionService implements ServiceMethods {
 		return apiActionMap
 	}
 
+	List apiActionMethodList(ApiAction apiAction, boolean minimalInfo = false) {
+		Map<String, Object> apiActionMap = null
+		// Load just the minimal or all by setting properties to null
+		List<String> properties = minimalInfo ? ["id", "name"] : null
+		apiActionMap = GormUtil.domainObjectToMap(apiAction, properties)
+
+		// If all the properties are required, the entry for the AgentClass has to be overriden with the following map.
+		if (!minimalInfo) {
+			AbstractAgent agent = agentInstanceForAction(apiAction)
+			apiActionMap.agentClass = [id: apiAction.agentClass.name(),name: agent.name]
+			apiActionMap.version = apiAction.version
+		}
+
+		return apiActionMap
+	}
 	/**
 	 * Add task error message through the task facade
 	 * @param taskFacade - the task facade wrapper

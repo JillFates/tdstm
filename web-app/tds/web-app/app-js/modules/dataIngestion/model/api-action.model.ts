@@ -1,5 +1,6 @@
 import { INTERVAL } from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
+import {AgentMethodModel} from './agent.model';
 
 export class APIActionColumnModel {
 	columns: any[];
@@ -69,28 +70,48 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 68,
+				width: 64,
 				locked: true
-			}, {
+			},
+			{
+				label: 'custom',
+				property: 'required',
+				type: 'boolean',
+				width: 42
+			},
+			{
+				label: 'custom',
+				property: 'readonly',
+				type: 'boolean',
+				width: 42
+			},
+			{
 				label: 'Name',
-				property: 'param',
+				property: 'paramName',
 				type: 'text',
-				width: 210
+				width: 198
 			}, {
 				label: 'Context',
 				property: 'context.value',
 				type: 'text',
-				width: 160
+				width: 140
 			}, {
 				label: 'Value',
 				property: 'value',
 				type: 'text',
-				width: 265
-			}, {
+				width: 218
+			},
+			{
+				label: 'custom',
+				property: 'encoded',
+				type: 'boolean',
+				width: 42
+			},
+			{
 				label: 'Description',
 				property: 'desc',
 				type: 'text',
-				width: 310
+				width: 268
 			}
 		];
 	}
@@ -100,10 +121,7 @@ export class APIActionModel {
 	id?: number;
 	name: string;
 	description: string;
-	agentMethod?: {
-		id?: number,
-		name?: string
-	};
+	agentMethod?: AgentMethodModel;
 	agentClass?: {
 		id?: number,
 		name?: string
@@ -143,36 +161,36 @@ export class APIActionModel {
 		id?: number,
 		name?: string
 	};
-	endpointUrl?: '';
-	endpointPath?: '';
+	endpointUrl?: string;
+	docUrl?: string;
 	eventReactions?: EventReaction[];
 	version?: number;
 
 	constructor() {
 		this.name = '';
 		this.description = '';
-		this.provider = { id: null, name: '' };
-		this.agentClass = { id: null, name: '' };
-		this.agentMethod = { id: null, name: ''};
+		this.provider = {id: null, name: ''};
+		this.agentClass = {id: null, name: ''};
+		this.agentMethod = new AgentMethodModel();
 		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
 		this.endpointUrl = '';
-		this.endpointPath = '';
-		this.polling =  {
-				frequency: {
-					value: 0,
-					interval: INTERVAL.SECONDS
-				},
-				lapsedAfter: {
-					value: 0,
-					interval: INTERVAL.MINUTES
-				},
-				stalledAfter: {
-					value: 0,
-					interval: INTERVAL.MINUTES
-				}
-			};
+		this.docUrl = '';
+		this.polling = {
+			frequency: {
+				value: 0,
+				interval: INTERVAL.SECONDS
+			},
+			lapsedAfter: {
+				value: 0,
+				interval: INTERVAL.MINUTES
+			},
+			stalledAfter: {
+				value: 0,
+				interval: INTERVAL.MINUTES
+			}
+		};
 		APIActionModel.createBasicReactions(this);
 	}
 
@@ -223,11 +241,11 @@ export class EventReaction {
 }
 
 export class APIActionParameterModel {
-	param?: string;
+	paramName?: string;
 	desc?: string;
 	type?: string;
 	context?: string;
-	property?: string;
+	fieldName?: string;
 	value?: string;
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;

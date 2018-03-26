@@ -343,7 +343,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 									
 						domain Device
 						extract 'device id' load id
-						extract 'model name' load name
+						extract 'model name' load Name
 					}""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -379,7 +379,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1522'
 				}
 
-				with(data[0].fields.name) {
+				with(data[0].fields.assetName) {
 					value == 'SRW24G1'
 					originalValue == 'SRW24G1'
 				}
@@ -389,7 +389,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1523'
 				}
 
-				with(data[1].fields.name) {
+				with(data[1].fields.assetName) {
 					value == 'ZPHA MODULE'
 					originalValue == 'ZPHA MODULE'
 				}
@@ -435,7 +435,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					iterate {
 						domain Device
 						extract 'device id' load id
-						extract 'model name' load name
+						extract 'model name' load Name
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -472,7 +472,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1522'
 				}
 
-				with(data[0].fields.name) {
+				with(data[0].fields.assetName) {
 					value == 'SRW24G1'
 					originalValue == 'SRW24G1'
 				}
@@ -482,7 +482,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1523'
 				}
 
-				with(data[1].fields.name) {
+				with(data[1].fields.assetName) {
 					value == 'ZPHA MODULE'
 					originalValue == 'ZPHA MODULE'
 				}
@@ -528,7 +528,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					from 1 to 2 iterate {
 						domain Device
 						extract 'device id' load id
-						extract 'model name' load name
+						extract 'model name' load assetName
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -565,7 +565,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1522'
 				}
 
-				with(data[0].fields.name) {
+				with(data[0].fields.assetName) {
 					value == 'SRW24G1'
 					originalValue == 'SRW24G1'
 				}
@@ -575,7 +575,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 					originalValue == '1523'
 				}
 
-				with(data[1].fields.name) {
+				with(data[1].fields.assetName) {
 					value == 'ZPHA MODULE'
 					originalValue == 'ZPHA MODULE'
 				}

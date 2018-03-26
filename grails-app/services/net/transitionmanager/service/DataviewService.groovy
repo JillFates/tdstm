@@ -8,6 +8,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.FavoriteDataview
 import net.transitionmanager.domain.Person
@@ -589,10 +590,13 @@ class DataviewService implements ServiceMethods {
 				// Trigger the parsing of the parameter.
 				SqlUtil.parseParameter(fieldSearchData)
 
-				// Append the where clause to the list of conditions.
-				whereConditions << fieldSearchData.sqlSearchExpression
-				// Add the parameters required for this field.
-				whereParams += fieldSearchData.sqlSearchParameters
+				// Add the condition and its parameters only if there are parameters for the query.
+				if (fieldSearchData.sqlSearchParameters) {
+					// Append the where clause to the list of conditions.
+					whereConditions << fieldSearchData.sqlSearchExpression
+					// Add the parameters required for this field.
+					whereParams += fieldSearchData.sqlSearchParameters
+				}
 
 			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
 			} else {
@@ -909,5 +913,50 @@ class DataviewService implements ServiceMethods {
 		}
 
 		return dataviewSpec
+	}
+
+	/**
+	 * Validate if the name for the view is valid.
+	 * @param command
+	 * @return
+	 */
+	boolean validateUniqueName(DataviewNameValidationCommand command) {
+		return validateUniqueName(command.name, command.dataViewId)
+	}
+
+	/**
+	 * Check if a given DataView name is unique across project.
+	 *
+	 * This method will check that there's no other DataView for this project
+	 * with the same name or, if there is, that they have the same id.
+	 *
+	 * @param dataViewName
+	 * @param dataViewId
+	 * @param project (optional)
+	 * @return  true if the DataView name is unique for this project, false otherwise.
+	 */
+	boolean validateUniqueName(String dataViewName, Long dataViewId, Project project = null) {
+		boolean isUnique = true
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+
+		// If the name is null don't validate, throw an exception.
+		if (!dataViewName) {
+			throw new InvalidParamException("The DataView name cannot be null.")
+		}
+
+		Dataview dataView = Dataview.where {
+			name == dataViewName
+			project == project
+		}.find()
+
+		if (dataView) {
+			// If the ids don't match or params has no id, then it's a duplicate.
+			if (dataViewId != dataView.id) {
+				isUnique = false
+			}
+		}
+		return isUnique
 	}
 }

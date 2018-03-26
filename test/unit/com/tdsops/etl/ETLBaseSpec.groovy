@@ -124,13 +124,14 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('description', 'Description'),
 					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('location', 'Location'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
 			case AssetClass.DATABASE:
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
@@ -140,9 +141,33 @@ abstract class ETLBaseSpec extends Specification {
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
 					buildFieldSpec('location', 'Location'),
-					buildFieldSpec('name', 'Name'),
-					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('manufacturer', 'Manufacturer'),
+					buildFieldSpec('custom1', 'Network Interfaces'),
+					buildFieldSpec('custom2', 'Cost Basis'),
+					buildFieldSpec('description', 'Description'),
+					buildFieldSpec('assetType', 'Device Type'),
+					buildFieldSpec('model', 'Model'),
+					buildFieldSpec('shortName', 'Alternate Name'),
+					buildFieldSpec('serialNumber', 'Serial #'),
+					buildFieldSpec('assetTag', 'Asset Tag'),
+					buildFieldSpec('railType', 'Rail Type'),
+					buildFieldSpec('externalRefId', 'External Ref Id'),
+					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('priority', 'Priority'),
+					buildFieldSpec('ipAddress', 'IP Address'),
+					buildFieldSpec('os', 'OS'),
+					buildFieldSpec('supportType', 'SupportType'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration'),
+					buildFieldSpec('retireDate', 'Retire Date'),
+					buildFieldSpec('truck', 'Truck'),
+					buildFieldSpec('cart', 'Cart'),
+					buildFieldSpec('shelf', 'Shelf'),
+					buildFieldSpec('sourceLocation', 'Source Location'),
+					buildFieldSpec('moveBundle', 'Bundle'),
+					buildFieldSpec('planStatus', 'Plan Status'),
+					buildFieldSpec('validation', 'Validation'),
 				]
 				break
 			case ETLDomain.Dependency:

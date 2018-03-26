@@ -12,6 +12,7 @@ import { ComponentCreatorService } from '../shared/services/component-creator.se
 import { UIDialogService, UIActiveDialogService } from '../shared/services/ui-dialog.service';
 import { UILoaderService } from '../shared/services/ui-loader.service';
 // Shared Directives
+import {UIAutofocusDirective} from './directives/autofocus-directive';
 import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
@@ -29,6 +30,7 @@ import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.
 import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
 import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
+import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -47,6 +49,7 @@ import { DictionaryService } from './services/dictionary.service';
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
+		UIAutofocusDirective,
 		UILoaderDirective,
 		UIToastDirective,
 		UIBooleanPipe,
@@ -64,7 +67,8 @@ import { DictionaryService } from './services/dictionary.service';
 		UnauthorizedPageComponent,
 		DynamicComponent,
 		CodeMirrorComponent,
-		CheckActionComponent
+		CheckActionComponent,
+		URLViewerComponent
 	],
 	providers: [
 		AuthService,
@@ -84,6 +88,7 @@ import { DictionaryService } from './services/dictionary.service';
 		{ provide: 'localizedDictionary', useValue: en_DICTIONARY }
 	],
 	exports: [UILoaderDirective,
+		UIAutofocusDirective,
 		UIToastDirective,
 		UIDialogDirective,
 		UIBooleanPipe,
@@ -96,7 +101,8 @@ import { DictionaryService } from './services/dictionary.service';
 		FormlyInputHorizontal,
 		DynamicComponent,
 		CodeMirrorComponent,
-		CheckActionComponent
+		CheckActionComponent,
+		URLViewerComponent
 	],
 	entryComponents: [DynamicComponent]
 })
