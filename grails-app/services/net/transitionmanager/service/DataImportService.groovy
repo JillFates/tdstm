@@ -1080,6 +1080,7 @@ class DataImportService implements ServiceMethods {
 	private Integer tallyNumberOfErrors(ImportBatchRecord record, Map fieldsInfo) {
 		Integer count = 0
 		for (field in fieldsInfo) {
+// TODO : JPM 3/2018 : tallyNumberOfErrors logic does not look correct "field.value.errors", shouldn't it be "field.errors"
 			count += (field.value.errors ? field.value.errors.size() : 0 )
 		}
 		count += record.errorListAsList().size()

@@ -649,6 +649,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/validateUnique" {
+			controller = "wsAssetExplorer"
+			action = [
+							POST: "validateUniqueName",
+			]
+		}
+
 		"/ws/dataingestion/datascript/list" {
 			controller = "wsDataScript"
 			action = [

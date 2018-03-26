@@ -3,6 +3,7 @@ package net.transitionmanager.agent
 import net.transitionmanager.integration.ActionRequest
 import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.service.ServiceNowService
+
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 
@@ -101,7 +102,7 @@ class ServiceNowAgent extends AbstractAgent {
 					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_appl.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -127,7 +128,7 @@ class ServiceNowAgent extends AbstractAgent {
 					endpointUrl: ' https://YOUR-HOST.service-now.com/cmdb_ci_win_server.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -153,7 +154,7 @@ class ServiceNowAgent extends AbstractAgent {
 					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_linux_server.do',
 					docUrl: 'ServiceNow REST API for Tables|https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -220,7 +221,7 @@ class ServiceNowAgent extends AbstractAgent {
 
 	/**
 	 * Used to fetch/download assets lists from ServiceNow
-	 * @param payload
+	 * @param actionRequest
 	 * @return
 	 */
 	Map fetchAssetList(ActionRequest actionRequest) {

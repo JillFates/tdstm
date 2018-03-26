@@ -2,6 +2,8 @@ package net.transitionmanager.service
 
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.Credential
+import net.transitionmanager.integration.ActionRequest
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.auth.AuthScope

@@ -3,8 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdsops.tm.enums.domain.AuthenticationMethod
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -80,11 +78,12 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Get an agent details by agent name
-	 * @param agentCode
-	 * @return the method dictionary for a specified agent
+	 * Generates a detailed map of an agent and associated methods with all properties of the methods
+	 * @param id - the Agent code to look up (e.g. AWS)
+	 * @return the method dictionary for the specified agent code
+	 * @throws InvalidParamException when
 	 */
-	Map agentDictionary (String id) {
+	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []
 		agentClassMap.each { entry ->
@@ -104,10 +103,11 @@ class ApiActionService implements ServiceMethods {
 			for (String key in dictionary.keySet()) {
 				DictionaryItem agentInfo = dictionary[key]
 				if (agentInfo.params) {
-					for (Map paramsMap in agentInfo.params)
+					for (Map paramsMap in agentInfo.params) {
 						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
 							paramsMap.context = paramsMap.context.name()
 						}
+					}
 				}
 			}
 		}
@@ -217,7 +217,8 @@ class ApiActionService implements ServiceMethods {
 						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
-						credentials: action.credential?.toMap()
+						credentials: action.credential?.toMap(),
+						apiAction: apiActionToMap(action)
 				]
 
 				// get api action agent instance
@@ -751,5 +752,4 @@ class ApiActionService implements ServiceMethods {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
 		}
 	}
-
 }
