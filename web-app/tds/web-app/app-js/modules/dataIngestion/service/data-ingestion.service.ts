@@ -14,6 +14,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
+import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -68,7 +69,7 @@ export class DataIngestionService {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
 				dataScriptModels.forEach((r) => {
-					r.agentMethod = {name: r.agentMethod};
+					r.agentMethod = {id: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 					r.producesData = (r.producesData === 1);
@@ -102,7 +103,7 @@ export class DataIngestionService {
 		return this.http.get(`${this.dataApiActionUrl}/agent`)
 			.map((res: Response) => {
 				let result = res.json();
-				let agentModels = result; // && result.status === 'success' && result.data;
+				let agentModels = result;
 				return agentModels;
 			})
 			.catch((error: any) => error.json());
@@ -204,7 +205,7 @@ export class DataIngestionService {
 				for (let property in result) {
 					if (result.hasOwnProperty(property)) {
 						agentMethodModel.push({
-							id: result[property].name,
+							id: result[property].agentMethod,
 							name: result[property].name,
 							description: result[property].description,
 							endpointUrl: result[property].endpointUrl,
@@ -323,7 +324,8 @@ export class DataIngestionService {
 		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
-			parameterList.data.forEach( (param) => {
+			let requestParameterListData = R.clone(parameterList.data);
+			requestParameterListData.forEach( (param) => {
 				if (param.property && param.property.field) {
 					param.property = param.property.field;
 				}
@@ -333,7 +335,7 @@ export class DataIngestionService {
 				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
-			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}
 
 		if (model.credential && model.credential.id && model.credential.id !== 0) {
