@@ -187,19 +187,19 @@ const run_collection = (collection, program, on_start = undefined, on_done = und
             reporters: newman_reporters,
             environment: program.environment,
             globals: program.global,
-            interationCount: program.interationCount,
-            interationData: program.interationData,
+            interationCount: program.interation_count,
+            interationData: program.interation_data,
             timeout: program.timeout,
             timeoutRequest: program.timeout_request,
             timeoutScript: program.timeoutScript,
-            delayRequest: program.delayRequest,
-            ignoreRedirects: program.ignoreRedirects,
+            delayRequest: program.delay_request,
+            ignoreRedirects: program.ignore_redirects,
             insecure: program.insecure,
             color: program.color,
             noColor: program.noColor,
             sslClientCert: program.sslClientCert, 
-            sslClientKey: program.sslClientKey,
-            sslClientPassphrase: program.sslClientPassphrase,
+            sslClientKey: program.ssl_client_key,
+            sslClientPassphrase: program.ssl_client_passphrase,
         })
         .on('start', 
             (error, args) => {
@@ -274,9 +274,9 @@ program.version(PROGRAM_VERSION)
     .option('-e, --environment [path]', 'Specify a URL or Path to a Postman Environment')
     .option('-g, --globals [path]', 'Specify a URL or Path to a file containing Postman Globals.')
     .option('-r, --reporters [reporters]', 'Specify the reporters to use for this run. (default: cli)')
-    .option('-n, --interation-count [n]', 'Define the number of iterations to run.')
-    .option('-d, --interation-data [path]', 'Specify a data file to use for iterations (either json or csv).')
-    .option('-D, --delay-request [path]', 'Specify the extent of delay between requests (milliseconds) (default: 0)')
+    .option('-n, --interation_count [n]', 'Define the number of iterations to run.')
+    .option('-d, --interation_data [path]', 'Specify a data file to use for iterations (either json or csv).')
+    .option('-D, --delay_request [path]', 'Specify the extent of delay between requests (milliseconds) (default: 0)')
     .option('-C, --color', 'Force colored output (for use in CI environments).')
     .option('-c, --no-color', 'Disable colored output (for use in CI environments).')
     .option('-t, --timeout [n]', 'Specify a timeout for collection run (in milliseconds) (default: 0)')
