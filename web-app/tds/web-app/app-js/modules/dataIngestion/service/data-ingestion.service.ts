@@ -627,18 +627,4 @@ export class DataIngestionService {
 	saveSizeDataScriptDesigner(width: number, height: number): Observable<any> {
 		return this.preferenceService.setPreference(DATA_SCRIPT_SIZE_PREFERENCE, `${width}${UNITS_SIZE_SEPARATOR}${height}`);
 	}
-
-	validateUniquenessDataViewByName(dataViewName: string): Observable<boolean> {
-		let postRequest = {
-			name: dataViewName
-		};
-
-		const url = `${this.dataIngestionUrl}/dataview/validateunique`;
-		return this.http.post(url, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data && result.data.isUnique;
-			})
-			.catch((error: any) => error.json());
-	}
 }

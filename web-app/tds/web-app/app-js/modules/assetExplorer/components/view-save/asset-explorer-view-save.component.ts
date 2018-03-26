@@ -91,8 +91,18 @@ export class AssetExplorerViewSaveComponent {
 	}
 
 	protected onNameChanged() {
-		this.dataIngestionService.validateUniquenessDataViewByName(this.model.name)
-			.subscribe((isUnique: boolean) => this.isUnique = isUnique,
-				(error) => console.log(error.message));
+		this.validateUniquenessDataViewByName(this.model.name);
+	}
+
+	private validateUniquenessDataViewByName(dataViewName = '') {
+		if (!dataViewName.trim()) {
+			// handle empty string
+			this.isUnique = false;
+		} else {
+			this.assetExpService.validateUniquenessDataViewByName(dataViewName)
+				.subscribe((isUnique: boolean) => this.isUnique = isUnique,
+					(error) => console.log(error.message));
+		}
+
 	}
 }
