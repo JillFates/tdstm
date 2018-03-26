@@ -19,6 +19,17 @@ class ServiceNowAgent extends AbstractAgent {
 
 	private static final List<LinkedHashMap> COMMON_PARAMS = [
 		[
+			paramName: 'HOSTNAME',
+			desc: 'The ServiceNow Hostname of the instance to intract with',
+			type: 'String',
+			context: ContextType.USER_DEF,
+			fieldName: null,
+			value: 'false',
+			required:1,
+			readonly:0,
+			encoded:1
+		],
+		[
 			paramName: 'sysparm_display_value',
 			desc: 'Set to true will return all fields, false returns only the fields in sysparm_fields (option true|false, default false)',
 			type: 'String',
@@ -42,7 +53,7 @@ class ServiceNowAgent extends AbstractAgent {
 		],
 		[
 			paramName: 'sysparm_offset',
-			desc: 'Use this parameter to obtain more records than specified in sysparm_limit',
+			desc: 'Use to obtain more records than specified in sysparm_limit',
 			type: 'Integer',
 			context: ContextType.USER_DEF,
 			fieldName: null,

@@ -122,9 +122,19 @@ class RestfulRouteBuilder extends RouteBuilder {
 
         ActionHttpRequestElements httpElements = new ActionHttpRequestElements( actionRequest.endpointUrl, actionRequest.param )
         URIBuilder builder = new URIBuilder( httpElements.baseUrl )
-        builder.setPath( httpElements.urlPath )
-        // Add all of the query string parameters
-        for (param in httpElements.queryStringMap()) {
+
+        // Typically all parameters should be added as parameters using the builder.addParameter (see below) however our implementation
+        // is designed to honor API Actions that have query string parameters explicitely defined in the URI. When that occurs the path
+        // will consist of the path and those query string parameters. All other parameters defined in the API Action will loaded below.
+        // Note that the use of POST is regardless of the actual method that the action will use. POST is only used to get just query string
+        // arguments that are explicit in the URI endpoint definition.
+        builder.setPath( httpElements.getUrlPathWithQueryString(HttpMethod.POST) )  // (e.g. /rest/server/SERVERNAME?filter=xyz )
+
+        // Add all of the extra parameters there were not any of the explicit query string parameters
+        // TODO : JPM 3/2016 : TM-9936 this list most likely has the other non-parameter variables embedded (e.g. task_id, action_id, etc)
+        // Those parameters should be weeded out in the ActionHttpRequestElements temporarily. See ActionHttpRequestElements.ParamsToIgnored and
+        // update the getExtraParams to strip those out.
+        for (param in httpElements.extraParams) {
             builder.addParameter(param.key, param.value)
         }
 
