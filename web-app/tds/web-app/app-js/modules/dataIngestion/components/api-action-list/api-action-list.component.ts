@@ -230,6 +230,7 @@ export class APIActionListComponent {
 			}
 			this.reloadData();
 		}).catch(result => {
+			this.reloadData();
 			console.log('Dismissed Dialog');
 		});
 	}

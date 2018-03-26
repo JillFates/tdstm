@@ -14,6 +14,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
+import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -323,7 +324,8 @@ export class DataIngestionService {
 		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
 
 		if (parameterList && parameterList.data && parameterList.data.length > 0) {
-			parameterList.data.forEach( (param) => {
+			let requestParameterListData = R.clone(parameterList.data);
+			requestParameterListData.forEach( (param) => {
 				if (param.property && param.property.field) {
 					param.property = param.property.field;
 				}
@@ -333,7 +335,7 @@ export class DataIngestionService {
 				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
-			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}
 
 		if (model.credential && model.credential.id && model.credential.id !== 0) {

@@ -294,7 +294,8 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
-					this.activeDialog.close(result);
+					this.apiActionModel.version = result.version;
+					this.dataSignature = JSON.stringify(this.apiActionModel);
 				}
 			},
 			(err) => console.log(err));

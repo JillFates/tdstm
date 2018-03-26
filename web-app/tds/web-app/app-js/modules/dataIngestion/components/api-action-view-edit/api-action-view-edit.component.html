@@ -347,7 +347,7 @@
 												<span *ngIf="column.property === 'encoded'"><span *ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
-												<span>{{dataItem.param}}</span>
+												<span>{{dataItem.paramName}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
 												<span>{{getAssetClassValue(dataItem.context)}}</span>
