@@ -326,8 +326,11 @@ export class DataIngestionService {
 		if (parameterList && parameterList.length > 0) {
 			let requestParameterListData = R.clone(parameterList);
 			requestParameterListData.forEach( (param) => {
-				if (param.property && param.property.field) {
-					param.property = param.property.field;
+				if (param.fieldName && param.fieldName.field) {
+					param.fieldName = param.fieldName.field;
+				}
+				if (param.context && param.context.assetClass) {
+					param.context = param.context.assetClass;
 				}
 				if (param.context === DOMAIN.COMMON) {
 					param.context = 'ASSET';
