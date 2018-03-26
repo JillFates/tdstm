@@ -130,7 +130,11 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedAgent: AgentModel = {
+	private lastSelectedAgentModel: AgentModel = {
+		id: 0,
+		name: 'Select...'
+	};
+	private lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: 0,
 		name: 'Select...'
 	};
@@ -419,28 +423,52 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param value
 	 */
 	protected onAgentValueChange(agentModel: AgentModel): void {
-		if (agentModel.id !== 0) {
-			this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
-				(result: any) => {
-					this.agentMethodList = new Array<AgentMethodModel>();
-					this.agentMethodList.push({id: 0, name: 'Select...'});
-
-					if (this.apiActionModel.agentMethod) {
-						this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
-					}
-
-					if (!this.apiActionModel.agentMethod) {
-						this.apiActionModel.agentMethod = this.agentMethodList[0];
-					}
-
-					this.modifySignatureByProperty('agentMethod');
-					this.agentMethodList = result;
-				},
-				(err) => console.log(err));
+		console.log();
+		if (this.lastSelectedAgentModel && this.lastSelectedAgentModel.id !== 0) {
+			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
+				.then((res) => {
+					this.loadAgentModel(agentModel, res);
+				});
 		} else {
-			this.agentMethodList = new Array<AgentMethodModel>();
-			this.agentMethodList.push({id: 0, name: 'Select...'});
-			this.apiActionModel.agentMethod = this.agentMethodList[0];
+			this.loadAgentModel(agentModel, true);
+		}
+	}
+
+	private loadAgentModel(agentModel: AgentModel, changeAgent: boolean): void {
+		if (changeAgent) {
+			if (agentModel.id !== 0) {
+				this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
+					(result: any) => {
+						this.agentMethodList = new Array<AgentMethodModel>();
+						this.agentMethodList.push({id: 0, name: 'Select...'});
+
+						if (this.apiActionModel.agentMethod) {
+							this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
+						}
+
+						if (!this.apiActionModel.agentMethod) {
+							this.apiActionModel.agentMethod = this.agentMethodList[0];
+						}
+
+						this.modifySignatureByProperty('agentMethod');
+						this.agentMethodList = result;
+					},
+					(err) => console.log(err));
+			} else {
+				this.agentMethodList = new Array<AgentMethodModel>();
+				this.agentMethodList.push({id: 0, name: 'Select...'});
+				this.apiActionModel.agentMethod = this.agentMethodList[0];
+			}
+		} else if (this.lastSelectedAgentModel) {
+			// Return the value to the previous one if is on the same List
+			let agent = this.agentList.find((method) => {
+				return method.id === this.lastSelectedAgentModel.id;
+			});
+			if (agent) {
+				this.apiActionModel.agentClass = R.clone(this.lastSelectedAgentModel);
+			} else {
+				this.apiActionModel.agentClass = R.clone(this.agentList[0]);
+			}
 		}
 	}
 
@@ -449,8 +477,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param event
 	 */
 	protected onMethodValueChange(event: any): void {
-		if (this.lastSelectedAgent && this.lastSelectedAgent.id !== 0) {
-			this.prompt.open('Confirmation Required', 'Changing the Method will override the Parameter List, Do you want to proceed?', 'Yes', 'No')
+		console.log();
+		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== 0) {
+			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentMethodModel(res);
 				});
@@ -473,15 +502,16 @@ export class APIActionViewEditComponent implements OnInit {
 			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
 			this.guardParams();
 			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
-		} else if (this.lastSelectedAgent) {
+			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
+		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
 			let agentMethod = this.agentMethodList.find((method) => {
-				return method.id === this.lastSelectedAgent.id;
+				return method.id === this.lastSelectedAgentMethodModel.id;
 			});
 			if (agentMethod) {
-				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgent);
+				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgentMethodModel);
 			} else {
-				this.apiActionModel.agentMethod = this.agentMethodList[0];
+				this.apiActionModel.agentMethod = R.clone(this.agentMethodList[0]);
 			}
 		}
 	}
@@ -555,11 +585,20 @@ export class APIActionViewEditComponent implements OnInit {
 	}
 
 	/**
+	 * Track the Last Agent Selected
+	 */
+	protected onOpenAgent(): void {
+		if (this.apiActionModel.agentClass && this.apiActionModel.agentClass.id !== 0) {
+			this.lastSelectedAgentModel = R.clone(this.apiActionModel.agentClass);
+		}
+	}
+
+	/**
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== 0) {
-			this.lastSelectedAgent = R.clone(this.apiActionModel.agentMethod);
+			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
 		}
 		setTimeout(() => {
 			jQuery('kendo-popup').css('width', 'auto');

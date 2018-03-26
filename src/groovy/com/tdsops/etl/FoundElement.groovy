@@ -124,9 +124,9 @@ abstract class FoundElement {
 	private def calculateValue(def args) {
 
 		if(args.size() == 1) {
-			return ETLValueHelper.stringValueOf(args[0])
+			return ETLValueHelper.valueOf(args[0])
 		} else {
-			return args.collect{ ETLValueHelper.stringValueOf(it) }
+			return args.collect{ ETLValueHelper.valueOf(it) }
 		}
 	}
 
