@@ -15,6 +15,7 @@ import org.apache.camel.Exchange
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.RouteDefinition
 import org.apache.http.client.utils.URIBuilder
+import org.springframework.http.HttpMethod
 
 /**
  * This bean is used to create a Camel RouteDefinition used by
@@ -54,7 +55,8 @@ class RestfulRouteBuilder extends RouteBuilder {
         routeDefinition = routeDefinition.setProperty("API_ACTION_ID", constant(apiActionId))
         routeDefinition = routeDefinition.setProperty("TASK_ID", constant(taskId))
         routeDefinition = routeDefinition.setProperty("ROUTE_ID", constant(routeId))
-        routeDefinition = routeDefinition.setProperty("API_ACTION_CONTEXT", constant(JsonUtil.toJson(actionRequest.param)))
+		// This is no longer required
+        // routeDefinition = routeDefinition.setProperty("API_ACTION_CONTEXT", constant(JsonUtil.toJson(actionRequest.param)))
 
         routeDefinition = routeDefinition.setBody(constant(null))
 
@@ -120,7 +122,7 @@ class RestfulRouteBuilder extends RouteBuilder {
      */
     private String buildUrl(RouteDefinition routeDefinition, ActionRequest actionRequest) {
 
-        ActionHttpRequestElements httpElements = new ActionHttpRequestElements( actionRequest.endpointUrl, actionRequest.param )
+        ActionHttpRequestElements httpElements = new ActionHttpRequestElements(actionRequest.param.apiAction.endpointUrl, actionRequest)
         URIBuilder builder = new URIBuilder( httpElements.baseUrl )
 
         // Typically all parameters should be added as parameters using the builder.addParameter (see below) however our implementation
@@ -128,14 +130,15 @@ class RestfulRouteBuilder extends RouteBuilder {
         // will consist of the path and those query string parameters. All other parameters defined in the API Action will loaded below.
         // Note that the use of POST is regardless of the actual method that the action will use. POST is only used to get just query string
         // arguments that are explicit in the URI endpoint definition.
-        builder.setPath( httpElements.getUrlPathWithQueryString(HttpMethod.POST) )  // (e.g. /rest/server/SERVERNAME?filter=xyz )
+        builder.setPath( httpElements.getUrlPathWithQueryString(HttpMethod.POST))  // (e.g. /rest/server/SERVERNAME?filter=xyz )
 
         // Add all of the extra parameters there were not any of the explicit query string parameters
         // TODO : JPM 3/2016 : TM-9936 this list most likely has the other non-parameter variables embedded (e.g. task_id, action_id, etc)
         // Those parameters should be weeded out in the ActionHttpRequestElements temporarily. See ActionHttpRequestElements.ParamsToIgnored and
         // update the getExtraParams to strip those out.
         for (param in httpElements.extraParams) {
-            builder.addParameter(param.key, param.value)
+			// TODO : SL 03/2018 : Restore this after TM-9963 Move params else where, gets implemented
+            // builder.addParameter(param.key, param.value)
         }
 
         // Add flag to not throw HttpOperationFailedException but instead return control to action invocation flow to eval result
@@ -143,7 +146,7 @@ class RestfulRouteBuilder extends RouteBuilder {
         builder.addParameter('throwExceptionOnFailure', 'false')
 
 		// only provides a trust store if endpoint url is secure and credentials are nor for production
-		if (UrlUtil.isSecure(endpointUrl)) {
+		if (UrlUtil.isSecure(builder.toString())) {
 			if (actionRequest.param.credentials && actionRequest.param.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
 				// for more details see CustomHttpClientConfigurer class
 				builder.addParameter('httpClientConfigurer', 'customHttpClientConfigurer')

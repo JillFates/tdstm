@@ -4,7 +4,6 @@ import org.springframework.http.HttpMethod
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.integration.ActionRequest
 
 
 /**
@@ -182,6 +181,7 @@ class ActionHttpRequestElements {
 			throw new InvalidParamException('Action endpoint URL has extraneous \'?\' character')
 		}
 		// Get the unique list of the placeholders
+		// TODO : SL 03/2018 : Move methods from StringUtil to UrlUtil since this is URL stuff related
 		Set<String> placeholderNames = StringUtil.extractPlaceholders(urlParts[0])
 		Set<String> queryPlaceholderNames = (urlParts.size() > 1 ? StringUtil.extractPlaceholders(urlParts[1]) : null)
 		placeholderNames += queryPlaceholderNames
@@ -192,7 +192,8 @@ class ActionHttpRequestElements {
 			// Grab the values for the placeholders and encode them
 			for (String name in placeholderNames) {
 				if (actionRequest.param.hasProperty(name)) {
-					uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
+					//uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
+					uriParamValues.put(name, actionRequest.param.getProperty(name))
 				}
 			}
 
