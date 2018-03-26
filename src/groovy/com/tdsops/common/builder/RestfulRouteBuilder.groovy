@@ -8,6 +8,7 @@ import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
+import net.transitionmanager.integration.ActionHttpRequestElements
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import org.apache.camel.Exchange
@@ -118,10 +119,16 @@ class RestfulRouteBuilder extends RouteBuilder {
      * @return
      */
     private String buildUrl(RouteDefinition routeDefinition, ActionRequest actionRequest) {
-		String endpointUrl = actionRequest.config.getProperty(Exchange.HTTP_URL)
-        URIBuilder builder = new URIBuilder(endpointUrl)
-        builder.setPath(actionRequest.config.getProperty(Exchange.HTTP_PATH))
-        // do not throw HttpOperationFailedException and instead return control to action invocation flow to eval result
+
+        ActionHttpRequestElements httpElements = new ActionHttpRequestElements( actionRequest.endpointUrl, actionRequest.param )
+        URIBuilder builder = new URIBuilder( httpElements.baseUrl )
+        builder.setPath( httpElements.urlPath )
+        // Add all of the query string parameters
+        for (param in httpElements.queryStringMap()) {
+            builder.addParameter(param.key, param.value)
+        }
+
+        // Add flag to not throw HttpOperationFailedException but instead return control to action invocation flow to eval result
         // see http://camel.apache.org/http4.html#HttpEndpoint Options
         builder.addParameter('throwExceptionOnFailure', 'false')
 
