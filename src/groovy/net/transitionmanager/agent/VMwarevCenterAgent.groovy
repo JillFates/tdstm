@@ -47,7 +47,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 
 		setDictionary([
 				getClusterInfo: new DictionaryItem([
-						agentMethod: 'clusterList',
+						agentMethod: 'getClusterInfo',
 						name: 'List of clusters',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) clusters in vCenter.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/cluster',
@@ -59,7 +59,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						]
 				]),
 				getClusterDetailInfo: new DictionaryItem([
-						agentMethod: 'clusterDetail',
+						agentMethod: 'getClusterDetailInfo',
 						name: 'Get cluster',
 						description: 'Retrieves information about the cluster corresponding to cluster.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/cluster',
@@ -71,7 +71,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						]
 				]),
 				getHostInfo: new DictionaryItem([
-						agentMethod: 'hostList',
+						agentMethod: 'getHostInfo',
 						name: 'List of hosts',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) hosts in vCenter.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/host',
@@ -83,7 +83,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						]
 				]),
 				getNetworkInfo: new DictionaryItem([
-						agentMethod: 'networkInfo',
+						agentMethod: 'getNetworkInfo',
 						name: 'List of networks',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) networks in vCenter.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/network',
@@ -95,7 +95,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						]
 				]),
 				getVMsInfo: new DictionaryItem([
-						agentMethod: 'vmList',
+						agentMethod: 'getVMsInfo',
 						name: 'List of VMs',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) virtual machines in vCenter.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm',
@@ -107,7 +107,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						]
 				]),
 				getVMDetailInfo: new DictionaryItem([
-						agentMethod: 'vmDetail',
+						agentMethod: 'getVMDetailInfo',
 						name: 'VM detailed info',
 						description: 'Returns information about a virtual machine.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}',
@@ -117,7 +117,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						params: HOST_VM_NAME_PARAMS
 				]),
 				getVMPowerStatus: new DictionaryItem([
-						agentMethod: 'vmPowerStatus',
+						agentMethod: 'getVMPowerStatus',
 						name: 'VM power status',
 						description: 'Returns the power state information of a virtual machine.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power',
@@ -127,7 +127,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						params: HOST_VM_NAME_PARAMS
 				]),
 				startVM: new DictionaryItem([
-						agentMethod: 'vmStart',
+						agentMethod: 'startVM',
 						name: 'Start VM',
 						description: 'Powers on a powered-off or suspended virtual machine.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power/start',
@@ -137,7 +137,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						params: HOST_VM_NAME_PARAMS
 				]),
 				stopVM: new DictionaryItem([
-						agentMethod: 'vmStop',
+						agentMethod: 'stopVM',
 						name: 'Stop VM',
 						description: 'Powers off a powered-on or suspended virtual machine.',
 						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power/stop',
