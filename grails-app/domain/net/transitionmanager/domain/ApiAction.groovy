@@ -216,12 +216,17 @@ class ApiAction {
 	}
 
 	/**
-	 * TM-9758 replace placeholders to the correct params
+	 * Used to transform the Endpoint URL on the domain where the {{placeholders}} are replaced
+	 * with the values that in the provided map. The values in the map are expected to be unescaped
+	 * and may contain non ASCII characters. The values will be encoded as part of the process.
+	 *
 	 * @param params Map containing the placeholders to replace
 	 * @return
+	 * @Deprecated - Use new ActionHttpRequestElements class to get URL
 	 */
+	@Deprecated
 	String endpointUrlWithPlaceholdersSubstituted(Map params) {
-		return StringUtil.replacePlaceholders(endpointPath, params, true)
+		return StringUtil.replacePlaceholders(endpointUrl, params)
 	}
 
 	/**

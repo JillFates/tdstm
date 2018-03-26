@@ -1,12 +1,16 @@
 package net.transitionmanager.agent
 
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.InvalidConfigurationException
 import com.tds.asset.AssetComment
+import com.tdssrc.grails.UrlUtil
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import java.net.UnknownHostException
 
 /**
  * AbstractAgent Class
@@ -53,7 +57,34 @@ class AbstractAgent {
 	}
 
 	/**
-	 * Used to construct the Map of parameters that will be used to call the remote method
+	 * Used to trigger the invocation of the particular method on the agent
+	 * @param methodName - the name of the Agent method identified in the Dictionary
+	 * @param actionRequest - the container class that contains all we need to know about the call
+	 */
+	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
+	Map invoke(String methodName, ActionRequest actionRequest) {
+		if (dict.containsKey(methodName)) {
+			DictionaryItem dictItem = (DictionaryItem) dict[methodName]
+			if (dictItem.method) {
+				log.debug 'invoke({}) about to invoke method {}', methodName, dictItem.method
+				return "${dictItem.method}"(actionRequest)
+			} else {
+				String msg = "The Action Agent $name for method $methodName is incorrectly configured"
+				log.error msg
+				throw new InvalidRequestException(msg)
+			}
+		} else {
+			String msg = "The agent $name does not have method $methodName defined"
+			log.error msg
+			throw new InvalidRequestException(msg)
+		}
+	}
+
+
+	/**
+	 * Used to construct the Map of parameters that will be used to call the remote method. Note
+	 * that the values are not URL encoded.
+	 *
 	 * @param action - the ApiAction that contains the methodParams
 	 * @param context - the domain context that the data for the parameters will come from
 	 * @return the map of the parameters with the appropriate values
@@ -61,13 +92,13 @@ class AbstractAgent {
 	@CompileStatic(TypeCheckingMode.SKIP)
 	protected Map buildMethodParamsWithContext(ApiAction action, AssetComment task) {
 		Map methodParams = [:]
-		for (param in action.methodParamsList) {
 
-			// TODO : JPM 3/2018 : Need to strip out URI Param Placeholders (not here actually)
+		String value
+		for (param in action.methodParamsList) {
 
 			switch (ContextType.lookup(param.context)) {
 				case ContextType.TASK:
-					methodParams.put(param.paramName, task[param.fieldName] )
+					value = task[param.fieldName]
 					break
 				case ContextType.ASSET:
 				case ContextType.APPLICATION:
@@ -75,15 +106,21 @@ class AbstractAgent {
 				case ContextType.DEVICE:
 				case ContextType.STORAGE:
 					if (task.assetEntity) {
-						methodParams.put(param.paramName, task.assetEntity[param.fieldName] )
+						// This line prevents the @CompileStatic
+						value = task.assetEntity[param.fieldName]
 					}
 					break
 				case ContextType.USER_DEF:
-					methodParams.put(param.paramName, param.value)
+					value = param.value
 					break
 				default:
-					throw new InvalidRequestException("Param context ${param.context} not supported")
+					// Shouldn't actually ever get here but just in case - put a bullet in this execution
+					throw new InvalidRequestException("Parameter context ${param.context} is not supported")
 			}
+			if (param.encoded == 1) {
+				value = UrlUtil.decode(value)
+			}
+			methodParams.put(param.paramName,value)
 		}
 		return methodParams
 	}

@@ -388,4 +388,16 @@ class StringUtilTests extends Specification {
 			'Parameters map for placeholder replacement is null' == ex3.message
 
 	}
+
+	def 'test containsPlaceholders method'() {
+		expect:
+			expected == StringUtil.containsPlaceholders(text)
+		where:
+			text		| expected
+			'abcdefg'	| false
+			''			| false
+			'a{{b}}c'	| true
+			null		| false
+	}
+
 }
