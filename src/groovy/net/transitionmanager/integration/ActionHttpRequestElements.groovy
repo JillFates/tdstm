@@ -72,6 +72,7 @@ class ActionHttpRequestElements {
 	 * @param method - the indentended Http Method that this querystring will be used with
 	 * @return the appropriate parameters and values URL encoded
 	 */
+	// TODO : JPM 3/2018 : queryStringMap is returning String instead of Map - Need to solve
 	String queryStringMap(HttpMethod method) {
 		return UrlUtil.queryStringToMap(queryString, method)
 	}
@@ -81,6 +82,7 @@ class ActionHttpRequestElements {
 	 * purposes not be encoded.
 	 * @return the map of all query string params
 	 */
+	// TODO : JPM 3/2018 : queryStringMap is returning String instead of Map - Need to solve
 	String queryStringMap() {
 		return queryStringMap(HttpMethod.GET)
 	}
@@ -138,6 +140,17 @@ class ActionHttpRequestElements {
 	String getQueryString() { return queryString }
 	Map getExtraParams() { return extraParams }
 	Map getQueryParams() { return queryParams }
+
+	/**
+	 * Used to get the path and potentially part of the query string if the ApiAction endpoint uri had
+	 * any explicit parameters specified.
+	 * @param method - if defined with GET then all parameters will be included otherwise only query string params explicitely
+	 * @return the path and possibly the query string
+	 */
+	String getUrlPathWithQueryString(HttpMethod method) {
+		String qs = queryString(method)
+		return urlPath + (qs ? '?' + qs : '')
+	}
 
 	/**
 	 * Used to retrieve the query string as a set of name value parameters as a Map and optionally
