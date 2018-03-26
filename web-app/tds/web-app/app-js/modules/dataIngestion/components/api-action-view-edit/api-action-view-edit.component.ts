@@ -160,11 +160,15 @@ export class APIActionViewEditComponent implements OnInit {
 		this.getCredentials();
 		this.getDataScripts();
 		this.getCommonFieldSpecs();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
+		this.getModalTitle();
 	}
 
 	ngOnInit(): void {
 		this.prepareFormListener();
+	}
+
+	private getModalTitle(): void {
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create API Action' : (this.modalType === ActionType.EDIT ? 'API Action Edit' : 'API Action Detail');
 	}
 
 	/**
@@ -294,6 +298,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
+					this.modalType = this.actionTypes.EDIT;
+					this.getModalTitle();
+					this.apiActionModel.id = result.id;
 					this.apiActionModel.version = result.version;
 					this.dataSignature = JSON.stringify(this.apiActionModel);
 					this.dataParameterListSignature = JSON.stringify(this.parameterList);
