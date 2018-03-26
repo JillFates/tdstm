@@ -4,6 +4,7 @@ import org.springframework.http.HttpMethod
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.integration.ActionRequest
 
 
 /**
@@ -27,6 +28,11 @@ import net.transitionmanager.service.InvalidParamException
  * baseUrl + urlPath ? queryParams and an
  */
 class ActionHttpRequestElements {
+
+	// These parameters are injected into the Params but should be moved to something else
+	// TODO :JPM 3/2018 : TM-9963 Move params else where
+	static final List<String>ParamsToIgnored = ['actionId', 'producesData', 'credentials']
+
 	// Represents the first section of the URI up to the path
 	protected String baseUrl = ''
 
@@ -52,8 +58,8 @@ class ActionHttpRequestElements {
 	 * @param uri - the complete URI of an endpoint
 	 * @param extraParams - a map containing placeholder, querystring and JSON body parameter name/values
 	 */
-	ActionHttpRequestElements(String uri, Map paramValues) {
-		parse(uri, paramValues)
+	ActionHttpRequestElements(String uri, ActionRequest actionRequest) {
+		parse(uri, actionRequest)
 	}
 
 	/**
@@ -94,9 +100,13 @@ class ActionHttpRequestElements {
 	protected String buildQueryStringParams() {
 		String qs = ''
 		// Integer x=0
-		qs = extraParams.collect { k, v -> k + '=' + UrlUtil.encode(v) }.join('&')
-		// 	qs = ((x++ > 0) ? '&' : '') + k + '=' + UrlUtil.encode(v)
-		// }
+		qs = extraParams.collect { k, v ->
+			// These parameters are injected into the Params but should be moved to something else
+			// TODO :JPM 3/2018 : TM-9963
+			if (! paramsToIgnored.contains(k)) {
+				k + '=' + UrlUtil.encode(v.toString())
+			}
+		}.join('&')
 		return qs
 	}
 
@@ -111,6 +121,15 @@ class ActionHttpRequestElements {
 	String uri(HttpMethod method) {
 		String qs = queryString(method)
 		return baseUrl + urlPath + (qs ? '?' + qs : '')
+	}
+
+	/**
+	 * Used to retrieve the complete URI intended for a GET request therefore all of the query params will
+	 * be included in the URI encoded appropriately.
+	 * @return the complete URL with the query string parameters
+	 */
+	String uri(){
+		uri(HttpMethod.GET)
 	}
 
 	// Accessor methods to the properties that should be readonly visable
@@ -137,7 +156,7 @@ class ActionHttpRequestElements {
 	 * @param uri - the complete URI of an endpoint
 	 * @param paramValues - a map containing placeholder, querystring and JSON body parameter name/values
 	 */
-	private void parse(final String uri, final Map nameValues) {
+	private void parse(final String uri, final ActionRequest actionRequest) {
 		if (! uri) {
 			throw new InvalidParamException('Action endpoint URL appears to be undefined')
 		}
@@ -159,8 +178,8 @@ class ActionHttpRequestElements {
 			Map uriParamValues = [:]
 			// Grab the values for the placeholders and encode them
 			for (String name in placeholderNames) {
-				if (nameValues.containsKey(name)) {
-					uriParamValues.put(name, UrlUtil.encode( nameValues[name] ) )
+				if (actionRequest.param.hasProperty(name)) {
+					uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
 				}
 			}
 
@@ -186,10 +205,10 @@ class ActionHttpRequestElements {
 
 		// Now load extraParams with the parameters that were not used as placeholders
 		if (placeholderNames) {
-			this.extraParams = nameValues.findAll {k, v ->
+			this.extraParams = actionRequest.param.getAllProperties().findAll {k, v ->
 				! placeholderNames.contains(k) }
 		} else {
-			this.extraParams = nameValues.clone()
+			this.extraParams = actionRequest.param.getAllProperties().clone()
 		}
 	}
 }

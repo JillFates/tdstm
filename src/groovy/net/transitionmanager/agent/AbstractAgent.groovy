@@ -1,13 +1,16 @@
 package net.transitionmanager.agent
 
 import net.transitionmanager.domain.ApiAction
+import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.service.InvalidRequestException
+import net.transitionmanager.service.InvalidConfigurationException
 import com.tds.asset.AssetComment
 import com.tdssrc.grails.UrlUtil
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import java.net.UnknownHostException
 
 /**
  * AbstractAgent Class
@@ -52,6 +55,31 @@ class AbstractAgent {
 	Map dictionary() {
 		return dict
 	}
+
+	/**
+	 * Used to trigger the invocation of the particular method on the agent
+	 * @param methodName - the name of the Agent method identified in the Dictionary
+	 * @param actionRequest - the container class that contains all we need to know about the call
+	 */
+	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
+	Map invoke(String methodName, ActionRequest actionRequest) {
+		if (dict.containsKey(methodName)) {
+			DictionaryItem dictItem = (DictionaryItem) dict[methodName]
+			if (dictItem.method) {
+				log.debug 'invoke({}) about to invoke method {}', methodName, dictItem.method
+				return "${dictItem.method}"(actionRequest)
+			} else {
+				String msg = "The Action Agent $name for method $methodName is incorrectly configured"
+				log.error msg
+				throw new InvalidRequestException(msg)
+			}
+		} else {
+			String msg = "The agent $name does not have method $methodName defined"
+			log.error msg
+			throw new InvalidRequestException(msg)
+		}
+	}
+
 
 	/**
 	 * Used to construct the Map of parameters that will be used to call the remote method. Note

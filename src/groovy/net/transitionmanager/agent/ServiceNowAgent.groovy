@@ -1,14 +1,15 @@
 package net.transitionmanager.agent
 
+import net.transitionmanager.integration.ActionRequest
 import com.tdsops.common.grails.ApplicationContextHolder
-import groovy.util.logging.Slf4j
 import net.transitionmanager.service.ServiceNowService
+import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 
 /**
  * Methods to interact with ServiceNow fetch/download assets lists
  */
-@Slf4j(value='logger')
+@Slf4j()
 @Singleton(strict=false)
 @CompileStatic
 class ServiceNowAgent extends AbstractAgent {
@@ -222,9 +223,10 @@ class ServiceNowAgent extends AbstractAgent {
 	 * @param payload
 	 * @return
 	 */
-	Map fetchAssetList(Object payload) {
-		Map result = serviceNowService.fetchAssetList(payload)
-		log.debug 'Result of fetch assets. {}', result
+	Map fetchAssetList(ActionRequest actionRequest) {
+
+		Map result = serviceNowService.fetchAssetList(actionRequest)
+		log.debug 'fetchAssetList() Result of fetch assets. {}', result
 
 		return result
 	}

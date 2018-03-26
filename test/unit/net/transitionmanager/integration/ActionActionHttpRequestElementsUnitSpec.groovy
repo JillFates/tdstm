@@ -3,6 +3,8 @@ package net.transitionmanager.integration
 import spock.lang.Specification
 import org.springframework.http.HttpMethod
 
+import net.transitionmanager.integration.ActionRequest
+
 /**
  * Test specifications for the ActionHttpRequestElements class
  */
@@ -29,7 +31,7 @@ class ActionActionHttpRequestElementsUnitSpec extends Specification {
 
 	def 'Test that the various properties of ActionHttpRequestElements instance are as they should'() {
         given: 'an ActionHttpRequestElements is instantiated'
-			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, params)
+			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, new ActionRequest(params))
 
 		expect: 'the baseUrl was parsed and placeholder replaced'
 			'https://xray.example.com' == ahre.baseUrl
@@ -45,7 +47,7 @@ class ActionActionHttpRequestElementsUnitSpec extends Specification {
 
 	def 'test buildQueryStringParams'() {
         given: 'an ActionHttpRequestElements is instantiated'
-			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, params)
+			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, new ActionRequest(params))
 
 		when: 'calling the buildQueryStringParams method'
 			String result = ahre.buildQueryStringParams()
@@ -56,7 +58,7 @@ class ActionActionHttpRequestElementsUnitSpec extends Specification {
     def 'test the uri method'() {
 
         given: 'an ActionHttpRequestElements is instantiated'
-			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, params)
+			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, new ActionRequest(params))
 
 		expect: 'that calling uril(GET) should return all query string parameters'
 			expectedGet == ahre.uri(HttpMethod.GET)

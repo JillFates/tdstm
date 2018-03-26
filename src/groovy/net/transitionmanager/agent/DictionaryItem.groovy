@@ -20,9 +20,6 @@ class DictionaryItem {
 	// List<DictionaryItemParameter> params = []
 	Map results = [:]
 
-	String getMethod() {
-		this.method ?: this.name
-	}
 }
 
 // TODO : JPM 3/2018 : Switch from using Map to DictionaryItemParameter class
