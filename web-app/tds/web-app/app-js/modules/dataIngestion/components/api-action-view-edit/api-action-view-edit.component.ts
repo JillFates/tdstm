@@ -517,6 +517,9 @@ export class APIActionViewEditComponent implements OnInit {
 			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
 			this.guardParams();
 			this.parameterList = process(this.apiActionModel.agentMethod.methodParams, this.state);
+			this.parameterList.data.forEach((parameter) => {
+				this.onContextValueChange(parameter);
+			});
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
 		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
