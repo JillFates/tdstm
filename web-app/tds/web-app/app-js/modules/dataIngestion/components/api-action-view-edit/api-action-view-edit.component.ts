@@ -83,6 +83,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public dataScriptMode = APIActionModel;
 	public actionTypes = ActionType;
 	private dataSignature: string;
+	private dataParameterListSignature: string;
 	private intervals = INTERVALS;
 	public interval = INTERVAL;
 	public selectedInterval = {value: 0, interval: ''};
@@ -135,7 +136,7 @@ export class APIActionViewEditComponent implements OnInit {
 		name: 'Select...'
 	};
 	private lastSelectedAgentMethodModel: AgentMethodModel = {
-		id: 0,
+		id: '0',
 		name: 'Select...'
 	};
 
@@ -156,6 +157,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 
 		this.dataSignature = JSON.stringify(this.apiActionModel);
+		this.dataParameterListSignature = '';
 		this.parameterList = process([], this.state);
 
 		this.getProviders();
@@ -212,10 +214,10 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('agentClass');
 				}
 				this.agentList.push(...result);
-				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.name) {
+				if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 					this.onAgentValueChange(this.apiActionModel.agentClass);
 				} else {
-					this.agentMethodList.push({ id: 0, name: 'Select...' });
+					this.agentMethodList.push({ id: '0', name: 'Select...' });
 					this.apiActionModel.agentMethod = this.agentMethodList[0];
 					this.modifySignatureByProperty('agentMethod');
 				}
@@ -269,6 +271,9 @@ export class APIActionViewEditComponent implements OnInit {
 				this.parameterList.data.forEach((parameter) => {
 					this.onContextValueChange(parameter);
 				});
+				setTimeout(() => {
+					this.dataParameterListSignature = JSON.stringify(this.parameterList.data);
+				}, 200);
 			},
 			(err) => console.log(err));
 	}
@@ -296,6 +301,7 @@ export class APIActionViewEditComponent implements OnInit {
 				if (result) {
 					this.apiActionModel.version = result.version;
 					this.dataSignature = JSON.stringify(this.apiActionModel);
+					this.dataParameterListSignature = JSON.stringify(this.parameterList.data);
 				}
 			},
 			(err) => console.log(err));
@@ -307,6 +313,14 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected isDirty(): boolean {
 		return this.dataSignature !== JSON.stringify(this.apiActionModel);
+	}
+
+	/**
+	 * Verify the Object has not changed
+	 * @returns {boolean}
+	 */
+	protected isParameterListDirty(): boolean {
+		return this.dataParameterListSignature !== JSON.stringify(this.parameterList.data);
 	}
 
 	/**
@@ -399,7 +413,7 @@ export class APIActionViewEditComponent implements OnInit {
 		// Test API Action Form
 		if (this.apiActionForm) {
 			this.validInfoForm = this.apiActionForm.valid &&
-				(this.apiActionModel.agentMethod.id !== 0 && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
+				(this.apiActionModel.agentMethod.id !== '0' && this.apiActionModel.agentClass.id !== 0 && this.apiActionModel.provider.id !== 0);
 
 			if (!this.validInfoForm && !this.initFormLoad) {
 				for (let i in this.apiActionForm.controls) {
@@ -441,10 +455,10 @@ export class APIActionViewEditComponent implements OnInit {
 				this.dataIngestionService.getActionMethodById(agentModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: 'Select...'});
+						this.agentMethodList.push({id: '0', name: 'Select...'});
 
 						if (this.apiActionModel.agentMethod) {
-							this.apiActionModel.agentMethod = result.find((agent) => agent.name === this.apiActionModel.agentMethod.name);
+							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
 						}
 
 						if (!this.apiActionModel.agentMethod) {
@@ -457,7 +471,7 @@ export class APIActionViewEditComponent implements OnInit {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: 0, name: 'Select...'});
+				this.agentMethodList.push({id: '0', name: 'Select...'});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedAgentModel) {
@@ -479,7 +493,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected onMethodValueChange(event: any): void {
 		console.log();
-		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== 0) {
+		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
 			this.prompt.open('Confirmation Required', 'Changing the Agent or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentMethodModel(res);
@@ -598,7 +612,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
-		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== 0) {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== '0') {
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
 		}
 		setTimeout(() => {
@@ -773,7 +787,7 @@ export class APIActionViewEditComponent implements OnInit {
 		// Wait 500 after the Grid has fully process the new params
 		setTimeout(() => {
 			this.verifyIsValidForm();
-		}, 100);
+		}, 200);
 	}
 
 	/**
