@@ -20,7 +20,9 @@ class AwsAgent extends AbstractAgent {
 	 */
 	AwsAgent() {
 
-		setInfo(AgentClass.AWS, 'Amazon AWS API')
+		// TODO : JPM 3/2018 : Need to reenable this line once AWS is implemented TM-9903
+		// setInfo(AgentClass.AWS, 'Amazon AWS API')
+
 		setDictionary( [
 			PublishSNS: new DictionaryItem( [
 				agentMethod: 'PublishSNS',
