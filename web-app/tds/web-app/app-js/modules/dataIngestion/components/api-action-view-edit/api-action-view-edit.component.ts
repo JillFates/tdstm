@@ -322,7 +322,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	protected cancelCloseDialog(): void {
-		if (this.isDirty() || !this.validParametersForm) {
+		if (this.isDirty() || this.isParameterListDirty()) {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
