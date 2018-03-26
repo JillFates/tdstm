@@ -1,16 +1,17 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 
 class Element implements RangeChecker {
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
-    String originalValue
+    Object originalValue
 	/**
 	 * Value with transformations applied
 	 */
-    String value
+	Object value
 	/**
 	 * Default o initialize value
 	 */
@@ -165,7 +166,20 @@ class Element implements RangeChecker {
 	    return this
     }
 
-    /**
+	/**
+	 * Transform current value in this Element instance to a Long number
+	 * <code>
+	 *      load ... transformation with number()
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element number(){
+		value = NumberUtil.toLong(value)
+		return this
+	}
+
+	/**
      * Replace all of the escape characters
      * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
      * and replaces any non-printable, control and special unicode character

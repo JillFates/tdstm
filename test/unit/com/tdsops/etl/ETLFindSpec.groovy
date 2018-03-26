@@ -5,6 +5,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.NumberUtil
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
@@ -1035,6 +1036,98 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find element using transformation number'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isLong(args.id)
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							load environment with 'Production'
+							extract 'application id' transform with number() load id
+							
+							find Application by id with DOMAIN.id into id
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == 152254l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152254l]
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == 152255l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152255l]
+					}
+				}
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)

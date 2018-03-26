@@ -92,7 +92,6 @@ class ETLFindElement {
 		].transpose().collectEntries { it }
 
 		if(!results){
-
 			try{
 				currentFind.objects = DomainClassQueryHelper.where(
 					ETLDomain.lookup(currentFind.domain),
@@ -130,11 +129,11 @@ class ETLFindElement {
 				values)
 		}
 
-		return values.collect { ETLValueHelper.stringValueOf(it) }
+		return values.collect { ETLValueHelper.valueOf(it) }
 	}
 
 	/**
-	 * Checks if the current instance of processor has a project already defiend.
+	 * Checks if the current instance of processor has a project already defined.
 	 * If not It throws an exception
 	 */
 	private void checkProject() {

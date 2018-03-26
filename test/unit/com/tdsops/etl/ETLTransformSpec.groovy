@@ -1075,6 +1075,52 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
 			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+	}
+
+
+	void 'test can transform a field value with toNumber'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'device id' transform with number()
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Every column for every row is transformed with middle 2 transformation'
+			etlProcessor.getElement(0, 0).value == 152254l
+			etlProcessor.getElement(1, 0).value == 152255l
+			etlProcessor.getElement(2, 0).value == 152256l
+	}
+
+	void 'test can throw an Exception transforming incorrectly a value'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'device id' transform with number() uppercase()
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			MissingMethodException e = thrown MissingMethodException
+			e.message == 'No signature of method: java.lang.Long.toUpperCase() is applicable for argument types: () values: []'
 
 	}
 }
