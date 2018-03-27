@@ -36,8 +36,12 @@
             <div class="col-sm-4 errors-header"><span>Errors</span></div>
         </div>
         <div class="row">
-            <div class="col-sm-2">{{batchRecord.status.label}}</div>
-            <div class="col-sm-2">{{batchRecord.errorCount}}</div>
+            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0 || batchRecord.errorList.length > 0}">
+                {{batchRecord.status.label}}
+            </div>
+            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0}">
+                {{batchRecord.errorCount}}
+            </div>
             <div class="col-sm-2">{{batchRecord.operation}}</div>
             <div class="col-sm-2">{{batchRecord.sourceRowId}}</div>
             <div class="col-sm-4">
