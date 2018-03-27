@@ -4,7 +4,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.service.RestfulProducerService
+import net.transitionmanager.service.HttpProducerService
 
 /**
  * Methods to interact with VMware vCenter to interact with the RESTful API provided there.
@@ -14,7 +14,7 @@ import net.transitionmanager.service.RestfulProducerService
 @CompileStatic
 class VMwarevCenterAgent extends AbstractAgent {
 	private static final String DOCUMENTATION_URL = 'https://code.vmware.com/apis/191/vsphere-automation';
-	RestfulProducerService restfulProducerService
+	HttpProducerService httpProducerService
 
 	private static final LinkedHashMap HOSTNAME_PARAM = [
 					paramName: 'HOSTNAME',
@@ -148,7 +148,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 				])
 		])
 
-		restfulProducerService = (RestfulProducerService) ApplicationContextHolder.getBean('restfulProducerService')
+		httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
 	}
 
 	/**
@@ -157,7 +157,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 	 * @return
 	 */
 	void invokeHttpRequest(ActionRequest actionRequest) {
-		restfulProducerService.executeCall(actionRequest)
+		httpProducerService.executeCall(actionRequest)
 	}
 
 }
