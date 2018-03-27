@@ -1,6 +1,6 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.builder.RestfulRouteBuilder
+import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile
  * Service class to execute Camel routes required by RESTful API Action
  */
 @Slf4j
-class RestfulProducerService {
+class HttpProducerService {
     private static final String DIRECT_RESTFUL_CALL = 'direct:RESTfulCall-'
     private static final String DIRECT_START = 'direct:start'
     private static final String CONTENT_DISPOSITION = 'Content-Disposition'
@@ -36,21 +36,21 @@ class RestfulProducerService {
     @Qualifier("camelContext")
     SpringCamelContext camelContext;
 
-    RestfulRouteBuilder restfulRouteBuilder
+    HttpRouteBuilder httpRouteBuilder
     TaskService taskService
     ApiActionService apiActionService
     FileSystemService fileSystemService
 
     /**
      * Executes a Camel route for the given action request
-     * @see <code>RestfulAgent.executeCall()</code>
+     * @see <code>HttpAgent.executeCall()</code>
      *
      * @param actionRequest - the action request
      */
     void executeCall(ActionRequest actionRequest) {
         try {
             log.debug('RESTful executeCall action request: {}', actionRequest)
-            RouteDefinition routeDefinition = restfulRouteBuilder.getRouteDefinition(actionRequest)
+            RouteDefinition routeDefinition = httpRouteBuilder.getRouteDefinition(actionRequest)
             log.debug('RESTful route defined: {}', routeDefinition)
             camelContext.addRouteDefinition(routeDefinition)
 
@@ -69,7 +69,7 @@ class RestfulProducerService {
      * After a api action Camel route execution, the Camel context comes to this point to
      * explore and process the exchange accordingly
      *
-     * @see <code>RestfulRouteBuilder.buildRESTfulReactionEndpoint()</code> for details
+     * @see <code>HttpRouteBuilder.buildRESTfulReactionEndpoint()</code> for details
      *
      * @param exchange
      */
