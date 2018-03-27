@@ -131,26 +131,20 @@ class ErrorHandlerController implements ControllerMethods {
 	 */
 	def forbidden() {
 		log.debug "Hit forbidden()"
-
-		def ex = errorHandlerService.getException(request)
-		if (ex) {
-		   log.error ExceptionUtil.stackTraceToString('error() The forbidden got into recursive loop so we just stopped', ex)
-		}
-
 		// arecordon: adds validation for handling AJAX requests and display an error message back to the user.
 		if (WebUtil.isAjax(request)){
 			response.status = 403
 			String message = response.getHeader("errorMessage")
 			ServiceResults.respondWithError(response, message)
 		} else {
-			response.status = 200
-			Map model = fetchModel()
-			// Add current user project
-			model.currProject = securityService.getUserCurrentProject()
-			String msg = model.exceptionMsg ?: 'URL not found'
-			securityService.reportViolation("${msg} while accessing ${model.requestUri}")
-			return model
-		}
+				response.status = 200
+				Map model = fetchModel()
+				// Add current user project
+				model.currProject = securityService.getUserCurrentProject()
+				String msg = model.exceptionMsg ?: 'URL not found'
+				securityService.reportViolation("${msg} while accessing ${model.requestUri}")
+				return model
+			}
 	}
 
 	/**
