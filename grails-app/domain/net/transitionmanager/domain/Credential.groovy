@@ -125,7 +125,7 @@ class Credential {
 	 * - assert ('double-colon@json::access_token' ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/) == false
 	 */
 	static Closure sessionNameValidator = { value, target ->
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
