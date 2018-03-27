@@ -31,7 +31,7 @@ export class DependencyBatchListComponent {
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
 		dir: 'desc',
-		field: 'importedDate'
+		field: 'dateCreated'
 	}];
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
