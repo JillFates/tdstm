@@ -310,7 +310,9 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	Map invoke (ApiAction action) {
-		assert action != null: 'No action provided'
+		if (!action) {
+			throw InvalidRequestException('No action was provided to the invoke command')
+		}
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)

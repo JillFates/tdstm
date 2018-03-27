@@ -130,7 +130,10 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     Map<String, ?> authenticate(Credential credential) {
+        // TODO : JPM 3/2018 : Throw exception - NO MORE assert in the code
         assert credential != null : 'Invalid credential information provided.'
+
+        log.debug 'authenticate() trying to authenticate user {}', credential.username
 
         // TODO look for authentication in cache by credential ID, if there is one
         // we shouldn't be doing re-authentication
@@ -153,6 +156,8 @@ class CredentialService implements ServiceMethods {
                 authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
                 break
         }
+
+        log.debug 'authenticate() results {}', authenticationResponse
         return authenticationResponse
     }
 

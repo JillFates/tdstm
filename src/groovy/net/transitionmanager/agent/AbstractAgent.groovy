@@ -95,7 +95,6 @@ class AbstractAgent {
 
 		String value
 		for (param in action.methodParamsList) {
-
 			switch (ContextType.lookup(param.context)) {
 				case ContextType.TASK:
 					value = task[param.fieldName]
