@@ -18,12 +18,12 @@ import org.apache.http.client.utils.URIBuilder
 
 /**
  * This bean is used to create a Camel RouteDefinition used by
- * RestfulProducerService during API Action invocation
+ * HttpProducerService during API Action invocation
  *
  * @see <code>resources.groovy</code> for definition
  */
-class RestfulRouteBuilder extends RouteBuilder {
-    private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
+class HttpRouteBuilder extends RouteBuilder {
+	private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
 	private static final HTTP_METHOD = 'HttpMethod'
 	private static final VALID_HTTP_METHODS = /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$/
 	private static final CONTENT_TYPE_HEADER = 'Content-Type'
@@ -107,9 +107,9 @@ class RestfulRouteBuilder extends RouteBuilder {
         StringBuilder restfulEndpoint = new StringBuilder()
 		// TODO <SL> Uncomment when callbackMethod and callbackMode gets implemented
 //        if (payload.callbackMethod) {
-//            restfulEndpoint.append("bean:restfulProducerService?method=").append(payload.callbackMethod)
+//            restfulEndpoint.append("bean:httpProducerService?method=").append(payload.callbackMethod)
 //        } else {
-            restfulEndpoint.append("bean:restfulProducerService?method=reaction")
+            restfulEndpoint.append("bean:httpProducerService?method=reaction")
 //        }
     }
 
@@ -165,7 +165,7 @@ class RestfulRouteBuilder extends RouteBuilder {
 					routeDefinition.setHeader('Cookie', constant(authentication.sessionName + '=' + authentication.sessionValue))
 					break
 				default:
-					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
+					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in HttpRouteBuilder")
 			}
         }
 
