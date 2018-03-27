@@ -229,7 +229,9 @@ class DataImportService implements ServiceMethods {
 		String transDomainName = LEGACY_DOMAIN_CLASSES[importContext.domainClass]
 
 		// Check if the domain class is valid
-		EavEntityType eavEntityType = EavEntityType.findByDomainName(transDomainName)
+		EavEntityType eavEntityType = EavEntityType.findByDomainName(
+			(transDomainName.equals('Device') ? 'AssetEntity' : transDomainName)
+		)
 
 		// If the asset class is invalid, return null
 		if (! eavEntityType) {
@@ -862,8 +864,8 @@ class DataImportService implements ServiceMethods {
 				log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
 			}
 			if (! supporting) {
-				primary = createReferenceDomain(project, 'dependent', fieldsInfo, context)
-				log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', supporting
+				supporting = createReferenceDomain(project, 'dependent', fieldsInfo, context)
+				log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
 			// Try finding & updating or creating the dependency with primary and supporting assets that were found
@@ -882,7 +884,7 @@ class DataImportService implements ServiceMethods {
 			if (record.errorCount) {
 				log.debug "processDependencyRecord() Failing due to errors (${record.errorCount})"
 				// Trash the dependency
-				dependency.detach()
+				dependency.discard()
 				dependency = null
 			} else {
 				record.operation = (dependency.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)

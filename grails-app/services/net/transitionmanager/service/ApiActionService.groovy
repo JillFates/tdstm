@@ -52,11 +52,12 @@ class ApiActionService implements ServiceMethods {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		//(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
 		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent,
 		(AgentClass.VCENTER.name())		: net.transitionmanager.agent.VMwarevCenterAgent
 	].asImmutable()
+		// TODO : JPM 3/2018 : TM-9903 AWS removed until we roll it back in
+		// (AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 
 	/**
 	 * Get a list of agent names
@@ -252,7 +253,12 @@ class ApiActionService implements ServiceMethods {
 				// execute PRE script if present
 				if (preScript) {
 					try {
-						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
+							new ApiActionResponse(),
+							taskFacade,
+							new AssetFacade(null, null, true),
+							new ApiActionJob()
+						)
 					} catch (ApiActionException preScriptException) {
 						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
