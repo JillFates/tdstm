@@ -12,13 +12,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             <tds-check-action
-                                    [disabled]="!script || !filename"
+                                    [disabled]="isTestDisabled()"
                                     [name]="'Test'"
                                     (onClick)="onTestScript()"
                                     [(model)]="operationStatus.test">
                             </tds-check-action>
                             <tds-check-action
-                                    [disabled]="!script || !filename"
+                                    [disabled]="isCheckSyntaxDisabled()"
                                     [name]="'Check Syntax'"
                                     (onClick)="onCheckScriptSyntax()"
                                     [(model)]="operationStatus.syntax">
