@@ -271,11 +271,8 @@
 							<div class="box-body no-padding ">
 								<kendo-grid
 										[data]="parameterList"
-										[sort]="state.sort"
-										[sortable]="{mode:'single'}"
 										[pageSize]="25"
-										[height]="430"
-										(sortChange)="sortChange($event)">
+										[height]="430">
 									<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
 										<button class="btn btn-default float-right mar-right-15" id="btnAddParameter" type="button" (click)="onAddParameter()"><i class="fa fa-fw fa-plus-circle"></i> {{ 'DATA_INGESTION.ADD_PARAMETER' | translate }}</button>
 									</ng-template>
@@ -308,7 +305,6 @@
 														[data]="assetClassesForParameters"
 														[textField]="'value'"
 														[valueField]="'assetClass'"
-														[valuePrimitive]="true"
 														(valueChange)="onContextValueChange(dataItem)"
 														[(ngModel)]="dataItem.context"
 														required

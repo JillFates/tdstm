@@ -91,9 +91,23 @@ class RestfulProducerService {
         apiActionResponse.headers = exchange.getIn().getHeaders() as Map<String, String>
         apiActionResponse.status = apiActionResponse.getHeader(Exchange.HTTP_RESPONSE_CODE) as Integer
         apiActionResponse.elapsed = exchange.getIn().getHeader(HttpHeaders.AGE) as Integer
-        apiActionResponse.successful = apiActionResponse.status == ReactionHttpStatus.OK
+
+// TODO : JPM 3/2018 : The determinination of the success should be done by the reaction Status Determination script so we're hard coding true for the moment
+// Perhaps we can set true as long as success is in 200's?
+
+        apiActionResponse.successful = apiActionResponse.status in [
+            ReactionHttpStatus.OK,
+            ReactionHttpStatus.CREATED,
+            ReactionHttpStatus.ACCEPTED,
+            ReactionHttpStatus.AUTHORITATIVE_INFORMATION,
+            ReactionHttpStatus.NO_CONTENT,
+            ReactionHttpStatus.RESET_CONTENT,
+            ReactionHttpStatus.PARTIAL_CONTENT
+        ]
+        log.debug 'reaction() reponse status={}, success={}', apiActionResponse.status, apiActionResponse.successful
+
         if (!apiActionResponse.successful) {
-            apiActionResponse.error = body.text
+            apiActionResponse.error = body?.text
             apiActionResponse.data = null
         } else {
             if (actionRequest.param.producesData == 1) {
