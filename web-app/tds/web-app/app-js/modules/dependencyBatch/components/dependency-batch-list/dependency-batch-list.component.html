@@ -32,7 +32,7 @@
                             </label>
                             <button *ngIf="canBulkDelete()"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                    (click)="onDeleteBatch()"
+                                    (click)="confirmDelete()"
                                     class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
@@ -129,11 +129,9 @@
                             </ng-template>
 
                             <!-- Cell Templates -->
-                            <!-- TODO: fix issue with the date format not working :(
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
-                                {{dataItem[column.property] | date: 'yyyy-mm-dd'}}
+                                {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                             </ng-template>
-                            -->
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">

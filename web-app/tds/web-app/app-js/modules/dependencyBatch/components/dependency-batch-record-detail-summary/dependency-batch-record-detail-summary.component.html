@@ -19,7 +19,7 @@
         </div>
         <div class="row">
             <div class="col-sm-2">{{importBatch.id}}</div>
-            <div class="col-sm-2">{{importBatch.dateCreated}}</div>
+            <div class="col-sm-2">{{importBatch.dateCreated | date: userPreferenceService.getUserTimeZone()}}</div>
             <div class="col-sm-2">{{importBatch.createdBy}}</div>
             <div class="col-sm-2">{{importBatch.domainClassName}}</div>
             <div class="col-sm-2">{{importBatch.datascript?.name}}</div>

@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ImportBatchModel} from '../../model/import-batch.model';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
+import {PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'dependency-batch-record-detail-summary',
@@ -13,7 +14,7 @@ export class DependencyBatchRecordDetailSummaryComponent {
 
 	private summaryCollapsed = false;
 
-	constructor() {
+	constructor(private userPreferenceService: PreferenceService) {
 		// Silence is golden
 	}
 
