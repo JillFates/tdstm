@@ -789,8 +789,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						originalValue == 'ACME Data Center'
 					}
 					with(fields.assetName) {
-						value == 152254
-						originalValue == 152254
+						value == '152254'
+						originalValue == '152254'
 					}
 				}
 
@@ -1485,7 +1485,7 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.DomainField.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+			e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
 	}
 
 	void 'test can evaluate a value loaded into the SOURCE.property'() {
@@ -2191,8 +2191,8 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 				domain Device
 				read labels
 				iterate {
-				      extract name load Name
-						load 'Network Interfaces' with NOW
+				    extract name load Name
+					load 'Network Interfaces' with NOW
 				}
 			""".stripIndent().trim()
 
