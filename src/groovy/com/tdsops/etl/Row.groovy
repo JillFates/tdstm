@@ -24,7 +24,7 @@ class Row {
         }
     }
 
-    Element addNewElement (String value) {
+    Element addNewElement (Object value) {
         Element newElement = new Element(originalValue: value,
                 value: value,
                 rowIndex: index,
@@ -33,7 +33,7 @@ class Row {
         newElement
     }
 
-	Element addNewElement (String value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
+	Element addNewElement (Object value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
 		Element newElement = new Element(originalValue: value,
 			value: value,
 			rowIndex: index,
