@@ -173,7 +173,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 	}
 
-
 	void 'test can define a the primary domain'() {
 
 		given:
@@ -2228,4 +2227,63 @@ zuludb01,HP,BL380,Blade""".stripIndent())
 				service.deleteTemporaryFile(fileName)
 			}
 	}
+
+
+	@See('TM-9995')
+	void 'test can declare local variables outside the iteration command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+name,mfg,model,type
+xraysrv01,Dell,PE2950,Server
+zuludb01,HP,BL380,Blade
+""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						set myLocalVariable with 'Custom Name'
+						iterate {
+							domain Device
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 }
