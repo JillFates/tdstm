@@ -191,7 +191,7 @@ beans = {
 		messageSourceService = ref('messageSourceService')
 	}
 
-	restfulRouteBuilder(HttpRouteBuilder) {
+	httpRouteBuilder(HttpRouteBuilder) {
 		credentialService = ref('credentialService')
 	}
 

@@ -43,7 +43,7 @@ class HttpProducerService {
 
     /**
      * Executes a Camel route for the given action request
-     * @see <code>RestfulAgent.executeCall()</code>
+     * @see <code>HttpAgent.executeCall()</code>
      *
      * @param actionRequest - the action request
      */
