@@ -39,6 +39,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
+		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
 		'PROVIDERS': 'Providers',
 		'CREATE_CREDENTIAL': 'Create Credential',

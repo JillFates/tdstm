@@ -161,4 +161,18 @@ export class AssetExplorerService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	validateUniquenessDataViewByName(dataViewName: string): Observable<boolean> {
+		let postRequest = {
+			name: dataViewName
+		};
+
+		const url = `${this.assetExplorerUrl}/validateUnique`;
+		return this.http.post(url, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.isUnique;
+			})
+			.catch((error: any) => error.json());
+	}
 }
