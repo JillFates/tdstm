@@ -79,7 +79,7 @@ class HttpProducerService {
         ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.ACTION_REQUEST)
         TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.TASK_FACADE)
         JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS)
-        AssetFacade assetFacade = new AssetFacade(null, null, true)
+        AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.ASSET_FACADE)
         ApiActionJob apiActionJob = new ApiActionJob()
 
         InputStream body = exchange.getIn().getBody(InputStream.class)
@@ -135,6 +135,7 @@ class HttpProducerService {
                 Map<String, ?> statusResult = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, statusScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                 log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, statusResult.result)
                 if (statusResult.result == ReactionScriptCode.SUCCESS) {
+                    assetFacade.setReadonly(false)
                     try {
                         Map<String, ?> successResult = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, successScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                         log.debug('{} script execution result: {}', ReactionScriptCode.SUCCESS, successResult.result)
@@ -171,7 +172,9 @@ class HttpProducerService {
                             }
                         }
                     }
+                    assetFacade.setReadonly(true)
                 } else {
+                    assetFacade.setReadonly(false)
                     // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
                     if (errorScript) {
                         try {
@@ -186,22 +189,27 @@ class HttpProducerService {
                             addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                         }
                     }
+                    assetFacade.setReadonly(true)
                 }
             } catch (ApiActionException statusScriptException) {
                 addTaskScriptInvocationError(taskFacade, ReactionScriptCode.STATUS, statusScriptException)
                 // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
                 if (errorScript) {
+                    assetFacade.setReadonly(false)
                     try {
                         apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                     } catch (ApiActionException errorScriptException) {
                         addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
                     }
+                    assetFacade.setReadonly(true)
                 } else if (defaultScript) {
+                    assetFacade.setReadonly(false)
                     try {
                         apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                     } catch (ApiActionException defaultScriptException) {
                         addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                     }
+                    assetFacade.setReadonly(true)
                 }
             }
         } else {
@@ -214,11 +222,13 @@ class HttpProducerService {
                     addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FAILED, failedScriptException)
                 }
             } else if (defaultScript) {
+                assetFacade.setReadonly(false)
                 try {
                     apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                 } catch (ApiActionException defaultScriptException) {
                     addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                 }
+                assetFacade.setReadonly(true)
             }
         }
 

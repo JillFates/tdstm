@@ -92,5 +92,6 @@ abstract class InitialValue {
 enum ThreadLocalVariable {
 	ACTION_REQUEST,
 	TASK_FACADE,
+	ASSET_FACADE,
 	REACTION_SCRIPTS
 }
