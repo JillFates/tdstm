@@ -28,7 +28,7 @@ class WsImportBatchController implements ControllerMethods {
 	@HasPermission(Permission.DataTransferBatchView)
 	def listImportBatches() {
 		Project project = getProjectForWs()
-		def batches = importBatchService.listBatches(project)
+		Collection batches = importBatchService.listBatches(project)
 		renderSuccessJson(batches)
 	}
 
