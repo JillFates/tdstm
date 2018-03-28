@@ -1,13 +1,12 @@
+import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import com.tdsops.common.security.spring.HasPermission
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Recipe
 import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.CookbookService
-import net.transitionmanager.service.InvalidParamException
-
+import net.transitionmanager.service.InvalidRequestException
 /**
  * Handles WS calls of the CookbookService.
  *
@@ -31,13 +30,25 @@ class WsCookbookController implements ControllerMethods {
 		renderSuccessJson(recipeId: rv.recipeId, recipeVersionId: rv.id)
 	}
 
+	/**
+	 *  The endpoint serves two functions:
+	 *  1- Deleting a recipe (no version provided)
+	 *  2- Discarding WIP (version > 0 is given)
+	 *
+	 * @param id - recipe id
+	 * @return
+	 */
 	@HasPermission(Permission.RecipeDelete)
 	def deleteRecipeOrVersion(Long id) {
 		def version = params.version
-		if (version == null || version == 0) {
-			// The front-end prevents this situation. This is just being extra cautious.
-			throw new InvalidParamException('Cannot delete recipe with an invalid version.')
+		// Intentionally deleting a recipe
+		if (version == null) {
+			cookbookService.deleteRecipe(id)
+		// Attempting to discard work in progress when there's no released version.
+		} else if (version == 0 ) {
+			throw new InvalidRequestException('Discarding WIP is not allowed when there is no released version.')
 		} else {
+			// Discard WIP.
 			cookbookService.deleteRecipeVersion(params.id, version)
 		}
 		renderSuccessJson()
