@@ -36,7 +36,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		@Inject('report') report: Observable<ViewModel>,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private assetService: AssetExplorerService,
+		private assetExplorerService: AssetExplorerService,
 		private stateService: StateService,
 		private notifier: NotifierService,
 		@Inject('fields') fields: Observable<DomainModel[]>) {
@@ -74,7 +74,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 		if (this.grid.justPlanning) {
 			params['justPlanning'] = true;
 		}
-		this.assetService.query(this.model.id, params).subscribe(result => {
+		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 			this.grid.apply(result);
 			jQuery('[data-toggle="popover"]').popover();
 		}, err => console.log(err));
@@ -88,7 +88,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected onSave() {
 		if (this.isSaveAvailable()) {
-			this.assetService.saveReport(this.model)
+			this.assetExplorerService.saveReport(this.model)
 				.subscribe(result => {
 					this.dataSignature = JSON.stringify(this.model);
 				});
@@ -139,19 +139,19 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected onFavorite(): void {
 		if (this.model.isFavorite) {
-			this.assetService.deleteFavorite(this.model.id)
+			this.assetExplorerService.deleteFavorite(this.model.id)
 				.subscribe(d => {
 					this.model.isFavorite = false;
 					this.select.loadData();
 				});
 		} else {
-			if (this.assetService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
 				});
 			} else {
-				this.assetService.saveFavorite(this.model.id)
+				this.assetExplorerService.saveFavorite(this.model.id)
 					.subscribe(d => {
 						this.model.isFavorite = true;
 						this.select.loadData();
@@ -185,7 +185,7 @@ export class AssetExplorerViewShowComponent implements OnInit {
 	}
 
 	protected isSaveAvailable(): boolean {
-		return this.assetService.isSaveAvailable(this.model);
+		return this.assetExplorerService.isSaveAvailable(this.model);
 	}
 
 	protected isSaveAsAvailable(): boolean {
