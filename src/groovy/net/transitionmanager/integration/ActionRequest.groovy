@@ -2,6 +2,7 @@ package net.transitionmanager.integration
 
 /**
  * This represents all of the details that were used build up the API request
+ * TM-8692
  */
 class ActionRequest {
 	private boolean readonly = false
@@ -10,7 +11,7 @@ class ActionRequest {
 	// These parameters will end up in the query string and/or json payload of requests
 	ActionRequestParameter params
 
-	// Contain properties need by the API logic (used internally by the implemenation code)
+	// Contain properties need by the API logic (used internally by the implementation code)
 	ActionRequestParameter options
 
 	// Contains any header that will be use in the request that can be populated in the Action PRE script
@@ -24,7 +25,8 @@ class ActionRequest {
 	}
 
 	ActionRequest(Map<String, Object> parameters) {
-		this.param = new ActionRequestParameter(parameters)
+		this.params = new ActionRequestParameter(parameters)
+		this.options = [:]
 		this.headers = [:]
 		this.config = [:]
 	}
@@ -35,7 +37,7 @@ class ActionRequest {
 
 	void setReadonly(boolean value) {
 		this.readonly = value
-		this.param.setReadonly(this.readonly)
+		this.params.setReadonly(this.readonly)
 		this.headers.setReadonly(this.readonly)
 	}
 
