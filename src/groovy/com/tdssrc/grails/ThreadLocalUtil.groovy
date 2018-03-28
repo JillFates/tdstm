@@ -89,9 +89,6 @@ abstract class InitialValue {
 /**
  * Supported and encapsulated ThreadLocal variables
  */
-enum ThreadLocalVariable {
-	ACTION_REQUEST,
-	TASK_FACADE,
-	ASSET_FACADE,
-	REACTION_SCRIPTS
+interface ThreadLocalVariable {
+
 }

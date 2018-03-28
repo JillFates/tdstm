@@ -24,6 +24,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
@@ -32,7 +33,6 @@ import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.apache.camel.Exchange
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -41,10 +41,10 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 @Transactional
 class ApiActionService implements ServiceMethods {
 	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [
-			ThreadLocalVariable.ACTION_REQUEST,
-			ThreadLocalVariable.TASK_FACADE,
-			ThreadLocalVariable.ASSET_FACADE,
-			ThreadLocalVariable.REACTION_SCRIPTS
+			ActionThreadLocalVariable.ACTION_REQUEST,
+			ActionThreadLocalVariable.TASK_FACADE,
+			ActionThreadLocalVariable.ASSET_FACADE,
+			ActionThreadLocalVariable.REACTION_SCRIPTS
 	]
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
@@ -246,11 +246,11 @@ class ApiActionService implements ServiceMethods {
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
 				String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
 
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.ACTION_REQUEST, actionRequest)
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
 
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.TASK_FACADE, taskFacade)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
 
 				// setup asset facade if task has an asset associated
 				AssetFacade assetFacade
@@ -261,7 +261,7 @@ class ApiActionService implements ServiceMethods {
 				} else {
 					assetFacade = new AssetFacade(null, null, true)
 				}
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.ASSET_FACADE, assetFacade)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
 
 				// execute PRE script if present
 				if (preScript) {

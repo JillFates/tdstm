@@ -4,7 +4,6 @@ import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
-import com.tdssrc.grails.ThreadLocalVariable
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.FileCommand
@@ -76,10 +75,10 @@ class HttpProducerService {
     void reaction(Exchange exchange) {
 
         // retrieve from ThreadLocal and prepare objects needed to attend the reaction
-        ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.ACTION_REQUEST)
-        TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.TASK_FACADE)
-        JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS)
-        AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.ASSET_FACADE)
+        ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST)
+        TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.TASK_FACADE)
+        JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
+        AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ASSET_FACADE)
         ApiActionJob apiActionJob = new ApiActionJob()
 
         InputStream body = exchange.getIn().getBody(InputStream.class)
