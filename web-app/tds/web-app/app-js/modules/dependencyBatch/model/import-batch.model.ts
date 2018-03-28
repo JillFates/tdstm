@@ -104,7 +104,7 @@ export class DependencyBatchColumnsModel {
 				locked: false
 			},
 			{
-				label: 'Datascript',
+				label: 'DataScript',
 				property: 'datascript.name',
 				type: 'text',
 				width: 130,
