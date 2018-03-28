@@ -157,8 +157,6 @@ export class APIActionViewEditComponent implements OnInit {
 
 		this.getProviders();
 		this.getAgents();
-		this.getCredentials();
-		this.getDataScripts();
 		this.getCommonFieldSpecs();
 		this.getModalTitle();
 	}
@@ -197,6 +195,8 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('provider');
 				}
 				this.providerList.push(...result);
+
+				this.getCredentials();
 			},
 			(err) => console.log(err));
 	}
@@ -236,6 +236,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('credential');
 				}
 				this.agentCredentialList.push(...result);
+				this.getDataScripts();
 			},
 			(err) => console.log(err));
 	}
