@@ -126,7 +126,6 @@ class MenuModule extends Module {
 
         projectName             { menuContainer.find("li a#nav-project-name")}
         projectLicenseIcon      { menuContainer.find("li a.licensing-error-warning i.fa-warning")}
-        projectLicenseIconHidden{ menuContainer.find("div.navbar-custom-menu li")[1]}
     }
 
     def selectMenu(menuItem) {
@@ -179,14 +178,6 @@ class MenuModule extends Module {
 
     def assertProjectName(name){
         projectName.text() == name
-    }
-
-    def assertLicenseIconVisible(){
-        projectLicenseIcon.isDisplayed()
-    }
-
-    def assertLicenseIconNotVisible(){
-        projectLicenseIconHidden.text() == ""
     }
 
     // TODO Add remains menu items here

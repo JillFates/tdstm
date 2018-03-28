@@ -8,6 +8,7 @@ import pages.Projects.ProjectListPage
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
+import geb.error.RequiredPageContentNotPresent
 
 @Stepwise
 class ProjectCreationSpec extends GebReportingSpec {
@@ -100,24 +101,31 @@ class ProjectCreationSpec extends GebReportingSpec {
             waitFor{$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode").find("a").text() == projName}
     }
 
-    def "6. Verify whether the Project is licensed or not"() {
+    def "6. Workaround to switch to a licensed Project"() {
         testKey = "TM-XXXX"
         given: 'The user is in Menu'
             at MenuPage
-        when: 'The user searches for the license Icon visible'
-            menuModule.assertLicenseIconVisible()
-        then: 'The user is in Project List Page'
-            at ProjectListPage
-        when: 'A licensed project should be selected'
-            waitFor {projectNameFilter.click()}
-            projectNameFilter = licensedProjectName
-            waitFor {projectNameGridField.find("a", text: licensedProjectName).first().click()}
-        then: 'The user is in the menu'
-            at MenuPage
-        and: 'The project name should be the selected'
-            waitFor {menuModule.projectName.isDisplayed()}
-            menuModule.assertProjectName(licensedProjectName)
-        and: 'The license icon is not present'
-            menuModule.assertLicenseIconNotVisible()
+        when: 'The user searches for the selected project'
+            menuModule.assertProjectName(projName)
+        then: 'A licensed project should be selected if license is requested'
+            def displayed = false
+            try {
+                // Check if license icon is displayed
+                menuModule.projectLicenseIcon.isDisplayed()
+                // Select a licensed project
+                at ProjectListPage
+                waitFor {projectNameFilter.click()}
+                projectNameFilter = licensedProjectName
+                waitFor {projectNameGridField.find("a", text: licensedProjectName).first().click()}
+                at MenuPage
+                waitFor {menuModule.projectName}
+                menuModule.assertProjectName(licensedProjectName)
+                // Recheck, if its present assertion will fail, otherwise we are OK
+                displayed = menuModule.projectLicenseIcon.isDisplayed()
+            } catch (RequiredPageContentNotPresent e) {
+                // Try failed because license icon is not present so a Licensed project is selected now
+                displayed = false
+            }
+            assert !displayed
     }
 }
