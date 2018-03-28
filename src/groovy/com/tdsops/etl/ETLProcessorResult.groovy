@@ -75,9 +75,11 @@ class ETLProcessorResult {
 		String findId = findElement.currentFind.findId
 
 		Map<String, ?> data = currentData()
+		data.rowNum = findElement.rowIndex
 
 		if(!data.fields.containsKey(findId)){
-			throw ETLProcessorException.invalidFindCommand(findId)
+			reference.fields.add(findId)
+			data.fields[findId] = initialFieldDataMap(null, null, null)
 		}
 
 		Map<String, ?> find = data.fields[findId].find
@@ -146,7 +148,7 @@ class ETLProcessorResult {
 
 		} else {
 			reference.fields.add(element.fieldSpec.name)
-			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
 		}
 
 	}
@@ -255,13 +257,14 @@ class ETLProcessorResult {
 	 *			},
 	 *		}
 	 * </pre>
-	 * @param element an element instance used to populate some of the data fields
+	 * @param originalValue
+	 * @param value
 	 * @return a Map that contains a final structure of the field node in ETLProcessorResult
 	 */
-	private Map<String, ?> initialFieldDataMap(Element element) {
+	private Map<String, ?> initialFieldDataMap(String originalValue, String value, String initValue) {
 		Map<String, ?> dataMap = [
-			value: element.value,
-			originalValue: element.originalValue,
+			value: value,
+			originalValue: originalValue,
 			error: false,
 			warn: false,
 			find: [
@@ -269,8 +272,8 @@ class ETLProcessorResult {
 			]
 		]
 
-		if(element.init){
-			dataMap.init = element.init
+		if(initValue){
+			dataMap.init = initValue
 		}
 		return dataMap
 	}

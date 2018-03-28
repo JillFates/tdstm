@@ -2,7 +2,7 @@ package com.tdsops.etl
 /**
  * ETL find command implementation.
  * <code>
- *     domain Dependency
+ *  domain Dependency
  *  // Try to find the Application using different searches
  * 	find Application 	 by id 				     with assetId into assetId
  * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
@@ -15,6 +15,7 @@ package com.tdsops.etl
 class ETLFindElement {
 
 	ETLProcessor processor
+	Integer rowIndex
 	String warnMessage
 	ETLDomain currentDomain
 	Map<String, ?> currentFind = [:]
@@ -26,8 +27,9 @@ class ETLFindElement {
 	 * @param processor
 	 * @param domain
 	 */
-	ETLFindElement(ETLProcessor processor, ETLDomain domain) {
+	ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex) {
 		this.processor = processor
+		this.rowIndex = rowIndex
 		setCurrentDomain(domain)
 	}
 

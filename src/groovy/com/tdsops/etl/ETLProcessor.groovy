@@ -564,7 +564,7 @@ class ETLProcessor implements RangeChecker {
         }
 
         debugConsole.info("find Domain: $findDomain")
-		currentFindElement = new ETLFindElement(this, findDomain)
+		currentFindElement = new ETLFindElement(this, findDomain, this.currentRowIndex)
 		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
 		return currentFindElement
 	}
