@@ -267,12 +267,14 @@ export class DependencyBatchListComponent {
 	 * On Play action button clicked, start import batch.
 	 * @param item
 	 */
-	private onPlayButton(item: any): void {
+	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadBatchList();
+				if (result.status === ApiResponseModel.API_SUCCESS && result.data.QUEUE) {
+					item.status.code = BatchStatus.QUEUED;
+					item.status.label = 'Queued';
 				} else {
+					this.reloadBatchList();
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
 			},
@@ -353,7 +355,7 @@ export class DependencyBatchListComponent {
 	/**
 	 * Clears out the Batch Status Interval if currently running.
 	 */
-	clearBatchStatusLooper(): void {
+	private clearBatchStatusLooper(): void {
 		if (this.batchStatusLooper) {
 			clearInterval(this.batchStatusLooper);
 		}
