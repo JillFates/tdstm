@@ -117,6 +117,10 @@ export const en_DICTIONARY: Object = {
 			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
 			'UNARCHIVE': 'Unarchive',
+			'ARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to archive this item?',
+			'ARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to archive these items?',
+			'UNARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to unarchive this item?',
+			'UNARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to unarchive these items?'
 		},
 		'DETAIL': {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',

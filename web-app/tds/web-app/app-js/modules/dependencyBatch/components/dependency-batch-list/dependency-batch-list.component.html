@@ -38,14 +38,14 @@
                             </button>
                             <button *ngIf="canBulkArchive() && !viewArchived"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                    (click)="onArchiveBatch()"
+                                    (click)="confirmArchive()"
                                     class="btn btn-default" id="btnBulkArchive" type="button">
                                 <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
                                 {{ 'GLOBAL.ARCHIVE' | translate }}
                             </button>
                             <button *ngIf="canBulkArchive() && viewArchived"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                    (click)="onUnArchiveBatch()"
+                                    (click)="confirmUnarchive()"
                                     class="btn btn-default" id="btnBulkUnArchive" type="button">
                                 <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
                                 {{ 'IMPORT_BATCH.LIST.UNARCHIVE' | translate }}
