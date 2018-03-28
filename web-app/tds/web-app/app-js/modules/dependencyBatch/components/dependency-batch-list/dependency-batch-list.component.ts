@@ -9,14 +9,20 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
-import {Observable} from 'rxjs/Observable';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {
+	DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
+	PROMPT_DELETE_ITEMS_CONFIRMATION
+} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'dependency-batch-list',
 	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-list/dependency-batch-list.component.html',
+	providers: [TranslatePipe]
 })
 export class DependencyBatchListComponent {
 
@@ -25,7 +31,7 @@ export class DependencyBatchListComponent {
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
 		dir: 'desc',
-		field: 'importedDate'
+		field: 'dateCreated'
 	}];
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
@@ -39,9 +45,13 @@ export class DependencyBatchListComponent {
 		private dialogService: UIDialogService,
 		private dependencyBatchService: DependencyBatchService,
 		private permissionService: PermissionService,
-		private notifierService: NotifierService) {
-		this.onLoad();
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
+		private notifierService: NotifierService,
+		private userPreferenceService: PreferenceService) {
+			this.onLoad();
 	}
+
 	/**
 	 * On Page Load.
 	 */
@@ -159,6 +169,21 @@ export class DependencyBatchListComponent {
 			},
 			(err) => this.handleError(err)
 		);
+	}
+
+	/**
+	 * Confirmation to proceed with the delete of the batches.
+	 */
+	private confirmDelete(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(ids.length === 1 ? PROMPT_DELETE_ITEM_CONFIRMATION : PROMPT_DELETE_ITEMS_CONFIRMATION),
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.onDeleteBatch();
+			}
+		}, (reason: any) => console.log('confirm rejected', reason));
 	}
 
 	/**

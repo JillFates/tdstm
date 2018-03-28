@@ -3,8 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.security.spring.CamelHostnameIdentifier
-import com.tdsops.tm.enums.domain.AuthenticationMethod
-import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -54,10 +52,12 @@ class ApiActionService implements ServiceMethods {
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
-		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent
+		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent,
+		(AgentClass.VCENTER.name())		: net.transitionmanager.agent.VMwarevCenterAgent
 	].asImmutable()
+		// TODO : JPM 3/2018 : TM-9903 AWS removed until we roll it back in
+		// (AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 
 	/**
 	 * Get a list of agent names
@@ -80,11 +80,12 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Get an agent details by agent name
-	 * @param agentCode
-	 * @return the method dictionary for a specified agent
+	 * Generates a detailed map of an agent and associated methods with all properties of the methods
+	 * @param id - the Agent code to look up (e.g. AWS)
+	 * @return the method dictionary for the specified agent code
+	 * @throws InvalidParamException when
 	 */
-	Map agentDictionary (String id) {
+	Map agentDictionary (String id) throws InvalidParamException {
 		Map dictionary = [:]
 		List<String> agentIds = []
 		agentClassMap.each { entry ->
@@ -104,16 +105,14 @@ class ApiActionService implements ServiceMethods {
 			for (String key in dictionary.keySet()) {
 				DictionaryItem agentInfo = dictionary[key]
 				if (agentInfo.params) {
-					for (Map paramsMap in agentInfo.params)
+					for (Map paramsMap in agentInfo.params) {
 						if (paramsMap.containsKey('context') && paramsMap.context && paramsMap.context instanceof ContextType) {
 							paramsMap.context = paramsMap.context.name()
 						}
+					}
 				}
 			}
 		}
-
-
-
 		return dictionary
 	}
 
@@ -188,18 +187,21 @@ class ApiActionService implements ServiceMethods {
 			// We only need to implement Task for the moment
 			remoteMethodParams = buildMethodParamsWithContext(action, context)
 
-			// add Camel hostname message identifier
-			remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
+			//
+			// This is disabled for the time being until we reimplement messaging
+			//
+			// // add Camel hostname message identifier
+			// remoteMethodParams << [messageOwner: camelHostnameIdentifier.hostnameIdentifierDigest]
 
-			boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
+			// boolean methodRequiresCallbackMethod = methodDef.params.containsKey('callbackMethod')
 
-			if (methodRequiresCallbackMethod) {
-				if (! action.callbackMethod) {
-					log.warn 'Action is missing required callback: {}', action.toString()
-					throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
-				}
-				remoteMethodParams << [callbackMethod: action.callbackMethod]
-			}
+			// if (methodRequiresCallbackMethod) {
+			// 	if (! action.callbackMethod) {
+			// 		log.warn 'Action is missing required callback: {}', action.toString()
+			// 		throw new InvalidConfigurationException("Action $action missing required callbackMethod name")
+			// 	}
+			// 	remoteMethodParams << [callbackMethod: action.callbackMethod]
+			// }
 
 			if (CallbackMode.MESSAGE == action.callbackMode) {
 				// We're going to perform an Async Message Invocation
@@ -217,32 +219,22 @@ class ApiActionService implements ServiceMethods {
 						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
-						credentials: action.credential?.toMap()
+						credentials: action.credential?.toMap(),
+						apiAction: apiActionToMap(action)
 				]
 
 				// get api action agent instance
 				def agent = agentInstanceForAction(action)
 
 				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
-				// params?
-				// headers?
-
-				// set config data
-	// TODO : JPM 3/2018 : Need to get the parameters and encode correctly - need to talk with Sidar
-	// TODO : JPM 3/2018 : Refactor this code out to a separate function so it can be tested easily
-				String endpointFullUrl = action.endpointUrlWithPlaceholdersSubstituted(remoteMethodParams)
-				String endpointPath = new java.net.URL(endpointFullUrl).getPath()
-				String endpointUrl = endpointFullUrl - endpointPath
-				actionRequest.config.setProperty(Exchange.HTTP_URL, endpointUrl)
-				actionRequest.config.setProperty(Exchange.HTTP_PATH, endpointPath)
 
 				// POC if credential authentication method is COOKIE (vcenter)
-				// TODO use case statement to handle COOKIE, HTTP_SESSION, JWT
-				// TODO use a method in Credential domain to determine if the call requires pre-authentication
+				// TODO : SL 2/2018 : use case statement to handle COOKIE, HTTP_SESSION, JWT
+				// TODO  : SL 2/2018 : use a method in Credential domain to determine if the call requires pre-authentication
 				// if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
 				// 	Map authentication = credentialService.authenticate(action.credential)
 				// 	if (authentication) {
-				// 		// TODO this needs to come from CredentialService according to the authenticationMethod being used
+				// 		// TODO  : SL 2/2018 : this needs to come from CredentialService according to the authenticationMethod being used
 				// 		actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
 				// 		actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
 				// 	}
@@ -261,7 +253,12 @@ class ApiActionService implements ServiceMethods {
 				// execute PRE script if present
 				if (preScript) {
 					try {
-						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
+							new ApiActionResponse(),
+							taskFacade,
+							new AssetFacade(null, null, true),
+							new ApiActionJob()
+						)
 					} catch (ApiActionException preScriptException) {
 						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
@@ -291,6 +288,7 @@ class ApiActionService implements ServiceMethods {
 								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
 							}
 						}
+
 						ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 						return
 					}
@@ -298,13 +296,17 @@ class ApiActionService implements ServiceMethods {
 
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
-				agent."${action.agentMethod}"(actionRequest)
+				try {
+					agent.invoke(action.agentMethod, actionRequest)
+				} finally {
+					// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
+					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+				}
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
 		} else {
-			throw new InvalidRequestException(
-					'invoke() not implemented for class ' + context.getClass().getName() )
+			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
@@ -314,7 +316,9 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	Map invoke (ApiAction action) {
-		assert action != null: 'No action provided.'
+		if (!action) {
+			throw InvalidRequestException('No action was provided to the invoke command')
+		}
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
@@ -322,10 +326,19 @@ class ApiActionService implements ServiceMethods {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
+		// TODO : JPM 3/2018 : TM-9936 Move these vars to new property in ActionRequest
+		remoteMethodParams << [
+			actionId: action.id,
+			producesData: action.producesData,
+			credentials: action.credential?.toMap()
+		]
+
+		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
-		// execute action and return any result coming
-		return agent."${action.agentMethod}"(remoteMethodParams)
+		// execute action and return any result that were returned
+		return agent.invoke(action.agentMethod, actionRequest)
 	}
 
 	/**
@@ -748,5 +761,4 @@ class ApiActionService implements ServiceMethods {
 			throw new InvalidParamException('An ApiAction with the same name already exists')
 		}
 	}
-
 }

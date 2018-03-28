@@ -47,6 +47,28 @@ class ActionRequestSpec extends Specification {
             actionRequest.param.property1 == 'value1'
     }
 
+    def 'test the hasProperty method' () {
+        setup: 'giving an ActionRequest object with parameters being set'
+            Map<String, Object> parameters = ['property1': 'value1']
+            ActionRequest actionRequest = new ActionRequest(parameters)
+        expect:
+            expected == actionRequest.param.hasProperty(propertyName)
+        where:
+            propertyName    | expected
+            'property1'     | true
+            'missing'       | false
+    }
+
+    def 'test getting all parameters' () {
+        setup: 'giving an ActionRequest object with parameters being set'
+            Map<String, Object> parameters = ['property1': 'value1']
+            ActionRequest actionRequest = new ActionRequest(parameters)
+            Map<String, Object> results
+
+        expect: 'calling getAllProperties() returns the map that was set'
+            ['property1': 'value1'] == actionRequest.param.getAllProperties()
+    }
+
     def 'test set header value when action request is not readonly' () {
         setup: 'giving an ActionRequest object'
             ActionRequest actionRequest = new ActionRequest()

@@ -1,5 +1,6 @@
 import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Rx';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
@@ -9,6 +10,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 
+const DEBOUNCE_MILLISECONDS = 800;
 @Component({
 	selector: 'data-script-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-view-edit/data-script-view-edit.component.html',
@@ -92,18 +94,15 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.datasourceName
-			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
-			.distinctUntilChanged()   // ignore if next search term is same as previous
-			.subscribe(term => {
-					if (term && term.trim().length > 0) {
-						this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel).subscribe(
-							(result: any) => {
-								this.isUnique = result.isUnique;
-							},
-							(err) => console.log(err));
-					}
-			});
+		const notEmptyViewName$: Observable<String> = this.datasourceName
+			.debounceTime(DEBOUNCE_MILLISECONDS)
+			.distinctUntilChanged()
+			.filter((name: string) => Boolean(name && name.trim()));
+
+		notEmptyViewName$
+			.flatMap(() => this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel))
+			.subscribe( (isUnique: boolean) => this.isUnique = isUnique,
+				(error: Error) => console.log(error.message));
 	}
 
 	protected onValidateUniqueness(): void {

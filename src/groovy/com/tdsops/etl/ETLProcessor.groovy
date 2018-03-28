@@ -139,6 +139,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor domain (String domain) {
+		result.releaseRowFoundInLookup()
 		selectedDomain = ETLDomain.values().find { it.name() == domain }
 		if (selectedDomain == null) {
 			throw ETLProcessorException.invalidDomain(domain)
@@ -764,7 +765,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
 		result.loadElement(element)
-		debugConsole.info "Adding element ${element} in results for domain ${domain}"
+		debugConsole.info "Adding element ${element.fieldSpec.getName()}='${element.value}' to domain ${domain} results"
 	}
 
 	/**

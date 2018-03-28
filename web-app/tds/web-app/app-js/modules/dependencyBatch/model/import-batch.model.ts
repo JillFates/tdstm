@@ -78,7 +78,7 @@ export class DependencyBatchColumnsModel {
 				label: 'Imported At',
 				property: 'dateCreated',
 				type: 'date',
-				format: '{0:yyyy/MM/dd HH:mm:ss}',
+				format: '{0:d}',
 				width: 200,
 				locked: false
 			},
@@ -125,7 +125,7 @@ export class DependencyBatchColumnsModel {
 				locked: false
 			},
 			{
-				label: 'Errors',
+				label: 'Erred',
 				property: 'errors',
 				type: 'number',
 				width: 80,

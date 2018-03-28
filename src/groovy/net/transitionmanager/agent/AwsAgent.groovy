@@ -20,7 +20,9 @@ class AwsAgent extends AbstractAgent {
 	 */
 	AwsAgent() {
 
-		setInfo(AgentClass.AWS, 'Amazon AWS API')
+		// TODO : JPM 3/2018 : Need to reenable this line once AWS is implemented TM-9903
+		// setInfo(AgentClass.AWS, 'Amazon AWS API')
+
 		setDictionary( [
 			PublishSNS: new DictionaryItem( [
 				agentMethod: 'PublishSNS',
@@ -29,7 +31,7 @@ class AwsAgent extends AbstractAgent {
 				endpointUrl: 'https://sns.{{region}}.amazonaws.com/',
 				docUrl: 'https://docs.aws.amazon.com/sns/latest/api/Welcome.html',
 				method: 'publishSnsNotification',
-				providesData: 0,
+				producesData: 0,
 				results: invokeResults(),
 				params: [
 					[
@@ -52,7 +54,7 @@ class AwsAgent extends AbstractAgent {
 				endpointUrl: 'https://sqs.{{region}}.amazonaws.com/',
 				docUrl: '',
 				method: 'sendSqsMessage',
-				providesData: 0,
+				producesData: 0,
 				results: invokeResults(),
 				params: [
 					[

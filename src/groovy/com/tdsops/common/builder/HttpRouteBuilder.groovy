@@ -8,21 +8,23 @@ import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
+import net.transitionmanager.integration.ActionHttpRequestElements
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import org.apache.camel.Exchange
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.model.RouteDefinition
 import org.apache.http.client.utils.URIBuilder
+import org.springframework.http.HttpMethod
 
 /**
  * This bean is used to create a Camel RouteDefinition used by
- * RestfulProducerService during API Action invocation
+ * HttpProducerService during API Action invocation
  *
  * @see <code>resources.groovy</code> for definition
  */
-class RestfulRouteBuilder extends RouteBuilder {
-    private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
+class HttpRouteBuilder extends RouteBuilder {
+	private static final String ROUTE_ID_PREFIX = 'TM_CAMEL_ROUTE_'
 	private static final HTTP_METHOD = 'HttpMethod'
 	private static final VALID_HTTP_METHODS = /^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)$/
 	private static final CONTENT_TYPE_HEADER = 'Content-Type'
@@ -53,7 +55,8 @@ class RestfulRouteBuilder extends RouteBuilder {
         routeDefinition = routeDefinition.setProperty("API_ACTION_ID", constant(apiActionId))
         routeDefinition = routeDefinition.setProperty("TASK_ID", constant(taskId))
         routeDefinition = routeDefinition.setProperty("ROUTE_ID", constant(routeId))
-        routeDefinition = routeDefinition.setProperty("API_ACTION_CONTEXT", constant(JsonUtil.toJson(actionRequest.param)))
+		// This is no longer required
+        // routeDefinition = routeDefinition.setProperty("API_ACTION_CONTEXT", constant(JsonUtil.toJson(actionRequest.param)))
 
         routeDefinition = routeDefinition.setBody(constant(null))
 
@@ -106,9 +109,9 @@ class RestfulRouteBuilder extends RouteBuilder {
         StringBuilder restfulEndpoint = new StringBuilder()
 		// TODO <SL> Uncomment when callbackMethod and callbackMode gets implemented
 //        if (payload.callbackMethod) {
-//            restfulEndpoint.append("bean:restfulProducerService?method=").append(payload.callbackMethod)
+//            restfulEndpoint.append("bean:httpProducerService?method=").append(payload.callbackMethod)
 //        } else {
-            restfulEndpoint.append("bean:restfulProducerService?method=reaction")
+            restfulEndpoint.append("bean:httpProducerService?method=reaction")
 //        }
     }
 
@@ -118,15 +121,32 @@ class RestfulRouteBuilder extends RouteBuilder {
      * @return
      */
     private String buildUrl(RouteDefinition routeDefinition, ActionRequest actionRequest) {
-		String endpointUrl = actionRequest.config.getProperty(Exchange.HTTP_URL)
-        URIBuilder builder = new URIBuilder(endpointUrl)
-        builder.setPath(actionRequest.config.getProperty(Exchange.HTTP_PATH))
-        // do not throw HttpOperationFailedException and instead return control to action invocation flow to eval result
+
+        ActionHttpRequestElements httpElements = new ActionHttpRequestElements(actionRequest.param.apiAction.endpointUrl, actionRequest)
+        URIBuilder builder = new URIBuilder( httpElements.baseUrl )
+
+        // Typically all parameters should be added as parameters using the builder.addParameter (see below) however our implementation
+        // is designed to honor API Actions that have query string parameters explicitely defined in the URI. When that occurs the path
+        // will consist of the path and those query string parameters. All other parameters defined in the API Action will loaded below.
+        // Note that the use of POST is regardless of the actual method that the action will use. POST is only used to get just query string
+        // arguments that are explicit in the URI endpoint definition.
+        builder.setPath( httpElements.getUrlPathWithQueryString(HttpMethod.POST))  // (e.g. /rest/server/SERVERNAME?filter=xyz )
+
+        // Add all of the extra parameters there were not any of the explicit query string parameters
+        // TODO : JPM 3/2016 : TM-9936 this list most likely has the other non-parameter variables embedded (e.g. task_id, action_id, etc)
+        // Those parameters should be weeded out in the ActionHttpRequestElements temporarily. See ActionHttpRequestElements.ParamsToIgnored and
+        // update the getExtraParams to strip those out.
+        for (param in httpElements.extraParams) {
+			// TODO : SL 03/2018 : Restore this after TM-9963 Move params else where, gets implemented
+            // builder.addParameter(param.key, param.value)
+        }
+
+        // Add flag to not throw HttpOperationFailedException but instead return control to action invocation flow to eval result
         // see http://camel.apache.org/http4.html#HttpEndpoint Options
         builder.addParameter('throwExceptionOnFailure', 'false')
 
 		// only provides a trust store if endpoint url is secure and credentials are nor for production
-		if (UrlUtil.isSecure(endpointUrl)) {
+		if (UrlUtil.isSecure(builder.toString())) {
 			if (actionRequest.param.credentials && actionRequest.param.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
 				// for more details see CustomHttpClientConfigurer class
 				builder.addParameter('httpClientConfigurer', 'customHttpClientConfigurer')
@@ -158,7 +178,7 @@ class RestfulRouteBuilder extends RouteBuilder {
 					routeDefinition.setHeader('Cookie', constant(authentication.sessionName + '=' + authentication.sessionValue))
 					break
 				default:
-					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in RestfulRouteBuilder")
+					throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in HttpRouteBuilder")
 			}
         }
 

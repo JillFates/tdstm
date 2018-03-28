@@ -1,14 +1,16 @@
 package net.transitionmanager.agent
 
+import net.transitionmanager.integration.ActionRequest
 import com.tdsops.common.grails.ApplicationContextHolder
-import groovy.util.logging.Slf4j
 import net.transitionmanager.service.ServiceNowService
+
+import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 
 /**
  * Methods to interact with ServiceNow fetch/download assets lists
  */
-@Slf4j(value='logger')
+@Slf4j()
 @Singleton(strict=false)
 @CompileStatic
 class ServiceNowAgent extends AbstractAgent {
@@ -16,6 +18,17 @@ class ServiceNowAgent extends AbstractAgent {
 	public ServiceNowService serviceNowService
 
 	private static final List<LinkedHashMap> COMMON_PARAMS = [
+		[
+			paramName: 'HOSTNAME',
+			desc: 'The ServiceNow Hostname of the instance to intract with',
+			type: 'String',
+			context: ContextType.USER_DEF,
+			fieldName: null,
+			value: 'false',
+			required:1,
+			readonly:0,
+			encoded:1
+		],
 		[
 			paramName: 'sysparm_display_value',
 			desc: 'Set to true will return all fields, false returns only the fields in sysparm_fields (option true|false, default false)',
@@ -40,7 +53,7 @@ class ServiceNowAgent extends AbstractAgent {
 		],
 		[
 			paramName: 'sysparm_offset',
-			desc: 'Use this parameter to obtain more records than specified in sysparm_limit',
+			desc: 'Use to obtain more records than specified in sysparm_limit',
 			type: 'Integer',
 			context: ContextType.USER_DEF,
 			fieldName: null,
@@ -73,7 +86,7 @@ class ServiceNowAgent extends AbstractAgent {
 		],
 		[
 			paramName: 'CSV',
-			desc: 'Used to indicate the list format as CSV',
+			desc: 'Indicate the list format as CSV',
 			type: 'String',
 			context: ContextType.USER_DEF,
 			fieldName: null,
@@ -97,10 +110,10 @@ class ServiceNowAgent extends AbstractAgent {
 					agentMethod: 'ApplicationList',
 					name: 'Application List',
 					description: 'Retrieves a list of applications from ServiceNow',
-					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_appl.do',
+					endpointUrl: 'https://{{HOSTNAME}}.service-now.com/cmdb_ci_appl.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -123,10 +136,10 @@ class ServiceNowAgent extends AbstractAgent {
 					name: 'Windows Server List',
 					description: 'Retrieves a list of Windows Servers from ServiceNow',
 					method: 'fetchAssets',
-					endpointUrl: ' https://YOUR-HOST.service-now.com/cmdb_ci_win_server.do',
+					endpointUrl: ' https://{{HOSTNAME}}.service-now.com/cmdb_ci_win_server.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -149,10 +162,10 @@ class ServiceNowAgent extends AbstractAgent {
 					name: 'Linux Server List',
 					description: 'Retrieves a list of Linux Servers from ServiceNow',
 					method: 'fetchAssets',
-					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_linux_server.do',
+					endpointUrl: 'https://{{HOSTNAME}}.service-now.com/cmdb_ci_linux_server.do',
 					docUrl: 'ServiceNow REST API for Tables|https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
-					providesData: 1,
+					producesData: 1,
 					results: invokeResults(),
 					params: [
 						[
@@ -219,12 +232,13 @@ class ServiceNowAgent extends AbstractAgent {
 
 	/**
 	 * Used to fetch/download assets lists from ServiceNow
-	 * @param payload
+	 * @param actionRequest
 	 * @return
 	 */
-	Map fetchAssetList(Object payload) {
-		Map result = serviceNowService.fetchAssetList(payload)
-		log.debug 'Result of fetch assets. {}', result
+	Map fetchAssetList(ActionRequest actionRequest) {
+
+		Map result = serviceNowService.fetchAssetList(actionRequest)
+		log.debug 'fetchAssetList() Result of fetch assets. {}', result
 
 		return result
 	}

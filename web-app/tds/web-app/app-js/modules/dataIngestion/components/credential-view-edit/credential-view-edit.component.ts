@@ -309,4 +309,8 @@ export class CredentialViewEditComponent {
 	private focusForm() {
 		this.credentialsContainer.nativeElement.focus();
 	}
+
+	protected isCheckSyntaxDisabled(): boolean {
+		return this.operationStatusModel.state === CHECK_ACTION.VALID;
+	}
 }
