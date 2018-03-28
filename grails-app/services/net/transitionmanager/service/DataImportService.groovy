@@ -229,7 +229,9 @@ class DataImportService implements ServiceMethods {
 		String transDomainName = LEGACY_DOMAIN_CLASSES[importContext.domainClass]
 
 		// Check if the domain class is valid
-		EavEntityType eavEntityType = EavEntityType.findByDomainName(transDomainName)
+		EavEntityType eavEntityType = EavEntityType.findByDomainName(
+			(transDomainName.equals('Device') ? 'AssetEntity' : transDomainName)
+		)
 
 		// If the asset class is invalid, return null
 		if (! eavEntityType) {
@@ -648,6 +650,9 @@ class DataImportService implements ServiceMethods {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		if (specifiedRecordIds == null) {
+			specifiedRecordIds = []
+		}
 		log.info "processBatch() for batch $batchId of project $project started with ids=$specifiedRecordIds"
 		def stopwatch = new StopWatch()
 		stopwatch.start()
@@ -667,12 +672,14 @@ class DataImportService implements ServiceMethods {
 			List<Long> recordIds = ImportBatchRecord.where {
 				importBatch.id == batch.id
 				status == ImportBatchStatusEnum.PENDING
-				if (specifiedRecordIds) {
+				if (specifiedRecordIds.size() > 0) {
 					id in specifiedRecordIds
 				}
 			}
 			.projections { property('id') }
 			.list(sortBy: 'id')
+
+			log.debug 'processBatch() found {} PENDING rows', recordIds.size()
 
 			// Initialize the context with things that are going to be helpful throughtout the process
 			Map context = initContextForProcessBatch( batch.domainClassName )
@@ -686,7 +693,6 @@ class DataImportService implements ServiceMethods {
 			while (! aborted && recordIds) {
 				List recordSetIds = recordIds.take(setSize)
 				recordIds = recordIds.drop(setSize)
-
 				List records = ImportBatchRecord.where {
 					id in recordSetIds
 				}.list(sortBy: 'id')
@@ -696,7 +702,6 @@ class DataImportService implements ServiceMethods {
 					processBatchRecord(batch, record, context)
 					println "processBatch() record ${record.id} status ${record.status}"
 					rowsProcessed++
-					break
 				}
 
 				aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
@@ -732,6 +737,7 @@ class DataImportService implements ServiceMethods {
 		// Perhaps the above code can be broken out into a separate service call and called subsequent to this method so that the
 		// data would be committed appropriately and the the query will have the correct information.
 
+
 		if (ex) {
 			// Now we send the exception back to the user interface
 			throw ex
@@ -765,6 +771,24 @@ class DataImportService implements ServiceMethods {
 		}
 
 		return error
+	}
+
+	/**
+	 * Used to update the ImportBatch status to COMPLETED if all rows are COMPLETED or IGNORED otherwise
+	 * set the status to PENDING.
+	 * @param batch - the batch that the ImportBatchRecord
+	 */
+	private void updateBatchStatus(ImportBatch batch) {
+		Integer count = ImportBatchRecord.where {
+			importBatch.id == batch.id
+			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
+		}.count()
+		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
+
+		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batch.id, count, status.name()
+
+		batch.status = status
+		batch.save()
 	}
 
 	/**
@@ -840,8 +864,8 @@ class DataImportService implements ServiceMethods {
 				log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
 			}
 			if (! supporting) {
-				primary = createReferenceDomain(project, 'dependent', fieldsInfo, context)
-				log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', supporting
+				supporting = createReferenceDomain(project, 'dependent', fieldsInfo, context)
+				log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
 			// Try finding & updating or creating the dependency with primary and supporting assets that were found
@@ -860,7 +884,7 @@ class DataImportService implements ServiceMethods {
 			if (record.errorCount) {
 				log.debug "processDependencyRecord() Failing due to errors (${record.errorCount})"
 				// Trash the dependency
-				dependency.detach()
+				dependency.discard()
 				dependency = null
 			} else {
 				record.operation = (dependency.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
@@ -1058,6 +1082,7 @@ class DataImportService implements ServiceMethods {
 	private Integer tallyNumberOfErrors(ImportBatchRecord record, Map fieldsInfo) {
 		Integer count = 0
 		for (field in fieldsInfo) {
+// TODO : JPM 3/2018 : tallyNumberOfErrors logic does not look correct "field.value.errors", shouldn't it be "field.errors"
 			count += (field.value.errors ? field.value.errors.size() : 0 )
 		}
 		count += record.errorListAsList().size()

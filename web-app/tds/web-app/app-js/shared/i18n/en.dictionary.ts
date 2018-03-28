@@ -39,6 +39,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
+		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
 		'PROVIDERS': 'Providers',
 		'CREATE_CREDENTIAL': 'Create Credential',
@@ -92,6 +93,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
+			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
 			'FETCH_WITH_DATA_ACTION': 'Fetch with Data Action:',
 			'FETCH_WITH_FILE_UPLOAD': 'Fetch with File Upload:',
@@ -150,7 +152,9 @@ export const en_DICTIONARY: Object = {
 		'FETCH': 'Fetch',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Confirmation Required',
-			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?'
+			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
+			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		}
 	},
 	'TASK_MANAGER': {

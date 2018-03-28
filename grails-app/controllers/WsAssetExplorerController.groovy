@@ -6,6 +6,7 @@
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.command.DataviewNameValidationCommand
 import net.transitionmanager.command.DataviewUserParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
@@ -267,5 +268,22 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 			renderErrorJson(e.getMessage())
 		}
 
+	}
+
+	/**
+	 * Endpoint to query if a given name is unique across project. Along with the
+	 * name to look up, this method also expects:
+	 *
+	 * - dataViewId.
+	 *
+	 * The latter is to contemplate the scenario where the user is editing a DataView and this
+	 * endpoint is invoked. If the name hasn't changed, it would report the name as not unique.
+	 * The parameters are encapsulated inside the DataviewNameValidationCommand.
+	 */
+	@Secured('isAuthenticated()')
+	def validateUniqueName () {
+		DataviewNameValidationCommand cmd = populateCommandObject(DataviewNameValidationCommand)
+		boolean isUnique = dataviewService.validateUniqueName(cmd)
+		renderSuccessJson([isUnique: isUnique])
 	}
 }

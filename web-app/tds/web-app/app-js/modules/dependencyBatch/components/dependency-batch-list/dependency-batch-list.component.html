@@ -3,7 +3,7 @@
 </style>
 
 <!-- Main content -->
-<div class="content body default-list-component dependency-batch-list-component">
+<div class="content body tds-kendo-grid dependency-batch-list-component">
     <section>
         <div>
             <div class="box-body box-with-empty-header">
@@ -23,7 +23,7 @@
                         (sortChange)="dataGridOperationsHelper.sortChange($event)"
                         [selectable]="selectableSettings"
                         [rowSelected]="dataGridOperationsHelper.isRowSelected"
-                        (cellClick)="dataGridOperationsHelper.selectCell($event); openBatchDetail($event)">
+                        (cellClick)="openBatchDetail($event)">
 
                         <!-- Toolbar Template -->
                         <ng-template kendoGridToolbarTemplate [position]="'top'">
@@ -32,7 +32,7 @@
                             </label>
                             <button *ngIf="canBulkDelete()"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
-                                    (click)="onDeleteBatch()"
+                                    (click)="confirmDelete()"
                                     class="btn btn-default" id="btnBulkDelete" type="button">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {{ 'GLOBAL.DELETE' | translate }}
                             </button>
@@ -73,14 +73,12 @@
                                 </div>
                             </ng-template>
                             <ng-template kendoGridCellTemplate let-dataItem>
-                                <div class="text-center k-grid-ignore-click" *ngIf="dataItem.status.code !== 'RUNNING'">
-                                    <label style="min-height: 15px;">
-                                        <input type="checkbox"
-                                               [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
-                                               name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
-                                               (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
-                                    </label>
-                                </div>
+                                <label class="selectall-checkbox-column text-center k-grid-ignore-click">
+                                    <input type="checkbox"
+                                           [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
+                                           name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
+                                           (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
+                                </label>
                             </ng-template>
                         </kendo-grid-column>
 
@@ -131,11 +129,9 @@
                             </ng-template>
 
                             <!-- Cell Templates -->
-                            <!-- TODO: fix issue with the date format not working :(
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'date'" let-dataItem>
-                                {{dataItem[column.property] | date: 'yyyy-mm-dd'}}
+                                {{dataItem[column.property] | date: userPreferenceService.getUserTimeZone()}}
                             </ng-template>
-                            -->
                             <!-- Action -->
                             <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
                                 <div class="k-grid-ignore-click" style="cursor: default;">
@@ -164,7 +160,7 @@
                             <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
                                 <div *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED' ; then progressBarTemplate else statusTemplate;"></div>
                                 <ng-template #progressBarTemplate>
-                                    <div class="text-center">{{ dataItem.status.label }}</div>
+                                    <div >{{ dataItem.status.label }}</div>
                                     <div class="progress" style="margin-bottom: 0px;">
                                         <div class="progress-bar" role="progressbar" [style.width.%]="dataItem.currentProgress">
                                             {{dataItem.currentProgress}}%

@@ -1,4 +1,4 @@
-import {ElementRef, Component, OnInit, ViewChild, HostListener} from '@angular/core';
+import {ElementRef, Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ActionType} from '../../model/data-script.model';
@@ -19,6 +19,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 export class ProviderViewEditComponent implements OnInit {
 
 	@ViewChild('providerNameElement', {read: ElementRef}) providerNameElement: ElementRef;
+	@ViewChild('providerContainer') providerContainer: ElementRef;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;
@@ -95,11 +96,15 @@ export class ProviderViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-				if (result) {
-					this.activeDialog.dismiss();
-				}
-			});
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
+					}
+				})
+				.catch((error) => console.log(error));
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -110,6 +115,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 */
 	protected changeToEditProvider(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.focusForm();
 	}
 
 	/**
@@ -133,7 +139,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -149,5 +155,9 @@ export class ProviderViewEditComponent implements OnInit {
 			term = this.providerModel.name.trim();
 		}
 		return term === '';
+	}
+
+	private focusForm() {
+		this.providerContainer.nativeElement.focus();
 	}
 }

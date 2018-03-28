@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
-    <title>Asset Import</title>
+    <title>Import Assets (TM XLS)</title>
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
     <g:javascript src="jquery/ui.progressbar.js"/>
     <g:javascript src="import.export.js"/>
@@ -90,7 +90,7 @@
 
 </head>
 <body>
-<tds:subHeader title="Import Assets" crumbs="['Assets','Import Assets']"/>
+<tds:subHeader title="Import Assets (TM XLS)" crumbs="['Assets','Import Assets (TM XLS)']"/>
 <g:if test="${flash.error}">
     <div class="errors">${flash.error}</div>
 </g:if>

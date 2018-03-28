@@ -147,6 +147,7 @@ class WsImportBatchController implements ControllerMethods {
 				return
 		}
 
+		dataImportService.updateBatchStatus(importBatch)
 		renderSuccessJson( (actionCmd.action.toString()) : affected )
 	}
 

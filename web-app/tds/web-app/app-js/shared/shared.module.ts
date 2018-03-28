@@ -30,6 +30,7 @@ import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.
 import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
 import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
+import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -66,7 +67,8 @@ import { DictionaryService } from './services/dictionary.service';
 		UnauthorizedPageComponent,
 		DynamicComponent,
 		CodeMirrorComponent,
-		CheckActionComponent
+		CheckActionComponent,
+		URLViewerComponent
 	],
 	providers: [
 		AuthService,
@@ -99,7 +101,8 @@ import { DictionaryService } from './services/dictionary.service';
 		FormlyInputHorizontal,
 		DynamicComponent,
 		CodeMirrorComponent,
-		CheckActionComponent
+		CheckActionComponent,
+		URLViewerComponent
 	],
 	entryComponents: [DynamicComponent]
 })

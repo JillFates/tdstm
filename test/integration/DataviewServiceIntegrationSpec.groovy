@@ -66,6 +66,33 @@ class DataviewServiceIntegrationSpec extends IntegrationSpec {
 			e.message ==~ /.*Property name of class net.transitionmanager.domain.Dataview with value \[.+\] must be unique.*/
 	}
 
+	void '4. Test that unique name validation with duplicate name within same project returns false'() {
+		setup:
+			Project project = projectTestHelper.createProject()
+			Person person = personHelper.createPerson()
+			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			JSONObject dataviewJson = createDataview('my dataview name')
+			dataviewService.create(person, project, dataviewJson)
+		when: 'a dataview with same name and project is tested'
+			boolean result = dataviewService.validateUniqueName('my dataview name', null, project)
+		then: 'the validation returns false'
+			result == false
+	}
+
+	void '5. test unique name validation with duplicate name for a different project returns true'() {
+		setup:
+			Project project = projectTestHelper.createProject()
+			Project anotherProject = projectTestHelper.createProject()
+			Person person = personHelper.createPerson()
+			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			JSONObject dataviewJson = createDataview('my dataview name')
+			dataviewService.create(person, project, dataviewJson)
+		when: 'validate if a dataview with same name for a different project can be created'
+			boolean result = dataviewService.validateUniqueName('my dataview name', null, anotherProject)
+		then: 'the validation returns true'
+			result == true
+	}
+
 	private JSONObject createDataview(String name) {
 		Map<String, ?> dataviewMap = [
 		        'name': name == null ? RandomStringUtils.randomAlphabetic(10) : name,

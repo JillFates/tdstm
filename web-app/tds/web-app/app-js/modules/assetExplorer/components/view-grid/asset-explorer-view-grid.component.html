@@ -7,7 +7,7 @@
     }
 </style>
 
-<kendo-grid #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
+<kendo-grid class="tds-kendo-grid without-selectabe-rows" #kendoGridComponent="kendoGrid" [filterable]="true" [sortable]="{ mode:'single' }" [data]="gridData" [skip]="state.skip" [sort]="state.sort"
  [pageSize]="state.take" [resizable]="true" [pageable]="{ pageSizes: maxOptions, info: true}" (dataStateChange)="dataStateChange($event)"
  (columnResize)="onWidthChange($event)" (cellClick)="cellClick($event)" [rowClass]="rowCallbackClass">
 
@@ -44,15 +44,16 @@
 			</div>
 		</ng-template>
 		<ng-template kendoGridCellTemplate let-dataItem>
-			<div class="row">
-				<div class="col-md-12 text-center">
-					<div class="checkbox checkbox-grid">
-						<label style="min-height: 15px;">
-							<input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
-						</label>
-					</div>
-				</div>
-			</div>
+            <label class="selectall-checkbox-column text-center">
+                <input type="checkbox" [(ngModel)]="bulkItems[dataItem.common_id]" (change)="setSelectedItems()" name="checkbox_{{dataItem.common_id}}">
+            </label>
+			<!--<div class="row">-->
+				<!--<div class="col-md-12 text-center">-->
+					<!--<div class="checkbox checkbox-grid">-->
+
+					<!--</div>-->
+				<!--</div>-->
+			<!--</div>-->
 		</ng-template>
 	</kendo-grid-column>
 

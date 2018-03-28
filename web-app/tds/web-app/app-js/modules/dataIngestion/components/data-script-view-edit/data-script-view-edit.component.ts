@@ -1,5 +1,6 @@
-import {Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Rx';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
@@ -9,6 +10,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { DataScriptEtlBuilderComponent } from '../data-script-etl-builder/data-script-etl-builder.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 
+const DEBOUNCE_MILLISECONDS = 800;
 @Component({
 	selector: 'data-script-view-edit',
 	templateUrl: '../tds/web-app/app-js/modules/dataIngestion/components/data-script-view-edit/data-script-view-edit.component.html',
@@ -20,6 +22,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 })
 export class DataScriptViewEditComponent implements OnInit {
 	@ViewChild('dataScriptProvider', { read: DropDownListComponent }) dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptContainer') dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();
 	public modalTitle: string;
@@ -91,19 +94,15 @@ export class DataScriptViewEditComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		const notEmptyViewName$: Observable<String> = this.datasourceName
+			.debounceTime(DEBOUNCE_MILLISECONDS)
+			.distinctUntilChanged()
+			.filter((name: string) => Boolean(name && name.trim()));
 
-		this.datasourceName
-			.debounceTime(800)        // wait 300ms after each keystroke before considering the term
-			.distinctUntilChanged()   // ignore if next search term is same as previous
-			.subscribe(term => {
-					if (term && term.trim().length > 0) {
-						this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel).subscribe(
-							(result: any) => {
-								this.isUnique = result.isUnique;
-							},
-							(err) => console.log(err));
-					}
-			});
+		notEmptyViewName$
+			.flatMap(() => this.dataIngestionService.validateUniquenessDataScriptByName(this.dataScriptModel))
+			.subscribe( (isUnique: boolean) => this.isUnique = isUnique,
+				(error: Error) => console.log(error.message));
 	}
 
 	protected onValidateUniqueness(): void {
@@ -132,6 +131,10 @@ export class DataScriptViewEditComponent implements OnInit {
 		return this.dataSignature !== JSON.stringify(copy);
 	}
 
+	private focusForm() {
+		this.dataScriptContainer.nativeElement.focus();
+	}
+
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
@@ -140,11 +143,15 @@ export class DataScriptViewEditComponent implements OnInit {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
-					if (result) {
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
 						this.activeDialog.dismiss();
+					} else {
+						this.focusForm();
 					}
-				});
+				})
+				.catch((error) => console.log(error));
 		} else {
 			if (this.etlScriptCode.updated) {
 				this.activeDialog.close();
@@ -159,6 +166,7 @@ export class DataScriptViewEditComponent implements OnInit {
 	 */
 	protected changeToEditDataScript(): void {
 		this.modalType = this.actionTypes.EDIT;
+		this.focusForm();
 	}
 
 	/**
@@ -204,7 +212,10 @@ export class DataScriptViewEditComponent implements OnInit {
 	protected onDataScriptDesigner(): void {
 		this.dialogService.extra(DataScriptEtlBuilderComponent,
 			[UIDialogService,
-				{provide: DataScriptModel, useValue: this.dataScriptModel}])
+				{
+					provide: DataScriptModel,
+					useValue: this.dataScriptModel}
+					], false, true)
 			.then((result) => {
 				if (result.updated) {
 					this.etlScriptCode.updated = result.updated;
@@ -212,5 +223,4 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			});
 	}
-
 }
