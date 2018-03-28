@@ -59,13 +59,15 @@ export class ManualImportComponent implements OnInit {
 		this.importResult = null;
 		// this.selectedScriptOption = null;
 		this.importAssetsService.postFetch(this.selectedActionOption).subscribe( (result) => {
-			this.fetchResult = result;
+			this.fetchResult.status = result.status;
 			this.fetchInputUsed = 'action';
 			if (result.status === 'error') {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: result.errors[0]
 				});
+			} else {
+				this.fetchResult.filename = result.data.filename;
 			}
 			this.fetchInProcess = false;
 		} );
