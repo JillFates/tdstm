@@ -104,16 +104,6 @@ export class AssetExplorerIndexComponent {
 	}
 
 	/**
-	 * Show/Hide the Create Button if not in All / Favorites / Recent
-	 * @returns {boolean}
-	 */
-	protected isCreateVisible(): boolean {
-		return this.selectedFolder.type !== this.viewType.ALL &&
-			this.selectedFolder.type !== this.viewType.FAVORITES &&
-			this.selectedFolder.type !== this.viewType.RECENT;
-	}
-
-	/**
 	 * Disable the Create Report if the user does not have the proper permission
 	 * @returns {boolean}
 	 */
