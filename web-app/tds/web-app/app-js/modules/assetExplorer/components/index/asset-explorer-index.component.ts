@@ -57,11 +57,14 @@ export class AssetExplorerIndexComponent {
 
 	protected onCreateReport(): void {
 		if (this.isCreateAvailable()) {
-			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name,
+			const selectedFolderType: ViewType = this.selectedFolder.type;
+			const params: ViewModel = Object.assign(new ViewModel(),
 				{
-					// system: this.selectedFolder.type === this.viewType.SYSTEM_VIEWS,
-					// shared: this.selectedFolder.type === this.viewType.SHARED_VIEWS
+					isSystem: selectedFolderType === this.viewType.SYSTEM_VIEWS,
+					isShared: selectedFolderType === this.viewType.SHARED_VIEWS,
+					isFavorite: selectedFolderType === this.viewType.FAVORITES
 				});
+			this.stateService.go(AssetExplorerStates.REPORT_CREATE.name, params);
 		}
 	}
 
@@ -101,16 +104,6 @@ export class AssetExplorerIndexComponent {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 			});
-	}
-
-	/**
-	 * Show/Hide the Create Button if not in All / Favorites / Recent
-	 * @returns {boolean}
-	 */
-	protected isCreateVisible(): boolean {
-		return this.selectedFolder.type !== this.viewType.ALL &&
-			this.selectedFolder.type !== this.viewType.FAVORITES &&
-			this.selectedFolder.type !== this.viewType.RECENT;
 	}
 
 	/**

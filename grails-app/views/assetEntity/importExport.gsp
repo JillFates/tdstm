@@ -216,7 +216,7 @@
                     <tds:hasPermission permission="${Permission.AssetImport}">
                         <div class="box-footer">
                             <button type="submit" id="run"  class="btn btn-primary">Import Spreadsheet&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
-                            <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></div>
+                            <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Asset Batches: ${dataTransferBatchs}</g:link></div>
                         </div>
                     </tds:hasPermission>
                 </g:form>

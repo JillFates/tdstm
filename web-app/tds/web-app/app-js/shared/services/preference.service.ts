@@ -5,9 +5,12 @@ import { HttpInterceptor } from '../providers/http-interceptor.provider';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {DateUtils} from '../utils/date.utils';
 
 @Injectable()
 export class PreferenceService {
+
+	public static readonly USER_PREFERENCES_DATE_FORMAT = 'CURR_DT_FORMAT';
 
 	private preferenceUrl = '../ws/user/preferences';
 	private preferenceUrlPost = '../ws/user/preference';
@@ -37,4 +40,11 @@ export class PreferenceService {
 		return this.http.post(this.preferenceUrlPost, body, requestOptions);
 	}
 
+	getUserTimeZone(): string {
+		const currentUserDateFormat = this.preferences[PreferenceService.USER_PREFERENCES_DATE_FORMAT];
+		if (currentUserDateFormat) {
+			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
+		}
+		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
+	}
 }

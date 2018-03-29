@@ -19,6 +19,17 @@ class ServiceNowAgent extends AbstractAgent {
 
 	private static final List<LinkedHashMap> COMMON_PARAMS = [
 		[
+			paramName: 'HOSTNAME',
+			desc: 'The ServiceNow Hostname of the instance to intract with',
+			type: 'String',
+			context: ContextType.USER_DEF,
+			fieldName: null,
+			value: 'false',
+			required:1,
+			readonly:0,
+			encoded:1
+		],
+		[
 			paramName: 'sysparm_display_value',
 			desc: 'Set to true will return all fields, false returns only the fields in sysparm_fields (option true|false, default false)',
 			type: 'String',
@@ -42,7 +53,7 @@ class ServiceNowAgent extends AbstractAgent {
 		],
 		[
 			paramName: 'sysparm_offset',
-			desc: 'Use this parameter to obtain more records than specified in sysparm_limit',
+			desc: 'Use to obtain more records than specified in sysparm_limit',
 			type: 'Integer',
 			context: ContextType.USER_DEF,
 			fieldName: null,
@@ -75,7 +86,7 @@ class ServiceNowAgent extends AbstractAgent {
 		],
 		[
 			paramName: 'CSV',
-			desc: 'Used to indicate the list format as CSV',
+			desc: 'Indicate the list format as CSV',
 			type: 'String',
 			context: ContextType.USER_DEF,
 			fieldName: null,
@@ -99,7 +110,7 @@ class ServiceNowAgent extends AbstractAgent {
 					agentMethod: 'ApplicationList',
 					name: 'Application List',
 					description: 'Retrieves a list of applications from ServiceNow',
-					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_appl.do',
+					endpointUrl: 'https://{HOSTNAME}.service-now.com/cmdb_ci_appl.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
 					producesData: 1,
@@ -125,7 +136,7 @@ class ServiceNowAgent extends AbstractAgent {
 					name: 'Windows Server List',
 					description: 'Retrieves a list of Windows Servers from ServiceNow',
 					method: 'fetchAssets',
-					endpointUrl: ' https://YOUR-HOST.service-now.com/cmdb_ci_win_server.do',
+					endpointUrl: ' https://{HOSTNAME}.service-now.com/cmdb_ci_win_server.do',
 					docUrl: 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
 					producesData: 1,
@@ -151,7 +162,7 @@ class ServiceNowAgent extends AbstractAgent {
 					name: 'Linux Server List',
 					description: 'Retrieves a list of Linux Servers from ServiceNow',
 					method: 'fetchAssets',
-					endpointUrl: 'https://YOUR-HOST.service-now.com/cmdb_ci_linux_server.do',
+					endpointUrl: 'https://{HOSTNAME}.service-now.com/cmdb_ci_linux_server.do',
 					docUrl: 'ServiceNow REST API for Tables|https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET',
 					method: 'fetchAssetList',
 					producesData: 1,

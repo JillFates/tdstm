@@ -24,6 +24,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
@@ -32,7 +33,6 @@ import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
-import org.apache.camel.Exchange
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -41,21 +41,25 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 @Transactional
 class ApiActionService implements ServiceMethods {
 	public static final ThreadLocalVariable[] THREAD_LOCAL_VARIABLES = [
-			ThreadLocalVariable.ACTION_REQUEST,
-			ThreadLocalVariable.TASK_FACADE,
-			ThreadLocalVariable.REACTION_SCRIPTS
+			ActionThreadLocalVariable.ACTION_REQUEST,
+			ActionThreadLocalVariable.TASK_FACADE,
+			ActionThreadLocalVariable.ASSET_FACADE,
+			ActionThreadLocalVariable.REACTION_SCRIPTS
 	]
 	CamelHostnameIdentifier camelHostnameIdentifier
 	CredentialService credentialService
 	DataScriptService dataScriptService
 	SecurityService securityService
+	CustomDomainService customDomainService
 
 	// This is a map of the AgentClass enums to the Agent classes (see agentClassForAction)
 	private static Map agentClassMap = [
-		(AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 		(AgentClass.SERVICE_NOW.name()) : net.transitionmanager.agent.ServiceNowAgent,
-		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent
+		(AgentClass.HTTP.name())		: net.transitionmanager.agent.HttpAgent,
+		(AgentClass.VCENTER.name())		: net.transitionmanager.agent.VMwarevCenterAgent
 	].asImmutable()
+		// TODO : JPM 3/2018 : TM-9903 AWS removed until we roll it back in
+		// (AgentClass.AWS.name())      	: net.transitionmanager.agent.AwsAgent,
 
 	/**
 	 * Get a list of agent names
@@ -242,16 +246,32 @@ class ApiActionService implements ServiceMethods {
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
 				String preScript = reactionScripts[ReactionScriptCode.PRE.name()]
 
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.ACTION_REQUEST, actionRequest)
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, reactionScripts)
 
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
-				ThreadLocalUtil.setThreadVariable(ThreadLocalVariable.TASK_FACADE, taskFacade)
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
+
+				// setup asset facade if task has an asset associated
+				AssetFacade assetFacade
+				if (context.assetEntity) {
+					AssetEntity assetEntity = context.assetEntity
+					Map<String, ?> fieldSettings = customDomainService.allFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
+					assetFacade = new AssetFacade(context.assetEntity, fieldSettings, true)
+				} else {
+					assetFacade = new AssetFacade(null, null, true)
+				}
+				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ASSET_FACADE, assetFacade)
 
 				// execute PRE script if present
 				if (preScript) {
 					try {
-						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+						invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
+							new ApiActionResponse(),
+							taskFacade,
+							new AssetFacade(null, null, true),
+							new ApiActionJob()
+						)
 					} catch (ApiActionException preScriptException) {
 						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
 						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
@@ -260,23 +280,27 @@ class ApiActionService implements ServiceMethods {
 
 						// execute ERROR or DEFAULT scripts if present
 						if (errorScript) {
+							assetFacade.setReadonly(false)
 							try {
-								invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+								invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
 							} catch (ApiActionException errorScriptException) {
 								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
 							}
+							assetFacade.setReadonly(true)
 						} else if (defaultScript) {
+							assetFacade.setReadonly(false)
 							try {
-								invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+								invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
 							} catch (ApiActionException defaultScriptException) {
 								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
 							}
+							assetFacade.setReadonly(true)
 						}
 
 						// finalize PRE branch when it failed
 						if (finalizeScript) {
 							try {
-								invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, new AssetFacade(null, null, true), new ApiActionJob())
+								invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
 							} catch (ApiActionException finalizeScriptException) {
 								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
 							}
@@ -290,16 +314,16 @@ class ApiActionService implements ServiceMethods {
 				// Lets try to invoke the method if nothing came up with the PRE script execution
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
-					agent."${action.agentMethod}"(actionRequest)
+					agent.invoke(action.agentMethod, actionRequest)
 				} finally {
+					// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 				}
 			} else {
 				throw new InvalidRequestException('Synchronous invocation not supported')
 			}
 		} else {
-			throw new InvalidRequestException(
-					'invoke() not implemented for class ' + context.getClass().getName() )
+			throw new InvalidRequestException('invoke() not implemented for class ' + context.getClass().getName() )
 		}
 	}
 
@@ -309,7 +333,9 @@ class ApiActionService implements ServiceMethods {
 	 * @return
 	 */
 	Map invoke (ApiAction action) {
-		assert action != null: 'No action provided'
+		if (!action) {
+			throw InvalidRequestException('No action was provided to the invoke command')
+		}
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
@@ -328,7 +354,7 @@ class ApiActionService implements ServiceMethods {
 
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
-		// execute action and return any result coming
+		// execute action and return any result that were returned
 		return agent.invoke(action.agentMethod, actionRequest)
 	}
 

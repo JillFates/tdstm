@@ -318,16 +318,7 @@ class StringUtilTests extends Specification {
 			result == StringUtil.md5Hex(value)
 		where:
 			value			| result
-			'Some text'		| '9db5682a4d778ca2cb79580bdb67083f'
-			''				| 'd41d8cd98f00b204e9800998ecf8427e'
-	}
-
-	void 'Test the md5hex method'() {
-		expect:
-			result == StringUtil.md5Hex(value)
-		where:
-			value			| result
-			'Some text'		| '9db5682a4d778ca2cb79580bdb67083f'
+			'Some text'	| '9db5682a4d778ca2cb79580bdb67083f'
 			''				| 'd41d8cd98f00b204e9800998ecf8427e'
 	}
 
@@ -336,7 +327,7 @@ class StringUtilTests extends Specification {
 			Set set
 
 		when: 'called with multiple placeholders'
-			set = StringUtil.extractPlaceholders('My favorite color is {{COLOR}} and my favorite icecream is {{ FLAVOR }}. What is yours?')
+			set = StringUtil.extractPlaceholders('My favorite color is {COLOR} and my favorite icecream is { FLAVOR }. What is yours?')
 		then: 'results should have to values'
 			2 == set.size()
 		and: 'it contains the expected value color'
@@ -345,7 +336,7 @@ class StringUtilTests extends Specification {
 			set.contains('FLAVOR')
 
 		when: 'called with repeated placeholders'
-			set = StringUtil.extractPlaceholders('My favorite beer is {{BEER}}. Do you like {{BEER}}?')
+			set = StringUtil.extractPlaceholders('My favorite beer is {BEER}. Do you like {BEER}?')
 		then: 'the results should only have one'
 			1 == set.size()
 		and: 'contain the expected value'
@@ -357,15 +348,15 @@ class StringUtilTests extends Specification {
 			result == StringUtil.replacePlaceholders(text, map)
 
 		where:
-			text							| map					| result
-			'Color {{ COLOR }}'				| [COLOR:'red']			| 'Color red'
-			'Letters {{1}}, {{2}}, {{1}}'	| ['1':'A', '2': 'Z']	| 'Letters A, Z, A'
-			'{{first.name}}'				| ['first.name': 'Tom']	| 'Tom'
+			text							| map					      | result
+			'Color { COLOR }'			| [COLOR:'red']			| 'Color red'
+			'Letters {1}, {2}, {1}'	| ['1':'A', '2': 'Z']	| 'Letters A, Z, A'
+			'{first.name}'				| ['first.name': 'Tom']	| 'Tom'
 	}
 
 	void 'Test replacePlaceholders method for bad cases'() {
 		given:
-			String message = 'Expecting {{KEY}} and {{VALUE}} in map'
+			String message = 'Expecting {KEY} and {VALUE} in map'
 		when: 'called with a single missing parameter in map'
 			StringUtil.replacePlaceholders(message, [KEY:'lowercase', value:'is wrong'])
 		then: 'an exception is thrown'
@@ -394,9 +385,9 @@ class StringUtilTests extends Specification {
 			expected == StringUtil.containsPlaceholders(text)
 		where:
 			text		| expected
-			'abcdefg'	| false
+			'abcdefg'| false
 			''			| false
-			'a{{b}}c'	| true
+			'a{b}c'	| true
 			null		| false
 	}
 

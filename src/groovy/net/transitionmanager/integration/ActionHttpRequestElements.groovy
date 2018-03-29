@@ -4,7 +4,6 @@ import org.springframework.http.HttpMethod
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.integration.ActionRequest
 
 
 /**
@@ -72,6 +71,7 @@ class ActionHttpRequestElements {
 	 * @param method - the indentended Http Method that this querystring will be used with
 	 * @return the appropriate parameters and values URL encoded
 	 */
+	// TODO : JPM 3/2018 : queryStringMap is returning String instead of Map - Need to solve
 	String queryStringMap(HttpMethod method) {
 		return UrlUtil.queryStringToMap(queryString, method)
 	}
@@ -81,6 +81,7 @@ class ActionHttpRequestElements {
 	 * purposes not be encoded.
 	 * @return the map of all query string params
 	 */
+	// TODO : JPM 3/2018 : queryStringMap is returning String instead of Map - Need to solve
 	String queryStringMap() {
 		return queryStringMap(HttpMethod.GET)
 	}
@@ -140,6 +141,17 @@ class ActionHttpRequestElements {
 	Map getQueryParams() { return queryParams }
 
 	/**
+	 * Used to get the path and potentially part of the query string if the ApiAction endpoint uri had
+	 * any explicit parameters specified.
+	 * @param method - if defined with GET then all parameters will be included otherwise only query string params explicitely
+	 * @return the path and possibly the query string
+	 */
+	String getUrlPathWithQueryString(HttpMethod method) {
+		String qs = queryString(method)
+		return urlPath + (qs ? '?' + qs : '')
+	}
+
+	/**
 	 * Used to retrieve the query string as a set of name value parameters as a Map and optionally
 	 * decoding the values.
 	 * @param decodeValue - a flag if the value should be decoded in the results (default true)
@@ -169,6 +181,7 @@ class ActionHttpRequestElements {
 			throw new InvalidParamException('Action endpoint URL has extraneous \'?\' character')
 		}
 		// Get the unique list of the placeholders
+		// TODO : SL 03/2018 : Move methods from StringUtil to UrlUtil since this is URL stuff related
 		Set<String> placeholderNames = StringUtil.extractPlaceholders(urlParts[0])
 		Set<String> queryPlaceholderNames = (urlParts.size() > 1 ? StringUtil.extractPlaceholders(urlParts[1]) : null)
 		placeholderNames += queryPlaceholderNames
@@ -179,7 +192,8 @@ class ActionHttpRequestElements {
 			// Grab the values for the placeholders and encode them
 			for (String name in placeholderNames) {
 				if (actionRequest.param.hasProperty(name)) {
-					uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
+					//uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
+					uriParamValues.put(name, actionRequest.param.getProperty(name))
 				}
 			}
 

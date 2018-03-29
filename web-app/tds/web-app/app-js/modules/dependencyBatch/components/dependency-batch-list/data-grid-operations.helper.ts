@@ -72,7 +72,7 @@ export class DataGridOperationsHelper {
 			if (!filter) {
 				root.filters.push({
 					field: column.property,
-					operator: 'gte',
+					operator: 'eq',
 					value: column.filter
 				});
 			} else {

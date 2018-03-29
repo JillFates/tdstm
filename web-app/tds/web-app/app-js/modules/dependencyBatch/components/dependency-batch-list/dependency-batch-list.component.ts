@@ -9,14 +9,20 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependencyBatchDetailDialogComponent} from '../dependency-batch-detail-dialog/dependency-batch-detail-dialog.component';
-import {Observable} from 'rxjs/Observable';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
+import {
+	DIALOG_SIZE, PROMPT_DEFAULT_TITLE_KEY, PROMPT_DELETE_ITEM_CONFIRMATION,
+	PROMPT_DELETE_ITEMS_CONFIRMATION
+} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'dependency-batch-list',
 	templateUrl: '../tds/web-app/app-js/modules/dependencyBatch/components/dependency-batch-list/dependency-batch-list.component.html',
+	providers: [TranslatePipe]
 })
 export class DependencyBatchListComponent {
 
@@ -25,7 +31,7 @@ export class DependencyBatchListComponent {
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	private initialSort: any = [{
 		dir: 'desc',
-		field: 'importedDate'
+		field: 'dateCreated'
 	}];
 	private checkboxSelectionConfig = {
 		useColumn: 'id'
@@ -34,14 +40,22 @@ export class DependencyBatchListComponent {
 	private batchStatusLooper: any;
 	private readonly PROGRESS_MAX_TRIES = 10;
 	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
+	private readonly ARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEM_CONFIRMATION';
+	private readonly ARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEMS_CONFIRMATION';
+	private readonly UNARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEM_CONFIRMATION';
+	private readonly UNARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEMS_CONFIRMATION';
 
 	constructor(
 		private dialogService: UIDialogService,
 		private dependencyBatchService: DependencyBatchService,
 		private permissionService: PermissionService,
-		private notifierService: NotifierService) {
-		this.onLoad();
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
+		private notifierService: NotifierService,
+		private userPreferenceService: PreferenceService) {
+			this.onLoad();
 	}
+
 	/**
 	 * On Page Load.
 	 */
@@ -130,6 +144,21 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
+	 * Confirmation to proceed with the archive of the batches.
+	 */
+	private confirmArchive(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(ids.length === 1 ? this.ARCHIVE_ITEM_CONFIRMATION : this.ARCHIVE_ITEMS_CONFIRMATION),
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.onArchiveBatch();
+			}
+		}, (reason: any) => console.log('confirm rejected', reason));
+	}
+
+	/**
 	 * On Archive batch button click.
 	 */
 	private onArchiveBatch(): void {
@@ -146,9 +175,24 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
+	 * Confirmation to proceed with the archive of the batches.
+	 */
+	private confirmUnarchive(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(ids.length === 1 ? this.UNARCHIVE_ITEM_CONFIRMATION : this.UNARCHIVE_ITEMS_CONFIRMATION),
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.onUnarchiveBatch();
+			}
+		}, (reason: any) => console.log('confirm rejected', reason));
+	}
+
+	/**
 	 * On UnArchive batch button click.
 	 */
-	private onUnArchiveBatch(): void {
+	private onUnarchiveBatch(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItemsAsNumbers();
 		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
@@ -159,6 +203,21 @@ export class DependencyBatchListComponent {
 			},
 			(err) => this.handleError(err)
 		);
+	}
+
+	/**
+	 * Confirmation to proceed with the delete of the batches.
+	 */
+	private confirmDelete(): void {
+		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(ids.length === 1 ? PROMPT_DELETE_ITEM_CONFIRMATION : PROMPT_DELETE_ITEMS_CONFIRMATION),
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.onDeleteBatch();
+			}
+		}, (reason: any) => console.log('confirm rejected', reason));
 	}
 
 	/**
@@ -208,12 +267,14 @@ export class DependencyBatchListComponent {
 	 * On Play action button clicked, start import batch.
 	 * @param item
 	 */
-	private onPlayButton(item: any): void {
+	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadBatchList();
+				if (result.status === ApiResponseModel.API_SUCCESS && result.data.QUEUE) {
+					item.status.code = BatchStatus.QUEUED;
+					item.status.label = 'Queued';
 				} else {
+					this.reloadBatchList();
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
 			},
@@ -294,7 +355,7 @@ export class DependencyBatchListComponent {
 	/**
 	 * Clears out the Batch Status Interval if currently running.
 	 */
-	clearBatchStatusLooper(): void {
+	private clearBatchStatusLooper(): void {
 		if (this.batchStatusLooper) {
 			clearInterval(this.batchStatusLooper);
 		}

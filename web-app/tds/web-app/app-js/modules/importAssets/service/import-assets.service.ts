@@ -29,7 +29,7 @@ export class ImportAssetsService {
 	 * @returns {Observable<any>} This will return status and the filename.
 	 */
 	public postFetch(action: any): Observable<any> {
-		let url = this.importEndpointURL + 'invokeFetchAction?actionId=' + action.id;
+		let url = this.importEndpointURL + 'invokeFetchAction/' + action.id;
 		return this.http.post(url, null)
 			.map((res: Response) => {
 				return res.json();
