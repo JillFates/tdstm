@@ -119,10 +119,10 @@ var EntityCrud = (function ($) {
 		var rmCtrl = $('#roomSelect' + sourceTarget);
 		var roomId = pub.selectOptionSelected(rmCtrl);
 		if (roomId == -1) {
-			var type = ((sourceTarget == 'S') ? '#source' : '#target');
-			var location = $(type + 'LocationId').val();
-			var room = $(type + 'RoomId').val();
-			var rack = $(type + 'RackId').val();
+			var type = ((sourceTarget == 'S') ? 'Source' : 'Target');
+			var location = $('#location' + type + 'Id' ).val();
+			var room = $('#room' + type + 'Id').val();
+			var rack = $('#rack' + type + 'Id').val();
 			if (tds.utils.stringUtils.empty(location) ||
 				tds.utils.stringUtils.empty(room) ) {
 				alert("Location and Room Name must be defined for 'Add Room'")
@@ -131,8 +131,8 @@ var EntityCrud = (function ($) {
 		} else {
 			var rackId = $('#' + ((sourceTarget == 'S') ? 'rackSourceId' : 'rackTargetId')).val();
 			if (rackId == -1) {
-				var type = ((sourceTarget == 'S') ? '#source' : '#target');
-				var rack = $(type + 'RackId').val();
+				var type = ((sourceTarget == 'S') ? 'Source' : 'Target');
+				var rack = $('#rack' + type + 'Id').val();
 				if (tds.utils.stringUtils.empty(rack)) {
 					alert("Rack name must be defined for 'Add Rack'")
 					ok = false;

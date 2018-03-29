@@ -23,7 +23,6 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.tm.search.FieldSearchData
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
@@ -2317,10 +2316,10 @@ class AssetEntityService implements ServiceMethods {
 		model.manufacturer = filters?.manufacturer ?:''
 		model.prefType = prefType
 		model.serialNumber = filters?.serialNumberFilter ?:''
-		model.sourceLocation = filters?.sourceLocationFilter ?:''
-		model.sourceRack = filters?.sourceRackFilter ?:''
-		model.targetLocation = filters?.targetLocationFilter ?:''
-		model.targetRack = filters?.targetRackFilter ?:''
+		model.sourceLocation = filters?.locationSourceFilter ?:''
+		model.sourceRack = filters?.rackSourceFilter ?:''
+		model.targetLocation = filters?.locationTargetFilter ?:''
+		model.targetRack = filters?.rackTargetFilter ?:''
 		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
 		model.type = params.type
 

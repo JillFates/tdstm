@@ -20,10 +20,10 @@
 	<input type="hidden" id="asset_moveBundle" 		name="moveBundleFilter" value="" />
 	<input type="hidden" id="asset_planStatus" 		name="planStatusFilter" value="" />
 	<input type="hidden" id="asset_serialNumber" 	name="serialNumberFilter" value="" />
-	<input type="hidden" id="asset_sourceLocation" 	name="sourceLocationFilter" value="" />
-	<input type="hidden" id="asset_sourceRack" 		name="sourceRackFilter" value="" />
-	<input type="hidden" id="asset_targetLocation" 	name="targetLocationFilter" value="" />
-	<input type="hidden" id="asset_targetRack" 		name="targetRackFilter" value="" />
+	<input type="hidden" id="asset_locationSource" 	name="locationSourceFilter" value="" />
+	<input type="hidden" id="asset_rackSource" 		name="rackSourceFilter" value="" />
+	<input type="hidden" id="asset_locationTarget" 	name="locationTargetFilter" value="" />
+	<input type="hidden" id="asset_rackTarget" 		name="trackTargetFilter" value="" />
 
 	<%-- Flow control parameters --%>
 	<input type="hidden" id="dstPath" 				name="dstPath" value ="${redirectTo}"/>
@@ -133,58 +133,58 @@
 										/>
 							</tds:tooltipSpan>
 							</td>
-							<td class="label {standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
-								<label for="sourceLocationId">Location/Room</label>
+							<td class="label {standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
+								<label for="locationSourceId">Location/Room</label>
 							</td>
-							<td class="${standardFieldSpecs.sourceLocation.imp?:''}" style="vertical-align: text-top;" data-for="sourceLocationId">
-									<tds:tooltipSpan class="useRoomS" field="${standardFieldSpecs.sourceLocation}">
+							<td class="${standardFieldSpecs.locationSource.imp?:''}" style="vertical-align: text-top;" data-for="locationSourceId">
+									<tds:tooltipSpan class="useRoomS" field="${standardFieldSpecs.locationSource}">
 										<g:select id="roomSelectS"  name="roomSourceId"
 												  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
 												  noSelection="${[0:'Please select...']}"
-												  class="${standardFieldSpecs.sourceLocation.imp?:''} assetSelect roomSelectS"
+												  class="${standardFieldSpecs.locationSource.imp?:''} assetSelect roomSelectS"
 												  onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"
 												  tabindex="300"
 												/>
 									</tds:tooltipSpan>
 								<%-- Theses fields are used to allow user to create a source room on the fly --%>
-									<span class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.sourceLocation.tip?: standardFieldSpecs.sourceLocation.label}">
-										<input type="text" id="sourceLocationId" name="sourceLocation" value=""
+									<span class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationSource.tip?: standardFieldSpecs.locationSource.label}">
+										<input type="text" id="locationSourceId" name="locationSource" value=""
 											   placeholder="Location"
-											   class="${standardFieldSpecs.sourceLocation.imp?:''}"
+											   class="${standardFieldSpecs.locationSource.imp?:''}"
 											   size=10
 											   tabindex="301"
 												/>
-										<input type="text" id="sourceRoomId" name="sourceRoom" value=""
+										<input type="text" id="roomSourceId" name="roomSource" value=""
 											   placeholder="Room Name"
-											   class="${standardFieldSpecs.sourceRoom.imp?:''}"
+											   class="${standardFieldSpecs.roomSource.imp?:''}"
 											   size=10
 											   tabindex="302"
 												/>
 									</span>
 							</td>
-							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.sourceLocation.imp?:''}" data-for="sourceLocationId">
-									<tds:tooltipSpan class="useRoomT" field="${standardFieldSpecs.targetLocation}">
+							<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.locationSource.imp?:''}" data-for="locationSourceId">
+									<tds:tooltipSpan class="useRoomT" field="${standardFieldSpecs.locationTarget}">
 										<g:select id="roomSelectT" name="roomTargetId"
 												  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
 												  optionKey="id" optionValue="${{it.value}}"
 												  noSelection="${[0:'Please select...']}"
-												  class="${standardFieldSpecs.targetLocation.imp?:''} assetSelect roomSelectT"
+												  class="${standardFieldSpecs.locationTarget.imp?:''} assetSelect roomSelectT"
 												  onchange="EntityCrud.updateOnRoomSelection(this, 'T', 'Edit')"
 												  tabindex="330"
 												/>
 									</tds:tooltipSpan>
 								<%-- Theses fields are used to allow user to create a source room on the fly --%>
-									<span class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.targetLocation.tip?: standardFieldSpecs.targetLocation.label}">
+									<span class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationTarget.tip?: standardFieldSpecs.locationTarget.label}">
 										<br/>
-										<input type="text" id="targetLocationId" name="targetLocation" value=""
+										<input type="text" id="locationTarget" name="locationTarget" value=""
 											   placeholder="Location"
-											   class="${standardFieldSpecs.targetLocation.imp?:''}"
+											   class="${standardFieldSpecs.locationTarget.imp?:''}"
 											   size=10 tabindex="331"
 												/>
-										<input type="text" id="targetRoomId" name="targetRoom" value=""
+										<input type="text" id="roomTargetId" name="roomTarget" value=""
 											   placeholder="Room Name"
-											   class="${standardFieldSpecs.targetRoom.imp?:''}"
+											   class="${standardFieldSpecs.roomTarget.imp?:''}"
 											   size=10 tabindex="332"
 												/>
 									</span>
@@ -238,14 +238,14 @@
 								</tds:tooltipSpan>
 							</td>
 							<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" data-for="sourceRackId">
-								<tds:tooltipSpan class="useRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRack}">
-									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.targetRack.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+								<tds:tooltipSpan class="useRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.rackTarget}">
+									<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.rackTarget.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 																				   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
 								</tds:tooltipSpan>
-								<tds:tooltipSpan class="newRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRack}">
-									<input type="text" id="targetRackId" name="targetRack" value=""
+								<tds:tooltipSpan class="newRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.rackTarget}">
+									<input type="text" id="rackTargetId" name="rackTarget" value=""
 										   placeholder="New rack name"
-										   class="${standardFieldSpecs.targetRack.imp?:''}"
+										   class="${standardFieldSpecs.rackTarget.imp?:''}"
 										   xstyle="display:none"
 										   size=20 tabindex="341" />
 									<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
