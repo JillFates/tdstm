@@ -80,6 +80,11 @@ class ETLProcessor implements RangeChecker {
 	 * A debug output assignable in the ETLProcessor creation
 	 */
 	DebugConsole debugConsole
+	/**
+	 * This boolean value defines if the ETLProcessor instance is in a loop using iterate command
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 */
+	Boolean isIterating = false
 
 	List<Column> columns = []
 	Map<String, Column> columnsMap = [:]
@@ -249,6 +254,7 @@ class ETLProcessor implements RangeChecker {
 
 		currentRowIndex = 1
 		rows.each { def row ->
+			isIterating = true
 			currentColumnIndex = 0
 			result.releaseRowFoundInLookup()
 			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
@@ -262,6 +268,7 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
+		isIterating = false
 		currentRowIndex--
 		return this
 	}
@@ -458,8 +465,12 @@ class ETLProcessor implements RangeChecker {
 	def set(final String variableName) {
 		[
 			with: { value ->
-				Element localVariable = currentRow.addNewElement(ETLValueHelper.stringValueOf(value))
-				addVariableInBinding(variableName, localVariable)
+				String localVariable = ETLValueHelper.stringValueOf(value)
+				if(isIterating){
+					addLocalVariableInBinding(variableName, localVariable)
+				} else {
+					addGlobalVariableInBinding(variableName, localVariable)
+				}
 				localVariable
 			}
 		]
@@ -487,7 +498,7 @@ class ETLProcessor implements RangeChecker {
 		    with: { value ->
 			    String stringValue = ETLValueHelper.stringValueOf(value)
 			    boolean found = result.lookupInReference(fieldName, stringValue)
-			    addVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
 		    }
 		]
 	}
@@ -728,10 +739,20 @@ class ETLProcessor implements RangeChecker {
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
 	 */
-	void addVariableInBinding(String variableName, Object value) {
+	void addLocalVariableInBinding(String variableName, Object value) {
 		binding.addDynamicVariable(variableName, value)
 	}
 
+	/**
+	 * Add a variable within the script as a global variable.
+	 * Tipically this variable is defined ouside a iterate command
+	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @param variableName binding name for a variable value
+	 * @param value an object to be binding in context
+	 */
+	void addGlobalVariableInBinding(String variableName, Object value) {
+		binding.addGlobalVariable(variableName, value)
+	}
 	/**
 	 * Adds a new row in the list of rows
 	 * @param rowIndex

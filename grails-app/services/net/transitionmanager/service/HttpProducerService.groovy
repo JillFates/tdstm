@@ -1,10 +1,9 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.builder.RestfulRouteBuilder
+import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
-import com.tdssrc.grails.ThreadLocalVariable
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.FileCommand
@@ -27,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile
  * Service class to execute Camel routes required by RESTful API Action
  */
 @Slf4j
-class RestfulProducerService {
+class HttpProducerService {
     private static final String DIRECT_RESTFUL_CALL = 'direct:RESTfulCall-'
     private static final String DIRECT_START = 'direct:start'
     private static final String CONTENT_DISPOSITION = 'Content-Disposition'
@@ -36,21 +35,21 @@ class RestfulProducerService {
     @Qualifier("camelContext")
     SpringCamelContext camelContext;
 
-    RestfulRouteBuilder restfulRouteBuilder
+    HttpRouteBuilder httpRouteBuilder
     TaskService taskService
     ApiActionService apiActionService
     FileSystemService fileSystemService
 
     /**
      * Executes a Camel route for the given action request
-     * @see <code>RestfulAgent.executeCall()</code>
+     * @see <code>HttpAgent.executeCall()</code>
      *
      * @param actionRequest - the action request
      */
     void executeCall(ActionRequest actionRequest) {
         try {
             log.debug('RESTful executeCall action request: {}', actionRequest)
-            RouteDefinition routeDefinition = restfulRouteBuilder.getRouteDefinition(actionRequest)
+            RouteDefinition routeDefinition = httpRouteBuilder.getRouteDefinition(actionRequest)
             log.debug('RESTful route defined: {}', routeDefinition)
             camelContext.addRouteDefinition(routeDefinition)
 
@@ -69,17 +68,17 @@ class RestfulProducerService {
      * After a api action Camel route execution, the Camel context comes to this point to
      * explore and process the exchange accordingly
      *
-     * @see <code>RestfulRouteBuilder.buildRESTfulReactionEndpoint()</code> for details
+     * @see <code>HttpRouteBuilder.buildRESTfulReactionEndpoint()</code> for details
      *
      * @param exchange
      */
     void reaction(Exchange exchange) {
 
         // retrieve from ThreadLocal and prepare objects needed to attend the reaction
-        ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.ACTION_REQUEST)
-        TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.TASK_FACADE)
-        JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ThreadLocalVariable.REACTION_SCRIPTS)
-        AssetFacade assetFacade = new AssetFacade(null, null, true)
+        ActionRequest actionRequest = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST)
+        TaskFacade taskFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.TASK_FACADE)
+        JSONObject reactionScripts = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
+        AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ASSET_FACADE)
         ApiActionJob apiActionJob = new ApiActionJob()
 
         InputStream body = exchange.getIn().getBody(InputStream.class)
@@ -135,6 +134,7 @@ class RestfulProducerService {
                 Map<String, ?> statusResult = apiActionService.invokeReactionScript(ReactionScriptCode.STATUS, statusScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                 log.debug('{} script execution result: {}', ReactionScriptCode.STATUS, statusResult.result)
                 if (statusResult.result == ReactionScriptCode.SUCCESS) {
+                    assetFacade.setReadonly(false)
                     try {
                         Map<String, ?> successResult = apiActionService.invokeReactionScript(ReactionScriptCode.SUCCESS, successScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                         log.debug('{} script execution result: {}', ReactionScriptCode.SUCCESS, successResult.result)
@@ -171,7 +171,9 @@ class RestfulProducerService {
                             }
                         }
                     }
+                    assetFacade.setReadonly(true)
                 } else {
+                    assetFacade.setReadonly(false)
                     // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
                     if (errorScript) {
                         try {
@@ -186,22 +188,27 @@ class RestfulProducerService {
                             addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                         }
                     }
+                    assetFacade.setReadonly(true)
                 }
             } catch (ApiActionException statusScriptException) {
                 addTaskScriptInvocationError(taskFacade, ReactionScriptCode.STATUS, statusScriptException)
                 // execute ERROR or DEFAULT scripts if present when STATUS script execution returns ERROR
                 if (errorScript) {
+                    assetFacade.setReadonly(false)
                     try {
                         apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                     } catch (ApiActionException errorScriptException) {
                         addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
                     }
+                    assetFacade.setReadonly(true)
                 } else if (defaultScript) {
+                    assetFacade.setReadonly(false)
                     try {
                         apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                     } catch (ApiActionException defaultScriptException) {
                         addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                     }
+                    assetFacade.setReadonly(true)
                 }
             }
         } else {
@@ -214,11 +221,13 @@ class RestfulProducerService {
                     addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FAILED, failedScriptException)
                 }
             } else if (defaultScript) {
+                assetFacade.setReadonly(false)
                 try {
                     apiActionService.invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, apiActionResponse, taskFacade, assetFacade, apiActionJob)
                 } catch (ApiActionException defaultScriptException) {
                     addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
                 }
+                assetFacade.setReadonly(true)
             }
         }
 

@@ -4,7 +4,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.service.RestfulProducerService
+import net.transitionmanager.service.HttpProducerService
 
 /**
  * Methods to interact with VMware vCenter to interact with the RESTful API provided there.
@@ -14,7 +14,7 @@ import net.transitionmanager.service.RestfulProducerService
 @CompileStatic
 class VMwarevCenterAgent extends AbstractAgent {
 	private static final String DOCUMENTATION_URL = 'https://code.vmware.com/apis/191/vsphere-automation';
-	RestfulProducerService restfulProducerService
+	HttpProducerService httpProducerService
 
 	private static final LinkedHashMap HOSTNAME_PARAM = [
 					paramName: 'HOSTNAME',
@@ -50,7 +50,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getClusterInfo',
 						name: 'List of clusters',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) clusters in vCenter.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/cluster',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/cluster',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -62,7 +62,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getClusterDetailInfo',
 						name: 'Get cluster',
 						description: 'Retrieves information about the cluster corresponding to cluster.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/cluster',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/cluster',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -74,7 +74,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getHostInfo',
 						name: 'List of hosts',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) hosts in vCenter.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/host',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/host',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -86,7 +86,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getNetworkInfo',
 						name: 'List of networks',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) networks in vCenter.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/network',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/network',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -98,7 +98,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getVMsInfo',
 						name: 'List of VMs',
 						description: 'Returns information about at most 1000 visible (subject to permission checks) virtual machines in vCenter.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -110,7 +110,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getVMDetailInfo',
 						name: 'VM detailed info',
 						description: 'Returns information about a virtual machine.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm/{VM}',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -120,7 +120,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getVMPowerStatus',
 						name: 'VM power status',
 						description: 'Returns the power state information of a virtual machine.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm/{VM}/power',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -130,7 +130,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'startVM',
 						name: 'Start VM',
 						description: 'Powers on a powered-off or suspended virtual machine.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power/start',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm/{VM}/power/start',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -140,7 +140,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'stopVM',
 						name: 'Stop VM',
 						description: 'Powers off a powered-on or suspended virtual machine.',
-						endpointUrl: 'https://{{HOSTNAME}}/rest/vcenter/vm/{{VM}}/power/stop',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm/{VM}/power/stop',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
@@ -148,7 +148,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 				])
 		])
 
-		restfulProducerService = (RestfulProducerService) ApplicationContextHolder.getBean('restfulProducerService')
+		httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
 	}
 
 	/**
@@ -157,7 +157,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 	 * @return
 	 */
 	void invokeHttpRequest(ActionRequest actionRequest) {
-		restfulProducerService.executeCall(actionRequest)
+		httpProducerService.executeCall(actionRequest)
 	}
 
 }

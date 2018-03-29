@@ -39,6 +39,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
+		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
 		'PROVIDERS': 'Providers',
 		'CREATE_CREDENTIAL': 'Create Credential',
@@ -100,7 +101,7 @@ export const en_DICTIONARY: Object = {
 			'OR': 'or',
 			'TRANSFORM_WITH_DATA_SCRIPT': 'Transform with DataScript:',
 			'LOAD_TRANSFORMED_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
-			'GOTO_MANAGE_IMPORT_BATCHES': 'Go to Manage Import Batches',
+			'GOTO_MANAGE_ASSET_BATCHES': 'Go to Manage Asset Batches',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',
@@ -116,6 +117,10 @@ export const en_DICTIONARY: Object = {
 			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
 			'UNARCHIVE': 'Unarchive',
+			'ARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to archive this item?',
+			'ARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to archive these items?',
+			'UNARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to unarchive this item?',
+			'UNARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to unarchive these items?'
 		},
 		'DETAIL': {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',

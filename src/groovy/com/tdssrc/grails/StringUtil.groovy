@@ -16,6 +16,7 @@ class StringUtil {
 
 	private static final List<String> trueList = ['y', 'yes', 't', 'true', '1'].asImmutable()
 	private static final List<String> falseList = ['n', 'no', 'f', 'false', '0'].asImmutable()
+	static final String PLACEHOLDER_REGEXP = /\{([^\}]*)\}/
 
 	/**
 	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer
@@ -459,7 +460,7 @@ class StringUtil {
 		}
 
 		StringBuffer sb = new StringBuffer()
-		Matcher m = text =~ /\{\{([^\}]*)\}\}/
+		Matcher m = text =~ PLACEHOLDER_REGEXP
 		Set<String> missing = []
 
 		while (m.find()) {
@@ -492,7 +493,7 @@ class StringUtil {
 		HashSet<String> placeholders = []
 
 		if (text) {
-			Matcher m = text =~ /\{\{([^\}]*)\}\}/
+			Matcher m = text =~ PLACEHOLDER_REGEXP
 
 			while (m.find()) {
 				placeholders << m.group(1).trim()

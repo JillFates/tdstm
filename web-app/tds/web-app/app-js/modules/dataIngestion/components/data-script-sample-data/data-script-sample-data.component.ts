@@ -132,9 +132,10 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 	 */
 	private onFetch(): void {
 		this.importAssetsService.postFetch(this.webService.selected).subscribe( (result) => {
-			if (result.status === 'success' && result.data.filename) {
+			if (result.status === 'success') {
 				this.webService.state = 'success';
 				this.webService.filename = result.data.filename;
+				this.OPTIONS.useFileFrom = this.OPTIONS.SERVICE;
 			} else {
 				this.notifierService.broadcast({
 					name: AlertType.DANGER,
