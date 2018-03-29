@@ -45,20 +45,19 @@ class ETLFindElement {
 	ETLFindElement elseFind(ETLDomain domain) {
 		findings.add(currentFind)
 		setCurrentDomain(domain)
-
-		this
+		return this
 	}
 
 	/**
-	 * Defines the findId for the current find element
-	 * @param findId
+	 * Defines the property for the current find element
+	 * @param property
 	 * @return
 	 */
-	ETLFindElement into(String findId) {
-		validateReference(findId)
-		currentFind.findId = findId
+	ETLFindElement into(String property) {
+		validateReference(property)
+		currentFind.property = property
 		processor.addFindElement(this)
-		this
+		return this
 	}
 
 	/**
@@ -71,7 +70,7 @@ class ETLFindElement {
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
 		}
-		this
+		return this
 	}
 
 	/**
@@ -106,15 +105,19 @@ class ETLFindElement {
 			}
 
 			if(currentFind.objects && !currentFind.objects.isEmpty()){
-				results = [
-					size: currentFind.objects.size(),
-					objects: currentFind.objects,
-					matchOn: findings.size() + 1
-				]
+				if(currentFind.objects.size() == 1){
+					results = [
+						size: currentFind.objects.size(),
+						objects: currentFind.objects,
+						matchOn: findings.size() + 1
+					]
+				} else {
+					currentFind.error = 'Multiple entities found for query'
+				}
 			}
 		}
 
-		this
+		return this
 	}
 
 	/**
@@ -136,7 +139,7 @@ class ETLFindElement {
 	}
 
 	/**
-	 * Checks if the current instance of processor has a project already defiend.
+	 * Checks if the current instance of processor has a project already defined.
 	 * If not It throws an exception
 	 */
 	private void checkProject() {
@@ -145,10 +148,19 @@ class ETLFindElement {
 		}
 	}
 
+	/**
+	 * Appends a warn message in the ETL Processor result.
+	 * <pre>
+	 *   find Application by assetName with primaryName into assetId
+	 *   elseFind Asset by assetName with primaryName into assetId warn 'found with wrong asset class'
+	 * </pre>
+	 * @param message
+	 * @return
+	 */
 	ETLFindElement warn(String message) {
 		this.warnMessage = message
 		this.processor.addFindWarnMessage(this)
-		this
+		return this
 	}
 
 	/**

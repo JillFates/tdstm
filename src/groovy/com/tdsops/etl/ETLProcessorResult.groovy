@@ -72,17 +72,20 @@ class ETLProcessorResult {
 	 */
 	void addFindElement(ETLFindElement findElement) {
 
-		String findId = findElement.currentFind.findId
+		String property = findElement.currentFind.property
 
 		Map<String, ?> data = currentData()
 		data.rowNum = findElement.rowIndex
 
-		if(!data.fields.containsKey(findId)){
-			reference.fields.add(findId)
-			data.fields[findId] = initialFieldDataMap(null, null, null)
+		if(!data.fields.containsKey(property)){
+			reference.fields.add(property)
+			data.fields[property] = initialFieldDataMap(null, null, null)
 		}
 
-		Map<String, ?> find = data.fields[findId].find
+		Map<String, ?> find = data.fields[property].find
+		if(findElement.currentFind.error){
+			data.fields[property].errors = [findElement.currentFind.error]
+		}
 
 		find.query.add(queryDataMap(findElement))
 
@@ -103,12 +106,12 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.objects){
 			Map<String, ?> data = reference.data.last()
-			addWarnMessageDataMap(data.fields[findElement.currentFind.findId], findElement)
+			addWarnMessageDataMap(data.fields[findElement.currentFind.property], findElement)
 		}
 	}
 
 	/**
-	 * Add a FoundElement in the result based on its findId
+	 * Add a FoundElement in the result based on its property
 	 * <pre>
 	 *		whenFound asset create {
 	 *			assetClass Application

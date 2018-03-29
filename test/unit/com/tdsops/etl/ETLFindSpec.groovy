@@ -1040,16 +1040,103 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can find a domain Property and create the target property automatically'() {
+	void 'test can find a domain Property and create the target property automatically with 0 results'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				[]
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						read labels
+						domain Dependency
+						iterate {
+							find Application by id with SOURCE.'application id' into id
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == null
+						warn == false
+						with (find){
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152254'
+								}
+							}
+						}
+					}
+				}
+
+				with(data[1]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == null
+						warn == false
+						with (find){
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152255'
+								}
+							}
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+	void 'test can find a domain Property and create the target property automatically with 1 result'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
 				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.DEVICE, id: 152258l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -1081,7 +1168,8 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						read labels
 						domain Dependency
 						iterate {
-							find Application by id with SOURCE.'application id' into id   
+							find Application by id with SOURCE.'application id' into id   // 
+							// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1091,16 +1179,156 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
 
-				with(data[0].fields.id) {
-					!originalValue
-					!value
-					!init
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == null
+						warn == false
+						with (find){
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152254'
+								}
+							}
+						}
+					}
 				}
 
-				with(data[1].fields.id) {
-					!originalValue
-					!value
-					!init
+				with(data[1]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == null
+						warn == false
+						with (find){
+							size == 1
+							results == [152255]
+							matchOn == 1
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152255'
+								}
+							}
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find a domain Property and create the target property automatically with more than 1 results'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						read labels
+						domain Dependency
+						iterate {
+							find Application by id with SOURCE.'application id' into id   // 
+							// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == null
+						warn == false
+						with (find){
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152254'
+								}
+							}
+						}
+					}
+				}
+
+				with(data[1]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.id) {
+						originalValue == null
+						value == null
+						init == null
+						errors == ['Multiple entities found for query']
+						warn == false
+						with (find){
+							with (query[0]){
+								domain == 'Application'
+								with(kv){
+									id == '152255'
+								}
+							}
+						}
+					}
 				}
 			}
 
