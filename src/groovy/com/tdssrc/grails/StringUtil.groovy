@@ -16,6 +16,7 @@ class StringUtil {
 
 	private static final List<String> trueList = ['y', 'yes', 't', 'true', '1'].asImmutable()
 	private static final List<String> falseList = ['n', 'no', 'f', 'false', '0'].asImmutable()
+	static final String PLACEHOLDER_REGEXP = /\{([^\}]*)\}/
 
 	/**
 	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer
@@ -459,7 +460,7 @@ class StringUtil {
 		}
 
 		StringBuffer sb = new StringBuffer()
-		Matcher m = text =~ /\{\{([^\}]*)\}\}/
+		Matcher m = text =~ PLACEHOLDER_REGEXP
 		Set<String> missing = []
 
 		while (m.find()) {
@@ -485,14 +486,14 @@ class StringUtil {
 
 	/**
 	 * Extract a Set of String mustache like placeholders from another string (avoiding duplicated entries)
-	 * @param value String with the placeholders
+	 * @param text String with the placeholders
 	 * @return Set of placeholders, empty set if null
 	 */
-	static Set<String> extractPlaceholders(String value) {
+	static Set<String> extractPlaceholders(String text) {
 		HashSet<String> placeholders = []
 
-		if (value) {
-			Matcher m = value =~ /\{\{([^\}]*)\}\}/
+		if (text) {
+			Matcher m = text =~ PLACEHOLDER_REGEXP
 
 			while (m.find()) {
 				placeholders << m.group(1).trim()
@@ -500,5 +501,14 @@ class StringUtil {
 		}
 
 		return placeholders
+	}
+
+	/**
+	 * Used to determine if a string contains any placeholders
+	 * @param text - the string to inspect
+	 * @return true if the string contains a placeholder otherwise false
+	 */
+	static Boolean containsPlaceholders(String text) {
+		return extractPlaceholders(text).size() > 0
 	}
 }

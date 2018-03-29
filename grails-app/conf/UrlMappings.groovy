@@ -195,7 +195,7 @@ class UrlMappings {
 
 		/***************************/
 
-		"/ws/assetImport/invokeFetchAction" {
+		"/ws/assetImport/invokeFetchAction/$id" {
 			controller = 'wsAssetImport'
 			action = [POST: 'invokeFetchAction']
 		}
@@ -649,6 +649,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/assetExplorer/validateUnique" {
+			controller = "wsAssetExplorer"
+			action = [
+							POST: "validateUniqueName",
+			]
+		}
+
 		"/ws/dataingestion/datascript/list" {
 			controller = "wsDataScript"
 			action = [
@@ -679,7 +686,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/datascript/validateunique/$name" {
+		"/ws/dataingestion/datascript/validateUnique" {
 			controller = "wsDataScript"
 			action = [
 					POST: "validateUniqueName"
@@ -716,7 +723,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateunique/$name" {
+		"/ws/dataingestion/provider/validateUnique/$name" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"

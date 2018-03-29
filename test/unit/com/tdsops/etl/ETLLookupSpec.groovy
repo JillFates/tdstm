@@ -88,7 +88,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract server load Name set nameVar
 							extract model load model
 							extract dependsOn set dependsOnVar
-							
+
 							lookup unknown with dependsOnVar
 							if ( LOOKUP ) {
 								load custom1 with dependsOnVar
@@ -129,7 +129,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract server load Name set nameVar
 							extract model load model
 							extract dependsOn set dependsOnVar
-							
+
 							lookup assetName with dependsOnVar
 							if ( LOOKUP.found() ) {
 								load custom1 with dependsOnVar
@@ -212,7 +212,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract server load Name set nameVar
 							extract model load model
 							extract dependsOn set dependsOnVar
-							
+
 							lookup assetName with dependsOnVar
 							if ( LOOKUP.notFound() ) {
 								log 'Repeated asset'
@@ -289,7 +289,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract server load Name set nameVar
 							extract model load model
 							extract dependsOn set dependsOnVar
-							
+
 							lookup assetName with dependsOnVar
 							if ( LOOKUP ) {
 								load custom1 with dependsOnVar
@@ -372,7 +372,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							extract server load Name set nameVar
 							extract model load model
 							extract dependsOn set dependsOnVar
-							
+
 							lookup assetName with dependsOnVar
 							if ( !LOOKUP ) {
 								log 'Repeated asset'
@@ -451,45 +451,44 @@ class ETLLookupSpec extends ETLBaseSpec {
 				.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
-					
+
 					read labels
 					iterate {
 						domain Device
-					
+
 							extract Vm load Name
 							def vmName = CE
-						
+
 							extract 'Vm Id' load externalRefId
 							extract 'Vm Uuid' load serialNumber
 							extract 'OS according to the VMware Tools' load os
-						
+
 							// Grab the cluster name to be used in Application and Dependency section
 							extract Cluster set clusterName
-					
+
 						domain Application
 							lookup assetName with clusterName
 							if ( LOOKUP.notFound() ) {
 								load assetName with clusterName
-						
+
 								load id with ''
 								find Application by assetName, appVendor with DOMAIN.assetName, vmWare into id
 								elseFind Application by assetName with DOMAIN.assetName into id warn 'Not sure about this match'
-						
 								whenNotFound id create {
 									assetName clusterName
 									appVendor vmWare
 								}
 							}
-					
+
 						domain Dependency
-					
+
 							/*
 							* Create the dependencies
 							*
 							* Host supports the Cluster
 							* Cluster supports the VM
 							*/
-						
+
 							load asset with vmName
 							find Device by assetName, assetType with vmName, assetTypeVM into asset
 							whenNotFound asset create {
@@ -498,14 +497,14 @@ class ETLLookupSpec extends ETLBaseSpec {
 								manufacturer 'VMWare'
 								model 'VM'
 							}
-						
+
 							load dependent with clusterName
 							find Application by assetName with clusterName into dependent
 							whenNotFound dependent create {
 								assetName clusterName
 								appVendor 'VMWare'
 							}
-						
+
 							load type with 'Hosts'
 							load status with 'Validated'
 							load dataFlowFreq with 'constant'
@@ -531,7 +530,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			with(etlProcessor.result.domains[2]) {
 				domain == ETLDomain.Dependency.name()
 				fields == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
-				data.size() == 2
+				data.size() == 5
 			}
 
 		cleanup:

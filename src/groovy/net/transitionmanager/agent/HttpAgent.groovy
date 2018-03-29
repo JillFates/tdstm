@@ -3,7 +3,7 @@ package net.transitionmanager.agent
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.service.RestfulProducerService
+import net.transitionmanager.service.HttpProducerService
 import groovy.transform.CompileStatic
 
 /**
@@ -14,7 +14,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class HttpAgent extends AbstractAgent {
 
-    RestfulProducerService restfulProducerService
+    HttpProducerService httpProducerService
 
     HttpAgent() {
         setInfo(AgentClass.HTTP, 'HTTP API')
@@ -27,12 +27,12 @@ class HttpAgent extends AbstractAgent {
 				endpointUrl: 'https://SOME-DOMAIN/SOME/PATH',
 				docUrl: '',
 				method: 'invokeHttpRequest',
-				providesData: 0,
+				producesData: 0,
 				params: queueParams()
             ])
         ] )
 
-        restfulProducerService = (RestfulProducerService) ApplicationContextHolder.getBean('restfulProducerService')
+        httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
     }
 
     /**
@@ -41,6 +41,6 @@ class HttpAgent extends AbstractAgent {
      * @return
      */
     void invokeHttpRequest(ActionRequest actionRequest) {
-        restfulProducerService.executeCall(actionRequest)
+        httpProducerService.executeCall(actionRequest)
     }
 }

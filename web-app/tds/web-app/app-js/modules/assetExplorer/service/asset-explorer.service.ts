@@ -16,6 +16,7 @@ export class AssetExplorerService {
 	private assetExplorerUrl = '../ws/assetExplorer';
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
+	private ALL_ASSETS = 'All Assets';
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
@@ -158,6 +159,47 @@ export class AssetExplorerService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	isAllAssets(model: ViewModel): boolean {
+		return model.name === this.ALL_ASSETS;
+	}
+
+	isSaveAvailable(model: ViewModel): boolean {
+		return model && !this.isAllAssets(model) && this.hasSavePermission(model);
+	}
+
+	hasSavePermission(model): boolean {
+		const hasPermission = this.permissionService.hasPermission.bind(this.permissionService);
+		const {AssetExplorerSystemEdit, AssetExplorerEdit, AssetExplorerSystemCreate, AssetExplorerCreate } = Permission;
+
+		if (model.id && model.isSystem) {
+			return hasPermission(AssetExplorerSystemEdit);
+		}
+
+		if (model.id) {
+			return  model.isOwner && hasPermission(AssetExplorerEdit);
+		}
+
+		if (model.isSystem) {
+			return hasPermission(AssetExplorerSystemCreate);
+		}
+
+		return model.isOwner && hasPermission(AssetExplorerCreate);
+	}
+
+	validateUniquenessDataViewByName(dataViewName: string): Observable<boolean> {
+		let postRequest = {
+			name: dataViewName
+		};
+
+		const url = `${this.assetExplorerUrl}/validateUnique`;
+		return this.http.post(url, JSON.stringify(postRequest))
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.isUnique;
 			})
 			.catch((error: any) => error.json());
 	}

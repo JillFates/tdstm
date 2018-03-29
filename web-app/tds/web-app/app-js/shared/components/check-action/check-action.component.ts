@@ -58,19 +58,9 @@ export class CheckActionComponent implements DoCheck {
 	}
 
 	/**
-	 * Determine is buttons should be disabled.
-	 * @returns {boolean}
-	 */
-	private preventClick(): boolean {
-		return this.model.state === CHECK_ACTION.VALID || this.disabled;
-	}
-
-	/**
 	 * Return the event so it can be managed by the Parent
 	 */
 	protected onCheckThumbBindAction(): void {
-		if (!this.preventClick()) {
-			this.onCallback.emit();
-		}
+		this.onCallback.emit();
 	}
 }

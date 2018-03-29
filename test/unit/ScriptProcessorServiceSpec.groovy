@@ -91,7 +91,6 @@ class ScriptProcessorServiceSpec extends Specification {
 			String script = """
                 console on
                 iterate { }
-                
             """.stripIndent()
 
 		when: 'Service executes the script with correct syntax'
@@ -112,7 +111,6 @@ class ScriptProcessorServiceSpec extends Specification {
 			String script = """
                 console on
                 iterate {
-                
             """.stripIndent()
 
 		when: 'Service executes the script with incorrect syntax'

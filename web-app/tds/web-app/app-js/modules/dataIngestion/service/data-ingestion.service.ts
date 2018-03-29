@@ -14,6 +14,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import {HttpResponse} from '@angular/common/http';
 import {StringUtils} from '../../../shared/utils/string.utils';
 import {DOMAIN} from '../../../shared/model/constants';
+import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
@@ -68,7 +69,7 @@ export class DataIngestionService {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
 				dataScriptModels.forEach((r) => {
-					r.agentMethod = {name: r.agentMethod};
+					r.agentMethod = {id: r.agentMethod};
 					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
 					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
 					r.producesData = (r.producesData === 1);
@@ -102,7 +103,7 @@ export class DataIngestionService {
 		return this.http.get(`${this.dataApiActionUrl}/agent`)
 			.map((res: Response) => {
 				let result = res.json();
-				let agentModels = result; // && result.status === 'success' && result.data;
+				let agentModels = result;
 				return agentModels;
 			})
 			.catch((error: any) => error.json());
@@ -204,7 +205,7 @@ export class DataIngestionService {
 				for (let property in result) {
 					if (result.hasOwnProperty(property)) {
 						agentMethodModel.push({
-							id: result[property].name,
+							id: result[property].agentMethod,
 							name: result[property].name,
 							description: result[property].description,
 							endpointUrl: result[property].endpointUrl,
@@ -322,10 +323,14 @@ export class DataIngestionService {
 
 		postRequest['defaultDataScript'] = { id: ((postRequest.producesData === 1 && model.defaultDataScript.id !== 0) ? model.defaultDataScript.id : null) };
 
-		if (parameterList && parameterList.data && parameterList.data.length > 0) {
-			parameterList.data.forEach( (param) => {
-				if (param.property && param.property.field) {
-					param.property = param.property.field;
+		if (parameterList && parameterList.length > 0) {
+			let requestParameterListData = R.clone(parameterList);
+			requestParameterListData.forEach( (param) => {
+				if (param.fieldName && param.fieldName.field) {
+					param.fieldName = param.fieldName.field;
+				}
+				if (param.context && param.context.assetClass) {
+					param.context = param.context.assetClass;
 				}
 				if (param.context === DOMAIN.COMMON) {
 					param.context = 'ASSET';
@@ -333,7 +338,7 @@ export class DataIngestionService {
 				delete param.sourceFieldList;
 				delete param.currentFieldList;
 			});
-			postRequest['methodParams'] = JSON.stringify(parameterList.data);
+			postRequest['methodParams'] = JSON.stringify(requestParameterListData);
 		}
 
 		if (model.credential && model.credential.id && model.credential.id !== 0) {
@@ -373,10 +378,14 @@ export class DataIngestionService {
 			terminateUrl: (model.terminateUrl) ? model.terminateUrl : '',
 			renewTokenUrl: (model.renewTokenUrl) ? model.renewTokenUrl : '',
 			requestMode: (model.requestMode === REQUEST_MODE.BASIC_AUTH) ? 'BASIC_AUTH' : 'FORM_VARS',
-			httpMethod: model.httpMethod.toUpperCase(),
-			sessionName: (model.sessionName) ? model.sessionName  : '',
-			validationExpression: (model.validationExpression) ? model.validationExpression  : '',
+			httpMethod: model.httpMethod.toUpperCase()
 		};
+
+		// Properties only required on this methods.
+		if (model.authMethod === AUTH_METHODS.COOKIE || model.authMethod === AUTH_METHODS.HEADER) {
+			postRequest.sessionName = (model.sessionName) ? model.sessionName  : '';
+			postRequest.validationExpression = (model.validationExpression) ? model.validationExpression  : '';
+		}
 
 		// The UI validates if the Password exists however, on edition is not required unless you want to change it
 		if (model.password && model.password.length > 0 && model.password !== '') {
@@ -402,17 +411,18 @@ export class DataIngestionService {
 		}
 	}
 
-	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<DataScriptModel> {
+	validateUniquenessDataScriptByName(model: DataScriptModel): Observable<boolean> {
 		let postRequest = {
-			providerId: model.provider.id
+			providerId: model.provider.id,
+			name: model.name
 		};
 		if (model.id) {
 			postRequest['dataScriptId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/datascript/validateUnique`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
-				return result && result.status === 'success' && result.data;
+				return result && result.status === 'success' && result.data && result.data.isUnique;
 			})
 			.catch((error: any) => error.json());
 	}
@@ -422,22 +432,7 @@ export class DataIngestionService {
 		if (model.id) {
 			postRequest['providerId'] = model.id;
 		}
-		return this.http.post(`${this.dataIngestionUrl}/provider/validateunique/${model.name}`, JSON.stringify(postRequest))
-			.map((res: Response) => {
-				let result = res.json();
-				return result && result.status === 'success' && result.data;
-			})
-			.catch((error: any) => error.json());
-	}
-
-	validateUniquenessAPIActionByName(model: APIActionModel): Observable<APIActionModel> {
-		let postRequest = {
-			providerId: model.provider.id
-		};
-		if (model.id) {
-			postRequest['dataScriptId'] = model.id;
-		}
-		return this.http.post(`${this.dataIngestionUrl}/datascript/validateunique/${model.name}`, JSON.stringify(postRequest))
+		return this.http.post(`${this.dataIngestionUrl}/provider/validateUnique/${model.name}`, JSON.stringify(postRequest))
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data;
