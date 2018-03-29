@@ -789,7 +789,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					}
 					with(fields.assetName) {
 						value == '152254'
-						originalValue == '152254 '
+						originalValue == '152254'
 					}
 				}
 
