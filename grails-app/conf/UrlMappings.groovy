@@ -195,7 +195,7 @@ class UrlMappings {
 
 		/***************************/
 
-		"/ws/assetImport/invokeFetchAction" {
+		"/ws/assetImport/invokeFetchAction/$id" {
 			controller = 'wsAssetImport'
 			action = [POST: 'invokeFetchAction']
 		}

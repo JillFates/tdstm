@@ -77,27 +77,17 @@ class WsAssetImportController implements ControllerMethods {
 	 * 		filename: <String> the name of the import file if successful
 	 */
 	@HasPermission(Permission.AssetImport)
-	def invokeFetchAction(Long actionId) {
+	def invokeFetchAction(Long id) {
+		ApiAction action = fetchDomain(ApiAction, params)
 
-		Map result = [status:'success', errors:[], filename:'']
-
-		// See if we can find an action to be invoked
-		ApiAction action = ApiAction.read(actionId)
-		if (!action) {
-			sendNotFound("Action $actionId Not Found")
-			return
-		}
-
-		// invoke action and eval the result
+		// Invoke action and eval the result
 		Map actionInvocationResult = apiActionService.invoke(action)
-		if (actionInvocationResult.status == 'error') {
-			result.status = 'error'
-			result.errors << actionInvocationResult.cause
-		} else {
-			result.filename = actionInvocationResult.filename
-		}
 
-		renderAsJson result
+		if (actionInvocationResult.status == 'error') {
+			renderErrorJson(actionInvocationResult.cause)
+		} else {
+			renderSuccessJson( [ filename: actionInvocationResult.filename ] )
+		}
 	}
 
 	/**

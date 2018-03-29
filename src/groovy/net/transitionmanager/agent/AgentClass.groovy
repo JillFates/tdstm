@@ -7,12 +7,12 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 enum AgentClass {
-	AWS,
+	// AWS,
 	HTTP,
-	SERVICE_NOW
+	SERVICE_NOW,
+	VCENTER
 
 	// Other Agents to create
-	// VMWARE_VCENTER
 	// RIVER_MEADOW,
 	// RISK_NETWORKS,
 	// RACIME,
