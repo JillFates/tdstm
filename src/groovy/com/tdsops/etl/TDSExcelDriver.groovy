@@ -41,6 +41,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
 class TDSExcelDriver extends ExcelDriver {
 
 	Workbook workbook
+	Map<String, List<Field>> fieldsMap = [:]
 
 	@Override
 	protected long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
@@ -109,18 +110,23 @@ class TDSExcelDriver extends ExcelDriver {
 	@Override
 	protected List<Field> fields(Dataset dataset) {
 
-		Workbook workbook = getWorkbook(dataset)
-		Integer currentRowIndex = dataset.params.currentRowIndex ?:0
 		dataset.params.listName = dataset.params.listName?:0
 
-		XSSFSheet sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
-		List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
-		List<Field> fields = []
-		cells.each { Cell cell ->
-			fields << new Field(name: cellValue(cell), type: cellType(cell))
+		if(!fieldsMap.containsKey(dataset.params.listName)){
+			Workbook workbook = getWorkbook(dataset)
+			Integer currentRowIndex = dataset.params.currentRowIndex ?:0
+
+			XSSFSheet sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
+			List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
+			List<Field> fields = []
+			cells.each { Cell cell ->
+				fields << new Field(name: cellValue(cell), type: cellType(cell))
+			}
+
+			fieldsMap[dataset.params.listName] = fields
 		}
 
-		return fields
+		return fieldsMap[dataset.params.listName]
 	}
 
 	/**
