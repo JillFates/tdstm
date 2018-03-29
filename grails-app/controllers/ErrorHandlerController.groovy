@@ -137,14 +137,14 @@ class ErrorHandlerController implements ControllerMethods {
 			String message = response.getHeader("errorMessage")
 			ServiceResults.respondWithError(response, message)
 		} else {
-				response.status = 200
-				Map model = fetchModel()
-				// Add current user project
-				model.currProject = securityService.getUserCurrentProject()
-				String msg = model.exceptionMsg ?: 'URL not found'
-				securityService.reportViolation("${msg} while accessing ${model.requestUri}")
-				return model
-			}
+			response.status = 200
+			Map model = fetchModel()
+			// Add current user project
+			model.currProject = securityService.getUserCurrentProject()
+			String msg = model.exceptionMsg ?: 'URL not found'
+			securityService.reportViolation("${msg} while accessing ${model.requestUri}")
+			return model
+		}
 	}
 
 	/**
