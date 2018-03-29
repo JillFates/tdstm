@@ -47,7 +47,7 @@ class ServiceNowService {
 	Map fetchAssetList(ActionRequest actionRequest) {
 		log.debug 'fetchAssetList() Fetching ServiceNow assets: {}', actionRequest
 		Map result
-		Long actionId = (Long) actionRequest.params.getProperty('actionId')
+		Long actionId = (Long) actionRequest.options['actionId']
 		ApiAction action = ApiAction.where { id == actionId }.get()
 		Map map =  downloadAndSaveAssetsFile(action, actionRequest)
 		if (map.error) {
