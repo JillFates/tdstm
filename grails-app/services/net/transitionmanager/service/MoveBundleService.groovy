@@ -274,10 +274,7 @@ class MoveBundleService implements ServiceMethods {
 			adb.dependency_bundle AS dependencyBundle,
 			COUNT(distinct adb.asset_id) AS assetCnt,
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
-			SUM(if(a.plan_status='$AssetEntityPlanStatus.ASSIGNED',1,0)) AS statusAssigned,
-			SUM(if(a.plan_status='$AssetEntityPlanStatus.MOVED',1,0)) AS statusMoved,
-			SUM(if(a.plan_status='$AssetEntityPlanStatus.CONFIRMED',1,0)) AS statusConfirmed,
-			SUM(if(a.plan_status='$AssetEntityPlanStatus.LOCKED',1,0)) AS statusLocked,
+			SUM(if(a.plan_status='$AssetEntityPlanStatus.UNASSIGNED',1,0)) AS statusUnassigned,
 			SUM(if(a.validation<>'BundleReady',1,0)) AS notBundleReady,
 			SUM(if(a.asset_class = '$AssetClass.DEVICE'
 				AND if(m.model_id > -1, m.asset_type in ($physicalTypes), a.asset_type in ($physicalTypes)), 1, 0)) AS serverCount,
@@ -342,23 +339,19 @@ class MoveBundleService implements ServiceMethods {
 					  vmCount: 0,
 					  dbCount: 0,
 					  storageCount: 0,
-					  statusAssigned: 0,
-					  statusMoved: 0,
-					  statusConfirmed: 0,
-					  statusLocked: 0
+					  statusUnassigned: 0
 			])
 		}
 
 		dependList.each { group ->
-			def depGroupsDone = group.statusAssigned + group.statusMoved + group.statusConfirmed + group.statusLocked
 			String statusClass = ''
 			if ( group.moveBundles?.contains(',') || group.needsReview > 0 ) {
 				// Assets in multiple bundles or dependency status unknown or questioned
 				statusClass = 'depGroupConflict'
-			} else if ( group.notBundleReady == 0  && depGroupsDone != group.assetCnt) {
+			} else if ( group.notBundleReady == 0  && group.statusUnassigned == group.assetCnt ) {
 				// If all assets are BundleReady and not fully assigned
 				statusClass = 'depGroupReady'
-			} else if ( depGroupsDone == group.assetCnt ) {
+			} else if ( group.statusUnassigned == 0 ) {
 				// Assets assigned + moved total the number of assets in the group so the group is done
 				statusClass = 'depGroupDone'
 			}
