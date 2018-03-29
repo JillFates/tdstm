@@ -7,17 +7,11 @@ class MyViewsModule extends Module {
     static at = {
         createViewButton.text().trim() =="Create"
     }
-
     static content = {
         viewsContainer       { $( "div", class:"content body")}
-        //createViewButton    {viewsContainer.find("button", text:"Create View")}
-        createViewButton    {viewsContainer.find("button", text:"Create View")}
-
+        createViewButton    {viewsContainer.find("button", text:containsWord("Create"))}
     }
-
     def clickCreateView(){
-        println(">> clickcing create view")
         createViewButton.click()
-        println(">>>>> clicked create new view button")
     }
 }
