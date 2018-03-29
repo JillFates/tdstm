@@ -276,6 +276,8 @@ class MoveBundleService implements ServiceMethods {
 			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
 			SUM(if(a.plan_status='$AssetEntityPlanStatus.ASSIGNED',1,0)) AS statusAssigned,
 			SUM(if(a.plan_status='$AssetEntityPlanStatus.MOVED',1,0)) AS statusMoved,
+			SUM(if(a.plan_status='$AssetEntityPlanStatus.CONFIRMED',1,0)) AS statusConfirmed,
+			SUM(if(a.plan_status='$AssetEntityPlanStatus.LOCKED',1,0)) AS statusLocked,
 			SUM(if(a.validation<>'BundleReady',1,0)) AS notBundleReady,
 			SUM(if(a.asset_class = '$AssetClass.DEVICE'
 				AND if(m.model_id > -1, m.asset_type in ($physicalTypes), a.asset_type in ($physicalTypes)), 1, 0)) AS serverCount,
@@ -341,12 +343,14 @@ class MoveBundleService implements ServiceMethods {
 					  dbCount: 0,
 					  storageCount: 0,
 					  statusAssigned: 0,
-					  statusMoved: 0
+					  statusMoved: 0,
+					  statusConfirmed: 0,
+					  statusLocked: 0
 			])
 		}
 
 		dependList.each { group ->
-			def depGroupsDone = group.statusAssigned + group.statusMoved
+			def depGroupsDone = group.statusAssigned + group.statusMoved + group.statusConfirmed + group.statusLocked
 			String statusClass = ''
 			if ( group.moveBundles?.contains(',') || group.needsReview > 0 ) {
 				// Assets in multiple bundles or dependency status unknown or questioned
