@@ -4,7 +4,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
-import {DataGridOperationsHelper} from '../dependency-batch-list/data-grid-operations.helper';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {ImportBatchRecordDetailColumnsModel, ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';

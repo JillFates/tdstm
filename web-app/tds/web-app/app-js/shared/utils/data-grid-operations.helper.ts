@@ -1,4 +1,4 @@
-import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../../../../shared/model/data-list-grid.model';
+import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../model/data-list-grid.model';
 import {
 	CompositeFilterDescriptor, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
 	State
@@ -7,7 +7,7 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
-import {MAX_DEFAULT, MAX_OPTIONS} from '../../../../shared/model/constants';
+import {MAX_DEFAULT, MAX_OPTIONS} from '../model/constants';
 
 export class DataGridOperationsHelper {
 

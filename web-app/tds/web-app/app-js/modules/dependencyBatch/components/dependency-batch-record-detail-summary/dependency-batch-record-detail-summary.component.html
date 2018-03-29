@@ -14,7 +14,7 @@
             <div class="col-sm-2">Imported At</div>
             <div class="col-sm-2">Imported By</div>
             <div class="col-sm-2">Class</div>
-            <div class="col-sm-2">Data Script</div>
+            <div class="col-sm-2">DataScript</div>
             <div class="col-sm-2">Status</div>
         </div>
         <div class="row">
@@ -36,7 +36,7 @@
             <div class="col-sm-4 errors-header"><span>Errors</span></div>
         </div>
         <div class="row">
-            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0 || batchRecord.errorList.length > 0}">
+            <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0 || batchRecord.errorList?.length > 0}">
                 {{batchRecord.status.label}}
             </div>
             <div class="col-sm-2" [ngClass]="{'error': batchRecord.errorCount > 0}">
