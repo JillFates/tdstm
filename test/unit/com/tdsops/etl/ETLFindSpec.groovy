@@ -52,26 +52,26 @@ class ETLFindSpec extends ETLBaseSpec {
 	def setup() {
 
 		assetDependencyDataSetContent = """
-AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
-1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
-2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
-3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
-4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
-5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
-6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
-7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
-8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
-9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
-10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
-11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
-12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
-13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
-14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent()
+				AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
+				1,151954,ACMEVMPROD01,VM,152402,VMWare Vcenter,Application,Hosts
+				2,151971,ACMEVMPROD18,VM,152402,VMWare Vcenter,Application,Hosts
+				3,151974,ACMEVMPROD21,VM,152402,VMWare Vcenter,Application,Hosts
+				4,151975,ACMEVMPROD22,VM,152402,VMWare Vcenter,Application,Hosts
+				5,151978,ATXVMPROD25,VM,152368,V Cluster Prod,Application,Hosts
+				6,151990,ACMEVMDEV01,VM,152403,VMWare Vcenter Test,Application,Hosts
+				7,151999,ACMEVMDEV10,VM,152063,PE-1650-01,Server,Unknown
+				8,152098,Mailserver01,Server,151960,ACMEVMPROD07,VM,Unknown
+				9,152100,PL-DL580-01,Server,151960,ACMEVMPROD07,VM,Unknown
+				10,152106,SH-E-380-1,Server,152357,Epic,Application,Unknown
+				11,152117,System z10 Cab 1,Server,152118,System z10 Cab 2,Server,Runs On
+				12,152118,System z10 Cab 2,Server,152006,VMAX-1,Storage,File
+				13,152118,System z10 Cab 2,Server,152007,VMAX-2,Storage,File
+				14,152118,System z10 Cab 2,Server,152008,VMAX-3,Storage,File""".stripIndent().trim()
 
 		applicationDataSetContent = """
-application id,vendor name,technology,location
-152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center""".stripIndent()
+			application id,vendor name,technology,location
+			152254,Microsoft,(xlsx updated),ACME Data Center
+			152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
@@ -275,27 +275,24 @@ application id,vendor name,technology,location
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
 					find.query[0].kv.id == '151954'
-					find.size == 1
 					find.results == [151954]
-					find.matchOn == 1
+					find.matchOn == 0
 				}
 
 				with(data[1].fields.id) {
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
 					find.query[0].kv.id == '151971'
-					find.size == 1
 					find.results == [151971]
-					find.matchOn == 1
+					find.matchOn == 0
 				}
 
 				with(data[2].fields.id) {
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
 					find.query[0].kv.id == '151974'
-					find.size == 1
 					find.results == [151974]
-					find.matchOn == 1
+					find.matchOn == 0
 				}
 			}
 
@@ -760,9 +757,8 @@ application id,vendor name,technology,location
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Microsoft']
 
-						size == 1
 						results == [152254]
-						matchOn == 1
+						matchOn == 0
 					}
 
 					!fields.id.warn
@@ -787,13 +783,12 @@ application id,vendor name,technology,location
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Mozilla']
 
-						size == 1
-						results == [152253]
-						matchOn == 2
+						results == []
+						matchOn == null
 					}
 
 					fields.id.warn
-					fields.id.warnMsg == 'found without asset id field'
+					fields.id.errors == 'found without asset id field'
 				}
 			}
 
@@ -924,13 +919,12 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
-13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
-13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+				${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+				${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+				13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
 
 		and:
 			GroovyMock(Room, global: true)
@@ -991,13 +985,12 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
-13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
-13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+				${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+				${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+				13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
 
 		and:
 			GroovyMock(Room, global: true)
@@ -1087,9 +1080,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == null
+						errors == []
 						warn == false
 						with (find){
+							results == []
+							matchOn == null
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1110,9 +1105,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == null
+						errors == []
 						warn == false
 						with (find){
+							results == []
+							matchOn == null
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1127,6 +1124,7 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
+
 	void 'test can find a domain Property and create the target property automatically with 1 result'() {
 
 		given:
@@ -1189,9 +1187,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == null
+						errors == []
 						warn == false
 						with (find){
+							results == []
+							matchOn == null
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1212,12 +1212,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == null
+						errors == []
 						warn == false
 						with (find){
-							size == 1
 							results == [152255]
-							matchOn == 1
+							matchOn == 0
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1295,9 +1294,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == null
+						errors == []
 						warn == false
 						with (find){
+							results == []
+							matchOn == null
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1318,9 +1319,11 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 						originalValue == null
 						value == null
 						init == null
-						errors == ['Multiple entities found for query']
+						errors == ['The find/elseFind command(s) found multiple records']
 						warn == false
 						with (find){
+							matchOn == 0
+							results == [152255, 152255]
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
@@ -1335,5 +1338,4 @@ ${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME D
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
-
 }

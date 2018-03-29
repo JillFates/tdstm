@@ -100,19 +100,21 @@ class ETLFindElement {
 					processor.project,
 					currentFind.kv)
 			} catch(all){
+
 				processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
 				currentFind.kv.error = all.getMessage()
 			}
 
+			results = [
+				objects : [],
+				matchOn: null
+			]
 			if(currentFind.objects && !currentFind.objects.isEmpty()){
-				if(currentFind.objects.size() == 1){
-					results = [
-						size: currentFind.objects.size(),
-						objects: currentFind.objects,
-						matchOn: findings.size() + 1
-					]
-				} else {
-					currentFind.error = 'Multiple entities found for query'
+				results.objects = currentFind.objects
+				results.matchOn = findings.size()
+
+				if(currentFind.objects.size() > 1){
+					currentFind.error = 'The find/elseFind command(s) found multiple records'
 				}
 			}
 		}

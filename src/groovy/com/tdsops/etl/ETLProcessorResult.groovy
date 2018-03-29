@@ -84,14 +84,12 @@ class ETLProcessorResult {
 
 		Map<String, ?> find = data.fields[property].find
 		if(findElement.currentFind.error){
-			data.fields[property].errors = [findElement.currentFind.error]
+			data.fields[property].errors.add(findElement.currentFind.error)
 		}
 
 		find.query.add(queryDataMap(findElement))
 
-		if(findElement.results){
-			addResultsDataMap(find, findElement)
-		}
+		addResultsDataMap(find, findElement)
 	}
 
 	/**
@@ -268,7 +266,7 @@ class ETLProcessorResult {
 		Map<String, ?> dataMap = [
 			value: value,
 			originalValue: originalValue,
-			error: false,
+			errors: [],
 			warn: false,
 			find: [
 				query: []
@@ -332,7 +330,6 @@ class ETLProcessorResult {
 	 * following the current format:
 	 * <pre>
 	 *  [
-	 *  	"size": 3,
 	 * 		"matchOn": 2,
 	 * 		"results": [
 	 * 			115123,
@@ -341,7 +338,6 @@ class ETLProcessorResult {
 	 * 		]
 	 * 	]
 	 * </pre>
-	 * Size is the total amount of results.
 	 * Results are the id of the domain classes collected by the find command
 	 * and matcOn defines the ordinal position
 	 * in the query object list where those results where found.
@@ -349,7 +345,6 @@ class ETLProcessorResult {
 	 * @param findElement the find element with the warn message
 	 */
 	private void addResultsDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
-		fieldDataMap.size = findElement.results.size
 		fieldDataMap.results = findElement.results.objects.collect { it.id }
 		fieldDataMap.matchOn = findElement.results.matchOn
 	}
