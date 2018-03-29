@@ -19,6 +19,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { AssetExplorerModule } from '../assetExplorer/asset-explorer.module';
 import { PopupPollingComponent } from './components/popups/popup-polling.component';
 import { PopupProvidesDataComponent } from './components/popups/popup-provides-data.component';
+import { PopupSessionAuthenticationNameComponent } from './components/popups/popup-session-authentication-name.component';
 import { CredentialListComponent } from './components/credential-list/credential-list.component';
 import { CredentialViewEditComponent } from './components/credential-view-edit/credential-view-edit.component';
 import { PopupValidateExpressionComponent } from './components/popups/popup-validate-expression.component';
@@ -69,6 +70,7 @@ import {ImportAssetsService} from '../importAssets/service/import-assets.service
 		PopupPollingComponent,
 		PopupProvidesDataComponent,
 		PopupValidateExpressionComponent,
+		PopupSessionAuthenticationNameComponent,
 		CredentialListComponent,
 		CredentialViewEditComponent
 	],
