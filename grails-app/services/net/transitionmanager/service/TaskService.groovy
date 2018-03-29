@@ -1655,12 +1655,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (recipe.releasedVersion) {
 				recipeVersion = recipe.releasedVersion
 			} else {
-				throw new UnauthorizedException('There is no released version of the recipe to generate tasks with')
+				throw new InvalidRequestException('There is no released version of the recipe to generate tasks with')
 			}
 		} else {
 			recipeVersion = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 			if (!recipeVersion) {
-				throw new UnauthorizedException('There is no wip version of the recipe to generate tasks with')
+				throw new InvalidRequestException('There is no wip version of the recipe to generate tasks with')
 			}
 		}
 
