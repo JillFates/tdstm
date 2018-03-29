@@ -40,8 +40,14 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
  */
 class TDSExcelDriver extends ExcelDriver {
 
+	/**
+	 * Workbook instance. It's open once using TDSExcelDriver#getWorkbook
+	 */
 	Workbook workbook
-	Map<String, List<Field>> fieldsMap = [:]
+	/**
+	 * Maps of fields base on listName param.
+	 */
+	Map<Object, List<Field>> fieldsMap = [:]
 
 	@Override
 	protected long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
