@@ -197,7 +197,6 @@ class ScriptProcessorServiceSpec extends Specification {
 					with(data[0].fields.id) {
 						value == '152254'
 						originalValue == '152254'
-						find.size == 1
 						find.results == [152254]
 						find.matchOn == 1
 						find.query.size() == 1
@@ -208,7 +207,6 @@ class ScriptProcessorServiceSpec extends Specification {
 					with(data[1].fields.id) {
 						value == '152255'
 						originalValue == '152255'
-						find.size == 1
 						find.results == [152255]
 						find.matchOn == 1
 						find.query.size() == 1
