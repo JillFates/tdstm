@@ -32,7 +32,7 @@ ext {
         //seleniumVersion = '3.4.0'
         seleniumVersion = '3.5.3'
         //chromeDriverVersion = '2.31'
-        chromeDriverVersion = '2.32'
+        chromeDriverVersion = '2.37'
         geckoDriverVersion = '0.18.0'
     }
 }
