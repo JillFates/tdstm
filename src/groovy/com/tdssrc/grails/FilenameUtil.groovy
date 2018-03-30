@@ -14,6 +14,8 @@ import net.transitionmanager.domain.MoveEvent
 @Slf4j(value='logger')
 class FilenameUtil {
 
+
+	static final String CSV_SUFIX = 'csv'
 	/**
 	 * Main method for creating a file name.
 	 *
@@ -258,4 +260,14 @@ class FilenameUtil {
 		}
 		return str
 	}
+
+	/**
+	 * It checks if a filename is a csv or CSV filename.
+	 * @param fileName
+	 * @return true if fileName belongs to a csv file
+	 */
+	static boolean isCsvFile(String fileName){
+		return fileName && fileName.toLowerCase().endsWith(CSV_SUFIX)
+	}
+
 }

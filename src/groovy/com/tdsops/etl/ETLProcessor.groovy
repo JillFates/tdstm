@@ -1,6 +1,8 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
+import getl.data.Field
 import net.transitionmanager.domain.Project
 
 /**
@@ -164,7 +166,7 @@ class ETLProcessor implements RangeChecker {
 
 		if ('labels'.equalsIgnoreCase(dataPart)) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
-				Column column = new Column(label: field.name.trim(), index: index)
+				Column column = new Column(label: fieldNameToLabel(field), index: index)
 				columns.add(column)
 				columnsMap[column.label] = column
 			}
@@ -431,11 +433,10 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (String columnName) {
-		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
-		if (!columnsMap.containsKey(columnName.toLowerCase())) {
+		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
 		}
-		currentColumnIndex = columnsMap[columnName.toLowerCase()].index
+		currentColumnIndex = columnsMap[labelToFieldName(columnName)].index
 
 		doExtract()
 	}
@@ -856,6 +857,40 @@ class ETLProcessor implements RangeChecker {
 	def methodMissing (String methodName, args) {
 		debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
+	}
+
+	/**
+	 * Converts Field#name instance to the ETL label column name.
+	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
+	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
+	 * @param field an instance of getl.data.Field
+	 * @return the label column name
+	 * @see getl.data.Field#name
+	 */
+	private String fieldNameToLabel(Field field) {
+		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
+			return field.name.toLowerCase().trim()
+		} else {
+			return field.name.trim()
+		}
+	}
+
+	/**
+	 * Converts ETL label value to a correct Field#name to be used in th ETL xtract command.
+	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
+	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
+	 * @param label a column name
+	 * @return the field name used to check dataset fields
+	 * @see getl.data.Field#name
+	 */
+	private String labelToFieldName(String label) {
+		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
+			return label.toLowerCase()
+		} else {
+			return label
+		}
 	}
 
 	ETLDomain getSelectedDomain () {
