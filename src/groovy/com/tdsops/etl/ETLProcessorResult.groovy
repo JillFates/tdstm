@@ -79,7 +79,7 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.errors){
 			addErrorsToCurrentRow(field, findElement.currentFind.errors)
-			data.errorCount = field.errors.size()
+			data.errorCount = (data.errorCount ? data.errorCount + field.errors.size() : field.errors.size() )
 		}
 
 		if(!data.fields.containsKey(findId)){
