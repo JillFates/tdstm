@@ -5,25 +5,6 @@ import geb.Module
 class MenuModule extends Module {
 
     static at = {
-        adminItem.text().trim()         == "Admin"
-        adminSections[0].text().trim()  == "Administration"
-        adminSections[1].text().trim()  == "Manage Clients"
-        adminSections[2].text().trim()  == "Manage Workflows"
-        adminSections[3].text().trim()  == "Manage Model Library"
-        adminPortalItem.text().trim()   == "Admin Portal"
-        adminLMItem.text().trim()       == "License Admin"
-        adminNoticesItem.text().trim()  == "Notices"
-        adminRolesItem.text().trim()    == "Role Permissions"
-        adminAssetOptItem.text().trim() == "Asset Options"
-        adminCompaniesItem.text().trim()== "List Companies"
-        adminStaffItem.text().trim()    == "List Staff"
-        adminUsersItem.text().trim()    == "List Users"
-        adminImportAccItem.text().trim()== "Import Accounts"
-        adminExportAccItem.text().trim()== "Export Accounts"
-        adminWorkflowsItem.text().trim()== "List Workflows"
-        adminManufItem.text().trim()    == "List Manufacturers"
-        adminModelsItem.text().trim()   == "List Models"
-        adminExportManModItem.text().trim() == "Export Mfg & Models"
 
         projectsItem.text().trim()          == "Projects"
         projectsActiveItem.text().trim()    == "Active Projects"
@@ -65,24 +46,6 @@ class MenuModule extends Module {
     static content = {
         menuContainer       { $( "div", class:"container menu-top-container menu-top-container-full-menu")}
         menuBar             { menuContainer.find("div#navbar-collapse")}
-
-        adminItem               { menuBar.find("li.menu-parent-admin")}
-        adminMenu               { adminItem.find("ul",class:"dropdown-menu menu-item-expand")}
-        adminSections           { adminMenu.find("li",class:"menu-parent-item")}
-        adminPortalItem         { adminMenu.find("li.menu-admin-portal")}
-        adminLMItem             { adminMenu.find("li.menu-admin-license-manager").find("a","href":"/tdstm/app/license/admin/list")}
-        adminNoticesItem        { adminMenu.find("li.menu-admin-license-manager").find("a","href":"/tdstm/app/notice/list")}
-        adminRolesItem          { adminMenu.find("li.menu-admin-role")}
-        adminAssetOptItem       { adminMenu.find("li.menu-admin-asset-options")}
-        adminCompaniesItem      { adminMenu.find("li.menu-list-companies")}
-        adminStaffItem          { adminMenu.find("li.menu-list-staff")}
-        adminUsersItem          { adminMenu.find("li.menu-list-users")}
-        adminImportAccItem      { adminMenu.find("li.menu-client-import-accounts")}
-        adminExportAccItem      { adminMenu.find("li.menu-client-export-accounts")}
-        adminWorkflowsItem      { adminMenu.find("li.menu-list-workflows")}
-        adminManufItem          { adminMenu.find("li.menu-list-manufacturers")}
-        adminModelsItem         { adminMenu.find("li.menu-list-models")}
-        adminExportManModItem   { adminMenu.find("li.menu-sync-libraries")}
 
         projectsItem            { menuBar.find("li.menu-parent-projects") }
         projectsMenu            { projectsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -144,16 +107,6 @@ class MenuModule extends Module {
                 waitFor { item.click()}
             }
         }
-    }
-
-    def goToAdminPortal(){
-        selectMenu(adminItem)
-        selectItem(adminPortalItem)
-    }
-
-    def goToAdminListStaff(){
-        selectMenu(adminItem)
-        selectItem(adminStaffItem)
     }
 
     def goToProjectsActive(){
