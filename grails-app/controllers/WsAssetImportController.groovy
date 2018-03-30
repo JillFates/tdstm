@@ -1,14 +1,11 @@
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.etl.ETLProcessor
-import com.tdsops.etl.ETLProcessorResult
-import grails.plugin.springsecurity.annotation.Secured
-import groovy.util.logging.Slf4j
-import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
+import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.InvalidRequestException
+import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
@@ -17,11 +14,10 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import net.transitionmanager.service.FileSystemService
-import org.apache.commons.lang3.RandomStringUtils
-import org.hibernate.transform.Transformers
-
+import net.transitionmanager.service.InvalidParamException
+import net.transitionmanager.service.dataingestion.ScriptProcessorService
+import org.codehaus.groovy.grails.web.json.JSONObject
 /**
  * Handles WS calls of the ApplicationService.
  *
@@ -163,9 +159,9 @@ class WsAssetImportController implements ControllerMethods {
 			throw new InvalidParamException('Missing filename parameter')
 		}
 
-		if (! (filename.endsWith('.csv') || filename.endsWith('.xml'))) {
-			// TODO : JPM 2/2016 : get the list of extentions from FileSystemUtil
-			throw new InvalidParamException('File type must be JSON')
+		if (! FileSystemUtil.validateExtension(filename, FileSystemUtil.ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS)) {
+			String validExtensions = FileSystemUtil.ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS.join(', ')
+			throw new InvalidParamException("Invalid file extension. Supported extensions are: $validateExtension")
 		}
 
 		if (! fileSystemService.temporaryFileExists(filename)) {
