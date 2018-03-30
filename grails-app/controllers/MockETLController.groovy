@@ -46,14 +46,14 @@ class MockETLController implements ControllerMethods {
         
             set environment with 'Production'
             // find Application 'for' id by id with SOURCE.'device id'
-            find Application of id by id with SOURCE.'device id'
+            find Application by id with SOURCE.'device id' into id
         
             domain Device
         
             extract 1 load id
             extract 'model name' transform with uppercase() load Name
             // find Device 'for' id by id with SOURCE.'device id'
-            find Device of id by id with SOURCE.'device id'
+            find Device by id with SOURCE.'device id' into id
         }\
     """.stripIndent().trim()
 

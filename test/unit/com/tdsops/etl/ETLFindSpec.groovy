@@ -872,25 +872,25 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
+					console on
+					read labels
+					domain Dependency
+					iterate {
+					
+						extract AssetDependencyId load id
+						extract AssetId load asset
 						
-							extract AssetDependencyId load id
-							extract AssetId load asset
-							
-							find Asset by assetName with SOURCE.AssetName into asset
-							// Grab the reference to the FINDINGS to be used later. 
-							def primaryFindings = FINDINGS
-	
-							if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
-							 	set comment with 'Asset results found'		
-							} else {
-							 	set comment with 'Asset results not found'
-							}
+						find Asset by assetName with SOURCE.AssetName into asset
+						// Grab the reference to the FINDINGS to be used later. 
+						def primaryFindings = FINDINGS
+
+						if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
+						    set comment with 'Asset results found'		
+						} else {
+						    set comment with 'Asset results not found'
 						}
-						""".stripIndent(),
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'It throws an Exception because project was not defined'
@@ -944,17 +944,17 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Rack
-							extract rackId load id 
-							extract Location load location
-							extract Room load room
-					 
-							find Room by id with SOURCE.RoomId into room
-						}
-						""".stripIndent(),
+					console on
+					read labels
+					iterate {
+						domain Rack
+						extract rackId load id 
+						extract Location load location
+						extract Room load room
+				 
+						find Room by id with SOURCE.RoomId into room
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Rack domain results associated'
@@ -1010,17 +1010,17 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Rack
-							extract rackId load id 
-							extract Location load location
-							extract Room load room
-					 
-							find Room 'for' room by id with SOURCE.RoomId
-						}
-						""".stripIndent(),
+					console on
+					read labels
+					iterate {
+						domain Rack
+						extract rackId load id 
+						extract Location load location
+						extract Room load room
+				 
+						find Room 'for' room by id with SOURCE.RoomId
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 
@@ -1056,12 +1056,12 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						read labels
-						domain Dependency
-						iterate {
-							find Application by id with SOURCE.'application id' into id
-						}
-						""".stripIndent(),
+					read labels
+					domain Dependency
+					iterate {
+						find Application by id with SOURCE.'application id' into id
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
@@ -1162,13 +1162,13 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						read labels
-						domain Dependency
-						iterate {
-							find Application by id with SOURCE.'application id' into id   // 
-							// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
-						}
-						""".stripIndent(),
+					read labels
+					domain Dependency
+					iterate {
+						find Application by id with SOURCE.'application id' into id   // 
+						// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
@@ -1269,13 +1269,13 @@ class ETLFindSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						read labels
-						domain Dependency
-						iterate {
-							find Application by id with SOURCE.'application id' into id   // 
-							// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
-						}
-						""".stripIndent(),
+					read labels
+					domain Dependency
+					iterate {
+						find Application by id with SOURCE.'application id' into id   // 
+						// >1 results. Record an error with 'Multiple entities found for query'. Add message in  data.fields[fieldName]."errors": ,
+					}
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
