@@ -47,7 +47,7 @@ class StaffListSpec extends GebReportingSpec {
         given: 'The User searches in the Menu Page'
             at MenuPage
         when: 'The User Clicks in the Admin > List Staff Menu Option'
-        adminModule.goToAdminListStaff()
+            adminModule.goToAdminListStaff()
 
         then: 'Staff List Should be displayed'
             at StaffListPage
