@@ -51,8 +51,8 @@ class AdminLandingPageSpec extends GebReportingSpec {
 
         //We set the number of elements as 25 because we need to take into account the divisions among items
         //We could also do the assertion comparing the length of the text
-        waitFor{ (adminModule.adminMenu.children().size() == 25) }
-        //waitFor{ (adminModule.adminMenu.text().length() == 268) }
+        adminModule.adminMenu.children().size() == 25
+        //adminModule.adminMenu.text().length() == 268
         at MenuPage
     }
 
