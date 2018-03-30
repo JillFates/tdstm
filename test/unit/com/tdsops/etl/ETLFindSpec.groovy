@@ -684,8 +684,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<Application> applications = [
-					[assetClass: AssetClass.APPLICATION, id: 152253l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
-					[assetClass: AssetClass.APPLICATION, id: 152254l, appVendor: 'Microsoft', assetName: "ACME Data Center", project: GMDEMO]
+					[assetClass: AssetClass.APPLICATION, id: 1l, appVendor: 'Mozilla', assetName: "ACME Data Center", project: GMDEMO],
+					[assetClass: AssetClass.APPLICATION, id: 2l, appVendor: 'Apple', assetName: "ACME Data Center", project: GMDEMO]
 			].collect {
 				Application mock = Mock()
 				mock.getId() >> it.id
@@ -757,8 +757,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Microsoft']
 
-						results == [152254]
-						matchOn == 0
+						results == []
+						matchOn == null
 					}
 
 					!fields.id.warn
@@ -783,12 +783,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Mozilla']
 
-						results == []
-						matchOn == null
+						results == [1l]
+						matchOn == 1
 					}
-
 					fields.id.warn
-					fields.id.errors == 'found without asset id field'
+					fields.id.warnMsg == 'found without asset id field'
 				}
 			}
 

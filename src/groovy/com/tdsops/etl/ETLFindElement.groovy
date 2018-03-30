@@ -92,7 +92,7 @@ class ETLFindElement {
 			currentFind.values
 		].transpose().collectEntries { it }
 
-		if(!results){
+		if(!results?.objects){
 
 			try{
 				currentFind.objects = DomainClassQueryHelper.where(
