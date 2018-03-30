@@ -399,7 +399,11 @@ class ImportBatchService implements ServiceMethods {
 			// Although only 'progress' is supported at the moment, I leave the code ready for future changes.
 			switch(info) {
 				case 'progress':
-					infoMap = [progress: importBatch.processProgress, lastUpdated: importBatch.processLastUpdated]
+					infoMap = [
+						status: [code: importBatch.status.getKey(), label:importBatch.status.toString()],
+						progress: importBatch.processProgress,
+						lastUpdated: importBatch.processLastUpdated
+					]
 					break
 				default:
 					throw new InvalidParamException("Unsupported info requested $info.")
