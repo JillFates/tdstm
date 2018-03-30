@@ -9,7 +9,7 @@ package com.tdsops.etl
  * @see ETLProcessorResult#initialRowDataMap()
  * @see ETLProcessorResult#initialFieldDataMap(com.tdsops.etl.Element)
  * @see ETLProcessorResult#queryDataMap(com.tdsops.etl.ETLFindElement)
- * @see ETLProcessorResult#addWarnMessageDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
+ * @see ETLProcessorResult#addWarnMessageInData(java.util.Map, com.tdsops.etl.ETLFindElement)
  * @see ETLProcessorResult#addResultsDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
  */
 class ETLProcessorResult {
@@ -75,17 +75,18 @@ class ETLProcessorResult {
 		String findId = findElement.currentFind.findId
 
 		Map<String, ?> data = currentRowData()
+		Map<String, ?> field = data.fields[findId]
 
 		if(findElement.currentFind.errors){
-			addErrorsToCurrentRow(data, findElement.currentFind.errors)
+			addErrorsToCurrentRow(field, findElement.currentFind.errors)
+			data.errorCount = field.errors.size()
 		}
 
 		if(!data.fields.containsKey(findId)){
 			throw ETLProcessorException.invalidFindCommand(findId)
 		}
 
-		Map<String, ?> find = data.fields[findId].find
-
+		Map<String, ?> find = field.find
 		find.query.add(queryDataMap(findElement))
 
 		if(findElement.results){
@@ -464,18 +465,14 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Adds errors to the row Error list.
-	 * <pre>
-	 *
-	 * </pre>
-	 * @param data a row result content
-	 * @param errors a list of errors to be added in row.errors list
+	 * Adds errors to the field Error list.
+	 * @param field a field data map result content
+	 * @param errors a list of errors to be added in field.property.errors list
 	 */
-	void addErrorsToCurrentRow(Map<String, ?> data, List<String> errors){
-		if(!data.errors){
-			data.errors = []
+	void addErrorsToCurrentRow(Map<String, ?> field, List<String> errors){
+		if(!field.errors){
+			field.errors = []
 		}
-		data.errors.addAll(errors)
-		data.errorCount = data.errors.size()
+		field.errors.addAll(errors)
 	}
 }

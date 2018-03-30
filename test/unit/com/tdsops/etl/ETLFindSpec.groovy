@@ -779,7 +779,6 @@ application id,vendor name,technology,location
 				with(data[1]) {
 					warn
 					errors == ['found without asset id field']
-
 					with(fields){
 
 						with(environment){
@@ -859,7 +858,7 @@ application id,vendor name,technology,location
 				domain == ETLDomain.Application.name()
 				fields == ['id', 'appVendor'] as Set
 				with(data[0]) {
-					errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
+
 					errorCount == 2
 					with(fields) {
 
@@ -872,6 +871,7 @@ application id,vendor name,technology,location
 								query[1].domain == ETLDomain.Application.name()
 								query[1].kv == [appVendor: 'Microsoft']
 							}
+							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 						}
 						with(appVendor) {
 							originalValue == 'Microsoft'
@@ -880,7 +880,6 @@ application id,vendor name,technology,location
 					}
 				}
 				with(data[1]) {
-					errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 					errorCount == 2
 					with(fields) {
 
@@ -893,6 +892,8 @@ application id,vendor name,technology,location
 								query[1].domain == ETLDomain.Application.name()
 								query[1].kv == [appVendor: 'Mozilla']
 							}
+
+							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 						}
 						with(appVendor) {
 							originalValue == 'Mozilla'
