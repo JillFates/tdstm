@@ -18,6 +18,7 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {EnumModel} from '../../../../shared/model/enum.model';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -391,8 +392,7 @@ export class DependencyBatchListComponent {
 						batch.status.label = 'Stalled';
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else if (batch.currentProgress >= 100) {
-						batch.status.code = BatchStatus.COMPLETED;
-						batch.status.label = 'Completed';
+						batch.status = response.data.status as EnumModel;
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else {
 						batch.lastUpdated =  response.data.lastUpdated as Date;
