@@ -117,7 +117,7 @@ class ETLFindElement {
 				results.matchOn = findings.size()
 
 				if(currentFind.objects.size() > 1){
-					currentFind.error = 'The find/elseFind command(s) found multiple records'
+					currentFind.errors = ['The find/elseFind command(s) found multiple records']
 				}
 			}
 		}

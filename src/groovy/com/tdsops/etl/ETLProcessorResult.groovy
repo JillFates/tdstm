@@ -7,7 +7,7 @@ package com.tdsops.etl
  * Every part of the results are covered in formatter functions.
  *
  * @see ETLProcessorResult#initialRowDataMap()
- * @see ETLProcessorResult#initialFieldDataMap(com.tdsops.etl.Element)
+ * @see ETLProcessorResult#initialFieldDataMap(java.lang.String, java.lang.String, java.lang.String)
  * @see ETLProcessorResult#queryDataMap(com.tdsops.etl.ETLFindElement)
  * @see ETLProcessorResult#addWarnMessageInData(java.util.Map, com.tdsops.etl.ETLFindElement)
  * @see ETLProcessorResult#addResultsDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
@@ -67,31 +67,35 @@ class ETLProcessorResult {
 
 	/**
 	 * Adds a find Element to the ETL Processor result.
+	 * It needs to collect results and errors.
+	 * Errors are located at the field level or at the row level.
+	 * Results are added using find query results
+	 * @see ETLFindElement#currentFind
 	 * @param findElement is an instance of ETLFindElement
-	 * 			used to calculate a query data result
+	 * 			used to calculate a query data, results and errors
 	 */
 	void addFindElement(ETLFindElement findElement) {
 
-		String findId = findElement.currentFind.findId
+		String property = findElement.currentFind.property
 
 		Map<String, ?> data = currentRowData()
-		Map<String, ?> field = data.fields[findId]
+		data.rowNum = findElement.rowIndex
+
+		if(!data.fields.containsKey(property)){
+			reference.fields.add(property)
+			data.fields[property] = initialFieldDataMap(null, null, null)
+		}
+
+		Map<String, ?> field = data.fields[property]
 
 		if(findElement.currentFind.errors){
 			addErrorsToCurrentRow(field, findElement.currentFind.errors)
 			data.errorCount = (data.errorCount ? data.errorCount + field.errors.size() : field.errors.size() )
 		}
 
-		if(!data.fields.containsKey(findId)){
-			throw ETLProcessorException.invalidFindCommand(findId)
-		}
-
 		Map<String, ?> find = field.find
 		find.query.add(queryDataMap(findElement))
-
-		if(findElement.results){
-			addResultsDataMap(find, findElement)
-		}
+		addResultsDataMap(find, findElement)
 	}
 
 	/**
@@ -111,7 +115,7 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * Add a FoundElement in the result based on its findId
+	 * Add a FoundElement in the result based on its property
 	 * <pre>
 	 *		whenFound asset create {
 	 *			assetClass Application
@@ -151,7 +155,7 @@ class ETLProcessorResult {
 
 		} else {
 			reference.fields.add(element.fieldSpec.name)
-			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
+			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
 		}
 	}
 
@@ -253,19 +257,20 @@ class ETLProcessorResult {
 	 *					{"domain": "Application", "kv": { "assetName": "CommGen" }},
 	 *					{"domain": "Asset", "kv": { "assetName": "CommGen" }, "warn": true}
 	 *				],
-	 *				"size": 2,
 	 *				"matchOn": 2,
 	 *				"results": [12312,123123,123123123]
 	 *			},
 	 *		}
 	 * </pre>
-	 * @param element an element instance used to populate some of the data fields
+	 * @param originalValue the original valu from DataSet
+	 * @param value value modified by transformations
+	 * @param initValue initial value
 	 * @return a Map that contains a final structure of the field node in ETLProcessorResult
 	 */
-	private Map<String, ?> initialFieldDataMap(Element element) {
+	private Map<String, ?> initialFieldDataMap(String originalValue, String value, String initValue) {
 		Map<String, ?> dataMap = [
-			value: element.value,
-			originalValue: element.originalValue,
+			value: value,
+			originalValue: originalValue,
 			errors: [],
 			warn: false,
 			find: [
@@ -273,8 +278,8 @@ class ETLProcessorResult {
 			]
 		]
 
-		if(element.init){
-			dataMap.init = element.init
+		if(initValue){
+			dataMap.init = initValue
 		}
 		return dataMap
 	}
@@ -326,7 +331,7 @@ class ETLProcessorResult {
 		data.warn = true
 		data.errors.add(findElement.warnMessage)
 
-		Map<String, ?> fieldDataMap = data.fields[findElement.currentFind.findId]
+		Map<String, ?> fieldDataMap = data.fields[findElement.currentFind.property  ]
 		fieldDataMap.warn = true
 		fieldDataMap.errors.add(findElement.warnMessage)
 	}
@@ -336,7 +341,6 @@ class ETLProcessorResult {
 	 * following the current format:
 	 * <pre>
 	 *  [
-	 *  	"size": 3,
 	 * 		"matchOn": 2,
 	 * 		"results": [
 	 * 			115123,
@@ -345,7 +349,6 @@ class ETLProcessorResult {
 	 * 		]
 	 * 	]
 	 * </pre>
-	 * Size is the total amount of results.
 	 * Results are the id of the domain classes collected by the find command
 	 * and matcOn defines the ordinal position
 	 * in the query object list where those results where found.
@@ -353,7 +356,6 @@ class ETLProcessorResult {
 	 * @param findElement the find element with the warn message
 	 */
 	private void addResultsDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
-		fieldDataMap.size = findElement.results.size
 		fieldDataMap.results = findElement.results.objects.collect { it.id }
 		fieldDataMap.matchOn = findElement.results.matchOn
 	}
