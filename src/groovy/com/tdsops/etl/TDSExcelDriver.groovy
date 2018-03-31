@@ -122,7 +122,7 @@ class TDSExcelDriver extends ExcelDriver {
 			Workbook workbook = getWorkbook(dataset)
 			Integer currentRowIndex = dataset.params.currentRowIndex ?:0
 
-			def sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
+			Sheet sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
 			List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
 			List<Field> fields = []
 			cells.each { Cell cell ->

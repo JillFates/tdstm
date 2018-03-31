@@ -870,7 +870,7 @@ class ETLProcessor implements RangeChecker {
 	private String fieldNameToLabel(Field field) {
 		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
-			return field.name.toLowerCase().trim()
+			return field.name.trim().toLowerCase()
 		} else {
 			return field.name.trim()
 		}
