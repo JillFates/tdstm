@@ -166,6 +166,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -197,6 +198,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -229,8 +231,10 @@ export class DependencyBatchListComponent {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					} else {
 						this.reloadBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					}
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
