@@ -30,7 +30,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			]},
 			{id: 3, name: 'Pending with Errors', filters: [
 				{column: 'status.label', value: 'Pending'},
-				{column: 'errorCount', value: 1},
+				{column: 'errorCount', value: 1, operator: 'gte'},
 			]},
 			{id: 4, name: 'Ignored', filters: [
 				{column: 'status.label', value: 'Ignored'},
@@ -187,7 +187,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 				let foundMatch: GridColumnModel = this.columnsModel.columns.find( (column: GridColumnModel) => column.property === filter.column );
 				if (foundMatch) {
 					foundMatch.filter = filter.value;
-					this.dataGridOperationsHelper.onFilter(foundMatch);
+					this.dataGridOperationsHelper.onFilter(foundMatch, $event.id === 3 ? 'gte' : null);
 				}
 			}
 		}
