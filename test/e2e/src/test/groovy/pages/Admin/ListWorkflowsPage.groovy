@@ -3,15 +3,16 @@ package pages.Admin
 import geb.Page
 import modules.AdminModule
 
-class AdminPortalPage extends Page {
+class ListWorkflowsPage extends Page{
 
     static at = {
-        title == "TDS TransitionManager™ Admin Portal"
-        pageHeaderName.text() == "Admin Portal"
+        title == "Workflows"
+        pageHeaderName.text() == "Workflows"
     }
 
     static content = {
         adminModule { module AdminModule}
         pageHeaderName { $("section", class:"content-header").find("h1")}
     }
+
 }

@@ -3,7 +3,6 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
-import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
@@ -18,6 +17,7 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {EnumModel} from '../../../../shared/model/enum.model';
 
 @Component({
@@ -167,6 +167,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -198,6 +199,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -230,8 +232,10 @@ export class DependencyBatchListComponent {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					} else {
 						this.reloadBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					}
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);

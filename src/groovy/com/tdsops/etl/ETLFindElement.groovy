@@ -100,7 +100,10 @@ class ETLFindElement {
 					currentFind.kv)
 			} catch(all){
 				processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
-				currentFind.kv.error = all.getMessage()
+				if(currentFind.errors == null) {
+					currentFind.errors = []
+				}
+				currentFind.errors.add(all.getMessage())
 			}
 
 			if(currentFind.objects && !currentFind.objects.isEmpty()){

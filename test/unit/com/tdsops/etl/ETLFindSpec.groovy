@@ -743,57 +743,163 @@ application id,vendor name,technology,location
 				domain == ETLDomain.Application.name()
 
 				with(data[0]) {
-					fields.environment.originalValue == 'Production'
-					fields.environment.value == 'Production'
+					!warn
 
-					fields.appVendor.originalValue == 'Microsoft'
-					fields.appVendor.value == 'Microsoft'
+					with(fields) {
 
-					fields.id.originalValue == '152254'
-					fields.id.value == '152254'
+						with(environment){
+							originalValue == 'Production'
+							value == 'Production'
+						}
+						with(appVendor){
+							originalValue == 'Microsoft'
+							value == 'Microsoft'
+						}
+						with(id){
+							originalValue == '152254'
+							value == '152254'
 
-					// Validating queries
-					with(fields.id.find) {
-						query[0].domain == ETLDomain.Application.name()
-						query[0].kv == [id: '152254']
+							// Validating queries
+							with(find) {
+								query[0].domain == ETLDomain.Application.name()
+								query[0].kv == [id: '152254']
 
-						query[1].domain == ETLDomain.Application.name()
-						query[1].kv == [appVendor: 'Microsoft']
+								query[1].domain == ETLDomain.Application.name()
+								query[1].kv == [appVendor: 'Microsoft']
 
-						size == 1
-						results == [152254]
-						matchOn == 1
+								size == 1
+								results == [152254]
+								matchOn == 1
+							}
+						}
+
 					}
-
-					!fields.id.warn
-					!fields.id.warnMsg
 				}
 
 				with(data[1]) {
-					fields.environment.originalValue == 'Production'
-					fields.environment.value == 'Production'
+					warn
+					errors == ['found without asset id field']
+					with(fields){
 
-					fields.appVendor.originalValue == 'Mozilla'
-					fields.appVendor.value == 'Mozilla'
+						with(environment){
+							originalValue == 'Production'
+							value == 'Production'
+						}
+						with(appVendor){
+							originalValue == 'Mozilla'
+							value == 'Mozilla'
+						}
+						with(id){
+							originalValue == '152255'
+							value == '152255'
+							// Validating queries
+							with(find) {
+								query[0].domain == ETLDomain.Application.name()
+								query[0].kv == [id: '152255']
 
-					fields.id.originalValue == '152255'
-					fields.id.value == '152255'
+								query[1].domain == ETLDomain.Application.name()
+								query[1].kv == [appVendor: 'Mozilla']
 
-					// Validating queries
-					with(fields.id.find) {
-						query[0].domain == ETLDomain.Application.name()
-						query[0].kv == [id: '152255']
-
-						query[1].domain == ETLDomain.Application.name()
-						query[1].kv == [appVendor: 'Mozilla']
-
-						size == 1
-						results == [152253]
-						matchOn == 2
+								size == 1
+								results == [152253]
+								matchOn == 2
+							}
+							warn
+							errors == ['found without asset id field']
+						}
 					}
+				}
+			}
 
-					fields.id.warn
-					fields.id.warnMsg == 'found without asset id field'
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can collect error messages in find command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				throw new RuntimeException('Invalid query for this Spec')
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							extract 'application id' load id
+							extract 'vendor name' load Vendor
+							
+							find Application by id with SOURCE.'application id' into id 
+							elseFind Application by appVendor with DOMAIN.appVendor into id
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['id', 'appVendor'] as Set
+				with(data[0]) {
+
+					errorCount == 2
+					with(fields) {
+
+						with(id) {
+							originalValue == '152254'
+							value == '152254'
+							with(find) {
+								query[0].domain == ETLDomain.Application.name()
+								query[0].kv == [id: '152254']
+								query[1].domain == ETLDomain.Application.name()
+								query[1].kv == [appVendor: 'Microsoft']
+							}
+							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
+						}
+						with(appVendor) {
+							originalValue == 'Microsoft'
+							value == 'Microsoft'
+						}
+					}
+				}
+				with(data[1]) {
+					errorCount == 2
+					with(fields) {
+
+						with(id) {
+							originalValue == '152255'
+							value == '152255'
+							with(find) {
+								query[0].domain == ETLDomain.Application.name()
+								query[0].kv == [id: '152255']
+								query[1].domain == ETLDomain.Application.name()
+								query[1].kv == [appVendor: 'Mozilla']
+							}
+
+							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
+						}
+						with(appVendor) {
+							originalValue == 'Mozilla'
+							value == 'Mozilla'
+						}
+					}
 				}
 			}
 

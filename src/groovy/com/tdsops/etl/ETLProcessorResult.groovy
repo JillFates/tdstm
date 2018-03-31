@@ -9,7 +9,7 @@ package com.tdsops.etl
  * @see ETLProcessorResult#initialRowDataMap()
  * @see ETLProcessorResult#initialFieldDataMap(com.tdsops.etl.Element)
  * @see ETLProcessorResult#queryDataMap(com.tdsops.etl.ETLFindElement)
- * @see ETLProcessorResult#addWarnMessageDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
+ * @see ETLProcessorResult#addWarnMessageInData(java.util.Map, com.tdsops.etl.ETLFindElement)
  * @see ETLProcessorResult#addResultsDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
  */
 class ETLProcessorResult {
@@ -74,14 +74,19 @@ class ETLProcessorResult {
 
 		String findId = findElement.currentFind.findId
 
-		Map<String, ?> data = currentData()
+		Map<String, ?> data = currentRowData()
+		Map<String, ?> field = data.fields[findId]
+
+		if(findElement.currentFind.errors){
+			addErrorsToCurrentRow(field, findElement.currentFind.errors)
+			data.errorCount = (data.errorCount ? data.errorCount + field.errors.size() : field.errors.size() )
+		}
 
 		if(!data.fields.containsKey(findId)){
 			throw ETLProcessorException.invalidFindCommand(findId)
 		}
 
-		Map<String, ?> find = data.fields[findId].find
-
+		Map<String, ?> find = field.find
 		find.query.add(queryDataMap(findElement))
 
 		if(findElement.results){
@@ -101,7 +106,7 @@ class ETLProcessorResult {
 
 		if(findElement.currentFind.objects){
 			Map<String, ?> data = reference.data.last()
-			addWarnMessageDataMap(data.fields[findElement.currentFind.findId], findElement)
+			addWarnMessageInData(data, findElement)
 		}
 	}
 
@@ -138,7 +143,7 @@ class ETLProcessorResult {
 	 */
 	void loadElement(Element element) {
 
-		Map<String, ?> currentData = currentData()
+		Map<String, ?> currentData = currentRowData()
 		currentData.rowNum = element.rowIndex
 
 		if(currentData.fields[element.fieldSpec.name]) {
@@ -148,7 +153,6 @@ class ETLProcessorResult {
 			reference.fields.add(element.fieldSpec.name)
 			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element)
 		}
-
 	}
 
 	/**
@@ -157,7 +161,7 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#removeIgnoredRows()
 	 */
 	void ignoreCurrentRow() {
-		currentData().ignore = true
+		currentRowData().ignore = true
 	}
 
 	/**
@@ -178,7 +182,7 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#rowFoundInLookup
 	 * @return a map with the current data node
 	 */
-	Map<String, ?> currentData() {
+	Map<String, ?> currentRowData() {
 
 		if(rowFoundInLookup){
 			return rowFoundInLookup
@@ -262,7 +266,7 @@ class ETLProcessorResult {
 		Map<String, ?> dataMap = [
 			value: element.value,
 			originalValue: element.originalValue,
-			error: false,
+			errors: [],
 			warn: false,
 			find: [
 				query: []
@@ -296,29 +300,35 @@ class ETLProcessorResult {
 			kv    : findElement.currentFind.kv
 		]
 
-		if(findElement.currentFind.error){
-			queryDataMap.error = findElement.currentFind.error
-		}
-
 		return queryDataMap
 	}
 
 	/**
 	 * It adds the warn message result in the field Data Map
 	 * <pre>
-	 * "asset": {
+	 *  "data": {
+	 *    "warn":true,
+	 *    "errors": ["found with wrong asset class"],
+	 *
+	 *    "asset": {
 	 * 		....
 	 * 		"warn":true,
-	 * 		"warnMsg": "found with wrong asset class",
-	 * 		....
+	 * 		"errors": ["found with wrong asset class"],
+	 * 		    ....
+	 * 	    }
 	 * 	}
 	 * </pre>
-	 * @param fieldDataMap a field data map
+	 * @param data a row data map
 	 * @param findElement the find element with the warn message
 	 */
-	private void addWarnMessageDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
+	private void addWarnMessageInData(Map<String, ?> data, ETLFindElement findElement) {
+		//TODO. Add this information at the row level too.
+		data.warn = true
+		data.errors.add(findElement.warnMessage)
+
+		Map<String, ?> fieldDataMap = data.fields[findElement.currentFind.findId]
 		fieldDataMap.warn = true
-		fieldDataMap.warnMsg = findElement.warnMessage
+		fieldDataMap.errors.add(findElement.warnMessage)
 	}
 
 	/**
@@ -452,5 +462,17 @@ class ETLProcessorResult {
 	 */
 	void releaseRowFoundInLookup(){
 		rowFoundInLookup = null
+	}
+
+	/**
+	 * Adds errors to the field Error list.
+	 * @param field a field data map result content
+	 * @param errors a list of errors to be added in field.property.errors list
+	 */
+	void addErrorsToCurrentRow(Map<String, ?> field, List<String> errors){
+		if(!field.errors){
+			field.errors = []
+		}
+		field.errors.addAll(errors)
 	}
 }

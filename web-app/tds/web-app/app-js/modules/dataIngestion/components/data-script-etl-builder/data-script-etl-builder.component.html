@@ -91,9 +91,18 @@
                     </div>
                     <hr>
                     <div class="row" *ngIf="scriptTestResult.domains.length > 0">
-                        <div class="col-md-12">
+                        <label class="col-md-12">
                             <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
-                        </div>
+                            <button data-toggle="collapse" data-target=".collapsible"
+                                    (click)="toggleSummary()"
+                                    class="btn btn-default pull-right">
+                                <i [ngClass]="{'fa-angle-double-right': !summaryCollapsed, 'fa-angle-double-down': summaryCollapsed}"
+                                   class="fa"></i>
+                            </button>
+                        </label>
+                        <!--<div class="col-md-12">
+                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
+                        </div>-->
                         <div class="col-md-12">
                             <kendo-tabstrip>
                                 <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
