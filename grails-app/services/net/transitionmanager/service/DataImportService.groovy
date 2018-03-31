@@ -11,6 +11,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Person
@@ -29,11 +30,6 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.TransactionDefinition
-
-
-
-import com.tds.asset.AssetEntity
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -646,6 +642,7 @@ class DataImportService implements ServiceMethods {
 	@NotTransactional()
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		Map context
 
 		if (specifiedRecordIds == null) {
 			specifiedRecordIds = []
@@ -680,7 +677,7 @@ class DataImportService implements ServiceMethods {
 			log.info 'processBatch({}) found {} PENDING rows', batchId, recordIds.size()
 
 			// Initialize the context with things that are going to be helpful throughtout the process
-			Map context = initContextForProcessBatch( batch.domainClassName )
+			context = initContextForProcessBatch( batch.domainClassName )
 
 			int totalRowCount = recordIds.size()
 			int offset = 0
@@ -697,6 +694,7 @@ class DataImportService implements ServiceMethods {
 
 				ImportBatchRecord.withNewTransaction { status ->
 					for (record in records) {
+						log.debug '\n\nprocessBatch() processing row {}', rowsProcessed
 						context.record = record
 						processBatchRecord(batch, record, context)
 						rowsProcessed++
@@ -1111,7 +1109,7 @@ class DataImportService implements ServiceMethods {
 
 			if (dependency) {
 				// UPDATE
-
+				log.debug 'findAndUpdateOrCreateDependency() UPDATING DEPENDENCY ID {}', dependency.id
 				// Update the primary or supporting assets if they changed
 				if (dependency.asset.id != primary.id) {
 					log.debug "findAndUpdateOrCreateDependency() Updated primary asset on Dependency"
@@ -1207,7 +1205,7 @@ class DataImportService implements ServiceMethods {
 			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
 			entity = context.cache[md5]
 			if (entity) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found in cache'
+				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity.id
 				break
 			}
 
@@ -1244,9 +1242,9 @@ class DataImportService implements ServiceMethods {
 			qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
-				log.debug 'lookupDomainRecordByFieldMetaData() found using ETL find/elseFind criteria'
+				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} using ETL find/elseFind criteria', entity.id
 			} else if (qtyFound > 1 ) {
-				log.debug "lookupDomainRecordByFieldMetaData() ETL find/elseFind criteria returned {} entities", qtyFound
+				log.debug "lookupDomainRecordByFieldMetaData() FOUND MULTIPLE - ETL find/elseFind criteria returned {} entities", qtyFound
 				entity = -2
 			}
 
@@ -1278,7 +1276,7 @@ class DataImportService implements ServiceMethods {
 
 		} else {
 
-			log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
+			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
 			int foundMatchOn = 0
 
@@ -1389,7 +1387,7 @@ class DataImportService implements ServiceMethods {
 		String errorMsg
 		Map createInfo
 		List<String> propertiesThatCannotBeSet = ['id', 'version', 'assetClass', 'moveBundle', 'createdBy', 'project']
-		log.debug 'createReferenceDomain() called for property {}', propertyName
+		log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
 		while (true) {
 			if (!fieldsInfo.containsKey(propertyName)) {
 				errorMsg = "Property $propertyName was missing from ETL meta-data"
