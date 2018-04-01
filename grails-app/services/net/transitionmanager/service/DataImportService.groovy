@@ -1062,9 +1062,29 @@ class DataImportService implements ServiceMethods {
 		fieldsToIgnore.addAll(['id'])
 		fieldNames =  fieldNames - fieldsToIgnore
 
+		// If no new value and init contains value and entity property has no value
+		// Then set the property to the init value
+		// Else if new value and current value not equal new value
+		// Then set new value
+
 		Map fieldsValues = [:]
-		for (field in fieldNames) {
-			fieldsValues[field] = fieldsInfo[field].value
+		for (fieldName in fieldNames) {
+			def newValue = fieldsInfo[fieldName].value
+			def domainValue = domain[fieldName]
+			boolean setWithInit = false
+			if ( newValue == null || (newValue instanceof String && newValue.trim() == '') ) {
+				// Consider setting the initialize value appropriately
+				def initValue = fieldsInfo[fieldName].init
+				if (initValue != null && (domainValue == null || (domainValue instanceof String) && domainValue == '') ) {
+					fieldsValues.put(fieldName, initValue)
+					setWithInit = true
+				}
+			}
+			if (! setWithInit) {
+				if (newValue != null && newValue != domainValue) {
+					fieldsValues.put(fieldName, newValue)
+				}
+			}
 		}
 		GormUtil.bindMapToDomain(domain, fieldsValues, fieldsToIgnore)
 	}
@@ -1205,7 +1225,7 @@ class DataImportService implements ServiceMethods {
 			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
 			entity = context.cache[md5]
 			if (entity) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity.id
+				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity
 				break
 			}
 
