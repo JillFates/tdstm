@@ -16,7 +16,7 @@
 		<div class="col-sm-6">
 			<div class="checkbox pull-left">
 				<label>
-					<input type="checkbox" (change)="onReload()" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
+					<input type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)" [(ngModel)]="justPlanning" name="justPlanning"> Just Planning</label>
 			</div>
 			<button type="button" class="btn btn-default btnDelete pull-left" id="btnDeleteAll" [disabled]="!hasItensSelected()" (click)="onBulkDelete()">
 				<i class="fa fa-fw fa-trash"></i> {{'GLOBAL.DELETE' | translate}}</button>
