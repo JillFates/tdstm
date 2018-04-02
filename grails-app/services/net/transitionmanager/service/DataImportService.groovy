@@ -1071,16 +1071,14 @@ class DataImportService implements ServiceMethods {
 		for (fieldName in fieldNames) {
 			def newValue = fieldsInfo[fieldName].value
 			def domainValue = domain[fieldName]
-			boolean setWithInit = false
-			if ( newValue == null || (newValue instanceof String && newValue.trim() == '') ) {
-				// Consider setting the initialize value appropriately
-				def initValue = fieldsInfo[fieldName].init
-				if (initValue != null && (domainValue == null || (domainValue instanceof String) && domainValue == '') ) {
-					fieldsValues.put(fieldName, initValue)
-					setWithInit = true
-				}
-			}
-			if (! setWithInit) {
+			def initValue = fieldsInfo[fieldName].init
+			boolean hasInitializeValue = (initValue != null)
+
+			if (hasInitializeValue) {
+				 if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
+					 fieldsValues.put(fieldName, initValue)
+				 }
+			} else {
 				if (newValue != null && newValue != domainValue) {
 					fieldsValues.put(fieldName, newValue)
 				}
