@@ -6,6 +6,7 @@ import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
 import net.transitionmanager.command.DataScriptNameValidationCommand
+import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person
@@ -263,7 +264,9 @@ class DataScriptService implements ServiceMethods{
 	* Parse a file that represent a MAP of data
 	* Current Formats supported:
 	*   JSON, CSV, EXCEL
-	* @param fileName
+	* @param fileName - the filename to use to retrieve data from filesystem
+	* @param paginationCommand - the pagination command containing the maximum number of rows to retrieve
+	 * 	(currently only supported by Excel)
 	* @return
 	*/
 	Map parseDataFromFile (String fileName) throws EmptyResultException{
@@ -278,7 +281,7 @@ class DataScriptService implements ServiceMethods{
 				return parseDataFromCSV(fileName)
 
 			case ['XLS', 'XLSX'] :
-				return parseDataFromXLS(fileName)
+				return parseDataFromXLS(fileName, 0, 0, paginationCommand)
 
 			default :
 			   throw new RuntimeException("Format ($extension) not supported")
@@ -362,13 +365,14 @@ class DataScriptService implements ServiceMethods{
 
 	/**
 	 * Parse Excel file to generate the JSON datafile
-	 * @param xlsFile
-	 * @param sheetNumber
-	 * @param headerRowIndex
+	 * @param xlsFile - the filename to use to retrieve data from filesystem
+	 * @param sheetNumber - the workbook sheet number to pull data from
+	 * @param headerRowIndex - the header row index
+	 * @param paginationCommand - the pagination command containing the maximum number of rows to retrieve
 	 * @return Map with the description of the Excel File Data
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0) throws RuntimeException {
+	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0, PaginationCommand paginationCommand) throws RuntimeException {
 
 		DecimalFormat df = new DecimalFormat('#.#########')
 
@@ -400,26 +404,24 @@ class DataScriptService implements ServiceMethods{
 		List<Map> data = []
 		int lastRowNum = sheet.getLastRowNum()
 
-		for( int r = headerRowIndex + 1; r <= lastRowNum; r++ ) {
+		for( int r = headerRowIndex + 1; (r <= lastRowNum && r <= paginationCommand.rows); r++ ) {
 			Row row = sheet.getRow(r)
 
 			Map object = [:]
 			data << object
 			Iterator<Row>cellIterator = row.cellIterator()
 
-			int c = 0
 			while (cellIterator.hasNext()) {
 				Cell cell = cellIterator.next()
-				String key = headerMap[ cell.columnIndex ]
-				String value = ''
-				if (cell.cellType== Cell.CELL_TYPE_NUMERIC) {
-					value =  df.format( cell.numericCellValue )
+				String key = headerMap[cell.columnIndex]
+				String value
+				if (cell.cellType == Cell.CELL_TYPE_NUMERIC) {
+					value = df.format(cell.numericCellValue)
 				} else {
 					value = cell.toString()
 				}
 
-				object[ key ] = value
-				c ++
+				object[key] = value
 			}
 		}
 

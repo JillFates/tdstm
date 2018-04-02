@@ -1,10 +1,13 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.common.ui.Pagination
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataScriptNameValidationCommand
+import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
@@ -20,7 +23,7 @@ import org.springframework.http.HttpStatus
  */
 @Secured("isAuthenticated()")
 @Slf4j(value = 'logger', category = 'grails.app.controllers.WsDataScriptController')
-class WsDataScriptController implements ControllerMethods {
+class WsDataScriptController implements ControllerMethods, PaginationMethods {
 
     private final static DELETE_OK_MESSAGE = "DataScript deleted successfully.";
 
@@ -172,6 +175,14 @@ class WsDataScriptController implements ControllerMethods {
         renderSuccessJson(result)
     }
 
+    /**
+     * Retrieve  sample data from uploaded file (JSON, CSV, EXCEL). For EXCEL files, it has it has the
+     * ability to return a maximum amount of rows by passing the optional parameter <code>rows</code>, it works
+     * the same way as other pagination endpoints.
+     * @param filename - sample data temporary filename uploaded
+     * @param rows - maximum amount of rows to return
+     * @return
+     */
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
         Map jsonMap = dataScriptService.parseDataFromFile(filename)
