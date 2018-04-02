@@ -853,7 +853,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				fields == ['id', 'appVendor'] as Set
 				with(data[0]) {
 
-					errorCount == 3
+					errorCount == 2
 					with(fields) {
 
 						with(id) {
@@ -874,7 +874,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					}
 				}
 				with(data[1]) {
-					errorCount == 3
+					errorCount == 2
 					with(fields) {
 
 						with(id) {

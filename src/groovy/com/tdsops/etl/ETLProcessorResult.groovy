@@ -78,24 +78,28 @@ class ETLProcessorResult {
 
 		String property = findElement.currentFind.property
 
-		Map<String, ?> data = currentRowData()
-		data.rowNum = findElement.rowIndex
+		Map<String, ?> rowDataMap = currentRowData()
+		rowDataMap.rowNum = findElement.rowIndex
 
-		if(!data.fields.containsKey(property)){
+		if(!rowDataMap.fields.containsKey(property)){
 			reference.fields.add(property)
-			data.fields[property] = initialFieldDataMap(null, null, null)
+			rowDataMap.fields[property] = initialFieldDataMap(null, null, null)
 		}
 
-		Map<String, ?> field = data.fields[property]
+		Map<String, ?> fieldDataMap = rowDataMap.fields[property]
+		List findCommandErrors  = findElement.currentFind.errors
 
-		if(findElement.currentFind.errors){
-			addErrorsToCurrentRow(field, findElement.currentFind.errors)
-			data.errorCount = (data.errorCount ? data.errorCount + field.errors.size() : field.errors.size() )
+
+		if(findCommandErrors){
+			addErrorsToCurrentRow(fieldDataMap, findCommandErrors)
+			// After add errors at the field level
+			// we need to sum the total amount of errors at the row level
+			rowDataMap.errorCount += findCommandErrors.size()
 		}
 
-		Map<String, ?> find = field.find
-		find.query.add(queryDataMap(findElement))
-		addResultsDataMap(find, findElement)
+		Map<String, ?> findDataMap = fieldDataMap.find
+		findDataMap.query.add(queryDataMap(findElement))
+		addResultsDataMap(findDataMap, findElement)
 	}
 
 	/**
@@ -222,6 +226,7 @@ class ETLProcessorResult {
 	 *	"data": [
 	 *		{
 	 * 		    "op": "I",
+	 * 		    "errorCount": 0,
 	 * 		    "warn": true,
 	 * 		    "duplicate": true,
 	 * 		    "errors": [],
@@ -233,6 +238,7 @@ class ETLProcessorResult {
 	private Map<String, ?> initialRowDataMap() {
 		return [
 			op: 'I',
+			errorCount: 0,
 			warn: false,
 			duplicate: false,
 			errors: [],

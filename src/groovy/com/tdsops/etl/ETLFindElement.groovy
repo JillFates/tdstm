@@ -4,22 +4,44 @@ package com.tdsops.etl
  * <code>
  *  domain Dependency
  *  // Try to find the Application using different searches
- * 	find Application 	 by id 				     with assetId into assetId
- * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
- * 	elseFind Application by assetName            with primaryName into assetId
- * 	elseFind Asset 		 by assetName            with primaryName into assetId warn 'found with wrong asset class'
+ * 	find Application 	 by id 				     with assetId into property
+ * 	elseFind Application by assetName, assetType with primaryName, primaryType into property
+ * 	elseFind Application by assetName            with primaryName into property
+ * 	elseFind Asset 		 by assetName            with primaryName into property warn 'found with wrong asset class'
  * </code>
  * @param values
  * @return
  */
 class ETLFindElement {
 
+	/**
+	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
+	 * @see ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex)
+	 */
 	ETLProcessor processor
+	/**
+	 * Each command in sequence of find/elseFind commands has defined the row index in the iteration loop.
+	 */
 	Integer rowIndex
+	/**
+	 * One warn message could be added in a sequence of find/elseFind commands
+	 */
 	String warnMessage
+	/**
+	 * A sequence of find/elseFind commands are associated to a ETLDomain value
+	 */
 	ETLDomain currentDomain
+	/**
+	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
+	 */
 	Map<String, ?> currentFind = [:]
+	/**
+	 * Total results collected towards a sequence of find/elseFind commands
+	 */
 	Map<String, ?> results
+	/**
+	 * List of references to each one in a sequence of find/elseFind commands
+	 */
 	List<Map<String, ?>> findings = []
 
 	/**
