@@ -1,46 +1,31 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.sql.SqlUtil
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
-import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import net.transitionmanager.command.ETLDataRecordFieldsCommand
-import net.transitionmanager.command.ETLDataRecordFieldsPropertyCommand
-
-import groovy.util.logging.Slf4j
-import grails.transaction.Transactional
 import grails.transaction.NotTransactional
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.TransactionDefinition
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
-// LEGACY
+import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
-
+import net.transitionmanager.domain.ImportBatch
+import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.transaction.annotation.Propagation
+// LEGACY
 /**
  * DataImportService - contains the methods for dealing with data importing from the ETL process;
  * interacting with the Import Batch management; and posting of data into various domains.
@@ -926,11 +911,12 @@ class DataImportService implements ServiceMethods {
 			for (error in domain.errors.allErrors) {
 				log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
 				String property = error.getField()
+				String errorMsg = i18nMessage(error)
 				if (fieldsInfo[property]) {
-					fieldsInfo[property].errors << error.toString()
+					fieldsInfo[property].errors << errorMsg
 				} else {
 					// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
-					record.addError(error.toString())
+					record.addError(errorMsg)
 				}
 			}
 		}
