@@ -6,7 +6,6 @@ import com.tds.asset.AssetEntity
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -26,16 +25,8 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
-
-
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
@@ -751,16 +742,18 @@ class PersonService implements ServiceMethods {
 			if (!hasRef) {
 				StringBuilder sb = new StringBuilder("SELECT count(*) AS count FROM ${table} WHERE ")
 				boolean first=true
-				columns.each { col ->
-					if (first) {
-						first=false
-					} else {
-						sb.append(' OR ')
+				columns.each { col, delete ->
+					if (delete){
+						if (first) {
+							first=false
+						} else {
+							sb.append(' OR ')
+						}
+						sb.append("$col = ${person.id}")
+						String sql = sb.toString()
+						int count = jdbcTemplate.queryForObject(sql, Integer.class)
+						hasRef = (count > 0)
 					}
-					sb.append("$col = ${person.id}")
-					String sql = sb.toString()
-					int count = jdbcTemplate.queryForObject(sql, Integer.class)
-					hasRef = (count > 0)
 				}
 			}
 		}
