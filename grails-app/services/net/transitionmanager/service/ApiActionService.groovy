@@ -330,7 +330,6 @@ class ApiActionService implements ServiceMethods {
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
-
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
@@ -342,6 +341,14 @@ class ApiActionService implements ServiceMethods {
 		]
 
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+		Map optionalRequestParams = [
+			actionId: action.id,
+			producesData: action.producesData,
+			credentials: action.credential?.toMap(),
+			apiAction: apiActionToMap(action)
+		]
+
+		actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
 
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
