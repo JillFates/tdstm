@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.ObjectError
 
 /**
  * This service wraps the access to the MessageSource class for i18n messages.
@@ -52,6 +53,16 @@ class MessageSourceService {
 	 */
 	String i18nMessage(String code, Object[] args, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
 		return messageSource.getMessage(code, args, defaultMessage, locale)
+	}
+
+	/**
+	 * Return the corresponding error message for the ObjectError and Locale received.
+	 * @param objectError
+	 * @param locale
+	 * @return
+	 */
+	String i18nMessage(ObjectError objectError, Locale locale = LocaleContextHolder.locale){
+		return messageSource.getMessage(objectError, locale)
 	}
 
 }

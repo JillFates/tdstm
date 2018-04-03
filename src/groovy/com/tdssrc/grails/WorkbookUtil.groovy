@@ -25,6 +25,60 @@ import java.text.DateFormat
 class WorkbookUtil {
 
 	/**
+	 * Creates a new Workbook based on file extension
+	 * @param extension
+	 * @return an instance or Workbook
+	 * @trows a RuntimeException if the extension is not supported
+	 */
+	static Workbook createWorkbook(String extension = 'XLSX'){
+
+		Workbook workbook
+		if (extension.toUpperCase() == 'XLSX') {
+			workbook = new XSSFWorkbook()
+		} else if (extension.toUpperCase() == 'XLS') {
+			workbook = new HSSFWorkbook()
+		}
+
+		if (!workbook) {
+			throw new RuntimeException("Unsupported File Format $extension")
+		}
+
+		return workbook
+	}
+
+	/**
+	 * Saves a workbook instance in an outputStream
+	 * @param workbook an instance of Workbook class
+	 * @param outputStream Stream of data used to save workbook parameter
+	 * @return same instance of workbook used to saved data
+	 * @throws Exception if there was an error working with outputStream parameter
+	 */
+	static Workbook saveToOutputStream(Workbook workbook, OutputStream outputStream) throws Exception{
+		workbook.write(outputStream)
+		workbook.close()
+		outputStream.close()
+		return workbook
+	}
+
+	/**
+	 *
+	 * @param rowNumber
+	 * @param sheet
+	 * @return
+	 */
+	static List<Cell> getCellsForSheet(int rowNumber, Sheet sheet) {
+
+		List<Cell> cells = []
+		Row row = sheet.getRow(rowNumber)
+		Iterator iterator = row.iterator()
+		while(iterator.hasNext()){
+			cells.add((Cell)iterator.next())
+		}
+		return cells
+	}
+
+
+	/**
 	 * Get sheet names
 	 * @param workbook
 	 * @return
@@ -579,6 +633,33 @@ class WorkbookUtil {
 	}
 
 	/**
+	 * Get a workbook sheet based on a sheetNumber
+	 * @param workbook
+	 * @param sheetName
+	 * @return Sheet
+	 */
+	static Sheet getSheetFromWorkbookAt(Workbook workbook, int sheetNumber) {
+		Sheet sheet = workbook.getSheetAt(sheetNumber)
+		if (!sheet) {
+			throw new RuntimeException("Unable to find sheet $sheetNumber in the uploaded spreadsheet")
+		}
+		if (sheet instanceof SXSSFSheet) {
+			((SXSSFSheet)sheet).setRandomAccessWindowSize(25)
+		}
+		return sheet
+	}
+
+	/**
+	 * Read sheet name using Workbook instance
+	 * @param workbook
+	 * @param sheetNumber
+	 * @return
+	 */
+	static String getSheetName(Workbook workbook, int sheetNumber) {
+		return workbook.getSheetName(sheetNumber)
+	}
+
+	/**
 	 * Get a workbook sheet
 	 * @param workbook
 	 * @param sheetName
@@ -741,4 +822,5 @@ class WorkbookUtil {
 
 		return rowStyles
 	}
+
 }

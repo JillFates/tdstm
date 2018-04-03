@@ -1,50 +1,31 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.sql.SqlUtil
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
-import com.tds.asset.AssetDependency
-import net.transitionmanager.domain.ImportBatch
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.UserLogin
-import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
-import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import net.transitionmanager.command.ETLDataRecordFieldsCommand
-import net.transitionmanager.command.ETLDataRecordFieldsPropertyCommand
-
-import groovy.util.logging.Slf4j
-import grails.transaction.Transactional
 import grails.transaction.NotTransactional
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.TransactionDefinition
-
-
-
-import com.tds.asset.AssetEntity
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
-// LEGACY
+import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
-
+import net.transitionmanager.domain.ImportBatch
+import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.UserLogin
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.transaction.annotation.Propagation
+// LEGACY
 /**
  * DataImportService - contains the methods for dealing with data importing from the ETL process;
  * interacting with the Import Batch management; and posting of data into various domains.
@@ -388,8 +369,6 @@ class DataImportService implements ServiceMethods {
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
 		for (fieldName in importContext.fields) {
 
-			// println "** insertRowDataIntoDataTransferValues() domainId=$domainId, fieldName=$fieldName"
-
 			// If the current field is the id, skip it (avoid inserting it into the database).
 			if (fieldName != 'id') {
 
@@ -414,14 +393,11 @@ class DataImportService implements ServiceMethods {
 					rowId: rowNum
 				)
 
-				// println "** insertRowDataIntoDataTransferValues() domainId=$domainId for batch ${batch.id}, batchRecord.assetEntityId=${batchRecord.assetEntityId} field:${batchRecord.fieldName} value: ${batchRecord.correctedValue}"
-
 				// Boolean triggerFailureTest = (fieldValue == 'oradbsrv02')
 				Boolean triggerFailureTest = false
 
 				// This should NOT throw an exception because we're dealing errors in a savepoint rollback
 				if (! batchRecord.save(failOnError:false) || triggerFailureTest ) {
-					// println "** FORCING ROLLBACK"
 
 					// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
 					importContext.errors << "Unable to save field $fieldName on row ${rowNum}: ${GormUtil.allErrorsString(batchRecord)}"
@@ -552,6 +528,7 @@ class DataImportService implements ServiceMethods {
 			// Now make sure nobody altered the batch in the meantime
 			// Can only start running a batch if it was QUEUED or PENDING
 			if ( ! [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.PENDING].contains(batch.status) ) {
+				log.debug 'setBatchToRunning() batch {}, status {}', batchId, batch.status
 				throw new DomainUpdateException('Unable to process batch due to change in status')
 			}
 
@@ -563,7 +540,7 @@ class DataImportService implements ServiceMethods {
 
 			// Check to see if there are any other batches in the RUNNING state
 			// that show progress in the past two minutes.
-			int count = ImportBatch.where{
+			int count = ImportBatch.where {
 				project.id == batch.project.id
 				status == ImportBatchStatusEnum.RUNNING
 				processLastUpdated < noProgressInPast2Min
@@ -580,7 +557,8 @@ class DataImportService implements ServiceMethods {
 				processLastUpdated = new Date()
 				processStopFlag = 0
 			}
-			batch.save(failOnError:true)
+			log.debug 'setBatchToRunning() dirtyProperties {}', batch.dirtyPropertyNames
+			batch.save(failOnError:true, flush:true)
 		}
 	}
 
@@ -593,7 +571,7 @@ class DataImportService implements ServiceMethods {
 	 * @param status - the status to set the batch to when the processing has been completed.
 	 * @return false if the processing should be stopped.
 	 */
-	@NotTransactional()
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	boolean updateBatchProgress( Long batchId, Integer rowsProcessed, Integer totalRows, ImportBatchStatusEnum status = null) {
 		ImportBatch.withNewTransaction { session ->
 			ImportBatch batch = ImportBatch.get(batchId)
@@ -606,13 +584,12 @@ class DataImportService implements ServiceMethods {
 			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
 			batch.processProgress = percComplete
 			batch.processLastUpdated = new Date()
-			batch.processStopFlag = 0
 			if (status) {
 				batch.status = status
 			}
 			batch.save(failOnError:true)
 
-			return (1 == batch.processStopFlag)
+			return (0 == batch.processStopFlag)
 		}
 	}
 
@@ -647,13 +624,15 @@ class DataImportService implements ServiceMethods {
 	 * @param specifiedRecordIds - an optional list of ImportBatchRecord IDs to process
 	 * @return the number of rows that were processed
 	 */
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@NotTransactional()
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		Map context
+
 		if (specifiedRecordIds == null) {
 			specifiedRecordIds = []
 		}
-		log.info "processBatch() for batch $batchId of project $project started with ids=$specifiedRecordIds"
+		log.info "processBatch() for batch $batchId of project $project started with requested ids=$specifiedRecordIds"
 		def stopwatch = new StopWatch()
 		stopwatch.start()
 
@@ -661,12 +640,13 @@ class DataImportService implements ServiceMethods {
 
 		String error = validateBatchForProcessing(batch)
 		if (error) {
-
+			// TODO : JPM 3/2018 : validateBatchForProcessing is not being handled for errors
 		}
 
 		Exception ex = null
 		try {
 			setBatchToRunning(batch.id)
+			batch.refresh()
 
 			// Get the list of the ImportBatchRecord IDs to be processed
 			List<Long> recordIds = ImportBatchRecord.where {
@@ -679,14 +659,14 @@ class DataImportService implements ServiceMethods {
 			.projections { property('id') }
 			.list(sortBy: 'id')
 
-			log.debug 'processBatch() found {} PENDING rows', recordIds.size()
+			log.info 'processBatch({}) found {} PENDING rows', batchId, recordIds.size()
 
 			// Initialize the context with things that are going to be helpful throughtout the process
-			Map context = initContextForProcessBatch( batch.domainClassName )
+			context = initContextForProcessBatch( batch.domainClassName )
 
 			int totalRowCount = recordIds.size()
 			int offset = 0
-			int setSize = 100
+			int setSize = 5
 			boolean aborted = false
 
 			// Now iterate over the list in sets of 100 rows
@@ -697,24 +677,26 @@ class DataImportService implements ServiceMethods {
 					id in recordSetIds
 				}.list(sortBy: 'id')
 
-				for (record in records) {
-					context.record = record
-					processBatchRecord(batch, record, context)
-					println "processBatch() record ${record.id} status ${record.status}"
-					rowsProcessed++
+				ImportBatchRecord.withNewTransaction { status ->
+					for (record in records) {
+						log.debug '\n\nprocessBatch() processing row {}', rowsProcessed
+						context.record = record
+						processBatchRecord(batch, record, context)
+						rowsProcessed++
+					}
+					aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
+					GormUtil.flushAndClearSession()
 				}
 
-				aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
-				// GormUtil.flushAndClearSession()
-
-				break
+				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
+				if (aborted) {
+					log.info 'processBatch({}) received abort process signal and stopped', batchId
+				}
 			}
-			//GormUtil.flushAndClearSession()
-
 		} catch(e) {
-			// If an exception happened to occur during this process then we'll save it for the moment
+			// If an exception happened to occur during this process then we'll save it for the moment and then deal with
+			// it after updating the batch appropriately.
 			ex = e
-
 		}
 
 		// Now update the status of the ImportBatch based on the number of records still in the
@@ -728,7 +710,7 @@ class DataImportService implements ServiceMethods {
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
 
-		log.info "processBatch() for batch $batchId finished and took ${stopwatch.endDuration()}"
+		log.info "processBatch({}) finished in {} and processed {} records", batchId, stopwatch.endDuration(), rowsProcessed
 
 		// TODO : JPM 3/2018 : Fix the batch status update after processing
 		// It occurred to me that throwing the Exception is going to rollback the changes but that the
@@ -736,7 +718,6 @@ class DataImportService implements ServiceMethods {
 		// triggered back at the Controller layer after the transaction was rolled back to update the batch status appropriately.
 		// Perhaps the above code can be broken out into a separate service call and called subsequent to this method so that the
 		// data would be committed appropriately and the the query will have the correct information.
-
 
 		if (ex) {
 			// Now we send the exception back to the user interface
@@ -751,6 +732,7 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch to be evaluated
 	 * @return A string containing an error if one was discovered
 	 */
+	@NotTransactional()
 	def validateBatchForProcessing(ImportBatch batch) {
 		String error
 		String domainName = batch.domainClassName.name()
@@ -778,6 +760,7 @@ class DataImportService implements ServiceMethods {
 	 * set the status to PENDING.
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
+	@NotTransactional()
 	private void updateBatchStatus(ImportBatch batch) {
 		Integer count = ImportBatchRecord.where {
 			importBatch.id == batch.id
@@ -842,37 +825,36 @@ class DataImportService implements ServiceMethods {
 			primary = lookupDomainRecordByFieldMetaData(project, 'asset', fieldsInfo, context)
 			supporting = lookupDomainRecordByFieldMetaData(project, 'dependent', fieldsInfo, context)
 
-			log.debug 'processDependencyRecord() primary={}', primary
-			log.debug 'processDependencyRecord() primary errors={}', fieldsInfo['asset'].errors
-			log.debug 'processDependencyRecord() supporting={}', supporting
-			log.debug 'processDependencyRecord() supporting errors={}', fieldsInfo['dependent'].errors
+			// log.debug 'processDependencyRecord() primary={}', primary
+			// log.debug 'processDependencyRecord() primary errors={}', fieldsInfo['asset'].errors
+			// log.debug 'processDependencyRecord() supporting={}', supporting
+			// log.debug 'processDependencyRecord() supporting errors={}', fieldsInfo['dependent'].errors
 			// if ( primary < 0  || supporting < 0|| fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
 			if ( fieldsInfo['asset'].errors || fieldsInfo['dependent'].errors ) {
-				log.debug 'processDependencyRecord() primary create={}, errors={}', fieldsInfo['asset'].create, fieldsInfo['asset'].errors
-				log.debug 'processDependencyRecord() supporting create={}, errors={}', fieldsInfo['dependent'].create, fieldsInfo['dependent'].errors
+				// log.debug 'processDependencyRecord() primary create={}, errors={}', fieldsInfo['asset'].create, fieldsInfo['asset'].errors
+				// log.debug 'processDependencyRecord() supporting create={}, errors={}', fieldsInfo['dependent'].create, fieldsInfo['dependent'].errors
 
 				// If there were multiple assets found then we can't create/update the dependency
-				log.debug "processDependencyRecord() Abandoning the creation/updating of AssetDependency due to errors"
+				// log.debug "processDependencyRecord() Abandoning the creation/updating of AssetDependency due to errors"
 				break
 			}
 
-			log.debug "processDependencyRecord() before createReferenceDomain: primary asset: $primary, supporting: $supporting"
+			// log.debug "processDependencyRecord() before createReferenceDomain: primary asset: $primary, supporting: $supporting"
 
 			// Attempt to create the assets if it don't exist using the create structure generated by the ETL process
 			if (! primary) {
 				primary = createReferenceDomain(project, 'asset', fieldsInfo, context)
-				log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
+				// log.debug 'processDependencyRecord() after createReferenceDomain: primary: {}', primary
 			}
 			if (! supporting) {
 				supporting = createReferenceDomain(project, 'dependent', fieldsInfo, context)
-				log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
+				// log.debug 'processDependencyRecord() after createReferenceDomain: supporting: {}', supporting
 			}
 
 			// Try finding & updating or creating the dependency with primary and supporting assets that were found
 			if (primary && supporting) {
 				dependency = findAndUpdateOrCreateDependency(primary, supporting, fieldsInfo, context)
 			}
-
 			break
 		}
 
@@ -889,7 +871,7 @@ class DataImportService implements ServiceMethods {
 			} else {
 				record.operation = (dependency.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
 
-				log.debug "processDependencyRecord() Saving the Dependency"
+				// log.debug "processDependencyRecord() Saving the Dependency"
 				if (dependency.save(failOnError:false)) {
 					// If we still have a dependency record then the process must have finished
 					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum
@@ -905,7 +887,7 @@ class DataImportService implements ServiceMethods {
 
 		// Update the fieldsInfo back into the Import Batch Record
 		record.fieldsInfo = JsonUtil.toJson(fieldsInfo)
-		log.debug "processDependencyRecord() Saving the ImportBatchRecord with status ${record.status}"
+		// log.debug "processDependencyRecord() Saving the ImportBatchRecord with status ${record.status}"
 		if (! record.save(failOnError:false) ) {
 			log.warn "processDependencyRecord() Failed saving ImportBatchRecord : ${ GormUtil.allErrorsString(record) }"
 		}
@@ -929,11 +911,12 @@ class DataImportService implements ServiceMethods {
 			for (error in domain.errors.allErrors) {
 				log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
 				String property = error.getField()
+				String errorMsg = i18nMessage(error)
 				if (fieldsInfo[property]) {
-					fieldsInfo[property].errors << error.toString()
+					fieldsInfo[property].errors << errorMsg
 				} else {
 					// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
-					record.addError(error.toString())
+					record.addError(errorMsg)
 				}
 			}
 		}
@@ -1065,9 +1048,27 @@ class DataImportService implements ServiceMethods {
 		fieldsToIgnore.addAll(['id'])
 		fieldNames =  fieldNames - fieldsToIgnore
 
+		// If no new value and init contains value and entity property has no value
+		// Then set the property to the init value
+		// Else if new value and current value not equal new value
+		// Then set new value
+
 		Map fieldsValues = [:]
-		for (field in fieldNames) {
-			fieldsValues[field] = fieldsInfo[field].value
+		for (fieldName in fieldNames) {
+			def newValue = fieldsInfo[fieldName].value
+			def domainValue = domain[fieldName]
+			def initValue = fieldsInfo[fieldName].init
+			boolean hasInitializeValue = (initValue != null)
+
+			if (hasInitializeValue) {
+				 if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
+					 fieldsValues.put(fieldName, initValue)
+				 }
+			} else {
+				if (newValue != null && newValue != domainValue) {
+					fieldsValues.put(fieldName, newValue)
+				}
+			}
 		}
 		GormUtil.bindMapToDomain(domain, fieldsValues, fieldsToIgnore)
 	}
@@ -1112,7 +1113,7 @@ class DataImportService implements ServiceMethods {
 
 			if (dependency) {
 				// UPDATE
-
+				log.debug 'findAndUpdateOrCreateDependency() UPDATING DEPENDENCY ID {}', dependency.id
 				// Update the primary or supporting assets if they changed
 				if (dependency.asset.id != primary.id) {
 					log.debug "findAndUpdateOrCreateDependency() Updated primary asset on Dependency"
@@ -1208,7 +1209,7 @@ class DataImportService implements ServiceMethods {
 			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
 			entity = context.cache[md5]
 			if (entity) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found in cache'
+				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity
 				break
 			}
 
@@ -1245,9 +1246,9 @@ class DataImportService implements ServiceMethods {
 			qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
-				log.debug 'lookupDomainRecordByFieldMetaData() found using ETL find/elseFind criteria'
+				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} using ETL find/elseFind criteria', entity.id
 			} else if (qtyFound > 1 ) {
-				log.debug "lookupDomainRecordByFieldMetaData() ETL find/elseFind criteria returned {} entities", qtyFound
+				log.debug "lookupDomainRecordByFieldMetaData() FOUND MULTIPLE - ETL find/elseFind criteria returned {} entities", qtyFound
 				entity = -2
 			}
 
@@ -1279,7 +1280,7 @@ class DataImportService implements ServiceMethods {
 
 		} else {
 
-			log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
+			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
 			int foundMatchOn = 0
 
@@ -1390,7 +1391,7 @@ class DataImportService implements ServiceMethods {
 		String errorMsg
 		Map createInfo
 		List<String> propertiesThatCannotBeSet = ['id', 'version', 'assetClass', 'moveBundle', 'createdBy', 'project']
-		log.debug 'createReferenceDomain() called for property {}', propertyName
+		log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
 		while (true) {
 			if (!fieldsInfo.containsKey(propertyName)) {
 				errorMsg = "Property $propertyName was missing from ETL meta-data"
@@ -1441,7 +1442,7 @@ class DataImportService implements ServiceMethods {
 				break
 			} else {
 				// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
-				log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
+				//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
 				entity.save(failOnError:true, flush:true)
 			}
 
@@ -1471,7 +1472,6 @@ class DataImportService implements ServiceMethods {
 		for (field in fieldsInfo) {
 			field.value.errors = []
 		}
-		println "resetRecordAndFieldsInfoErrors() fieldsInfo=$fieldsInfo"
 	}
 
 	/**
@@ -1502,7 +1502,6 @@ class DataImportService implements ServiceMethods {
 			( fieldsInfo[fieldName].find.containsKey('query') ? fieldsInfo[fieldName].find.query.toString() : 'NO-QUERY-SPECIFIED')
 		)
 	}
-
 }
 
 		// The following was my initial attempt to get the marshalling of the fieldsInfo JSON into a hierarchical set of Command

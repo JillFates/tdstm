@@ -24,6 +24,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
@@ -217,7 +218,7 @@ class ApiActionService implements ServiceMethods {
 				agent."${action.agentMethod}"(action.asyncQueue, remoteMethodParams)
 			} else if (!action.callbackMode || CallbackMode.DIRECT == action.callbackMode) {
 				// add additional data to the api action execution to have it available when needed
-				remoteMethodParams << [
+				Map optionalRequestParams = [
 						actionId: action.id,
 						taskId: context.id,
 						producesData: action.producesData,
@@ -228,19 +229,9 @@ class ApiActionService implements ServiceMethods {
 				// get api action agent instance
 				def agent = agentInstanceForAction(action)
 
+				// construct action request object and pass options params
 				ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
-
-				// POC if credential authentication method is COOKIE (vcenter)
-				// TODO : SL 2/2018 : use case statement to handle COOKIE, HTTP_SESSION, JWT
-				// TODO  : SL 2/2018 : use a method in Credential domain to determine if the call requires pre-authentication
-				// if (action?.credential && action.credential.authenticationMethod == AuthenticationMethod.COOKIE) {
-				// 	Map authentication = credentialService.authenticate(action.credential)
-				// 	if (authentication) {
-				// 		// TODO  : SL 2/2018 : this needs to come from CredentialService according to the authenticationMethod being used
-				// 		actionRequest.config.setProperty('AUTH_COOKIE_ID', 'vmware-api-session-id')
-				// 		actionRequest.config.setProperty('AUTH_COOKIE_VALUE', authentication.value)
-				// 	}
-				// }
+				actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
 
 				// check pre script
 				JSONObject reactionScripts = JsonUtil.parseJson(action.reactionScripts)
@@ -339,7 +330,6 @@ class ApiActionService implements ServiceMethods {
 
 		// get the agent instance
 		def agent = agentInstanceForAction(action)
-
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = agent.buildMethodParamsWithContext(action, null)
 
@@ -351,21 +341,19 @@ class ApiActionService implements ServiceMethods {
 		]
 
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
+		Map optionalRequestParams = [
+			actionId: action.id,
+			producesData: action.producesData,
+			credentials: action.credential?.toMap(),
+			apiAction: apiActionToMap(action)
+		]
+
+		actionRequest.setOptions(new ActionRequestParameter(optionalRequestParams))
 
 		log.debug 'About to invoke the following command: {}.{} with params {}', agent.name, action.agentMethod, remoteMethodParams
 
 		// execute action and return any result that were returned
 		return agent.invoke(action.agentMethod, actionRequest)
-	}
-
-	/**
-	 * Get ApiAction parameters values from context object.
-	 * @param apiAction
-	 * @param assetComment
-	 * @return
-	 */
-	Map<String, ?> getApiActionParametersAndValuesFromContext (ApiAction apiAction, AssetComment assetComment) {
-		return buildMethodParamsWithContext(apiAction, assetComment)
 	}
 
 	/**

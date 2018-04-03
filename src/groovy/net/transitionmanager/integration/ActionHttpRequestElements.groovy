@@ -191,9 +191,8 @@ class ActionHttpRequestElements {
 			Map uriParamValues = [:]
 			// Grab the values for the placeholders and encode them
 			for (String name in placeholderNames) {
-				if (actionRequest.param.hasProperty(name)) {
-					//uriParamValues.put(name, UrlUtil.encode( actionRequest.param.getProperty(name) ) )
-					uriParamValues.put(name, actionRequest.param.getProperty(name))
+				if (actionRequest.params.hasProperty(name)) {
+					uriParamValues.put(name, UrlUtil.encode( actionRequest.params.getProperty(name) ) )
 				}
 			}
 
@@ -219,10 +218,10 @@ class ActionHttpRequestElements {
 
 		// Now load extraParams with the parameters that were not used as placeholders
 		if (placeholderNames) {
-			this.extraParams = actionRequest.param.getAllProperties().findAll {k, v ->
+			this.extraParams = actionRequest.params.getAllProperties().findAll {k, v ->
 				! placeholderNames.contains(k) }
 		} else {
-			this.extraParams = actionRequest.param.getAllProperties().clone()
+			this.extraParams = actionRequest.params.getAllProperties().clone()
 		}
 	}
 }
