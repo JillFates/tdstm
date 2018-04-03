@@ -2,23 +2,46 @@ package com.tdsops.etl
 /**
  * ETL find command implementation.
  * <code>
- *     domain Dependency
+ *  domain Dependency
  *  // Try to find the Application using different searches
- * 	find Application 	 by id 				     with assetId into assetId
- * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
- * 	elseFind Application by assetName            with primaryName into assetId
- * 	elseFind Asset 		 by assetName            with primaryName into assetId warn 'found with wrong asset class'
+ * 	find Application 	 by id 				     with assetId into property
+ * 	elseFind Application by assetName, assetType with primaryName, primaryType into property
+ * 	elseFind Application by assetName            with primaryName into property
+ * 	elseFind Asset 		 by assetName            with primaryName into property warn 'found with wrong asset class'
  * </code>
  * @param values
  * @return
  */
 class ETLFindElement {
 
+	/**
+	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
+	 * @see ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex)
+	 */
 	ETLProcessor processor
+	/**
+	 * Each command in sequence of find/elseFind commands has defined the row index in the iteration loop.
+	 */
+	Integer rowIndex
+	/**
+	 * One warn message could be added in a sequence of find/elseFind commands
+	 */
 	String warnMessage
+	/**
+	 * A sequence of find/elseFind commands are associated to a ETLDomain value
+	 */
 	ETLDomain currentDomain
+	/**
+	 * This variable contains the current find command params and results in a sequence of find/elseFind commands
+	 */
 	Map<String, ?> currentFind = [:]
+	/**
+	 * Total results collected towards a sequence of find/elseFind commands
+	 */
 	Map<String, ?> results
+	/**
+	 * List of references to each one in a sequence of find/elseFind commands
+	 */
 	List<Map<String, ?>> findings = []
 
 	/**
@@ -26,8 +49,9 @@ class ETLFindElement {
 	 * @param processor
 	 * @param domain
 	 */
-	ETLFindElement(ETLProcessor processor, ETLDomain domain) {
+	ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex) {
 		this.processor = processor
+		this.rowIndex = rowIndex
 		setCurrentDomain(domain)
 	}
 
@@ -43,20 +67,19 @@ class ETLFindElement {
 	ETLFindElement elseFind(ETLDomain domain) {
 		findings.add(currentFind)
 		setCurrentDomain(domain)
-
-		this
+		return this
 	}
 
 	/**
-	 * Defines the findId for the current find element
-	 * @param findId
+	 * Defines the property for the current find element
+	 * @param property
 	 * @return
 	 */
-	ETLFindElement into(String findId) {
-		validateReference(findId)
-		currentFind.findId = findId
+	ETLFindElement into(String property) {
+		validateReference(property)
+		currentFind.property = property
 		processor.addFindElement(this)
-		this
+		return this
 	}
 
 	/**
@@ -69,7 +92,7 @@ class ETLFindElement {
 			checkAssetFieldSpec(field)
 			currentFind.fields.add(field)
 		}
-		this
+		return this
 	}
 
 	/**
@@ -91,7 +114,7 @@ class ETLFindElement {
 			currentFind.values
 		].transpose().collectEntries { it }
 
-		if(!results){
+		if(!results?.objects){
 
 			try{
 				currentFind.objects = DomainClassQueryHelper.where(
@@ -99,6 +122,7 @@ class ETLFindElement {
 					processor.project,
 					currentFind.kv)
 			} catch(all){
+
 				processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
 				if(currentFind.errors == null) {
 					currentFind.errors = []
@@ -106,16 +130,21 @@ class ETLFindElement {
 				currentFind.errors.add(all.getMessage())
 			}
 
+			results = [
+				objects : [],
+				matchOn: null
+			]
 			if(currentFind.objects && !currentFind.objects.isEmpty()){
-				results = [
-					size: currentFind.objects.size(),
-					objects: currentFind.objects,
-					matchOn: findings.size() + 1
-				]
+				results.objects = currentFind.objects
+				results.matchOn = findings.size()
+
+				if(currentFind.objects.size() > 1){
+					currentFind.errors = ['The find/elseFind command(s) found multiple records']
+				}
 			}
 		}
 
-		this
+		return this
 	}
 
 	/**
@@ -137,7 +166,7 @@ class ETLFindElement {
 	}
 
 	/**
-	 * Checks if the current instance of processor has a project already defiend.
+	 * Checks if the current instance of processor has a project already defined.
 	 * If not It throws an exception
 	 */
 	private void checkProject() {
@@ -146,10 +175,19 @@ class ETLFindElement {
 		}
 	}
 
+	/**
+	 * Appends a warn message in the ETL Processor result.
+	 * <pre>
+	 *   find Application by assetName with primaryName into assetId
+	 *   elseFind Asset by assetName with primaryName into assetId warn 'found with wrong asset class'
+	 * </pre>
+	 * @param message
+	 * @return
+	 */
 	ETLFindElement warn(String message) {
 		this.warnMessage = message
 		this.processor.addFindWarnMessage(this)
-		this
+		return this
 	}
 
 	/**
