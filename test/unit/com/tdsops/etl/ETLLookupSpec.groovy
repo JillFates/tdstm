@@ -474,7 +474,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 								load id with ''
 								find Application by assetName, appVendor with DOMAIN.assetName, vmWare into id
 								elseFind Application by assetName with DOMAIN.assetName into id warn 'Not sure about this match'
-
 								whenNotFound id create {
 									assetName clusterName
 									appVendor vmWare
