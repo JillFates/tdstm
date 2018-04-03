@@ -26,11 +26,7 @@ declare var jQuery: any;
             </div>
         </div>
         <div #extraDialog></div>`,
-	styles: [`
-        .modal {
-            background: none;
-        }
-	`]
+	styles: [``]
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
