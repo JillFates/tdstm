@@ -3,7 +3,7 @@
  * UI Active Dialog its a singleton intance of the current opened dialog and provide the way to close it and access
  * its component
  */
-import {Injectable, ComponentRef, HostListener, AfterViewInit, OnInit} from '@angular/core';
+import {Injectable, ComponentRef, HostListener, OnDestroy} from '@angular/core';
 import { NotifierService } from './notifier.service';
 import {DIALOG_SIZE} from '../model/constants';
 
@@ -106,14 +106,19 @@ export class UIActiveDialogService {
 declare var jQuery: any;
 const ESCAPE_KEYCODE = 27;
 
-export class UIExtraDialog {
+export class UIExtraDialog implements OnDestroy {
 	modalIntance: any;
 	resolve: any;
 	reject: any;
 	cmpRef: ComponentRef<{}>;
 	private enableEsc = false;
+	private currentActiveModalDivIndex = 0;
 
 	constructor(private modalSelector: string) {}
+
+	ngOnDestroy(): void {
+		this.processMultipleDialogBackgrounds(true);
+	}
 
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent) {
@@ -145,6 +150,7 @@ export class UIExtraDialog {
 				handle: '.modal-header'
 			});
 		}
+		this.processMultipleDialogBackgrounds();
 	}
 
 	close(value?: any) {
@@ -159,4 +165,23 @@ export class UIExtraDialog {
 		this.cmpRef.destroy();
 	}
 
+	/**
+	 * Fixes Darker Background Issues when opening multiple dialogs.
+	 */
+	private processMultipleDialogBackgrounds(closingDialog?: boolean): void {
+		let divs = jQuery('tds-ui-dialog div.modal.fade.in');
+		let index = 1;
+		for (let div of divs) {
+			if (!closingDialog) {
+				this.currentActiveModalDivIndex = index;
+				jQuery(div).addClass('no-background');
+				if (index === divs.length) {
+					jQuery(div).removeClass('no-background');
+				}
+			} else if (index === this.currentActiveModalDivIndex - 1) {
+				jQuery(div).removeClass('no-background');
+			}
+			index++;
+		}
+	}
 }

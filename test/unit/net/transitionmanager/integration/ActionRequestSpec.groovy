@@ -10,7 +10,7 @@ class ActionRequestSpec extends Specification {
             Map<String, Object> parameters = ['property1': 'value1']
             ActionRequest actionRequest = new ActionRequest(parameters)
         when: 'trying to set a non existing parameter'
-            actionRequest.param.property2 = 'value2'
+            actionRequest.params.property2 = 'value2'
         then: 'an exception should be thrown indicating that passed parameter is missing'
             MissingPropertyException e = thrown MissingPropertyException
             "No such property: property2" == e.message
@@ -21,9 +21,9 @@ class ActionRequestSpec extends Specification {
             Map<String, Object> parameters = ['property1': 'value1']
             ActionRequest actionRequest = new ActionRequest(parameters)
         when: 'trying to set an existing parameter value and readonly flag is false'
-            actionRequest.param.property1 = 'value2'
+            actionRequest.params.property1 = 'value2'
         then: 'the parameter value should be updated to the expected value'
-            actionRequest.param.property1 == 'value2'
+            actionRequest.params.property1 == 'value2'
     }
 
     def 'test set existing parameter value when action request is readonly will throw ReadOnlyPropertyException' () {
@@ -32,7 +32,7 @@ class ActionRequestSpec extends Specification {
             ActionRequest actionRequest = new ActionRequest(parameters)
             actionRequest.readonly = true
         when: 'trying to set an existing parameter value and readonly flag is true'
-            actionRequest.param.property1 = 'value2'
+            actionRequest.params.property1 = 'value2'
         then: 'an exception should be thrown indicating that we are trying to write on a readonly property'
             ReadOnlyPropertyException e = thrown ReadOnlyPropertyException
             "Cannot set readonly property: property1 for class: net.transitionmanager.integration.ActionRequestParameter" == e.message
@@ -44,7 +44,7 @@ class ActionRequestSpec extends Specification {
             ActionRequest actionRequest = new ActionRequest(parameters)
             actionRequest.readonly = true
         expect: 'we should be able to read values despite the readonly flag status'
-            actionRequest.param.property1 == 'value1'
+            actionRequest.params.property1 == 'value1'
     }
 
     def 'test the hasProperty method' () {
@@ -52,7 +52,7 @@ class ActionRequestSpec extends Specification {
             Map<String, Object> parameters = ['property1': 'value1']
             ActionRequest actionRequest = new ActionRequest(parameters)
         expect:
-            expected == actionRequest.param.hasProperty(propertyName)
+            expected == actionRequest.params.hasProperty(propertyName)
         where:
             propertyName    | expected
             'property1'     | true
@@ -66,7 +66,7 @@ class ActionRequestSpec extends Specification {
             Map<String, Object> results
 
         expect: 'calling getAllProperties() returns the map that was set'
-            ['property1': 'value1'] == actionRequest.param.getAllProperties()
+            ['property1': 'value1'] == actionRequest.params.getAllProperties()
     }
 
     def 'test set header value when action request is not readonly' () {

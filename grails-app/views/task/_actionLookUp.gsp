@@ -41,9 +41,9 @@
                                 <table id="updateCommentTableInnerTable">
                                     <thead>
                                         <tr>
-                                            <th>Parameter</th>
+                                            <th>Parameter Name</th>
                                             <th>Context</th>
-                                            <th>Property</th>
+                                            <th>Field Name</th>
                                             <th>Value</th>
                                         </tr>
                                     </thead>
@@ -52,7 +52,7 @@
                                             <tr>
                                                 <td>${methodParam.paramName}</td>
                                                 <td>${methodParam.context}</td>
-                                                <td>${methodParam.fieldName == null ? methodParam.value : methodParam.fieldName}</td>
+                                                <td>${methodParam.fieldName}</td>
                                                 <td>${apiAction.methodParamsValues[methodParam.paramName]}</td>
                                             </tr>
                                         </g:each>

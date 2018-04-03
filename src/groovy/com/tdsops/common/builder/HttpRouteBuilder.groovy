@@ -47,17 +47,14 @@ class HttpRouteBuilder extends RouteBuilder {
      */
     RouteDefinition getRouteDefinition(ActionRequest actionRequest) {
 
-        String apiActionId = actionRequest.param.actionId
-        String taskId = actionRequest.param.taskId
+        String apiActionId = actionRequest.options.actionId
+        String taskId = actionRequest.options.taskId
         String routeId = getRouteId(apiActionId)
 
         RouteDefinition routeDefinition = from("direct:RESTfulCall-" + apiActionId)
         routeDefinition = routeDefinition.setProperty("API_ACTION_ID", constant(apiActionId))
         routeDefinition = routeDefinition.setProperty("TASK_ID", constant(taskId))
         routeDefinition = routeDefinition.setProperty("ROUTE_ID", constant(routeId))
-		// This is no longer required
-        // routeDefinition = routeDefinition.setProperty("API_ACTION_CONTEXT", constant(JsonUtil.toJson(actionRequest.param)))
-
         routeDefinition = routeDefinition.setBody(constant(null))
 
         if (actionRequest.config.hasProperty(HTTP_METHOD)) {
@@ -84,7 +81,7 @@ class HttpRouteBuilder extends RouteBuilder {
 		}
 
         routeDefinition = routeDefinition.to(UrlUtil.sanitizeUrlForCamel(buildUrl(routeDefinition, actionRequest)))
-        routeDefinition = routeDefinition.to(buildRESTfulReactionEndpoint(actionRequest.param))
+        routeDefinition = routeDefinition.to(buildRESTfulReactionEndpoint(actionRequest.params))
         routeDefinition = routeDefinition.routeId(routeId)
         routeDefinition = routeDefinition.stop()
         return routeDefinition
@@ -122,23 +119,19 @@ class HttpRouteBuilder extends RouteBuilder {
      */
     private String buildUrl(RouteDefinition routeDefinition, ActionRequest actionRequest) {
 
-        ActionHttpRequestElements httpElements = new ActionHttpRequestElements(actionRequest.param.apiAction.endpointUrl, actionRequest)
+        ActionHttpRequestElements httpElements = new ActionHttpRequestElements(actionRequest.options.apiAction.endpointUrl, actionRequest)
         URIBuilder builder = new URIBuilder( httpElements.baseUrl )
 
         // Typically all parameters should be added as parameters using the builder.addParameter (see below) however our implementation
-        // is designed to honor API Actions that have query string parameters explicitely defined in the URI. When that occurs the path
+        // is designed to honor API Actions that have query string parameters explicitly defined in the URI. When that occurs the path
         // will consist of the path and those query string parameters. All other parameters defined in the API Action will loaded below.
         // Note that the use of POST is regardless of the actual method that the action will use. POST is only used to get just query string
         // arguments that are explicit in the URI endpoint definition.
         builder.setPath( httpElements.getUrlPathWithQueryString(HttpMethod.POST))  // (e.g. /rest/server/SERVERNAME?filter=xyz )
 
         // Add all of the extra parameters there were not any of the explicit query string parameters
-        // TODO : JPM 3/2016 : TM-9936 this list most likely has the other non-parameter variables embedded (e.g. task_id, action_id, etc)
-        // Those parameters should be weeded out in the ActionHttpRequestElements temporarily. See ActionHttpRequestElements.ParamsToIgnored and
-        // update the getExtraParams to strip those out.
         for (param in httpElements.extraParams) {
-			// TODO : SL 03/2018 : Restore this after TM-9963 Move params else where, gets implemented
-            // builder.addParameter(param.key, param.value)
+             builder.addParameter(param.key, param.value)
         }
 
         // Add flag to not throw HttpOperationFailedException but instead return control to action invocation flow to eval result
@@ -147,20 +140,20 @@ class HttpRouteBuilder extends RouteBuilder {
 
 		// only provides a trust store if endpoint url is secure and credentials are nor for production
 		if (UrlUtil.isSecure(builder.toString())) {
-			if (actionRequest.param.credentials && actionRequest.param.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
+			if (actionRequest.options.credentials && actionRequest.options.credentials.environment != CredentialEnvironment.PRODUCTION.name()) {
 				// for more details see CustomHttpClientConfigurer class
 				builder.addParameter('httpClientConfigurer', 'customHttpClientConfigurer')
 			}
 		}
 
-        if (actionRequest.param.credentials) {
-			if (actionRequest.param.credentials.status == CredentialStatus.INACTIVE.name()) {
+        if (actionRequest.options.credentials) {
+			if (actionRequest.options.credentials.status == CredentialStatus.INACTIVE.name()) {
 				throw new InvalidRequestException("The Credential associated with API Action is disabled")
 			}
 
 			// fetch a fresh copy of the credentials to have access to password and salt when needed
 			// TODO use CredentialService if possible
-			Credential credential = Credential.read(actionRequest.param.credentials.id)
+			Credential credential = Credential.read(actionRequest.options.credentials.id)
 			switch (credential.authenticationMethod) {
 				case AuthenticationMethod.BASIC_AUTH:
 					builder.addParameter('authUsername', credential.username)

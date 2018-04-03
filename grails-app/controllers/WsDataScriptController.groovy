@@ -9,6 +9,7 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.DataScriptService
+import net.transitionmanager.service.EmptyResultException
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
@@ -173,12 +174,8 @@ class WsDataScriptController implements ControllerMethods {
 
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
-	    try {
-           Map jsonMap = dataScriptService.parseDataFromFile(filename)
-           renderSuccessJson(jsonMap)
-	    }catch ( ex ) {
-           render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
-	    }
+        Map jsonMap = dataScriptService.parseDataFromFile(filename)
+        renderSuccessJson(jsonMap)
     }
 
 }

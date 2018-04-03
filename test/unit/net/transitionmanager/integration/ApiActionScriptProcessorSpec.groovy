@@ -126,7 +126,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			new GroovyShell(this.class.classLoader, scriptBinding)
 					.evaluate("""
 						
-						request.param.format = 'json'
+						request.params.format = 'json'
 						request.headers.add('header1', 'value1')
 						
 						// Set the socket and connect to 5 seconds
@@ -154,7 +154,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 			scriptBinding.hasVariable('SC')
 
 		and: 'the request object was modified correctly'
-			request.param.format == 'json'
+			request.params.format == 'json'
 			request.config.getProperty('httpClient.socketTimeout') == 5000
 			request.config.getProperty('httpClient.connectionTimeout') == 5000
 			request.config.getProperty('proxyAuthHost') == '123.88.23.42'
@@ -177,7 +177,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		when: 'The PRE script is evaluated'
 			new GroovyShell(this.class.classLoader, scriptBinding)
 					.evaluate("""
-						request.param.format = 'json'
+						request.params.format = 'json'
 						request.headers.add('header1', 'value1')
 						
 						if (response.status == SC.OK) {
@@ -214,7 +214,7 @@ class ApiActionScriptProcessorSpec extends Specification {
 		when: 'The PRE script is evaluated'
 			new GroovyShell(this.class.classLoader, scriptBinding)
 					.evaluate("""
-						request.param.format = 'json'
+						request.params.format = 'json'
 						request.headers.add('header1', 'value1')
 						
 						if (response.status == SC.OK) {

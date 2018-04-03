@@ -57,7 +57,8 @@ class ImportBatchService implements ServiceMethods {
 			if (results.containsKey(batch.id)) {
 				batchMap = results[batch.id]
 			} else {
-				batchMap = [batch: batch.toMap(), count:0, erred: 0, ignored:0, pending:0, processed: 0]
+				batchMap = batch.toMap()
+				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
 				results[batch.id] = batchMap
 			}
 
@@ -65,17 +66,17 @@ class ImportBatchService implements ServiceMethods {
 			ImportBatchStatusEnum status = batchInfo[1]
 			switch(status) {
 				case ImportBatchStatusEnum.IGNORED:
-					batchMap['ignored'] = statusCount
+					batchMap['recordsSummary']['ignored'] = statusCount
 					break
 				case ImportBatchStatusEnum.PENDING:
-					batchMap['pending'] = statusCount
+					batchMap['recordsSummary']['pending'] = statusCount
 					break
 				case ImportBatchStatusEnum.COMPLETED:
-					batchMap['processed'] = statusCount
+					batchMap['recordsSummary']['processed'] = statusCount
 					break
 			}
 			// Update the number of records for this batch.
-			batchMap['count'] += statusCount
+			batchMap['recordsSummary']['count'] += statusCount
 		}
 
 		// Query for the info about erred records.
@@ -97,7 +98,8 @@ class ImportBatchService implements ServiceMethods {
 		// Update the results with the erred number of records for each batch.
 		for (batchErrorInfo in batchErrorsList) {
 			ImportBatch batch = (ImportBatch) batchErrorInfo[0]
-			results[batch.id]['erred'] = batchErrorInfo[1]
+			Map batchMap = results[batch.id]
+			batchMap['recordsSummary']['erred'] = batchErrorInfo[1]
 		}
 
 		return results.values()
@@ -397,7 +399,11 @@ class ImportBatchService implements ServiceMethods {
 			// Although only 'progress' is supported at the moment, I leave the code ready for future changes.
 			switch(info) {
 				case 'progress':
-					infoMap = [progress: importBatch.processProgress, lastUpdated: importBatch.processLastUpdated]
+					infoMap = [
+						status: [code: importBatch.status.getKey(), label:importBatch.status.toString()],
+						progress: importBatch.processProgress,
+						lastUpdated: importBatch.processLastUpdated
+					]
 					break
 				default:
 					throw new InvalidParamException("Unsupported info requested $info.")
