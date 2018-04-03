@@ -1,5 +1,4 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.common.ui.Pagination
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -185,8 +184,15 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
-        Map jsonMap = dataScriptService.parseDataFromFile(filename)
-        renderSuccessJson(jsonMap)
+
+        PaginationCommand paginationCommand = populateCommandObject(PaginationCommand)
+
+        try {
+           Map jsonMap = dataScriptService.parseDataFromFile(filename, paginationCommand)
+           renderSuccessJson(jsonMap)
+	    } catch ( ex ) {
+           render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
+	    }
     }
 
 }
