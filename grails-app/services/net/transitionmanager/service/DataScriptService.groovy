@@ -12,12 +12,14 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.apache.commons.io.FilenameUtils
+import org.apache.poi.poifs.filesystem.NotOLE2FileException
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
 
@@ -25,6 +27,11 @@ class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
     SecurityService securityService
+
+	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
+			   config: [],
+			   rows  : []
+	 ].asImmutable()
 
     /**
      * Create or update a DataScript instance based on the JSON object received.
@@ -259,7 +266,7 @@ class DataScriptService implements ServiceMethods{
 	* @param fileName
 	* @return
 	*/
-	Map parseDataFromFile (String fileName) {
+	Map parseDataFromFile (String fileName) throws EmptyResultException{
 		try{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
@@ -279,8 +286,34 @@ class DataScriptService implements ServiceMethods{
 
 		} catch (ex) {
 			log.error(ex.message, ex)
-			throw ex
+
+			String message
+			switch(ex) {
+				case FileNotFoundException :
+					message = "The source data was not found"
+					break
+
+				case NotOLE2FileException:
+				case InvalidParamException:
+				case SuperCsvException:
+					message = "Unable to parse the source data"
+					break
+
+				default :
+					message = ex.message
+			}
+
+			throw new InvalidParamException(message)
 		}
+	}
+
+	private File tempFile(String fileName) throws FileNotFoundException {
+		File inputFile = new File(FileSystemService.temporaryDirectory, fileName)
+		if (! inputFile.exists()) {
+			throw new FileNotFoundException(inputFile.toString())
+		}
+
+		return inputFile
 	}
 
 	/**
@@ -290,17 +323,24 @@ class DataScriptService implements ServiceMethods{
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
-		def inputFile = new File(FileSystemService.temporaryDirectory, jsonFile)
-		return JsonUtil.parseJson(inputFile.text)
+		File inputFile = tempFile(jsonFile)
+		String text = inputFile?.text?.trim()
+		if(! text ) {
+			return EMPTY_SAMPLE_DATA_TABLE
+		}
+
+		return JsonUtil.parseJson(text)
 	}
 
 	/**
-	 * PArse CSV file to get the
+	 * Parse CSV file to get the
 	 * @param csvFile
 	 * @return Map with the description of the CSV File Data
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromCSV (String csvFile) throws RuntimeException {
+		tempFile(csvFile)
+
 		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
 		def csv = new CSVDataset(connection: con, fileName: csvFile, header: true)
 
@@ -332,25 +372,28 @@ class DataScriptService implements ServiceMethods{
 
 		DecimalFormat df = new DecimalFormat('#.#########')
 
-		Workbook workbook = WorkbookFactory.create(new File(FileSystemService.temporaryDirectory, xlsFile))
-		Sheet sheet = workbook.getSheetAt(sheetNumber)
-		Row header = sheet.getRow(headerRowIndex)
-		Iterator<Cell> headerCells = header.cellIterator()
-
 		List<Map<String, String>> config = []
 		Map<Integer, String> headerMap = [:]
 
-		while (headerCells.hasNext()) {
-			Cell cell = headerCells.next()
-			String type = 'text'
-			String value = cell.toString()
+		Workbook workbook = WorkbookFactory.create( tempFile(xlsFile) )
+		Sheet sheet = workbook.getSheetAt(sheetNumber)
+		Row header = sheet.getRow(headerRowIndex)
 
-			headerMap[cell.columnIndex] = value
+		if (header) {
+			Iterator<Cell> headerCells = header.cellIterator()
 
-			config << [
-					property: value,
-					type    : type
-			]
+			while (headerCells.hasNext()) {
+				Cell cell = headerCells.next()
+				String type = 'text'
+				String value = cell.toString()
+
+				headerMap[cell.columnIndex] = value
+
+				config << [
+						  property: value,
+						  type    : type
+				]
+			}
 		}
 
 
