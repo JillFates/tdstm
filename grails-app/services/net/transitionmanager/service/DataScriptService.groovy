@@ -273,18 +273,18 @@ class DataScriptService implements ServiceMethods{
 		try{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
-			switch (extension) {
-			case 'JSON':
-				return parseDataFromJSON(fileName)
+        switch (extension) {
+            case 'JSON':
+                return parseDataFromJSON(fileName)
 
-			case 'CSV':
-				return parseDataFromCSV(fileName)
+            case 'CSV':
+                return parseDataFromCSV(fileName)
 
-			case ['XLS', 'XLSX'] :
-				return parseDataFromXLS(fileName, 0, 0, paginationCommand)
+            case ['XLS', 'XLSX'] :
+                return parseDataFromXLS(fileName, 0, 0, paginationCommand)
 
 			default :
-			   throw new RuntimeException("Format ($extension) not supported")
+				throw new InvalidParamException("File format ($extension) is not supported")
 			}
 
 		} catch (ex) {

@@ -184,15 +184,8 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
      */
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
-
-        PaginationCommand paginationCommand = new PaginationCommand(params)
-
-        try {
-           Map jsonMap = dataScriptService.parseDataFromFile(filename, paginationCommand)
-           renderSuccessJson(jsonMap)
-	    } catch ( ex ) {
-           render status: HttpStatus.NOT_FOUND.value(), text: ex.localizedMessage
-	    }
+        Map jsonMap = dataScriptService.parseDataFromFile(filename, paginationMaxRowValue)
+        renderSuccessJson(jsonMap)
     }
 
 }
