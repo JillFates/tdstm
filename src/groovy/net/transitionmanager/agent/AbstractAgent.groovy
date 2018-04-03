@@ -2,6 +2,7 @@ package net.transitionmanager.agent
 
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.InvalidConfigurationException
 import com.tds.asset.AssetComment
@@ -24,7 +25,7 @@ import java.net.UnknownHostException
 @CompileStatic
 class AbstractAgent {
 
-	private Map dict = [:]
+	private Map<String, DictionaryItem> dict = [:]
 
 	AgentClass agentClass
 	String name
@@ -54,6 +55,18 @@ class AbstractAgent {
 	 */
 	Map dictionary() {
 		return dict
+	}
+
+	/**
+	 * Used to get the definition of a method
+	 * @param methodName - the name of the method to get
+	 * @return the Method DictionaryItem or null if not found
+	 */
+	DictionaryItem getMethod(String methodName) {
+		if (dict.containsKey(methodName)) {
+			return dict[methodName]
+		}
+		throw new InvalidParamException("Action Method $methodName does not exist for agent $name")
 	}
 
 	/**
