@@ -28,6 +28,11 @@ class DataScriptService implements ServiceMethods{
     ProviderService providerService
     SecurityService securityService
 
+	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
+			   config: [],
+			   rows  : []
+	 ].asImmutable()
+
     /**
      * Create or update a DataScript instance based on the JSON object received.
      *
@@ -298,7 +303,7 @@ class DataScriptService implements ServiceMethods{
 					message = ex.message
 			}
 
-			throw new EmptyResultException(message)
+			throw new InvalidParamException(message)
 		}
 	}
 
@@ -321,14 +326,14 @@ class DataScriptService implements ServiceMethods{
 		File inputFile = tempFile(jsonFile)
 		String text = inputFile?.text?.trim()
 		if(! text ) {
-			throw new EmptyResultException("The source data has no content")
+			return EMPTY_SAMPLE_DATA_TABLE
 		}
 
 		return JsonUtil.parseJson(text)
 	}
 
 	/**
-	 * PArse CSV file to get the
+	 * Parse CSV file to get the
 	 * @param csvFile
 	 * @return Map with the description of the CSV File Data
 	 * @throws RuntimeException

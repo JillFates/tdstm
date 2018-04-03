@@ -175,9 +175,6 @@ class WsDataScriptController implements ControllerMethods {
     @HasPermission(Permission.DataScriptCreate)
     def sampleData (String filename) {
         Map jsonMap = dataScriptService.parseDataFromFile(filename)
-        if (! jsonMap.rows ) {
-            throw new EmptyResultException("The source data has no content")
-        }
         renderSuccessJson(jsonMap)
     }
 

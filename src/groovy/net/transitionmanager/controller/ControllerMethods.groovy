@@ -208,7 +208,7 @@ trait ControllerMethods {
 		handleException(e, 'error', msg)
 	}
 	def emptyResultExceptionHandler(EmptyResultException e) {
-		String msg = e?.message ?: 'Requested information was not found'
+		String msg = e.message ?: 'Requested information was not found'
 		handleException(e, 'notFound', msg)
 	}
 	def illegalArgumentExceptionHandler(IllegalArgumentException e) {
