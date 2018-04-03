@@ -1,18 +1,17 @@
 package net.transitionmanager.service.dataingestion
 
-import com.tdsops.etl.*
+import com.tdsops.etl.DataSetFacade
+import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.DomainClassFieldsValidator
+import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Dataset
-import getl.data.Field
-import getl.excel.ExcelConnection
-import getl.excel.ExcelDataset
-import getl.exception.ExceptionGETL
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
@@ -51,7 +50,7 @@ class ScriptProcessorService {
     /**
      * Base on a project it creates a DomainClassFieldsValidator instance tha implements ETLFieldsValidator.
      * @param project a defined Project instance to be used in fields spec request
-     * @see ETLFieldsValidator interface
+     * @see com.tdsops.etl.ETLFieldsValidator interface
      * @return an instance of DomainClassFieldsValidator.
      */
     private DomainClassFieldsValidator createFieldsSpecValidator (Project project) {
@@ -88,10 +87,11 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-            CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+
+	        Dataset dataset = FileSystemService.buildDataset(fileName)
 
             etlProcessor = new ETLProcessor(project,
-                    new DataSetFacade(new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)),
+                    new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
@@ -103,8 +103,10 @@ class ScriptProcessorService {
             result.error = all.getMessage()
         }
 
-        result.consoleLog = etlProcessor?.debugConsole?.content()
-        result.data = etlProcessor.result.toMap()
+	     if (etlProcessor) {
+		     result.consoleLog = etlProcessor?.debugConsole?.content()
+		     result.data = etlProcessor.result.toMap()
+	     }
 
         return result
     }
@@ -131,8 +133,7 @@ class ScriptProcessorService {
      */
     Map<String, ?> checkSyntax (Project project, String scriptContent, String fileName) {
 
-        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
-        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
+	    Dataset dataset = FileSystemService.buildDataset(fileName)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 

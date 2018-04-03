@@ -50,10 +50,10 @@
                                     <tbody>
                                         <g:each var="methodParam" in="${apiAction.methodParams}">
                                             <tr>
-                                                <td>${methodParam.param}</td>
+                                                <td>${methodParam.paramName}</td>
                                                 <td>${methodParam.context}</td>
-                                                <td>${methodParam.property == null ? methodParam.value : methodParam.property}</td>
-                                                <td>${apiAction.methodParamsValues[methodParam.param]}</td>
+                                                <td>${methodParam.fieldName == null ? methodParam.value : methodParam.fieldName}</td>
+                                                <td>${apiAction.methodParamsValues[methodParam.paramName]}</td>
                                             </tr>
                                         </g:each>
                                     </tbody>

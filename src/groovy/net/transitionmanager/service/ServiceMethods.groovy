@@ -2,13 +2,14 @@ package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.codehaus.groovy.grails.web.util.WebUtils
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.ObjectError
+import org.springframework.web.context.request.RequestContextHolder
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.codehaus.groovy.grails.web.util.WebUtils
-import org.springframework.web.context.request.RequestContextHolder
 
 trait ServiceMethods {
 
@@ -125,6 +126,16 @@ trait ServiceMethods {
 	// TODO : JPM 2/2018 : Shouldn't this take the Locale as a default?
 	String i18nMessage(String code, String defaultMessage) {
 		return i18nMessage(code, [] as Object[], defaultMessage)
+	}
+
+	/**
+	 * Return an error message based on the ObjectError and Locale provided.
+	 * @param objectError
+	 * @param locale
+	 * @return
+	 */
+	String i18nMessage(ObjectError objectError, Locale locale = LocaleContextHolder.locale) {
+		return messageSourceService.i18nMessage(objectError, locale)
 	}
 
 	/**

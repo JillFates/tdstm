@@ -213,7 +213,7 @@ class ETLDataSetSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'The current row index is the last row in data source'
-			etlProcessor.currentRowIndex == jsonDataSet.readRows()
+			etlProcessor.currentRowIndex == jsonDataSet.rowsSize()
 
 			// TODO: Auto detect JSON headers. Not yet implemented
 //		and : 'A column map is created'

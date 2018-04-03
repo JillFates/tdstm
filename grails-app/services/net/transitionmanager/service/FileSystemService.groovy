@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.etl.TDSExcelDriver
 import com.tdssrc.grails.FileSystemUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -10,6 +11,7 @@ import getl.excel.ExcelDataset
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
@@ -81,7 +83,7 @@ class FileSystemService  implements InitializingBean {
 		}
 
 		if (!workbook) {
-			throw new RuntimeException("Unsupported File Format $ext")
+			throw new InvalidRequestException('Uploaded file does not appear to be in the Excel format')
 		}
 
 		Sheet sheet = workbook.createSheet("Data Sheet")
@@ -144,7 +146,7 @@ class FileSystemService  implements InitializingBean {
 		// Getting the first row for the header
 		Row row = sheet.getRow(0)
 
-		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName))
+		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName), driver: TDSExcelDriver)
 		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
 
 		// Iterate over the Header Row to build the Header fields
@@ -159,9 +161,9 @@ class FileSystemService  implements InitializingBean {
         // This will need to be moved to a function that will evetunally get context of the sheet name and
         // the row that the labels reside on and compute dynamically instead of this statically built list.
 		// currently adding Monkey-patching to support getting the fields since the original behaviour is not supported
-		dataset.connection.driver.metaClass.fields = { Dataset ds ->
-			return ds.field
-		}
+//		dataset.connection.driver.metaClass.fields = { Dataset ds ->
+//			return ds.field
+//		}
 
 		return dataset
 	}

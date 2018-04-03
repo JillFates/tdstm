@@ -38,7 +38,8 @@ class AssetDependency {
 		c3 nullable: true
 		c4 nullable: true
 		comment size: 0..65535
-    createdBy nullable: true // @See TM-8392
+    	createdBy nullable: true // @See TM-8392
+		updatedBy nullable: true
 		dataFlowDirection blank: false, size: 0..14, inList: ['Unknown', 'bi-directional', 'incoming', 'outgoing']
 		dataFlowFreq nullable: true, size: 0..8, inList: ['Unknown', 'constant', 'hourly', 'daily', 'weekly', 'monthly']
 		dependent nullable: true

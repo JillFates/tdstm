@@ -1,10 +1,13 @@
-import {DefaultBooleanFilterData, Flatten} from '../../../../shared/model/data-list-grid.model';
-import {CompositeFilterDescriptor, filterBy, process, SortDescriptor, State} from '@progress/kendo-data-query';
+import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../model/data-list-grid.model';
+import {
+	CompositeFilterDescriptor, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
+	State
+} from '@progress/kendo-data-query';
 import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
-import {MAX_DEFAULT, MAX_OPTIONS} from '../../../../shared/model/constants';
+import {MAX_DEFAULT, MAX_OPTIONS} from '../model/constants';
 
 export class DataGridOperationsHelper {
 
@@ -17,7 +20,9 @@ export class DataGridOperationsHelper {
 		filter: {
 			filters: [],
 			logic: 'and'
-		}
+		},
+		skip: 0,
+		take: MAX_DEFAULT
 	};
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.index) >= 0;
 	public selectedRows = [];
@@ -25,8 +30,6 @@ export class DataGridOperationsHelper {
 	public selectAllCheckboxes = false;
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
-	public skip = 0;
-	public defaultPageSize = MAX_DEFAULT;
 	public defaultPageOptions = MAX_OPTIONS;
 
 	constructor(result: any, defaultSort: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any) {
@@ -41,7 +44,6 @@ export class DataGridOperationsHelper {
 			}
 			this.checkboxSelectionConfig = checkboxSelectionConfig;
 		}
-		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
 
@@ -49,13 +51,33 @@ export class DataGridOperationsHelper {
 	 * On Filter column event.
 	 * @param column
 	 */
-	public onFilter(column: any): void {
+	public onFilter(column: GridColumnModel, operator?: string): void {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 
-		if (!column.filter) {
+		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
 			column.filter = '';
+		}
+		// check for number types and null value (clear out the filters)
+		if (column.type === 'number' && column.filter === null) {
+			this.clearValue(column);
+			return; // exit
+		}
+
+		if (column.type === 'number') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: operator ? operator : 'eq',
+					value: column.filter
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
 		}
 
 		if (column.type === 'text') {
@@ -115,7 +137,7 @@ export class DataGridOperationsHelper {
 	 * On Clear Value for filter event.
 	 * @param column
 	 */
-	public clearValue(column: any): void {
+	public clearValue(column: GridColumnModel): void {
 		column.filter = '';
 		if (this.state.filter && this.state.filter.filters.length > 0) {
 			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
@@ -130,7 +152,6 @@ export class DataGridOperationsHelper {
 	 */
 	public filterChange(filter: CompositeFilterDescriptor): void {
 		this.state.filter = filter;
-		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
 
@@ -186,6 +207,14 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * Get all checkbox selected as an array of numbers
+	 * @returns {Array<number>}
+	 */
+	public getCheckboxSelectedItemsAsNumbers(): Array<number> {
+		return this.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+	}
+
+	/**
 	 * On checkbox change event.
 	 * @param key
 	 */
@@ -201,7 +230,6 @@ export class DataGridOperationsHelper {
 	 */
 	public reloadData(result: any): void {
 		this.resultSet = result;
-		// this.gridData = process(this.resultSet, this.state);
 		this.loadPageData();
 	}
 
@@ -210,22 +238,15 @@ export class DataGridOperationsHelper {
 	 * @param {PageChangeEvent} event
 	 */
 	public pageChange(event: PageChangeEvent): void {
-		this.skip = event.skip;
+		this.state.skip = event.skip;
+		this.state.take = event.take;
 		this.loadPageData();
 	}
 
 	/**
-	 * Change the Model to the Page + Filter
+	 * Change the Model to the Page + Filter + Sort
 	 */
 	public loadPageData(): void {
-		this.gridData = {
-			data: filterBy(this.resultSet.slice(this.skip, this.skip + this.defaultPageSize), this.state.filter),
-			total: this.resultSet.length
-		};
-		// If we delete an item and it was the last element in the page, go one page back
-		if (this.gridData.data.length === 0  && (this.skip && this.skip !== 0)) {
-			this.skip -= this.defaultPageSize;
-			this.loadPageData();
-		}
+		this.gridData = process(this.resultSet, this.state);
 	}
 }

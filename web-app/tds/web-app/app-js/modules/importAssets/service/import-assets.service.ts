@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import { Response } from '@angular/http';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Observable} from 'rxjs/Observable';
-import {ApiReponseModel} from '../../../shared/model/ApiReponseModel';
+import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 @Injectable()
 export class ImportAssetsService {
@@ -29,7 +29,7 @@ export class ImportAssetsService {
 	 * @returns {Observable<any>} This will return status and the filename.
 	 */
 	public postFetch(action: any): Observable<any> {
-		let url = this.importEndpointURL + 'invokeFetchAction?actionId=' + action.id;
+		let url = this.importEndpointURL + 'invokeFetchAction/' + action.id;
 		return this.http.post(url, null)
 			.map((res: Response) => {
 				return res.json();
@@ -60,7 +60,7 @@ export class ImportAssetsService {
 	 * @param option
 	 * @returns {Observable<any>} It will return the status including counts, errors, and output filename.
 	 */
-	public postTransform(datascript: any, filename: string): Observable<ApiReponseModel> {
+	public postTransform(datascript: any, filename: string): Observable<ApiResponseModel> {
 		let url = this.importEndpointURL + 'transformData?dataScriptId=' + datascript.id + '&filename=' + filename;
 		return this.http.post(url, null)
 			.map((res: Response) => {

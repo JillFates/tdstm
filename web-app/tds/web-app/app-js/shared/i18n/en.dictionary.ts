@@ -39,6 +39,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'API Actions',
 		'DATA_INGESTION': 'Data Ingestion',
 		'DATA_SCRIPTS': 'DataScripts',
+		'DATA_VIEW': 'View',
 		'DATA_SCRIPT': 'DataScript',
 		'PROVIDERS': 'Providers',
 		'CREATE_CREDENTIAL': 'Create Credential',
@@ -92,6 +93,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'IMPORT_ASSETS': {
 		'MANUAL_IMPORT': {
+			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',
 			'FETCH_WITH_DATA_ACTION': 'Fetch with Data Action:',
 			'FETCH_WITH_FILE_UPLOAD': 'Fetch with File Upload:',
@@ -99,22 +101,30 @@ export const en_DICTIONARY: Object = {
 			'OR': 'or',
 			'TRANSFORM_WITH_DATA_SCRIPT': 'Transform with DataScript:',
 			'LOAD_TRANSFORMED_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
-			'GOTO_MANAGE_IMPORT_BATCHES': 'Go to Manage Import Batches',
+			'GOTO_MANAGE_ASSET_BATCHES': 'Go to Manage Asset Batches',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',
 			'VIEW_DATA': 'View Data'
 		}
 	},
-	'DEPENDENCY_BATCH': {
+	'IMPORT_BATCH': {
 		'MANAGE_LIST': 'Manage Dependency Batches',
 		'DEPENDENCY_BATCH': 'Dependency Batch',
 		'LIST': {
-			'PENDING_TOOLTIP': 'Queue to be processed',
-			'QUEUED_TOOLTIP': 'Remove from queue',
-			'PROCESSING_TOOLTIP': 'Stop processing',
+			'QUEUE_TO_BE_PROCESSED': 'Queue to be processed',
+			'REMOVE_FROM_QUEUE': 'Remove from queue',
+			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
-			'UNARCHIVE': 'Unarchive'
+			'UNARCHIVE': 'Unarchive',
+			'ARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to archive this item?',
+			'ARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to archive these items?',
+			'UNARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to unarchive this item?',
+			'UNARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to unarchive these items?'
+		},
+		'DETAIL': {
+			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
+			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
 	'GLOBAL': {
@@ -143,7 +153,13 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'CONTINUE': 'Continue',
 		'UPLOAD': 'Upload',
-		'FETCH': 'Fetch'
+		'FETCH': 'Fetch',
+		'CONFIRMATION_PROMPT' : {
+			'CONFIRMATION_REQUIRED': 'Confirmation Required',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
+			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
+		}
 	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',

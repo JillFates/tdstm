@@ -45,7 +45,8 @@ class CredentialValidationExpression {
 				break
 			case ExpressionAttributeEnum.HEADER:
 				if (response.getHeaders()) {
-					comparator = response.getHeaders().get(headerName)
+					// returning first header since response.getHeaders().get() returns a list
+					comparator = response.getHeaders().getFirst(headerName)
 				}
 				break
 			case ExpressionAttributeEnum.STATUS:

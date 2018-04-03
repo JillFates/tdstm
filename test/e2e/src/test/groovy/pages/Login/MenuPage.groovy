@@ -1,6 +1,7 @@
 package pages.Login
 
 import geb.Page
+import modules.AdminModule
 import modules.MenuModule
 
 class MenuPage extends Page {
@@ -12,5 +13,6 @@ class MenuPage extends Page {
     static content = {
         contextPath { $("input",id:"contextPath")}
         menuModule { module MenuModule}
+        adminModule { module AdminModule}
     }
 }

@@ -222,4 +222,8 @@ databaseChangeLog = {
 	include file: '20180228-alter-table-api-action-change-last-modified-column-name-to-last-updated.groovy'
 	include file: '20180302-Dataview-add-unique-constraint.groovy'
 	include file: '20180308-alter-table-credential-add-validation-expression-column.groovy'
+	include file: '20180304-changes-for-batch-processing.groovy'
+	include file: '20180319-alter-table-apiaction-consolidate-url-and-path.groovy'
+	include file: '20180322-remove-recipe-version-tombstones.groovy'
+	include file: '20180325-alter-table-apiaction-agentclass-from-RESTFULL-to-HTTP.groovy'
 }

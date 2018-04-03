@@ -2,6 +2,8 @@ import {INTERVAL} from '../model/constants';
 
 export class DateUtils {
 
+	public static readonly DEFAULT_TIMEZONE_FORMAT = 'dd/MM/yyyy';
+
 	/**
 	 * Create a Date Object
 	 * @param destination
@@ -75,5 +77,18 @@ export class DateUtils {
 		}
 		// Same Base / target conversion
 		return intervalBase.value;
+	}
+
+	/**
+	 * Given a User Preference TimeZone format convert it to a known date format used by angular date pipe.
+	 * @returns {string}
+	 */
+	public static translateTimeZoneFormat(dateFormat: string): string {
+		let result = dateFormat;
+		const dayRegExp = /D/g;
+		result = result.replace(dayRegExp, 'd');
+		const yearRegExp = /Y/g;
+		result = result.replace(yearRegExp, 'y');
+		return result;
 	}
 }

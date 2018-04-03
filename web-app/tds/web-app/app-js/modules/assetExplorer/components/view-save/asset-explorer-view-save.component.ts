@@ -6,6 +6,7 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {DataIngestionService} from '../../../../modules/dataIngestion/service/data-ingestion.service';
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -13,6 +14,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class AssetExplorerViewSaveComponent {
 	model: ViewModel;
+	private isUnique = true;
 
 	constructor(
 		model: ViewModel,
@@ -20,7 +22,8 @@ export class AssetExplorerViewSaveComponent {
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
-		private notifier: NotifierService) {
+		private notifier: NotifierService,
+		private dataIngestionService: DataIngestionService) {
 
 		this.model = { ...model };
 		if (this.model.id) {
@@ -40,12 +43,12 @@ export class AssetExplorerViewSaveComponent {
 
 	protected confirmCloseDialog() {
 		this.assetExpService.saveReport(this.model)
-			.subscribe(result => this.activeDialog.close(result),
+			.subscribe(result => result && this.activeDialog.close(result),
 			error => this.activeDialog.dismiss(error));
 	}
 
 	protected isValid(): boolean {
-		return this.model.name && this.model.name.trim() !== '';
+		return this.model.name && this.model.name.trim() !== '' && this.isUnique;
 	}
 
 	/**
@@ -83,6 +86,22 @@ export class AssetExplorerViewSaveComponent {
 			} else {
 				this.model.isFavorite = true;
 			}
+		}
+
+	}
+
+	protected onNameChanged() {
+		this.validateUniquenessDataViewByName(this.model.name);
+	}
+
+	private validateUniquenessDataViewByName(dataViewName = '') {
+		if (!dataViewName.trim()) {
+			// handle empty string
+			this.isUnique = false;
+		} else {
+			this.assetExpService.validateUniquenessDataViewByName(dataViewName)
+				.subscribe((isUnique: boolean) => this.isUnique = isUnique,
+					(error) => console.log(error.message));
 		}
 
 	}

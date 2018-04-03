@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import spock.lang.Specification
+import net.transitionmanager.service.InvalidParamException
 
 /**
  * Unit test cases for the StringUtil class
@@ -310,6 +311,84 @@ class StringUtilTests extends Specification {
 			'' as CharSequence		| false
 			'a'	as CharSequence		| true
 			null as CharSequence	| false
+	}
+
+	void 'Test the md5hex method'() {
+		expect:
+			result == StringUtil.md5Hex(value)
+		where:
+			value			| result
+			'Some text'	| '9db5682a4d778ca2cb79580bdb67083f'
+			''				| 'd41d8cd98f00b204e9800998ecf8427e'
+	}
+
+	void 'Test extractPlaceholders'() {
+		given:
+			Set set
+
+		when: 'called with multiple placeholders'
+			set = StringUtil.extractPlaceholders('My favorite color is {COLOR} and my favorite icecream is { FLAVOR }. What is yours?')
+		then: 'results should have to values'
+			2 == set.size()
+		and: 'it contains the expected value color'
+			set.contains('COLOR')
+		and: 'it contains FLAVOR with spacing removed'
+			set.contains('FLAVOR')
+
+		when: 'called with repeated placeholders'
+			set = StringUtil.extractPlaceholders('My favorite beer is {BEER}. Do you like {BEER}?')
+		then: 'the results should only have one'
+			1 == set.size()
+		and: 'contain the expected value'
+			'BEER' == set[0]
+	}
+
+	void 'Test replacePlaceholders method for safe calls'() {
+		expect:
+			result == StringUtil.replacePlaceholders(text, map)
+
+		where:
+			text							| map					      | result
+			'Color { COLOR }'			| [COLOR:'red']			| 'Color red'
+			'Letters {1}, {2}, {1}'	| ['1':'A', '2': 'Z']	| 'Letters A, Z, A'
+			'{first.name}'				| ['first.name': 'Tom']	| 'Tom'
+	}
+
+	void 'Test replacePlaceholders method for bad cases'() {
+		given:
+			String message = 'Expecting {KEY} and {VALUE} in map'
+		when: 'called with a single missing parameter in map'
+			StringUtil.replacePlaceholders(message, [KEY:'lowercase', value:'is wrong'])
+		then: 'an exception is thrown'
+			InvalidParamException ex = thrown()
+		and: 'the message is what is expecting'
+			'Missing parameter for placeholder VALUE' == ex.message
+
+		when: 'called with missing parameters in map'
+			StringUtil.replacePlaceholders(message, [key:'lowercase', value:'is wrong'])
+		then: 'an exception is thrown'
+			InvalidParamException ex2 = thrown()
+		and: 'the message contains the list of missing parameters'
+			ex2.message.contains('KEY, VALUE')
+
+		when: 'called with a null map'
+			StringUtil.replacePlaceholders(message, null)
+		then: 'an exception is thrown'
+			InvalidParamException ex3 = thrown()
+		and: 'the message contains the list of both missing parameters'
+			'Parameters map for placeholder replacement is null' == ex3.message
+
+	}
+
+	def 'test containsPlaceholders method'() {
+		expect:
+			expected == StringUtil.containsPlaceholders(text)
+		where:
+			text		| expected
+			'abcdefg'| false
+			''			| false
+			'a{b}c'	| true
+			null		| false
 	}
 
 }

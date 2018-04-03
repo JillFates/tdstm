@@ -22,6 +22,7 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	 * @param field
 	 * @return
 	 */
+	//TODO: rename validate fieldName exists
 	Boolean hasSpecs(ETLDomain domain, String field) {
 
 		if(domain.isAsset()){

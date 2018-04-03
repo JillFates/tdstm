@@ -130,7 +130,10 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     Map<String, ?> authenticate(Credential credential) {
+        // TODO : JPM 3/2018 : Throw exception - NO MORE assert in the code
         assert credential != null : 'Invalid credential information provided.'
+
+        log.debug 'authenticate() trying to authenticate user {}', credential.username
 
         // TODO look for authentication in cache by credential ID, if there is one
         // we shouldn't be doing re-authentication
@@ -153,6 +156,8 @@ class CredentialService implements ServiceMethods {
                 authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet" ]
                 break
         }
+
+        log.debug 'authenticate() results {}', authenticationResponse
         return authenticationResponse
     }
 
@@ -295,7 +300,7 @@ class CredentialService implements ServiceMethods {
      * based on a HttpStatus code equals 200.
 
      * @param credential - the credentials
-     * @param resp - the authentication call response
+     * @param resp - http call response
      * @return a Map with the expected fields required by the authentication method
      */
     private Map<String, ?> getAuthenticationResponse(Credential credential, RestResponse resp) {
@@ -309,39 +314,52 @@ class CredentialService implements ServiceMethods {
             authenticationSucceeded = credentialValidationExpression.evaluate(resp)
         }
 
-        Map<String, ?> authenticationResponse = [:]
-        if (authenticationSucceeded) {
-            switch (credential.authenticationMethod) {
-                case AuthenticationMethod.BASIC_AUTH:
-                case AuthenticationMethod.JWT:
-                    authenticationResponse = JsonUtil.convertJsonToMap(resp.json)
-                    break;
-                case AuthenticationMethod.COOKIE:
-                    // pull out session header data
-                    for (String header : resp.getHeaders().get(HttpHeaders.SET_COOKIE)) {
-                        if (header.contains(credential.sessionName)) {
-                            String sessionHeader = header.split(';')[0]
-                            String[] sessionName = sessionHeader.split('=')
-                            authenticationResponse = ['sessionName': sessionName[0], 'sessionValue': sessionName[1]]
-                        }
-                    }
-                    break
-                case AuthenticationMethod.HEADER:
-                    // pull out session header data
-                    String sessionHeader = resp.getHeaders().get(credential.sessionName)
-                    if (sessionHeader) {
-                        authenticationResponse = ['sessionName': credential.sessionName, 'sessionValue': sessionHeader]
-                    }
-                    break
-                default:
-                    authenticationResponse = [error: "Authentication method [${credential.authenticationMethod}] not implemented yet"]
-                    break
-            }
-        } else {
+        if (!authenticationSucceeded) {
             log.debug('Error during credential authentication: {}', resp.text)
             throw new RuntimeException('Error during credential authentication, not expected response: ' + resp.text)
         }
-        return authenticationResponse
+
+        // if authentication validation succeeded then extract sessionId within the response
+        return extractSessionId(credential.sessionName, resp)
+    }
+
+    /**
+     * Extract session Id from the authentication response call
+     * @param sessionNameProperties - session name in the format of SessionHeaderName@source:propertyName
+     * @param resp - http call response
+     * @return
+     */
+    private Map<String, ?> extractSessionId(String sessionNameProperties, RestResponse resp) {
+        Map<String, ?> sessionId = [:]
+        def (String sessionHeaderName, String source, String propertyName) = sessionNameProperties.split(/[@:]/)
+        switch (source) {
+            case 'header':
+                // pull out session header data
+                // returning first header since response.getHeaders().get() returns a list
+                String sessionHeader = resp.getHeaders().getFirst(propertyName)
+                if (sessionHeader) {
+                    sessionId = ['sessionName': sessionHeaderName, 'sessionValue': sessionHeader]
+                }
+                break
+            case 'cookie':
+                // pull out cookies data
+                for (String header : resp.getHeaders().get(HttpHeaders.SET_COOKIE)) {
+                    if (header.contains(propertyName)) {
+                        String sessionHeader = header.split(';')[0]
+                        String[] sessionName = sessionHeader.split('=')
+                        sessionId = ['sessionName': sessionName[0], 'sessionValue': sessionName[1]]
+                    }
+                }
+                break
+            case 'json':
+                Map<String, ?> json = JsonUtil.convertJsonToMap(resp.json)
+                sessionId = ['sessionName': sessionHeaderName, 'sessionValue': json.get(propertyName)]
+                break
+            default:
+                sessionId = [error: "Authentication response does not contain session source [${source}] data"]
+                break
+        }
+        return sessionId
     }
 
     /**

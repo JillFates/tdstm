@@ -16,9 +16,9 @@ export const importAssetsState: Ng2StateDeclaration = <Ng2StateDeclaration>{
 	url: ImportAssetsStates.IMPORT_ASSETS.url,
 	data: {
 		page: {
-			title: 'IMPORT_ASSETS.MANUAL_IMPORT.MANUAL_ASSET_IMPORT',
+			title: 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL',
 			instruction: '',
-			menu: [],
+			menu: ['ASSETS.ASSETS', 'IMPORT_ASSETS.MANUAL_IMPORT.IMPORT_ASSETS_ETL'],
 			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-import-assets-etl'}
 		},
 		requiresAuth: true,

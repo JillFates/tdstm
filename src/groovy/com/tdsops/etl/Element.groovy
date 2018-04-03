@@ -3,9 +3,18 @@ package com.tdsops.etl
 import com.tdssrc.grails.StringUtil
 
 class Element implements RangeChecker {
-
+	/**
+	 * Original value extracted from Dataset and used to create an instance of Element
+	 */
     String originalValue
+	/**
+	 * Value with transformations applied
+	 */
     String value
+	/**
+	 * Default o initialize value
+	 */
+	String init
     Integer rowIndex
     Integer columnIndex
     ETLDomain domain
@@ -15,6 +24,12 @@ class Element implements RangeChecker {
 
     /**
      * Transform command on an element with a closure to be executed
+     * <pre>
+     *     domain Application
+     *     extract 'location' transform {
+     *          lowercase() append('**')
+     *     } load description
+     * </pre>
      * @param closure
      * @return the element instance that received this command
      */
@@ -22,19 +37,20 @@ class Element implements RangeChecker {
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
-        this
+	    return this
     }
 
     /**
      * Transform command with a hack for this example:
      * <code>
-     *     extract .. transform with uppercase() lowercase()
+     *     domain Application
+     *     extract 'location' transform with uppercase() lowercase() load description
      * </code>
      * @param command
      * @return the element instance that received this command
      */
     Element transform (String command) {
-        this
+	    return this
     }
 
     /**
@@ -50,13 +66,50 @@ class Element implements RangeChecker {
         if (processor.hasSelectedDomain()) {
             this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
             processor.addElementLoaded(processor.selectedDomain, this)
-            this
+            return this
         } else {
             throw ETLProcessorException.domainMustBeSpecified()
         }
     }
 
-    /**
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name initialize custom1
+	 * </code>
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 */
+	Element initialize (String fieldName) {
+		if (processor.hasSelectedDomain()) {
+			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.init = this.value
+			this.originalValue = ''
+			this.value = ''
+			processor.addElementLoaded(processor.selectedDomain, this)
+			return this
+		} else {
+			throw ETLProcessorException.domainMustBeSpecified()
+		}
+	}
+
+	/**
+	 * Initialize an Element with a particular value
+	 * <code>
+	 *     domain Device
+	 *     extract name init custom1
+	 * </code>
+	 * * @param init
+	 * @param fieldName
+	 * @return the element instance that received this command
+	 * @see Element#initialize(java.lang.String)
+	 */
+	Element init (String initValue) {
+		return initialize(initValue)
+	}
+
+	/**
      * Validation for incorrect methods on script content
      * @param methodName
      * @param args
@@ -92,7 +145,7 @@ class Element implements RangeChecker {
         int to = (start + take - 1)
         subListRangeCheck(start, start + to, value.size())
         value = value[start..to]
-        this
+	    return this
     }
 
     /**
@@ -109,7 +162,7 @@ class Element implements RangeChecker {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
-        this
+	    return this
     }
 
     /**
@@ -122,7 +175,7 @@ class Element implements RangeChecker {
      */
     Element sanitize () {
         value = StringUtil.sanitizeAndStripSpaces(value)
-        this
+	    return this
     }
 
     /**
@@ -134,7 +187,7 @@ class Element implements RangeChecker {
      */
     Element trim () {
         value = value.trim()
-        this
+	    return this
     }
 
     /**
@@ -147,7 +200,7 @@ class Element implements RangeChecker {
      */
     Element first (String content) {
         value = value.replaceFirst(content, '')
-        this
+	    return this
     }
 
     /**
@@ -160,7 +213,7 @@ class Element implements RangeChecker {
      */
     Element all (String content) {
         value = value.replaceAll(content, '')
-        this
+	    return this
     }
 
     /**
@@ -173,20 +226,20 @@ class Element implements RangeChecker {
      */
     Element last (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
-        this
+	    return this
     }
 
     /**
      * Converts all of the characters in this element value to upper
      * case using the rules of the default locale.
      * <code>
-     *      load ... transformation with uppercase()
+     *      load ... transform with uppercase()
      * <code>
      * @return the element instance that received this command
      */
     Element uppercase () {
         value = value.toUpperCase()
-        this
+	    return this
     }
 
     /**
@@ -199,7 +252,7 @@ class Element implements RangeChecker {
      */
     Element lowercase () {
         value = value.toLowerCase()
-        this
+	    return this
     }
 
     /**
@@ -213,7 +266,7 @@ class Element implements RangeChecker {
      */
     Element left (Integer amount) {
         value = value.take(amount)
-        this
+	    return this
     }
 
     /**
@@ -227,7 +280,7 @@ class Element implements RangeChecker {
      */
     Element right (Integer amount) {
         value = value.reverse().take(amount).reverse()
-        this
+	    return this
     }
 
     /**
@@ -243,20 +296,21 @@ class Element implements RangeChecker {
      */
     Element replace (String regex, String replacement) {
         value = value.replaceAll(regex, replacement)
-        this
+	    return this
     }
 
     /**
-     * Saves a new variable in the binding context in order to use it later
-     * It's used in this ETL script command
+     * Saves a new local variable in the binding context in order to use it later
+     * It's used in following ETL script command
      * <code>
-     *     extract 3 transform with lowercase() set myVar
+     *     extract 3 transform with lowercase() set myLocalVariable
      * </code>
      * * @param variableName
      * @return
      */
     Element set (String variableName) {
-        processor.addDynamicVariable(variableName, this)
+        processor.addLocalVariableInBinding(variableName, this)
+	    return this
     }
 
     /**
@@ -278,7 +332,7 @@ class Element implements RangeChecker {
             }
         }
         this.value += newValue
-        this
+	    return this
     }
 
     /**
@@ -292,7 +346,7 @@ class Element implements RangeChecker {
      */
     Element plus (Element anotherElement) {
         this.value += anotherElement?.value
-        this
+	    return this
     }
 
     /**
@@ -306,7 +360,7 @@ class Element implements RangeChecker {
      */
     Element plus (String value) {
         this.value += value
-        this
+	    return this
     }
 
     /**

@@ -1,4 +1,4 @@
-<!-- database-show.component.js -->
+<!-- database-show.component.ts -->
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
@@ -72,7 +72,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
                                         <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-                                                <tds:convertDate date="${asset?.maintExpDate}" endian="$dateFormat" />
+                                                <tds:convertDate date="${asset?.maintExpDate}" endian = "${dateFormat}" />
                                             </tdsAngular:tooltipSpan>
                                         </td>
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
@@ -101,7 +101,7 @@
                 </tr>
 
                 <tr>
-                    <td colspan="2">
+                    <td colspan="2" class="dates-info-container">
                         <table class="dates-info">
                             <tr>
                                 <td class="date-created">Date created: ${dateCreated}</td>

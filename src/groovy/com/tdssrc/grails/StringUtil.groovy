@@ -1,9 +1,13 @@
 package com.tdssrc.grails
 
 import com.tdsops.common.lang.CollectionUtils
+import net.transitionmanager.service.InvalidParamException
 import groovy.json.StringEscapeUtils
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.codec.digest.DigestUtils
+
+import java.util.regex.Matcher
 
 /**
  * String manipulation methods.
@@ -12,6 +16,7 @@ class StringUtil {
 
 	private static final List<String> trueList = ['y', 'yes', 't', 'true', '1'].asImmutable()
 	private static final List<String> falseList = ['n', 'no', 'f', 'false', '0'].asImmutable()
+	static final String PLACEHOLDER_REGEXP = /\{([^\}]*)\}/
 
 	/**
 	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer
@@ -426,5 +431,84 @@ class StringUtil {
 			compareTo = compareTo.toUpperCase()
 		}
 		return compareTo.contains(str)
+	}
+
+	/**
+	 * Calculates the MD5 digest and returns the value as a 32 character hex string
+	 * @param text - the text to convert
+	 * @return the MD5 equivalent hash
+	 */
+	static String md5Hex(String text) {
+		return DigestUtils.md5Hex(text)
+	}
+
+	/**
+	 * Used to replace in a String mustache like placeholders (e.g. {{ KEY }} ) with the name value map provided
+	 * @param text - String with Mustache like placeholders to be replaced
+	 * @param params Parameters Dictionary
+	 * @return the String with the parameters replaced with the values
+	 * @throws InvalidParamException if isn't a parameter defined for one or more placeholders
+	 *
+	 * @usage
+	 * <pre>
+	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {{COLOR}}', [COLOR:'Red'] )
+	 * </pre>
+	 */
+	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
+		if (params == null) {
+			throw new InvalidParamException('Parameters map for placeholder replacement is null')
+		}
+
+		StringBuffer sb = new StringBuffer()
+		Matcher m = text =~ PLACEHOLDER_REGEXP
+		Set<String> missing = []
+
+		while (m.find()) {
+			String paramName = m.group(1).trim()
+			if (params.containsKey(paramName)) {
+				m.appendReplacement(sb, params[paramName])
+			} else {
+				missing << paramName
+			}
+		}
+		m.appendTail(sb)
+
+		if (missing) {
+			if (missing.size() == 1 ) {
+				throw new InvalidParamException("Missing parameter for placeholder ${missing[0]}")
+			} else {
+				throw new InvalidParamException("Missing parameters for placeholders ${missing.join(', ')}")
+			}
+		}
+
+		return sb.toString()
+	}
+
+	/**
+	 * Extract a Set of String mustache like placeholders from another string (avoiding duplicated entries)
+	 * @param text String with the placeholders
+	 * @return Set of placeholders, empty set if null
+	 */
+	static Set<String> extractPlaceholders(String text) {
+		HashSet<String> placeholders = []
+
+		if (text) {
+			Matcher m = text =~ PLACEHOLDER_REGEXP
+
+			while (m.find()) {
+				placeholders << m.group(1).trim()
+			}
+		}
+
+		return placeholders
+	}
+
+	/**
+	 * Used to determine if a string contains any placeholders
+	 * @param text - the string to inspect
+	 * @return true if the string contains a placeholder otherwise false
+	 */
+	static Boolean containsPlaceholders(String text) {
+		return extractPlaceholders(text).size() > 0
 	}
 }

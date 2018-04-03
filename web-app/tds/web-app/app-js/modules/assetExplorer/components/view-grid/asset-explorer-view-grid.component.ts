@@ -9,7 +9,10 @@ import { Observable } from 'rxjs/Rx';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE } from '../../../../shared/model/constants';
+import {
+	SEARCH_QUITE_PERIOD, MAX_OPTIONS, MAX_DEFAULT, KEYSTROKE,
+	DIALOG_SIZE
+} from '../../../../shared/model/constants';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { FieldSettingsModel, FIELD_NOT_FOUND } from '../../../fieldSettings/model/field-settings.model';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -238,7 +241,7 @@ export class AssetExplorerViewGridComponent {
 			this.dialog.open(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				'lg').then(x => {
+				DIALOG_SIZE.LG).then(x => {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}).catch(x => {
 					console.log(x);
@@ -250,7 +253,7 @@ export class AssetExplorerViewGridComponent {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			'lg', true).then(x => {
+			DIALOG_SIZE.LG, true).then(x => {
 				if (x) {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}

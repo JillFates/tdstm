@@ -8,9 +8,11 @@ package com.tdsops.etl
  * </pre>
  * After that definition, FindingsFacade can be used like the following examples:
  * <pre>
- *   if (supportingFindings.size == 1 and
- *   		primaryFindings.isApplication() ) {*         	........
- *}* </pre>
+ *  if (supportingFindings.size == 1 and
+ *      primaryFindings.isApplication() ) {
+ *   	........
+ *  }
+ * </pre>
  */
 class FindingsFacade {
 

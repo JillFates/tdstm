@@ -140,4 +140,15 @@ class NumberUtilTests extends Specification {
          assert it instanceof Long
       }
    }
+
+   def 'Test the isNumber method'() {
+	   	expect:
+	   		result == NumberUtil.isaNumber( object )
+		where:
+			object		| result
+			5			| true
+			5L			| true
+			'abc'		| false
+			3.142		| false
+   }
 }

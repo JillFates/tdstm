@@ -30,6 +30,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
@@ -52,9 +53,11 @@ import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -406,6 +409,7 @@ class TaskService implements ServiceMethods {
 	 * @param task - the Task to invoke the method on
 	 * @return The status that the task should be set to
 	 */
+	@NotTransactional
 	String invokeAction(AssetComment task, Person whom) {
 		def status = task.status
 		//return status
@@ -422,29 +426,25 @@ class TaskService implements ServiceMethods {
 					errMsg = 'Task has an synchronous action which are not supported'
 				} else {
 					try {
-						log.debug "invokeAction() attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+						markTaskStarted(task.id)
 
-						// Update the task so that the we track that the action was invoked
-						task.apiActionInvokedAt = new Date()
+						log.debug "Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
-						// Update the task so that we track the task started at
-						task.actStart = new Date()
+						// Need to refresh the task with changes that were just committed in separate transaction
+						AssetComment.withTransaction { TransactionStatus ts ->
+							task.refresh()
+							status = task.status
 
-						// Log a note that the API Action was called
-						// TODO : JPM 2/2017 : The note should be part of the ApiActionService.invoke
-						addNote(task, whom, "Invoked action ${task.apiAction.name}")
+							// Kick of the async method and mark the task STARTED
+							addNote(task, whom, "Invoked action ${task.apiAction.name}")
 
-						// Make sure that the status is STARTED instead
-						status = AssetCommentStatus.STARTED
-						task.status = status
-						task.save(flush: true)
-
-						// Kick of the async method and mark the task STARTED
-						apiActionService.invoke(task.apiAction, task)
-
+							apiActionService.invoke(task.apiAction, task)
+						}
 					} catch (InvalidRequestException e) {
 						errMsg = e.getMessage()
 					} catch (InvalidConfigurationException e) {
+						errMsg = e.getMessage()
+					} catch (CannotAcquireLockException e) {
 						errMsg = e.getMessage()
 					} catch (e) {
 						errMsg = 'A runtime error occurred while attempting to process the action'
@@ -454,17 +454,46 @@ class TaskService implements ServiceMethods {
 
 				if (errMsg) {
 					log.warn "invokeAction() error $errMsg"
-					AssetComment.withNewTransaction {
-						AssetComment taskObj = AssetComment.get(task.id)
-						addNote(taskObj, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
-						status = ACS.HOLD
-						taskObj.status = status
-						taskObj.save(failOnError:true)
-					}
+					addNote(task, whom, "Invoke action ${task.apiAction.name} failed : $errMsg")
 				}
 			}
 		}
 		return status
+	}
+
+	/**
+	 * Try to mark a task as started by locking it before, if lock fails
+	 * or if the task was already started by another user, thows an exception
+	 * indicating it so
+	 * @param id - the id of the task to mark as started
+	 */
+	@NotTransactional
+	void markTaskStarted(Long id) {
+		try {
+			AssetComment.withTransaction { TransactionStatus ts ->
+				log.debug "Attempting to mark asset comment as started for task.id={}", id
+
+				def taskWithLock = AssetComment.lock(id)
+				log.debug 'Locked out AssetComment: {}', taskWithLock
+
+				if (taskWithLock.status in [ACS.STARTED, ACS.HOLD, ACS.COMPLETED]) {
+					throw new Exception('Another user invoked the action before')
+				}
+
+				// Update the task so that the we track that the action was invoked
+				taskWithLock.apiActionInvokedAt = new Date()
+
+				// Update the task so that we track the task started at
+				taskWithLock.actStart = taskWithLock.apiActionInvokedAt
+
+				// Make sure that the status is STARTED instead
+				taskWithLock.status = AssetCommentStatus.STARTED
+				taskWithLock.save(flush: true, failOnError: true)
+			}
+		} catch (Exception e) {
+			log.error ExceptionUtil.stackTraceToString('markAssetCommentAsStarted() failed ', e)
+			throw new CannotAcquireLockException('Another user invoked the action before')
+		}
 	}
 
 	/**
@@ -1626,12 +1655,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (recipe.releasedVersion) {
 				recipeVersion = recipe.releasedVersion
 			} else {
-				throw new UnauthorizedException('There is no released version of the recipe to generate tasks with')
+				throw new InvalidRequestException('There is no released version of the recipe to generate tasks with')
 			}
 		} else {
 			recipeVersion = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
 			if (!recipeVersion) {
-				throw new UnauthorizedException('There is no wip version of the recipe to generate tasks with')
+				throw new InvalidRequestException('There is no wip version of the recipe to generate tasks with')
 			}
 		}
 

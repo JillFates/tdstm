@@ -1,13 +1,21 @@
 package com.tdsops.etl
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.WorkbookUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.excel.ExcelConnection
+import getl.excel.ExcelDataset
+import getl.excel.ExcelDriver
 import getl.utils.FileUtils
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFRow
 import spock.lang.Specification
 
 abstract class ETLBaseSpec extends Specification {
@@ -88,6 +96,37 @@ abstract class ETLBaseSpec extends Specification {
 		]
 	}
 
+
+	/**
+	 * Builds a SpreadSheet dataSet from a csv content
+	 * @param csvContent
+	 * @return
+	 */
+	private List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+
+		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
+		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
+
+		// Getting the Sheet at index zero
+		Sheet sheet = workbook.createSheet(sheetName)
+		sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
+			XSSFRow currentRow = sheet.createRow(rowNumber)
+			line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+				currentRow.createCell(columnNumber).setCellValue(cellContent)
+			}
+		}
+
+		WorkbookUtil.saveToOutputStream(workbook, outputStream)
+
+		ExcelConnection con = new ExcelConnection(
+			path: service.temporaryDirectory,
+			fileName: fileName,
+			driver: TDSExcelDriver)
+		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
+
+		return [fileName, new DataSetFacade(dataSet)]
+	}
+
 	/**
 	 * Builds a CSV dataSet from a csv content
 	 * @param csvContent
@@ -95,9 +134,9 @@ abstract class ETLBaseSpec extends Specification {
 	 */
 	private List buildCSVDataSet(String csvContent) {
 
-		def (String fileName, OutputStream sixRowsDataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
-		sixRowsDataSetOS << csvContent
-		sixRowsDataSetOS.close()
+		def (String fileName, OutputStream dataSetOS) = service.createTemporaryFile('unit-test-', 'csv')
+		dataSetOS << csvContent
+		dataSetOS.close()
 
 		String fullName = service.getTemporaryFullFilename(fileName)
 
@@ -124,13 +163,14 @@ abstract class ETLBaseSpec extends Specification {
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('description', 'Description'),
 					buildFieldSpec('assetName', 'Name'),
+					buildFieldSpec('location', 'Location'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
 				break
 			case AssetClass.DATABASE:
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('name', 'Name'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('environment', 'Environment'),
 					buildFieldSpec('assetClass', 'Asset Class'),
 				]
@@ -140,9 +180,33 @@ abstract class ETLBaseSpec extends Specification {
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
 					buildFieldSpec('location', 'Location'),
-					buildFieldSpec('name', 'Name'),
-					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('assetName', 'Name'),
 					buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('manufacturer', 'Manufacturer'),
+					buildFieldSpec('custom1', 'Network Interfaces'),
+					buildFieldSpec('custom2', 'Cost Basis'),
+					buildFieldSpec('description', 'Description'),
+					buildFieldSpec('assetType', 'Device Type'),
+					buildFieldSpec('model', 'Model'),
+					buildFieldSpec('shortName', 'Alternate Name'),
+					buildFieldSpec('serialNumber', 'Serial #'),
+					buildFieldSpec('assetTag', 'Asset Tag'),
+					buildFieldSpec('railType', 'Rail Type'),
+					buildFieldSpec('externalRefId', 'External Ref Id'),
+					buildFieldSpec('environment', 'Environment'),
+					buildFieldSpec('priority', 'Priority'),
+					buildFieldSpec('ipAddress', 'IP Address'),
+					buildFieldSpec('os', 'OS'),
+					buildFieldSpec('supportType', 'SupportType'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration'),
+					buildFieldSpec('retireDate', 'Retire Date'),
+					buildFieldSpec('truck', 'Truck'),
+					buildFieldSpec('cart', 'Cart'),
+					buildFieldSpec('shelf', 'Shelf'),
+					buildFieldSpec('sourceLocation', 'Source Location'),
+					buildFieldSpec('moveBundle', 'Bundle'),
+					buildFieldSpec('planStatus', 'Plan Status'),
+					buildFieldSpec('validation', 'Validation'),
 				]
 				break
 			case ETLDomain.Dependency:

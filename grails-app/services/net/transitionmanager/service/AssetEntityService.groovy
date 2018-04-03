@@ -1419,10 +1419,10 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[	assetId: assetEntity?.id,
-			assetComment: assetComment,
-			assetCommentList: assetCommentList,
-			dateFormat: userPreferenceService.getDateFormat(),
+		[   assetId: assetEntity?.id,
+		    assetComment: assetComment,
+		    assetCommentList: assetCommentList,
+		    dateFormat: userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
 			dependentAssets: dependentAssets,
 			errors: params.errors,
@@ -2654,7 +2654,7 @@ class AssetEntityService implements ServiceMethods {
 			query.append(whereAnd() + " assets.planStatus='$params.plannedStatus'")
 		}
 		query.append(" ORDER BY $sortIndex $sortOrder")
-		log.debug  "query = $query"
+		// log.debug  "query = $query"
 
 		def assetList = []
 		if (queryParams.size()) {

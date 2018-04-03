@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.json.JSONConnection
@@ -24,6 +25,8 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
+import org.apache.http.client.utils.DateUtils
+import spock.lang.See
 import spock.lang.Shared
 
 /**
@@ -170,7 +173,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
 	}
 
-
 	void 'test can define a the primary domain'() {
 
 		given:
@@ -183,7 +185,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						domain Application
-						
+
 					 """.stripIndent(),
 				ETLProcessor.class.name)
 
@@ -215,7 +217,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						/*
 							And multiple Lines comments
 						*/
-						
+
 					 """.stripIndent(),
 				ETLProcessor.class.name)
 
@@ -244,7 +246,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				.evaluate("""
 
 						domain Unknown
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -266,7 +268,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						domain Application
 						domain Device
 						domain Storage
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -307,7 +309,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						domain Application
 						domain Device
 						domain Application
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -397,7 +399,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						iterate {
 							extract 2
 						}
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -424,13 +426,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					
+
 						domain Device
 						read labels
 						iterate {
 							extract 'model name'
 						}
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -453,13 +455,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					
+
 						domain Device
 						read labels
 						iterate {
 							extract 'model'
 						}
-						
+
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -561,61 +563,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can use if else groovy clause to load a field with an extracted element value'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-					
-						extract 'vendor name' 
-						
-						if ( CE == 'Microsoft'){
-							load appVendor
-						} else {
-							load environment
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-					}
-				}
-
-				with(data[1]) {
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-					}
-				}
-			}
-	}
-
-	void 'test can set a an extracted element in a variable'() {
+	void 'test can load a field using a string literal'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -635,11 +583,260 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myVar = CE
-						if ( myVar == 'Microsoft'){
-							load appVendor
+						if ( CE == 'Microsoft'){
+							load Name with 'This is a Microsoft Application'
 						} else {
-							load environment
+							load environment with 'This is not a Microsoft Application'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['assetName', 'environment'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.assetName) {
+						value == 'This is a Microsoft Application'
+						originalValue == 'This is a Microsoft Application'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.environment) {
+						value == 'This is not a Microsoft Application'
+						originalValue == 'This is not a Microsoft Application'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field using CE'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name'
+						if ( CE == 'Microsoft'){
+							load appVendor with CE
+						} else {
+							load environment with CE
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.environment) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field using DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						extract 'location' load environment
+
+						if ( CE == 'Microsoft'){
+							load Name with DOMAIN.appVendor
+						} else {
+							load Name with DOMAIN.environment
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field using SOURCE.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load appVendor
+						extract 'location' load environment
+
+						if ( CE == 'Microsoft'){
+							load Name with SOURCE.'vendor name'
+						} else {
+							load Name with SOURCE.'application id'
+						}
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				fields == ['appVendor', 'environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]) {
+					rowNum == 1
+					with(fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == '152254'
+						originalValue == '152254'
+					}
+				}
+
+				with(data[1]) {
+					rowNum == 2
+					with(fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
+					with(fields.environment) {
+						value == 'ACME Data Center'
+						originalValue == 'ACME Data Center'
+					}
+					with(fields.assetName) {
+						value == '152255'
+						originalValue == '152255'
+					}
+				}
+			}
+	}
+
+	void 'test can load a field with a local variable'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name'
+						def myLocalVariable = CE
+
+						if ( myLocalVariable == 'Microsoft'){
+							load appVendor with myLocalVariable
+						} else {
+							load environment with myLocalVariable
 						}
 					}
 				""".stripIndent(),
@@ -836,6 +1033,94 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-9283')
+	void 'test correct trimming of spaces in column names'() {
+
+		given:
+		ETLFieldsValidator validator = new DomainClassFieldsValidator()
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+		and:
+		def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			name , mfg, model
+			xraysrv01,Dell,PE2950
+			oradbsrv02,HP,DL8150
+			oradbsrv03,HP,DL8155""".stripIndent())
+		and:
+		ETLProcessor etlProcessor = new ETLProcessor(
+						GroovyMock(Project),
+						dataSet,
+						new DebugConsole(buffer: new StringBuffer()),
+						validator)
+
+		when: 'The ETL script is evaluated'
+		new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			.evaluate("""
+				read labels
+				domain Device
+				iterate {
+					extract name load assetName
+					extract mfg load manufacturer
+					extract 3 load model
+				}
+			""".stripIndent(),
+					ETLProcessor.class.name)
+
+		then: 'Every field property is assigned to the correct element'
+		etlProcessor.result.domains.size() == 1
+		with(etlProcessor.result.domains[0]) {
+			domain == ETLDomain.Device.name()
+			with(data[0]) {
+				rowNum == 1
+				with (fields.assetName){
+					originalValue == "xraysrv01"
+					value == "xraysrv01"
+				}
+				with (fields.manufacturer){
+					originalValue == "Dell"
+					value == "Dell"
+				}
+				with (fields.model){
+					originalValue == "PE2950"
+					value == "PE2950"
+				}
+			}
+
+			with(data[1]) {
+				rowNum == 2
+				with (fields.assetName){
+					originalValue == "oradbsrv02"
+					value == "oradbsrv02"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8150"
+					value == "DL8150"
+				}
+			}
+
+			with(data[2]) {
+				rowNum == 3
+				with (fields.assetName){
+					originalValue == "oradbsrv03"
+					value == "oradbsrv03"
+				}
+				with (fields.manufacturer){
+					originalValue == "HP"
+					value == "HP"
+				}
+				with (fields.model){
+					originalValue == "DL8155"
+					value == "DL8155"
+				}
+			}
+		}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can create new results loading values without extract previously'() {
 
 		given:
@@ -856,13 +1141,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						set environment with Production
+						load environment with 'Production'
 						extract 1 load id
 						extract 'vendor name' load appVendor
-							
+
 						domain Device
-						extract 1 load id 
-						set location with 'Development'        
+						extract 1 load id
+						load location with 'Development'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -964,482 +1249,706 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load Room domain instances'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
-673,DC1,ACME Data Center,26.00,40.00,Source,112 Main St ,Cumberland,,IA,50843
-674,ACME Room 1,New Colo Provider,4.00,42.00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
+				roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
+				673,DC1,ACME Data Center,26.00,40.00,Source,112 Main St ,Cumberland,,IA,50843
+				674,ACME Room 1,New Colo Provider,4.00,42.00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
 
-		and:
-			List<Room> rooms = buildRooms([
-				[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
-				[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
-			])
+						and:
+							List<Room> rooms = buildRooms([
+								[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+								[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+							])
 
-		and:
-			GroovyMock(Room, global: true)
-			Room.executeQuery(_, _) >> { String query, Map args ->
-				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Room
-							extract roomId load id 
-							extract Name load roomName
-						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain Room domain results associated'
-			etlProcessor.result.domains.size() == 1
-
-
-		cleanup:
-			service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can load Rack domain instances'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
-13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
-13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
-13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
-13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
-
-		and:
-			List<Room> rooms = buildRooms([
-				[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
-				[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
-			])
-
-		and:
-			GroovyMock(Room, global: true)
-			Room.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
-			Room.executeQuery(_, _) >> { String query, Map args ->
-				rooms.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-						console on
-						read labels
-						iterate {
-							domain Rack
-							extract rackId load id 
-							extract Location load location
-							extract Room load room
-						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
-
-		cleanup:
-			if (fileName) service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can evaluate a value loaded into the DOMAIN.property'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract 'vendor name' load appVendor
-						if (DOMAIN.appVendor.startsWith('Mi')){
-							set environment with 'Production'
-						} else {
-							set environment with 'Development'
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['appVendor', 'environment'] as Set
-				with(data[0]){
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-					}
-				}
-
-				with(data[0]){
-					rowNum == 1
-					with(fields.environment) {
-						value == 'Production'
-						originalValue == 'Production'
-					}
-				}
-
-				with(data[1]){
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-					}
-				}
-
-				with(data[1]){
-					rowNum == 2
-					with(fields.environment) {
-						value == 'Development'
-						originalValue == 'Development'
-					}
-				}
-			}
-	}
-
-	void 'test can throw an exception if an domain is not specified'() {
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
-13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
-13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
-13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
-13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator)
-			)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-
-					iterate {
-						extract 1 load id
-					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown()
-			e.message == 'A domain must be specified'
-
-		cleanup:
-			if (fileName) service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract 'vendor name' load appVendor
-						if (DOMAIN.appVendor.unknownMethod('Mi')){
-							set environment with 'Production'
-						} else {
-							set environment with 'Development'
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.DomainField.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
-	}
-
-	void 'test can evaluate a value loaded into the SOURCE.property'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract 'vendor name' load appVendor
-						if (!SOURCE.technology.startsWith('NGM')){
-							set environment with 'Production'
-						} else {
-							set environment with 'Development'
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['appVendor', 'environment'] as Set
-
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
-
-				with(data[0].fields.environment) {
-					value == 'Production'
-					originalValue == 'Production'
-				}
-
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
-				}
-
-				with(data[1].fields.environment) {
-					value == 'Development'
-					originalValue == 'Development'
-				}
-			}
-	}
-
-	void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract 'vendor name' load appVendor
-						if (!SOURCE.technology.unknownMethod('NGM')){
-							set environment with 'Production'
-						} else {
-							set environment with 'Development'
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
-	}
-
-	void 'test can ignore current row based on some condition'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					
-					iterate {
-						domain Application
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
-						
-						if (!SOURCE.'vendor name'.startsWith('Mi')){
-							ignore row
-						} else {
-							domain Device
-							extract 'application id' load id
-							extract technology load Name
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['id', 'appVendor'] as Set
-				data.size() == 1
-				with(data[0]){
-					rowNum == 1
-					with(fields.id){
-						value == '152254'
-						originalValue == '152254'
-					}
-				}
-
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
-			}
-
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
-				data.size() == 1
-				with(data[0]){
-					rowNum == 1
-					with(fields.id) {
-						value == '152254'
-						originalValue == '152254'
-					}
-
-					with(fields.name) {
-						value == '(xlsx updated)'
-						originalValue == '(xlsx updated)'
-					}
-				}
-			}
-	}
-
-	void 'test can ignore current row more than once in the same iteration'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					iterate {
-						domain Application
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
-						
-						if (!SOURCE.'vendor name'.startsWith('Mi')){
-							ignore row
-						} else {
-							domain Device
-							extract 'application id' load id
-							extract technology load Name
-							
-							if(DOMAIN.name.contains('updated')){
-								ignore row
-							} else {
-								domain Database
-								extract 'application id' load id
+						and:
+							GroovyMock(Room, global: true)
+							Room.executeQuery(_, _) >> { String query, Map args ->
+								rooms.findAll { it.id == args.id && it.project.id == args.project.id }
 							}
-						}
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GMDEMO,
+								dataSet,
+								debugConsole,
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+										console on
+										read labels
+										iterate {
+											domain Room
+											extract roomId load id
+											extract Name load roomName
+										}
+										""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain Room domain results associated'
+							etlProcessor.result.domains.size() == 1
+
+
+						cleanup:
+							service.deleteTemporaryFile(fileName)
 					}
-				""".stripIndent(),
+
+					void 'test can load Rack domain instances'() {
+
+						given:
+							def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+				13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+				13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+				13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+				13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+						and:
+							List<Room> rooms = buildRooms([
+								[673, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+								[674, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+							])
+
+						and:
+							GroovyMock(Room, global: true)
+							Room.isAssignableFrom(_) >> { Class<?> clazz ->
+								return true
+							}
+							Room.executeQuery(_, _) >> { String query, Map args ->
+								rooms.findAll { it.id == args.id && it.project.id == args.project.id }
+							}
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GMDEMO,
+								dataSet,
+								debugConsole,
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+										console on
+										read labels
+										iterate {
+											domain Rack
+											extract rackId load id
+											extract Location load location
+											extract Room load room
+										}
+										""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain Rack domain results associated'
+							etlProcessor.result.domains.size() == 1
+
+						cleanup:
+							if (fileName) service.deleteTemporaryFile(fileName)
+					}
+
+					void 'test can evaluate a value loaded into the DOMAIN.property'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract 'vendor name' load appVendor
+										if (DOMAIN.appVendor.startsWith('Mi')){
+											load environment with 'Production'
+										} else {
+											load environment with 'Development'
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain domain results associated'
+							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+							etlProcessor.result.domains.size() == 1
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['appVendor', 'environment'] as Set
+								with(data[0]){
+									rowNum == 1
+									with(fields.appVendor) {
+										value == 'Microsoft'
+										originalValue == 'Microsoft'
+									}
+								}
+
+								with(data[0]){
+									rowNum == 1
+									with(fields.environment) {
+										value == 'Production'
+										originalValue == 'Production'
+									}
+								}
+
+								with(data[1]){
+									rowNum == 2
+									with(fields.appVendor) {
+										value == 'Mozilla'
+										originalValue == 'Mozilla'
+									}
+								}
+
+								with(data[1]){
+									rowNum == 2
+									with(fields.environment) {
+										value == 'Development'
+										originalValue == 'Development'
+									}
+								}
+							}
+					}
+
+					void 'test can throw an exception if an domain is not specified'() {
+						given:
+							def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
+				13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
+				13167,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,Source,160,0,1430,1430,0,Rack,R
+				13187,Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,Source,1,15,0,0,0,Object,L
+				13358,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,Source,41,42,0,0,0,block3x5,L""".stripIndent())
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								dataSet,
+								GroovyMock(DebugConsole),
+								GroovyMock(ETLFieldsValidator)
+							)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+
+									iterate {
+										extract 1 load id
+									}
+									""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'An ETLProcessorException is thrown'
+							ETLProcessorException e = thrown()
+							e.message == 'A domain must be specified'
+
+						cleanup:
+							if (fileName) service.deleteTemporaryFile(fileName)
+					}
+
+					void 'test can throw an exception if script tries evaluate an invalid method loaded into the DOMAIN.property'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract 'vendor name' load appVendor
+										if (DOMAIN.appVendor.unknownMethod('Mi')){
+											set environment with 'Production'
+										} else {
+											set environment with 'Development'
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'An ETLProcessorException is thrown'
+							MissingMethodException e = thrown MissingMethodException
+							e.message == 'No signature of method: com.tdsops.etl.DomainField.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+					}
+
+					void 'test can evaluate a value loaded into the SOURCE.property'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract 'vendor name' load appVendor
+										if (!SOURCE.technology.startsWith('NGM')){
+											load environment with 'Production'
+										} else {
+											load environment with 'Development'
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain domain results associated'
+							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+							etlProcessor.result.domains.size() == 1
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['appVendor', 'environment'] as Set
+
+								with(data[0].fields.appVendor) {
+									value == 'Microsoft'
+									originalValue == 'Microsoft'
+								}
+
+								with(data[0].fields.environment) {
+									value == 'Production'
+									originalValue == 'Production'
+								}
+
+								with(data[1].fields.appVendor) {
+									value == 'Mozilla'
+									originalValue == 'Mozilla'
+								}
+
+								with(data[1].fields.environment) {
+									value == 'Development'
+									originalValue == 'Development'
+								}
+							}
+					}
+
+					void 'test can throw an exception if script tries evaluate an invalid method loaded into the SOURCE.property'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract 'vendor name' load appVendor
+										if (!SOURCE.technology.unknownMethod('NGM')){
+											set environment with 'Production'
+										} else {
+											set environment with 'Development'
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'An ETLProcessorException is thrown'
+							MissingMethodException e = thrown MissingMethodException
+							e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
+					}
+
+					void 'test can ignore current row based on some condition'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+
+									iterate {
+										domain Application
+										extract 'application id' load id
+										extract 'vendor name' load appVendor
+
+										if (!SOURCE.'vendor name'.startsWith('Mi')){
+											ignore row
+										} else {
+											domain Device
+											extract 'application id' load id
+											extract technology load Name
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain domain results associated'
+							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+							etlProcessor.result.domains.size() == 2
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['id', 'appVendor'] as Set
+								data.size() == 1
+								with(data[0]){
+									rowNum == 1
+									with(fields.id){
+										value == '152254'
+										originalValue == '152254'
+									}
+								}
+
+								with(data[0].fields.appVendor) {
+									value == 'Microsoft'
+									originalValue == 'Microsoft'
+								}
+							}
+
+							with(etlProcessor.result.domains[1]) {
+								domain == ETLDomain.Device.name()
+								fields == ['id', 'assetName'] as Set
+								data.size() == 1
+								with(data[0]){
+									rowNum == 1
+									with(fields.id) {
+										value == '152254'
+										originalValue == '152254'
+									}
+
+									with(fields.assetName) {
+										value == '(xlsx updated)'
+										originalValue == '(xlsx updated)'
+									}
+								}
+							}
+					}
+
+					void 'test can ignore current row more than once in the same iteration'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									iterate {
+										domain Application
+										extract 'application id' load id
+										extract 'vendor name' load appVendor
+
+										if (!SOURCE.'vendor name'.startsWith('Mi')){
+											ignore row
+										} else {
+											domain Device
+											extract 'application id' load id
+											extract technology load Name
+
+											if(DOMAIN.assetName.contains('updated')){
+												ignore row
+											} else {
+												domain Database
+												extract 'application id' load id
+											}
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results should contain domain results associated'
+							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
+							etlProcessor.result.domains.size() == 2
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['id', 'appVendor'] as Set
+								data.size() == 1
+								with(data[0]){
+									rowNum == 1
+									with(fields.id){
+										value == '152254'
+										originalValue == '152254'
+									}
+								}
+
+								with(data[0].fields.appVendor) {
+									value == 'Microsoft'
+									originalValue == 'Microsoft'
+								}
+							}
+
+							with(etlProcessor.result.domains[1]) {
+								domain == ETLDomain.Device.name()
+								fields == ['id', 'assetName'] as Set
+								data.isEmpty()
+							}
+					}
+
+					void 'test can throw and exception when script tries to ignore a row and there isn not a domain already defined'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									iterate {
+										ignore row
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'An ETLProcessorException is thrown'
+							ETLProcessorException e = thrown ETLProcessorException
+							e.message == 'A domain must be specified'
+					}
+
+					void 'test can ignore even if results are empty'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract technology
+										if( CE == 'NGM') {
+											ignore row
+										} else {
+											load Name with CE
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results will ignore a row'
+							etlProcessor.result.domains.size() == 1
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['assetName'] as Set
+								data.size() == 1
+							}
+					}
+
+					void 'test can ignore rows without loading values previously'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								applicationDataSet,
+								new DebugConsole(buffer: new StringBuffer()),
+								validator)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									read labels
+									domain Application
+									iterate {
+										extract technology
+										if( CE != 'NGM') {
+											ignore row
+										} else {
+											load Name with CE
+										}
+									}
+								""".stripIndent(),
+								ETLProcessor.class.name)
+
+						then: 'Results will ignore a row'
+							etlProcessor.result.domains.size() == 1
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Application.name()
+								fields == ['assetName'] as Set
+								data.size() == 1
+							}
+					}
+
+					void 'test can ignore rows in the middle of a data set'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							ETLProcessor etlProcessor = new ETLProcessor(
+								GroovyMock(Project),
+								sixRowsDataSet,
+								GroovyMock(DebugConsole),
+								validator
+							)
+
+						when: 'The ETL script is evaluated'
+							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+								.evaluate("""
+									console on
+									read labels
+									iterate {
+										domain Device
+										extract 'device id' load id
+										extract 'model name' transform with lowercase() load Name
+
+										if( SOURCE.'device id'.startsWith('152253') ){
+											ignore row
+										}
+
+									}
+								""".stripIndent(), ETLProcessor.class.name)
+
+						then: 'Third row was removed from the domain results'
+							etlProcessor.result.domains.size() == 1
+							with(etlProcessor.result.domains[0]) {
+								domain == ETLDomain.Device.name()
+								fields == ['id', 'assetName'] as Set
+								data.size() == 5
+
+								data*.rowNum == [1, 2, 4, 5, 6]
+								data.collect{ it.fields.id.value } == [
+									'152251', '152252', '152254', '152255', '152256'
+								]
+								data.collect{ it.fields.assetName.value } == [
+									'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
+								]
+								data.collect{ it.fields.assetName.originalValue } == [
+									'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
+								]
+							}
+					}
+
+					void 'test can set a local variable with a string literal'() {
+
+						given:
+							ETLFieldsValidator validator = new DomainClassFieldsValidator()
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+						and:
+							def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							set myLocalVariable with 'Custom Name'
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
 				ETLProcessor.class.name)
 
-		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 2
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['id', 'appVendor'] as Set
-				data.size() == 1
+				domain == ETLDomain.Device.name()
+				fields == ['assetName'] as Set
+				data.size() == 2
 				with(data[0]){
 					rowNum == 1
-					with(fields.id){
-						value == '152254'
-						originalValue == '152254'
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
 					}
 				}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
 				}
 			}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
-				data.isEmpty()
-			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can throw and exception when script tries to ignore a row and there isn not a domain already defined'() {
+	void 'test can set a local variable with a SOURCE.property'() {
 
 		given:
 			ETLFieldsValidator validator = new DomainClassFieldsValidator()
@@ -1448,158 +1957,331 @@ rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Fron
 			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
 
 		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					iterate {
-						ignore row
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'A domain must be specified'
-	}
-
-	void 'test can ignore even if results are empty'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract technology
-						if( CE == 'NGM') {
-							ignore row
-						} else {
-							load Name
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results will ignore a row'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName'] as Set
-				data.size() == 1
-			}
-	}
-
-	void 'test can ignore rows without loading values previously'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Application
-					iterate {
-						extract technology
-						if( CE != 'NGM') {
-							ignore row
-						} else {
-							load Name
-						}
-					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results will ignore a row'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fields == ['assetName'] as Set
-				data.size() == 1
-			}
-	}
-
-	void 'test can ignore rows in the middle of a data set'() {
-
-		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				sixRowsDataSet,
+				dataSet,
 				GroovyMock(DebugConsole),
-				validator
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							set myLocalVariable with SOURCE.'name'
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'xraysrv01'
+						originalValue == 'xraysrv01'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'zuludb01'
+						originalValue == 'zuludb01'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can set a local variable with a DOMAIN.property'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							extract type load environment
+							set myLocalVariable with DOMAIN.environment
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['environment', 'assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.environment){
+						value == 'Server'
+						originalValue == 'Server'
+					}
+					with(fields.assetName){
+						value == 'Server'
+						originalValue == 'Server'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.environment){
+						value == 'Blade'
+						originalValue == 'Blade'
+					}
+					with(fields.assetName){
+						value == 'Blade'
+						originalValue == 'Blade'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can set a multiple local variables'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Device
+							extract name load Name
+							load custom1 with 'abc'
+
+							extract mfg set myMfg
+							myMfg += " (" + extract(type) + ")"
+							load Manufacturer with myMfg
+
+							set anotherVar with 'xyzzy'
+							load custom2 with anotherVar
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain values from the local variable'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fields == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'xraysrv01'
+						originalValue == 'xraysrv01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'Dell (Server)'
+						originalValue == 'Dell (Server)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'zuludb01'
+						originalValue == 'zuludb01'
+					}
+					with(fields.custom1){
+						value == 'abc'
+						originalValue == 'abc'
+					}
+					with(fields.manufacturer){
+						value == 'HP (Blade)'
+						originalValue == 'HP (Blade)'
+					}
+					with(fields.custom2){
+						value == 'xyzzy'
+						originalValue == 'xyzzy'
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test NOW variable'() {
+
+		given:
+			String iso8601 = TimeUtil.FORMAT_DATE_TIME_ISO8601.replace("'", '')
+			def dataSetCSV = """
+				name
+				fubar
+			""".stripIndent().trim()
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(dataSetCSV)
+
+		and:
+			def scriptContent = """
+				console on
+				domain Device
+				read labels
+				iterate {
+				      extract name load Name
+						load 'Network Interfaces' with NOW
+				}
+			""".stripIndent().trim()
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator
 			)
 
 		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent, ETLProcessor.class.name)
+
+		then:
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				with(data[0]) {
+					with(fields.assetName) {
+						value == 'fubar'
+						originalValue == 'fubar'
+					}
+
+					with(fields.custom1) {
+						Date date = DateUtils.parseDate(value, TimeUtil.FORMAT_DATE_TIME_ISO8601)
+						assert date != null : "$value is not parseable using ISO8601 format (${TimeUtil.FORMAT_DATE_TIME_ISO8601})"
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-9995')
+	void 'test can declare local variables outside the iteration command'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					console on
-					read labels
-					iterate {
-					    domain Device
-					    extract 'device id' load id
-					    extract 'model name' transform with lowercase() load Name
-					
-					    if( SOURCE.'device id'.startsWith('152253') ){
-					        ignore row
-					    }
-					   
-					}
-				""".stripIndent(), ETLProcessor.class.name)
+						console on
+						read labels
+						set myLocalVariable with 'Custom Name'
+						iterate {
+							domain Device
+							load Name with myLocalVariable
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
 
-		then: 'Third row was removed from the domain results'
+		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['id', 'name'] as Set
-				data.size() == 5
+				fields == ['assetName'] as Set
+				data.size() == 2
+				with(data[0]){
+					rowNum == 1
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
 
-				data*.rowNum == [1, 2, 4, 5, 6]
-				data.collect{ it.fields.id.value } == [
-					'152251', '152252', '152254', '152255', '152256'
-				]
-				data.collect{ it.fields.name.value } == [
-					'srw24g1', 'srw24g2', 'srw24g4', 'srw24g5', 'zpha module'
-				]
-				data.collect{ it.fields.name.originalValue } == [
-					'SRW24G1', 'SRW24G2', 'SRW24G4', 'SRW24G5', 'ZPHA MODULE'
-				]
+				with(data[1]){
+					rowNum == 2
+					with(fields.assetName){
+						value == 'Custom Name'
+						originalValue == 'Custom Name'
+					}
+				}
 			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
 }
