@@ -359,16 +359,6 @@ class ApiActionService implements ServiceMethods {
 	}
 
 	/**
-	 * Get ApiAction parameters values from context object.
-	 * @param apiAction
-	 * @param assetComment
-	 * @return
-	 */
-	Map<String, ?> getApiActionParametersAndValuesFromContext (ApiAction apiAction, AssetComment assetComment) {
-		return buildMethodParamsWithContext(apiAction, assetComment)
-	}
-
-	/**
 	 * Used to construct the method paramater values Map needed to invoke the function
 	 * @param action - the ApiAction to generate the method params for
 	 * @param context - the context to get the property values from

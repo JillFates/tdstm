@@ -1118,7 +1118,7 @@ digraph runbook {
 					method      : apiAction.agentMethod,
 					description : apiAction.description,
 					methodParams: apiAction.methodParamsList,
-					methodParamsValues: apiActionService.getApiActionParametersAndValuesFromContext(apiAction, assetComment)
+					methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 
 			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
