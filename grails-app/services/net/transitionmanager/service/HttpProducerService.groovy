@@ -55,11 +55,11 @@ class HttpProducerService {
 
             camelContext.setTracing(true)
             ProducerTemplate producerTemplate = camelContext.createProducerTemplate()
-            producerTemplate.setDefaultEndpointUri(DIRECT_RESTFUL_CALL + actionRequest.param.actionId)
+            producerTemplate.setDefaultEndpointUri(DIRECT_RESTFUL_CALL + actionRequest.options.actionId)
             producerTemplate.sendBody(DIRECT_START)
         } catch (Exception e) {
             log.error('Error when executing Camel route. ' + ExceptionUtil.stackTraceToString(e))
-            Long taskId = actionRequest.param.taskId
+            Long taskId = actionRequest.options.taskId
             taskService.updateTaskStateByMessage([taskId: taskId, status: 'error', cause: e.message])
         }
     }
@@ -109,7 +109,7 @@ class HttpProducerService {
             apiActionResponse.error = body?.text
             apiActionResponse.data = null
         } else {
-            if (actionRequest.param.producesData == 1) {
+            if (actionRequest.options.producesData == 1) {
                 // if the api action call produces data, it means that a file is being downloaded
                 // and therefore it requires to be saved into the file system
                 String filename = getFilename(exchange.getIn())
