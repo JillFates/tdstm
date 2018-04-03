@@ -17,4 +17,17 @@ class PaginationCommand implements CommandObject {
 		rows min: 0
 	}
 
+	PaginationCommand(Map params) {
+		if (params.offset) {
+			this.offset = params.offset as Integer
+		}
+		if (params.rows) {
+			this.rows = params.rows as Integer
+		}
+
+		// make sure the max rows param is within boundaries
+		Integer rows = Pagination.maxRowForParam(this.rows as String)
+		this.rows = rows
+	}
+
 }

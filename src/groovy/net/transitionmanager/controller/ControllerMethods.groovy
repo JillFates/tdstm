@@ -408,13 +408,6 @@ trait ControllerMethods {
 			// Request contained query parameters
 			bindData(cmd, params)
 		}
-
-		// when command object is a PaginationCommand, let's make sure the max rows param is within boundaries
-		if (cmd instanceof PaginationCommand) {
-			Integer rows = Pagination.maxRowForParam(cmd.rows as String)
-			cmd.rows = rows
-		}
-
 		return cmd
 	}
 
