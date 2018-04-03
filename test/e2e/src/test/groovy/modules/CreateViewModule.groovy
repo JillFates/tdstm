@@ -60,9 +60,6 @@ class CreateViewModule extends Module {
     def clickPreview(){
         previewBtn.click()
     }
-    def filter(){
-        println(previewGrid.count())
-    }
     def String searchFieldName(){
         def checkboxes = $("div.content.body input")
         def num =Math.abs(new Random().nextInt() % checkboxes.size()-4)-1
@@ -84,20 +81,16 @@ class CreateViewModule extends Module {
         def checkboxes = $("div.content.body input")
         def willSelect =Math.abs(new Random().nextInt() % 5)+1
         for(int i = 1;i<willSelect+1;i++) {
-            println("for: i= "+i)
-            //this cuts out the input at the begiNning and the last 4 which are not part of the set we want
+            //this cuts out the input at the beginning and the last 4 which are not part of the set we want
             def num =Math.abs(new Random().nextInt() % checkboxes.size()-4)
-            println ">>>>  num"+ num
-            println ">>>>>>>  CLICKING"
             if (checkboxes[num].value()!="on"){
                 checkboxes[num].click()
             }
-
         }
     }
     def boolean selectedCheckboxesDisplayed(){
         boolean isChecked=true
-        def selectedChecks =  $("div.content.body inputy")
+        def selectedChecks =  $("div.content.body input")
         for (int j=10;j<selectedChecks.size()-5;j++){
             if(selectedChecks[j].value()=="on"){
             }else{
