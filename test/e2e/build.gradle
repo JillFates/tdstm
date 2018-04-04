@@ -31,8 +31,6 @@ ext {
         gebVersion = '1.1.1'
         //seleniumVersion = '3.4.0'
         seleniumVersion = '3.5.3'
-
-        //Set the chromeDriverVersion which needs to be compatible with the Chrome One
         chromeDriverVersion = '2.37'
         geckoDriverVersion = '0.18.0'
     }
