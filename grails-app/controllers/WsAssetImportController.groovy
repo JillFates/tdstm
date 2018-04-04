@@ -1,9 +1,5 @@
 import com.tdsops.common.security.spring.HasPermission
-import com.tdsops.etl.ETLProcessor
-import com.tdssrc.grails.FileSystemUtil
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
@@ -16,7 +12,6 @@ import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
-import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
 /**
  * Handles WS calls of the ApplicationService.
@@ -30,7 +25,6 @@ class WsAssetImportController implements ControllerMethods {
 	ApiActionService apiActionService
 	DataImportService dataImportService
 	FileSystemService fileSystemService
-	ScriptProcessorService scriptProcessorService
 
 	// mock data to use until methods are integrated with database
 	static final List<Map> actions = [
@@ -149,50 +143,8 @@ class WsAssetImportController implements ControllerMethods {
 	@HasPermission(Permission.AssetImport)
 	def transformData(Long dataScriptId, String filename) {
 		Project project = getProjectForWs()
-
-		Map result = [filename:'']
-		if (!dataScriptId) {
-			throw new InvalidParamException('Missing required dataScriptId parameter')
-		}
-
-		if (!filename) {
-			throw new InvalidParamException('Missing filename parameter')
-		}
-
-		if (! FileSystemUtil.validateExtension(filename, FileSystemUtil.ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS)) {
-			String validExtensions = FileSystemUtil.ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS.join(', ')
-			throw new InvalidParamException("Invalid file extension. Supported extensions are: $validateExtension")
-		}
-
-		if (! fileSystemService.temporaryFileExists(filename)) {
-			throw new InvalidParamException('Specified input file not found')
-		}
-
-		// See if we can find an action to be invoked
-		DataScript dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
-
-		if (! dataScript.etlSourceCode) {
-			throw new InvalidParamException('DataScript has no source specified')
-		}
-
-		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
-
-		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename)
-
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
-
-		result.filename = outputFilename
-
-		try {
-			os << (etlProcessor.result.toMap() as JSON)
-			os.close()
-		}
-		catch(e) {
-			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
-			throw new RuntimeException('Unable to write output file : ' + e.message)
-		}
-
-		renderSuccessJson result
+		Map result = dataImportService.transformEtlData(project, dataScriptId, filename)
+		renderSuccessJson(result)
 	}
 
 	/**
