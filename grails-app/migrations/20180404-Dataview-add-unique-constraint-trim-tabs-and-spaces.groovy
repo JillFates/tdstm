@@ -11,16 +11,17 @@ databaseChangeLog = {
 				"Take into account spaces and tabs.")
 		grailsChange{
 			change {
+				sql.execute('SET @ROWNUM=0;')
 				def duplicatedDataViews = sql.rows('''
-					SELECT project_id, TRIM(CHAR(9) FROM TRIM(name)) n
+					SELECT id, project_id, trim(replace(replace(replace(replace(name,'\\t',''),'\\r',''),'\\n',''),'\\f','')) AS DV_NAME, @ROWNUM:=@ROWNUM+1 AS ROWNUM
 					FROM dataview
-					GROUP  BY project_id, n
+					GROUP  BY project_id, DV_NAME
 					HAVING COUNT(*) > 1;
 				''')
 
 				if (duplicatedDataViews) {
 					duplicatedDataViews.each { duplicated ->
-						sql.execute("UPDATE dataview SET name = CONCAT(name, ' ', id) WHERE name = '${duplicated.n}' AND project_id = ${duplicated.project_id}")
+						sql.execute("UPDATE dataview SET name = CONCAT(${duplicated.DV_NAME}, ' ', '${duplicated.ROWNUM}') WHERE id = '${duplicated.id}' AND project_id = ${duplicated.project_id}")
 					}
 				}
 			}

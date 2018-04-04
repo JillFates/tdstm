@@ -127,8 +127,23 @@ class DataScriptService implements ServiceMethods{
 	 * @param command
 	 * @return
 	 */
-	boolean validateUniqueName(DataScriptNameValidationCommand command) {
-		return validateUniqueName(command.name, command.dataScriptId, command.providerId)
+	boolean validateUniqueName(DataScriptNameValidationCommand command, Project project = null) {
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+		// Make sure that name is unique
+		int count = DataScript.where {
+			project == project
+			name == command.name
+			provider.id == command.providerId
+			if (command.dataScriptId) {
+				id != command.dataScriptId
+			}
+		}.count()
+		if (count > 0) {
+				return false
+		}
+		return true
 	}
 
 
