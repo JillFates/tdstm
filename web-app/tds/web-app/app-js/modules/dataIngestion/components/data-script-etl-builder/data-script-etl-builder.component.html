@@ -109,7 +109,7 @@
                                     <ng-template kendoTabContent>
                                         <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
                                            <kendo-grid [data]="domain.data" [resizable]="true">
-                                                <kendo-grid-column *ngFor="let column of domain.fields;
+                                                <kendo-grid-column *ngFor="let column of domain.fieldNames;
                                                            let columnIndex = index;"
                                                                    title="{{column}}">
                                                     <ng-template kendoGridCellTemplate let-dataItem>
