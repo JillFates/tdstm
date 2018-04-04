@@ -226,4 +226,5 @@ databaseChangeLog = {
 	include file: '20180319-alter-table-apiaction-consolidate-url-and-path.groovy'
 	include file: '20180322-remove-recipe-version-tombstones.groovy'
 	include file: '20180325-alter-table-apiaction-agentclass-from-RESTFULL-to-HTTP.groovy'
+	include file: '20180404-Dataview-add-unique-constraint-trim-tabs-and-spaces.groovy'
 }
