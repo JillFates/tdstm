@@ -6,7 +6,6 @@ import getl.csv.CSVConnection
 import getl.csv.CSVDataset
 import getl.data.Field
 import net.transitionmanager.command.DataScriptNameValidationCommand
-import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataScriptMode
 import net.transitionmanager.domain.Person

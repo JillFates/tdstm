@@ -4,7 +4,6 @@ import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.DataScriptNameValidationCommand
-import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.domain.DataScript
