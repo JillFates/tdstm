@@ -158,7 +158,7 @@ class Element implements RangeChecker {
      * @param dictionary
      * @return the element instance that received this command
      */
-    Element translate (def dictionary) {
+    Element substitute (def dictionary) {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
@@ -198,7 +198,7 @@ class Element implements RangeChecker {
      * @param content
      * @return the element instance that received this command
      */
-    Element first (String content) {
+    Element replaceFirst (String content) {
         value = value.replaceFirst(content, '')
 	    return this
     }
@@ -211,7 +211,7 @@ class Element implements RangeChecker {
      * @param content
      * @return the element instance that received this command
      */
-    Element all (String content) {
+    Element replaceAll (String content) {
         value = value.replaceAll(content, '')
 	    return this
     }
@@ -224,7 +224,7 @@ class Element implements RangeChecker {
      * @param content
      * @return the element instance that received this command
      */
-    Element last (String content) {
+    Element replaceLast (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
 	    return this
     }
