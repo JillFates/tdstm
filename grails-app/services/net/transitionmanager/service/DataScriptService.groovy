@@ -265,11 +265,11 @@ class DataScriptService implements ServiceMethods{
 	* Current Formats supported:
 	*   JSON, CSV, EXCEL
 	* @param fileName - the filename to use to retrieve data from filesystem
-	* @param paginationCommand - the pagination command containing the maximum number of rows to retrieve
+	* @param maxRows - the maximum number of rows to retrieve
 	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (String fileName) throws EmptyResultException{
+	Map parseDataFromFile (String fileName, Long maxRows) throws EmptyResultException{
 		try{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
@@ -281,7 +281,7 @@ class DataScriptService implements ServiceMethods{
                 return parseDataFromCSV(fileName)
 
             case ['XLS', 'XLSX'] :
-                return parseDataFromXLS(fileName, 0, 0, paginationCommand)
+                return parseDataFromXLS(fileName, 0, 0, maxRows)
 
 			default :
 				throw new InvalidParamException("File format ($extension) is not supported")
@@ -368,11 +368,11 @@ class DataScriptService implements ServiceMethods{
 	 * @param xlsFile - the filename to use to retrieve data from filesystem
 	 * @param sheetNumber - the workbook sheet number to pull data from
 	 * @param headerRowIndex - the header row index
-	 * @param paginationCommand - the pagination command containing the maximum number of rows to retrieve
+	 * @param maxRows - the maximum number of rows to retrieve
 	 * @return Map with the description of the Excel File Data
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0, PaginationCommand paginationCommand) throws RuntimeException {
+	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0, Long maxRows) throws RuntimeException {
 
 		DecimalFormat df = new DecimalFormat('#.#########')
 
@@ -400,11 +400,10 @@ class DataScriptService implements ServiceMethods{
 			}
 		}
 
-
 		List<Map> data = []
 		int lastRowNum = sheet.getLastRowNum()
 
-		for( int r = headerRowIndex + 1; (r <= lastRowNum && r <= paginationCommand.rows); r++ ) {
+		for( int r = headerRowIndex + 1; (r <= lastRowNum && r <= maxRows); r++ ) {
 			Row row = sheet.getRow(r)
 
 			Map object = [:]
