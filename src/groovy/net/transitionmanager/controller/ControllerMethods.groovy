@@ -10,7 +10,6 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
-import net.transitionmanager.command.PaginationCommand
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DomainUpdateException
