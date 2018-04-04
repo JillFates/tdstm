@@ -3,11 +3,9 @@
  * However, it has the structure of possible values for the Database Model
  * up to date 13/03/2018
  *
- * This can be also used to get the definition of an element, useful for some datas being empty like Scale
+ * This can be also used to get the definition of an element, useful for some data being empty like Scale
  * that requires an structure to work with widgets, and so on.
  */
-import * as R from 'ramda';
-
 export class DatabaseModel {
 	assetName: string;
 	description: string;

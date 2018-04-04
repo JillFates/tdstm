@@ -1,8 +1,16 @@
+/**
+ *  The component is being used dynamically, some vars will show as not being used or referenced but they could be part
+ *  of the GSP
+ *
+ *  Use angular/views/TheAssetType as reference
+ */
 import { Component, Inject, OnInit } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {SelectableSettings} from '@progress/kendo-angular-grid';
 
 declare var jQuery: any;
 
@@ -16,7 +24,13 @@ export function DatabaseEditComponent(template, editModel) {
 		]
 	}) class DatabaseShowComponent implements OnInit {
 
-		dateFormat: string;
+		private dateFormat: string;
+		private dataGridOperationsHelper: DataGridOperationsHelper;
+		private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
+		private initialSort: any = [{
+			dir: 'desc',
+			field: 'dateCreated'
+		}];
 
 		constructor(
 			@Inject('model') private model: any,
@@ -35,6 +49,8 @@ export function DatabaseEditComponent(template, editModel) {
 					name: ''
 				};
 			}
+
+			this.dataGridOperationsHelper = new DataGridOperationsHelper([], this.initialSort, this.selectableSettings);
 		}
 
 		/**

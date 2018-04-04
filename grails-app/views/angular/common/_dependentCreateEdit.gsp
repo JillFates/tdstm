@@ -1,10 +1,28 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetClass" %>
 
+<kendo-grid [data]="dataGridOperationsHelper.gridData">
+	<kendo-grid-column field="ProductID" title="ID" width="40">
+	</kendo-grid-column>
+	<kendo-grid-column field="ProductName" title="Name" width="250">
+	</kendo-grid-column>
+	<kendo-grid-column field="Category.CategoryName" title="Category">
+	</kendo-grid-column>
+	<kendo-grid-column field="UnitPrice" title="Price" width="80">
+	</kendo-grid-column>
+	<kendo-grid-column field="UnitsInStock" title="In stock" width="80">
+	</kendo-grid-column>
+	<kendo-grid-column field="Discontinued" title="Discontinued" width="120">
+		<ng-template kendoGridCellTemplate let-dataItem>
+			<input type="checkbox" [checked]="dataItem.Discontinued" disabled/>
+		</ng-template>
+	</kendo-grid-column>
+</kendo-grid>
+
 <%-- Supports Block --%>
 <td valign="top" colspan="2">
 	<div style="width: auto;" >
-		<span style="float: left;"><h1>Supports:&nbsp;&nbsp;</h1></span>
-		<span><input type='button'  class="addDepButton" value='Add' onclick="EntityCrud.addAssetDependencyRow('support');"></span>
+		<span style="float: left;"><h1>Supports:</h1></span>
+		<span><input type='button' class="addDepButton" value='Add' onclick="EntityCrud.addAssetDependencyRow('support');"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
@@ -196,45 +214,3 @@
 		</table>
 	</div>
 </td>
-
-<script type="text/javascript">
-$(document).ready(function() {
-	$(".depComDiv").dialog({ autoOpen: false})
-	
-	if (!isIE7OrLesser) {
-		EntityCrud.assetNameSelect2( $(".scrollSelect") );
-	}
-
-<%--
-
-/*
-	$(".scrollSelect").select2({
-		 minimumInputLength: 0,
-		 initSelection: function (element, callback) {
-			var data = { id: element.val(), text: element.data("asset-name")};
-			callback(data);
-		 },
-		 ajax: {
-		 	url: contextPath+"/assetEntity/assetListForSelect2",
-			dataType: 'json',
-		 	quietMillis: 600,
-		 	data: function (term, page) { // page is the one-based page number tracked by Select2
-				 return {
-					 q: term, //search term
-					 max: 25, // page size
-					 page: page, // page number
-					 assetClassOption: $(this).data("asset-type"),
-	 			};
-		 	},
-	 		results: function (data, page) {
- 			 	var more = (page * 25) < data.total;
-	 			return { results: data.results , more: more};
-            }
-		 }
-	});
-*/
---%>
-
-})
-</script>
-

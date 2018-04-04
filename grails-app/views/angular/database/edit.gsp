@@ -107,6 +107,11 @@
 						</div>
 					</td>
 				</tr>
+				<!-- Dependencies -->
+
+				<tr id="deps">
+					<g:render template="/angular/common/dependentCreateEdit" model="[whom:'edit', supportAssets:[],dependentAssets:[]]" ></g:render>
+				</tr>
 			</table>
 		</div>
 	</div>
