@@ -198,7 +198,7 @@ class ScriptProcessorServiceSpec extends Specification {
 				data.domains.size() == 1
 				with(data.domains[0]) {
 					domain == ETLDomain.Application.name()
-					fields == ['id', 'appVendor', 'environment'] as Set
+					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
 						value == '152254'
@@ -325,7 +325,7 @@ application id,vendor name,technology,location
 				data.domains.size() == 1
 				with(data.domains[0]) {
 					domain == ETLDomain.Application.name()
-					fields == ['id', 'appVendor', 'environment'] as Set
+					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
 						value == '152254'
