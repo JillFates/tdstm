@@ -396,7 +396,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() first('A')
+						extract 'model name' transform with uppercase() replaceFirst('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -419,7 +419,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() last('A')
+						extract 'model name' transform with uppercase() replaceLast('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -442,7 +442,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() all('A')
+						extract 'model name' transform with uppercase() replaceAll('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -465,7 +465,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() all('A') lowercase()
+						extract 'model name' transform with uppercase() replaceAll('A') lowercase()
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -684,7 +684,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					def final dictionary = [prod: 'Production', dev: 'Development']
 					read labels
 					iterate {
-						extract 'environment' transform with lowercase() translate(dictionary)
+						extract 'environment' transform with lowercase() substitute(dictionary)
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)

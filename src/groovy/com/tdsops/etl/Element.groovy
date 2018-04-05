@@ -154,13 +154,13 @@ class Element implements RangeChecker {
      * Translate an element value using dictionary Map
      * <code>
      *      dictionary = [prod: 'Production', dev: 'Development']
-     *      load ... transformation with translate(dictionary)
+     *      load ... transformation with substitute(dictionary)
      * <code>
      *
      * @param dictionary
      * @return the element instance that received this command
      */
-    Element translate (def dictionary) {
+    Element substitute (def dictionary) {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
@@ -221,12 +221,12 @@ class Element implements RangeChecker {
     /**
      * Replace the first string content in the element value
      * <code>
-     *      load ... transformation with first(content)
+     *      load ... transformation with replaceFirst(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element first (String content) {
+    Element replaceFirst (String content) {
         value = value.replaceFirst(content, '')
 	    return this
     }
@@ -234,12 +234,12 @@ class Element implements RangeChecker {
     /**
      * Replace all the string content in the element value
      * <code>
-     *      load ... transformation with all(content)
+     *      load ... transformation with replaceAll(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element all (String content) {
+    Element replaceAll (String content) {
         value = value.replaceAll(content, '')
 	    return this
     }
@@ -247,12 +247,12 @@ class Element implements RangeChecker {
     /**
      * Replace the last string content in the element value
      * <code>
-     *      load ... transformation with last(content)
+     *      load ... transformation with replaceLast(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element last (String content) {
+    Element replaceLast (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
 	    return this
     }
