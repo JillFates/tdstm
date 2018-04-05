@@ -180,6 +180,19 @@ class Element implements RangeChecker {
 	}
 
 	/**
+	 * Transform current value in this Element instance to a Integer number
+	 * <code>
+	 *      load ... transformation with integer()
+	 * <code>
+	 * @see NumberUtil#toInteger(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element integer(){
+		value = NumberUtil.toInteger(value)
+		return this
+	}
+
+	/**
      * Replace all of the escape characters
      * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
      * and replaces any non-printable, control and special unicode character

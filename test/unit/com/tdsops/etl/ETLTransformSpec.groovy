@@ -1078,7 +1078,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	}
 
 
-	void 'test can transform a field value with toNumber'() {
+	void 'test can transform a field value using to number transformation'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
@@ -1113,14 +1113,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'device id' transform with number() uppercase()
+						extract 'device id' transform with integer() uppercase()
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: java.lang.Long.toUpperCase() is applicable for argument types: () values: []'
+			e.message == 'No signature of method: java.lang.Integer.toUpperCase() is applicable for argument types: () values: []'
 
 	}
 }
