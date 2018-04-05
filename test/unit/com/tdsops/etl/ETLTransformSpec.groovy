@@ -1090,7 +1090,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'device id' transform with number()
+						extract 'device id' transform with toLong()
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1113,7 +1113,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'device id' transform with integer() uppercase()
+						extract 'device id' transform with toInteger() uppercase()
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)

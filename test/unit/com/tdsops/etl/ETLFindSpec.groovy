@@ -1183,7 +1183,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						iterate {
 							domain Application
 							load environment with 'Production'
-							extract 'application id' transform with integer() load id
+							extract 'application id' transform with toInteger() load id
 							
 							find Application by id with DOMAIN.id into id
 						}
@@ -1275,7 +1275,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						iterate {
 							domain Application
 							load environment with 'Production'
-							extract 'application id' transform with number() load id
+							extract 'application id' transform with toLong() load id
 							
 							find Application by id with DOMAIN.id into id
 						}

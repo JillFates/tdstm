@@ -169,12 +169,12 @@ class Element implements RangeChecker {
 	/**
 	 * Transform current value in this Element instance to a Long number
 	 * <code>
-	 *      load ... transformation with number()
+	 *      load ... transformation with toLong()
 	 * <code>
 	 * @see NumberUtil#toLong(java.lang.Object)
 	 * @return the element instance that received this command
 	 */
-	Element number(){
+	Element toLong(){
 		value = NumberUtil.toLong(value)
 		return this
 	}
@@ -182,12 +182,12 @@ class Element implements RangeChecker {
 	/**
 	 * Transform current value in this Element instance to a Integer number
 	 * <code>
-	 *      load ... transformation with integer()
+	 *      load ... transformation with toInteger()
 	 * <code>
 	 * @see NumberUtil#toInteger(java.lang.Object)
 	 * @return the element instance that received this command
 	 */
-	Element integer(){
+	Element toInteger(){
 		value = NumberUtil.toInteger(value)
 		return this
 	}
