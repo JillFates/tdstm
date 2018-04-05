@@ -48,6 +48,12 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: 'arecordon', id: 'TM-9770-2') {
+		comment('Default the version column to zero')
+		sql('ALTER TABLE dataview MODIFY COLUMN version INT DEFAULT 0')
+		sql('UPDATE dataview SET version = 0 WHERE version IS NULL')
+	}
+
+	changeSet(author: 'arecordon', id: 'TM-9770-3') {
 		comment("Correct the name for location, rack and room in the report schema for existing dataviews.")
 		grailsChange {
 			change {
