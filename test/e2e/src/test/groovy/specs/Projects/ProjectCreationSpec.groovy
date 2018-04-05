@@ -19,7 +19,7 @@ class ProjectCreationSpec extends GebReportingSpec {
     //Define the names for the Staff you will Create and Edit
     static baseName = "QAE2E"
     static projName = baseName +" "+ randStr
-    static projDesc = "Descrition of the project "+ projName +" created by QA E2E Geb Scripts"
+    static projDesc = "Description of the project "+ projName +" created by QA E2E Geb Scripts"
     static projComment = "Comment for project "+ projName +" created by QA E2E Geb Scripts"
     static projCompDate =  ((new Date()) + 3).format("MM/dd/yyyy")
     static licensedProjectName = "TM-Demo"
@@ -80,7 +80,7 @@ class ProjectCreationSpec extends GebReportingSpec {
             waitFor {pdPageMessage.text().contains(projName + " was created")}
     }
 
-    def "4. Go to Project List for search new project"() {
+    def "4. Go to Project List to search new project"() {
         testKey = "TM-XXXX"
         given: 'The user navigates to Projects'
             at MenuPage

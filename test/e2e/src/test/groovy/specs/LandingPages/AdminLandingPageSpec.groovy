@@ -179,7 +179,7 @@ class AdminLandingPageSpec extends GebReportingSpec {
         testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>Export Mfg & Models option'
             adminModule.goToExportModels()
-        
+
         then: 'We verify the Export Mfg & Models page loads fine'
             at ExportMfgModelsPage
     }
