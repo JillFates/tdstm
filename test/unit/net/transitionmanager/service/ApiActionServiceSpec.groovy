@@ -55,7 +55,7 @@ class ApiActionServiceSpec extends Specification {
 
 		when: 'A PRE script is evaluated'
 			String script = """
-				request.param.format = 'json'
+				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
 						
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
@@ -91,7 +91,7 @@ class ApiActionServiceSpec extends Specification {
 
 		when: 'A PRE script is evaluated'
 			String script = """
-				request.param.format = 'json'
+				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
 						
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')

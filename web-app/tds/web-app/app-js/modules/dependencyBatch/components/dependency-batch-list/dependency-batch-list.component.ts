@@ -3,7 +3,6 @@ import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {BatchStatus, DependencyBatchColumnsModel, ImportBatchModel} from '../../model/import-batch.model';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
-import {DataGridOperationsHelper} from './data-grid-operations.helper';
 import {Permission} from '../../../../shared/model/permission.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
@@ -18,6 +17,8 @@ import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
+import {EnumModel} from '../../../../shared/model/enum.model';
 
 @Component({
 	selector: 'dependency-batch-list',
@@ -166,6 +167,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.archiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.reloadBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -197,6 +199,7 @@ export class DependencyBatchListComponent {
 		this.dependencyBatchService.unArchiveImportBatches(ids).subscribe( (result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadArchivedBatchList();
+					this.dataGridOperationsHelper.unSelectAllCheckboxes();
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
@@ -229,8 +232,10 @@ export class DependencyBatchListComponent {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					if (this.viewArchived) {
 						this.loadArchivedBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					} else {
 						this.reloadBatchList();
+						this.dataGridOperationsHelper.unSelectAllCheckboxes();
 					}
 				} else {
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -267,12 +272,14 @@ export class DependencyBatchListComponent {
 	 * On Play action button clicked, start import batch.
 	 * @param item
 	 */
-	private onPlayButton(item: any): void {
+	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS) {
-					this.reloadBatchList();
+				if (result.status === ApiResponseModel.API_SUCCESS && result.data.QUEUE) {
+					item.status.code = BatchStatus.QUEUED;
+					item.status.label = 'Queued';
 				} else {
+					this.reloadBatchList();
 					this.handleError(result.errors ? result.errors[0] : null);
 				}
 			},
@@ -353,7 +360,7 @@ export class DependencyBatchListComponent {
 	/**
 	 * Clears out the Batch Status Interval if currently running.
 	 */
-	clearBatchStatusLooper(): void {
+	private clearBatchStatusLooper(): void {
 		if (this.batchStatusLooper) {
 			clearInterval(this.batchStatusLooper);
 		}
@@ -389,8 +396,7 @@ export class DependencyBatchListComponent {
 						batch.status.label = 'Stalled';
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else if (batch.currentProgress >= 100) {
-						batch.status.code = BatchStatus.COMPLETED;
-						batch.status.label = 'Completed';
+						batch.status = response.data.status as EnumModel;
 						this.removeBatchFromLoop(batch, runningBatches);
 					} else {
 						batch.lastUpdated =  response.data.lastUpdated as Date;

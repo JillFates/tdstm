@@ -1,9 +1,10 @@
 package net.transitionmanager.service
 
-import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
+import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ImportBatchRecordUpdateCommand
 import net.transitionmanager.domain.ImportBatch
@@ -24,13 +25,85 @@ class ImportBatchService implements ServiceMethods {
 	 * @param batchStatus - param for filtering by that status.
 	 * @return all the batches for the project.
 	 */
-	List<ImportBatch> listBatches(Project project, ImportBatchStatusEnum batchStatus = null) {
-		return ImportBatch.where {
-			project == project
-			if (batchStatus) {
-				status == batchStatus
+	Collection listBatches(Project project, ImportBatchStatusEnum batchStatus = null) {
+
+		/* Query the info batch and the number of records grouped by status.
+		 * This will produce a list of [batch, status, number of records] */
+		List batchStatusList = ImportBatchRecord.createCriteria().list {
+			createAlias('importBatch', 'batch')
+			if (batchStatus){
+				eq('batch.status', batchStatus)
 			}
-		}.list()
+
+			eq('batch.project', project)
+			projections{
+				property('importBatch')
+				property('status')
+				count('id', 'statusCount')
+
+			}
+			groupProperty('importBatch')
+			groupProperty('status')
+		}
+
+		// Map that will contain the result that will be returned.
+		Map results = [:]
+		// Iterate over the result of the query.
+		for (batchInfo in batchStatusList) {
+			// Map that will contain the summary for the batch (total of erred records, etc.).
+			Map batchMap = null
+			// Fetch the corresponding batch
+			ImportBatch batch = (ImportBatch) batchInfo[0]
+			if (results.containsKey(batch.id)) {
+				batchMap = results[batch.id]
+			} else {
+				batchMap = batch.toMap()
+				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
+				results[batch.id] = batchMap
+			}
+
+			Long statusCount = NumberUtil.toPositiveLong(batchInfo[2])
+			ImportBatchStatusEnum status = batchInfo[1]
+			switch(status) {
+				case ImportBatchStatusEnum.IGNORED:
+					batchMap['recordsSummary']['ignored'] = statusCount
+					break
+				case ImportBatchStatusEnum.PENDING:
+					batchMap['recordsSummary']['pending'] = statusCount
+					break
+				case ImportBatchStatusEnum.COMPLETED:
+					batchMap['recordsSummary']['processed'] = statusCount
+					break
+			}
+			// Update the number of records for this batch.
+			batchMap['recordsSummary']['count'] += statusCount
+		}
+
+		// Query for the info about erred records.
+		List batchErrorsList = ImportBatchRecord.createCriteria().list {
+			createAlias('importBatch', 'batch')
+			if (batchStatus){
+				eq('batch.status', batchStatus)
+			}
+
+			gt('errorCount', (long)0)
+			eq('batch.project', project)
+			projections {
+				property('importBatch')
+				count('id', 'errorCount')
+			}
+			groupProperty('importBatch')
+		}
+
+		// Update the results with the erred number of records for each batch.
+		for (batchErrorInfo in batchErrorsList) {
+			ImportBatch batch = (ImportBatch) batchErrorInfo[0]
+			Map batchMap = results[batch.id]
+			batchMap['recordsSummary']['erred'] = batchErrorInfo[1]
+		}
+
+		return results.values()
+
 	}
 
 	/**
@@ -326,7 +399,11 @@ class ImportBatchService implements ServiceMethods {
 			// Although only 'progress' is supported at the moment, I leave the code ready for future changes.
 			switch(info) {
 				case 'progress':
-					infoMap = [progress: importBatch.processProgress, lastUpdated: importBatch.processLastUpdated]
+					infoMap = [
+						status: [code: importBatch.status.getKey(), label:importBatch.status.toString()],
+						progress: importBatch.processProgress,
+						lastUpdated: importBatch.processLastUpdated
+					]
 					break
 				default:
 					throw new InvalidParamException("Unsupported info requested $info.")

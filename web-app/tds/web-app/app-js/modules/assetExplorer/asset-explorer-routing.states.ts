@@ -7,7 +7,6 @@ import { AssetExplorerViewShowComponent } from './components/view-show/asset-exp
 import { HeaderComponent } from '../../shared/modules/header/header.component';
 
 import { AssetExplorerService } from './service/asset-explorer.service';
-import { ViewModel } from './model/view.model';
 import { CustomDomainService } from '../fieldSettings/service/custom-domain.service';
 import { PreferenceService } from '../../shared/services/preference.service';
 
@@ -117,13 +116,7 @@ export const assetExplorerReportCreatorState: Ng2StateDeclaration = <Ng2StateDec
 			token: 'report',
 			policy: { async: 'RXWAIT' },
 			deps: [Transition],
-			resolveFn: (trans: Transition) => {
-				let model = new ViewModel();
-				let params = trans.targetState().params() as any;
-				model.isSystem = params.system || false;
-				model.isShared = params.shared || false;
-				return Observable.from([model]);
-			}
+			resolveFn: (trans: Transition) => Observable.of(trans.targetState().params())
 		}, {
 			token: 'reports',
 			policy: { async: 'RXWAIT' },

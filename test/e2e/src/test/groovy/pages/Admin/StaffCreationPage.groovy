@@ -1,5 +1,6 @@
 package pages.Admin
 import geb.Page
+import modules.AdminModule
 
 class StaffCreationPage extends Page {
 

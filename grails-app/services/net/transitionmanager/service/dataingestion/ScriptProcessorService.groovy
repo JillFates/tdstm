@@ -87,10 +87,11 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-            CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
+
+	        Dataset dataset = FileSystemService.buildDataset(fileName)
 
             etlProcessor = new ETLProcessor(project,
-                    new DataSetFacade(new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)),
+                    new DataSetFacade(dataset),
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
@@ -132,8 +133,7 @@ class ScriptProcessorService {
      */
     Map<String, ?> checkSyntax (Project project, String scriptContent, String fileName) {
 
-        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
-        CSVDataset dataset = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fileName), header: true)
+	    Dataset dataset = FileSystemService.buildDataset(fileName)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 

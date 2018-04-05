@@ -1419,9 +1419,10 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[	assetId: assetEntity?.id,
-			assetComment: assetComment,
-			assetCommentList: assetCommentList,
+		[   assetId: assetEntity?.id,
+		    assetComment: assetComment,
+		    assetCommentList: assetCommentList,
+		    dateFormat: userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
 			dependentAssets: dependentAssets,
 			errors: params.errors,

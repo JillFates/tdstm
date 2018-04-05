@@ -167,7 +167,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -538,7 +538,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 

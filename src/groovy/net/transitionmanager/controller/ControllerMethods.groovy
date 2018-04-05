@@ -4,6 +4,7 @@ import com.google.gson.JsonSyntaxException
 import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.ui.Pagination
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.WebUtil
@@ -208,7 +209,7 @@ trait ControllerMethods {
 		handleException(e, 'error', msg)
 	}
 	def emptyResultExceptionHandler(EmptyResultException e) {
-		String msg = 'Requested information was not found'
+		String msg = e.message ?: 'Requested information was not found'
 		handleException(e, 'notFound', msg)
 	}
 	def illegalArgumentExceptionHandler(IllegalArgumentException e) {
@@ -269,6 +270,7 @@ trait ControllerMethods {
 		List<String> msgs = GormUtil.validateErrorsI18n(e, LocaleContextHolder.locale)
 		handleException(e, 'error', msgs)
 	}
+
 	// If all else fails the default exception hander will catch the rest
 	def defaultExceptionHandler(Exception e) {
 		handleException(e, 'error', '', true)

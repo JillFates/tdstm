@@ -15,8 +15,8 @@
                         (filterChange)="dataGridOperationsHelper.filterChange($event)"
                         [sort]="dataGridOperationsHelper.state.sort"
                         [sortable]="{mode:'single'}"
-                        [pageSize]="dataGridOperationsHelper.currentPageSize"
-                        [skip]="dataGridOperationsHelper.skip"
+                        [pageSize]="dataGridOperationsHelper.state.take"
+                        [skip]="dataGridOperationsHelper.state.skip"
                         [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
                         (pageChange)="dataGridOperationsHelper.pageChange($event)"
                         [resizable]="true"
@@ -27,9 +27,6 @@
 
                         <!-- Toolbar Template -->
                         <ng-template kendoGridToolbarTemplate [position]="'top'">
-                            <label class="reload-grid-button" title="Reload Batch List" (click)="onToggleViewArchived()">
-                                <span class="glyphicon glyphicon-repeat"></span>
-                            </label>
                             <button *ngIf="canBulkDelete()"
                                     [disabled]="dataGridOperationsHelper.getCheckboxSelectedItems().length === 0"
                                     (click)="confirmDelete()"
@@ -54,6 +51,9 @@
                                 <input name="viewArchived" type="checkbox" style="margin-right: 5px; margin-top: 2px;"
                                        (change)="onToggleViewArchived()" [(ngModel)]="viewArchived">
                                 {{'IMPORT_BATCH.LIST.VIEW_ARCHIVED' | translate}}
+                            </label>
+                            <label class="reload-grid-button pull-right" title="Reload Batch List" (click)="onToggleViewArchived()">
+                                <span class="glyphicon glyphicon-repeat"></span>
                             </label>
                         </ng-template>
 
@@ -96,7 +96,7 @@
                                             title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status.code === 'RUNNING'"
+                                    <button *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">

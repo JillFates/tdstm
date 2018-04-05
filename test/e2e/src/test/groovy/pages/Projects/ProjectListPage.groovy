@@ -34,5 +34,6 @@ class ProjectListPage extends Page {
         rowSize                     { projectGridHeaderCols.size()}
         projectNameFilter           { $("input#gs_projectCode")}
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
+        projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
     }
 }

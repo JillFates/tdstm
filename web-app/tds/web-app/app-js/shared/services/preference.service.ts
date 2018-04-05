@@ -20,6 +20,11 @@ export class PreferenceService {
 	constructor(private http: HttpInterceptor) {
 	}
 
+	// query a set of user preferences passed as arg variables
+	getPreferences(...preferencesCodes: string[]): Observable <any> {
+		return this.getPreference(preferencesCodes.join(','));
+	}
+
 	getPreference(preferenceCode: string): Observable<any> {
 		return this.http.get(`${this.preferenceUrl}/${preferenceCode}`)
 			.map((res: Response) => {
@@ -27,6 +32,7 @@ export class PreferenceService {
 				Object.keys(response.data.preferences).forEach((key) => {
 					this.preferences[key] = response.data.preferences[key];
 				});
+				return this.preferences;
 			})
 			.catch((error: any) => Observable.throw(error.json() || 'Server error'));
 	}
@@ -48,3 +54,9 @@ export class PreferenceService {
 		return DateUtils.DEFAULT_TIMEZONE_FORMAT;
 	}
 }
+
+// add constants as needed
+export const PREFERENCES_LIST = {
+	ASSET_JUST_PLANNING: 'assetJustPlanning',
+	ASSET_LIST_SIZE : 'assetListSize'
+};

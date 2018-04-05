@@ -80,7 +80,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 
 	constructor(
 		@Inject('report') report: Observable<ViewModel>,
-		private assetExpService: AssetExplorerService,
+		private assetExplorerService: AssetExplorerService,
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
 		private state: StateService,
@@ -266,13 +266,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	}
 
 	protected isSaveAvailable(): boolean {
-		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit) :
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) :
-				this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		return this.assetExplorerService.isSaveAvailable(this.model);
 	}
 
 	protected isSaveAsAvailable(): boolean {
@@ -330,7 +324,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected onSave() {
 		if (this.isSaveAvailable()) {
 			if (this.model.id) {
-				this.assetExpService.saveReport(this.model)
+				this.assetExplorerService.saveReport(this.model)
 					.subscribe(result => {
 						this.dataSignature = JSON.stringify(this.model);
 						this.select.loadData();
@@ -415,7 +409,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected onFavorite() {
 		if (this.model.isFavorite) {
 			if (this.model.id) {
-				this.assetExpService.deleteFavorite(this.model.id)
+				this.assetExplorerService.deleteFavorite(this.model.id)
 					.subscribe(d => {
 						this.model.isFavorite = false;
 						this.modifyFavoriteSignature(this.model.isFavorite);
@@ -426,14 +420,14 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 			}
 
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
 				});
 			} else {
 				if (this.model.id) {
-					this.assetExpService.saveFavorite(this.model.id)
+					this.assetExplorerService.saveFavorite(this.model.id)
 						.subscribe(d => {
 							this.model.isFavorite = true;
 							this.modifyFavoriteSignature(this.model.isFavorite);
@@ -449,7 +443,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected onPreview(): void {
 		if (this.isValid() && this.previewButtonClicked) {
 			let params = this.getQueryParams();
-			this.assetExpService.previewQuery(params)
+			this.assetExplorerService.previewQuery(params)
 				.subscribe(result => {
 					this.grid.apply(result);
 					jQuery('[data-toggle="popover"]').popover();

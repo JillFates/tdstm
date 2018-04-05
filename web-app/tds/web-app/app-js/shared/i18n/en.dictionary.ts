@@ -101,7 +101,7 @@ export const en_DICTIONARY: Object = {
 			'OR': 'or',
 			'TRANSFORM_WITH_DATA_SCRIPT': 'Transform with DataScript:',
 			'LOAD_TRANSFORMED_DATA_INTO_IMPORT': 'Load transformed data into Import Batches:',
-			'GOTO_MANAGE_IMPORT_BATCHES': 'Go to Manage Import Batches',
+			'GOTO_MANAGE_ASSET_BATCHES': 'Go to Manage Asset Batches',
 			'FETCH': 'Fetch',
 			'TRANSFORM': 'Transform',
 			'IMPORT': 'Import',

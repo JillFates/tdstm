@@ -1,4 +1,4 @@
-<div class="modal fade in no-background data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
+<div class="modal fade in data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content resizable" #resizableForm  [style.width.px]="width" [style.height.px]="height">
 			<div class="modal-header">
@@ -91,16 +91,25 @@
                     </div>
                     <hr>
                     <div class="row" *ngIf="scriptTestResult.domains.length > 0">
-                        <div class="col-md-12">
+                        <label class="col-md-12">
                             <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
-                        </div>
+                            <button data-toggle="collapse" data-target=".collapsible"
+                                    (click)="toggleSummary()"
+                                    class="btn btn-default pull-right">
+                                <i [ngClass]="{'fa-angle-double-right': !summaryCollapsed, 'fa-angle-double-down': summaryCollapsed}"
+                                   class="fa"></i>
+                            </button>
+                        </label>
+                        <!--<div class="col-md-12">
+                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
+                        </div>-->
                         <div class="col-md-12">
                             <kendo-tabstrip>
                                 <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
                                     <ng-template kendoTabContent>
                                         <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
                                            <kendo-grid [data]="domain.data" [resizable]="true">
-                                                <kendo-grid-column *ngFor="let column of domain.fields;
+                                                <kendo-grid-column *ngFor="let column of domain.fieldNames;
                                                            let columnIndex = index;"
                                                                    title="{{column}}">
                                                     <ng-template kendoGridCellTemplate let-dataItem>

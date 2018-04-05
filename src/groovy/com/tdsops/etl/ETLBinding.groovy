@@ -3,11 +3,8 @@ package com.tdsops.etl
 import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
- *
  * ETLBinding represents all the custom bindings associated a DSL ETL Script.
- *
  * It'll use from outside the script to pass variables into it.
- *
  */
 class ETLBinding extends Binding {
 
@@ -52,6 +49,16 @@ class ETLBinding extends Binding {
      */
     void addDynamicVariable (String name, def value) {
         dynamicVariables.add(name)
+        this.variables[name] = value
+    }
+
+    /**
+     * Adds a new Global variable from an ETL script.
+     * It uses name parameter to define it in an internal map definition.
+     * @param name the name of the variable to be added dynamically within the binding context.
+     * @param value the ETL Element define for the name variable
+     */
+    void addGlobalVariable (String name, def value) {
         this.variables[name] = value
     }
 

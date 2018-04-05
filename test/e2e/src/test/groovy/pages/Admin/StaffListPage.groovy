@@ -1,8 +1,9 @@
 package pages.Admin
 
 import geb.Page
+import modules.AdminModule
 
-class StaffListPage extends Page {
+class   StaffListPage extends Page {
 
     static at = {
         staffPageTitle.text().trim() == "Staff List"
@@ -47,5 +48,7 @@ class StaffListPage extends Page {
 
         createStaffModal(required: false, wait:true) {$ ("div", class:"modal fade in")}
         manageStaffModal(required: false, wait:true) { $("div", "window-class":"modal-task")}
+
+        adminModule { module AdminModule}
     }
 }
