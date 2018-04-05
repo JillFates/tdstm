@@ -146,8 +146,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
 
 		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': '152255', 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
+			updater(['application id': 152254, 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
+			updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
@@ -1484,7 +1484,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 						then: 'An ETLProcessorException is thrown'
 							MissingMethodException e = thrown MissingMethodException
-							e.message == 'No signature of method: com.tdsops.etl.DomainField.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+							e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
 					}
 
 					void 'test can evaluate a value loaded into the SOURCE.property'() {

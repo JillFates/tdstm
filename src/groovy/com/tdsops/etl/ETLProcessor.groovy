@@ -465,7 +465,7 @@ class ETLProcessor implements RangeChecker {
 			with: { value ->
 
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
-				Element newElement = currentRow.addNewElement(ETLValueHelper.stringValueOf(value), fieldSpec, this)
+				Element newElement = currentRow.addNewElement(ETLValueHelper.valueOf(value), fieldSpec, this)
 				addElementLoaded(selectedDomain, newElement)
 				newElement
 			}
@@ -492,7 +492,7 @@ class ETLProcessor implements RangeChecker {
 	def set(final String variableName) {
 		[
 			with: { value ->
-				String localVariable = ETLValueHelper.stringValueOf(value)
+				String localVariable = ETLValueHelper.valueOf(value)
 				if(isIterating){
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
@@ -523,7 +523,7 @@ class ETLProcessor implements RangeChecker {
 		lookUpFieldSpecs(selectedDomain, fieldName)
 		[
 		    with: { value ->
-			    String stringValue = ETLValueHelper.stringValueOf(value)
+			    String stringValue = ETLValueHelper.valueOf(value)
 			    boolean found = result.lookupInReference(fieldName, stringValue)
 			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
 		    }
@@ -566,7 +566,7 @@ class ETLProcessor implements RangeChecker {
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
 
 				Element newElement = currentRow.addNewElement("", fieldSpec, this)
-				newElement.init = ETLValueHelper.stringValueOf(defaultValue)
+				newElement.init = ETLValueHelper.valueOf(defaultValue)
 				addElementLoaded(selectedDomain, newElement)
 				newElement
 			}
@@ -684,7 +684,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor log (Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
-		debugConsole.append(level, ETLValueHelper.stringValueOf(message))
+		debugConsole.append(level, ETLValueHelper.valueOf(message))
 		return this
 	}
 

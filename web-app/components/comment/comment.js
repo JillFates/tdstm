@@ -246,12 +246,6 @@ tds.comments.controller.MainController = function (rootScope, scope, modal, wind
 				}
 			}
 		});
-
-		modalInstance.result.then(function() {
-
-		}, function (result) {
-
-		});
 	}
 
 	this.bulkEditTasks = function () {
@@ -1027,8 +1021,16 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 
 tds.comments.controller.ActionLookUpDialogController = function($scope, $modalInstance, $log, $timeout, commentService, alerts, apiAction, appCommonData, utils, commentUtils) {
 
-
 	$scope.apiAction = apiAction;
+
+	$modalInstance.opened.then(function () {
+		setTimeout(function(){
+			var element = angular.element('#actionLookUpDialog');
+			if (!element || !element[0]) {
+				commentUtils.closePopup($scope, 'actionLookUp');
+			}
+		}, 700);
+	});
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'actionLookUp');

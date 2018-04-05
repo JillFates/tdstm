@@ -162,7 +162,7 @@ class ETLFindElement {
 				values)
 		}
 
-		return values.collect { ETLValueHelper.stringValueOf(it) }
+		return values.collect { ETLValueHelper.valueOf(it) }
 	}
 
 	/**

@@ -96,11 +96,7 @@ abstract class FoundElement {
 	 * @trows ETLProcessorException if assetClass parameter is not an ETLDomain
 	 * @see ETLDomain
 	 */
-	FoundElement assetClass(String assetClass){
-		ETLDomain domain = ETLDomain.lookup(assetClass)
-		if(!domain){
-			throw ETLProcessorException.invalidDomain(assetClass)
-		}
+	FoundElement assetClass(ETLDomain domain){
 		this.propertiesMap.assetClass = domain.name()
 		this
 	}
@@ -124,9 +120,9 @@ abstract class FoundElement {
 	private def calculateValue(def args) {
 
 		if(args.size() == 1) {
-			return ETLValueHelper.stringValueOf(args[0])
+			return ETLValueHelper.valueOf(args[0])
 		} else {
-			return args.collect{ ETLValueHelper.stringValueOf(it) }
+			return args.collect{ ETLValueHelper.valueOf(it) }
 		}
 	}
 

@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import com.tdssrc.grails.NumberUtil
 
 /**
  * Test about ETLProcessor commands:
@@ -1133,6 +1134,190 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find element using integer transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isaNumber(args.id)
+				applications.findAll { it.id.toInteger() == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							load 'environment' with 'Production'
+							extract 'application id' transform with toInteger() load 'id'
+							
+							find Application by 'id' with DOMAIN.id into 'id'
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == 152254
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152254]
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == 152255
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152255]
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find element using number transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isLong(args.id)
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							load 'environment' with 'Production'
+							extract 'application id' transform with toLong() load 'id'
+							
+							find Application by 'id' with DOMAIN.id into 'id'
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == 152254l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152254l]
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == 152255l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152255l]
+					}
+				}
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
