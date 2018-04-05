@@ -38,7 +38,7 @@ class ETLBinding extends Binding {
 	        // TM-10103: We are (in a nasty way) forcing local variables ending with this sufix names
 	        // Now set command is working with:
 	        // set environmentVar with 'Production'
-	        if(name.toLowerCase().endsWith('variable') || name.toLowerCase().endsWith('var') || name.toLowerCase().endsWith('local')){
+	        if(name.endsWith('Var')){
 		        result = name
 	        } else {
 		        throw ETLProcessorException.missingPropertyException(name)

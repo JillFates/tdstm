@@ -831,12 +831,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myLocalVariable = CE
+						def myLocalVar = CE
 
-						if ( myLocalVariable == 'Microsoft'){
-							load 'appVendor' with myLocalVariable
+						if ( myLocalVar == 'Microsoft'){
+							load 'appVendor' with myLocalVar
 						} else {
-							load 'environment' with myLocalVariable
+							load 'environment' with myLocalVar
 						}
 					}
 				""".stripIndent(),
@@ -1915,8 +1915,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							set myLocalVariable with 'Custom Name'
-							load 'Name' with myLocalVariable
+							set myLocalVar with 'Custom Name'
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1977,8 +1977,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							set myLocalVariable with SOURCE.'name'
-							load 'Name' with myLocalVariable
+							set myLocalVar with SOURCE.'name'
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -2040,8 +2040,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						iterate {
 							domain Device
 							extract 'type' load 'environment'
-							set myLocalVariable with DOMAIN.environment
-							load 'Name' with myLocalVariable
+							set myLocalVar with DOMAIN.environment
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -2249,10 +2249,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				.evaluate("""
 						console on
 						read labels
-						set myLocalVariable with 'Custom Name'
+						set myLocalVar with 'Custom Name'
 						iterate {
 							domain Device
-							load 'Name' with myLocalVariable
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)

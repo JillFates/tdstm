@@ -626,8 +626,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable) load 'description'
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -714,8 +714,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 								
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(myLocalVariable + ' - ' + CE) load 'description'
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -755,8 +755,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-					extract 'vendor name' transform with lowercase() set myLocalVariable
-					extract 'location' transform with append('-', myLocalVariable, '-' , CE ) load 'description'
+					extract 'vendor name' transform with lowercase() set myLocalVar
+					extract 'location' transform with append('-', myLocalVar, '-' , CE ) load 'description'
 				}""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -795,8 +795,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable, ' - ') load 'description'
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar, ' - ') load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -836,8 +836,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable) load 'description'
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
