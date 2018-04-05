@@ -204,7 +204,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						iterate {
-							println it
+							log it
 						}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -225,7 +225,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						from 1 to 3 iterate {
-							println it
+							log it
 						}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -285,7 +285,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						from 1, 2, 3 iterate {
-							println it
+							log it
 						}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -343,12 +343,12 @@ class ETLIterateSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
+						extract 'application id' load 'id'
+						extract 'vendor name' load 'appVendor'
 									
 						domain Device
-						extract 'device id' load id
-						extract 'model name' load Name
+						extract 'device id' load 'id'
+						extract 'model name' load 'Name'
 					}""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -433,14 +433,14 @@ class ETLIterateSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
+						extract 'application id' load 'id'
+						extract 'vendor name' load 'appVendor'
 					}
 
 					iterate {
 						domain Device
-						extract 'device id' load id
-						extract 'model name' load Name
+						extract 'device id' load 'id'
+						extract 'model name' load 'Name'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -526,14 +526,14 @@ class ETLIterateSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
+						extract 'application id' load 'id'
+						extract 'vendor name' load 'appVendor'
 					}
 
 					from 1 to 2 iterate {
 						domain Device
-						extract 'device id' load id
-						extract 'model name' load assetName
+						extract 'device id' load 'id'
+						extract 'model name' load 'assetName'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)

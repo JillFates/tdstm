@@ -207,7 +207,7 @@ class ETLDataSetSpec extends ETLBaseSpec {
 						domain Device
 						read labels
 						iterate {
-							println it
+							log SOURCE.'device id'
 						}
 					""".stripIndent(),
 				ETLProcessor.class.name)

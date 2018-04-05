@@ -143,7 +143,17 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Sheet $sheetNumber is not found in workbook".toString())
     }
 
-    /**
+	static final String missingPropertyExceptionMessage = "No such property: variableName"
+	static ETLProcessorException missingPropertyException (String variableName) {
+		return new ETLProcessorException(missingPropertyExceptionMessage.replace('variableName', variableName))
+	}
+
+	static final String invalidReadCommandMessage = "Incorrect use of 'read labels' command'"
+	static ETLProcessorException invalidReadCommand () {
+		return new ETLProcessorException(invalidReadCommandMessage)
+	}
+
+	/**
      * Exception being thrown when no domain is specified upon load clause
      * @return
      */

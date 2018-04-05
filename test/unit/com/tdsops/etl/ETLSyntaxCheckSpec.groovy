@@ -453,14 +453,14 @@ class ETLSyntaxCheckSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-							console open
+							console 'open'
 							domain Device
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unknown console command option: open"
+			e.message == 'Unrecognized command console with args [open]'
 	}
 
 }
