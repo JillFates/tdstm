@@ -6,6 +6,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import java.text.SimpleDateFormat
+import utils.ManageSystemDirectory
 
 @Stepwise
 class ExportAccountsSpec extends GebReportingSpec {
@@ -18,10 +19,17 @@ class ExportAccountsSpec extends GebReportingSpec {
     static fileName = "AccountExport-${projName}-${formattedDate}"
     static fullFileName = fileName + "." + fileExtension
 
+    def initializeManageSystemDirectory() {
+        new ManageSystemDirectory()
+    }
+
     def setupSpec() {
         testCount = 0
+        initializeManageSystemDirectory().createTempDownloadsFolder()
         to LoginPage
         login()
+        at MenuPage
+        assert menuModule.assertProjectName(projName), "${projName} is required to perform this test"
     }
 
     def setup() {
@@ -31,6 +39,10 @@ class ExportAccountsSpec extends GebReportingSpec {
     def cleanup() {
         String sCount = String.format("%03d", testCount)
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
+    }
+
+    def cleanupSpec() {
+        initializeManageSystemDirectory().deleteTempDownloadsFolder()
     }
 
     def "1. The User Navigates in the Export Accounts Section"() {
@@ -47,8 +59,6 @@ class ExportAccountsSpec extends GebReportingSpec {
         testKey = "TM-XXXX"
         given: 'The User is on the Export Accounts Page'
             at ExportAccountsPage
-        and: 'The User makes sure Downloads folder does not contain previous file version'
-            cleanUserHomeDownloadsFolder()
         when: 'The User selects Staffing type'
             randomSelectStaffing()
         and: 'The user selects User Logins type from dropdown'
@@ -56,8 +66,8 @@ class ExportAccountsSpec extends GebReportingSpec {
         and: 'The user clicks on export button'
             clickOnExportExcel()
         and: 'The user waits for success file download'
-            waitForDownloadedFile(fileName)
+            initializeManageSystemDirectory().waitForDownloadedFile(fileName)
         then: 'The file was successfully downloaded'
-            assert verifyExportedFile(fileName, fullFileName), "Expecting ${fullFileName}"
+            assert initializeManageSystemDirectory().verifyExportedFile(fileName, fullFileName), "Expecting ${fullFileName}"
     }
 }
