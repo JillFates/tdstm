@@ -396,7 +396,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() first('A')
+						extract 'model name' transform with uppercase() replaceFirst('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -419,7 +419,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() last('A')
+						extract 'model name' transform with uppercase() replaceLast('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -442,7 +442,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() all('A')
+						extract 'model name' transform with uppercase() replaceAll('A')
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -465,7 +465,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Device
 					read labels
 					iterate {
-						extract 'model name' transform with uppercase() all('A') lowercase()
+						extract 'model name' transform with uppercase() replaceAll('A') lowercase()
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -533,7 +533,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' transform with trim() replace(Inc, Incorporated) load appVendor
+						extract 'vendor name' transform with trim() replace('Inc', 'Incorporated') load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -564,7 +564,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load appVendor
+						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -626,8 +626,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable) load description
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -659,14 +659,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-					console open
+					console 'open'
 					domain Device
 				""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unknown console command option: open"
+			e.message == 'Unrecognized command console with args [open]'
 	}
 
 	void 'test can translate an extracted value using a dictionary'() {
@@ -684,7 +684,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					def final dictionary = [prod: 'Production', dev: 'Development']
 					read labels
 					iterate {
-						extract 'environment' transform with lowercase() translate(dictionary)
+						extract 'environment' transform with lowercase() substitute(dictionary)
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -714,8 +714,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 								
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(myLocalVariable + ' - ' + CE) load description
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -755,8 +755,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-					extract 'vendor name' transform with lowercase() set myLocalVariable
-					extract 'location' transform with append('-', myLocalVariable, '-' , CE ) load description
+					extract 'vendor name' transform with lowercase() set myLocalVar
+					extract 'location' transform with append('-', myLocalVar, '-' , CE ) load 'description'
 				}""".stripIndent(),
 				ETLProcessor.class.name)
 
@@ -795,8 +795,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable, ' - ') load description
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar, ' - ') load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -836,8 +836,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' transform with lowercase() set myLocalVariable
-						extract 'location' transform with append(' - ', myLocalVariable) load description
+						extract 'vendor name' transform with lowercase() set myLocalVar
+						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -879,7 +879,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					iterate {
 						extract 'location' transform { 
 							lowercase() append('**') 
-						} load description
+						} load 'description'
 								  
 					}
 				""".stripIndent(),
@@ -912,7 +912,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' transform with sanitize() load appVendor
+						extract 'vendor name' transform with sanitize() load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -937,7 +937,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' transform with trim() load appVendor
+						extract 'vendor name' transform with trim() load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -960,11 +960,11 @@ class ETLTransformSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 					trim on
-					replace Inc, Incorporated
+					replace 'Inc', 'Incorporated'
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -990,7 +990,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					from 1 to 2 iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1012,7 +1012,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 						domain Application
 						read labels
 						iterate {
-							extract 'vendor name' load appVendor
+							extract 'vendor name' load 'appVendor'
 						}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1038,7 +1038,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1064,7 +1064,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1075,6 +1075,52 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
 			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+	}
+
+
+	void 'test can transform a field value using to number transformation'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'device id' transform with toLong()
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Every column for every row is transformed with middle 2 transformation'
+			etlProcessor.getElement(0, 0).value == 152254l
+			etlProcessor.getElement(1, 0).value == 152255l
+			etlProcessor.getElement(2, 0).value == 152256l
+	}
+
+	void 'test can throw an Exception transforming incorrectly a value'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+				GroovyMock(ETLFieldsValidator))
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					domain Device
+					read labels
+					iterate {
+						extract 'device id' transform with toInteger() uppercase()
+					}
+				""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'An ETLProcessorException is thrown'
+			MissingMethodException e = thrown MissingMethodException
+			e.message == 'No signature of method: java.lang.Integer.toUpperCase() is applicable for argument types: () values: []'
 
 	}
 }

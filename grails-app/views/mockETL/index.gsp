@@ -121,13 +121,13 @@
                     <div class="table-responsive">
                         <table style="width:100%" class="table table-condensed table-hover">
                             <tr>
-                                <g:each in="${resultsRow.fields}" var="header">
+                                <g:each in="${resultsRow.fieldNames}" var="header">
                                     <th>${header}</th>
                                 </g:each>
                             </tr>
                             <g:each in="${resultsRow.data}" var="row" status="i">
                                 <tr>
-                                    <g:each in="${resultsRow.fields}" var="fieldName">
+                                    <g:each in="${resultsRow.fieldNames}" var="fieldName">
                                         <td>${row.fields[fieldName]?.value} <br>
                                             ${row.fields[fieldName]?.find?.query?:''} <br>
 

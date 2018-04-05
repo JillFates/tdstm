@@ -24,7 +24,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	private height = 0;
 	private collapsed = {
 		code: true,
-		sample: false
+		sample: false,
+		transform: false,
 	};
 	private script: string;
 	private filename: string;

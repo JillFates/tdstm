@@ -70,57 +70,55 @@
                                       style="cursor: default; resize: vertical;">{{getSyntaxErrors()}}</textarea>
                         </div>
                     </div>
-
                     <hr>
-                    <div class="row">
-                        <div class="col-md-12 sample-preview" >
-                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
-                            <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
-                                <i class="fa" [ngClass]="{'fa-angle-double-down':!collapsed.sample,'fa-angle-double-right':collapsed.sample}" style="padding-right:0px"></i>
-                            </button>
+                    <div class="data-preview">
+                        <div class="row">
+                            <div class="col-md-12 sample-preview" >
+                                <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SAMPLE_DATA_PREVIEW' | translate }}</h4>
+                                <button class="pull-right btn btn-default" (click)="toggleSection('sample')">
+                                    <i class="fa" [ngClass]="collapsed.sample ? 'fa-angle-double-right' : 'fa-angle-double-down'"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="">
+                                <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
+                                    <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
+                                        <ng-template kendoGridHeaderTemplate>
+                                            <label> {{column.label}}</label>
+                                        </ng-template>
+                                    </kendo-grid-column>
+                                </kendo-grid>
+                            </div>
                         </div>
-                        <div class="col-md-12" *ngIf="!collapsed.sample && sampleDataModel && sampleDataModel.data" style="">
-                            <kendo-grid [data]="sampleDataModel.data" [height]="sampleDataModel.gridHeight" [resizable]="true">
-                                <kendo-grid-column *ngFor="let column of sampleDataModel.columns" field="{{column.property}}" title="{{column.label}}" [width]="column.width">
-                                    <ng-template kendoGridHeaderTemplate>
-                                        <label> {{column.label}}</label>
-                                    </ng-template>
-                                </kendo-grid-column>
-                            </kendo-grid>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row" *ngIf="scriptTestResult.domains.length > 0">
-                        <label class="col-md-12">
-                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
-                            <button data-toggle="collapse" data-target=".collapsible"
-                                    (click)="toggleSummary()"
-                                    class="btn btn-default pull-right">
-                                <i [ngClass]="{'fa-angle-double-right': !summaryCollapsed, 'fa-angle-double-down': summaryCollapsed}"
-                                   class="fa"></i>
-                            </button>
-                        </label>
-                        <!--<div class="col-md-12">
-                            <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
-                        </div>-->
-                        <div class="col-md-12">
-                            <kendo-tabstrip>
-                                <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
-                                    <ng-template kendoTabContent>
-                                        <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
-                                           <kendo-grid [data]="domain.data" [resizable]="true">
-                                                <kendo-grid-column *ngFor="let column of domain.fieldNames;
-                                                           let columnIndex = index;"
-                                                                   title="{{column}}">
-                                                    <ng-template kendoGridCellTemplate let-dataItem>
-                                                        {{dataItem.fields[column] ? dataItem.fields[column].value : '' }}
-                                                    </ng-template>
-                                                </kendo-grid-column>
-                                            </kendo-grid>
-                                        </div>
-                                    </ng-template>
-                                </kendo-tabstrip-tab>
-                            </kendo-tabstrip>
+                        <hr>
+                        <div class="row" *ngIf="scriptTestResult.domains.length > 0">
+                            <label class="col-md-12">
+                                <h4 class="pull-left">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.TRANSFORMED_DATA_PREVIEW' | translate }}</h4>
+                                <button data-toggle="collapse" data-target=".collapsible"
+                                        (click)="toggleSection('transform')"
+                                        class="btn btn-default pull-right">
+                                    <i [ngClass]="collapsed.transform ? 'fa-angle-double-right' : 'fa-angle-double-down'"
+                                       class="fa"></i>
+                                </button>
+                            </label>
+                            <div class="col-md-12 collapse in collapsible">
+                                <kendo-tabstrip>
+                                    <kendo-tabstrip-tab [title]="domain.domain" [selected]="i===0" *ngFor="let domain of scriptTestResult.domains; let i = index;">
+                                        <ng-template kendoTabContent>
+                                            <div *ngIf="scriptTestResult.domains && (!testHasErrors() || !syntaxHasErrors())">
+                                               <kendo-grid [data]="domain.data" [resizable]="true">
+                                                    <kendo-grid-column *ngFor="let column of domain.fieldNames;
+                                                               let columnIndex = index;"
+                                                                       title="{{column}}">
+                                                        <ng-template kendoGridCellTemplate let-dataItem>
+                                                            {{dataItem.fields[column] ? dataItem.fields[column].value : '' }}
+                                                        </ng-template>
+                                                    </kendo-grid-column>
+                                                </kendo-grid>
+                                            </div>
+                                        </ng-template>
+                                    </kendo-tabstrip-tab>
+                                </kendo-tabstrip>
+                            </div>
                         </div>
                     </div>
                 </div>

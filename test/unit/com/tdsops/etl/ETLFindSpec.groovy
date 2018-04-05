@@ -15,6 +15,7 @@ import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import com.tdssrc.grails.NumberUtil
 
 /**
  * Test about ETLProcessor commands:
@@ -131,10 +132,10 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							load environment with 'Production'
-							extract 'application id' load id
+							load 'environment' with 'Production'
+							extract 'application id' load 'id'
 							
-							find Application by id with SOURCE.'application id' into id
+							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -256,8 +257,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						domain Application
 						iterate {
-							extract AssetId load id
-							find Application by id with DOMAIN.id into id 
+							extract 'AssetId' load 'id'
+							find Application by 'id' with DOMAIN.id into 'id' 
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -380,18 +381,18 @@ class ETLFindSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 						
-							extract AssetDependencyId load id
-							find Dependency by id with DOMAIN.id into id
+							extract 'AssetDependencyId' load 'id'
+							find Dependency by 'id' with DOMAIN.id into 'id'
 							
-    						extract AssetId load asset
+    						extract 'AssetId' load 'asset'
 							
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application by id with DOMAIN.asset into asset  
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
-       						elseFind Application by assetName with SOURCE.DependentName into asset
-    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset'  
+   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
 						}
 						""".stripIndent(),
@@ -526,16 +527,16 @@ class ETLFindSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 						
-							extract AssetId load id
-							find Application by id with DOMAIN.id into id
+							extract 'AssetId' load 'id'
+							find Application by 'id' with DOMAIN.id into 'id'
 							
 							// Grab the reference to the FINDINGS to be used later. 
 							def primaryFindings = FINDINGS
 	
 							if (primaryFindings.size() > 0 ){
-							 	load comment with 'Asset results found'		
+							 	load 'comment' with 'Asset results found'		
 							} else {
-							 	load comment with 'Asset results not found'
+							 	load 'comment' with 'Asset results not found'
 							}
 						}
 						""".stripIndent(),
@@ -597,8 +598,8 @@ class ETLFindSpec extends ETLBaseSpec {
 						domain Dependency
 						
 						iterate {
-							extract 'application id' load asset
-							find Application by id with DOMAIN.asset into asset   
+							extract 'application id' load 'asset'
+							find Application by 'id' with DOMAIN.asset into 'asset'   
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -662,9 +663,9 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							load environment with 'Production'
-							extract 'application id' load id
-							find Application by id with id into id
+							load 'environment' with 'Production'
+							extract 'application id' load 'id'
+							find Application by 'id' with 'id' into 'id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -724,12 +725,12 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							load environment with 'Production'
-							extract 'vendor name' load Vendor
-							extract 'application id' load id
+							load 'environment' with 'Production'
+							extract 'vendor name' load 'Vendor'
+							extract 'application id' load 'id'
 							
-							find Application by id with SOURCE.'application id' into id 
-							elseFind Application by appVendor with DOMAIN.appVendor into id warn 'found without asset id field'
+							find Application by 'id' with SOURCE.'application id' into 'id' 
+							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -837,11 +838,11 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							extract 'application id' load id
-							extract 'vendor name' load Vendor
+							extract 'application id' load 'id'
+							extract 'vendor name' load 'Vendor'
 							
-							find Application by id with SOURCE.'application id' into id 
-							elseFind Application by appVendor with DOMAIN.appVendor into id
+							find Application by 'id' with SOURCE.'application id' into 'id' 
+							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id'
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -983,17 +984,17 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain Dependency
 					iterate {
 					
-						extract AssetDependencyId load id
-						extract AssetId load asset
+						extract 'AssetDependencyId' load 'id'
+						extract 'AssetId' load 'asset'
 						
-						find Asset by assetName with SOURCE.AssetName into asset
+						find Asset by 'assetName' with SOURCE.AssetName into 'asset'
 						// Grab the reference to the FINDINGS to be used later. 
 						def primaryFindings = FINDINGS
 
 						if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
-						    set comment with 'Asset results found'		
+						    set commentVar with 'Asset results found'		
 						} else {
-						    set comment with 'Asset results not found'
+						    set commentVar with 'Asset results not found'
 						}
 					}
 					""".stripIndent(),
@@ -1054,11 +1055,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Rack
-						extract rackId load id 
-						extract Location load location
-						extract Room load room
+						extract 'rackId' load 'id' 
+						extract 'Location' load 'location'
+						extract 'Room' load 'room'
 				 
-						find Room by id with SOURCE.RoomId into room
+						find Room by 'id' with SOURCE.RoomId into 'room'
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1120,11 +1121,11 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Rack
-						extract rackId load id 
-						extract Location load location
-						extract Room load room
+						extract 'rackId' load 'id' 
+						extract 'Location' load 'location'
+						extract 'Room' load 'room'
 				 
-						find Room 'for' room by id with SOURCE.RoomId
+						find Room 'for' 'room' by 'id' with SOURCE.RoomId
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1133,6 +1134,190 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Unrecognized command for with args [room] for the find / elseFind command'
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find element using integer transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isaNumber(args.id)
+				applications.findAll { it.id.toInteger() == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							load 'environment' with 'Production'
+							extract 'application id' transform with toInteger() load 'id'
+							
+							find Application by 'id' with DOMAIN.id into 'id'
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == 152254
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152254]
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == 152255
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152255]
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find element using number transformation'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assert NumberUtil.isLong(args.id)
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						console on
+						read labels
+						iterate {
+							domain Application
+							load 'environment' with 'Production'
+							extract 'application id' transform with toLong() load 'id'
+							
+							find Application by 'id' with DOMAIN.id into 'id'
+						}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				with(data[0].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[0].fields.id) {
+					originalValue == '152254'
+					value == 152254l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152254l]
+					}
+				}
+
+				with(data[1].fields.environment) {
+					originalValue == 'Production'
+					value == 'Production'
+				}
+
+				with(data[1].fields.id) {
+					originalValue == '152255'
+					value == 152255l
+
+					find.query.size() == 1
+					with(find.query[0]) {
+						domain == 'Application'
+						kv == [id: 152255l]
+					}
+				}
+			}
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -1165,7 +1350,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						find Application by id with SOURCE.'application id' into id
+						find Application by 'id' with SOURCE.'application id' into 'id'
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1271,7 +1456,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						find Application by id with SOURCE.'application id' into id   // 
+						find Application by 'id' with SOURCE.'application id' into 'id' 
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1377,7 +1562,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						find Application by id with SOURCE.'application id' into id   // 
+						find Application by 'id' with SOURCE.'application id' into 'id' 
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)

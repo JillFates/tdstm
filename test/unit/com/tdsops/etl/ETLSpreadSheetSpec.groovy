@@ -82,7 +82,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sheet Applications
+						sheet 'Applications'
 						
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -109,7 +109,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sheet Applications
+						sheet 'Applications'
 						read labels
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -395,7 +395,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sheet Applications
+						sheet 'Applications'
 						skip 1
 						read labels
 						
@@ -444,11 +444,11 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						sheet Applications
+						sheet 'Applications'
 						read labels
 						iterate {
 							domain Application
-							extract 'vendor name' load Vendor
+							extract 'vendor name' load 'Vendor'
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -541,7 +541,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						skip 1
 						domain Application
 						iterate {
-							extract 'vendor name' load Vendor
+							extract 'vendor name' load 'Vendor'
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -584,7 +584,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						iterate {
 							domain Application
 							
-							extract 'vendor name' load Vendor
+							extract 'vendor name' load 'Vendor'
 							if(CE == 'Microsoft'){
 								ignore row
 							}

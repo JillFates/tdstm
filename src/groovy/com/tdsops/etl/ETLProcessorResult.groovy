@@ -273,7 +273,7 @@ class ETLProcessorResult {
 	 * @param initValue initial value
 	 * @return a Map that contains a final structure of the field node in ETLProcessorResult
 	 */
-	private Map<String, ?> initialFieldDataMap(String originalValue, String value, String initValue) {
+	private Map<String, ?> initialFieldDataMap(Object originalValue, Object value, Object initValue) {
 		Map<String, ?> dataMap = [
 			value: value,
 			originalValue: originalValue,

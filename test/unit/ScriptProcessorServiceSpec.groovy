@@ -180,11 +180,11 @@ class ScriptProcessorServiceSpec extends Specification {
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load id
-                    extract 'vendor name' load Vendor
-                    load environment with 'Production'
+                    extract 'application id' load 'id'
+                    extract 'vendor name' load 'Vendor'
+                    load 'environment' with 'Production'
                     
-                    find Application by id with DOMAIN.id into id
+                    find Application by 'id' with DOMAIN.id into 'id'
                 }
             """.stripIndent()
 
@@ -250,11 +250,10 @@ class ScriptProcessorServiceSpec extends Specification {
 	void 'test can test a script content for Application domain Asset using a excel dataSet'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
-"""invalid headers, are not part, of the valid data set
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',"""invalid headers, are not part, of the valid data set
 application id,vendor name,technology,location
 152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center""".stripIndent().trim())
+152255,Mozilla,NGM,ACME Data Center""".stripIndent())
 
 		and:
 			Project GMDEMO = Mock(Project)
@@ -305,11 +304,11 @@ application id,vendor name,technology,location
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load id
-                    extract 'vendor name' load Vendor
-                    load environment with 'Production'
+                    extract 'application id' load 'id'
+                    extract 'vendor name' load 'Vendor'
+                    load 'environment' with 'Production'
                     
-                    find Application by id with DOMAIN.id into id
+                    find Application by 'id' with DOMAIN.id into 'id'
                 }
             """.stripIndent()
 
@@ -415,9 +414,8 @@ application id,vendor name,technology,location
                 read labels
                 iterate {
                     domain Unknown
-                    load environment with Production
-                    extract 'location' load Vendor
-                    reference assetName with Vendor
+                    set environmentVar with 'Production'
+                    extract 'location' load 'Vendor'
                 }
             """.stripIndent()
 
@@ -427,7 +425,7 @@ application id,vendor name,technology,location
 		then: 'Service result has validSyntax equals false and a list of errors'
 			with(result) {
 				!isValid
-				error == 'Invalid domain: \'Unknown\'. It should be one of these values: [Application, Device, Database, Storage, External, Task, Person, Comment, Asset, Manufacturer, Model, Dependency, Rack, Bundle, Room, Files]'
+				error == 'No such property: Unknown'
 				consoleLog.contains('INFO - Reading labels [0:application id, 1:vendor name, 2:technology, 3:location]')
 				!data.domains
 			}
