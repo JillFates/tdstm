@@ -111,7 +111,7 @@ class DataImportService implements ServiceMethods {
 
 			// The following are reset per domain
 			domainClass: null,
-			fields: [],
+			fieldNames: [],
 			rowsCreated: 0,
 			rowsSkipped: 0,
 			rowNumber: 0,
@@ -146,7 +146,7 @@ class DataImportService implements ServiceMethods {
 						rowsSkipped = 0
 						rowNumber = 0
 					}
-					importContext.fields = domainJson.fields
+					importContext.fieldNames = domainJson.fieldNames
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
@@ -275,7 +275,7 @@ class DataImportService implements ServiceMethods {
 				// createdBy: importContext.etlInfo.createdBy,
 				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
 				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
-				fieldNameList: JsonUtil.toJson(importContext.fields),
+				fieldNameList: JsonUtil.toJson(importContext.fieldNames),
 				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
@@ -375,7 +375,7 @@ class DataImportService implements ServiceMethods {
 		Boolean hadError = false
 
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
-		for (fieldName in importContext.fields) {
+		for (fieldName in importContext.fieldNames) {
 
 			// If the current field is the id, skip it (avoid inserting it into the database).
 			if (fieldName != 'id') {
@@ -635,6 +635,7 @@ class DataImportService implements ServiceMethods {
 	@NotTransactional()
 	Integer processBatch(Project project, Long batchId, List specifiedRecordIds=null) {
 		ImportBatch batch = GormUtil.findInProject(project, ImportBatch, batchId, true)
+		Map context
 
 		if (specifiedRecordIds == null) {
 			specifiedRecordIds = []
@@ -669,7 +670,7 @@ class DataImportService implements ServiceMethods {
 			log.info 'processBatch({}) found {} PENDING rows', batchId, recordIds.size()
 
 			// Initialize the context with things that are going to be helpful throughtout the process
-			Map context = initContextForProcessBatch( batch.domainClassName )
+			context = initContextForProcessBatch( batch.domainClassName )
 
 			int totalRowCount = recordIds.size()
 			int offset = 0
@@ -686,6 +687,7 @@ class DataImportService implements ServiceMethods {
 
 				ImportBatchRecord.withNewTransaction { status ->
 					for (record in records) {
+						log.debug '\n\nprocessBatch() processing row {}', rowsProcessed
 						context.record = record
 						processBatchRecord(batch, record, context)
 						rowsProcessed++
@@ -917,11 +919,12 @@ class DataImportService implements ServiceMethods {
 			for (error in domain.errors.allErrors) {
 				log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
 				String property = error.getField()
+				String errorMsg = i18nMessage(error)
 				if (fieldsInfo[property]) {
-					fieldsInfo[property].errors << error.toString()
+					fieldsInfo[property].errors << errorMsg
 				} else {
 					// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
-					record.addError(error.toString())
+					record.addError(errorMsg)
 				}
 			}
 		}
@@ -1053,9 +1056,27 @@ class DataImportService implements ServiceMethods {
 		fieldsToIgnore.addAll(['id'])
 		fieldNames =  fieldNames - fieldsToIgnore
 
+		// If no new value and init contains value and entity property has no value
+		// Then set the property to the init value
+		// Else if new value and current value not equal new value
+		// Then set new value
+
 		Map fieldsValues = [:]
-		for (field in fieldNames) {
-			fieldsValues[field] = fieldsInfo[field].value
+		for (fieldName in fieldNames) {
+			def newValue = fieldsInfo[fieldName].value
+			def domainValue = domain[fieldName]
+			def initValue = fieldsInfo[fieldName].init
+			boolean hasInitializeValue = (initValue != null)
+
+			if (hasInitializeValue) {
+				 if (domainValue == null || (domainValue instanceof String) && domainValue == '') {
+					 fieldsValues.put(fieldName, initValue)
+				 }
+			} else {
+				if (newValue != null && newValue != domainValue) {
+					fieldsValues.put(fieldName, newValue)
+				}
+			}
 		}
 		GormUtil.bindMapToDomain(domain, fieldsValues, fieldsToIgnore)
 	}
@@ -1100,7 +1121,7 @@ class DataImportService implements ServiceMethods {
 
 			if (dependency) {
 				// UPDATE
-
+				log.debug 'findAndUpdateOrCreateDependency() UPDATING DEPENDENCY ID {}', dependency.id
 				// Update the primary or supporting assets if they changed
 				if (dependency.asset.id != primary.id) {
 					log.debug "findAndUpdateOrCreateDependency() Updated primary asset on Dependency"
@@ -1196,7 +1217,7 @@ class DataImportService implements ServiceMethods {
 			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
 			entity = context.cache[md5]
 			if (entity) {
-				log.debug 'lookupDomainRecordByFieldMetaData() found in cache'
+				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity
 				break
 			}
 
@@ -1233,9 +1254,9 @@ class DataImportService implements ServiceMethods {
 			qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
-				log.debug 'lookupDomainRecordByFieldMetaData() found using ETL find/elseFind criteria'
+				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} using ETL find/elseFind criteria', entity.id
 			} else if (qtyFound > 1 ) {
-				log.debug "lookupDomainRecordByFieldMetaData() ETL find/elseFind criteria returned {} entities", qtyFound
+				log.debug "lookupDomainRecordByFieldMetaData() FOUND MULTIPLE - ETL find/elseFind criteria returned {} entities", qtyFound
 				entity = -2
 			}
 
@@ -1267,7 +1288,7 @@ class DataImportService implements ServiceMethods {
 
 		} else {
 
-			log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
+			// log.debug 'performQueryAndUpdateFindElement() for property {}: Searching with query={}', propertyName, fieldsInfo[propertyName].find?.query
 			int recordsFound = 0
 			int foundMatchOn = 0
 
@@ -1378,7 +1399,7 @@ class DataImportService implements ServiceMethods {
 		String errorMsg
 		Map createInfo
 		List<String> propertiesThatCannotBeSet = ['id', 'version', 'assetClass', 'moveBundle', 'createdBy', 'project']
-		log.debug 'createReferenceDomain() called for property {}', propertyName
+		log.debug 'createReferenceDomain() CREATING reference entity for property {}', propertyName
 		while (true) {
 			if (!fieldsInfo.containsKey(propertyName)) {
 				errorMsg = "Property $propertyName was missing from ETL meta-data"

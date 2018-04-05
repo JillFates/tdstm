@@ -14,8 +14,8 @@ class AssetDependency {
 	String type = 'Unknown'
 	String dataFlowFreq = 'Unknown'
 	String dataFlowDirection = 'Unknown'
-	String status
-	String comment
+	String status = 'Unknown'
+	String comment = ''
 	Person createdBy
 	Person updatedBy
 
@@ -37,7 +37,7 @@ class AssetDependency {
 		c2 nullable: true
 		c3 nullable: true
 		c4 nullable: true
-		comment size: 0..65535
+		comment size: 0..65535, blank: true
     	createdBy nullable: true // @See TM-8392
 		updatedBy nullable: true
 		dataFlowDirection blank: false, size: 0..14, inList: ['Unknown', 'bi-directional', 'incoming', 'outgoing']

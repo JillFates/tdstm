@@ -5,7 +5,6 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
-import grails.test.spock.IntegrationSpec
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
@@ -15,12 +14,14 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Ignore
 import test.helper.AssetEntityTestHelper
 
+import grails.test.spock.IntegrationSpec
+import grails.validation.ValidationException
+import org.codehaus.groovy.grails.web.json.JSONObject
 // import net.transitionmanager.service.InvalidParamException
 // import net.transitionmanager.service.ProjectRequiredException
 // import net.transitionmanager.command.CredentialCommand
@@ -284,7 +285,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			dataImportService.resetRecordAndFieldsInfoErrors(context.record, fieldsInfo)
 
         when: 'called with no id and an empty query section'
-			def entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			def entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
         then: 'no entity should be returned'
 			! entity
 		and: 'a particular error message should be recorded in the fieldsInfo'
@@ -294,7 +295,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			fieldsInfo[property].value = device.id
 		and: 'any previous error messages have been cleared out'
 			dataImportService.resetRecordAndFieldsInfoErrors(context.record, fieldsInfo)
-			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
 		then: 'the asset should be found'
 			entity
 		and: 'the asset should match the one attempting to be found'
@@ -311,14 +312,14 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'has no id value'
 			fieldsInfo[property].value = ''
 		then: 'the calling lookupDomainRecordByFieldMetaData should should return the access'
-			device == dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			device == dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
 
 		when: 'the cache values are overwritten so that we can tell the results came from cache'
 			String overwritten = 'Cache entry was overwritten'
 			Set keys = context.cache.keySet()
 			keys.each { key -> context.cache[key] = overwritten }
 		and: 'lookupDomainRecordByFieldMetaData is called again with the same query information'
-			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
 		then: 'the object returned should have come from found the cache with the overwritten value'
 			overwritten == entity
 
@@ -338,7 +339,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'any previous error messages have been cleared out'
 			dataImportService.resetRecordAndFieldsInfoErrors(context.record, fieldsInfo)
 		and: 'the lookupDomainRecordByFieldMetaData method is called'
-			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
 		then: 'the return value should be -2 indicating multiple entities found'
 			-2 == entity
 		and: 'an error should be reported that there were multiple references'
@@ -349,7 +350,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		and: 'we have cleared out previous error messages'
 			dataImportService.resetRecordAndFieldsInfoErrors(context.record, fieldsInfo)
 		and: 'the lookupDomainRecordByFieldMetaData method is called'
-			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, fieldsInfo, context)
+			entity = dataImportService.lookupDomainRecordByFieldMetaData(project, property, new JSONObject(fieldsInfo), context)
 		then: 'a -1 should be returned indicating that an explicit ID lookup failed (in this case because asset was on another project)'
 			-1 == entity
     }
@@ -374,9 +375,90 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo)
 	}
 
-	@Ignore
+	// @Ignore
 	void '8. test bindFieldsInfoValuesToEntity method'() {
-		// bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, List fieldsToIgnore=[] )
+		setup:
+			AssetEntity asset = new AssetEntity()
+			String assetName = 'rosebud'
+			String initValue = 'Value set by init'
+			String fieldToIgnore = 'custom1'
+			String ignoredFieldValue = 'Apparently I am being ignored'
+			Map fieldInfoMap = [
+				"id": [
+					"value": 42,
+					"originalValue": "",
+					"error": false,
+					"warn": false,
+					"errors": [],
+					"find": [
+						"query": []
+					]
+				],
+				"assetName": [
+					"value": assetName,
+					"originalValue": "",
+					"error": false,
+					"warn": false,
+					"errors": [],
+					"find": [
+						"query": []
+					]
+				],
+				"description": [
+					"value": null,
+					"originalValue": "",
+					"error": false,
+					"warn": false,
+					"errors": [],
+					"find": [
+						"query": []
+					],
+					init: initValue
+				],
+				(fieldToIgnore): [
+					"value": ignoredFieldValue,
+					"originalValue": "",
+					"error": false,
+					"warn": false,
+					"errors": [],
+					"find": [
+						"query": []
+					],
+				],
+				maintExpDate: [
+					"value": null,
+					"originalValue": "",
+					"error": false,
+					"warn": false,
+					"errors": [],
+					"find": [
+						"query": []
+					],
+					init: new Date()
+				]
+
+			]
+
+		when: 'calling bindFieldsInfoValuesToEntity to set property values while ignoring fields'
+			dataImportService.bindFieldsInfoValuesToEntity(asset, fieldInfoMap, [fieldToIgnore] )
+		then: 'the id should not be set because it is the identify and GORM would not be very happy with that'
+			null == asset.id
+		and: 'the asset name should be set'
+			assetName == asset.assetName
+		and: 'description should be set with the init value'
+			initValue == asset.description
+		and: 'ignored field should not be set'
+			null == asset[fieldToIgnore]
+
+		when: 'the field to set with init value already has a value'
+			String setValue = 'Init should not over write this'
+			asset.description = setValue
+		and: 'calling bindFieldsInfoValuesToEntity to set property values and NOT ignoring fields'
+			dataImportService.bindFieldsInfoValuesToEntity(asset, fieldInfoMap)
+		then: 'the init value should not have overwritten the domain field value'
+			setValue == asset.description
+		and: 'the previously ignored field is now set'
+			ignoredFieldValue == asset[fieldToIgnore]
 	}
 
 	@Ignore

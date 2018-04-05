@@ -15,8 +15,8 @@
                         (filterChange)="dataGridOperationsHelper.filterChange($event)"
                         [sort]="dataGridOperationsHelper.state.sort"
                         [sortable]="{mode:'single'}"
-                        [pageSize]="dataGridOperationsHelper.currentPageSize"
-                        [skip]="dataGridOperationsHelper.skip"
+                        [pageSize]="dataGridOperationsHelper.state.take"
+                        [skip]="dataGridOperationsHelper.state.skip"
                         [pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
                         (pageChange)="dataGridOperationsHelper.pageChange($event)"
                         [resizable]="true"
@@ -96,7 +96,7 @@
                                             title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
                                         <i class="fa fa-play-circle-o"></i>
                                     </button>
-                                    <button *ngIf="dataItem.status.code === 'RUNNING'"
+                                    <button *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
                                             (click)="onStopButton(dataItem)"
                                             class="btn btn-action btn-default"
                                             title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">

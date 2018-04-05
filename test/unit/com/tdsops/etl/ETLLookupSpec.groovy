@@ -144,7 +144,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'model', 'custom1'] as Set
+				fieldNames == ['assetName', 'model', 'custom1'] as Set
 				data.size() == 3
 				with(data[0]){
 					with(fields.assetName){
@@ -225,7 +225,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'model'] as Set
+				fieldNames == ['assetName', 'model'] as Set
 				data.size() == 3
 				with(data[0]){
 					with(fields.assetName){
@@ -304,7 +304,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'model', 'custom1'] as Set
+				fieldNames == ['assetName', 'model', 'custom1'] as Set
 				data.size() == 3
 				with(data[0]){
 					with(fields.assetName){
@@ -385,7 +385,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'model'] as Set
+				fieldNames == ['assetName', 'model'] as Set
 				data.size() == 3
 				with(data[0]){
 					with(fields.assetName){
@@ -474,7 +474,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 								load id with ''
 								find Application by assetName, appVendor with DOMAIN.assetName, vmWare into id
 								elseFind Application by assetName with DOMAIN.assetName into id warn 'Not sure about this match'
-
 								whenNotFound id create {
 									assetName clusterName
 									appVendor vmWare
@@ -518,19 +517,19 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 3
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
+				fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
 				data.size() == 5
 			}
 
 			with(etlProcessor.result.domains[1]) {
 				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'id'] as Set
+				fieldNames == ['assetName', 'id'] as Set
 				data.size() == 2
 			}
 
 			with(etlProcessor.result.domains[2]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
+				fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
 				data.size() == 5
 			}
 

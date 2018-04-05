@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.FilenameFormat
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
+import org.apache.commons.io.FilenameUtils
 
 /**
  * The FilenameUtil class contains a set of file name formats that can be used to simplify the creation
@@ -14,6 +15,8 @@ import net.transitionmanager.domain.MoveEvent
 @Slf4j(value='logger')
 class FilenameUtil {
 
+
+	static final String CSV_SUFIX = 'csv'
 	/**
 	 * Main method for creating a file name.
 	 *
@@ -258,4 +261,14 @@ class FilenameUtil {
 		}
 		return str
 	}
+
+	/**
+	 * It checks if a filename is a csv or CSV filename.
+	 * @param fileName
+	 * @return true if fileName belongs to a csv file
+	 */
+	static boolean isCsvFile(String fileName){
+		return FilenameUtils.isExtension(fileName?.toLowerCase(), CSV_SUFIX)
+	}
+
 }

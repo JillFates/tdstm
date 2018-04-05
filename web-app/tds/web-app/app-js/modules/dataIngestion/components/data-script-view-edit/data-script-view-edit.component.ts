@@ -215,7 +215,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				{
 					provide: DataScriptModel,
 					useValue: this.dataScriptModel}
-					], false, true)
+					], false, false)
 			.then((result) => {
 				if (result.updated) {
 					this.etlScriptCode.updated = result.updated;
