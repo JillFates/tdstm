@@ -4,10 +4,10 @@ package com.tdsops.etl
  * <code>
  *  domain Dependency
  *  // Try to find the Application using different searches
- * 	find Application 	 by id 				     with assetId into property
- * 	elseFind Application by assetName, assetType with primaryName, primaryType into property
- * 	elseFind Application by assetName            with primaryName into property
- * 	elseFind Asset 		 by assetName            with primaryName into property warn 'found with wrong asset class'
+ * 	find Application 	 by 'id' 				     with 'assetId' into 'property'
+ * 	elseFind Application by 'assetName', 'assetType' with primaryNameVar, primaryTypeVar into 'property'
+ * 	elseFind Application by 'assetName'            with primaryNameVar into 'property'
+ * 	elseFind Asset 		 by 'assetName'            with primaryNameVar into 'property' warn 'found with wrong asset class'
  * </code>
  * @param values
  * @return
@@ -58,8 +58,8 @@ class ETLFindElement {
 	/**
 	 * Defines a new find option. See this code:
 	 * <pre>
-	 * 	find Application by id with assetId into assetId
-	 * 	elseFind Application by assetName, assetType with primaryName, primaryType into assetId
+	 * 	find Application by 'id' with 'assetId' into 'assetId'
+	 * 	elseFind Application by 'assetName', 'assetType' with primaryNameVar, primaryTypeVar into 'assetId'
 	 * </pre>
 	 * @param domain
 	 * @return
@@ -178,8 +178,8 @@ class ETLFindElement {
 	/**
 	 * Appends a warn message in the ETL Processor result.
 	 * <pre>
-	 *   find Application by assetName with primaryName into assetId
-	 *   elseFind Asset by assetName with primaryName into assetId warn 'found with wrong asset class'
+	 * 	find Application by 'id' with 'assetId' into 'assetId'
+	 * 	elseFind Application by 'assetName', 'assetType' with primaryNameVar, primaryTypeVar into 'assetId' warn 'found with wrong asset class'
 	 * </pre>
 	 * @param message
 	 * @return

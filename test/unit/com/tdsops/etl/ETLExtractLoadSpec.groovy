@@ -252,7 +252,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
+			e.message == 'No such property: Unknown'
 	}
 
 	void 'test can define a several domains in an ETL script'() {
@@ -339,11 +339,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("invalid command", ETLProcessor.class.name)
+				.evaluate("invalid on", ETLProcessor.class.name)
 
 		then: 'An MissingMethodException exception is thrown'
-			MissingMethodException missingMethodException = thrown MissingMethodException
-			missingMethodException.stackTrace.find { StackTraceElement ste -> ste.fileName == ETLProcessor.class.name }?.lineNumber == 1
+			ETLProcessorException exception = thrown ETLProcessorException
+			exception.message == 'No such property: invalid'
 	}
 
 	void 'test can read labels from dataSource and create a map of columns'() {
@@ -534,7 +534,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -584,9 +584,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					iterate {
 						extract 'vendor name'
 						if ( CE == 'Microsoft'){
-							load Name with 'This is a Microsoft Application'
+							load 'Name' with 'This is a Microsoft Application'
 						} else {
-							load environment with 'This is not a Microsoft Application'
+							load 'environment' with 'This is not a Microsoft Application'
 						}
 					}
 				""".stripIndent(),
@@ -637,9 +637,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					iterate {
 						extract 'vendor name'
 						if ( CE == 'Microsoft'){
-							load appVendor with CE
+							load 'appVendor' with CE
 						} else {
-							load environment with CE
+							load 'environment' with CE
 						}
 					}
 				""".stripIndent(),
@@ -688,13 +688,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load appVendor
-						extract 'location' load environment
+						extract 'vendor name' load 'appVendor'
+						extract 'location' load 'environment'
 
 						if ( CE == 'Microsoft'){
-							load Name with DOMAIN.appVendor
+							load 'Name' with DOMAIN.appVendor
 						} else {
-							load Name with DOMAIN.environment
+							load 'Name' with DOMAIN.environment
 						}
 					}
 				""".stripIndent(),
@@ -759,13 +759,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load appVendor
-						extract 'location' load environment
+						extract 'vendor name' load 'appVendor'
+						extract 'location' load 'environment'
 
 						if ( CE == 'Microsoft'){
-							load Name with SOURCE.'vendor name'
+							load 'Name' with SOURCE.'vendor name'
 						} else {
-							load Name with SOURCE.'application id'
+							load 'Name' with SOURCE.'application id'
 						}
 					}
 				""".stripIndent(),
@@ -831,12 +831,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myLocalVariable = CE
+						def myLocalVar = CE
 
-						if ( myLocalVariable == 'Microsoft'){
-							load appVendor with myLocalVariable
+						if ( myLocalVar == 'Microsoft'){
+							load 'appVendor' with myLocalVar
 						} else {
-							load environment with myLocalVariable
+							load 'environment' with myLocalVar
 						}
 					}
 				""".stripIndent(),
@@ -884,7 +884,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load appVendor load description
+						extract 'vendor name' load 'appVendor' load 'description'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -946,7 +946,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'vendor name' load appVendor
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -976,7 +976,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					domain Application
 					iterate {
-						extract 'vendor name' load vendedor
+						extract 'vendor name' load 'vendedor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1005,8 +1005,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					read labels
 					iterate {
-						extract 'application id' load id
-						extract 'vendor name' load appVendor
+						extract 'application id' load 'id'
+						extract 'vendor name' load 'appVendor'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1058,9 +1058,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
-					extract name load assetName
-					extract mfg load manufacturer
-					extract 3 load model
+					extract 'name' load 'assetName'
+					extract 'mfg' load 'manufacturer'
+					extract 3 load 'model'
 				}
 			""".stripIndent(),
 					ETLProcessor.class.name)
@@ -1141,13 +1141,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						load environment with 'Production'
-						extract 1 load id
-						extract 'vendor name' load appVendor
+						load 'environment' with 'Production'
+						extract 1 load 'id'
+						extract 'vendor name' load 'appVendor'
 
 						domain Device
-						extract 1 load id
-						load location with 'Development'
+						extract 1 load 'id'
+						load 'location' with 'Development'
 					}
 				""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1279,8 +1279,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 										read labels
 										iterate {
 											domain Room
-											extract roomId load id
-											extract Name load roomName
+											extract 'roomId' load 'id'
+											extract 'Name' load 'roomName'
 										}
 										""".stripIndent(),
 								ETLProcessor.class.name)
@@ -1333,9 +1333,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 										read labels
 										iterate {
 											domain Rack
-											extract rackId load id
-											extract Location load location
-											extract Room load room
+											extract 'rackId' load 'id'
+											extract 'Location' load 'location'
+											extract 'Room' load 'room'
 										}
 										""".stripIndent(),
 								ETLProcessor.class.name)
@@ -1366,11 +1366,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract 'vendor name' load appVendor
+										extract 'vendor name' load 'appVendor'
 										if (DOMAIN.appVendor.startsWith('Mi')){
-											load environment with 'Production'
+											load 'environment' with 'Production'
 										} else {
-											load environment with 'Development'
+											load 'environment' with 'Development'
 										}
 									}
 								""".stripIndent(),
@@ -1440,7 +1440,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 
 									iterate {
-										extract 1 load id
+										extract 1 load 'id'
 									}
 									""".stripIndent(),
 								ETLProcessor.class.name)
@@ -1472,11 +1472,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract 'vendor name' load appVendor
+										extract 'vendor name' load 'appVendor'
 										if (DOMAIN.appVendor.unknownMethod('Mi')){
-											set environment with 'Production'
+											set environmentVar with 'Production'
 										} else {
-											set environment with 'Development'
+											set environmentVar with 'Development'
 										}
 									}
 								""".stripIndent(),
@@ -1506,11 +1506,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract 'vendor name' load appVendor
+										extract 'vendor name' load 'appVendor'
 										if (!SOURCE.technology.startsWith('NGM')){
-											load environment with 'Production'
+											load 'environment' with 'Production'
 										} else {
-											load environment with 'Development'
+											load 'environment' with 'Development'
 										}
 									}
 								""".stripIndent(),
@@ -1564,11 +1564,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract 'vendor name' load appVendor
+										extract 'vendor name' load 'appVendor'
 										if (!SOURCE.technology.unknownMethod('NGM')){
-											set environment with 'Production'
+											set environmentVar with 'Production'
 										} else {
-											set environment with 'Development'
+											set environmentVar with 'Development'
 										}
 									}
 								""".stripIndent(),
@@ -1600,15 +1600,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 									iterate {
 										domain Application
-										extract 'application id' load id
-										extract 'vendor name' load appVendor
+										extract 'application id' load 'id'
+										extract 'vendor name' load 'appVendor'
 
 										if (!SOURCE.'vendor name'.startsWith('Mi')){
 											ignore row
 										} else {
 											domain Device
-											extract 'application id' load id
-											extract technology load Name
+											extract 'application id' load 'id'
+											extract 'technology' load 'Name'
 										}
 									}
 								""".stripIndent(),
@@ -1675,21 +1675,21 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									iterate {
 										domain Application
-										extract 'application id' load id
-										extract 'vendor name' load appVendor
+										extract 'application id' load 'id'
+										extract 'vendor name' load 'appVendor'
 
 										if (!SOURCE.'vendor name'.startsWith('Mi')){
 											ignore row
 										} else {
 											domain Device
-											extract 'application id' load id
-											extract technology load Name
+											extract 'application id' load 'id'
+											extract 'technology' load 'Name'
 
 											if(DOMAIN.assetName.contains('updated')){
 												ignore row
 											} else {
 												domain Database
-												extract 'application id' load id
+												extract 'application id' load 'id'
 											}
 										}
 									}
@@ -1775,11 +1775,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract technology
+										extract 'technology'
 										if( CE == 'NGM') {
 											ignore row
 										} else {
-											load Name with CE
+											load 'Name' with CE
 										}
 									}
 								""".stripIndent(),
@@ -1815,11 +1815,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									domain Application
 									iterate {
-										extract technology
+										extract 'technology'
 										if( CE != 'NGM') {
 											ignore row
 										} else {
-											load Name with CE
+											load 'Name' with CE
 										}
 									}
 								""".stripIndent(),
@@ -1857,8 +1857,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 									read labels
 									iterate {
 										domain Device
-										extract 'device id' load id
-										extract 'model name' transform with lowercase() load Name
+										extract 'device id' load 'id'
+										extract 'model name' transform with lowercase() load 'Name'
 
 										if( SOURCE.'device id'.startsWith('152253') ){
 											ignore row
@@ -1887,16 +1887,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							}
 					}
 
-					void 'test can set a local variable with a string literal'() {
+	void 'test can set a local variable with a string literal'() {
 
-						given:
-							ETLFieldsValidator validator = new DomainClassFieldsValidator()
-							validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-							validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-							validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
 
-						and:
-							def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -1915,8 +1915,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							set myLocalVariable with 'Custom Name'
-							load Name with myLocalVariable
+							set myLocalVar with 'Custom Name'
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1977,8 +1977,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							set myLocalVariable with SOURCE.'name'
-							load Name with myLocalVariable
+							set myLocalVar with SOURCE.'name'
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -2039,9 +2039,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							extract type load environment
-							set myLocalVariable with DOMAIN.environment
-							load Name with myLocalVariable
+							extract 'type' load 'environment'
+							set myLocalVar with DOMAIN.environment
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -2109,15 +2109,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							extract name load Name
-							load custom1 with 'abc'
+							extract 'name' load 'Name'
+							load 'custom1' with 'abc'
 
-							extract mfg set myMfg
-							myMfg += " (" + extract(type) + ")"
-							load Manufacturer with myMfg
+							extract 'mfg' set myMfgVar
+							myMfgVar += " (" + extract('type') + ")"
+							load 'Manufacturer' with myMfgVar
 
 							set anotherVar with 'xyzzy'
-							load custom2 with anotherVar
+							load 'custom2' with anotherVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -2189,7 +2189,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				domain Device
 				read labels
 				iterate {
-				    extract name load Name
+				    extract 'name' load 'Name'
 					load 'Network Interfaces' with NOW
 				}
 			""".stripIndent().trim()
@@ -2249,10 +2249,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				.evaluate("""
 						console on
 						read labels
-						set myLocalVariable with 'Custom Name'
+						set myLocalVar with 'Custom Name'
 						iterate {
 							domain Device
-							load Name with myLocalVariable
+							load 'Name' with myLocalVar
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)

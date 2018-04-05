@@ -8,7 +8,7 @@ import net.transitionmanager.domain.Project
 /**
  * Class that receives all the ETL initial commands.
  * <pre>
- *	extract dataSetFieldName load assetFieldName
+ *	extract 'dataSetFieldName' load 'assetFieldName'
  *	set assetFieldName with 'A simple label value'
  *  iterate {
  *     ....
@@ -59,7 +59,7 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * An instance of this interface should be assigned
 	 * to be used in fieldSpec validations
-	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs( java.lang.String)
+	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
 	/**
@@ -116,6 +116,17 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
+	 * Some words to be used in an ETL script.
+	 * <b> read labels</b>
+	 * <b> console on/off</b>
+	 * <b> ignore row</b>
+	 * <b> ... transform with ...</b>
+	 */
+	static enum ReservedWord {
+		labels, with, on, off, row, ControlCharacters
+	}
+
+	/**
 	 *
 	 *  https://en.wikipedia.org/wiki/Control_character
 	 */
@@ -145,13 +156,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain a domain String value
 	 * @return the current instance of ETLProcessor
 	 */
-	ETLProcessor domain (String domain) {
+	ETLProcessor domain (ETLDomain domain) {
+		selectedDomain = domain
 		result.releaseRowFoundInLookup()
-		selectedDomain = ETLDomain.values().find { it.name() == domain }
-		if (selectedDomain == null) {
-			throw ETLProcessorException.invalidDomain(domain)
-		}
-
 		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
 		return this
@@ -159,12 +166,12 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Read Labels from source of data
-	 * @param dataPart
+	 * @param reservedWord
 	 * @return
 	 */
-	ETLProcessor read (String dataPart) {
+	ETLProcessor read (ReservedWord reservedWord) {
 
-		if ('labels'.equalsIgnoreCase(dataPart)) {
+		if (reservedWord == ReservedWord.labels) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: fieldNameToLabel(field), index: index)
 				columns.add(column)
@@ -173,6 +180,8 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			dataSetFacade.setCurrentRowIndex(currentRowIndex)
 			debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
+		} else {
+			throw ETLProcessorException.invalidReadCommand()
 		}
 		return this
 	}
@@ -234,14 +243,16 @@ class ETLProcessor implements RangeChecker {
 	 * @param label just a label to detect if the command was used with 'row' label
 	 * @return current instance of ETLProcessor
 	 */
-	ETLProcessor ignore (String label) {
+	ETLProcessor ignore (ReservedWord reservedWord) {
 
-		if('row'.equalsIgnoreCase(label)){
+		if(reservedWord == ReservedWord.row){
 			if (!hasSelectedDomain()) {
 				throw ETLProcessorException.domainMustBeSpecified()
 			}
 			result.ignoreCurrentRow()
 			debugConsole.info("Ignore row ${currentRowIndex}")
+		} else {
+			// TODO: add validation for invalid use of this command
 		}
 
 		return this
@@ -290,12 +301,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param status
 	 * @return
 	 */
-	ETLProcessor console (String status) {
+	ETLProcessor console (ReservedWord reservedWord) {
 
-		DebugConsole.ConsoleStatus consoleStatus = DebugConsole.ConsoleStatus.values().find { it.name() == status }
+		DebugConsole.ConsoleStatus consoleStatus = DebugConsole.ConsoleStatus.values().find { it.name() == reservedWord.name() }
 
 		if (consoleStatus == null) {
-			throw ETLProcessorException.invalidConsoleStatus(status)
+			throw ETLProcessorException.invalidConsoleStatus(reservedWord.name())
 		}
 		debugConsole.status = consoleStatus
 		debugConsole.info "Console status changed: $consoleStatus"
@@ -307,15 +318,15 @@ class ETLProcessor implements RangeChecker {
 	 * @param status
 	 * @return the instance of ETLProcessor who received this message
 	 */
-	ETLProcessor trim (String status) {
+	ETLProcessor trim (ReservedWord reservedWord) {
 
-		if (status == 'on') {
+		if (reservedWord == ReservedWord.on) {
 			globalTransformers.add(Trimmer)
-		} else if (status == 'of') {
+		} else if (reservedWord == ReservedWord.off) {
 			globalTransformers.remove(Trimmer)
 		}
 
-		debugConsole.info "Global trim status changed: $status"
+		debugConsole.info "Global trim status changed: $reservedWord"
 		return this
 	}
 
@@ -324,15 +335,15 @@ class ETLProcessor implements RangeChecker {
 	 * @param status
 	 * @return the instance of ETLProcessor who received this message
 	 */
-	ETLProcessor sanitize (String status) {
+	ETLProcessor sanitize (ReservedWord reservedWord) {
 
-		if (status == 'on') {
+		if (reservedWord == ReservedWord.on) {
 			globalTransformers.add(Sanitizer)
-		} else if (status == 'of') {
+		} else if (reservedWord == ReservedWord.off) {
 			globalTransformers.remove(Sanitizer)
 		}
 
-		debugConsole.info "Global sanitize status changed: $status"
+		debugConsole.info "Global sanitize status changed: $reservedWord"
 		return this
 	}
 
@@ -354,14 +365,13 @@ class ETLProcessor implements RangeChecker {
 	 * @param control
 	 * @return
 	 */
-	def replace (String control) {
-
-		debugConsole.info "Global trm status changed: $control"
-		if (control == 'ControlCharacters') {
+	def replace (ReservedWord reservedWord) {
+		debugConsole.info "Global trm status changed: $reservedWord"
+		if (reservedWord == ReservedWord.ControlCharacters) {
 			[
-					with: { y ->
-						globalTransformers.add(Replacer(ControlCharactersRegex, y))
-					}
+				with: { y ->
+					globalTransformers.add(Replacer(ControlCharactersRegex, y))
+				}
 			]
 		}
 	}
@@ -372,18 +382,13 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor skip (Integer amount) {
-//		if (amount + currentRowIndex <= this.dataSetFacade.rowsSize()) {
-//			currentRowIndex += amount
-//		} else {
-//			throw ETLProcessorException.invalidSkipStep(amount)
-//		}
 		currentRowIndex += amount
 		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		return this
 	}
 
 	/**
-	 *
+	 * Defines the sheet name to be used in an ETl script
 	 * @param sheetName
 	 * @return
 	 */
@@ -392,7 +397,7 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
-	 *
+	 * Defines the sheetNumber to be used in an ETl script
 	 * @param sheetNumber
 	 * @return
 	 */
@@ -405,8 +410,8 @@ class ETLProcessor implements RangeChecker {
 	 * <code>
 	 *     domain Application
 	 *     iterate {
-	 *          extract 1 load appName
-	 *          extract 3 load description
+	 *          extract 1 load 'appName'
+	 *          extract 3 load 'description'
 	 *     }
 	 * <code>
 	 * @param index
@@ -426,7 +431,7 @@ class ETLProcessor implements RangeChecker {
 	 * <code>
 	 *      domain Application
 	 *      iterate {
-	 *          extract 'column name' load appName
+	 *          extract 'column name' load 'appName'
 	 *      }
 	 * <code>
 	 * @param columnName
@@ -446,11 +451,11 @@ class ETLProcessor implements RangeChecker {
 	 * a DOMAIN or SOURCE reference, or a CE/local variable.
 	 * <pre>
 	 *    domain Application
-	 *    load assetName with 'Asset Name'
-	 *    load assetName with CE
-	 *    load assetName with myLocalVariable
-	 *    load assetName with DOMAIN.id
-	 *    load assetName with SOURCE.'data name'
+	 *    load 'assetName' with 'Asset Name'
+	 *    load 'assetName' with CE
+	 *    load 'assetName' with myLocalVariable
+	 *    load 'assetName' with DOMAIN.id
+	 *    load 'assetName' with SOURCE.'data name'
 	 * </pre>
 	 * @param fieldName
 	 * @return
@@ -475,9 +480,9 @@ class ETLProcessor implements RangeChecker {
 	 *	iterate {
 	 *		domain Application
 	 *	    ...
-	 *		set environment with 'Production'
-	 *		set environment with SOURCE.'application id'
-	 *		set environment with DOMAIN.id
+	 *		set environmentVar with 'Production'
+	 *		set environmentVar with SOURCE.'application id'
+	 *		set environmentVar with DOMAIN.id
 	 *		.....
 	 *	}
 	 * </pre>
@@ -504,11 +509,11 @@ class ETLProcessor implements RangeChecker {
 	 *  iterate {
 	 *      ...
 	 *      domain Device
-	 *      extract Vm load Name
+	 *      extract 'Vm' load 'Name'
 	 *      extract Cluster
 	 *      def clusterName = CE
 	 *
-	 *      lookup assetName with clusterName
+	 *      lookup 'assetName' with 'clusterName'
 	 *  }
 	 * </pre>
 	 * @param fieldNames
@@ -542,13 +547,13 @@ class ETLProcessor implements RangeChecker {
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		initialize environment with 'Production'
-	 *	    initialize environment with Production
-	 *	    initialize environment with SOURCE.'application id'
-	 *	    initialize environment with DOMAIN.id
+	 *		initialize 'environment' with 'Production'
+	 *	    initialize 'environment' with Production
+	 *	    initialize 'environment' with SOURCE.'application id'
+	 *	    initialize 'environment' with DOMAIN.id
 	 *
 	 *	    extract 'application id'
-	 *	    initialize environment with CE
+	 *	    initialize 'environment' with CE
 	 *	}
 	 * </pre>
 	 * @param field
@@ -573,7 +578,7 @@ class ETLProcessor implements RangeChecker {
 	 * <pre>
 	 *	iterate {
 	 *		domain Application
-	 *		init environment with 'Production'
+	 *		init 'environment' with 'Production'
 	 *	}
 	 * </pre>
 	 * @param field
@@ -590,14 +595,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain
 	 * @return
 	 */
-	def find (String domain) {
-        ETLDomain findDomain = ETLDomain.lookup(domain)
-        if (findDomain == null) {
-            throw ETLProcessorException.invalidDomain(findDomain)
-        }
-
-        debugConsole.info("find Domain: $findDomain")
-		currentFindElement = new ETLFindElement(this, findDomain, this.currentRowIndex)
+	def find (ETLDomain domain) {
+        debugConsole.info("find Domain: $domain")
+		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
 		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
 		return currentFindElement
 	}
@@ -606,34 +606,29 @@ class ETLProcessor implements RangeChecker {
 	 * Adds another find results in the current find element
 	 * @param domain
 	 */
-	ETLFindElement elseFind(String domain) {
-		ETLDomain findDomain = ETLDomain.lookup(domain)
-		if (findDomain == null) {
-			throw ETLProcessorException.invalidDomain(findDomain)
-		}
-
+	ETLFindElement elseFind(ETLDomain domain) {
 		if (!currentFindElement) {
 			throw ETLProcessorException.notCurrentFindElement()
 		}
 
-		return currentFindElement.elseFind(findDomain)
+		return currentFindElement.elseFind(domain)
 	}
 
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 *		whenNotFound asset create {
+	 *		whenNotFound 'asset' create {
 	 *			assetClass: Application
-	 *			assetName: primaryName
-	 *			assetType: primaryType
+	 *			assetName: primaryNameVar
+	 *			assetType: primaryTypeVar
 	 *			"SN Last Seen": NOW
 	 *		}
 	 * </pre>
-	 * @param dependentId
+	 * @param property
 	 * @return the current find Element
 	 */
-	FoundElement whenNotFound(final String dependentId) {
-		return new WhenNotFoundElement(dependentId, result)
+	FoundElement whenNotFound(final String property) {
+		return new WhenNotFoundElement(property, result)
 	}
 
 	/**
@@ -643,11 +638,11 @@ class ETLProcessor implements RangeChecker {
 	 *			"TN Last Seen": NOW
 	 *		}
 	 * </pre>
-	 * @param dependentId
+	 * @param property
 	 * @return the current find Element
 	 */
-	FoundElement whenFound(final String dependentId) {
-		return new WhenFoundElement(dependentId, result)
+	FoundElement whenFound(final String property) {
+		return new WhenFoundElement(property, result)
 	}
 
 	/**
@@ -688,8 +683,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param level level used to add a new message in debug console
 	 * @return current instance of ETLProcessor
 	 */
-	ETLProcessor log (String message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
-		debugConsole.append(level, message)
+	ETLProcessor log (Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
+		debugConsole.append(level, ETLValueHelper.valueOf(message))
 		return this
 	}
 

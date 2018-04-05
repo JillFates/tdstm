@@ -96,11 +96,7 @@ abstract class FoundElement {
 	 * @trows ETLProcessorException if assetClass parameter is not an ETLDomain
 	 * @see ETLDomain
 	 */
-	FoundElement assetClass(String assetClass){
-		ETLDomain domain = ETLDomain.lookup(assetClass)
-		if(!domain){
-			throw ETLProcessorException.invalidDomain(assetClass)
-		}
+	FoundElement assetClass(ETLDomain domain){
 		this.propertiesMap.assetClass = domain.name()
 		this
 	}

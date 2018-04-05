@@ -29,7 +29,7 @@ class Element implements RangeChecker {
      *     domain Application
      *     extract 'location' transform {
      *          lowercase() append('**')
-     *     } load description
+     *     } load 'description'
      * </pre>
      * @param closure
      * @return the element instance that received this command
@@ -45,12 +45,13 @@ class Element implements RangeChecker {
      * Transform command with a hack for this example:
      * <code>
      *     domain Application
-     *     extract 'location' transform with uppercase() lowercase() load description
+     *     extract 'location' transform with uppercase() lowercase() load 'description'
      * </code>
      * @param command
      * @return the element instance that received this command
      */
-    Element transform (String command) {
+    Element transform (ETLProcessor.ReservedWord reservedWord) {
+	    //TODO: validate invalid reserved words
 	    return this
     }
 
@@ -58,7 +59,7 @@ class Element implements RangeChecker {
      * Loads a field using fields spec based on domain validation
      * It's used in this ETL script command
      * <code>
-     *     extract 3 transform with lowercase() load description
+     *     extract 3 transform with lowercase() load 'description'
      * </code>
      * @param fieldName
      * @return the element instance that received this command
@@ -77,7 +78,7 @@ class Element implements RangeChecker {
 	 * Initialize an Element with a particular value
 	 * <code>
 	 *     domain Device
-	 *     extract name initialize custom1
+	 *     extract 'name' initialize 'custom1'
 	 * </code>
 	 * @param fieldName
 	 * @return the element instance that received this command
@@ -99,7 +100,7 @@ class Element implements RangeChecker {
 	 * Initialize an Element with a particular value
 	 * <code>
 	 *     domain Device
-	 *     extract name init custom1
+	 *     extract 'name' init 'custom1'
 	 * </code>
 	 * * @param init
 	 * @param fieldName
