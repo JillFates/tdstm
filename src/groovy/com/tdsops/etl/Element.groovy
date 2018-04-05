@@ -152,7 +152,7 @@ class Element implements RangeChecker {
      * Translate an element value using dictionary Map
      * <code>
      *      dictionary = [prod: 'Production', dev: 'Development']
-     *      load ... transformation with translate(dictionary)
+     *      load ... transformation with substitute(dictionary)
      * <code>
      *
      * @param dictionary
@@ -193,7 +193,7 @@ class Element implements RangeChecker {
     /**
      * Replace the first string content in the element value
      * <code>
-     *      load ... transformation with first(content)
+     *      load ... transformation with replaceFirst(content)
      * <code>
      * @param content
      * @return the element instance that received this command
@@ -206,7 +206,7 @@ class Element implements RangeChecker {
     /**
      * Replace all the string content in the element value
      * <code>
-     *      load ... transformation with all(content)
+     *      load ... transformation with replaceAll(content)
      * <code>
      * @param content
      * @return the element instance that received this command
@@ -219,7 +219,7 @@ class Element implements RangeChecker {
     /**
      * Replace the last string content in the element value
      * <code>
-     *      load ... transformation with last(content)
+     *      load ... transformation with replaceLast(content)
      * <code>
      * @param content
      * @return the element instance that received this command
