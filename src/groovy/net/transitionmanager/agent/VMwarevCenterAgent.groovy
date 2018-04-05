@@ -40,6 +40,18 @@ class VMwarevCenterAgent extends AbstractAgent {
 					encoded: 0
 			]
 
+	private static final LinkedHashMap CLUSTER_NAME_PARAM = [
+					paramName: 'CLUSTER',
+					desc: 'Cluster identifier. The parameter must be an identifier for the resource type: Cluster.',
+					type: 'String',
+					context: ContextType.USER_DEF,
+					fieldName: null,
+					value: 'Enter cluster identifier',
+					required: 1,
+					readonly: 0,
+					encoded: 0
+			]
+
 	private static final List<LinkedHashMap> HOST_VM_NAME_PARAMS = [HOSTNAME_PARAM, VM_NAME_PARAM]
 
 	VMwarevCenterAgent() {
@@ -62,12 +74,13 @@ class VMwarevCenterAgent extends AbstractAgent {
 						agentMethod: 'getClusterDetailInfo',
 						name: 'Get cluster',
 						description: 'Retrieves information about the cluster corresponding to cluster.',
-						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/cluster',
+						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/cluster/{CLUSTER}',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
 						producesData: 0,
 						params: [
-								HOSTNAME_PARAM
+								HOSTNAME_PARAM,
+								CLUSTER_NAME_PARAM
 						]
 				]),
 				getHostInfo: new DictionaryItem([
@@ -91,7 +104,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						method: 'invokeHttpRequest',
 						producesData: 0,
 						params: [
-
+								HOSTNAME_PARAM
 						]
 				]),
 				getVMsInfo: new DictionaryItem([
