@@ -596,7 +596,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['assetName', 'environment'] as Set
+				fieldNames == ['assetName', 'environment'] as Set
 				data.size() == 2
 				with(data[0]) {
 					rowNum == 1
@@ -649,7 +649,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['appVendor', 'environment'] as Set
+				fieldNames == ['appVendor', 'environment'] as Set
 				data.size() == 2
 				with(data[0]) {
 					rowNum == 1
@@ -704,7 +704,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['appVendor', 'environment', 'assetName'] as Set
+				fieldNames == ['appVendor', 'environment', 'assetName'] as Set
 				data.size() == 2
 				with(data[0]) {
 					rowNum == 1
@@ -775,7 +775,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['appVendor', 'environment', 'assetName'] as Set
+				fieldNames == ['appVendor', 'environment', 'assetName'] as Set
 				data.size() == 2
 				with(data[0]) {
 					rowNum == 1
@@ -1381,7 +1381,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 1
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['appVendor', 'environment'] as Set
+								fieldNames == ['appVendor', 'environment'] as Set
 								with(data[0]){
 									rowNum == 1
 									with(fields.appVendor) {
@@ -1521,7 +1521,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 1
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['appVendor', 'environment'] as Set
+								fieldNames == ['appVendor', 'environment'] as Set
 
 								with(data[0].fields.appVendor) {
 									value == 'Microsoft'
@@ -1619,7 +1619,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 2
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['id', 'appVendor'] as Set
+								fieldNames == ['id', 'appVendor'] as Set
 								data.size() == 1
 								with(data[0]){
 									rowNum == 1
@@ -1637,7 +1637,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 							with(etlProcessor.result.domains[1]) {
 								domain == ETLDomain.Device.name()
-								fields == ['id', 'assetName'] as Set
+								fieldNames == ['id', 'assetName'] as Set
 								data.size() == 1
 								with(data[0]){
 									rowNum == 1
@@ -1701,7 +1701,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 2
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['id', 'appVendor'] as Set
+								fieldNames == ['id', 'appVendor'] as Set
 								data.size() == 1
 								with(data[0]){
 									rowNum == 1
@@ -1719,7 +1719,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 							with(etlProcessor.result.domains[1]) {
 								domain == ETLDomain.Device.name()
-								fields == ['id', 'assetName'] as Set
+								fieldNames == ['id', 'assetName'] as Set
 								data.isEmpty()
 							}
 					}
@@ -1789,7 +1789,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 1
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['assetName'] as Set
+								fieldNames == ['assetName'] as Set
 								data.size() == 1
 							}
 					}
@@ -1829,7 +1829,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 1
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Application.name()
-								fields == ['assetName'] as Set
+								fieldNames == ['assetName'] as Set
 								data.size() == 1
 							}
 					}
@@ -1871,7 +1871,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							etlProcessor.result.domains.size() == 1
 							with(etlProcessor.result.domains[0]) {
 								domain == ETLDomain.Device.name()
-								fields == ['id', 'assetName'] as Set
+								fieldNames == ['id', 'assetName'] as Set
 								data.size() == 5
 
 								data*.rowNum == [1, 2, 4, 5, 6]
@@ -1925,7 +1925,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName'] as Set
+				fieldNames == ['assetName'] as Set
 				data.size() == 2
 				with(data[0]){
 					rowNum == 1
@@ -1987,7 +1987,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName'] as Set
+				fieldNames == ['assetName'] as Set
 				data.size() == 2
 				with(data[0]){
 					rowNum == 1
@@ -2050,7 +2050,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['environment', 'assetName'] as Set
+				fieldNames == ['environment', 'assetName'] as Set
 				data.size() == 2
 				with(data[0]){
 					rowNum == 1
@@ -2126,7 +2126,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
+				fieldNames == ['assetName', 'custom1', 'manufacturer', 'custom2'] as Set
 				data.size() == 2
 				with(data[0]){
 					rowNum == 1
@@ -2261,7 +2261,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
-				fields == ['assetName'] as Set
+				fieldNames == ['assetName'] as Set
 				data.size() == 2
 				with(data[0]){
 					rowNum == 1

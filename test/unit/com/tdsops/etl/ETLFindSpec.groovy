@@ -267,7 +267,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['id'] as Set
+				fieldNames == ['id'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
 
@@ -402,7 +402,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -546,7 +546,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'comment'] as Set
+				fieldNames == ['id', 'comment'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
 			}
@@ -851,7 +851,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Application.name()
-				fields == ['id', 'appVendor'] as Set
+				fieldNames == ['id', 'appVendor'] as Set
 				with(data[0]) {
 
 					errorCount == 2
@@ -1068,7 +1068,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Rack.name()
-				fields == ['id', 'location', 'room'] as Set
+				fieldNames == ['id', 'location', 'room'] as Set
 			}
 
 		cleanup:

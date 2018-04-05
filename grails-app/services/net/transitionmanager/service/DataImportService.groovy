@@ -103,7 +103,7 @@ class DataImportService implements ServiceMethods {
 
 			// The following are reset per domain
 			domainClass: null,
-			fields: [],
+			fieldNames: [],
 			rowsCreated: 0,
 			rowsSkipped: 0,
 			rowNumber: 0,
@@ -138,7 +138,7 @@ class DataImportService implements ServiceMethods {
 						rowsSkipped = 0
 						rowNumber = 0
 					}
-					importContext.fields = domainJson.fields
+					importContext.fieldNames = domainJson.fieldNames
 
 					// Create a Transfer Batch for the asset class
 					def batch = createBatch(importContext)
@@ -267,7 +267,7 @@ class DataImportService implements ServiceMethods {
 				// createdBy: importContext.etlInfo.createdBy,
 				autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
 				dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
-				fieldNameList: JsonUtil.toJson(importContext.fields),
+				fieldNameList: JsonUtil.toJson(importContext.fieldNames),
 				nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 				originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 				overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
@@ -367,7 +367,7 @@ class DataImportService implements ServiceMethods {
 		Boolean hadError = false
 
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
-		for (fieldName in importContext.fields) {
+		for (fieldName in importContext.fieldNames) {
 
 			// If the current field is the id, skip it (avoid inserting it into the database).
 			if (fieldName != 'id') {

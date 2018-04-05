@@ -57,7 +57,7 @@ class ETLProcessorResult {
 		if(!reference){
 			reference = [
 				domain: domain.name(),
-				fields: [] as Set,
+				fieldNames: [] as Set,
 				data: [initialRowDataMap()]
 			]
 
@@ -82,7 +82,7 @@ class ETLProcessorResult {
 		rowDataMap.rowNum = findElement.rowIndex
 
 		if(!rowDataMap.fields.containsKey(property)){
-			reference.fields.add(property)
+			reference.fieldNames.add(property)
 			rowDataMap.fields[property] = initialFieldDataMap(null, null, null)
 		}
 
@@ -158,7 +158,7 @@ class ETLProcessorResult {
 			updateFieldDataMap(currentData, element)
 
 		} else {
-			reference.fields.add(element.fieldSpec.name)
+			reference.fieldNames.add(element.fieldSpec.name)
 			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
 		}
 	}
