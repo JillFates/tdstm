@@ -78,11 +78,30 @@ import { DependecyService } from '../../service/dependecy.service';
 	}`]
 })
 export class AssetDependencyComponent extends UIExtraDialog {
+	dependencyA: any;
+	dependencyB: any;
 
 	constructor(
 		@Inject('ASSET_DEP_MODEL') private assetDependency: any,
 		private assetService: DependecyService) {
 		super('#assetDependency');
+
+		this.dependencyA = assetDependency.assetA && assetDependency.assetA.dependency || null;
+		this.dependencyB = assetDependency.assetB && assetDependency.assetB.dependency || null ;
+
+		// while dateCreated and lastUpdated are not coming from server inside of assetDependency.assetX.dependency
+		// we need to get them from assetDependency.assetX
+		this.dependencyA = this.getDependencyWithDates(this.dependencyA, assetDependency.assetA);
+		this.dependencyB = this.getDependencyWithDates(this.dependencyB, assetDependency.assetB);
+	}
+
+	private getDependencyWithDates(dependency: any, asset: any): any {
+		if (!asset || !dependency) {
+			return dependency;
+		}
+
+		const { dateCreated, lastUpdated }  = asset;
+		return Object.assign({}, dependency, { dateCreated, lastUpdated });
 	}
 
 	protected cancelCloseDialog(): void {
