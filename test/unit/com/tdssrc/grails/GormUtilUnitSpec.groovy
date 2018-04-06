@@ -6,6 +6,9 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tdsops.etl.ETLProcessor
 import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.PartyRelationship
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
@@ -240,5 +243,26 @@ class GormUtilUnitSpec extends Specification {
 	void '15. Test the domainShortName method'() {
 		expect: 'shortname of net.transitionmanager.domain.Person should be Person'
 			'Person' == GormUtil.domainShortName(net.transitionmanager.domain.Person)
+	}
+
+	void '16. take getAlternateKeyPropertyName method for a spin'() {
+		expect:
+			expectedName == GormUtil.getAlternateKeyPropertyName(clazz)
+		where:
+			clazz				| expectedName
+			Application			| 'assetName'
+			Manufacturer		| 'name'
+			Model				| 'modelName'
+			PartyRelationship	| null
+	}
+
+	void '17. Test getDomainClassOfProperty method'() {
+		expect:
+			expectedClazz == GormUtil.getDomainClassOfProperty(clazz, propertyName)
+		where:
+			clazz				| propertyName	| expectedClazz
+			Application			| 'id'			| Application
+			Application			| 'sme'			| Person
+			Application			| 'url'			| Application
 	}
 }

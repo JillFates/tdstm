@@ -3,7 +3,7 @@ package net.transitionmanager.domain
 import com.tdssrc.grails.TimeUtil
 
 class Manufacturer {
-	
+
 	def manufacturerService
 
 	String name
@@ -13,6 +13,8 @@ class Manufacturer {
 	String website
 	Date dateCreated
 	Date lastModified
+
+	static String alternateKey = 'name'
 
 	static hasMany = [models: Model, racks: Rack]
 

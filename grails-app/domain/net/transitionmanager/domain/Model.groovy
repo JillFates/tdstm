@@ -60,6 +60,8 @@ class Model {
 	Integer sourceTDS = 1
 	Integer sourceTDSVersion = 1
 
+	static String alternateKey = 'modelName'
+
 	static hasMany = [modelConnectors: ModelConnector, racks: Rack]
 
 	static belongsTo = [manufacturer: Manufacturer]

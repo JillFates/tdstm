@@ -20,6 +20,8 @@ class MoveBundle extends Party {
 	Room targetRoom
 	Boolean tasksCreated = false
 
+	static String alternateKey = 'name'
+
 	static hasMany = [assets: AssetEntity, moveBundleSteps: MoveBundleStep, sourceRacks: Rack, targetRacks: Rack]
 
 	static belongsTo = [project: Project]
