@@ -3,6 +3,7 @@ package com.tdsops.etl
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import getl.data.Field
+import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
@@ -10,7 +11,22 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
-import org.codehaus.groovy.syntax.SyntaxException
+
+import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
+import static org.codehaus.groovy.syntax.Types.DIVIDE
+import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.MINUS
+import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
+import static org.codehaus.groovy.syntax.Types.MOD
+import static org.codehaus.groovy.syntax.Types.MULTIPLY
+import static org.codehaus.groovy.syntax.Types.PLUS
+import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
+import static org.codehaus.groovy.syntax.Types.POWER
 
 /**
  * Class that receives all the ETL initial commands.
@@ -954,10 +970,31 @@ class ETLProcessor implements RangeChecker {
 	private CompilerConfiguration defaultCompilerConfiguration(){
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-		secureASTCustomizer.closuresAllowed = true             // allow closure creation for the ETL iterate command
-		secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-		secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
-		secureASTCustomizer.starImportsWhitelist = []
+		secureASTCustomizer.with {
+			// allow closure creation for the ETL iterate command
+			closuresAllowed = true
+			// disallow method definitions
+			methodDefinitionAllowed = false
+			// Empty withe list means forbid imports
+			importsWhitelist = []
+			starImportsWhitelist = []
+			// Language tokens allowed
+			tokensWhitelist = [
+				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS,
+				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL,
+				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
+			].asImmutable()
+			// Types allowed to be used (Including primitive types)
+			constantTypesClassesWhiteList = [
+				Object, Integer, Float, Long, Double, BigDecimal, String,
+				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
+			].asImmutable()
+			// Classes who are allwed to be receivers of method calls
+			receiversClassesWhiteList = [
+			    Object, // TODO: This is too much generic class.
+				Integer, Float, Double, Long, BigDecimal, String
+			].asImmutable()
+		}
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
@@ -974,6 +1011,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param etlProcessor
 	 * @return
 	 */
+	@TimedInterrupt(10l)
 	Object evaluate(String script){
 		return evaluate(script, defaultCompilerConfiguration())
 	}
@@ -981,12 +1019,16 @@ class ETLProcessor implements RangeChecker {
 	/**
 	 * Using an instance of GroovyShell, it evaluates an ETL script content
 	 * using this instance of the ETLProcessor.
+	 * It throws an InterruptedException when checks indicate code ran longer than desired
 	 * @see GroovyShell#evaluate(java.lang.String)
 	 * @param script
 	 * @param etlProcessor
 	 * @params configuration
 	 * @return the result of evauate ETL script param
+	 * @see TimedInterrupt
+
 	 */
+	@TimedInterrupt(10l)
 	Object evaluate(String script, CompilerConfiguration configuration){
 		return new GroovyShell(this.class.classLoader, this.binding, configuration)
 			.evaluate(script,ETLProcessor.class.name)
@@ -1001,6 +1043,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
+	@TimedInterrupt(10l)
 	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration){
 
 		List<Map<String, ?>> errors = []
@@ -1056,6 +1099,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
+	@TimedInterrupt(10l)
 	Map<String, ?>  checkSyntax(String script){
 		return checkSyntax(script, defaultCompilerConfiguration())
 	}

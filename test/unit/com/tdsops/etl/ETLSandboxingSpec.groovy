@@ -20,6 +20,8 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.Ignore
 
+import java.util.concurrent.TimeoutException
+
 @TestFor(FileSystemService)
 @Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
 class ETLSandboxingSpec  extends ETLBaseSpec {
@@ -414,6 +416,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				domain Device
 				read labels
 				iterate {
+				    10/2 == 5
 					debug 'device id'
 				}
 				""".stripIndent())
@@ -424,6 +427,36 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			console.buffer.toString().contains('INFO - Selected Domain: Device')
 			console.buffer.toString().contains('DEBUG - [position:[0, 1], value:152254]')
 			console.buffer.toString().contains('DEBUG - [position:[0, 2], value:152255]')
+	}
+
+	void 'test can throw an exception if a script takes more than 10 seconds'() {
+
+		given:
+			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				simpleDataSet,
+				console,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				domain Device
+				read labels
+				iterate {
+					set myCustomVar with 'Production'
+					while(myCustomVar == 'Production') {
+					    load 'environment' with myCustomVar
+					}
+				}
+				""".stripIndent())
+
+		then: 'An TimeoutException exception is thrown'
+			TimeoutException e = thrown TimeoutException
+			e.message.startsWith('Execution timed out after 10 units. Start time')
 	}
 
 	final static String deviceDataSetContent = """
