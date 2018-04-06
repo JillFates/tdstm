@@ -832,15 +832,17 @@ class DataImportService implements ServiceMethods {
 
 		while (true) {
 			// Try finding the Dependency by it's id if specified in fieldsInfo
-			def findDomainByIdResult = lookupDomainRecordByFieldMetaData('id', fieldsInfo, context)
-			if (NumberUtil.isaNumber(findDomainByIdResult)) {
-				// the fields.Info.id.value had a number but the id was not found which is an error
-				log.debug "processDependencyRecord() lookupDomainRecordByFieldMetaData() failed ($findDomainByIdResult)"
-				break
-			}
+			if (fieldsInfo.containsKey('id')) {
+				def findDomainByIdResult = lookupDomainRecordByFieldMetaData('id', fieldsInfo, context)
+				if (NumberUtil.isaNumber(findDomainByIdResult)) {
+					// the fields.Info.id.value had a number but the id was not found which is an error
+					log.debug "processDependencyRecord() lookupDomainRecordByFieldMetaData() failed ($findDomainByIdResult)"
+					break
+				}
 
-			// Yes! Found the elusive sucker!
-			dependency = findDomainByIdResult
+				// Yes! Found the elusive sucker!
+				dependency = findDomainByIdResult
+			}
 
 			// Try looking up both Asset References using the id and/or query elements in fieldsInfo
 			primary = lookupDomainRecordByFieldMetaData('asset', fieldsInfo, context)
@@ -1097,7 +1099,7 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// Deal with entity being set to an error message
-		if (entity instanceof String) {
+		if (entity instanceof CharSequence) {
 			if (recordNewError) {
 				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, entity)
 			}
@@ -1347,7 +1349,7 @@ class DataImportService implements ServiceMethods {
 			entity = domainClassToCreate.newInstance()
 
 			// load with the values from the create key/value pairs
-			List fieldNames = fixOrderInWhichToProcessFields(item.keySet())
+			List fieldNames = fixOrderInWhichToProcessFields(createInfo.keySet())
 			for (fieldName in fieldNames) {
 				errorMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
 				// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered (Augusto)
