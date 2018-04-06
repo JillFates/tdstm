@@ -4,6 +4,13 @@ import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import getl.data.Field
 import net.transitionmanager.domain.Project
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.ErrorCollector
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer
+import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.syntax.SyntaxException
 
 /**
  * Class that receives all the ETL initial commands.
@@ -852,6 +859,124 @@ class ETLProcessor implements RangeChecker {
 	def methodMissing (String methodName, args) {
 		debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
+	}
+
+	/**
+	 * It returns the default compiler configuration used by an instance of ETLProceesor.
+	 * It prepares an instance of CompilerConfiguration with an instance of ImportCustomizer
+	 * and an instance of SecureASTCustomizer.
+	 * @see CompilerConfiguration
+	 * @see SecureASTCustomizer
+	 * @see ImportCustomizer
+	 * @return
+	 */
+	private CompilerConfiguration defaultCompilerConfiguration(){
+
+		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+		secureASTCustomizer.closuresAllowed = true             // allow closure creation for the ETL iterate command
+		secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+		secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+		secureASTCustomizer.starImportsWhitelist = []
+
+		ImportCustomizer customizer = new ImportCustomizer()
+
+		CompilerConfiguration configuration = new CompilerConfiguration()
+		configuration.addCompilationCustomizers customizer, secureASTCustomizer
+		return  configuration
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it evaluates an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script
+	 * @param etlProcessor
+	 * @return
+	 */
+	Object evaluate(String script){
+		return evaluate(script, defaultCompilerConfiguration())
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it evaluates an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script
+	 * @param etlProcessor
+	 * @params configuration
+	 * @return the result of evauate ETL script param
+	 */
+	Object evaluate(String script, CompilerConfiguration configuration){
+		return new GroovyShell(this.class.classLoader, this.binding, configuration)
+			.evaluate(script,ETLProcessor.class.name)
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script
+	 * @param etlProcessor
+	 * @param configuration an instance of CompilerConfiguration
+	 * @return a Map with validSyntax field boolean value and a list of errors
+	 */
+	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration){
+
+		List<Map<String, ?>> errors = []
+
+		try {
+			new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				configuration
+			).parse(script?.trim(), ETLProcessor.class.name)
+
+		} catch (MultipleCompilationErrorsException cfe) {
+			ErrorCollector errorCollector = cfe.getErrorCollector()
+			errors = errorCollector.getErrors()
+		}
+
+		List errorsMap = errors.collect { error ->
+			if(error instanceof SyntaxErrorMessage){
+				[
+					startLine  : error.cause?.startLine,
+					endLine    : error.cause?.endLine,
+					startColumn: error.cause?.startColumn,
+					endColumn  : error.cause?.endColumn,
+					fatal      : error.cause?.fatal,
+					message    : error.cause?.message
+				]
+			} else {
+				[
+					startLine  : null,
+					endLine    : null,
+					startColumn: null,
+					endColumn  : null,
+					fatal      : true,
+					message    : error.cause?.message
+				]
+
+			}
+		}
+
+		return [
+			validSyntax: errors.isEmpty(),
+			errors     : errorsMap
+		]
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
+	 * using this instance of the ETLProcessor and its defaultCompilerConfiguration
+	 * @see ETLProcessor#defaultCompilerConfiguration()
+	 * @see GroovyShell#parse(java.lang.String)
+	 * @param script
+	 * @param etlProcessor
+	 * @param configuration an instance of CompilerConfiguration
+	 * @return a Map with validSyntax field boolean value and a list of errors
+	 */
+	Map<String, ?>  checkSyntax(String script){
+		return checkSyntax(script, defaultCompilerConfiguration())
 	}
 
 	/**
