@@ -177,7 +177,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			thrown MultipleCompilationErrorsException
 	}
 
-	void 'test can check syntax of an ETL script disallowing closure creation and using the default ETLProcessor compiler configuration'() {
+	void 'test can check syntax of an ETL script disallowing closure creation and using a custom compiler configuration'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -186,6 +186,18 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
+		and:
+			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
+			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+			secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+			secureASTCustomizer.starImportsWhitelist = []
+
+			ImportCustomizer customizer = new ImportCustomizer()
+
+			CompilerConfiguration configuration = new CompilerConfiguration()
+			configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor
 				.checkSyntax("""
@@ -193,7 +205,8 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 					read labels
 					def greeting = { String name -> "Hello, \$name!" }
 					assert greeting('Diego') == 'Hello, Diego!'
-				""".stripIndent())
+				""".stripIndent(),
+				configuration)
 
 		then: 'Result has validSyntax equals false and a list of errors'
 			with(result) {
@@ -210,32 +223,12 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can evaluate an ETL script disallowing closure creation and using the default ETLProcessor compiler configuration'() {
+	void 'test can evaluate an ETL script disallowing closure creation and using a custom compiler configuration'() {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				simpleDataSet,
 				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			etlProcessor
-				.evaluate("""
-					domain Device
-					read labels
-					def greeting = { String name -> "Hello, \$name!" }
-					assert greeting('Diego') == 'Hello, Diego!'
-				""".stripIndent())
-
-		then: 'An MissingMethodException exception is thrown'
-			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
-			e.errorCollector.errors[0].cause*.message == ['Closures are not allowed']
-	}
-
-	void 'test can disallow closure creation using a custom secure syntax with AST customizer'() {
-
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		and:
@@ -262,10 +255,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 
 		then: 'An MissingMethodException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
-			e.errorCollector.errors[0].cause*.message == ["Closures are not allowed"]
+			e.errorCollector.errors[0].cause*.message == ['Closures are not allowed']
 	}
 
-	void 'test can disallow method creation using a secure syntax with AST customizer'() {
+	void 'test can disallow method creation using the default ETLProcessor AST compiler configuration'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
@@ -286,7 +279,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			e.errorCollector.errors*.cause*.message == ["Method definitions are not allowed"]
 	}
 
-	void 'test can disallow unnecessary imports using a secure syntax with AST customizer'() {
+	void 'test can disallow unnecessary imports using using the default ETLProcessor AST compiler configuration'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -330,7 +323,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			e.errorCollector.errors*.cause*.message == ["Importing [java.lang.Math.*] is not allowed"]
 	}
 
-	void 'test can allow stars imports using a secure syntax with AST customizer'() {
+	void 'test can allow stars imports using custom secure using a custom compiler configuration'() {
 
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -339,11 +332,23 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
+		and:
+			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
+			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
+			secureASTCustomizer.importsWhitelist = []  // Empty withe list means forbid imports
+
+			ImportCustomizer customizer = new ImportCustomizer()
+			customizer.addStaticStars(Math.name)
+			CompilerConfiguration configuration = new CompilerConfiguration()
+			configuration.addCompilationCustomizers customizer, secureASTCustomizer
+
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
 				max 10, 100
-			""".stripIndent())
+			""".stripIndent(),
+				configuration)
 
 		then: 'An MultipleCompilationErrorsException exception is not thrown'
 			notThrown MultipleCompilationErrorsException
@@ -406,50 +411,23 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				console on
-				read labels
 				domain Device
+				read labels
 				iterate {
 					debug 'device id'
 				}
 				""".stripIndent())
 
 		then: 'A console content could be recovered after processing an ETL Scrtipt'
-			console.buffer.toString() == new StringBuffer("INFO - Console status changed: on")
-				.append(System.lineSeparator())
-				.append("INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name]")
-				.append(System.lineSeparator())
-				.append("INFO - Selected Domain: Device")
-				.append(System.lineSeparator())
-				.append("DEBUG - [position:[0, 1], value:152254]")
-				.append(System.lineSeparator())
-				.append("DEBUG - [position:[0, 2], value:152255]")
-				.append(System.lineSeparator())
-				.append("DEBUG - [position:[0, 3], value:152256]")
-				.append(System.lineSeparator())
-				.toString()
-	}
-
-	void 'test can throw an ETLProcessorException for an invalid console status'() {
-
-		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				console open
-				domain Device
-			""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Unknown console command option: open"
+			console.buffer.toString().contains('INFO - Console status changed: on')
+			console.buffer.toString().contains('INFO - Reading labels [0:device id, 1:model name, 2:manufacturer name, 3:location]')
+			console.buffer.toString().contains('INFO - Selected Domain: Device')
+			console.buffer.toString().contains('DEBUG - [position:[0, 1], value:152254]')
+			console.buffer.toString().contains('DEBUG - [position:[0, 2], value:152255]')
 	}
 
 	final static String deviceDataSetContent = """
-		device id,model name,manufacturer name
+		device id,model name,manufacturer name,location
 		152254,Microsoft,(xlsx updated),ACME Data Center
 		152255,Mozilla,NGM,ACME Data Center
 	""".stripIndent()

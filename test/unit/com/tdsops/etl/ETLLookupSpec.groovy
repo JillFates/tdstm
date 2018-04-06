@@ -428,7 +428,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test when lookup does not find results that the current result is new.'() {
+	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)

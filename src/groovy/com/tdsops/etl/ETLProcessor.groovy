@@ -862,6 +862,87 @@ class ETLProcessor implements RangeChecker {
 	}
 
 	/**
+	 * Converts Field#name instance to the ETL label column name.
+	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
+	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
+	 * @param field an instance of getl.data.Field
+	 * @return the label column name
+	 * @see getl.data.Field#name
+	 */
+	private String fieldNameToLabel(Field field) {
+		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
+			return field.name.trim().toLowerCase()
+		} else {
+			return field.name.trim()
+		}
+	}
+
+	/**
+	 * Converts ETL label value to a correct Field#name to be used in th ETL xtract command.
+	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
+	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
+	 * @param label a column name
+	 * @return the field name used to check dataset fields
+	 * @see getl.data.Field#name
+	 */
+	private String labelToFieldName(String label) {
+		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
+			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
+			return label.toLowerCase()
+		} else {
+			return label
+		}
+	}
+
+	ETLDomain getSelectedDomain () {
+		return selectedDomain
+	}
+
+	Column column (String columnName) {
+		return columnsMap[columnName]
+	}
+
+	Column column (Integer columnName) {
+		return columns[columnName]
+	}
+
+	Row getCurrentRow () {
+		return currentRow
+	}
+
+	Row getRow (Integer index) {
+		return rows[index]
+	}
+
+	Element getElement (Integer rowIndex, Integer columnIndex) {
+		return rows[rowIndex].getElement(columnIndex)
+	}
+
+
+	List<String> getAvailableMethods () {
+		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
+		 'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
+		 'uppercase()', 'lowercase()', 'first(content)', 'last(content)', 'all(content)',
+		 'left(amount)', 'right(amount)', 'replace(regex, replacement)']
+	}
+
+	List<String> getAssetFields () {
+		['id', 'assetName', 'moveBundle']
+	}
+
+	/**
+	 * Checks if there is a domain entity being specified within the script
+	 * @return
+	 */
+	boolean hasSelectedDomain() {
+		return selectedDomain != null
+	}
+
+	// ---------------------------------------------
+	// ETL DSL evaluation/check syntax methods
+	// ---------------------------------------------
+	/**
 	 * It returns the default compiler configuration used by an instance of ETLProceesor.
 	 * It prepares an instance of CompilerConfiguration with an instance of ImportCustomizer
 	 * and an instance of SecureASTCustomizer.
@@ -977,84 +1058,6 @@ class ETLProcessor implements RangeChecker {
 	 */
 	Map<String, ?>  checkSyntax(String script){
 		return checkSyntax(script, defaultCompilerConfiguration())
-	}
-
-	/**
-	 * Converts Field#name instance to the ETL label column name.
-	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
-	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
-	 * @param field an instance of getl.data.Field
-	 * @return the label column name
-	 * @see getl.data.Field#name
-	 */
-	private String fieldNameToLabel(Field field) {
-		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
-			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
-			return field.name.trim().toLowerCase()
-		} else {
-			return field.name.trim()
-		}
-	}
-
-	/**
-	 * Converts ETL label value to a correct Field#name to be used in th ETL xtract command.
-	 * <b>CSVDriver class</b> is converting field names to lower case, so we need to
-	 * supply that issue for the all the labels read until to fix this in ticket TM-9268
-	 * @param label a column name
-	 * @return the field name used to check dataset fields
-	 * @see getl.data.Field#name
-	 */
-	private String labelToFieldName(String label) {
-		if(FilenameUtil.isCsvFile(dataSetFacade.fileName())){
-			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
-			return label.toLowerCase()
-		} else {
-			return label
-		}
-	}
-
-	ETLDomain getSelectedDomain () {
-		return selectedDomain
-	}
-
-	Column column (String columnName) {
-		return columnsMap[columnName]
-	}
-
-	Column column (Integer columnName) {
-		return columns[columnName]
-	}
-
-	Row getCurrentRow () {
-		return currentRow
-	}
-
-	Row getRow (Integer index) {
-		return rows[index]
-	}
-
-	Element getElement (Integer rowIndex, Integer columnIndex) {
-		return rows[rowIndex].getElement(columnIndex)
-	}
-
-
-	List<String> getAvailableMethods () {
-		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',
-		 'with', 'on', 'labels', 'transform with', 'translate', 'debug', 'translate',
-		 'uppercase()', 'lowercase()', 'first(content)', 'last(content)', 'all(content)',
-		 'left(amount)', 'right(amount)', 'replace(regex, replacement)']
-	}
-
-	List<String> getAssetFields () {
-		['id', 'assetName', 'moveBundle']
-	}
-
-	/**
-	 * Checks if there is a domain entity being specified within the script
-	 * @return
-	 */
-	boolean hasSelectedDomain() {
-		return selectedDomain != null
 	}
 
 }
