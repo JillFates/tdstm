@@ -96,6 +96,9 @@ class ETLProcessor implements RangeChecker {
 	ETLDomain selectedDomain
 	ETLFindElement currentFindElement
 
+	// List of command that needs to be completed
+	private Stack<ETLStackableCommand> commandStack = []
+
 	/**
 	 * A set of Global transformations that will be apply over each iteration
 	 */
@@ -289,11 +292,40 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Iterates and applies closure to every row in the dataSource
+	 * @todo After discussing with @dcorrea we agreed that he can add a Pre/Post Conditions to the User script (TM-9746) that will run the validations instead of figuring out where do we need to run it.
 	 * @param closure
 	 * @return
 	 */
 	ETLProcessor iterate (Closure closure) {
 		doIterate(this.dataSetFacade.rows(), closure)
+		validateStack()
+	}
+
+	/**
+	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
+	 * @param expectedObjectOnStack
+	 */
+	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
+
+		boolean stackViolation = false
+		if(expectedObjectOnStack == null && commandStack.size() > 0){
+			stackViolation = true
+		} else if(expectedObjectOnStack &&
+							  (commandStack.size() == 0 || commandStack.peek() != expectedObjectOnStack) ) {
+			stackViolation = true
+		}
+		if(stackViolation){
+			ETLStackableCommand stackableCommand = commandStack.pop()
+			throw new ETLProcessorException(stackableCommand.stackableErrorMessage())
+		}
+	}
+
+	boolean pushIntoStack(command) {
+		commandStack.push(command)
+	}
+
+	ETLStackableCommand popFromStack(){
+		commandStack.pop()
 	}
 
 	/**
@@ -596,9 +628,11 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def find (ETLDomain domain) {
-        debugConsole.info("find Domain: $domain")
+		validateStack()
+		debugConsole.info("find Domain: $domain")
 		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
 		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
+		pushIntoStack(currentFindElement)
 		return currentFindElement
 	}
 
@@ -607,10 +641,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain
 	 */
 	ETLFindElement elseFind(ETLDomain domain) {
+		validateStack()
 		if (!currentFindElement) {
 			throw ETLProcessorException.notCurrentFindElement()
 		}
 
+		pushIntoStack(currentFindElement)
 		return currentFindElement.elseFind(domain)
 	}
 
@@ -811,7 +847,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param findElement
 	 */
 	void addFindElement(ETLFindElement findElement) {
+		validateStack(findElement)
 		result.addFindElement(findElement)
+		popFromStack()
 	}
 
 	/**
