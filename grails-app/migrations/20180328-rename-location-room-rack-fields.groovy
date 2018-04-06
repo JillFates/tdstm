@@ -49,8 +49,8 @@ databaseChangeLog = {
 
 	changeSet(author: 'arecordon', id: 'TM-9770-2') {
 		comment('Default the version column to zero')
-		sql('ALTER TABLE dataview MODIFY COLUMN version INT DEFAULT 0')
 		sql('UPDATE dataview SET version = 0 WHERE version IS NULL')
+		sql('ALTER TABLE dataview MODIFY COLUMN version INT NOT NULL DEFAULT 0')
 	}
 
 	changeSet(author: 'arecordon', id: 'TM-9770-3') {
