@@ -65,7 +65,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/cluster',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
-						producesData: 0,
+						producesData: 1,
 						params: [
 								HOSTNAME_PARAM
 						]
@@ -90,7 +90,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/host',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
-						producesData: 0,
+						producesData: 1,
 						params: [
 								HOSTNAME_PARAM
 						]
@@ -102,7 +102,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/network',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
-						producesData: 0,
+						producesData: 1,
 						params: [
 								HOSTNAME_PARAM
 						]
@@ -114,7 +114,7 @@ class VMwarevCenterAgent extends AbstractAgent {
 						endpointUrl: 'https://{HOSTNAME}/rest/vcenter/vm',
 						docUrl: DOCUMENTATION_URL,
 						method: 'invokeHttpRequest',
-						producesData: 0,
+						producesData: 1,
 						params: [
 								HOSTNAME_PARAM
 						]
