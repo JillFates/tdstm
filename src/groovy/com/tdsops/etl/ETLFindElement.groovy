@@ -105,7 +105,6 @@ class ETLFindElement implements ETLStackableCommand{
 	 * @return
 	 */
 	ETLFindElement with(Object... values) {
-
 		checkProject()
 		currentFind.values = checkValues(values)
 

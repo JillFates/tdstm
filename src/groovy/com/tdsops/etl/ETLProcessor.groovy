@@ -154,12 +154,16 @@ class ETLProcessor implements RangeChecker {
 		this.result = new ETLProcessorResult(this)
 	}
 
+	// ------------------------------------
+	// ETL DSL methods
+	// ------------------------------------
 	/**
 	 * Selects a domain or throws an ETLProcessorException in case of an invalid domain
 	 * @param domain a domain String value
 	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor domain (ETLDomain domain) {
+		validateStack()
 		selectedDomain = domain
 		result.releaseRowFoundInLookup()
 		result.addCurrentSelectedDomain(selectedDomain)
@@ -173,7 +177,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor read (ReservedWord reservedWord) {
-
+		validateStack()
 		if (reservedWord == ReservedWord.labels) {
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: fieldNameToLabel(field), index: index)
@@ -200,6 +204,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return a Map with the next steps in this command.
 	 */
 	def from (int from) {
+		validateStack()
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
@@ -223,7 +228,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def from (int[] numbers) {
-
+		validateStack()
 		[iterate: { Closure closure ->
 			List rowNumbers = numbers as List
 			List rows = this.dataSetFacade.rows()
@@ -247,7 +252,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor ignore (ReservedWord reservedWord) {
-
+		validateStack()
 		if(reservedWord == ReservedWord.row){
 			if (!hasSelectedDomain()) {
 				throw ETLProcessorException.domainMustBeSpecified()
@@ -297,35 +302,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor iterate (Closure closure) {
-		doIterate(this.dataSetFacade.rows(), closure)
 		validateStack()
-	}
-
-	/**
-	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
-	 * @param expectedObjectOnStack
-	 */
-	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
-
-		boolean stackViolation = false
-		if(expectedObjectOnStack == null && commandStack.size() > 0){
-			stackViolation = true
-		} else if(expectedObjectOnStack &&
-							  (commandStack.size() == 0 || commandStack.peek() != expectedObjectOnStack) ) {
-			stackViolation = true
-		}
-		if(stackViolation){
-			ETLStackableCommand stackableCommand = commandStack.pop()
-			throw new ETLProcessorException(stackableCommand.stackableErrorMessage())
-		}
-	}
-
-	boolean pushIntoStack(command) {
-		commandStack.push(command)
-	}
-
-	ETLStackableCommand popFromStack(){
-		commandStack.pop()
+		doIterate(this.dataSetFacade.rows(), closure)
 	}
 
 	/**
@@ -334,7 +312,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor console (ReservedWord reservedWord) {
-
+		validateStack()
 		DebugConsole.ConsoleStatus consoleStatus = DebugConsole.ConsoleStatus.values().find { it.name() == reservedWord.name() }
 
 		if (consoleStatus == null) {
@@ -450,7 +428,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (Integer index) {
-
+		validateStack()
 		index--
 		rangeCheck(index, currentRow.size())
 
@@ -470,6 +448,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (String columnName) {
+		validateStack()
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
 		}
@@ -493,6 +472,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def load(final String fieldName) {
+		validateStack()
 		[
 			with: { value ->
 
@@ -522,6 +502,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def set(final String variableName) {
+		validateStack()
 		[
 			with: { value ->
 				String localVariable = ETLValueHelper.valueOf(value)
@@ -551,7 +532,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldNames
 	 */
 	def lookup(final String fieldName){
-
+		validateStack()
 		lookUpFieldSpecs(selectedDomain, fieldName)
 		[
 		    with: { value ->
@@ -592,6 +573,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def initialize(String field){
+		validateStack()
 		[
 			with: { defaultValue ->
 
@@ -618,6 +600,7 @@ class ETLProcessor implements RangeChecker {
 	 * @see ETLProcessor#initialize(java.lang.String)
 	 */
 	def init(final String field) {
+		validateStack()
 		initialize(field)
 	}
 
@@ -628,8 +611,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def find (ETLDomain domain) {
-		validateStack()
 		debugConsole.info("find Domain: $domain")
+		validateStack()
 		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
 		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
 		pushIntoStack(currentFindElement)
@@ -664,6 +647,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current find Element
 	 */
 	FoundElement whenNotFound(final String property) {
+		validateStack()
 		return new WhenNotFoundElement(property, result)
 	}
 
@@ -678,6 +662,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current find Element
 	 */
 	FoundElement whenFound(final String property) {
+		validateStack()
 		return new WhenFoundElement(property, result)
 	}
 
@@ -722,6 +707,37 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor log (Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
 		debugConsole.append(level, ETLValueHelper.valueOf(message))
 		return this
+	}
+
+	// ------------------------------------
+	// Support methods
+	// ------------------------------------
+
+	/**
+	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
+	 * @param expectedObjectOnStack
+	 */
+	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
+
+		boolean stackViolation = false
+		if(expectedObjectOnStack == null && commandStack.size() > 0){
+			stackViolation = true
+		} else if(expectedObjectOnStack &&
+				  (commandStack.size() == 0 || commandStack.peek() != expectedObjectOnStack) ) {
+			stackViolation = true
+		}
+		if(stackViolation){
+			ETLStackableCommand stackableCommand = commandStack.pop()
+			throw new ETLProcessorException(stackableCommand.stackableErrorMessage())
+		}
+	}
+
+	boolean pushIntoStack(command) {
+		commandStack.push(command)
+	}
+
+	ETLStackableCommand popFromStack(){
+		commandStack.pop()
 	}
 
 	/**
