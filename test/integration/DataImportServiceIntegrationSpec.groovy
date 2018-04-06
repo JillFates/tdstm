@@ -888,4 +888,17 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			dataImportService.PROPERTY_NAME_CANNOT_BE_SET_MSG == error
 
 	}
+
+	@Ignore
+	// This is not working and the code was disabled because the toSet is fucking with the order of the original list
+	void '15. Test fixOrderInWhichToProcessFields method'() {
+		expect:
+			expectedList == dataImportService.fixOrderInWhichToProcessFields(set)
+		where:
+			set												| expectedList
+			['a','b','c'].toSet()							| ['a','b','c']
+			['a','manufacturer','b','model','c'].toSet()	| ['a','manufacturer','b','model','c']
+			['a','model','b','manufacturer','c'].toSet()	| ['a','manufacturer','b','model','c']
+			['model','b','manufacturer','c'].toSet()		| ['manufacturer','b','model','c']
+	}
 }

@@ -62,6 +62,7 @@ class DataImportService implements ServiceMethods {
 	static final String ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG = 'Multiple records found with current value'
 
 	static final String propertyName = ''
+	// TODO : JPM 4/2018 : Augusto - Get these to work first
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field ${-> propertyName} can not be set by 'whenNotFound create' statement"
 	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field ${-> propertyName} was not found in ETL dataset"
 	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field ${-> propertyName} in domain"
@@ -477,8 +478,7 @@ class DataImportService implements ServiceMethods {
 			importBatch: batch,
 			operation: OpValue,
 			domainPrimaryId: domainId,
-			// TODO : JPM 2/2018 : Replace sourceRowId with value from rowData.rowNum when TM-9510 is implemented
-			sourceRowId: rowNum,
+			sourceRowId: rowData.rowNum,
 			errorCount: rowData.errors.size(),
 			errorList: JsonUtil.toJson( (rowData.errors ?: []) ),
 			warn: (rowData.warn ? 1 : 0),
@@ -662,7 +662,7 @@ class DataImportService implements ServiceMethods {
 
 		String error = validateBatchForProcessing(batch)
 		if (error) {
-			// TODO : JPM 3/2018 : validateBatchForProcessing is not being handled for errors
+			// TODO : JPM 3/2018 : validateBatchForProcessing is not handled when there are errors
 		}
 
 		Exception ex = null
@@ -895,7 +895,8 @@ class DataImportService implements ServiceMethods {
 				// log.debug "processDependencyRecord() Saving the Dependency"
 				if (dependency.save(failOnError:false)) {
 					// If we still have a dependency record then the process must have finished
-					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum
+					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
+					//    Note that I was running to some strange issues of casting that prevented from doing this originally
 					// record.status = ImportBatchRecordStatusEnum.COMPLETED
 					record.status = ImportBatchStatusEnum.COMPLETED
 				} else {
@@ -1024,20 +1025,22 @@ class DataImportService implements ServiceMethods {
 	 *
 	 */
 	private Object lookupDomainRecordByFieldMetaData(String propertyName, JSONObject fieldsInfo, Map context) {
-		// The entity property will be populated with either the entity or error message appropriately
+		// This will be populated with the entity object or error message appropriately
 		Object entity
 
-		// Will be used to check cache for previously searched items
+		// This will be used to check/set cache for previously searched items
 		String md5
 
 		log.debug 'lookupDomainRecordByFieldMetaData() called with domain {} on row {}, propertyName {}, value={}',
 			context.domainShortName, context.record.sourceRowId, propertyName, fieldsInfo[propertyName]?.value
 
+		boolean recordNewError=true
+		boolean foundInCache=false
+
 		boolean working = true
 		while (working) {
 			if ( ! fieldsInfo[propertyName] ) {
 				// Shouldn't happen but just in case...
-				// TODO : JPM 3/2018 : Figure out were to stuff this error of if we ever need to deal with this
 				entity = "Reference property $propertyName is missing from ETL output"
 				break
 			}
@@ -1046,9 +1049,13 @@ class DataImportService implements ServiceMethods {
 			md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
 			log.debug 'lookupDomainRecordByFieldMetaData() has cache key {}', md5
 			entity = context.cache[md5]
-			if (entity && ! (entity instanceof String)) {
+			if (entity) {
 				log.debug 'lookupDomainRecordByFieldMetaData() found in cache ID {}', entity
-				return entity
+				foundInCache=true
+				if (entity instanceof String) {
+					recordNewError = false
+				}
+				break
 			}
 
 			// Attempt to find the domain by the ID in find.results or the value if numeric
@@ -1062,7 +1069,7 @@ class DataImportService implements ServiceMethods {
 			int qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
 				entity = entities[0]
-				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} using ETL find/elseFind criteria', entity.id
+				log.debug 'lookupDomainRecordByFieldMetaData() FOUND ID {} with ETL find/elseFind criteria', entity.id
 				break
 			} else if (qtyFound > 1 ) {
 				log.debug "lookupDomainRecordByFieldMetaData() FOUND MULTIPLE - ETL find/elseFind criteria returned {} entities", qtyFound
@@ -1075,8 +1082,8 @@ class DataImportService implements ServiceMethods {
 			entities = findDomainByAlternateProperty(propertyName, fieldsInfo, context)
 			qtyFound = entities?.size() ?: 0
 			if (qtyFound == 1) {
-				entity = entities[0]
 				log.debug 'lookupDomainRecordByFieldMetaData() found by alternate property with value: {}', fieldsInfo[propertyName].value
+				entity = entities[0]
 			} else if (qtyFound > 1 ) {
 				log.debug "lookupDomainRecordByFieldMetaData() called findDomainByAlternateProperty returned {} entities", qtyFound
 				entity = ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG
@@ -1084,11 +1091,16 @@ class DataImportService implements ServiceMethods {
 			break
 		}
 
-		// Save the result to cache regardless of found, not found or error
-		context.cache[md5] = entity
+		// Save the result to cache regardless of found, not found or error (unless it was found in cache above)
+		if (md5 && ! foundInCache) {
+			context.cache[md5] = entity
+		}
 
+		// Deal with entity being set to an error message
 		if (entity instanceof String) {
-			addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, entity)
+			if (recordNewError) {
+				addErrorToFieldsInfoOrRecord(propertyName, fieldsInfo, context, entity)
+			}
 			entity = -1
 		}
 
@@ -1248,12 +1260,12 @@ class DataImportService implements ServiceMethods {
 			log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
 
 			if (! fieldsInfo.containsKey(propertyName)) {
-				errorMsg = PROPERTY_NAME_NOT_IN_FIELDS.toString()
+				errorMsg = PROPERTY_NAME_NOT_IN_FIELDS
 				break
 			}
 			// propertyName MUST be a reference or identifier for this function otherwise record an error
 			if (! ( isIdentifierProperty || isReferenceProperty ) ) {
-				errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG.toString()
+				errorMsg = WHEN_NOT_FOUND_PROPER_USE_MSG
 				break
 			}
 
@@ -1262,34 +1274,34 @@ class DataImportService implements ServiceMethods {
 				break
 			}
 
-			if (isReferenceProperty) {
-				// Try examining the find.query for a the first query since the class specified there would precisely what the
-				// DataScript developer intended to be created.
-				List query = fieldsInfo[propertyName].find?.query
-				if (query?.size() > 0) {
-					ed = ETLDomain.lookup(query[0].domain)
-					domainClassToCreate = ed.getClazz()
-					break
-				}
-
-				// When the class is AssetEntity we need to look into the create kv map for 'assetClass' to see if
-				// the DataScript developer specified an alternate.
-				Class referenceClass = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
-				if ('AssetEntity' == GormUtil.domainShortName(referenceClass)) {
-					// TODO : JPM 3/2018 : Here we want to look at the domain of the first Find query and assume that
-					// that is the applicable domain since the developer should be searching for the most specific
-					// asset domain class first.
-					Map createInfo = fieldsInfo[propertyName].create
-					if (createInfo?.assetClass) {
-						ed = ETLDomain.lookup(createInfo.assetClass)
-						domainClassToCreate = ed.getClazz()
-						break
-					}
-				}
-			}
-
 			// Get the type for the property of domain class being processed by the batch
 			domainClassToCreate = GormUtil.getDomainPropertyType(context.domainClass, propertyName)
+
+			if (isReferenceProperty) {
+				// We need to try and resolve what class to create. Most times it is just the class type of the property in the
+				// parent domain. In the case of AssetEntity however the class could be AssetEntity, Application, Database, etc.
+				// In order to know which the assumption is that there will be a find.query and that the first search is going to
+				//be precisely what that DataScript developer intended to be created.
+
+				String classShortName = GormUtil.domainShortName(domainClassToCreate)
+				if (classShortName in ['AssetEntity']) {
+					// Try looking for the exact class type in the find.query
+					List query = fieldsInfo[propertyName].find?.query
+					if (query?.size() > 0) {
+						ed = ETLDomain.lookup(query[0].domain)
+						domainClassToCreate = ed.getClazz()
+					} else {
+						// Need to look into the create kv map for 'assetClass' to see if the DataScript developer specified it
+						Map createInfo = fieldsInfo[propertyName].create ?: [:]
+						if (createInfo.containsKey('assetClass')) {
+							ed = ETLDomain.lookup(createInfo['assetClass'])
+							domainClassToCreate = ed.getClazz()
+						}
+					}
+				}
+				break
+			}
+
 			break
 		}
 		if (errorMsg) {
@@ -1335,11 +1347,10 @@ class DataImportService implements ServiceMethods {
 			entity = domainClassToCreate.newInstance()
 
 			// load with the values from the create key/value pairs
-
-			// TODO : JPM 4/2018 : Need to order the properties so that if model exists that it appears in the list after manufacturer
-			// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered
-			for (item in createInfo) {
-				errorMsg = setDomainPropertyWithValue(entity, item.key, item.value, propertyName, fieldsInfo, context)
+			List fieldNames = fixOrderInWhichToProcessFields(item.keySet())
+			for (fieldName in fieldNames) {
+				errorMsg = setDomainPropertyWithValue(entity, fieldName, createInfo[fieldName], propertyName, fieldsInfo, context)
+				// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered (Augusto)
 				if (errorMsg) {
 					break
 				}
@@ -1396,6 +1407,29 @@ class DataImportService implements ServiceMethods {
 		}
 
 		return entity
+	}
+
+	/**
+	 * Used to swap around the order of properties when processing fields
+	 * For some functionality the order of the fields will be critial that one or more are done ahead of others such
+	 * as Manufacturer and Model.
+	 * @param fieldNames - a set of the field names to reorder
+	 * @return the reordered list
+	 */
+	private List fixOrderInWhichToProcessFields(Set fieldNames) {
+		List list = fieldNames.toList()
+		// TODO : JPM 4/2018 : Disabled this functionality until I can figure out why the Set order is screwed up.
+		/*
+ 		int indexOfMfg = list.indexOf('manufacturer')
+		int indexOfModel = list.indexOf('model')
+		if (indexOfMfg && indexOfModel && indexOfMfg > indexOfModel) {
+			log.debug 'fixOrderInWhichToProcessFields found mfg in {} and model in {}', indexOfMfg, indexOfModel
+			// Need to swap the two around
+			list[indexOfMfg] = 'model'
+			list[indexOfModel] = 'manufacturer'
+		}
+		*/
+		return list
 	}
 
 	/**
@@ -1510,7 +1544,7 @@ class DataImportService implements ServiceMethods {
 						if (mfg) {
 							entities = [mfg]
 						} else {
-							Manufacturer mfg = ManufacturerAlias.where { name == searchValue }.find()?.manufacturer
+							mfg = ManufacturerAlias.where { name == searchValue }.find()?.manufacturer
 							if (mfg) {
 								entities = [mfg]
 							}
@@ -1537,7 +1571,7 @@ class DataImportService implements ServiceMethods {
 						// TODO : JPM 4/2018 : Implement Person lookup
 
 					default:
-						throw new RuntimeErrorException("findReferenceDomainByAlternateKey() called for unsupported type ${refDomainName}")
+						throw new RuntimeException("findReferenceDomainByAlternateKey() called for unsupported type ${refDomainName}")
 				}
 			}
 		}
@@ -1567,6 +1601,8 @@ class DataImportService implements ServiceMethods {
 	 * @return true if binding did not encounter any errors
 	 */
 	private Boolean bindFieldsInfoValuesToEntity(Object domain, Map fieldsInfo, Map context, List fieldsToIgnore=[]) {
+
+		// TODO - JPM 4/2018 : Refactor bindFieldsInfoValuesToEntity so that this can be used in both the row.field values + the create and update blocks
 		Boolean noErrorsEncountered = true
 		Set<String> fieldNames = fieldsInfo.keySet()
 		if (fieldsToIgnore == null) {
@@ -1602,7 +1638,7 @@ class DataImportService implements ServiceMethods {
 			} else {
 				if (isReference) {
 					// TODO : JPM 4/2018 : Need to implement Reference properties
-					throw new RuntimeErrorException("bindFieldsInfoValuesToEntity() does not yet support setting reference properties ($fieldName)")
+					throw new RuntimeException("bindFieldsInfoValuesToEntity() does not yet support setting reference properties ($fieldName)")
 				} else {
 					// TODO : JPM 4/2018 : Implement data type checking (use Grails BINDING logic to address ENUM, Date, etc)
 					Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
@@ -1611,7 +1647,7 @@ class DataImportService implements ServiceMethods {
 							fieldsValues.put(fieldName, newValue)
 						}
 					} else {
-						throw new RuntimeErrorException("bindFieldsInfoValuesToEntity() does not yet support setting type (${fieldClassType.getName()}) for property ($fieldName)")
+						throw new RuntimeException("bindFieldsInfoValuesToEntity() does not yet support setting type (${fieldClassType.getName()}) for property ($fieldName)")
 					}
 				}
 			}
