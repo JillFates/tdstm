@@ -691,7 +691,7 @@ class DataImportService implements ServiceMethods {
 			int setSize = 5
 			boolean aborted = false
 
-			// Now iterate over the list in sets of 100 rows
+			// Now iterate over the list in sets of 5 rows
 			while (! aborted && recordIds) {
 				List recordSetIds = recordIds.take(setSize)
 				recordIds = recordIds.drop(setSize)
@@ -706,7 +706,6 @@ class DataImportService implements ServiceMethods {
 						processBatchRecord(batch, record, context)
 						rowsProcessed++
 					}
-					aborted = updateBatchProgress(batchId, rowsProcessed, totalRowCount)
 					GormUtil.flushAndClearSession()
 				}
 
@@ -991,20 +990,24 @@ class DataImportService implements ServiceMethods {
 	 *		Then get with id
 	 *			If found then done
 	 *			Else error
-	 *		Else if find.query then requery
+	 *		Else if field.value is an ID (number)
+	 *			Then get with id
+	 *				If found then done
+	 *				Else error
+	 *		Else if find.query specified then requery
 	 *			If found one (1) then done
 	 *			Else if found more than one (1) then error
-	 *		Try searching by value in field.value
-	 *		If value is numeric the lookup by ID
-	 *			if found done else error
-	 *		Else search by alternate key
+	 *		Try searching by alternate key value in field.value
 	 *			if found one (1) then done else error
 	 *
 	 * The structure looks like the following:
 	 *	{
 	 * 		fields": {
 	 * 			"asset": {
-	 * 				"value": "114052",
+	 *				// Search by Alternate Key Example
+	 * 				"value": "xraysrv01",
+	 *				// Search by primary ID Example
+	 * 				"value": 114052,
 	 * 				"originalValue": "114052",
 	 * 				"error": false,
 	 *				"errors": [ "Lookup by ID was not found"],
@@ -1112,7 +1115,7 @@ class DataImportService implements ServiceMethods {
 	 * @param fieldsInfo - the fields map that came from the ETL process
 	 * @return the domain object if found; -1 of id is number and not found; otherwise null
 	 */
-	Object searchForDomainById(String propertyName, JSONObject fieldsInfo, Map context) {
+	private Object searchForDomainById(String propertyName, JSONObject fieldsInfo, Map context) {
 		String notFoundByID = 'Entity was not found by ID'
 		Object domain=null
 		Long id
@@ -1334,7 +1337,7 @@ class DataImportService implements ServiceMethods {
 			// load with the values from the create key/value pairs
 
 			// TODO : JPM 4/2018 : Need to order the properties so that if model exists that it appears in the list after manufacturer
-
+			// TODO : JPM 4/2018 : Change so that all errors are recorded against the reference field instead of just the first error encountered
 			for (item in createInfo) {
 				errorMsg = setDomainPropertyWithValue(entity, item.key, item.value, propertyName, fieldsInfo, context)
 				if (errorMsg) {
@@ -1347,6 +1350,7 @@ class DataImportService implements ServiceMethods {
 
 			//
 			// Handle different required properties
+			// TODO : JPM 4/2018 : Refactor to make this method smaller and more testable
 			//
 
 			// Project
@@ -1362,17 +1366,22 @@ class DataImportService implements ServiceMethods {
 
 			if (! entity.validate() ) {
 				log.debug "createReferenceDomain() failed : {}", GormUtil.allErrorsString(entity)
+				// TODO : JPM 4/2018 : Change to populate field with list of i18n errors (August - good one to work on)
+				// Populate field with list of errors
+				// clear the error message
+				// entity.discard()
 				errorMsg = "Failed to create record for $propertyName : " + GormUtil.errorsAsUL(entity)
 				break
-			} else {
-				// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
-				//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
-				entity.save(failOnError:true, flush:true)
 			}
+
+			// TODO : JPM 3/2018 : change failOnError:false throughout this code at some point
+			//log.info "Creating $propertyName reference for domain ${context.domainShortName} : $entity"
+			entity.save(failOnError:true, flush:true)
 
 			// Replace the cache reference of the query with that of the new entity
 			String md5 = generateMd5OfFieldsInfoField(context.domainShortName, propertyName, fieldsInfo)
 			log.debug "createReferenceDomain() replaced cache $md5 with {}", entity
+			// TODO : JPM 4/2018 : change to cache the ID of the object instead of the object to conserve memory
 			context.cache[md5] = entity
 
 			break
@@ -1417,8 +1426,10 @@ class DataImportService implements ServiceMethods {
 				if (GormUtil.isReferenceProperty(domainInstance, propertyName)) {
 					if (NumberUtil.isaNumber(value)) {
 						// Perform lookup by ID
+						// TODO : JPM 4/2018 : Refactor into Gorm as a single function
 						Class refDomainClass = GormUtil.getDomainPropertyType(domainClassToCreate, propertyName)
 						def entity = GormUtil.findInProject(context.project, refDomainClass, item.value)
+
 						if (entity) {
 							domainInstance[propertyName] = entity
 						} else {
@@ -1498,24 +1509,35 @@ class DataImportService implements ServiceMethods {
 						Manufacturer mfg = Manufacturer.where { name == searchValue }.find()
 						if (mfg) {
 							entities = [mfg]
+						} else {
+							Manufacturer mfg = ManufacturerAlias.where { name == searchValue }.find()?.manufacturer
+							if (mfg) {
+								entities = [mfg]
+							}
 						}
 						break
 
 					case 'Model':
-						if (entity.manufacturer) {
-							// Try finding the model by an alias lookup
+						if (entity.manufacturer && entity.assetType) {
+							// Searched already by mfg + name + assetType, so now try just by mfg + name
+							extraCriteria = [manufacturer:entity.manufacturer]
+							entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
+						}
+
+						// If not found then try by looking up the alias of the model
+						if (!entities) {
 							Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()
 							if (model) {
 								entities = [model]
-							} else {
-								if (entity.assetType) {
-									// Try by just Name + Mfg if first seach included the assetType
-									extraCriteria = [manufacturer:entity.manufacturer]
-									entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
-								}
 							}
 						}
 						break
+
+					case 'Person':
+						// TODO : JPM 4/2018 : Implement Person lookup
+
+					default:
+						throw new RuntimeErrorException("findReferenceDomainByAlternateKey() called for unsupported type ${refDomainName}")
 				}
 			}
 		}
@@ -1569,7 +1591,7 @@ class DataImportService implements ServiceMethods {
 
 			if (hasInitializeValue) {
 				if (isReference) {
-					noErrorsEncountered = true
+					noErrorsEncountered = false
 					addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, "The 'initialize' command is not supported for identifier or reference properties ($fieldName)")
 					continue
 				}
@@ -1578,8 +1600,19 @@ class DataImportService implements ServiceMethods {
 					fieldsValues.put(fieldName, initValue)
 				}
 			} else {
-				if (newValue != null && newValue != domainValue) {
-					fieldsValues.put(fieldName, newValue)
+				if (isReference) {
+					// TODO : JPM 4/2018 : Need to implement Reference properties
+					throw new RuntimeErrorException("bindFieldsInfoValuesToEntity() does not yet support setting reference properties ($fieldName)")
+				} else {
+					// TODO : JPM 4/2018 : Implement data type checking (use Grails BINDING logic to address ENUM, Date, etc)
+					Class fieldClassType = GormUtil.getDomainPropertyType(domain.getClass(), fieldName)
+					if (String == fieldClassType) {
+						if (newValue != null && newValue != domainValue) {
+							fieldsValues.put(fieldName, newValue)
+						}
+					} else {
+						throw new RuntimeErrorException("bindFieldsInfoValuesToEntity() does not yet support setting type (${fieldClassType.getName()}) for property ($fieldName)")
+					}
 				}
 			}
 		}

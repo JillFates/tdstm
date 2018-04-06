@@ -338,7 +338,7 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			String propertyName = 'xyzzy'
 			clazz = dataImportService.classOfDomainProperty(propertyName, fieldsInfo, context)
 		then: 'a Person domain class should be returned'
-			[dataImportService.PROPERTY_NAME_NOT_IN_FIELDS.toString()] == context.record
+			[dataImportService.PROPERTY_NAME_NOT_IN_FIELDS.toString()] == context.record.errorListAsList()
 
 		// when: 'called for a non-asset reference property (Person)'
 		// 	clazz = dataImportService.classOfDomainProperty('createdBy', fieldsInfo, context)
@@ -670,11 +670,42 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			setValue == asset.description
 		and: 'the previously ignored field is now set'
 			ignoredFieldValue == asset[fieldToIgnore]
+
+
+		// TODO : JPM 4/2018 : Add test to try init on a reference field which should result in an error on the field
+		// TODO : JPM 4/2018 : add tests for setting each data type (Date, Integer, Long, Person, etc)
 	}
 
 	@Ignore
 	void '9. test createReferenceDomain method'() {
 		// createReferenceDomain(String propertyName, Map fieldsInfo, Map context)
+		// TODO : Augusto - work on killing this one
+
+		// Add the create block to the fieldsInfo to create a device, application, moveBundle, manufacturer
+		// Won't test person, model, room/rack yet due to multiple fields in requirements
+		// First query should be specify the Asset class to create
+
+		/*
+			"find": {
+				"query": [
+					{
+						"domain": "Device",		// Set to Device or Application, etc
+						"kv": {
+							"assetName": "59admin",
+							"manufacturer": "VMWare",
+							"model": "VM",
+							"serialNumber": "422e2244-f78c-2012-b56a-e435d7519abf"
+						}
+					},
+
+			"create": {
+				"assetName": "59admin", // random string
+				"description": "59admin.moredirect.com CPU 2, Memory 16,384",
+				"environment": "Production",
+				"assetType": "VM",
+				"os": "Red Hat Enterprise Linux 6 (64-bit)"
+			}
+		*/
 	}
 
 	void '10. test addErrorToFieldsInfoOrRecord method'() {
