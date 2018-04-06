@@ -130,8 +130,13 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     Map<String, ?> authenticate(Credential credential) {
-        // TODO : JPM 3/2018 : Throw exception - NO MORE assert in the code
-        assert credential != null : 'Invalid credential information provided.'
+        if (!credential) {
+            throw new EmptyResultException('Credential not found.')
+        }
+
+        if (StringUtil.isBlank(credential.authenticationUrl)) {
+            throw new InvalidParamException('Provided authentication URL is invalid.')
+        }
 
         log.debug 'authenticate() trying to authenticate user {}', credential.username
 
@@ -320,7 +325,13 @@ class CredentialService implements ServiceMethods {
         }
 
         // if authentication validation succeeded then extract sessionId within the response
-        return extractSessionId(credential.sessionName, resp)
+        if (StringUtil.isNotBlank(credential.sessionName)) {
+            return extractSessionId(credential.sessionName, resp)
+        } else {
+            // if user did not provide a session name data, then there is no way to extract session information
+            // so just return any information gathered from server
+            return ['statusCode': resp.statusCode.reasonPhrase, 'headers': resp.headers, 'response': resp.text]
+        }
     }
 
     /**
@@ -368,7 +379,9 @@ class CredentialService implements ServiceMethods {
      * @return
      */
     Credential findById(Long id) {
-        assert id != null : 'Invalid id param.'
+        if (id == null) {
+            throw new InvalidParamException('Invalid id param.')
+        }
         Project project = securityService.getUserCurrentProject()
         return GormUtil.findInProject(project, Credential.class, id, true)
     }
