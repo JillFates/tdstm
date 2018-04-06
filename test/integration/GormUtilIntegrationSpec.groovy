@@ -636,6 +636,55 @@ class GormUtilIntegrationSpec extends Specification {
 
 	}
 
+	void '26. bang on the findDomainByAlternateKey method'() {
+		setup:
+			Project project = projectHelper.createProject()
+			Project project2 = projectHelper.createProject()
+			Person person = personHelper.createPerson()
+			Application application = assetHelper.createApplication(person, project)
+
+		when: 'calling findDomainByAlternateKey with valid alternate key'
+			List results = GormUtil.findDomainByAlternateKey(Application, application.assetName, project)
+		then: 'the domain entity should be found'
+			1 == results.size()
+
+		when: 'calling findDomainByAlternateKey with bad alternate key'
+			results = GormUtil.findDomainByAlternateKey(Application, 'nothing should exist with this for a name', project)
+		then: 'no domain entity should be found'
+			0 == results.size()
+
+		when: 'calling findDomainByAlternateKey with valid alternate key but different project'
+			results = GormUtil.findDomainByAlternateKey(Application, 'nothing should exist with this for a name', project2)
+		then: 'no domain entity should be found'
+			0 == results.size()
+
+		when: 'the entity has additional criteria to search on'
+			Map criteria = [
+				description: 'This is so cool',
+				url: 'http://wwww.whitehouse.gov'
+			]
+			application.description = criteria.description
+			application.url = criteria.url
+			application.save(flush:true)
+		and: 'calling findDomainByAlternateKey with the extra criteria'
+			results = GormUtil.findDomainByAlternateKey(Application, application.assetName, project, criteria)
+		then: 'the entity should be found'
+			1 == results.size()
+
+		when: 'the entity has additional criteria to search on but not correct'
+			criteria.description = 'This is NOT so cool'
+		and: 'calling findDomainByAlternateKey with the extra criteria'
+			results = GormUtil.findDomainByAlternateKey(Application, application.assetName, project, criteria)
+		then: 'the entity should NOT be found'
+			0 == results.size()
+
+		when: 'calling findDomainByAlternateKey with domain that does not have an alternate key'
+			results = GormUtil.findDomainByAlternateKey(PartyRelationship, 'nothing should exist with this for a name', project)
+		then: 'a null should be returned'
+			results == null
+
+	}
+
 }
 
 /**

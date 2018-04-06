@@ -46,7 +46,7 @@ class AssetEntity extends EavEntity {
 		'validation'
 	]
 
-	static String alternateLookup = 'assetName'
+	static String alternateKey = 'assetName'
 
 	AssetClass assetClass = DEVICE
 	String application = ''
