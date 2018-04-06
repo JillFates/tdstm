@@ -4,8 +4,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityAttribute
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -15,7 +14,6 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import net.transitionmanager.security.Permission
 
 @Slf4j(value='logger')
@@ -307,8 +305,8 @@ class DeviceService implements ServiceMethods {
 		}
 
 		// Set the source/target location/room which creates the Room if necessary
-		assetEntityService.assignAssetToRoom(project, device, params.roomSourceId, params.sourceLocation, params.sourceRoom, true)
-		assetEntityService.assignAssetToRoom(project, device, params.roomTargetId, params.targetLocation, params.targetRoom, false)
+		assetEntityService.assignAssetToRoom(project, device, params.roomSourceId, params.locationSource, params.roomSource, true)
+		assetEntityService.assignAssetToRoom(project, device, params.roomTargetId, params.locationTarget, params.roomTarget, false)
 
 		assetEntityService.assignDeviceToChassisOrRack(project, device, params)
 

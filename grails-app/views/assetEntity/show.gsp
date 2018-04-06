@@ -48,16 +48,16 @@
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
 
-						<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
-							<label for="sourceLocation" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
+						<td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
+							<label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
 						</td>
-												<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceLocation.imp?:''}" >
-														<tds:tooltipSpan field="${standardFieldSpecs.sourceLocation}" >
+												<td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}" >
+														<tds:tooltipSpan field="${standardFieldSpecs.locationSource}" >
 																${assetEntity.sourceLocation}
 														</tds:tooltipSpan>
 												</td>
-												<td class="valueNW nonVMLabel ${standardFieldSpecs.targetLocation.imp?:''}" >
-														<tds:tooltipSpan field="${standardFieldSpecs.targetLocation}" >
+												<td class="valueNW nonVMLabel ${standardFieldSpecs.locationTarget.imp?:''}" >
+														<tds:tooltipSpan field="${standardFieldSpecs.locationTarget}" >
 																${assetEntity.targetLocation}
 														</tds:tooltipSpan>
 												</td>
@@ -74,17 +74,17 @@
 						
 						<tds:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
 
-						<td class="label nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}" nowrap="nowrap">
-							<label for="sourceRoom" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
+						<td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+							<label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
 						</td>
 
-						<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}" >
-							<tds:tooltipSpan field="${standardFieldSpecs.sourceRoom}" >
+						<td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}" >
+							<tds:tooltipSpan field="${standardFieldSpecs.roomSource}" >
 								${roomSource?.roomName}
 							</tds:tooltipSpan>
 						</td>
-						<td class="valueNW nonVMLabel ${standardFieldSpecs.targetRoom.imp?:''}">
-							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRoom}" >
+						<td class="valueNW nonVMLabel ${standardFieldSpecs.roomTarget.imp?:''}">
+							<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.roomTarget}" >
 								${roomTarget?.roomName}
 							</tds:tooltipSpan>
 						</td>
@@ -97,16 +97,16 @@
 
 						<%-- The following fields will be displayed based on the assetType --%>
 						<%-- rackable --%>
-						<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}"  nowrap="nowrap" id="rackId">
-							<label for="sourceRackId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
+						<td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"  nowrap="nowrap" id="rackId">
+							<label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
 						</td>
-												<td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.sourceRack.imp?:''}" >
-														<tds:tooltipSpan field="${standardFieldSpecs.sourceRack}" >
+												<td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}" >
+														<tds:tooltipSpan field="${standardFieldSpecs.rackSource}" >
 																${assetEntity.rackSource?.tag}
 														</tds:tooltipSpan>
 												</td>
-												<td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.targetRack.imp?:''}" >
-														<tds:tooltipSpan field="${standardFieldSpecs.targetRack}" >
+												<td class="valueNW rackLabel nonVMLabel ${standardFieldSpecs.rackTarget.imp?:''}" >
+														<tds:tooltipSpan field="${standardFieldSpecs.rackTarget}" >
 																${assetEntity.rackTarget?.tag}
 														</tds:tooltipSpan>
 												</td>
@@ -133,7 +133,7 @@
 						<tds:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
 
 						<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
-							<label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
+							<label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
 								Position
 							</label>
 						</td>

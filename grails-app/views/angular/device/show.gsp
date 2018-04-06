@@ -55,16 +55,16 @@
 
 													<tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
 
-													<td class="label ${standardFieldSpecs.sourceLocation.imp?:''}" nowrap="nowrap">
-														<label for="sourceLocation" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
+													<td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
+														<label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
 													</td>
-													<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceLocation.imp?:''}">
-														<tdsAngular:tooltipSpan field="${standardFieldSpecs.sourceLocation}">
+													<td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}">
+														<tdsAngular:tooltipSpan field="${standardFieldSpecs.locationSource}">
 															${assetEntity.sourceLocation}
 														</tdsAngular:tooltipSpan>
 													</td>
-													<td class="valueNW nonVMLabel ${standardFieldSpecs.targetLocation.imp?:''}">
-														<tdsAngular:tooltipSpan field="${standardFieldSpecs.targetLocation}">
+													<td class="valueNW nonVMLabel ${standardFieldSpecs.locationTarget.imp?:''}">
+														<tdsAngular:tooltipSpan field="${standardFieldSpecs.locationTarget}">
 															${assetEntity.targetLocation}
 														</tdsAngular:tooltipSpan>
 													</td>
@@ -86,17 +86,17 @@
 
 													<tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
 
-													<td class="label nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}" nowrap="nowrap">
-														<label for="sourceRoom" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
+													<td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
+														<label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
 													</td>
 
-													<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRoom.imp?:''}">
-														<tdsAngular:tooltipSpan field="${standardFieldSpecs.sourceRoom}">
+													<td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}">
+														<tdsAngular:tooltipSpan field="${standardFieldSpecs.roomSource}">
 															${roomSource?.roomName}
 														</tdsAngular:tooltipSpan>
 													</td>
-													<td class="valueNW nonVMLabel ${standardFieldSpecs.targetRoom.imp?:''}">
-														<tdsAngular:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetRoom}">
+													<td class="valueNW nonVMLabel ${standardFieldSpecs.roomTarget.imp?:''}">
+														<tdsAngular:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.roomTarget}">
 															${roomTarget?.roomName}
 														</tdsAngular:tooltipSpan>
 													</td>
@@ -109,16 +109,16 @@
 
 													<%-- The following fields will be displayed based on the assetType --%>
 														<%-- rackable --%>
-															<td class="label rackLabel ${standardFieldSpecs.sourceRack.imp?:''}" nowrap="nowrap" id="rackId">
-																<label for="sourceRackId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
+															<td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}" nowrap="nowrap" id="rackId">
+																<label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
 															</td>
-															<td class="valueNW nonVMLabel ${standardFieldSpecs.sourceRack.imp?:''}">
-																<tdsAngular:tooltipSpan field="${standardFieldSpecs.sourceRack}">
+															<td class="valueNW nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}">
+																<tdsAngular:tooltipSpan field="${standardFieldSpecs.rackSource}">
 																	${assetEntity.rackSource?.tag}
 																</tdsAngular:tooltipSpan>
 															</td>
-															<td class="valueNW nonVMLabel ${standardFieldSpecs.targetRack.imp?:''}">
-																<tdsAngular:tooltipSpan field="${standardFieldSpecs.targetRack}">
+															<td class="valueNW nonVMLabel ${standardFieldSpecs.rackTarget.imp?:''}">
+																<tdsAngular:tooltipSpan field="${standardFieldSpecs.rackTarget}">
 																	${assetEntity.rackTarget?.tag}
 																</tdsAngular:tooltipSpan>
 															</td>
@@ -143,7 +143,7 @@
 													<tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}" />
 
 													<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
-														<label for="sourceRack" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
+														<label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
 															Position
 														</label>
 													</td>
