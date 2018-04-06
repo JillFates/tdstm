@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {BatchStatus, ImportBatchModel} from '../../model/import-batch.model';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DependencyBatchService} from '../../service/dependency-batch.service';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CellClickEvent, SelectableSettings} from '@progress/kendo-angular-grid';
