@@ -11,10 +11,10 @@ import getl.excel.ExcelDataset
 import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.command.UploadTextCommand
+import net.transitionmanager.service.InvalidRequestException
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
@@ -34,6 +34,11 @@ import javax.management.RuntimeErrorException
 @Transactional(readOnly = true)
 @Slf4j
 class FileSystemService  implements InitializingBean {
+
+	/*
+     * These are the accepted file extensions when uploading ETL files
+     */
+	public static final List<String> ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ['csv', 'json', 'xls', 'xlsx', 'xml']
 
     // The maximum number of tries to get a unique filename so that the getUniqueFilename doens't get into infinite loop
     static final int maxUniqueTries=100
@@ -354,4 +359,12 @@ class FileSystemService  implements InitializingBean {
 
         return temporaryFileName
     }
+
+	/**
+	 * Return the allowed extensions for ETL Uploads.
+	 * @return
+	 */
+	List<String> getAllowedExtensions() {
+		return ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS
+	}
 }

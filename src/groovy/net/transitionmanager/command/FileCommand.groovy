@@ -1,10 +1,10 @@
 package net.transitionmanager.command
 
-import com.tdssrc.grails.FileSystemUtil
-import grails.validation.Validateable
-
+import net.transitionmanager.service.FileSystemService
 
 trait FileCommand {
+
+    static FileSystemService fileSystemService
 
     /**
      * A List of accepted file extensions for validating
@@ -12,6 +12,6 @@ trait FileCommand {
      * @return
      */
     List<String> getValidFileExtension() {
-        return FileSystemUtil.ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS
+        return fileSystemService.getAllowedExtensions()
     }
 }

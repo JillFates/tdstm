@@ -1,7 +1,23 @@
-package net.transitionmanager.service
-
-import spock.lang.Unroll
+import com.tds.asset.Application
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.JsonUtil
+import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.MoveBundle
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Provider
+import net.transitionmanager.service.DataImportService
+import net.transitionmanager.service.FileSystemService
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.web.multipart.MultipartFile
 import spock.lang.Ignore
+import test.helper.AssetEntityTestHelper
 
 import grails.test.spock.IntegrationSpec
 import grails.validation.ValidationException
@@ -18,31 +34,18 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 // import org.codehaus.groovy.grails.commons.GrailsApplication
 // import org.hibernate.SessionFactory
 // import test.helper.CredentialTestHelper
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
-import test.helper.AssetEntityTestHelper
-import test.helper.MoveBundleTestHelper
-import test.helper.ProjectTestHelper
-import com.tdssrc.grails.StringUtil
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.etl.ETLDomain
-
-
 class DataImportServiceIntegrationSpec extends IntegrationSpec {
     DataImportService dataImportService
+	FileSystemService fileSystemService
     //GrailsApplication grailsApplication
     //SessionFactory sessionFactory
 
-    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
 	AssetEntityTestHelper assetEntityTestHelper = new AssetEntityTestHelper()
+	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
+	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
+	PersonTestHelper personTestHelper = new PersonTestHelper()
+    ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+	ProviderTestHelper providerTestHelper = new ProviderTestHelper()
 
 	Project project, otherProject
 	MoveBundle moveBundle
@@ -482,5 +485,59 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	void '13. test findAndUpdateOrCreateDependency method'() {
 		// generateMd5OfQuery
+	}
+
+	void '14. test transformData method'() {
+
+		setup: 'Create a DataScript, a Provider and other required data'
+			String etlSourceCode = """
+				read labels
+				domain Dependency
+				iterate {
+				    extract serverName load asset set srvNameVar
+				    find Device by assetName with srvNameVar into asset
+				    whenNotFound asset create {
+				        assetName srvNameVar
+				    }
+				
+				    extract appName load dependent set appNameVar
+				    find Application by assetName with appNameVar into dependent
+				    whenNotFound dependent create {
+				        assetName appNameVar
+				    }
+				
+				    load c1 with ''
+				    load status with 'UnknownStatus'
+				    initialize c1 with 'from initialize command'
+				}"""
+
+			String sampleData = 'serverName,appName\nxraysrv01,bigapp'
+
+			Person whom = personTestHelper.createPerson()
+			Provider provider = providerTestHelper.createProvider(project)
+			DataScript dataScript = dataScriptTestHelper.createDataScript(project, provider, whom, etlSourceCode)
+			String originalFilename = 'test.csv'
+			MultipartFile multiPartFile = new MockMultipartFile(originalFilename, originalFilename, "text/plain", sampleData.getBytes())
+			UploadFileCommand.fileSystemService = fileSystemService
+			UploadFileCommand cmd = new UploadFileCommand(file: multiPartFile)
+			String fileUploadName = fileSystemService.transferFileToFileSystem(cmd)
+			Map transformResults = dataImportService.transformEtlData(project, dataScript.id, fileUploadName)
+			String transformedFileName = transformResults['filename']
+
+			when: 'Requesting the content of the transformation'
+				JSONObject transformJson = JsonUtil.parseFile(fileSystemService.openTemporaryFile(transformedFileName))
+			then: 'The ETLInfo has the name of the temporary file'
+				transformJson.ETLInfo.originalFilename == fileUploadName
+			and: 'There is only one domain'
+				transformJson.domains.size() == 1
+			and: 'The Domain is Dependency'
+				transformJson.domains[0].domain == 'Dependency'
+			and: 'The data has only one element'
+				transformJson.domains[0].data.size() == 1
+			cleanup: 'Delete test files'
+				fileSystemService.deleteTemporaryFile(originalFilename)
+				fileSystemService.deleteTemporaryFile(transformedFileName)
+
+
 	}
 }

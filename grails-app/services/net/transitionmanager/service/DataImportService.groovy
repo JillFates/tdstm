@@ -5,17 +5,21 @@ import com.tds.asset.AssetEntity
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
+import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.eav.EavEntityType
+import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
+import grails.converters.JSON
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.DataTransferBatch
 import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
@@ -23,6 +27,8 @@ import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.transaction.annotation.Propagation
 // LEGACY
@@ -41,6 +47,8 @@ import org.springframework.transaction.annotation.Propagation
 class DataImportService implements ServiceMethods {
 
 	// IOC
+	FileSystemService fileSystemService
+	ScriptProcessorService scriptProcessorService
 	SecurityService securityService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
@@ -1501,6 +1509,62 @@ class DataImportService implements ServiceMethods {
 			":value=${fieldsInfo[fieldName].value}:query=" +
 			( fieldsInfo[fieldName].find.containsKey('query') ? fieldsInfo[fieldName].find.query.toString() : 'NO-QUERY-SPECIFIED')
 		)
+	}
+
+	/**
+	 * Transform the Data from ETL as part of the Asset Import process' first step.
+	 *
+	 * @param project
+	 * @param dataScriptId
+	 * @param filename
+	 * @return
+	 */
+	@NotTransactional()
+	Map transformEtlData(Project project, Long dataScriptId, String filename) {
+		Map result = [filename:'']
+		DataScript dataScript = null
+		String errorMsg = null
+
+		if (!dataScriptId) {
+			errorMsg = 'Missing required dataScriptId parameter'
+		} else if (!filename) {
+			errorMsg = 'Missing filename parameter'
+		} else if (! fileSystemService.temporaryFileExists(filename)) {
+			errorMsg = 'Specified input file not found'
+		} else {
+			List<String> allowedExtensions = fileSystemService.getAllowedExtensions()
+			if (! FileSystemUtil.validateExtension(filename, allowedExtensions)) {
+				errorMsg = i18nMessage(Message.FileSystemInvalidFileExtension)
+			} else {
+				// See if we can find a DataScript.
+				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
+
+				if (! dataScript.etlSourceCode) {
+					errorMsg = 'DataScript has no source specified'
+				}
+			}
+
+		}
+
+		// If there was an error in the previous validations, throw an exception.
+		if (errorMsg) {
+			throw new InvalidParamException(errorMsg)
+		}
+
+		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
+		ETLProcessor etlProcessor = scriptProcessorService.execute(project, dataScript.etlSourceCode, inputFilename)
+		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
+		result.filename = outputFilename
+		try {
+			os << (etlProcessor.result.toMap() as JSON)
+			os.close()
+		}
+		catch(e) {
+			log.error 'transformData() failed to write output logfile : {}', e.getMessage()
+			throw new RuntimeException('Unable to write output file : ' + e.message)
+		}
+
+		return result
 	}
 }
 

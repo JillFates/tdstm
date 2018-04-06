@@ -19,17 +19,17 @@ class DataScriptTestHelper {
      * @param createdBy
      * @return
      */
-    DataScript createDataScript(Project project, Provider provider, Person createdBy) {
-        DataScript datascript = new DataScript(
+    DataScript createDataScript(Project project, Provider provider, Person createdBy, String etlSourceCode = '') {
+        DataScript dataScript = new DataScript(
                 name: 'Test DataScript-' + RandomStringUtils.randomAlphabetic(10), 
                 description: 'Test description',
                 target: 'Test target', 
-                etlSourceCode: '{blah}',
+                etlSourceCode: etlSourceCode.trim(),
                 project: project,
                 provider: provider,
                 mode: DataScriptMode.IMPORT,
                 createdBy: createdBy
         ).save(flush: true, failOnError: true)
-        return datascript
+        return dataScript
     }
 }
