@@ -15,7 +15,8 @@ class UrlMappings {
 		 */
 		name dependencyConsoleMap: "/moveBundle/dependencyConsole/$subsection?/$groupId?" {
 			controller = "moveBundle"
-			action = [GET:"dependencyConsole"]
+			action = [GET:"dependencyConsole",
+					  POST:"dependencyConsole"]
 		}
 
 		/*

@@ -321,7 +321,7 @@ class MoveBundleService implements ServiceMethods {
 		def dependList = jdbcTemplate.queryForList(depSql.toString())
 
 		if (moveBundleId) {
-		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId)){ it } }
+		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId as String)){ it } }
 		}
 
 		dependList.removeAll([null])
