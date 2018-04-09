@@ -181,8 +181,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 //				GroovyMock(ETLFieldsValidator))
 //
 //		when: 'The ETL script is evaluated'
-//			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-//				.evaluate("skip 20", ETLProcessor.class.name)
+//			etlProcessor.evaluate("skip 20")
 //
 //		then: 'An ETLProcessorException is thrown'
 //			ETLProcessorException e = thrown ETLProcessorException

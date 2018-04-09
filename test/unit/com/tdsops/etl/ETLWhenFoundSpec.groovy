@@ -136,8 +136,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -260,8 +259,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -421,8 +419,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency

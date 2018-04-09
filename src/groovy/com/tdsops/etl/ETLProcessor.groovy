@@ -20,10 +20,13 @@ import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
 import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
 import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
+import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
 import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
 import static org.codehaus.groovy.syntax.Types.MOD
 import static org.codehaus.groovy.syntax.Types.MULTIPLY
+import static org.codehaus.groovy.syntax.Types.NOT
 import static org.codehaus.groovy.syntax.Types.PLUS
 import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
@@ -966,7 +969,7 @@ class ETLProcessor implements RangeChecker {
 	 * @see CompilerConfiguration
 	 * @see SecureASTCustomizer
 	 * @see ImportCustomizer
-	 * @return
+	 * @return a default instance of CompilerConfiguration
 	 */
 	private CompilerConfiguration defaultCompilerConfiguration(){
 
@@ -981,8 +984,8 @@ class ETLProcessor implements RangeChecker {
 			starImportsWhitelist = []
 			// Language tokens allowed
 			tokensWhitelist = [
-				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL,
-				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL,
+				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
+				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
@@ -1008,8 +1011,7 @@ class ETLProcessor implements RangeChecker {
 	 * Using an instance of GroovyShell, it evaluates an ETL script content
 	 * using this instance of the ETLProcessor.
 	 * @see GroovyShell#evaluate(java.lang.String)
-	 * @param script
-	 * @param etlProcessor
+	 * @param script an ETL script content
 	 * @return
 	 */
 	@TimedInterrupt(10l)
@@ -1022,10 +1024,9 @@ class ETLProcessor implements RangeChecker {
 	 * using this instance of the ETLProcessor.
 	 * It throws an InterruptedException when checks indicate code ran longer than desired
 	 * @see GroovyShell#evaluate(java.lang.String)
-	 * @param script
-	 * @param etlProcessor
+	 * @param script an ETL script content
 	 * @params configuration
-	 * @return the result of evauate ETL script param
+	 * @return the result of evaluate ETL script param
 	 * @see TimedInterrupt
 
 	 */
@@ -1039,8 +1040,7 @@ class ETLProcessor implements RangeChecker {
 	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
 	 * using this instance of the ETLProcessor.
 	 * @see GroovyShell#evaluate(java.lang.String)
-	 * @param script
-	 * @param etlProcessor
+	 * @param script an ETL script content
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
@@ -1062,6 +1062,7 @@ class ETLProcessor implements RangeChecker {
 		}
 
 		List errorsMap = errors.collect { error ->
+
 			if(error instanceof SyntaxErrorMessage){
 				[
 					startLine  : error.cause?.startLine,
@@ -1095,8 +1096,7 @@ class ETLProcessor implements RangeChecker {
 	 * using this instance of the ETLProcessor and its defaultCompilerConfiguration
 	 * @see ETLProcessor#defaultCompilerConfiguration()
 	 * @see GroovyShell#parse(java.lang.String)
-	 * @param script
-	 * @param etlProcessor
+	 * @param script an ETL script content
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */

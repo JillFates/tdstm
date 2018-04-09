@@ -149,10 +149,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				with(errors[0]) {
 					startLine == 5
 					endLine == 5
-					startColumn == 7
-					endColumn == 8
+					startColumn == 1
+					endColumn == 2
 					fatal == true
-					message == 'unexpected token: } @ line 5, column 7.'
+					message == 'unexpected token: } @ line 5, column 1.'
 				}
 			}
 	}
