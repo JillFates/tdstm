@@ -423,7 +423,10 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input  type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
+														<input  type="checkbox" name="apiActionBeforeCall"
+																(change)="onEventReactionSelect(apiActionModel.eventReactions[7])"
+																[(ngModel)]="apiActionModel.eventReactions[7].selected"
+																[disabled]="(apiActionModel.eventReactions[7].value.length > 0 && apiActionModel.eventReactions[7].value !== eventBeforeCallText) || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>
