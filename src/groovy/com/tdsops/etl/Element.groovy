@@ -1,16 +1,17 @@
 package com.tdsops.etl
 
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 
 class Element implements RangeChecker {
 	/**
 	 * Original value extracted from Dataset and used to create an instance of Element
 	 */
-    String originalValue
+    Object originalValue
 	/**
 	 * Value with transformations applied
 	 */
-    String value
+	Object value
 	/**
 	 * Default o initialize value
 	 */
@@ -28,7 +29,7 @@ class Element implements RangeChecker {
      *     domain Application
      *     extract 'location' transform {
      *          lowercase() append('**')
-     *     } load description
+     *     } load 'description'
      * </pre>
      * @param closure
      * @return the element instance that received this command
@@ -44,12 +45,13 @@ class Element implements RangeChecker {
      * Transform command with a hack for this example:
      * <code>
      *     domain Application
-     *     extract 'location' transform with uppercase() lowercase() load description
+     *     extract 'location' transform with uppercase() lowercase() load 'description'
      * </code>
      * @param command
      * @return the element instance that received this command
      */
-    Element transform (String command) {
+    Element transform (ETLProcessor.ReservedWord reservedWord) {
+	    //TODO: validate invalid reserved words
 	    return this
     }
 
@@ -57,7 +59,7 @@ class Element implements RangeChecker {
      * Loads a field using fields spec based on domain validation
      * It's used in this ETL script command
      * <code>
-     *     extract 3 transform with lowercase() load description
+     *     extract 3 transform with lowercase() load 'description'
      * </code>
      * @param fieldName
      * @return the element instance that received this command
@@ -76,7 +78,7 @@ class Element implements RangeChecker {
 	 * Initialize an Element with a particular value
 	 * <code>
 	 *     domain Device
-	 *     extract name initialize custom1
+	 *     extract 'name' initialize 'custom1'
 	 * </code>
 	 * @param fieldName
 	 * @return the element instance that received this command
@@ -98,7 +100,7 @@ class Element implements RangeChecker {
 	 * Initialize an Element with a particular value
 	 * <code>
 	 *     domain Device
-	 *     extract name init custom1
+	 *     extract 'name' init 'custom1'
 	 * </code>
 	 * * @param init
 	 * @param fieldName
@@ -152,20 +154,46 @@ class Element implements RangeChecker {
      * Translate an element value using dictionary Map
      * <code>
      *      dictionary = [prod: 'Production', dev: 'Development']
-     *      load ... transformation with translate(dictionary)
+     *      load ... transformation with substitute(dictionary)
      * <code>
      *
      * @param dictionary
      * @return the element instance that received this command
      */
-    Element translate (def dictionary) {
+    Element substitute (def dictionary) {
         if (dictionary.containsKey(value)) {
             value = dictionary[value]
         }
 	    return this
     }
 
-    /**
+	/**
+	 * Transform current value in this Element instance to a Long number
+	 * <code>
+	 *      load ... transformation with toLong()
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toLong(){
+		value = NumberUtil.toLong(value)
+		return this
+	}
+
+	/**
+	 * Transform current value in this Element instance to a Integer number
+	 * <code>
+	 *      load ... transformation with toInteger()
+	 * <code>
+	 * @see NumberUtil#toInteger(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toInteger(){
+		value = NumberUtil.toInteger(value)
+		return this
+	}
+
+	/**
      * Replace all of the escape characters
      * (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus( + )
      * and replaces any non-printable, control and special unicode character
@@ -193,12 +221,12 @@ class Element implements RangeChecker {
     /**
      * Replace the first string content in the element value
      * <code>
-     *      load ... transformation with first(content)
+     *      load ... transformation with replaceFirst(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element first (String content) {
+    Element replaceFirst (String content) {
         value = value.replaceFirst(content, '')
 	    return this
     }
@@ -206,12 +234,12 @@ class Element implements RangeChecker {
     /**
      * Replace all the string content in the element value
      * <code>
-     *      load ... transformation with all(content)
+     *      load ... transformation with replaceAll(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element all (String content) {
+    Element replaceAll (String content) {
         value = value.replaceAll(content, '')
 	    return this
     }
@@ -219,12 +247,12 @@ class Element implements RangeChecker {
     /**
      * Replace the last string content in the element value
      * <code>
-     *      load ... transformation with last(content)
+     *      load ... transformation with replaceLast(content)
      * <code>
      * @param content
      * @return the element instance that received this command
      */
-    Element last (String content) {
+    Element replaceLast (String content) {
         value = value.reverse().replaceFirst(content, '').reverse()
 	    return this
     }

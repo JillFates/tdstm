@@ -15,14 +15,14 @@ class ETLBinding extends Binding {
                 *: etlProcessor.metaClass.methods.collectEntries {
                     [(it.name): InvokerHelper.getMethodPointer(etlProcessor, it.name)]
                 },
+	            *: ETLProcessor.ReservedWord.values().collectEntries { [(it.name()): it] },
+	            *: ETLDomain.values().collectEntries { [(it.name()): it] },
                 *: vars
         ])
     }
 
     /**
-     *
      * Custom lookup variable
-     *
      * @param name
      * @return
      */
@@ -35,7 +35,14 @@ class ETLBinding extends Binding {
         Object result = variables.get(name)
 
         if (result == null && !variables.containsKey(name)) {
-            result = name
+	        // TM-10103: We are (in a nasty way) forcing local variables ending with this sufix names
+	        // Now set command is working with:
+	        // set environmentVar with 'Production'
+	        if(name.endsWith('Var')){
+		        result = name
+	        } else {
+		        throw ETLProcessorException.missingPropertyException(name)
+	        }
         }
 
         return result

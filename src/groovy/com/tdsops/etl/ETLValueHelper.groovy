@@ -30,9 +30,9 @@ class ETLValueHelper {
 	 * @param value a instance to be used in value calculation
 	 * @return the value depending on instance type
 	 */
-	static String stringValueOf(def value) {
+	static Object valueOf(def value) {
 
-		String fieldValue
+		Object fieldValue
 
 		switch(value){
 			case DomainField:     //DOMAIN.name // Label name or property name from fieldSpecs
@@ -44,8 +44,11 @@ class ETLValueHelper {
 			case SourceField:
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'
 				break
-			default:
+			case NOW:
 				fieldValue = String.valueOf(value)
+				break
+			default:
+				fieldValue = value
 				break
 		}
 

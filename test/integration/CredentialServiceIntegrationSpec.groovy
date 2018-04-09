@@ -180,7 +180,6 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
 
             Credential credential
             CredentialCommand credentialCO
-            ValidationException e
 
         when: 'save credential with invalid sessionName'
             credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
@@ -188,8 +187,7 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
                     sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
             credentialService.create(credentialCO)
         then: 'validation exception is thrown'
-            e = thrown()
-            e instanceof ValidationException
+            thrown ValidationException
         when: 'save credential with valid sessionName'
             sessionName = 'JSESSIONID@cookie:JSESSIONID'
             credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
@@ -201,20 +199,18 @@ class CredentialServiceIntegrationSpec extends IntegrationSpec {
         when: 'save credential with invalid sessionName'
             sessionName = 'access_token @ cookie : JSESSIONID'
             credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
-                'password', 'http://login.com', AuthenticationMethod.JWT,
+                'password', 'http://login.com', AuthenticationMethod.COOKIE,
                 sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
             credentialService.create(credentialCO)
         then: 'validation exception is thrown'
-            e = thrown()
-            e instanceof ValidationException
+            thrown ValidationException
         when: 'save credential with invalid source name "headers" instead of "header"'
             sessionName = 'access_token@headers:access_token'
             credentialCO = credentialTestHelper.createCredentialCO(provider, 'username',
-                'password', 'http://login.com', AuthenticationMethod.JWT,
+                'password', 'http://login.com', AuthenticationMethod.HEADER,
                 sessionName, AuthenticationRequestMode.FORM_VARS, validationExpression)
             credentialService.create(credentialCO)
         then: 'validation exception is thrown'
-            e = thrown()
-            e instanceof ValidationException
+            thrown ValidationException
     }
 }

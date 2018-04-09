@@ -1,4 +1,6 @@
 .asset-dependency-component
+    .error
+        color: $color-message-error--red
     .dependencies
         display: flex 
         flex-direction: column
@@ -19,7 +21,8 @@
                 max-width: 200px
                 overflow: hidden
                 font-weight: normal
-    .dependency-label 
+    .dependency-label
+        visibility: hidden
         max-width: 200px
         overflow: auto
         font-weight: normal
@@ -33,4 +36,7 @@
             color: #D1B9EE
         i 
             margin-left: -6px
+    .has-dependency-a .dependency-a .dependency-label,
+    .has-dependency-b .dependency-b .dependency-label
+      visibility: visible
 

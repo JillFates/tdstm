@@ -54,6 +54,10 @@ class MenuModule extends Module {
         projectsStaffItem       { projectsMenu.find("li.menu-projects-user-activation")}
         projectsMailItem        { projectsMenu.find("li.menu-projects-user-activation")}
         projectsFieldsSetItem   { projectsMenu.find("li.menu-projects-field-settings")}
+        projectsProviders       { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/provider/list")}
+        projectsCredentials     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/credential/list")}
+        projectsDatascripts     { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/datascript/list")}
+        projectsActions         { projectsMenu.find("li.menu-child-item").find("a", "href": "/tdstm/module/action/list")}
 
         assetsItem              { menuBar.find("li.menu-parent-assets")}
         assetsMenu              { assetsItem.find("ul",class:"dropdown-menu menu-item-expand")}
@@ -119,6 +123,26 @@ class MenuModule extends Module {
         selectItem(assetsApplicationsItem)
     }
 
+    def goToProviders(){
+        selectMenu(projectsItem)
+        selectItem(projectsProviders)
+    }
+
+    def goToCredentials(){
+        selectMenu(projectsItem)
+        selectItem(projectsCredentials)
+    }
+
+    def goToDatascripts(){
+        selectMenu(projectsItem)
+        selectItem(projectsDatascripts)
+    }
+
+    def goToActions(){
+        selectMenu(projectsItem)
+        selectItem(projectsActions)
+    }
+
     def goToTasksManager(){
         selectMenu(tasksItem)
         selectItem(tasksManagerItem)
@@ -127,6 +151,10 @@ class MenuModule extends Module {
     def goToTasksCookbook(){
         selectMenu(tasksItem)
         selectItem(tasksCookbookItem)
+    }
+    def goToAssetViewManager(){
+        selectMenu(assetsItem)
+        selectItem(assetsViewManagerItem)
     }
 
     def assertProjectName(name){

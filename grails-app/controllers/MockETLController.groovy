@@ -40,20 +40,17 @@ class MockETLController implements ControllerMethods {
         iterate {
             domain Application
         
-            extract 1 load id
-            extract 'model name' transform with lowercase() load Name
-            extract 3 transform with uppercase() load description
+            extract 1 load 'id'
+            extract 'model name' transform with lowercase() load 'Name'
+            extract 3 transform with uppercase() load 'description'
         
-            set environment with 'Production'
-            // find Application 'for' id by id with SOURCE.'device id'
-            find Application by id with SOURCE.'device id' into id
+            set environmentVar with 'Production'
+            find Application by 'id' with SOURCE.'device id' into 'id'
         
             domain Device
-        
-            extract 1 load id
-            extract 'model name' transform with uppercase() load Name
-            // find Device 'for' id by id with SOURCE.'device id'
-            find Device by id with SOURCE.'device id' into id
+            extract 1 load 'id'
+            extract 'model name' transform with uppercase() load 'Name'
+            find Device by 'id' with SOURCE.'device id' into 'id'
         }\
     """.stripIndent().trim()
 

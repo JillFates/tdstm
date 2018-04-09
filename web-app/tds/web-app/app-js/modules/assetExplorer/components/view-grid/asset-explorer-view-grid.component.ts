@@ -3,7 +3,7 @@ import {Component, Input, Output, EventEmitter, ViewEncapsulation, Inject, ViewC
 import { ViewSpec, ViewColumn, VIEW_COLUMN_MIN_WIDTH } from '../../model/view-spec.model';
 import { State } from '@progress/kendo-data-query';
 import {GridDataResult, DataStateChangeEvent, RowClassArgs} from '@progress/kendo-angular-grid';
-import { PreferenceService } from '../../../../shared/services/preference.service';
+import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { Observable } from 'rxjs/Rx';
 
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -21,7 +21,12 @@ import { AssetExplorerService } from '../../service/asset-explorer.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 
+const {
+	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
+	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE
+} = PREFERENCES_LIST;
 declare var jQuery: any;
+
 @Component({
 	selector: 'asset-explorer-view-grid',
 	exportAs: 'assetExplorerViewGrid',
@@ -87,14 +92,21 @@ export class AssetExplorerViewGridComponent {
 	private columnFiltersOldValues = [];
 
 	constructor(
-		private userPref: PreferenceService,
+		private preferenceService: PreferenceService,
 		@Inject('fields') fields: Observable<DomainModel[]>,
 		private prompt: UIPromptService,
 		private permissionService: PermissionService,
 		private assetService: AssetExplorerService,
 		private notifier: NotifierService,
 		private dialog: UIDialogService) {
-		this.state.take = +this.userPref.preferences['assetListSize'] || 25;
+
+		this.getPreferences()
+			.subscribe((preferences: any) => {
+				this.state.take  = parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25;
+				this.justPlanning =  preferences[PREFERENCE_JUST_PLANNING].toString() ===  'true';
+				this.onReload();
+			});
+
 		fields.subscribe((result: DomainModel[]) => {
 			this.fields = result.reduce((p, c) => {
 				return p.concat(c.fields);
@@ -105,6 +117,9 @@ export class AssetExplorerViewGridComponent {
 				};
 			});
 		}, (err) => console.log(err));
+	}
+	private getPreferences(): Observable<any> {
+		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
 	}
 
 	/**
@@ -335,5 +350,10 @@ export class AssetExplorerViewGridComponent {
 			return 'asset-detail-link';
 		}
 		return '';
+	}
+
+	onChangeJustPlanning(isChecked = false): void {
+		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
+			.subscribe(this.onReload.bind(this));
 	}
 }

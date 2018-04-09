@@ -39,6 +39,9 @@ public class GormUtil {
     // Used to control how some functions will perform comparisons with multiple where criteria
 	enum Operator { AND, OR }
 
+	// Used on Domain classes to specify the name property to use as the alternate lookup
+	static final String ALTERNATE_PROPERTY_NAME = 'alternateKey'
+
 	/**
 	 * Output GORM Domain constraints and update errors in human readable format
 	 * @param Domain the domain instance that has errors
@@ -1047,23 +1050,36 @@ public class GormUtil {
 	/**
 	 * Returns the data type for a given property on a Domain class
 	 * @param domainObject - the domain to inspect
-	 * @param property - the name of the property
+	 * @param propertyName - the name of the property
 	 * @return the class name of the property as a string
 	 */
-	static Class getDomainPropertyType(Object domainObject, String property) {
-		return getDomainPropertyType(domainObject.getClass(), property)
+	static Class getDomainPropertyType(Object domainObject, String propertyName) {
+		return getDomainPropertyType(domainObject.getClass(), propertyName)
 	}
 
 	/**
-	 * Returns the data type for a given property on domain class.
-	 *
-	 * @param clazz : the class to inspect.
-	 * @param property : the property to look up.
-	 *
-	 * @return the data type, null if the property doesn't exist.
+	 * Returns the data type for a given property on domain class
+	 * @param domainClass - the class to inspect
+	 * @param propertyName - the property to look up
+	 * @return the data type, null if the property doesn't exist
 	 */
-	static Class getDomainPropertyType(Class clazz, String property) {
-		return GrailsClassUtils.getPropertyType(clazz, property)
+	static Class getDomainPropertyType(Class domainClass, String propertyName) {
+		return GrailsClassUtils.getPropertyType(domainClass, propertyName)
+	}
+
+	/**
+	 * Used to get the domain class that a property represents in a domain. When the property is a reference
+	 * property then the reference class is returned otherwise the class specified is returned.
+	 * @param domainClass - the class to check
+	 * @param propertyName - the name of the property
+	 * @return the appropriate class
+	 */
+	static Class getDomainClassOfProperty(Class domainClass, String propertyName) {
+		if (isReferenceProperty(domainClass, propertyName)) {
+			 return getDomainPropertyType(domainClass, propertyName)
+		} else {
+			return domainClass
+		}
 	}
 
 	/**
@@ -1200,5 +1216,54 @@ public class GormUtil {
 	 */
 	static String domainShortName(Class domainClass) {
 		return domainClass.getName().split(/\./)[-1]
+	}
+
+	/**
+	 * Used to retrieve the property name that should be used as the alternate lookup
+	 * @param domainClass - the domain class to retrieve the alternate lookup property name
+	 * @return the property name if defined otherwise null
+	 */
+	static String getAlternateKeyPropertyName(Class domainClass) {
+		String name = null
+		if (domainClass.metaClass.hasProperty(domainClass,ALTERNATE_PROPERTY_NAME)) {
+			name = domainClass[ALTERNATE_PROPERTY_NAME]
+		}
+		return name
+	}
+
+	/**
+	 * Used to search a domain by its alternate key property name
+	 * @param domainClass - the domain class to perform the search on
+	 * @param searchValue - the search value to use in the search
+	 * @param project - the project to include in the search if the domain has a reference to one
+	 * @param extraCriteria - an optional map of additional parameters to use for the query
+	 * @return A list of the domain instances found or empty list if not found. If the domain does
+	 * 		have an alternate property name defined then the method will return NULL.
+	 */
+	static List findDomainByAlternateKey(Class domainClass, String searchValue, Project project=null, Map extraCriteria=null) {
+		List entities = null
+		String altKeyName = getAlternateKeyPropertyName(domainClass)
+		if (altKeyName) {
+			String domainName = domainShortName(domainClass)
+			Map params = [searchValue:searchValue]
+			StringBuilder hql = new StringBuilder("from ${domainName} as x where x.${altKeyName} = :searchValue")
+
+			// Include project in the query if the domain references it
+			if (isDomainProperty(domainClass, 'project')) {
+				hql.append(' and x.project.id = :projectId')
+				params.projectId = project.id
+			}
+
+			if (extraCriteria) {
+				for (criteria in extraCriteria) {
+					hql.append(" and x.${criteria.key} = :${criteria.key}")
+					params.put(criteria.key, criteria.value)
+				}
+			}
+			// println "hql = ${hql.toString()}, params=$params"
+			// Try finding the entity or more...
+			entities = domainClass.findAll(hql.toString(), params)
+		}
+		return entities
 	}
 }

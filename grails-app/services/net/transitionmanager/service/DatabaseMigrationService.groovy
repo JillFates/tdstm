@@ -140,7 +140,7 @@ class DatabaseMigrationService implements ServiceMethods {
 			// Assign the result of the script execution to the same field, which may be a different object.
 			domainObject[jsonField] = JsonUtil.validateJsonAndConvertToString(transformedJson)
 			// Save the changes or throw an exception.
-			if (!domainObject.save(flush:true)) {
+			if (!domainObject.save(flush:true, failOnError: true)) {
 				throw new DomainUpdateException(GormUtil.allErrorsString(domainObject))
 			}
 		}

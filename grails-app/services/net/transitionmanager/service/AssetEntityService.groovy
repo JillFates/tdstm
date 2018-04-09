@@ -2317,10 +2317,10 @@ class AssetEntityService implements ServiceMethods {
 		model.manufacturer = filters?.manufacturer ?:''
 		model.prefType = prefType
 		model.serialNumber = filters?.serialNumberFilter ?:''
-		model.sourceLocation = filters?.sourceLocationFilter ?:''
-		model.sourceRack = filters?.sourceRackFilter ?:''
-		model.targetLocation = filters?.targetLocationFilter ?:''
-		model.targetRack = filters?.targetRackFilter ?:''
+		model.sourceLocation = filters?.locationSourceFilter ?:''
+		model.sourceRack = filters?.rackSourceFilter ?:''
+		model.targetLocation = filters?.locationTargetFilter ?:''
+		model.targetRack = filters?.rackTargetFilter ?:''
 		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
 		model.type = params.type
 

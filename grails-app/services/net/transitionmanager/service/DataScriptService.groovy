@@ -12,12 +12,14 @@ import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import org.apache.commons.io.FilenameUtils
+import org.apache.poi.poifs.filesystem.NotOLE2FileException
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.supercsv.exception.SuperCsvException
 
 import java.text.DecimalFormat
 
@@ -25,6 +27,11 @@ class DataScriptService implements ServiceMethods{
 
     ProviderService providerService
     SecurityService securityService
+
+	 static final Map EMPTY_SAMPLE_DATA_TABLE = [
+			   config: [],
+			   rows  : []
+	 ].asImmutable()
 
     /**
      * Create or update a DataScript instance based on the JSON object received.
@@ -120,8 +127,23 @@ class DataScriptService implements ServiceMethods{
 	 * @param command
 	 * @return
 	 */
-	boolean validateUniqueName(DataScriptNameValidationCommand command) {
-		return validateUniqueName(command.name, command.dataScriptId, command.providerId)
+	boolean validateUniqueName(DataScriptNameValidationCommand command, Project project = null) {
+		if (!project) {
+			project = securityService.userCurrentProject
+		}
+		// Make sure that name is unique
+		int count = DataScript.where {
+			project == project
+			name == command.name
+			provider.id == command.providerId
+			if (command.dataScriptId) {
+				id != command.dataScriptId
+			}
+		}.count()
+		if (count > 0) {
+				return false
+		}
+		return true
 	}
 
 
@@ -256,31 +278,59 @@ class DataScriptService implements ServiceMethods{
 	* Parse a file that represent a MAP of data
 	* Current Formats supported:
 	*   JSON, CSV, EXCEL
-	* @param fileName
+	* @param fileName - the filename to use to retrieve data from filesystem
+	* @param maxRows - the maximum number of rows to retrieve
+	 * 	(currently only supported by Excel)
 	* @return
 	*/
-	Map parseDataFromFile (String fileName) {
+	Map parseDataFromFile (String fileName, Long maxRows) throws EmptyResultException{
 		try{
 			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
 
-			switch (extension) {
-			case 'JSON':
-				return parseDataFromJSON(fileName)
+        switch (extension) {
+            case 'JSON':
+                return parseDataFromJSON(fileName)
 
-			case 'CSV':
-				return parseDataFromCSV(fileName)
+            case 'CSV':
+                return parseDataFromCSV(fileName)
 
-			case ['XLS', 'XLSX'] :
-				return parseDataFromXLS(fileName)
+            case ['XLS', 'XLSX'] :
+                return parseDataFromXLS(fileName, 0, 0, maxRows)
 
 			default :
-			   throw new RuntimeException("Format ($extension) not supported")
+				throw new InvalidParamException("File format ($extension) is not supported")
 			}
 
 		} catch (ex) {
 			log.error(ex.message, ex)
-			throw ex
+
+			String message
+			switch(ex) {
+				case FileNotFoundException :
+					message = "The source data was not found"
+					break
+
+				case NotOLE2FileException:
+				case InvalidParamException:
+				case SuperCsvException:
+					message = "Unable to parse the source data"
+					break
+
+				default :
+					message = ex.message
+			}
+
+			throw new InvalidParamException(message)
 		}
+	}
+
+	private File tempFile(String fileName) throws FileNotFoundException {
+		File inputFile = new File(FileSystemService.temporaryDirectory, fileName)
+		if (! inputFile.exists()) {
+			throw new FileNotFoundException(inputFile.toString())
+		}
+
+		return inputFile
 	}
 
 	/**
@@ -290,17 +340,24 @@ class DataScriptService implements ServiceMethods{
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromJSON (String jsonFile) throws RuntimeException {
-		def inputFile = new File(FileSystemService.temporaryDirectory, jsonFile)
-		return JsonUtil.parseJson(inputFile.text)
+		File inputFile = tempFile(jsonFile)
+		String text = inputFile?.text?.trim()
+		if(! text ) {
+			return EMPTY_SAMPLE_DATA_TABLE
+		}
+
+		return JsonUtil.parseJson(text)
 	}
 
 	/**
-	 * PArse CSV file to get the
+	 * Parse CSV file to get the
 	 * @param csvFile
 	 * @return Map with the description of the CSV File Data
 	 * @throws RuntimeException
 	 */
 	Map parseDataFromCSV (String csvFile) throws RuntimeException {
+		tempFile(csvFile)
+
 		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
 		def csv = new CSVDataset(connection: con, fileName: csvFile, header: true)
 
@@ -322,61 +379,62 @@ class DataScriptService implements ServiceMethods{
 
 	/**
 	 * Parse Excel file to generate the JSON datafile
-	 * @param xlsFile
-	 * @param sheetNumber
-	 * @param headerRowIndex
+	 * @param xlsFile - the filename to use to retrieve data from filesystem
+	 * @param sheetNumber - the workbook sheet number to pull data from
+	 * @param headerRowIndex - the header row index
+	 * @param maxRows - the maximum number of rows to retrieve
 	 * @return Map with the description of the Excel File Data
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0) throws RuntimeException {
+	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0, Long maxRows) throws RuntimeException {
 
 		DecimalFormat df = new DecimalFormat('#.#########')
-
-		Workbook workbook = WorkbookFactory.create(new File(FileSystemService.temporaryDirectory, xlsFile))
-		Sheet sheet = workbook.getSheetAt(sheetNumber)
-		Row header = sheet.getRow(headerRowIndex)
-		Iterator<Cell> headerCells = header.cellIterator()
 
 		List<Map<String, String>> config = []
 		Map<Integer, String> headerMap = [:]
 
-		while (headerCells.hasNext()) {
-			Cell cell = headerCells.next()
-			String type = 'text'
-			String value = cell.toString()
+		Workbook workbook = WorkbookFactory.create( tempFile(xlsFile) )
+		Sheet sheet = workbook.getSheetAt(sheetNumber)
+		Row header = sheet.getRow(headerRowIndex)
 
-			headerMap[cell.columnIndex] = value
+		if (header) {
+			Iterator<Cell> headerCells = header.cellIterator()
 
-			config << [
-					property: value,
-					type    : type
-			]
+			while (headerCells.hasNext()) {
+				Cell cell = headerCells.next()
+				String type = 'text'
+				String value = cell.toString()
+
+				headerMap[cell.columnIndex] = value
+
+				config << [
+						  property: value,
+						  type    : type
+				]
+			}
 		}
-
 
 		List<Map> data = []
 		int lastRowNum = sheet.getLastRowNum()
 
-		for( int r = headerRowIndex + 1; r <= lastRowNum; r++ ) {
+		for( int r = headerRowIndex + 1; (r <= lastRowNum && r <= maxRows); r++ ) {
 			Row row = sheet.getRow(r)
 
 			Map object = [:]
 			data << object
 			Iterator<Row>cellIterator = row.cellIterator()
 
-			int c = 0
 			while (cellIterator.hasNext()) {
 				Cell cell = cellIterator.next()
-				String key = headerMap[ cell.columnIndex ]
-				String value = ''
-				if (cell.cellType== Cell.CELL_TYPE_NUMERIC) {
-					value =  df.format( cell.numericCellValue )
+				String key = headerMap[cell.columnIndex]
+				String value
+				if (cell.cellType == Cell.CELL_TYPE_NUMERIC) {
+					value = df.format(cell.numericCellValue)
 				} else {
 					value = cell.toString()
 				}
 
-				object[ key ] = value
-				c ++
+				object[key] = value
 			}
 		}
 

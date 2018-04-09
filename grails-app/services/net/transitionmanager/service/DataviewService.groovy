@@ -887,12 +887,12 @@ class DataviewService implements ServiceMethods {
 							join: 'left outer join AE.sme2',
 							alias:'sme2'],
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
-		'sourceLocation' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
-		'sourceRack'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
-		'sourceRoom'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
-		'targetLocation' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
-		'targetRack'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
-		'targetRoom'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget']
+		'locationSource' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
+		'rackSource'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
+		'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
+		'locationTarget' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
+		'rackTarget'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
+		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget']
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
     }

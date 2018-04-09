@@ -13,6 +13,8 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import net.transitionmanager.agent.AbstractAgent
+import net.transitionmanager.agent.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.MoveBundle
@@ -335,11 +337,11 @@ class TaskController implements ControllerMethods {
 			if (securityService.hasPermission(Permission.ActionReset)) {
 				if (comment.hasAction() && !comment.isAutomatic() && comment.status == HOLD) {
 					actionBar << [
-						label: message(code:'task.button.resetAction.label'), 
-						icon: 'ui-icon-power', 
+						label: message(code:'task.button.resetAction.label'),
+						icon: 'ui-icon-power',
 						actionType: 'resetAction', newStatus: READY,
-						redirect:'taskManager', 
-						tooltipText: message(code:'task.button.resetAction.tooltip'), 
+						redirect:'taskManager',
+						tooltipText: message(code:'task.button.resetAction.tooltip'),
 						disabled: false]
 				}
 			}
@@ -1098,7 +1100,7 @@ digraph runbook {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
 		def apiActionList = apiActionService.list(project)
-	
+
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
@@ -1113,14 +1115,15 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
+			AbstractAgent agent = apiActionService.agentInstanceForAction(assetComment.apiAction)
+			DictionaryItem methodInfo = agent.getMethod( apiAction.agentMethod )
 			Map apiActionPayload = [
-					agent       : apiAction.agentClass.toString(),
-					method      : apiAction.agentMethod,
-					description : apiAction.description,
-					methodParams: apiAction.methodParamsList,
-					methodParamsValues: apiActionService.getApiActionParametersAndValuesFromContext(apiAction, assetComment)
+				agent       : agent.name,
+				method      : methodInfo.name,
+				description : methodInfo.description,
+				methodParams: apiAction.methodParamsList,
+				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
-
 			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
 		} else {
 			sendForbidden()

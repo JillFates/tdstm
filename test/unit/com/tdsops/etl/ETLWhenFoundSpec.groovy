@@ -143,20 +143,20 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application by id with DOMAIN.asset into asset 
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
-       						elseFind Application by assetName with SOURCE.DependentName into asset
-    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenNotFound asset create {
+    						whenNotFound 'asset' create {
     							assetClass Application
-    							assetName primaryName
-    							assetType primaryType
+    							assetName primaryNameVar
+    							assetType primaryTypeVar
     							"SN Last Seen" NOW
     						}
 						}
@@ -167,7 +167,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -268,19 +268,19 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application by id with DOMAIN.asset into asset 
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
-       						elseFind Application by assetName with SOURCE.DependentName into asset
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						
-    						whenNotFound asset update {
+    						whenNotFound 'asset' update {
     							assetClass Application
-    							assetName primaryName
-    							assetType primaryType
+    							assetName primaryNameVar
+    							assetType primaryTypeVar
     							"SN Last Seen" NOW
     						}
 						}
@@ -351,17 +351,17 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application by id with DOMAIN.asset into asset 
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset
-       						elseFind Application by assetName with SOURCE.DependentName into asset
-    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, 'primaryType' into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenFound asset create {
+    						whenFound 'asset' create {
     							"TN Last Seen" NOW
     						}
 						}
@@ -371,91 +371,6 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Incorrect whenFound command. Use whenFound asset update { .... }'
-
-		cleanup:
-			if(fileName){
-				service.deleteTemporaryFile(fileName)
-			}
-	}
-
-	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain using local variables'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
-
-		and:
-			List<AssetEntity> assetEntities = [
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
-							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
-    
-							find Application by id with DOMAIN.asset into asset 
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset 
-       						elseFind Application by assetName with SOURCE.DependentName into asset 
-    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
-    						
-							whenNotFound asset create {
-								assetClass Unknown
-								assetName primaryName
-								assetType primaryType
-								"SN Last Seen" NOW
-							}
-
-						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 
 		cleanup:
 			if(fileName){
@@ -517,17 +432,17 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application by id with DOMAIN.asset into asset  
-   							elseFind Application by assetName, assetType with SOURCE.AssetName, primaryType into asset 
-       						elseFind Application by assetName with SOURCE.DependentName into asset
-    						elseFind Asset by assetName with SOURCE.DependentName into asset warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset'  
+   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenFound asset update {
+    						whenFound 'asset' update {
     							"TN Last Seen" NOW
     						}
 						}
@@ -538,7 +453,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 

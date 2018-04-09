@@ -248,5 +248,10 @@ export class DataGridOperationsHelper {
 	 */
 	public loadPageData(): void {
 		this.gridData = process(this.resultSet, this.state);
+		// if filtered data is less than the current page set (skip) move to the first page.
+		if (this.gridData.total < this.state.skip) {
+			this.state.skip = 0;
+			this.gridData = process(this.resultSet, this.state);
+		}
 	}
 }
