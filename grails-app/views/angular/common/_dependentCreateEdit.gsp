@@ -1,22 +1,63 @@
 <%@page import="com.tdsops.tm.enums.domain.AssetClass" %>
 
-<kendo-grid [data]="dataGridOperationsHelper.gridData">
-	<kendo-grid-column field="ProductID" title="ID" width="40">
-	</kendo-grid-column>
-	<kendo-grid-column field="ProductName" title="Name" width="250">
-	</kendo-grid-column>
-	<kendo-grid-column field="Category.CategoryName" title="Category">
-	</kendo-grid-column>
-	<kendo-grid-column field="UnitPrice" title="Price" width="80">
-	</kendo-grid-column>
-	<kendo-grid-column field="UnitsInStock" title="In stock" width="80">
-	</kendo-grid-column>
-	<kendo-grid-column field="Discontinued" title="Discontinued" width="120">
-		<ng-template kendoGridCellTemplate let-dataItem>
-			<input type="checkbox" [checked]="dataItem.Discontinued" disabled/>
+<td valign="top" colspan="2">
+<%-- Supports Block --%>
+<kendo-grid
+		*ngIf="dataGridSupportsOnHelper"
+		[data]="dataGridSupportsOnHelper.gridData"
+		[sort]="dataGridSupportsOnHelper.state.sort"
+		[sortable]="{mode:'single'}"
+		(pageChange)="dataGridSupportsOnHelper.pageChange($event)"
+		[resizable]="true"
+		(sortChange)="dataGridSupportsOnHelper.sortChange($event)">
+
+	<!-- Toolbar Template -->
+	<ng-template kendoGridToolbarTemplate [position]="'top'">
+		<label class="pad-top-7 pad-left-10">Supports On</label>
+		<button (click)="onAddSupportsOn()" class="btn btn-default float-right mar-right-15 pad-top-6" type="button">
+			<i class="fa fa-fw fa-plus-circle"></i> Add Suport
+		</button>
+	</ng-template>
+
+	<!-- Columns -->
+	<kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"
+					   field="{{column.property}}"
+					   [headerClass]="column.headerClass ? column.headerClass : ''"
+					   [headerStyle]="column.headerStyle ? column.headerStyle : ''"
+					   [class]="column.cellClass ? column.cellClass : ''"
+					   [style]="column.cellStyle ? column.cellStyle : ''"
+					   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+
+		<!-- Header Template -->
+		<ng-template kendoGridHeaderTemplate>
+			<label>{{column.label}}</label>
 		</ng-template>
+
+		<!-- Action -->
+		<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+			<div class="k-grid-ignore-click" style="cursor: default;">
+				<button *ngIf="dataItem.status.code === 'PENDING'"
+						(click)="onPlayButton(dataItem)"
+						class="btn btn-action btn-default"
+						title="Delete">
+					<i class="fa fa-play-circle-o"></i>
+				</button>
+			</div>
+		</ng-template>
+
+		<ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
+			<kendo-dropdownlist
+					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+					[data]="dataFlowFreqList"
+					[(ngModel)]="dataItem.context"
+					required>
+			</kendo-dropdownlist>
+		</ng-template>
+
 	</kendo-grid-column>
 </kendo-grid>
+
+</td>
 
 <%-- Supports Block --%>
 <td valign="top" colspan="2">

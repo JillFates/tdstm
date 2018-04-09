@@ -8,9 +8,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { DateUtils} from '../../../../shared/utils/date.utils';
-import * as R from 'ramda';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
+import {SupportOnColumnsModel} from '../../model/support-on-columns.model';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 
@@ -25,12 +26,15 @@ export function DatabaseEditComponent(template, editModel) {
 	}) class DatabaseShowComponent implements OnInit {
 
 		private dateFormat: string;
-		private dataGridOperationsHelper: DataGridOperationsHelper;
+		private dataGridSupportsOnHelper: DataGridOperationsHelper;
+		private dataGridDependsOnHelper: DataGridOperationsHelper;
+		private supportOnColumnModel: SupportOnColumnsModel;
 		private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 		private initialSort: any = [{
 			dir: 'desc',
 			field: 'dateCreated'
 		}];
+		private dataFlowFreqList = [];
 
 		constructor(
 			@Inject('model') private model: any,
@@ -50,7 +54,17 @@ export function DatabaseEditComponent(template, editModel) {
 				};
 			}
 
-			this.dataGridOperationsHelper = new DataGridOperationsHelper([], this.initialSort, this.selectableSettings);
+			// Lists
+			this.dataFlowFreqList =  R.clone(editModel.dataFlowFreq);
+			// Supports On
+			this.getSupportOnList();
+			// Depends On
+		}
+
+		private getSupportOnList(): void {
+			this.supportOnColumnModel = new SupportOnColumnsModel();
+			let dependencyMap = R.clone(editModel.dependencyMap);
+			this.dataGridSupportsOnHelper = new DataGridOperationsHelper([{ dataFlowFreq: 'Hola', supportClass: 'Hola2', name: 'Hola3', bundle: 'Hola4'}], this.initialSort, this.selectableSettings);
 		}
 
 		/**
@@ -60,8 +74,18 @@ export function DatabaseEditComponent(template, editModel) {
 			jQuery('[data-toggle="popover"]').popover();
 		}
 
-		cancelCloseDialog(): void {
+		/***
+		 * Close the Active Dialog
+		 */
+		public cancelCloseDialog(): void {
 			this.activeDialog.close();
+		}
+
+		/**
+		 * Add a new record to the Support On List
+		 */
+		public onAddSupportsOn(): void {
+			//
 		}
 
 	}

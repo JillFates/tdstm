@@ -325,15 +325,16 @@ class WsAssetController implements ControllerMethods {
 		AssetEntity asset = fetchDomain(AssetEntity, params)
 		if (asset) {
 			Map model = [
-				asset: asset,
-				dependencyMap: []
+				asset: asset
 			]
 			String domainName = AssetClass.getDomainForAssetType(asset.assetClass.toString())
 			if (mode == 'show') {
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
 			} else {
 				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
+				// Required for Supports On and Depends On
 				model.dependencyMap = assetEntityService.dependencyEditMap(params);
+				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 			}
 			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
 			renderAsJson(model)
