@@ -22,7 +22,9 @@ class HomeUserDownloadsPage extends Page {
     }
 
     def getFileRow(fullFileName){
-        $("table td a").find {it.text().contains(fullFileName)}
+        waitFor{ resultsTable }
+        def fileRow = resultsTable.find("td a")
+        fileRow.find {it.text().contains(fullFileName)}
     }
 
     def verifyExportedFile(fullFileName){
