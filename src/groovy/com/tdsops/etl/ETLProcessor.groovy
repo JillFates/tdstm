@@ -25,6 +25,7 @@ import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
 import static org.codehaus.groovy.syntax.Types.MOD
 import static org.codehaus.groovy.syntax.Types.MULTIPLY
 import static org.codehaus.groovy.syntax.Types.PLUS
+import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 
@@ -980,7 +981,7 @@ class ETLProcessor implements RangeChecker {
 			starImportsWhitelist = []
 			// Language tokens allowed
 			tokensWhitelist = [
-				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS,
+				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL,
 				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL,
 				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
 			].asImmutable()
@@ -989,7 +990,7 @@ class ETLProcessor implements RangeChecker {
 				Object, Integer, Float, Long, Double, BigDecimal, String,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
 			].asImmutable()
-			// Classes who are allwed to be receivers of method calls
+			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 			    Object, // TODO: This is too much generic class.
 				Integer, Float, Double, Long, BigDecimal, String

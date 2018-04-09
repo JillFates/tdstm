@@ -199,15 +199,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							log it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == sixRowsDataSet.rowsSize()
@@ -220,15 +218,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						from 1 to 3 iterate {
 							log it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == 3
@@ -241,15 +237,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script with iterate staring in zero is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						from 0 to 3 iterate {
 							println it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -257,15 +251,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 
 
 		when: 'The ETL script with iterate with a bigger to parameter is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						from 1 to 8 iterate {
 							println it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			e = thrown ETLProcessorException
@@ -280,15 +272,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						from 1, 2, 3 iterate {
 							log it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == 3
@@ -301,15 +291,13 @@ class ETLIterateSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						from 0, 2, 4 iterate {
 							println it
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown with a message for the invalid from parameter'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -338,8 +326,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
@@ -349,8 +336,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						domain Device
 						extract 'device id' load 'id'
 						extract 'model name' load 'Name'
-					}""".stripIndent(),
-				ETLProcessor.class.name)
+					}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 2
@@ -428,8 +414,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
@@ -442,8 +427,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						extract 'device id' load 'id'
 						extract 'model name' load 'Name'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 2
@@ -521,8 +505,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
@@ -535,8 +518,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 						extract 'device id' load 'id'
 						extract 'model name' load 'assetName'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 2

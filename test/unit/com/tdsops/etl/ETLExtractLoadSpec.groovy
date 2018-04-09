@@ -182,12 +182,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Application
 
-					 """.stripIndent(),
-				ETLProcessor.class.name)
+					 """.stripIndent())
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -210,16 +208,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						// Script supports one line comments
 						domain Application
 						/*
 							And multiple Lines comments
 						*/
 
-					 """.stripIndent(),
-				ETLProcessor.class.name)
+					 """.stripIndent())
 
 		then: 'A domain is selected'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -242,13 +238,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 
 						domain Unknown
 
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -262,15 +256,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 
 						domain Application
 						domain Device
 						domain Storage
 
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
 			etlProcessor.selectedDomain == ETLDomain.Storage
@@ -303,15 +295,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 
 						domain Application
 						domain Device
 						domain Application
 
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
 			etlProcessor.selectedDomain == ETLDomain.Application
@@ -338,8 +328,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("invalid on", ETLProcessor.class.name)
+			etlProcessor.evaluate("invalid on")
 
 		then: 'An MissingMethodException exception is thrown'
 			ETLProcessorException exception = thrown ETLProcessorException
@@ -357,11 +346,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
-					""".stripIndent(), ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'A column map is created'
 			etlProcessor.column('device id').index == 0
@@ -391,17 +379,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 2
 						}
 
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The last column index is selected correctly'
 			etlProcessor.currentColumnIndex == 1
@@ -424,17 +409,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 'model name'
 						}
-
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The last column index is selected correctly'
 			etlProcessor.currentColumnIndex == 1
@@ -453,17 +434,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 'model'
 						}
-
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -478,15 +455,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 0
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -500,15 +475,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 10000
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -529,15 +502,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -577,8 +548,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
@@ -589,8 +559,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							load 'environment' with 'This is not a Microsoft Application'
 						}
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -630,7 +599,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					read labels
 					domain Application
@@ -642,8 +611,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							load 'environment' with CE
 						}
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -683,8 +651,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
@@ -697,8 +664,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							load 'Name' with DOMAIN.environment
 						}
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -754,8 +720,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
@@ -768,8 +733,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							load 'Name' with SOURCE.'application id'
 						}
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -825,8 +789,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
@@ -839,8 +802,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							load 'environment' with myLocalVar
 						}
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -879,15 +841,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' load 'appVendor' load 'description'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -941,15 +901,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -971,15 +930,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' load 'vendedor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -1000,7 +958,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					domain Application
 					read labels
@@ -1008,8 +966,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						extract 'application id' load 'id'
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.result.domains.size() == 1
@@ -1053,7 +1010,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						validator)
 
 		when: 'The ETL script is evaluated'
-		new GroovyShell(this.class.classLoader, etlProcessor.binding)
+		etlProcessor
 			.evaluate("""
 				read labels
 				domain Device
@@ -1062,8 +1019,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'mfg' load 'manufacturer'
 					extract 3 load 'model'
 				}
-			""".stripIndent(),
-					ETLProcessor.class.name)
+			""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 		etlProcessor.result.domains.size() == 1
@@ -1136,7 +1092,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 					read labels
 					iterate {
@@ -1149,8 +1105,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						extract 1 load 'id'
 						load 'location' with 'Development'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 2
@@ -1273,7 +1228,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 										console on
 										read labels
@@ -1282,8 +1237,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											extract 'roomId' load 'id'
 											extract 'Name' load 'roomName'
 										}
-										""".stripIndent(),
-								ETLProcessor.class.name)
+										""".stripIndent())
 
 						then: 'Results should contain Room domain results associated'
 							etlProcessor.result.domains.size() == 1
@@ -1327,7 +1281,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 										console on
 										read labels
@@ -1337,8 +1291,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											extract 'Location' load 'location'
 											extract 'Room' load 'room'
 										}
-										""".stripIndent(),
-								ETLProcessor.class.name)
+										""".stripIndent())
 
 						then: 'Results should contain Rack domain results associated'
 							etlProcessor.result.domains.size() == 1
@@ -1361,7 +1314,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1373,8 +1326,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											load 'environment' with 'Development'
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results should contain domain results associated'
 							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -1435,15 +1387,14 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 
 									iterate {
 										extract 1 load 'id'
 									}
-									""".stripIndent(),
-								ETLProcessor.class.name)
+									""".stripIndent())
 
 						then: 'An ETLProcessorException is thrown'
 							ETLProcessorException e = thrown()
@@ -1467,7 +1418,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1479,8 +1430,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											set environmentVar with 'Development'
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'An ETLProcessorException is thrown'
 							MissingMethodException e = thrown MissingMethodException
@@ -1501,7 +1451,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1513,8 +1463,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											load 'environment' with 'Development'
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results should contain domain results associated'
 							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -1559,7 +1508,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1571,8 +1520,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											set environmentVar with 'Development'
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'An ETLProcessorException is thrown'
 							MissingMethodException e = thrown MissingMethodException
@@ -1594,7 +1542,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 
@@ -1611,8 +1559,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											extract 'technology' load 'Name'
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results should contain domain results associated'
 							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -1670,7 +1617,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									iterate {
@@ -1693,8 +1640,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											}
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results should contain domain results associated'
 							etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -1740,14 +1686,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									iterate {
 										ignore row
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'An ETLProcessorException is thrown'
 							ETLProcessorException e = thrown ETLProcessorException
@@ -1770,7 +1715,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1782,8 +1727,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											load 'Name' with CE
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results will ignore a row'
 							etlProcessor.result.domains.size() == 1
@@ -1810,7 +1754,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 								validator)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									read labels
 									domain Application
@@ -1822,8 +1766,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 											load 'Name' with CE
 										}
 									}
-								""".stripIndent(),
-								ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Results will ignore a row'
 							etlProcessor.result.domains.size() == 1
@@ -1851,7 +1794,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							)
 
 						when: 'The ETL script is evaluated'
-							new GroovyShell(this.class.classLoader, etlProcessor.binding)
+							etlProcessor
 								.evaluate("""
 									console on
 									read labels
@@ -1865,7 +1808,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 										}
 
 									}
-								""".stripIndent(), ETLProcessor.class.name)
+								""".stripIndent())
 
 						then: 'Third row was removed from the domain results'
 							etlProcessor.result.domains.size() == 1
@@ -1909,7 +1852,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 						console on
 						read labels
@@ -1918,8 +1861,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							set myLocalVar with 'Custom Name'
 							load 'Name' with myLocalVar
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1
@@ -1971,7 +1913,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 						console on
 						read labels
@@ -1980,8 +1922,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							set myLocalVar with SOURCE.'name'
 							load 'Name' with myLocalVar
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1
@@ -2033,7 +1974,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 						console on
 						read labels
@@ -2043,8 +1984,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							set myLocalVar with DOMAIN.environment
 							load 'Name' with myLocalVar
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1
@@ -2103,8 +2043,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -2119,8 +2058,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							set anotherVar with 'xyzzy'
 							load 'custom2' with anotherVar
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1
@@ -2203,7 +2141,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent, ETLProcessor.class.name)
+			etlProcessor.evaluate(scriptContent)
 
 		then:
 			etlProcessor.result.domains.size() == 1
@@ -2245,7 +2183,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+			etlProcessor
 				.evaluate("""
 						console on
 						read labels
@@ -2254,8 +2192,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 							domain Device
 							load 'Name' with myLocalVar
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
 			etlProcessor.result.domains.size() == 1

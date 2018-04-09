@@ -126,8 +126,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -137,8 +136,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -251,8 +249,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Application
@@ -260,8 +257,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetId' load 'id'
 							find Application by 'id' with DOMAIN.id into 'id' 
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -374,8 +370,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -395,8 +390,7 @@ class ETLFindSpec extends ETLBaseSpec {
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -520,8 +514,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -539,8 +532,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							 	load 'comment' with 'Asset results not found'
 							}
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -591,8 +583,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -601,8 +592,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'asset'
 							find Application by 'id' with DOMAIN.asset into 'asset'   
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -657,8 +647,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -667,8 +656,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'id'
 							find Application by 'id' with 'id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -719,8 +707,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -732,8 +719,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id' 
 							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1

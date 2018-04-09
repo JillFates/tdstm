@@ -83,10 +83,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			Map<String, ?> result = etlProcessor.checkSyntax("""
 				// Script supports one line comments
-				domain Application
 				/*
 					And multiple Lines comments
 				*/
+				domain Application
 			""".stripIndent())
 
 		then: 'It has a valid syntax'
@@ -107,10 +107,10 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				// Script supports one line comments
-				domain Application
 				/*
 					And multiple Lines comments
 				*/
+				domain Application
 			""".stripIndent())
 
 		then: 'A domain is selected'
@@ -134,12 +134,13 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			Map<String, ?> result = etlProcessor.checkSyntax("""domain Device
-						read labels
-						iterate 
-							extract 'MODEL NAME' 
-						}
-					""".stripIndent())
+			Map<String, ?> result = etlProcessor.checkSyntax("""
+					domain Device
+					read labels
+					iterate 
+						extract 'MODEL NAME' 
+					}
+				""".stripIndent())
 
 		then: 'Result has validSyntax equals false and a list of errors'
 			with(result) {
