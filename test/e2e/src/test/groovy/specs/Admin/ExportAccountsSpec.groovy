@@ -6,7 +6,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import java.text.SimpleDateFormat
-import utils.ManageSystemDirectory
+import pages.Downloads.HomeUserDownloadsPage
 
 @Stepwise
 class ExportAccountsSpec extends GebReportingSpec {
@@ -19,13 +19,8 @@ class ExportAccountsSpec extends GebReportingSpec {
     static fileName = "AccountExport-${projName}-${formattedDate}"
     static fullFileName = fileName + "." + fileExtension
 
-    def initializeManageSystemDirectory() {
-        new ManageSystemDirectory()
-    }
-
     def setupSpec() {
         testCount = 0
-        initializeManageSystemDirectory().createTempDownloadsFolder()
         to LoginPage
         login()
         at MenuPage
@@ -39,10 +34,6 @@ class ExportAccountsSpec extends GebReportingSpec {
     def cleanup() {
         String sCount = String.format("%03d", testCount)
         println "cleanup(): ${testKey} #${sCount} ${specificationContext.currentIteration.name} "
-    }
-
-    def cleanupSpec() {
-        initializeManageSystemDirectory().deleteTempDownloadsFolder()
     }
 
     def "1. The User Navigates in the Export Accounts Section"() {
@@ -65,9 +56,9 @@ class ExportAccountsSpec extends GebReportingSpec {
             randomSelectUserLogins()
         and: 'The user clicks on export button'
             clickOnExportExcel()
-        and: 'The user waits for success file download'
-            initializeManageSystemDirectory().waitForDownloadedFile(fileName)
-        then: 'The file was successfully downloaded'
-            assert initializeManageSystemDirectory().verifyExportedFile(fileName, fullFileName), "Expecting ${fullFileName}"
+        then: 'The user browse to Downloads folder'
+            to HomeUserDownloadsPage
+        and: 'The file was successfully downloaded'
+            assert verifyExportedFile(fullFileName), "System has exported more than one file"
     }
 }
