@@ -49,7 +49,7 @@
 			<kendo-dropdownlist
 					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
 					[data]="dataFlowFreqList"
-					[(ngModel)]="dataItem.context"
+					[(ngModel)]="dataItem.dataFlowFreq"
 					required>
 			</kendo-dropdownlist>
 		</ng-template>
@@ -61,14 +61,12 @@
 
 <%-- Supports Block --%>
 <td valign="top" colspan="2">
-	<div style="width: auto;" >
 		<span style="float: left;"><h1>Supports:</h1></span>
 		<span><input type='button' class="addDepButton" value='Add' onclick="EntityCrud.addAssetDependencyRow('support');"></span>
 		<br/>
 		<table style="width: 100%;">
 			<thead>
 				<tr>
-					<th>Frequency</th>
 					<th>Class</th>
 					<th>Name</th>
 					<th>Bundle</th>
@@ -82,7 +80,6 @@
 			<g:each in="${supportAssets}" var="support" status="i">
 				<g:set var="type" value="${ AssetClass.getClassOptionForAsset(support?.asset) }"></g:set>
 				<tr id='row_s_${i}_${support.id}'>
-					<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
 
 					<%-- Class --%>
 					<td class="class-wrap-depend">
@@ -153,10 +150,9 @@
 			</g:each>
 			</tbody>
 		</table>
-	</div>
 
 <%-- Depends Block --%>
-	<div style="width: auto;">
+
 		<span style="float: left;"><h1>Is dependent on:&nbsp;&nbsp;</h1></span>
 		<span><input type='button' class="addDepButton" value='Add' onclick="EntityCrud.addAssetDependencyRow('dependent');"></span>
 		<br/>
@@ -253,5 +249,4 @@
 			</g:each>
 			</tbody>
 		</table>
-	</div>
 </td>

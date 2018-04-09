@@ -10,7 +10,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
-import {SupportOnColumnsModel} from '../../model/support-on-columns.model';
+import {DependencySupportModel, SupportOnColumnsModel} from '../../model/support-on-columns.model';
 import * as R from 'ramda';
 
 declare var jQuery: any;
@@ -55,16 +55,28 @@ export function DatabaseEditComponent(template, editModel) {
 			}
 
 			// Lists
-			this.dataFlowFreqList =  R.clone(editModel.dataFlowFreq);
+			this.dataFlowFreqList = R.clone(editModel.dataFlowFreq);
 			// Supports On
 			this.getSupportOnList();
 			// Depends On
 		}
 
+		/**
+		 * Get the List of Supports On
+		 */
 		private getSupportOnList(): void {
 			this.supportOnColumnModel = new SupportOnColumnsModel();
-			let dependencyMap = R.clone(editModel.dependencyMap);
-			this.dataGridSupportsOnHelper = new DataGridOperationsHelper([{ dataFlowFreq: 'Hola', supportClass: 'Hola2', name: 'Hola3', bundle: 'Hola4'}], this.initialSort, this.selectableSettings);
+			let supportsOn = [];
+			if (editModel.dependencyMap && editModel.dependencyMap.supportAssets) {
+				let dependencyMap = R.clone(editModel.dependencyMap.supportAssets);
+				dependencyMap.forEach((dependency) => {
+					let dependencySupportModel: DependencySupportModel = {
+						dataFlowFreq: dependency.dataFlowFreq
+					};
+					supportsOn.push(dependencySupportModel);
+				});
+			}
+			this.dataGridSupportsOnHelper = new DataGridOperationsHelper(supportsOn, this.initialSort, this.selectableSettings);
 		}
 
 		/**

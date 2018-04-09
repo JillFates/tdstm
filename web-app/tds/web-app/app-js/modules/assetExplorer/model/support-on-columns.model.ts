@@ -53,3 +53,7 @@ export class SupportOnColumnsModel {
 		];
 	}
 }
+
+export class DependencySupportModel {
+	public dataFlowFreq: string;
+}
