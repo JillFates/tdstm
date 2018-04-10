@@ -86,7 +86,21 @@ class WorkbookUtil {
 	static List<String> getSheetNames(Workbook workbook) {
 		def result = []
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-			result << workbook.getSheetName(i)			}
+			result << workbook.getSheetName(i)
+		}
+		return result
+	}
+
+	/**
+	 * Get sheet names maps using ordinal positions of sheets as key
+	 * @param workbook
+	 * @return
+	 */
+	static Map<Integer, String> getSheetNamesMap(Workbook workbook) {
+		def result = [:]
+		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+			result << [(i): workbook.getSheetName(i)]
+		}
 		return result
 	}
 

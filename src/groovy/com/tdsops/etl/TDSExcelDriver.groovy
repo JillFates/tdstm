@@ -45,6 +45,16 @@ class TDSExcelDriver extends ExcelDriver {
 	 */
 	Workbook workbook
 	/**
+	 * List of sheetNames in a workbook instance
+	 * @see TDSExcelDriver#workbook
+	 */
+	List<String> sheetNames
+	/**
+	 * Map of sheet names as a map with ordinal position as a key
+	 */
+	Map<Integer, String> sheetNamesMap
+
+	/**
 	 * Maps of fields base on listName param.
 	 */
 	Map<Object, List<Field>> fieldsMap = [:]
@@ -169,6 +179,20 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
+	 * Lazy initialization for TDSExcelDriver#sheetNames field
+	 * @return
+	 */
+	protected List<String> getSheetNames(Dataset dataset){
+		if(!this.sheetNames){
+			Workbook workbook = getWorkbook(dataset)
+			this.sheetNames = WorkbookUtil.getSheetNames(workbook)
+			this.sheetNamesMap = WorkbookUtil.getSheetNamesMap(workbook)
+		}
+
+		return sheetNames
+	}
+
+	/**
 	 * Lazy initialization for TDSExcelDriver#workbook field
 	 * @param dataset
 	 * @return
@@ -185,6 +209,7 @@ class TDSExcelDriver extends ExcelDriver {
 			if (!FileUtils.ExistsFile(fullPath)) throw new ExceptionGETL("File \"${fileName}\" doesn't exists in \"${path}\"")
 
 			workbook = getWorkbookType(fullPath)
+			sheetNames = getSheetNames()
 		}
 
 		return workbook
