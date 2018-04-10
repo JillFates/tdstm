@@ -1117,11 +1117,15 @@ digraph runbook {
 			ApiAction apiAction = assetComment.apiAction
 			AbstractAgent agent = apiActionService.agentInstanceForAction(assetComment.apiAction)
 			DictionaryItem methodInfo = agent.getMethod( apiAction.agentMethod )
+
+			List<Map> methodParamsList = apiAction.methodParamsList
+			methodParamsList = customDomainService.fillLabels(project, methodParamsList)
+
 			Map apiActionPayload = [
 				agent       : agent.name,
 				method      : methodInfo.name,
 				description : methodInfo.description,
-				methodParams: apiAction.methodParamsList,
+				methodParams: methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
