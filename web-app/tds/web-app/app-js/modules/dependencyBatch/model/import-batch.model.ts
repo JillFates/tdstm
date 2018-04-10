@@ -69,7 +69,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Imported At',
-				property: 'dateCreated',
+				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
 				width: 200,
