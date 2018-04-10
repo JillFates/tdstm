@@ -58,7 +58,7 @@ class ExportAccountsSpec extends GebReportingSpec {
             clickOnExportExcel()
         then: 'The user browse to Downloads folder'
             to HomeUserDownloadsPage
-        and: 'The file was successfully downloaded'
-            assert verifyExportedFile(fullFileName), "System has exported more than one file"
+        and: 'The file started download process'
+            waitForExportedFile(fullFileName)
     }
 }
