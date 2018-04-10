@@ -215,7 +215,10 @@ class ServiceNowService {
 
 			String[] parts = disposition.toLowerCase().split('filename=')
 			if (parts.size() == 2) {
-				parts = parts[1].toString().split(/\./)
+				// remove double quotations marks when present
+				// e.g. Content-Disposition: inline;filename=cmdb_ci_appl.csv << no double quotations marks present
+				// e.g. Content-Disposition: attachment; filename="cmdb_ci_appl.csv" << double quotations marks present
+				parts = parts[1].toString().trim().replaceAll('"', '').split(/\./)
 				if (parts.size() == 2) {
 					extension = parts[1]
 				}
