@@ -5,6 +5,8 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
+import grails.test.spock.IntegrationSpec
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
@@ -14,31 +16,13 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import org.apache.commons.lang3.RandomStringUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Ignore
 import spock.lang.Shared
-
-import grails.test.spock.IntegrationSpec
-import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
 import test.helper.AssetEntityTestHelper
-import test.helper.MoveBundleTestHelper
-import test.helper.ProjectTestHelper
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.etl.ETLDomain
-import org.apache.commons.lang3.RandomStringUtils
 
 class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
@@ -46,6 +30,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
     DataImportService dataImportService
+
+	@Shared
+	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
 
 	@Shared
 	FileSystemService fileSystemService
@@ -805,8 +792,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	}
 
-	@Ignore
-	// TODO : Augusto 4/2018 : This was Ignored because of an error with the cleanup and deleting the file is not working correctly
 	void '14. test transformData method'() {
 
 		setup: 'Create a DataScript, a Provider and other required data'
@@ -814,21 +799,20 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-				    extract serverName load asset set srvNameVar
-				    find Device by assetName with srvNameVar into asset
-				    whenNotFound asset create {
-				        assetName srvNameVar
-				    }
-
-				    extract appName load dependent set appNameVar
-				    find Application by assetName with appNameVar into dependent
-				    whenNotFound dependent create {
-				        assetName appNameVar
-				    }
-
-				    load c1 with ''
-				    load status with 'UnknownStatus'
-				    initialize c1 with 'from initialize command'
+					extract 'serverName' load 'asset' set srvNameVar
+					find Device by 'assetName' with 'srvNameVar' into 'asset'
+					whenNotFound 'asset' create {
+						assetName srvNameVar
+					}
+	
+					extract 'appName' load 'dependent' set appNameVar
+					find Application by 'assetName' with appNameVar into 'dependent'
+					whenNotFound 'dependent' create {
+						assetName appNameVar
+					}
+	
+					load 'status' with 'UnknownStatus'
+					initialize 'c1' with 'from initialize command'
 				}"""
 
 			String sampleData = 'serverName,appName\nxraysrv01,bigapp'
