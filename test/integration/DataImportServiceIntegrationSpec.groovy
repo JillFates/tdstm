@@ -792,8 +792,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	}
 
-	@Ignore
-	// TODO : Augusto 4/2018 : This was Ignored because of an error with the cleanup and deleting the file is not working correctly
 	void '14. test transformData method'() {
 
 		setup: 'Create a DataScript, a Provider and other required data'
@@ -813,7 +811,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 						assetName appNameVar
 					}
 	
-					load 'c1' with ''
 					load 'status' with 'UnknownStatus'
 					initialize 'c1' with 'from initialize command'
 				}"""
