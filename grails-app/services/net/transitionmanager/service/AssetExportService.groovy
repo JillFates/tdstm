@@ -603,6 +603,27 @@ class AssetExportService {
 								}
 								colVal = value
 								break
+							case ~/Source Location|Target Location/:
+								String fieldName = "room" + field.substring(8)
+								Room room = currentAsset[fieldName]
+								if (room) {
+									colVal = room.location
+								}
+								break
+							case ~/Source Room|Target Room/:
+								String fieldName = "room" + field.substring(4)
+								Room room = currentAsset[fieldName]
+								if (room) {
+									colVal = room.roomName
+								}
+								break
+							case ~/Source Rack|Target Rack/:
+								String fieldName = "rack" + field.substring(4)
+								Rack rack = currentAsset[fieldName]
+								if (rack) {
+									colVal = rack.tag
+								}
+								break
 
 							default:
 								colVal = currentAsset[field]
