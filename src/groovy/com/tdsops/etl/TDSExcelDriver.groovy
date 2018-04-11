@@ -8,7 +8,6 @@ import getl.exception.ExceptionGETL
 import getl.utils.BoolUtils
 import getl.utils.FileUtils
 import getl.utils.ListUtils
-import getl.utils.Logs
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Workbook
@@ -41,48 +40,55 @@ import org.apache.poi.ss.usermodel.Workbook
 class TDSExcelDriver extends ExcelDriver {
 
 	/**
-	 * Workbook instance. It's open once using TDSExcelDriver#getWorkbook
+	 * Workbook instance. It's open once using TDSExcelDriver#readWorkbookAndSheets
 	 */
 	Workbook workbook
 	/**
+	 * Map of sheet names as a map with name and ordinal position as a key
+	 * <pre>
+	 *  [
+	 *      0: sheet1,
+	 *      1: sheet2,
+	 *      'Applications': sheet1
+	 *      'Devices': sheet2
+	 *  ]
+	 * </pre>
+	 */
+	Map<Object, Sheet> sheetsMap
+
+	/**
 	 * Maps of fields base on listName param.
+	 * <pre>
+	 * [
+	 *      0: [{ ..field1.. }, { ..field1.. }, ..., { ..fieldN.. }]
+	 * ]
+	 * </pre>
+	 * <pre>
+	 * [
+	 *      'Applications': [{ ..field1.. }, { ..field1.. }, ..., { ..fieldN.. }]
+	 * ]
+	 * </pre>
 	 */
 	Map<Object, List<Field>> fieldsMap = [:]
 
+
 	@Override
 	protected long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
-		String path = dataset.connection.params.path
-		String fileName = dataset.connection.params.fileName
-		String fullPath = FileUtils.ConvertToDefaultOSPath(path + File.separator + fileName)
-		boolean warnings = params.showWarnings
+
+		if(!workbook) {
+			this.readWorkbookAndSheets(dataset)
+		}
+		Sheet sheet = this.sheetsMap[dataset.params.listName]
 
 		dataset.field = fields(dataset)
 		if (dataset.field.isEmpty()) throw new ExceptionGETL("Required fields description with dataset")
-		if (!path) throw new ExceptionGETL("Required \"path\" parameter with connection")
-		if (!fileName) throw new ExceptionGETL("Required \"fileName\" parameter with connection")
-		if (!FileUtils.ExistsFile(fullPath)) throw new ExceptionGETL("File \"${fileName}\" doesn't exists in \"${path}\"")
 
 		Map datasetParams = dataset.params
-
-		def ln = datasetParams.listName?:0
 		def header = BoolUtils.IsValue([params.header, datasetParams.header], false)
-
 		Number offsetRows = dataset.params.currentRowIndex?:0
 		Number offsetCells = 0
-
 		long countRec = 0
-
 		if (prepareCode != null) prepareCode([])
-
-		Workbook workbook = getWorkbookType(fullPath)
-		org.apache.poi.ss.usermodel.Sheet sheet
-
-		if (ln instanceof String) sheet = workbook.getSheet(ln as String)
-		else {
-			sheet = workbook.getSheetAt(ln)
-			dataset.params.listName = workbook.getSheetName(ln)
-			if (warnings) Logs.Warning("Parameter listName not found. Using list name: '${dataset.params.listName}'")
-		}
 
 		def limit = ListUtils.NotNullValue([params.limit, datasetParams.limit, sheet.lastRowNum])
 
@@ -117,18 +123,18 @@ class TDSExcelDriver extends ExcelDriver {
 	protected List<Field> fields(Dataset dataset) {
 
 		dataset.params.listName = dataset.params.listName?:0
-
 		if(!fieldsMap.containsKey(dataset.params.listName)){
-			Workbook workbook = getWorkbook(dataset)
+
+			if(!workbook) {
+				this.readWorkbookAndSheets(dataset)
+			}
+			Sheet sheet = this.sheetsMap[dataset.params.listName]
 			Integer currentRowIndex = dataset.params.currentRowIndex ?:0
 
-			Sheet sheet = getSheetFromWorkbook(dataset, workbook, dataset.params.listName)
 			List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
-			List<Field> fields = []
-			cells.each { Cell cell ->
-				fields << new Field(name: cellValue(cell), type: cellType(cell))
+			List<Field> fields = cells.collect { Cell cell ->
+				new Field(name: cellValue(cell), type: cellType(cell))
 			}
-
 			fieldsMap[dataset.params.listName] = fields
 		}
 
@@ -136,7 +142,7 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
-	 *
+	 * Calculates String value of a Cell
 	 * @param cell
 	 * @param dataset
 	 * @param columnIndex
@@ -169,11 +175,13 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
-	 * Lazy initialization for TDSExcelDriver#workbook field
-	 * @param dataset
-	 * @return
+	 * Initialization for TDSExcelDriver#workbook field
+	 * and TDSExcelDriver#sheetsMap
+	 * @param dataset the dataset used in getl.excel.ExcelConnection
+	 * @return an instance with the Workbook created from dataset content
+	 * @see getl.excel.ExcelConnection
 	 */
-	protected Workbook getWorkbook(Dataset dataset){
+	protected Workbook readWorkbookAndSheets(Dataset dataset){
 
 		if(!workbook){
 			String path = dataset.connection.params.path
@@ -185,29 +193,30 @@ class TDSExcelDriver extends ExcelDriver {
 			if (!FileUtils.ExistsFile(fullPath)) throw new ExceptionGETL("File \"${fileName}\" doesn't exists in \"${path}\"")
 
 			workbook = getWorkbookType(fullPath)
+			sheetsMap = WorkbookUtil.getSheetsMap(workbook)
 		}
 
 		return workbook
 	}
 
 	/**
-	 * Check if a Worknbook instance has a Sheet based on a sheet name
+	 * Check if a Workbook instance has a Sheet based on a sheet name
 	 * @param dataset
 	 * @param listName
 	 * @return
 	 */
 	boolean hasSheet(Dataset dataset, String listName) {
-		return WorkbookUtil.getSheetFromWorkbook(getWorkbook(dataset), listName) != null
+		return WorkbookUtil.getSheetFromWorkbook(readWorkbookAndSheets(dataset), listName) != null
 	}
 
 	/**
-	 * Check if a Worknbook instance has a Sheet based on an ordinal sheet number
+	 * Check if a Workbook instance has a Sheet based on an ordinal sheet number
 	 * @param dataset
 	 * @param listName
 	 * @return
 	 */
 	boolean hasSheet(Dataset dataset, int sheetNumber) {
-		return WorkbookUtil.getSheetFromWorkbookAt(getWorkbook(dataset), sheetNumber) != null
+		return WorkbookUtil.getSheetFromWorkbookAt(readWorkbookAndSheets(dataset), sheetNumber) != null
 	}
 
 	/**
