@@ -39,6 +39,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			]}],
 		selected: {id: 1, name: 'All'}
 	};
+	private batchRecordsUpdatedFlag = false;
 
 	constructor(
 		private importBatchModel: ImportBatchModel,
@@ -125,6 +126,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			.then((result) => {
 				if (result === 'reload') {
 					this.reloadSingleBatchRecord(selectedBatchRecord);
+					this.batchRecordsUpdatedFlag = true;
 				}
 			}).catch( result => { console.log('dismissed'); });
 	}
@@ -141,7 +143,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	private cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+		this.activeDialog.close(this.batchRecordsUpdatedFlag);
 	}
 
 	/**
@@ -201,6 +203,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadImportBatchRecords();
+					this.batchRecordsUpdatedFlag = true;
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on bulk ignore batch records.');
 				}
@@ -216,6 +219,7 @@ export class DependencyBatchDetailDialogComponent implements OnInit {
 			.subscribe((result: ApiResponseModel) => {
 				if (result.status === ApiResponseModel.API_SUCCESS) {
 					this.loadImportBatchRecords();
+					this.batchRecordsUpdatedFlag = true;
 				} else {
 					this.handleError(result.errors[0] ? result.errors[0] : 'error on bulk Process batch records.');
 				}
