@@ -2209,8 +2209,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.depGroup = params.dependencyBundle
 				model.dependencyType = entities.dependencyType
 				model.dependencyStatus = entities.dependencyStatus
-				model.connectionTypes = '{}'
-				model.statusTypes = '{}'
+				model.connectionTypes = '[]'
+				model.statusTypes = '[]'
 				if (project.depConsoleCriteria) {
 					def depConsoleCriteria = JsonUtil.parseJson(project.depConsoleCriteria)
 					if (depConsoleCriteria.connectionTypes) {
