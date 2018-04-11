@@ -45,7 +45,7 @@ class GETLReaderSpec extends Specification {
             files.retrieveObjects(type: "DIR").size() == 0
 
         and: 'It can read files from parent directory'
-            files.retrieveObjects(directory: "..").size() == 14
+            files.retrieveObjects(directory: "..").size() == 15
 
     }
 
