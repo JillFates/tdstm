@@ -39,8 +39,9 @@ class WsImportBatchController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.DataTransferBatchView)
 	def fetchImportBatch(Long id) {
-		ImportBatch importBatch = fetchDomain(ImportBatch, [id:id]) as ImportBatch
-		renderSuccessJson(importBatch.toMap())
+		Project project = getProjectForWs()
+		Map batchMap = importBatchService.findBatch(project, id)
+		renderSuccessJson(batchMap)
 	}
 
 	/**
