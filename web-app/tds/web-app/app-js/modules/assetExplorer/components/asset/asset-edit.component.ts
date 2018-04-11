@@ -14,6 +14,7 @@ import { HttpInterceptor } from '../../../../shared/providers/http-interceptor.p
 import { DynamicComponent } from '../../../../shared/components/dynamic.component';
 
 import { DatabaseEditComponent } from '../database/database-edit.component';
+import { getStorageEditComponent } from  '../storage/storage-edit.component';
 
 @Component({
 	selector: `asset-database-edit`,
@@ -47,7 +48,12 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 						this.registerAndCreate(DatabaseEditComponent(template, model), this.view);
 						break;
 					case 'DEVICE':
+						break;
 					case 'STORAGE':
+						const component: any =  getStorageEditComponent(template, model);
+						this.registerAndCreate(component, this.view);
+						break;
+
 				}
 			});
 	}
