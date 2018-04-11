@@ -94,6 +94,40 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can define more than one sheet for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSetWithMultipleSheets(
+				[
+					'Applications': ApplicationDataSet,
+					'Devices': DeviceDataSet
+				]
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						sheet 'Applications'
+						
+						sheet 'Devices'
+						
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 0
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can read labels by default in first row by default for a spreadSheet DataSet'(){
 
 		given:
@@ -609,9 +643,16 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	static final String ApplicationDataSet = """application id,vendor name,technology,location
-152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center
-""".stripIndent().trim()
+	static final String ApplicationDataSet = """
+		application id,vendor name,technology,location
+		152254,Microsoft,(xlsx updated),ACME Data Center
+		152255,Mozilla,NGM,ACME Data Center
+		""".stripIndent().trim()
+
+	static final String DeviceDataSet = """
+		name,mfg,model,type
+		xraysrv01,Dell,PE2950,Server
+		zuludb01,HP,BL380,Blade
+		""".stripIndent().trim()
 
 }

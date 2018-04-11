@@ -44,17 +44,21 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 	}
 
 
-	void 'test can read sheet names map'() {
+	void 'test can read fields'() {
 		when:
-			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			def (String fileName, DataSetFacade dataSetFacade) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+			TDSExcelDriver tdsExcelDriver = (TDSExcelDriver)dataSetFacade.dataSet.connection.driver
 
 		then:
-			dataSet.driver.getSheetNames() == ['Applications']
+			tdsExcelDriver.getSheetNames(dataSetFacade.dataSet) == ['Applications']
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 
 	}
+
+
+
 	static final String ApplicationDataSet = """
 		application id,vendor name,technology,location
 		152254,Microsoft,(xlsx updated),ACME Data Center

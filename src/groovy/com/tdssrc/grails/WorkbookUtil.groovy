@@ -96,10 +96,13 @@ class WorkbookUtil {
 	 * @param workbook
 	 * @return
 	 */
-	static Map<Integer, String> getSheetNamesMap(Workbook workbook) {
+	static Map<Object, Sheet> getSheetsMap(Workbook workbook) {
 		def result = [:]
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-			result << [(i): workbook.getSheetName(i)]
+			String sheetNumber = workbook.getSheetName(i)
+			Sheet sheet = workbook.getSheet(sheetNumber)
+			result << [(i): sheet]
+			result << [(sheetNumber): sheet]
 		}
 		return result
 	}
