@@ -509,6 +509,78 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
+	void 'test can read iterate rows for more than one sheet in a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSetWithMultipleSheets(
+				[
+					'Applications': ApplicationDataSet,
+					'Devices': DeviceDataSet
+				]
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					sheet 'Applications'
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load 'Vendor'
+					}
+					
+					sheet 'Devices'
+					read labels
+					domain Device
+					iterate {
+						extract 'name' load 'Name'
+					}
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.result.domains.size() == 2
+
+		and: 'Results contains values'
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0].fields.appVendor) {
+					originalValue == 'Microsoft'
+					value == 'Microsoft'
+				}
+
+				with(data[1].fields.appVendor) {
+					originalValue == 'Mozilla'
+					value == 'Mozilla'
+				}
+			}
+
+			with(etlProcessor.result.domains[1]) {
+				domain == ETLDomain.Device.name()
+				data.size() == 2
+				with(data[0].fields.assetName) {
+					originalValue == 'xraysrv01'
+					value == 'xraysrv01'
+				}
+
+				with(data[1].fields.assetName) {
+					originalValue == 'zuludb01'
+					value == 'zuludb01'
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 	void 'test can read labels skipping rows before for a spreadSheet DataSet'(){
 
 		given:
@@ -526,6 +598,53 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						skip 1
+						read labels
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results contains'
+			etlProcessor.result.domains.size() == 0
+
+		and: 'Results contains values'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+
+	void 'test can read labels skipping more than one row before for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+				"invalid headers, are not part, of the valid\n" +
+					"Another, Lines with, invalid, headers, are not part, of the valid\n" +
+					ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+						skip 2
 						read labels
 						""".stripIndent(),
 				ETLProcessor.class.name)

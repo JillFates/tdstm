@@ -354,7 +354,6 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor replace (String regex, String replacement) {
-
 		globalTransformers.add(Replacer(regex, replacement))
 		debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
 		return this
@@ -393,6 +392,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor sheet (String sheetName) {
+		currentRowIndex = 0
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		dataSetFacade.setSheetName(sheetName)
 	}
 
@@ -402,6 +403,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor sheet (Integer sheetNumber) {
+		currentRowIndex = 0
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		dataSetFacade.setSheetNumber(sheetNumber)
 	}
 

@@ -157,9 +157,11 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
-	 * Lazy initialization for TDSExcelDriver#workbook field
-	 * @param dataset
-	 * @return
+	 * Initialization for TDSExcelDriver#workbook field
+	 * and TDSExcelDriver#sheetsMap
+	 * @param dataset the dataset used in getl.excel.ExcelConnection
+	 * @return an instance with the Workbook created from dataset content
+	 * @see getl.excel.ExcelConnection
 	 */
 	protected Workbook readWorkbookAndSheets(Dataset dataset){
 
