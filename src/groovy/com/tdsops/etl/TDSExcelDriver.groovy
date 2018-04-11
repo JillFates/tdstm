@@ -40,16 +40,34 @@ import org.apache.poi.ss.usermodel.Workbook
 class TDSExcelDriver extends ExcelDriver {
 
 	/**
-	 * Workbook instance. It's open once using TDSExcelDriver#getWorkbook
+	 * Workbook instance. It's open once using TDSExcelDriver#readWorkbookAndSheets
 	 */
 	Workbook workbook
 	/**
 	 * Map of sheet names as a map with name and ordinal position as a key
+	 * <pre>
+	 *  [
+	 *      0: sheet1,
+	 *      1: sheet2,
+	 *      'Applications': sheet1
+	 *      'Devices': sheet2
+	 *  ]
+	 * </pre>
 	 */
 	Map<Object, Sheet> sheetsMap
 
 	/**
 	 * Maps of fields base on listName param.
+	 * <pre>
+	 * [
+	 *      0: [{ ..field1.. }, { ..field1.. }, ..., { ..fieldN.. }]
+	 * ]
+	 * </pre>
+	 * <pre>
+	 * [
+	 *      'Applications': [{ ..field1.. }, { ..field1.. }, ..., { ..fieldN.. }]
+	 * ]
+	 * </pre>
 	 */
 	Map<Object, List<Field>> fieldsMap = [:]
 
@@ -192,7 +210,7 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
-	 * Check if a Worknbook instance has a Sheet based on an ordinal sheet number
+	 * Check if a Workbook instance has a Sheet based on an ordinal sheet number
 	 * @param dataset
 	 * @param listName
 	 * @return

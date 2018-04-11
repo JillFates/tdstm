@@ -83,12 +83,12 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						sheet 'Applications'
-						
-						""".stripIndent(),
+					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 0
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -115,14 +115,13 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						sheet 'Applications'
-						
 						sheet 'Devices'
-						
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 0
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -150,6 +149,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -197,6 +197,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -241,6 +242,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 				then: 'DataSet was modified by the ETL script'
 					etlProcessor.result.domains.size() == 0
+					etlProcessor.currentRowIndex == 1
 
 				and: 'A column map is created'
 					etlProcessor.column('application id').index == 0
@@ -341,6 +343,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -388,6 +391,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -438,6 +442,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
+			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
