@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
@@ -14,7 +15,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = 'ASSETS'
 	// Common Domian name (used to gather common fields in Domains)
-	 public static final String COMMON = 'COMMON'
+    public static final String COMMON = 'COMMON'
     public static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
     public static final int CUSTOM_USER_FIELD = 1
@@ -448,45 +449,6 @@ class CustomDomainService implements ServiceMethods {
         ]
 
         return fieldSpecs
-    }
-
-    /**
-     * Fills the methodParams with the Label of the fieldName and the contextDesc that gives a user readable name
-     * to be consistent with the API Action Parameters dialog
-     * @param project where we are getting the fieldSpecs
-     * @param List of maps with the MethodParam info
-     * @return the new methodParams List with the new fields added
-     */
-    List<Map> fillLabels(Project project, List<Map> methodParams) {
-	    Map ASSET_CLASS_FOR_PARAMETERS = [
-			      'COMMON': 'Asset',
-					'APPLICATION': 'Application',
-					'DATABASE': 'Database',
-					'DEVICE': 'Device',
-					'STORAGE': 'Storage',
-					'TASK': 'Task',
-					'USER_DEF': 'User Defined'
-	    ]
-
-	    Map fieldSpecs = fieldSpecsWithCommon(project)
-	    List<Map> newMethodParams = methodParams.collect {
-		    Map mparam = new HashMap(it)
-		    mparam.contextDesc = ASSET_CLASS_FOR_PARAMETERS[mparam.context] ?: mparam.context
-		    mparam.fieldNameLabel = mparam.fieldName
-
-		    def searchList =  ((fieldSpecs[mparam.context]?.fields)?:[]) + ((fieldSpecs['COMMON']?.fields)?:[])
-		    def found = searchList.find { spec ->
-			    spec.field == mparam.fieldName
-		    }
-
-		    if(found) {
-			    mparam.fieldNameLabel = found.label
-		    }
-
-		    return mparam
-	    }
-
-	    return newMethodParams
     }
 
 }

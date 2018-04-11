@@ -51,7 +51,7 @@
                                         <g:each var="methodParam" in="${apiAction.methodParams}">
                                             <tr>
                                                 <td>${methodParam.paramName}</td>
-                                                <td>${methodParam.contextDesc}</td>
+                                                <td>${methodParam.contextLabel}</td>
                                                 <td>${methodParam.fieldNameLabel}</td>
                                                 <td>${apiAction.methodParamsValues[methodParam.paramName]}</td>
                                             </tr>

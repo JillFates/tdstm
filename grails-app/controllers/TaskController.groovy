@@ -1119,7 +1119,7 @@ digraph runbook {
 			DictionaryItem methodInfo = agent.getMethod( apiAction.agentMethod )
 
 			List<Map> methodParamsList = apiAction.methodParamsList
-			methodParamsList = customDomainService.fillLabels(project, methodParamsList)
+			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
 				agent       : agent.name,
