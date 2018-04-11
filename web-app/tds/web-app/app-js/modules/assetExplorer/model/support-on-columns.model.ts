@@ -9,6 +9,13 @@ export class SupportOnColumnsModel {
 	constructor() {
 		this.columns = [
 			{
+				label: 'Action',
+				property: 'action',
+				type: 'action',
+				width: 46,
+				locked: true
+			},
+			{
 				label: 'Frequency',
 				property: 'dataFlowFreq',
 				type: 'text',
@@ -43,12 +50,6 @@ export class SupportOnColumnsModel {
 				property: 'provider.name',
 				type: 'text',
 				width: 130
-			},
-			{
-				label: 'DataScript',
-				property: 'datascript.name',
-				type: 'text',
-				width: 130,
 			}
 		];
 	}

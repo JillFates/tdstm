@@ -80,6 +80,20 @@ export function DatabaseEditComponent(template, editModel) {
 		}
 
 		/**
+		 * Add a new Support On Dependency
+		 */
+		public onAddSupportsOn(): void {
+			this.dataGridSupportsOnHelper.addDataItem({});
+		}
+
+		/**
+		 * Delete the selected element
+		 */
+		public onDeleteSupport(dataItem: any): void {
+			this.dataGridSupportsOnHelper.removeDataItem(dataItem);
+		}
+
+		/**
 		 * Initiates The Injected Component
 		 */
 		ngOnInit(): void {
@@ -91,13 +105,6 @@ export function DatabaseEditComponent(template, editModel) {
 		 */
 		public cancelCloseDialog(): void {
 			this.activeDialog.close();
-		}
-
-		/**
-		 * Add a new record to the Support On List
-		 */
-		public onAddSupportsOn(): void {
-			//
 		}
 
 	}

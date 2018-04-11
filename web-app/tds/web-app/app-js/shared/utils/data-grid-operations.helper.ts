@@ -254,4 +254,20 @@ export class DataGridOperationsHelper {
 			this.gridData = process(this.resultSet, this.state);
 		}
 	}
+
+	/**
+	 * Add one element to the list
+	 * @param item
+	 */
+	public addDataItem(item: any): void {
+		this.gridData.data.push(item);
+	}
+
+	/**
+	 * Remove one element from to the list
+	 * @param item
+	 */
+	public removeDataItem(item: any): void {
+		this.gridData.data.push(item);
+	}
 }

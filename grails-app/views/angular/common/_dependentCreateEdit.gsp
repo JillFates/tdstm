@@ -7,15 +7,15 @@
 		[data]="dataGridSupportsOnHelper.gridData"
 		[sort]="dataGridSupportsOnHelper.state.sort"
 		[sortable]="{mode:'single'}"
-		(pageChange)="dataGridSupportsOnHelper.pageChange($event)"
 		[resizable]="true"
+		[height]="210"
 		(sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
 	<!-- Toolbar Template -->
 	<ng-template kendoGridToolbarTemplate [position]="'top'">
 		<label class="pad-top-7 pad-left-10">Supports On</label>
-		<button (click)="onAddSupportsOn()" class="btn btn-default float-right mar-right-15 pad-top-6" type="button">
-			<i class="fa fa-fw fa-plus-circle"></i> Add Suport
+		<button (click)="onAddSupportsOn()" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
+			<i class="fa fa-fw fa-plus-circle"></i> Add Support
 		</button>
 	</ng-template>
 
@@ -36,11 +36,10 @@
 		<!-- Action -->
 		<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 			<div class="k-grid-ignore-click" style="cursor: default;">
-				<button *ngIf="dataItem.status.code === 'PENDING'"
-						(click)="onPlayButton(dataItem)"
+				<button (click)="onDeleteSupport(dataItem)"
 						class="btn btn-action btn-default"
 						title="Delete">
-					<i class="fa fa-play-circle-o"></i>
+					<span _ngcontent-c3="" class="fa fa-fw fa-trash"></span>
 				</button>
 			</div>
 		</ng-template>
