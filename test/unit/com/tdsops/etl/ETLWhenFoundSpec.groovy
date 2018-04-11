@@ -136,8 +136,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -160,8 +159,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"SN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -261,8 +259,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -284,8 +281,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"SN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -344,8 +340,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -365,8 +360,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"TN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -425,8 +419,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -446,8 +439,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"TN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
