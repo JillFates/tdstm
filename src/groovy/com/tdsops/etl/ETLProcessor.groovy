@@ -1014,7 +1014,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param script an ETL script content
 	 * @return
 	 */
-	@TimedInterrupt(10l)
+	@TimedInterrupt(600l)
 	Object evaluate(String script){
 		return evaluate(script, defaultCompilerConfiguration())
 	}
@@ -1030,7 +1030,7 @@ class ETLProcessor implements RangeChecker {
 	 * @see TimedInterrupt
 
 	 */
-	@TimedInterrupt(10l)
+	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration){
 		return new GroovyShell(this.class.classLoader, this.binding, configuration)
 			.evaluate(script,ETLProcessor.class.name)
@@ -1044,7 +1044,6 @@ class ETLProcessor implements RangeChecker {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
-	@TimedInterrupt(10l)
 	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration){
 
 		List<Map<String, ?>> errors = []
@@ -1100,7 +1099,6 @@ class ETLProcessor implements RangeChecker {
 	 * @param configuration an instance of CompilerConfiguration
 	 * @return a Map with validSyntax field boolean value and a list of errors
 	 */
-	@TimedInterrupt(10l)
 	Map<String, ?>  checkSyntax(String script){
 		return checkSyntax(script, defaultCompilerConfiguration())
 	}

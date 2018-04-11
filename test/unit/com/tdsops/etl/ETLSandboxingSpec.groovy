@@ -430,36 +430,6 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			console.buffer.toString().contains('DEBUG - [position:[0, 2], value:152255]')
 	}
 
-	void 'test can throw an exception if a script takes more than 10 seconds'() {
-
-		given:
-			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				console,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				console on
-				domain Device
-				read labels
-				iterate {
-					set myCustomVar with 'Production'
-					while(myCustomVar == 'Production') {
-					    load 'environment' with myCustomVar
-					}
-				}
-				""".stripIndent())
-
-		then: 'An TimeoutException exception is thrown'
-			TimeoutException e = thrown TimeoutException
-			e.message.startsWith('Execution timed out after 10 units. Start time')
-	}
-
 	final static String deviceDataSetContent = """
 		device id,model name,manufacturer name,location
 		152254,Microsoft,(xlsx updated),ACME Data Center
