@@ -385,7 +385,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "missing [into] keyword"
+			e.message == "find/elseFind statement is missing required [into] keyword"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -475,7 +475,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'It throws an Exception because find command is incorrect'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "missing [with, into] keywords"
+			e.message == "find/elseFind statement is missing required [with, into] keywords"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
