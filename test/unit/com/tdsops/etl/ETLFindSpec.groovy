@@ -31,6 +31,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
+	String deviceBladeChassisDataSetContent
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
@@ -74,18 +75,23 @@ class ETLFindSpec extends ETLBaseSpec {
 			152254,Microsoft,(xlsx updated),ACME Data Center
 			152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
+
+		deviceBladeChassisDataSetContent = """
+			name,mfg,model,type,chassis,slot
+			hpchassis01,HP,BladeSystem Z7000,Blade Chassis,,
+			xrayblade01,HP,ProLiant BL460c G1,Blade,hpchassis01,1
+			xrayblade02,HP,ProLiant BL460c G1,Blade,hpchassis01,2
+			xrayblade03,HP,ProLiant BL460c G1,Blade,hpchassis01,3
+			xrayblade04,HP,ProLiant BL460c G1,Blade,hpchassis01,4
+		""".stripIndent()
+
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
 
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -390,7 +396,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -433,7 +439,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					with(query[1]) {
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
+						kv.assetClass == 'VM'
 					}
 
 					with(query[2]) {
@@ -1626,4 +1632,92 @@ class ETLFindSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
+
+	void 'test can find a balades and chassis with their relationships'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceBladeChassisDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Device
+					iterate {
+						extract 'name' load 'Name'
+						extract 'mfg' load 'manufacturer' set mfgVar
+						extract 'model' load 'model'
+						extract 'type' load 'assetType' set typeVar
+						
+						if (typeVar == 'Blade') {
+							extract 'chassis' load 'sourceChassis' set chassisNameVar
+							// Try to find the Chassis to create the reference
+							// Assumming that the chassis is the same manufacturer as the Blade
+							find Device by 'Name', 'Manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
+							elseFind Device by 'Name', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
+							
+							whenNotFound 'sourceChassis' create {
+								assetName chassisNameVar
+								assetType 'Blade Chassis'
+								manufacturer mfgVar
+								// Don't know what the model will be at the point we're working with a blade
+							}
+							
+							// Set the slot that the blade is installed into
+							extract 'slot' transform with toInteger() load 'sourceBladePosition'
+						}
+					}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Dependency.name()
+
+				with(data[0].fields.asset) {
+					originalValue == '152254'
+					value == '152254'
+				}
+
+				with(data[1].fields.asset) {
+					originalValue == '152255'
+					value == '152255'
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
 }

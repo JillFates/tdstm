@@ -51,7 +51,6 @@ class ETLSyntaxCheckSpec extends ETLBaseSpec {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	Project GMDEMO
-	ETLFieldsValidator validator
 
 	static doWithSpring = {
 		coreService(CoreService) {

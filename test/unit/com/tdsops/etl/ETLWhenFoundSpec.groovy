@@ -79,12 +79,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -149,7 +144,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -187,7 +182,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 					with(find.query[1]) {
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
+						kv.assetClass == 'VM'
 					}
 
 					with(find.query[2]) {
@@ -274,7 +269,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						
     						whenNotFound 'asset' update {
@@ -357,7 +352,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, 'primaryType' into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, 'primaryType' into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -438,7 +433,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset' 
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -473,7 +468,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 					with(find.query[1]) {
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
+						kv.assetClass == 'VM'
 					}
 
 					with(find.query[2]) {

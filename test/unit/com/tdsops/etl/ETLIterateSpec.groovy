@@ -23,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.junit.Ignore
 import spock.lang.Shared
@@ -162,11 +163,7 @@ class ETLIterateSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 
@@ -319,11 +316,6 @@ class ETLIterateSpec extends ETLBaseSpec {
 	void 'test can load fields for more than one domain in the same iteration'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location,device id,model name,manufacturer name
 				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
@@ -409,11 +401,6 @@ class ETLIterateSpec extends ETLBaseSpec {
 	void 'test can load fields with more than one iteration'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location,device id,model name,manufacturer name
 				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
@@ -502,11 +489,6 @@ class ETLIterateSpec extends ETLBaseSpec {
 	void 'test can load fields combining iterators'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location,device id,model name,manufacturer name
 				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
