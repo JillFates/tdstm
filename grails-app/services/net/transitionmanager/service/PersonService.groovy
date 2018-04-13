@@ -702,6 +702,9 @@ class PersonService implements ServiceMethods {
 		if (userLogin && !deleteIfUserLogin) {
 			messages << "$person was unable to be delete due to having user login account"
 			isDeletable = false
+		} else if (userLogin == securityService.userLogin) {
+			messages << "You cannot delete your own user login account while logged in with it"
+			isDeletable = false
 		}
 		if (person.isSystemUser()) {
 			messages << "$person is a system account and can not be deleted"
@@ -790,7 +793,7 @@ class PersonService implements ServiceMethods {
 					Person person = validatePersonAccess(id, byWhom)
 					if (person) {
 						// Deletes the person and other related entities.
-						Map deleteResultMap = deletePerson(byWhom, person, true, deleteIfAssocWithAssets)
+						Map deleteResultMap = deletePerson(byWhom, person, false, deleteIfAssocWithAssets)
 						// Updates variables that comput different results.
 						cleared += deleteResultMap.cleared
 						if (deleteResultMap.deleted) {
