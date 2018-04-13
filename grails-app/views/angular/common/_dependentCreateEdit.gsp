@@ -82,9 +82,9 @@
 
 					<%-- Class --%>
 					<td class="class-wrap-depend">
-						<g:select name="entity_support_${support.id}" 
-							id="entity_support_${support.id}" 
-							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
+						<g:select name="entity_support_${support.id}"
+							id="entity_support_${support.id}"
+							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)"
 							from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
 							value="${AssetClass.getClassOptionForAsset(support?.asset)}"
 						></g:select>
@@ -92,16 +92,16 @@
 
 					<%-- Support Asset Name Select2 control --%>
 					<td id="assetListSupportTdId_${i}"  class='combo-td'>
-						<input type="hidden" 
+						<input type="hidden"
 							id="asset_support_${support.id}"
-							name="asset_support_${support.id}" 
-							class="scrollSelect" 
-							style="width:150px" 
-							value="${support?.asset?.id}" 
-							data-asset-id="${support?.asset?.id}" 
-							data-asset-name="${support?.asset?.assetName}" 
+							name="asset_support_${support.id}"
+							class="scrollSelect"
+							style="width:150px"
+							value="${support?.asset?.id}"
+							data-asset-id="${support?.asset?.id}"
+							data-asset-name="${support?.asset?.assetName}"
 							data-asset-type="${type}"
-							data-slide="deps"  
+							data-slide="deps"
 							onchange="EntityCrud.updateDependentBundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')"
 						/>
 					</td>
@@ -112,20 +112,20 @@
 						<g:set var="supportBundle" value="${support?.asset?.moveBundle}"></g:set>
 						<%-- Used to show bundle colors based on bundleConflicts --%>
 						<g:if test="${supportBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
-							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}"
 									optionKey="id" optionValue="name" style="background-color: red" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"/>
 						</g:if>
 						<g:elseif test="${supportBundle!=assetEntity.moveBundle }" >
-							<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
+							<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}"
 								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
 								class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle"
 							></g:select>
 						</g:elseif>
 						<g:else>
-							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}"
 								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
 								class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle">
-							</g:select>	
+							</g:select>
 						</g:else>
 					</td>
 
@@ -137,7 +137,7 @@
 
 					<%-- Status --%>
 					<td>
-						<g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus}" 
+						<g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus}"
 							optionValue="value" onchange="EntityCrud.changeDependentBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
 					</td>
 
@@ -173,16 +173,16 @@
 				<tr id='row_d_${i}_${dependent.id}'>
 					<%-- Dataflow --%>
 					<td>
-						<g:select name="dataFlowFreq_dependent_${dependent.id}" 
+						<g:select name="dataFlowFreq_dependent_${dependent.id}"
 							value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}"
 						></g:select>
 					</td>
 
 					<%-- Class option --%>
 					<td class="class-wrap-depend">
-						<g:select name="entity_dependent_${dependent.id}" 
-							id="entity_dependent_${dependent.id}" 
-							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
+						<g:select name="entity_dependent_${dependent.id}"
+							id="entity_dependent_${dependent.id}"
+							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)"
 							from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
 							value="${AssetClass.getClassOptionForAsset(dependent?.dependent)}"
 						></g:select>
@@ -190,17 +190,17 @@
 
 					<%-- Dependent Asset Name Select2 controller --%>
 					<td id="assetListDependentTdId_${i}"  class='combo-td'>
-						<input type="hidden" 
+						<input type="hidden"
 							id="asset_dependent_${dependent.id}"
 							name="asset_dependent_${dependent.id}"
-							class="scrollSelect" 
-							style="width:150px" 
+							class="scrollSelect"
+							style="width:150px"
 							value="${dependent?.dependent?.id}"
-							data-asset-id="${dependent?.dependent?.id}" 
-							data-asset-name="${dependent?.dependent?.assetName}" 
+							data-asset-id="${dependent?.dependent?.id}"
+							data-asset-name="${dependent?.dependent?.assetName}"
 							data-asset-type="${type}"
-							data-slide="deps" 
-							onchange="EntityCrud.updateDependentBundle(this.value, this.name, '${assetEntity?.moveBundle?.id}')" 
+							data-slide="deps"
+							onchange="EntityCrud.updateDependentBundle(this.value, this.name, '${assetEntity?.moveBundle?.id}')"
 						/>
 					</td>
 
@@ -209,19 +209,19 @@
 						<g:set var="depBundle" value="${dependent?.dependent?.moveBundle}"></g:set>
 						<%--Used to show bundle colors based on bundleConflicts--%>
 						<g:if test="${depBundle!=assetEntity.moveBundle && dependent.status == 'Validated' }" >
-							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" optionKey="id" 
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" optionKey="id"
 							optionValue="name" style="background-color: red" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"/>
 						</g:if>
 						<g:elseif test="${depBundle!=assetEntity.moveBundle }" >
-							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
-								optionKey="id" optionValue="name" 
+							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}"
+								optionKey="id" optionValue="name"
 								class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
 								onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
 							></g:select>
 						</g:elseif>
 						<g:else>
-							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
-								optionKey="id" optionValue="name" 
+							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}"
+								optionKey="id" optionValue="name"
 								class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
 								onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
 							></g:select>
@@ -236,7 +236,7 @@
 
 					<%-- Dependency Status --%>
 					<td>
-						<g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus}" 
+						<g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus}"
 							optionValue="value" onchange="EntityCrud.changeDependentBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
 					</td>
 
