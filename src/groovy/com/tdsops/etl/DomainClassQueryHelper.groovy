@@ -94,7 +94,8 @@ class DomainClassQueryHelper {
                and D.assetClass = :assetClass
 			   and $hqlWhere """.stripIndent()
 
-		return AssetEntity.executeQuery(hql, [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec))
+		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec)
+		return AssetEntity.executeQuery(hql, args)
 	}
 
 	/**

@@ -1633,15 +1633,15 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can find a balades and chassis with their relationships'() {
+	void 'test can find a blades and chassis with their relationships'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceBladeChassisDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.APPLICATION, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
 				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
@@ -1658,7 +1658,8 @@ class ETLFindSpec extends ETLBaseSpec {
 				return true
 			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+				List<AssetEntity> results = applications.findAll { it.id == args.id && it.project.id == args.project.id }
+				return results
 			}
 
 		and:
@@ -1667,6 +1668,8 @@ class ETLFindSpec extends ETLBaseSpec {
 				dataSet,
 				debugConsole,
 				validator)
+
+		AssetEntity.get()
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -1703,16 +1706,71 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+				domain == ETLDomain.Device.name()
+				fieldNames == ['assetName', 'manufacturer', 'model', 'assetType', 'sourceChassis', 'sourceBladePosition'] as Set
 
-				with(data[0].fields.asset) {
-					originalValue == '152254'
-					value == '152254'
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.assetName) {
+						originalValue == 'hpchassis01'
+						value == 'hpchassis01'
+						init == null
+						errors == []
+						warn == false
+					}
 				}
 
-				with(data[1].fields.asset) {
-					originalValue == '152255'
-					value == '152255'
+				with(data[1]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.assetName) {
+						originalValue == 'xrayblade01'
+						value == 'xrayblade01'
+						init == null
+						errors == []
+						warn == false
+					}
+
+					with(fields.sourceChassis) {
+						originalValue == 'hpchassis01'
+						value == 'hpchassis01'
+						init == null
+						errors == []
+						warn == false
+						with (find){
+							matchOn == 0
+							results == []
+							with (query[0]){
+								domain == ETLDomain.Device.name()
+								with(kv){
+									assetName == 'xrayblade01'
+									manufacturer == 'HP'
+									assetType == 'Blade'
+								}
+							}
+							with (query[1]){
+								domain == ETLDomain.Device.name()
+								with(kv){
+									assetName == 'xrayblade01'
+									assetType == 'Blade'
+								}
+							}
+						}
+					}
+					with(fields.sourceBladePosition) {
+						originalValue == ''
+						value == ''
+						init == null
+						errors == []
+						warn == false
+					}
 				}
 			}
 
