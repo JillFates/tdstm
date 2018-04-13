@@ -2455,7 +2455,7 @@ class AssetEntityService implements ServiceMethods {
 					joinQuery.append("\nLEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
 					break
 
-				case ~/source(Location|Room)/:
+				case ~/(Location|Room)source/:
 					// This is a hack for the columns that were moved to the Room domain property map attributes
 					def locOrRoom = Matcher.lastMatcher[0][1]
 
@@ -2476,7 +2476,7 @@ class AssetEntityService implements ServiceMethods {
 					// Handled by the default columns
 					break
 
-				case ~/target(Location|Room)/:
+				case ~/(Location|Room)target/:
 					// This is a hack for the columns that were moved to the Room domain property map attributes
 					def locOrRoom = Matcher.lastMatcher[0][1]
 
