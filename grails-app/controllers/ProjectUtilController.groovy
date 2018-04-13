@@ -78,10 +78,20 @@ class ProjectUtilController implements ControllerMethods {
 			def startDateTime = TimeUtil.parseDate(startDate)
 			int timeDelta = startDateTime.time - templateInstance?.startDate?.time > 0 ? startDateTime.time - templateInstance?.startDate?.time : 0
 			def completionDateTime = templateInstance?.completionDate?.time ? new Date(templateInstance?.completionDate?.time + timeDelta) : null
-			project = new Project(name: name, projectCode: name, comment: templateInstance?.comment,
-			                      description: templateInstance?.description, client: templateInstance?.client,
-			                      workflowCode: templateInstance?.workflowCode, projectType: "Demo",
-			                      startDate: startDateTime, completionDate: completionDateTime)
+
+			project = new Project(
+					name: name,
+					projectCode: name,
+					comment: templateInstance?.comment,
+					description: templateInstance?.description,
+					client: templateInstance?.client,
+					workflowCode: templateInstance?.workflowCode,
+					projectType: "Demo",
+					startDate: startDateTime,
+					completionDate: completionDateTime,
+					collectMetrics: false
+			)
+
 			if (!project.hasErrors() && project.save(flush:true)) {
 				// create party relation ship to demo project
 				def companyParty = PartyGroup.findByName("TDS")
