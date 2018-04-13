@@ -11,6 +11,7 @@ class DataviewUserParamsCommand implements CommandObject {
     String sortProperty
     String sortOrder = 'a'
     Boolean justPlanning
+    Boolean forExport
 
     int offset = 0
     int limit = 25
@@ -38,5 +39,6 @@ class DataviewUserParamsCommand implements CommandObject {
         offset min: 0
         limit min: 0
         justPlanning nullable: true
+        forExport nullable: true
     }
 }

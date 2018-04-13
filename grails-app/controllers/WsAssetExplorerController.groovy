@@ -170,9 +170,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 			return
 		}
 
-		Integer limit = Pagination.maxRowForParam(userParams.limit as String)
-		userParams.limit = limit
-		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
+        if (!userParams.forExport) {
+            Integer limit = Pagination.maxRowForParam(userParams.limit as String)
+            userParams.limit = limit
+            userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
+        }
+
 		Map queryResult = dataviewService.query(project, dataview, userParams)
 
         renderSuccessJson(queryResult)
