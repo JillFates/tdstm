@@ -115,7 +115,7 @@ class ServiceNowService {
 			int statusCode = response.getStatusLine().getStatusCode()
 			if (statusCode != HttpStatus.SC_OK) {
 				log.warn 'Request to ServiceNow failed code {}', statusCode
-				throw new EmptyResultException('Service request failed - ServiceNow responded with failure code ' + statusCode)
+				throw new EmptyResultException('Service request failed - ServiceNow responded with failure code ' + response.getStatusLine().toString())
 			}
 
 			//
