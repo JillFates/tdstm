@@ -2971,7 +2971,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 
 		return [
-			assetClassOptions: AssetClass.getClassOptionForAsset(asset),
+			assetClassOptions: AssetClass.classOptions,
 			dependentAssets: getDependentsOrSupporting(asset, true),
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
