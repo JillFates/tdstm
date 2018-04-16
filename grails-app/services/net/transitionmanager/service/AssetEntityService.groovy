@@ -1167,6 +1167,57 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Return a list with the information for the dependents for this asset.
+	 * @param asset
+	 * @param dependents : true -> dependents; false -> supporting
+	 * @return
+	 */
+	List<Map> getDependentsOrSupporting(AssetEntity asset, boolean dependents = true) {
+		String targetField = dependents ? 'dependent' : 'asset'
+		List dependentsInfo = AssetDependency.createCriteria().list {
+			createAlias('asset', 'asset')
+			createAlias('dependent', 'dependent')
+			eq('asset', asset)
+			projections {
+				property('id')
+				property('comment')
+				property('status')
+				property('type')
+				property('dataFlowDirection')
+				property('dataFlowFreq')
+				property("${targetField}")
+
+				order("${targetField}.assetType")
+				order("${targetField}.assetName")
+			}
+		}
+
+		List<Map> results = []
+		String assetClass = AssetClass.getClassOptionForAsset(asset)
+		for (depInfo in dependentsInfo) {
+			AssetEntity target = depInfo[6]
+			results << [
+			    id: depInfo[0],
+				comment: depInfo[1],
+				status: depInfo[2],
+				type: depInfo[3],
+			    dataFlowDirection: depInfo[4],
+			    dataFlowFreq: depInfo[5],
+				asset: [
+				    id: dependents ? asset.id : target.id,
+					assetType: dependents ? assetClass :  AssetClass.getClassOptionForAsset(target)
+				],
+				dependent: [
+					id: dependents ? target.id : asset.id,
+					assetType: dependents ? AssetClass.getClassOptionForAsset(target) : assetClass
+				]
+			]
+		}
+
+		return results
+	}
+
+	/**
 	 * Returns a list of MoveBundles for a project
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
@@ -2904,6 +2955,30 @@ class AssetEntityService implements ServiceMethods {
 			log.error("An error occurred : $ex.message", ex)
 		}
 		return returnMap
+	}
+
+	/**
+	 *
+	 * @param project
+	 * @param asset
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyEditMap(Project project, AssetEntity asset) {
+
+		if (!asset) {
+			throw new InvalidRequestException('An invalid asset id was requested')
+		}
+
+		return [
+			assetClassOptions: AssetClass.getClassOptionForAsset(asset),
+			dependentAssets: getDependentsOrSupporting(asset, true),
+			dependencyStatus: getDependencyStatuses(),
+			dependencyType: getDependencyTypes(),
+			moveBundleList: getMoveBundles(project),
+			nonNetworkTypes: AssetType.nonNetworkTypes,
+			supportAssets: getDependentsOrSupporting(asset, false)
+		]
 	}
 
 	/**

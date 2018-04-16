@@ -17,15 +17,10 @@ import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.UserPreferenceService
-import org.grails.datastore.mapping.query.api.BuildableCriteria
-import grails.gsp.PageRenderer
-import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 import java.text.DateFormat
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -333,7 +328,7 @@ class WsAssetController implements ControllerMethods {
 			} else {
 				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
 				// Required for Supports On and Depends On
-				model.dependencyMap = assetEntityService.dependencyEditMap(params);
+				model.dependencyMap = assetEntityService.dependencyEditMap(asset.project, asset)
 				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 			}
 			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
