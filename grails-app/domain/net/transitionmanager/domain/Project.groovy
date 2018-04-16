@@ -162,7 +162,6 @@ class Project extends PartyGroup {
 
 	private String generateGuid(){
 		return UUID.randomUUID()
-		//return "$projectCode$name${new Date()}${SecurityUtil.randomString(10)}".encodeAsMD5()//.encodeAsSHA256()
 	}
 
 	def beforeDelete = {
