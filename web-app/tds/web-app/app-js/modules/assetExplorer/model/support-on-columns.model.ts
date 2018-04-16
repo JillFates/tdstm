@@ -23,7 +23,7 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Class',
-				property: 'supportClass',
+				property: 'assetClass',
 				type: 'text',
 				width: 130
 			},
@@ -59,4 +59,5 @@ export class DependencySupportModel {
 	public dataFlowFreq: string;
 	public dependencyType: string;
 	public dependencyStatus: string;
+	public assetClass: string;
 }
