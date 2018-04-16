@@ -53,6 +53,24 @@
 			</kendo-dropdownlist>
 		</ng-template>
 
+		<ng-template kendoGridCellTemplate *ngIf="column.property === 'dependencyType'" let-dataItem let-rowIndex="rowIndex">
+			<kendo-dropdownlist
+					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+					[data]="dependencyTypeList"
+					[(ngModel)]="dataItem.dependencyType"
+					required>
+			</kendo-dropdownlist>
+		</ng-template>
+
+		<ng-template kendoGridCellTemplate *ngIf="column.property === 'dependencyStatus'" let-dataItem let-rowIndex="rowIndex">
+			<kendo-dropdownlist
+					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
+					[data]="dependencyStatusList"
+					[(ngModel)]="dataItem.dependencyStatus"
+					required>
+			</kendo-dropdownlist>
+		</ng-template>
+
 	</kendo-grid-column>
 </kendo-grid>
 
