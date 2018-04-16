@@ -41,13 +41,13 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Type',
-				property: 'domainClassName.name',
+				property: 'dependencyType',
 				type: 'text',
 				width: 130
 			},
 			{
 				label: 'Status',
-				property: 'provider.name',
+				property: 'dependencyStatus',
 				type: 'text',
 				width: 130
 			}
@@ -57,4 +57,6 @@ export class SupportOnColumnsModel {
 
 export class DependencySupportModel {
 	public dataFlowFreq: string;
+	public dependencyType: string;
+	public dependencyStatus: string;
 }
