@@ -1,0 +1,15 @@
+<kendo-combobox [data]="data"
+                [textField]="'text'"
+                [valueField]="'id'"
+                [placeholder]="placeholder"
+                [filterable]="true"
+                (valueChange)="onValueChange($event)"
+                (selectionChange)="onSelectionChange($event)"
+                (filterChange)="onFilterChange($event)"
+                (open)="onOpen()"
+                (close)="onClose()"
+                (focus)="onFocus()"
+                (blur)="onBlur()"
+                [disabled]="disabled"
+                required="required">
+</kendo-combobox>

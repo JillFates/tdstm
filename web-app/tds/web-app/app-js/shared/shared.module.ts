@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PopupModule } from '@progress/kendo-angular-popup';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
@@ -31,6 +32,7 @@ import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component
 import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
 import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
+import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -46,6 +48,7 @@ import { DictionaryService } from './services/dictionary.service';
 	imports: [
 		CommonModule,
 		PopupModule,
+		DropDownsModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
@@ -68,7 +71,8 @@ import { DictionaryService } from './services/dictionary.service';
 		DynamicComponent,
 		CodeMirrorComponent,
 		CheckActionComponent,
-		URLViewerComponent
+		URLViewerComponent,
+		TDSComboBoxComponent
 	],
 	providers: [
 		AuthService,
@@ -102,7 +106,8 @@ import { DictionaryService } from './services/dictionary.service';
 		DynamicComponent,
 		CodeMirrorComponent,
 		CheckActionComponent,
-		URLViewerComponent
+		URLViewerComponent,
+		TDSComboBoxComponent
 	],
 	entryComponents: [DynamicComponent]
 })
