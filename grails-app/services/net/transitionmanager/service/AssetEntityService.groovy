@@ -2958,7 +2958,7 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 *
+	 * Return the map of information for editing dependencies.
 	 * @param project
 	 * @param asset
 	 * @return
