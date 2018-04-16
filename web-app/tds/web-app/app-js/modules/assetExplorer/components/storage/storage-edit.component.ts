@@ -11,7 +11,7 @@ import {
 	PreferenceService
 } from '../../../../shared/services';
 
-export function getStorageEditComponent(template: string, editModel: any): any {
+export function StorageEditComponent(template: string, editModel: any): any {
 	@Component({
 		selector: 'storage-edit',
 		template: template,
@@ -19,13 +19,14 @@ export function getStorageEditComponent(template: string, editModel: any): any {
 			{ provide: 'model', useValue: editModel }
 		]
 	})
-	class StorageEditComponent implements  OnInit {
+	class StorageShowComponent implements  OnInit {
 		constructor( @Inject('model') private model: any, private activeDialog: UIActiveDialogService, private preference: PreferenceService) {
 		}
 
 		ngOnInit(): void {
+			console.log('Init storage-edit');
 		}
 	}
 
-	return StorageEditComponent;
+	return StorageShowComponent;
 }
