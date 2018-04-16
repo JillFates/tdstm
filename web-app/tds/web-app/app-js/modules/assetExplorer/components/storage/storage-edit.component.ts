@@ -5,11 +5,8 @@
  *  Use angular/views/TheAssetType as reference
  */
 import { Component, Inject, OnInit } from '@angular/core';
-
-import {
-	UIActiveDialogService,
-	PreferenceService
-} from '../../../../shared/services';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PreferenceService } from '../../../../shared/services/preference.service';
 
 export function StorageEditComponent(template: string, editModel: any): any {
 	@Component({
