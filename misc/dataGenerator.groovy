@@ -147,6 +147,7 @@ class Dgenerator {
 	List<Map> generateData(Date startDate, Date endDate) {
 		List<Map> data = []
 		(startDate..endDate).each { Date date ->
+			String dateString = date.format(dateFormat)
 			projects.each { String project ->
 				metrics.each { String metric ->
 
@@ -154,7 +155,7 @@ class Dgenerator {
 						data << [
 								project   : project,
 								metricCode: metric,
-								date      : "${date.format(dateFormat)}",
+								date      : dateString,
 								label     : 'count',
 								value     : "${generateRandomInt(1, 100)}"
 						]
@@ -166,7 +167,7 @@ class Dgenerator {
 							data << [
 									project   : project,
 									metricCode: metric,
-									date      : "${date.format(dateFormat)}",
+									date      : dateString,
 									label     : "${validation}:$planStatus",
 									value     : "${generateRandomInt(1, 100)}"
 							]
@@ -178,7 +179,7 @@ class Dgenerator {
 							data << [
 									project   : project,
 									metricCode: metric,
-									date      : "${date.format(dateFormat)}",
+									date      : dateString,
 									label     : "$validation",
 									value     : "${generateRandomInt(1, 100)}"
 							]
