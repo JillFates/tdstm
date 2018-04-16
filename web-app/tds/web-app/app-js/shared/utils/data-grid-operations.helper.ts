@@ -268,6 +268,10 @@ export class DataGridOperationsHelper {
 	 * @param item
 	 */
 	public removeDataItem(item: any): void {
-		this.gridData.data.push(item);
+		let index = this.gridData.data.indexOf(item);
+		if (index >= 0) {
+			this.gridData.data.splice(index, 1);
+			this.reloadData(this.gridData.data);
+		}
 	}
 }

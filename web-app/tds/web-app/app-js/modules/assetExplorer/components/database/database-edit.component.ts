@@ -37,6 +37,7 @@ export function DatabaseEditComponent(template, editModel) {
 		private dataFlowFreqList = [];
 		private dependencyTypeList = [];
 		private dependencyStatusList = [];
+		private dependencyClassList = [];
 
 		constructor(
 			@Inject('model') private model: any,
@@ -60,6 +61,11 @@ export function DatabaseEditComponent(template, editModel) {
 			this.dataFlowFreqList = R.clone(editModel.dataFlowFreq);
 			this.dependencyTypeList = R.clone(editModel.dependencyMap.dependencyType);
 			this.dependencyStatusList = R.clone(editModel.dependencyMap.dependencyStatus);
+			for (let prop in editModel.dependencyMap.assetClassOptions) {
+				if (editModel.dependencyMap.assetClassOptions[prop]) {
+					this.dependencyClassList.push({id: prop, text: editModel.dependencyMap.assetClassOptions[prop]});
+				}
+			}
 			// Supports On
 			this.getSupportOnList();
 			// Depends On
@@ -77,7 +83,8 @@ export function DatabaseEditComponent(template, editModel) {
 					let dependencySupportModel: DependencySupportModel = {
 						dataFlowFreq: dependency.dataFlowFreq,
 						dependencyType: dependency.type,
-						dependencyStatus: dependency.status
+						dependencyStatus: dependency.status,
+						assetClass: dependency.asset.assetType
 					};
 					supportsOn.push(dependencySupportModel);
 				});
