@@ -263,7 +263,7 @@
 					</div>
 				</div>
 				<div class="modal-footer form-group-center">
-					<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button">
-						<span class="glyphicon glyphicon-ban-circle"></span> Close</button>
-				</div>
+					<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Close</button>
+                    <button class="btn btn-default pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
+                </div>
 			</div>

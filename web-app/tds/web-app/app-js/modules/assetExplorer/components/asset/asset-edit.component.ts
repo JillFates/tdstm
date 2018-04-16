@@ -15,6 +15,7 @@ import { DynamicComponent } from '../../../../shared/components/dynamic.componen
 
 import { DatabaseEditComponent } from '../database/database-edit.component';
 import { StorageEditComponent } from  '../storage/storage-edit.component';
+import {DeviceEditComponent} from '../device/device-edit.component';
 
 @Component({
 	selector: `asset-database-edit`,
@@ -48,6 +49,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 						this.registerAndCreate(DatabaseEditComponent(template, model), this.view);
 						break;
 					case 'DEVICE':
+						this.registerAndCreate(DeviceEditComponent(template, model), this.view);
 						break;
 					case 'STORAGE':
 						const component: any =  StorageEditComponent(template, model);
