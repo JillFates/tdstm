@@ -233,6 +233,9 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -854,7 +857,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							find Application by 'id' with DOMAIN.asset into 'asset'
    							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset' 
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset' 
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into asset warn 'found with wrong asset class'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenNotFound 'asset' create {
     							assetClass Application
@@ -1111,7 +1114,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() { 'AssetEntity' }
+			AssetEntity.getName() >> { 'AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -1303,6 +1306,8 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
+
+			AssetEntity.getName() >> { 'AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}

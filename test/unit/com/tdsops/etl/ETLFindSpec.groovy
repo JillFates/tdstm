@@ -54,7 +54,6 @@ class ETLFindSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
-		GroovyMock(AssetEntity, global: true)
 
 		assetDependencyDataSetContent = """
 			AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
@@ -1039,22 +1038,21 @@ class ETLFindSpec extends ETLBaseSpec {
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceDataSetContent)
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				152254,SRW24G1,LINKSYS,${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+				152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+				152256,Slideaway,ATEN,${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+				152257,ZPHA MODULE,TippingPoint,${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+				152258,Slideaway,ATEN,13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
 
 		and:
 			GroovyMock(Room, global: true)
 			Room.isAssignableFrom(_) >> { Class<?> clazz->
-				return clazz == Room
+				return true
 			}
 			Room.executeQuery(_, _) >> { String query, Map args ->
 				rooms.findAll { it.id == args.id }
 			}
-
-//		and:
-//			GroovySpy(AssetEntity, global: true)
-//			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-//				return clazz in [AssetEntity, Application, Database]
-//			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -1069,13 +1067,12 @@ class ETLFindSpec extends ETLBaseSpec {
 					console on
 					read labels
 					iterate {
-						domain Device
-						extract 'device id' load 'id' 
-						extract 'model name' load 'assetName'
-						extract 'Location' load 'locationSource'
-						extract 'Room' load 'roomSource'
-						
-						find Room by 'id' with SOURCE.RoomId into 'roomSource'
+						domain Rack
+						extract 'rackId' load 'id'
+						extract 'Location' load 'location'
+						extract 'Room' load 'room'
+				 
+						find Room by 'id' with SOURCE.RoomId into 'room'
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1083,52 +1080,63 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'Results should contain Rack domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
+				domain == ETLDomain.Rack.name()
+				fieldNames == ['id', 'location', 'room'] as Set
 
-				with(data[0]){
+				data.size() == 5
+				with(data[0]) {
 					op == 'I'
 					warn == false
 					duplicate == false
 					errors == []
 					rowNum == 1
 					with(fields.id) {
-						originalValue == '152254'
-						value == '152254'
-						init == null
-						errors == []
-						warn == false
+						originalValue == '4'
+						value == '4'
 					}
-					with(fields.assetName) {
-						originalValue == 'SRW24G1'
-						value == 'SRW24G1'
-						init == null
-						errors == []
-						warn == false
+				}
+				with(data[1]) {
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.id) {
+						originalValue == '13145'
+						value == '13145'
 					}
-					with(fields.locationSource) {
-						originalValue == 'ACME Data Center'
-						value == 'ACME Data Center'
-						init == null
-						errors == []
-						warn == false
+				}
+				with(data[2]) {
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 3
+					with(fields.id) {
+						originalValue == '5'
+						value == '5'
 					}
-					with(fields.roomSource) {
-						originalValue == 'ACME Data Center / DC1'
-						value == 'ACME Data Center / DC1'
-						init == null
-						errors == []
-						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Room'
-								with(kv){
-									id == '100'
-								}
-							}
-						}
+				}
+				with(data[3]) {
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 4
+					with(fields.id) {
+						originalValue == '6'
+						value == '6'
+					}
+				}
+				with(data[4]) {
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 5
+					with(fields.id) {
+						originalValue == '13358'
+						value == '13358'
 					}
 				}
 
@@ -1799,6 +1807,20 @@ class ETLFindSpec extends ETLBaseSpec {
 				mock
 			}
 
+			GroovySpy(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll {
+					it.assetName == args.assetName &&
+						it.manufacturer == args.manufacturer &&
+						it.assetType == args.assetType &&
+						it.project.id == args.project.id
+
+				}
+			}
+
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
@@ -1839,20 +1861,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
-
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			1 * AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll {
-					it.assetName == args.assetName &&
-						it.manufacturer == args.manufacturer &&
-						it.assetType == args.assetType &&
-						it.project.id == args.project.id
-
-				}
-			}
-
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
