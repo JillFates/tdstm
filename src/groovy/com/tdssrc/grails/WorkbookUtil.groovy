@@ -236,7 +236,7 @@ class WorkbookUtil {
 				def stringValue = value.toString()
 				// TM-9073 Limiting max value size to 32767,
 				// which is the size limit imposed by the Excel format to its cells
-				cell.setCellValue((stringValue.size() < 32767)  ? stringValue : stringValue.substring(0, 32767))
+				cell.setCellValue(StringUtil.truncateIfBigger(stringValue, 32767))
 		}
 
 		return cell

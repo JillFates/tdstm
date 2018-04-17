@@ -391,4 +391,17 @@ class StringUtilTests extends Specification {
 			null		| false
 	}
 
+	def 'test truncateIfBigger method'() {
+		given:
+			int limit = 10
+		expect:
+			expected == StringUtil.truncateIfBigger(text, limit)
+		where:
+			text		| expected
+			''| ''  // empty string, do nothing
+			'abcdefg'| 'abcdefg'  // below limit, do nothing
+			'abcdefghij'| 'abcdefghij'  // in limit, do nothing
+			'abcdefghijk'| 'abcdefghij'  // over the limit, truncate
+	}
+
 }
