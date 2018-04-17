@@ -185,20 +185,20 @@ application id,vendor name,technology,location
 
 		and:
 			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -213,15 +213,15 @@ application id,vendor name,technology,location
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
+				[id: 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id: 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
+				[id: 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+					it.getId() == 152402l
+				}, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -233,9 +233,6 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -249,37 +246,34 @@ application id,vendor name,technology,location
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
-						
-							extract 'AssetDependencyId' load 'id'
-							find Dependency by 'id' with DOMAIN.id into 'id'
-							
-							// Process the PRIMARY asset in the dependency
-    						extract 'AssetId' load 'asset'
-							
-							// Set some local variables to be reused
-							extract 'AssetName' set primaryNameVar
-							extract 'AssetType' set primaryTypeVar
-    
-							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
-       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
-    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
-    						
-						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+				.evaluate("""
+				console on
+				read labels
+				domain Dependency
+				iterate {
+					extract 'AssetDependencyId' load 'id'
+					find Dependency by 'id' with DOMAIN.id into 'id'
+					
+					// Process the PRIMARY 'asset' in the dependency
+                    extract 'AssetId' load 'asset'
+					
+					// Set some local variables to be reused
+					extract 'AssetName' set primaryNameVar
+					extract 'AssetType' set primaryTypeVar
+
+					find Application by 'id' with DOMAIN.asset into 'asset'
+                    elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+				}
+			""".stripIndent(),
+				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -290,11 +284,11 @@ application id,vendor name,technology,location
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
 				data.collect { it.fields.asset.value } == [
-						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
 				]
 
-				// Validates command: find Application of asset by id with DOMAIN.asset
+				// Validates command: find Application by 'id' with DOMAIN.asset
 				(1..14).eachWithIndex { int value, int index ->
 					with(data[index].fields.id.find) {
 						query.size() == 1
@@ -305,9 +299,9 @@ application id,vendor name,technology,location
 					}
 				}
 
-				// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+				// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
 				with(data[0].fields.asset.find) {
-					query.size() == 4
+					query.size() == 3
 					with(query[0]) {
 						domain == ETLDomain.Application.name()
 						kv.id == '151954'
@@ -323,17 +317,15 @@ application id,vendor name,technology,location
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'VMWare Vcenter'
 					}
-
-					with(query[3]) {
-						domain == ETLDomain.Asset.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
 				}
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName){
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
 	}
+
 
 	void 'test can grab the reference to the FINDINGS to be used later'() {
 
@@ -647,9 +639,8 @@ application id,vendor name,technology,location
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Microsoft']
 
-						size == 1
 						results == [152254]
-						matchOn == 1
+						matchOn == 0
 					}
 
 					!fields.id.warn
@@ -674,13 +665,11 @@ application id,vendor name,technology,location
 						query[1].domain == ETLDomain.Application.name()
 						query[1].kv == [appVendor: 'Mozilla']
 
-						size == 1
 						results == [152253]
-						matchOn == 2
+						matchOn == 1
 					}
 
-					fields.id.warn
-					fields.id.warnMsg == 'found without asset id field'
+					fields.id.errors == ['found without asset id field']
 				}
 			}
 
@@ -862,7 +851,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
     						whenNotFound 'asset' create {
     							assetClass Application
     							assetName primaryNameVar
-    							assetType primaryTypeVar
+    							description primaryTypeVar
     							"SN Last Seen" NOW
     						}
 						}
@@ -893,7 +882,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					with(find.query[1]) {
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
+						kv.description == 'VM'
 					}
 
 					with(find.query[2]) {
@@ -909,7 +898,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					// whenNotFound create command assertions
 					create.assetClass == ETLDomain.Application.name()
 					create.assetName == 'ACMEVMPROD01'
-					create.assetType == 'VM'
+					create.description == 'VM'
 					!!create."SN Last Seen"
 				}
 			}
@@ -1114,7 +1103,10 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.getName() >> { 'AssetEntity' }
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetDependency.getName() >> { 'com.tds.asset.AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -1137,14 +1129,14 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 							extract 'AssetDependencyId' load 'id'
     						extract 'AssetId' load 'asset'
 							extract 'AssetName' set primaryNameVar
-							extract 'AssetName' set primaryTypeVar
+							extract 'AssetType' set primaryTypeVar
 							
 							find Application by 'id' with DOMAIN.asset into 'asset'
 							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
 							elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
 							elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenFound asset update {
+    						whenFound 'asset' update {
     							"TN Last Seen" NOW
     						}
 						}
@@ -1175,7 +1167,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 					with(find.query[1]) {
 						domain == ETLDomain.Application.name()
 						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
+						kv.description == 'VM'
 					}
 
 					with(find.query[2]) {
@@ -1272,7 +1264,6 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 					with(find.query[0]) {
 						domain == ETLDomain.Room.name()
 						!kv.id
-						kv.error == 'Named parameter [id] value may not be null'
 					}
 				}
 
@@ -1306,8 +1297,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-
-			AssetEntity.getName() >> { 'AssetEntity' }
+			AssetDependency.getName() >> { 'com.tds.asset.AssetEntity' }
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
@@ -1334,7 +1324,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 							extract 'chassis' load 'sourceChassis' set chassisNameVar
 							// Try to find the Chassis to create the reference
 							// Assumming that the chassis is the same manufacturer as the Blade
-						    find Device by 'assetName', 'Manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
+						    find Device by 'assetName', 'manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
 							elseFind Device by 'assetName', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
 							
 							whenNotFound 'sourceChassis' create {
@@ -1394,20 +1384,20 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 						warn == false
 						with (find){
 							matchOn == null
-							results == null
+							results == []
 							with (query[0]){
 								domain == ETLDomain.Device.name()
 								with(kv){
-									assetName == 'xrayblade01'
+									assetName == 'hpchassis01'
 									manufacturer == 'HP'
-									assetType == 'Blade'
+									assetType == 'Blade Chassis'
 								}
 							}
 							with (query[1]){
 								domain == ETLDomain.Device.name()
 								with(kv){
-									assetName == 'xrayblade01'
-									assetType == 'Blade'
+									assetName == 'hpchassis01'
+									assetType == 'Blade Chassis'
 								}
 							}
 						}
@@ -1419,8 +1409,8 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 						}
 					}
 					with(fields.sourceBladePosition) {
-						originalValue == ''
-						value == ''
+						originalValue == '1'
+						value == 1
 						init == null
 						errors == []
 						warn == false
