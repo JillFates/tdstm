@@ -1146,7 +1146,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test can load Devices with sourceLocations, Rooms and Racks'() {
+	void 'test can load Devices with locationSource, Rooms and Racks'() {
 
 		given:
 			List<Room> rooms = buildRooms([
