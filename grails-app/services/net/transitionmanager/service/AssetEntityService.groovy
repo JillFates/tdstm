@@ -1168,16 +1168,16 @@ class AssetEntityService implements ServiceMethods {
 
 	/**
 	 * Return a list with the information for the dependents for this asset.
-	 * @param asset
+	 * @param assetEntity
 	 * @param dependents : true -> dependents; false -> supporting
 	 * @return
 	 */
-	List<Map> getDependentsOrSupporting(AssetEntity asset, boolean dependents = true) {
+	List<Map> getDependentsOrSupporting(AssetEntity assetEntity, boolean dependents = true) {
 		String targetField = dependents ? 'dependent' : 'asset'
 		List dependentsInfo = AssetDependency.createCriteria().list {
 			createAlias('asset', 'asset')
 			createAlias('dependent', 'dependent')
-			eq('asset', asset)
+			eq('asset', assetEntity)
 			projections {
 				property('id')
 				property('comment')
@@ -1192,29 +1192,72 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		List<Map> results = []
-		String assetClass = AssetClass.getClassOptionForAsset(asset)
-		for (depInfo in dependentsInfo) {
-			AssetEntity target = depInfo[6]
-			results << [
-			    id: depInfo[0],
-				comment: depInfo[1],
-				status: depInfo[2],
-				type: depInfo[3],
-			    dataFlowDirection: depInfo[4],
-			    dataFlowFreq: depInfo[5],
-				asset: [
-				    id: dependents ? asset.id : target.id,
-					assetType: dependents ? assetClass :  AssetClass.getClassOptionForAsset(target)
-				],
-				dependent: [
-					id: dependents ? target.id : asset.id,
-					assetType: dependents ? AssetClass.getClassOptionForAsset(target) : assetClass
-				]
-			]
+		List<Map> results = null
+		if (dependents) {
+			results = generateMapForDependents(assetEntity, dependentsInfo)
+		} else {
+			results = generateMapForSupporting(assetEntity, dependentsInfo)
 		}
 
 		return results
+	}
+
+	/**
+	 * Generate the map with the dependency info for the dependents of this asset.
+	 * @param asset
+	 * @param depInfoList
+	 * @return
+	 */
+	List<Map> generateMapForDependents(AssetEntity asset, List depInfoList) {
+		List<Map> results = []
+		for (depInfo in depInfoList) {
+			AssetEntity dependent = depInfo[6]
+			results << getDependencyMap(asset, dependent, depInfo)
+		}
+		return results
+	}
+
+	/**
+	 * Generate the map with the dependency info for the assets being supported by this asset.
+	 * @param asset
+	 * @param depInfoList
+	 * @return
+	 */
+	List<Map> generateMapForSupporting(AssetEntity asset, List depInfoList) {
+		List<Map> results = []
+		for (depInfo in depInfoList) {
+			AssetEntity supporting = depInfo[6]
+			results << getDependencyMap(supporting, asset, depInfo)
+		}
+		return results
+	}
+
+	/**
+	 * Generate a dependency map for a single asset and a dependent.
+	 * @param asset
+	 * @param dependent
+	 * @param depInfo
+	 * @return
+	 */
+	Map getDependencyMap(AssetEntity asset, AssetEntity dependent, depInfo) {
+		return [
+			id: depInfo[0],
+			comment: depInfo[1],
+			status: depInfo[2],
+			type: depInfo[3],
+			dataFlowDirection: depInfo[4],
+			dataFlowFreq: depInfo[5],
+			asset: [
+				id: asset.id,
+				name: asset.assetName,
+				assetType: AssetClass.getClassOptionForAsset(asset)
+			],
+			dependent: [
+				id: dependent.id,
+				name: dependent.assetName,
+				assetType: AssetClass.getClassOptionForAsset(dependent)
+			]
+		]
 	}
 
 	/**
