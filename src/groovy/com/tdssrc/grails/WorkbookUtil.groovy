@@ -25,6 +25,11 @@ import java.text.DateFormat
 class WorkbookUtil {
 
 	/**
+	 * This is the max length for an XLS cell.
+	 */
+	static final Integer XLS_CELL_MAX_LENGTH = 32767
+
+	/**
 	 * Creates a new Workbook based on file extension
 	 * @param extension
 	 * @return an instance or Workbook
@@ -234,9 +239,8 @@ class WorkbookUtil {
 
 			default :
 				def stringValue = value.toString()
-				// TM-9073 Limiting max value size to 32767,
-				// which is the size limit imposed by the Excel format to its cells
-				cell.setCellValue(StringUtil.truncateIfBigger(stringValue, 32767))
+				// Prevent the cell from exceeding the maximum allowed length for XLS.
+				cell.setCellValue(trucanteXlsCell(stringValue))
 		}
 
 		return cell
@@ -824,6 +828,15 @@ class WorkbookUtil {
 		}
 
 		return rowStyles
+	}
+
+	/**
+	 * Truncate an XLS cell to the max length allowed.
+	 * @param value
+	 * @return
+	 */
+	static String trucanteXlsCell(String value) {
+		return StringUtil.truncateIfBigger(value, XLS_CELL_MAX_LENGTH)
 	}
 
 }

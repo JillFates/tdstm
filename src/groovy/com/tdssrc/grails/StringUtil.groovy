@@ -520,14 +520,11 @@ class StringUtil {
 	 * @throws InvalidParamException  if any parameter is null
 	 */
 	static String truncateIfBigger(String value, int limit) {
-		if (value == null || limit == null) {
+		if (value == null || limit < 0) {
 			throw new InvalidParamException('null parameters not allowed for truncateIfBigger method')
 		}
-		if (limit == 0) {
-			return value
-		}
+
 		return (value.size() < limit) ? value : value.substring(0, limit)
 	}
-
 
 }

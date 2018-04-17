@@ -391,17 +391,27 @@ class StringUtilTests extends Specification {
 			null		| false
 	}
 
-	def 'test truncateIfBigger method'() {
-		given:
-			int limit = 10
+	def 'test the truncateIfBigger method under some valid scenarios'() {
 		expect:
 			expected == StringUtil.truncateIfBigger(text, limit)
 		where:
-			text		| expected
-			''| ''  // empty string, do nothing
-			'abcdefg'| 'abcdefg'  // below limit, do nothing
-			'abcdefghij'| 'abcdefghij'  // in limit, do nothing
-			'abcdefghijk'| 'abcdefghij'  // over the limit, truncate
+			text		|   limit       | expected
+			''          |   10          |   ''
+			'abc'       |   0           |   ''
+			'abc'       |   3           |   'abc'
+			'abcd'      |   3           |   'abc'
+			'abc'       |   10          |   'abc'
+	}
+
+	def 'test the truncateIfBigger under invalid scenarios' () {
+		when: 'Trying to truncate a null String'
+			StringUtil.truncateIfBigger(null, 10)
+		then: 'an InvalidParamException is thrown'
+			thrown InvalidParamException
+		when: 'Trying to trucante using a negative limit'
+			StringUtil.truncateIfBigger('abc', -1)
+		then: 'an InvalidParamException is thrown'
+			thrown InvalidParamException
 	}
 
 }
