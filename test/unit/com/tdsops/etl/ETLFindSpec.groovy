@@ -16,6 +16,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import com.tdssrc.grails.NumberUtil
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -26,12 +27,13 @@ import com.tdssrc.grails.NumberUtil
  * </ul>
  */
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
 class ETLFindSpec extends ETLBaseSpec {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
 	String deviceBladeChassisDataSetContent
+	String deviceDataSetContent
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
@@ -52,6 +54,7 @@ class ETLFindSpec extends ETLBaseSpec {
 	}
 
 	def setup() {
+		GroovyMock(AssetEntity, global: true)
 
 		assetDependencyDataSetContent = """
 			AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,DependentType,Type
@@ -75,6 +78,11 @@ class ETLFindSpec extends ETLBaseSpec {
 			152254,Microsoft,(xlsx updated),ACME Data Center
 			152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
+		deviceDataSetContent = """
+			device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+			152254,SRW24G1,LINKSYS,322223,100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+			152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+			152256,Slideaway,ATEN,322224,4344344,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R""".stripIndent()
 
 		deviceBladeChassisDataSetContent = """
 			name,mfg,model,type,chassis,slot
@@ -1031,12 +1039,149 @@ class ETLFindSpec extends ETLBaseSpec {
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-				${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
-				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-				${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-				${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
-				13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceDataSetContent)
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.isAssignableFrom(_) >> { Class<?> clazz->
+				return clazz == Room
+			}
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id }
+			}
+
+//		and:
+//			GroovySpy(AssetEntity, global: true)
+//			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+//				return clazz in [AssetEntity, Application, Database]
+//			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					console on
+					read labels
+					iterate {
+						domain Device
+						extract 'device id' load 'id' 
+						extract 'model name' load 'assetName'
+						extract 'Location' load 'locationSource'
+						extract 'Room' load 'roomSource'
+						
+						find Room by 'id' with SOURCE.RoomId into 'roomSource'
+					}
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Rack domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
+
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.id) {
+						originalValue == '152254'
+						value == '152254'
+						init == null
+						errors == []
+						warn == false
+					}
+					with(fields.assetName) {
+						originalValue == 'SRW24G1'
+						value == 'SRW24G1'
+						init == null
+						errors == []
+						warn == false
+					}
+					with(fields.locationSource) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center'
+						init == null
+						errors == []
+						warn == false
+					}
+					with(fields.roomSource) {
+						originalValue == 'ACME Data Center / DC1'
+						value == 'ACME Data Center / DC1'
+						init == null
+						errors == []
+						warn == false
+						with (find){
+							results == []
+							matchOn == null
+							with (query[0]){
+								domain == 'Room'
+								with(kv){
+									id == '100'
+								}
+							}
+						}
+					}
+				}
+
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can load Devices with sourceLocations, Rooms and Racks'() {
+
+		given:
+			List<Room> rooms = buildRooms([
+				[1, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[2, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			List<Rack> racks = buildRacks([
+				[4, GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
+				[5, GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
+				[6, GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
+			])
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceDataSetContent)
+
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getProject() >> it.project
+				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
+				mock
+			}
 
 		and:
 			GroovyMock(Room, global: true)
@@ -1060,12 +1205,13 @@ class ETLFindSpec extends ETLBaseSpec {
 					console on
 					read labels
 					iterate {
-						domain Rack
-						extract 'rackId' load 'id' 
-						extract 'Location' load 'location'
-						extract 'Room' load 'room'
-				 
-						find Room by 'id' with SOURCE.RoomId into 'room'
+						domain Device
+						extract 'device id' load 'id' 
+						extract 'model name' load 'assetName'
+						extract 'Location' load 'locationSource'
+						extract 'Room' load 'roomSource'
+						
+						find Room by 'id' with SOURCE.RoomId into 'roomSource'
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1073,8 +1219,8 @@ class ETLFindSpec extends ETLBaseSpec {
 		then: 'Results should contain Rack domain results associated'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Rack.name()
-				fieldNames == ['id', 'location', 'room'] as Set
+				domain == ETLDomain.Device.name()
+				fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
 			}
 
 		cleanup:
@@ -1640,26 +1786,17 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetEntity> applications = [
-				[assetClass: AssetClass.DEVICE, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+				[assetClass: AssetClass.DEVICE, id: 152254l, assetName: "ACME Data Center", manufacturer: 'LINKSYS',project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Another Data Center", manufacturer: 'LINKSYS', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", manufacturer: 'TippingPoint', project: TMDEMO]
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
+				mock.getManufacturer() >> it.manufacturer
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
 				mock.getProject() >> it.project
 				mock
-			}
-
-		and:
-			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				List<AssetEntity> results = applications.findAll { it.id == args.id && it.project.id == args.project.id }
-				return results
 			}
 
 		and:
@@ -1668,8 +1805,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				dataSet,
 				debugConsole,
 				validator)
-
-		AssetEntity.get()
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
@@ -1686,8 +1821,8 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'chassis' load 'sourceChassis' set chassisNameVar
 							// Try to find the Chassis to create the reference
 							// Assumming that the chassis is the same manufacturer as the Blade
-							find Device by 'Name', 'Manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
-							elseFind Device by 'Name', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
+						    find Device by 'assetName', 'manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
+							//elseFind Device by 'assetName', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
 							
 							whenNotFound 'sourceChassis' create {
 								assetName chassisNameVar
@@ -1704,6 +1839,20 @@ class ETLFindSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Application domain results associated'
+
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			1 * AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll {
+					it.assetName == args.assetName &&
+						it.manufacturer == args.manufacturer &&
+						it.assetType == args.assetType &&
+						it.project.id == args.project.id
+
+				}
+			}
+
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Device.name()
@@ -1745,34 +1894,42 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						warn == false
 						with (find){
-							matchOn == 0
+							matchOn == null
 							results == []
 							with (query[0]){
 								domain == ETLDomain.Device.name()
 								with(kv){
-									assetName == 'xrayblade01'
+									assetName == 'hpchassis01'
 									manufacturer == 'HP'
-									assetType == 'Blade'
 								}
 							}
-							with (query[1]){
-								domain == ETLDomain.Device.name()
-								with(kv){
-									assetName == 'xrayblade01'
-									assetType == 'Blade'
-								}
-							}
+//							with (query[1]){
+//								domain == ETLDomain.Device.name()
+//								with(kv){
+//									assetName == 'xrayblade01'
+//									assetType == 'Blade'
+//								}
+//							}
+						}
+
+						with(create){
+							assetName == 'hpchassis01'
+							assetType == 'Blade Chassis'
+							manufacturer == 'HP'
 						}
 					}
 					with(fields.sourceBladePosition) {
-						originalValue == ''
-						value == ''
+						originalValue == '1'
+						value == 1
 						init == null
 						errors == []
 						warn == false
 					}
 				}
 			}
+
+		where:
+
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)

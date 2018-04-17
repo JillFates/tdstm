@@ -23,6 +23,8 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
+	String deviceBladeChassisDataSetContent
+	String deviceDataSetContent
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
@@ -55,15 +57,33 @@ application id,vendor name,technology,location
 152254,Microsoft,(xlsx updated),ACME Data Center
 152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
+		deviceDataSetContent = """
+			device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+			152254,SRW24G1,LINKSYS,322223,100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+			152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+			152256,Slideaway,ATEN,322224,4344344,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R""".stripIndent()
+
+		deviceBladeChassisDataSetContent = """
+			name,mfg,model,type,chassis,slot
+			hpchassis01,HP,BladeSystem Z7000,Blade Chassis,,
+			xrayblade01,HP,ProLiant BL460c G1,Blade,hpchassis01,1
+			xrayblade02,HP,ProLiant BL460c G1,Blade,hpchassis01,2
+			xrayblade03,HP,ProLiant BL460c G1,Blade,hpchassis01,3
+			xrayblade04,HP,ProLiant BL460c G1,Blade,hpchassis01,4
+		""".stripIndent()
+
 		GMDEMO = projectTestHelper.createProject(null)
 		TMDEMO = projectTestHelper.createProject(null)
 
 		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(ETLDomain.Dependency))
+		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
+
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE) + commonFieldsSpec)
+		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency) + commonFieldsSpec)
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -110,9 +130,9 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
-							extract 'application id' load id
-							find Application by id with SOURCE.'application id'
+							load 'environment' with 'Production'
+							extract 'application id' load 'id'
+							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -239,20 +259,20 @@ application id,vendor name,technology,location
 						domain Dependency
 						iterate {
 						
-							extract AssetDependencyId load id
-							find Dependency of id by id with DOMAIN.id
+							extract 'AssetDependencyId' load 'id'
+							find Dependency by 'id' with DOMAIN.id into 'id'
 							
 							// Process the PRIMARY asset in the dependency
-    						extract AssetId load asset
+    						extract 'AssetId' load 'asset'
 							
 							// Set some local variables to be reused
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
 						}
 						""".stripIndent(),
@@ -262,7 +282,7 @@ application id,vendor name,technology,location
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -381,16 +401,16 @@ application id,vendor name,technology,location
 						domain Dependency
 						iterate {
 						
-							extract AssetDependencyId load id
-							find Dependency of id by id with DOMAIN.id
+							extract 'AssetDependencyId' load 'id'
+							find Dependency by 'id' with DOMAIN.id into 'id'
 							
 							// Grab the reference to the FINDINGS to be used later. 
 							def primaryFindings = FINDINGS
 	
 							if (primaryFindings.size() > 0 ){
-							 	set comment with 'Asset results found'		
+							 	load 'comment' with 'Asset results found'		
 							} else {
-							 	set comment with 'Asset results not found'
+							 	load 'comment' with 'Asset results not found'
 							}
 						}
 						""".stripIndent(),
@@ -400,7 +420,7 @@ application id,vendor name,technology,location
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'comment'] as Set
+				fieldNames == ['id', 'comment'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -465,8 +485,8 @@ application id,vendor name,technology,location
 						domain Dependency
 						
 						iterate {
-							extract 'application id' load asset
-							find Application of asset by id with DOMAIN.asset  
+							extract 'application id' load 'asset'
+							find Application by 'id' with DOMAIN.asset into 'asset'  
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -530,9 +550,9 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
-							extract 'application id' load id
-							find Application of id by id with id
+							load 'environment' with 'Production'
+							extract 'application id' load 'id'
+							find Application by 'id' with 'id' into 'id'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -592,11 +612,11 @@ application id,vendor name,technology,location
 						read labels
 						iterate {
 							domain Application
-							set environment with Production
-							extract 'vendor name' load Vendor
-							extract 'application id' load id
-							find Application of id by id with SOURCE.'application id'
-							elseFind Application of id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
+							load 'environment' with 'Production'
+							extract 'vendor name' load 'Vendor'
+							extract 'application id' load 'id'
+							find Application by 'id' with SOURCE.'application id' into 'id'
+							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
 						}
 						""".stripIndent(),
 					ETLProcessor.class.name)
@@ -747,17 +767,17 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 						
-							extract AssetDependencyId load id
-							extract AssetId load asset
+							extract 'AssetDependencyId' load 'id'
+							extract 'AssetId' load 'asset'
 							
-							find Asset of asset by assetName with SOURCE.AssetName
+							find Asset by 'assetName' with SOURCE.AssetName into 'asset' 
 							// Grab the reference to the FINDINGS to be used later. 
 							def primaryFindings = FINDINGS
 	
 							if (primaryFindings.size() > 0 && primaryFindings.isApplication()){
-							 	set comment with 'Asset results found'		
+							 	load 'comment' with 'Asset results found'		
 							} else {
-							 	set comment with 'Asset results not found'
+							 	load 'comment' with 'Asset results not found'
 							}
 						}
 						""".stripIndent(),
@@ -826,20 +846,20 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset'
+   							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset' 
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into asset warn 'found with wrong asset class'
     						
-    						whenNotFound asset create {
+    						whenNotFound 'asset' create {
     							assetClass Application
-    							assetName primaryName
-    							assetType primaryType
+    							assetName primaryNameVar
+    							assetType primaryTypeVar
     							"SN Last Seen" NOW
     						}
 						}
@@ -850,7 +870,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -949,20 +969,20 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenNotFound asset update {
+    						whenNotFound 'asset' update {
     							assetClass Application
-    							assetName primaryName
-    							assetType primaryType
+    							assetName primaryNameVar
+    							assetType primaryTypeVar
     							"SN Last Seen" NOW
     						}
 						}
@@ -1031,17 +1051,17 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetType' set primaryTypeVar
     
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							find Application by 'id' with DOMAIN.asset into 'asset' 
+   							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
+       						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+    						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
-    						whenFound asset create {
+    						whenFound 'asset' create {
     							"TN Last Seen" NOW
     						}
 						}
@@ -1051,89 +1071,6 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == 'Incorrect whenFound command. Use whenFound asset update { .... }'
-
-		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can throw an Exception if whenFound or whenNotFound command does not match a supported domain '() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
-
-		and:
-			List<AssetEntity> assetEntities = [
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
-					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getEnvironment() >> it.environment
-				mock.getMoveBundle() >> it.moveBundle
-				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
-						console on
-						read labels
-						domain Dependency
-						iterate {
-							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
-    
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
-    						
-							whenNotFound asset create {
-								assetClass Unknown
-								assetName primaryName
-								assetType primaryType
-								"SN Last Seen" NOW
-							}
-
-						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
-
-		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == "Invalid domain: 'Unknown'. It should be one of these values: ${ETLDomain.values()}"
 
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
@@ -1194,15 +1131,15 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 						domain Dependency
 						iterate {
 							
-							extract AssetDependencyId load id
-    						extract AssetId load asset
-							extract AssetName set primaryName
-							extract AssetType set primaryType
-    
-							find Application of asset by id with DOMAIN.asset 
-   							elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-       						elseFind Application of asset by assetName with SOURCE.DependentName
-    						elseFind Asset of asset by assetName with SOURCE.DependentName warn 'found with wrong asset class'
+							extract 'AssetDependencyId' load 'id'
+    						extract 'AssetId' load 'asset'
+							extract 'AssetName' set primaryNameVar
+							extract 'AssetName' set primaryTypeVar
+							
+							find Application by 'id' with DOMAIN.asset into 'asset'
+							elseFind Application by 'assetName', 'description' with SOURCE.AssetName, primaryTypeVar into 'asset'
+							elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
+							elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
     						whenFound asset update {
     							"TN Last Seen" NOW
@@ -1215,7 +1152,7 @@ AssetDependencyId,AssetId,AssetName,AssetType,DependentId,DependentName,Dependen
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Dependency.name()
-				fields == ['id', 'asset'] as Set
+				fieldNames == ['id', 'asset'] as Set
 				data.size() == 14
 				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
@@ -1295,11 +1232,11 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 						read labels
 						iterate {
 							domain Rack
-							extract rackId load id 
-							extract Location load location
-							extract Room load room
+							extract 'rackId' load 'id' 
+							extract 'Location' load 'location'
+							extract 'Room' load 'room'
 					 
-					        find Room of room by id with SOURCE.RoomId
+					        find Room by 'id' with SOURCE.RoomId into 'room'
 						}
 						""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1308,7 +1245,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
 				domain == ETLDomain.Rack.name()
-				fields == ['id', 'location', 'room'] as Set
+				fieldNames == ['id', 'location', 'room'] as Set
 
 				data.collect { it.fields.id.value } == [
 					racks[0].id.toString(), '13145',
@@ -1336,6 +1273,154 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 					}
 				}
 
+			}
+
+		cleanup:
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can find a blades and chassis with their relationships'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceBladeChassisDataSetContent)
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.DEVICE, id: 152254l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					read labels
+					domain Device
+					iterate {
+						extract 'name' load 'Name'
+						extract 'mfg' load 'manufacturer' set mfgVar
+						extract 'model' load 'model'
+						extract 'type' load 'assetType' set typeVar
+						
+						if (typeVar == 'Blade') {
+							extract 'chassis' load 'sourceChassis' set chassisNameVar
+							// Try to find the Chassis to create the reference
+							// Assumming that the chassis is the same manufacturer as the Blade
+						    find Device by 'assetName', 'Manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
+							elseFind Device by 'assetName', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
+							
+							whenNotFound 'sourceChassis' create {
+								assetName chassisNameVar
+								assetType 'Blade Chassis'
+								manufacturer mfgVar
+								// Don't know what the model will be at the point we're working with a blade
+							}
+							
+							// Set the slot that the blade is installed into
+							extract 'slot' transform with toInteger() load 'sourceBladePosition'
+						}
+					}
+						""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'Results should contain Application domain results associated'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == ['assetName', 'manufacturer', 'model', 'assetType', 'sourceChassis', 'sourceBladePosition'] as Set
+
+				with(data[0]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.assetName) {
+						originalValue == 'hpchassis01'
+						value == 'hpchassis01'
+						init == null
+						errors == []
+						warn == false
+					}
+				}
+
+				with(data[1]){
+					op == 'I'
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 2
+					with(fields.assetName) {
+						originalValue == 'xrayblade01'
+						value == 'xrayblade01'
+						init == null
+						errors == []
+						warn == false
+					}
+
+					with(fields.sourceChassis) {
+						originalValue == 'hpchassis01'
+						value == 'hpchassis01'
+						init == null
+						errors == []
+						warn == false
+						with (find){
+							matchOn == null
+							results == null
+							with (query[0]){
+								domain == ETLDomain.Device.name()
+								with(kv){
+									assetName == 'xrayblade01'
+									manufacturer == 'HP'
+									assetType == 'Blade'
+								}
+							}
+							with (query[1]){
+								domain == ETLDomain.Device.name()
+								with(kv){
+									assetName == 'xrayblade01'
+									assetType == 'Blade'
+								}
+							}
+						}
+
+						with(create){
+							assetName == 'hpchassis01'
+							assetType == 'Blade Chassis'
+							manufacturer == 'HP'
+						}
+					}
+					with(fields.sourceBladePosition) {
+						originalValue == ''
+						value == ''
+						init == null
+						errors == []
+						warn == false
+					}
+				}
 			}
 
 		cleanup:
@@ -1392,6 +1477,7 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			rack
 		}
 	}
+
 	/**
 	 * Helper method to create Fields Specs based on Asset definition
 	 * @param asset
@@ -1400,52 +1486,170 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 	private List<Map<String, ?>> buildFieldSpecsFor(def asset) {
 
 		List<Map<String, ?>> fieldSpecs = []
-		switch (asset) {
+		switch(asset){
 			case AssetClass.APPLICATION:
 				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('appVendor', 'Vendor'),
-						buildFieldSpec('environment', 'Environment'),
-						buildFieldSpec('description', 'Description'),
-						buildFieldSpec('assetType', 'AssetType'),
-						buildFieldSpec('assetName', 'Name'),
-						buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('appFunction', 'Function', 'String'),
+					buildFieldSpec('appOwner', 'App Owner', 'Person'),
+					buildFieldSpec('appSource', 'Source', 'String'),
+					buildFieldSpec('appTech', 'Technology', 'String'),
+					buildFieldSpec('appVendor', 'Vendor', 'String'),
+					buildFieldSpec('appVersion', 'Version', 'String'),
+					buildFieldSpec('businessUnit', 'Business Unit', 'String'),
+					buildFieldSpec('criticality', 'Criticality', 'InList'),
+					buildFieldSpec('drRpoDesc', 'DR RPO', 'String'),
+					buildFieldSpec('drRtoDesc', 'DR RTO', 'String'),
+					buildFieldSpec('latency', 'Latency OK', 'YesNo'),
+					buildFieldSpec('license', 'License', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('shutdownBy', 'Shutdown By', 'String'),
+					buildFieldSpec('shutdownDuration', 'Shutdown Duration', 'Number'),
+					buildFieldSpec('shutdownFixed', 'Shutdown Fixed', 'Number'),
+					buildFieldSpec('sme', 'SME1', 'Person'),
+					buildFieldSpec('sme2', 'SME2', 'Person'),
+					buildFieldSpec('startupBy', 'Startup By', 'String'),
+					buildFieldSpec('startupDuration', 'Startup Duration', 'Number'),
+					buildFieldSpec('startupFixed', 'Startup Fixed', 'Number'),
+					buildFieldSpec('startupProc', 'Startup Proc OK', 'YesNo'),
+					buildFieldSpec('testingBy', 'Testing By', 'String'),
+					buildFieldSpec('testingDuration', 'Testing Duration', 'Number'),
+					buildFieldSpec('testingFixed', 'Testing Fixed', 'Number'),
+					buildFieldSpec('testProc', 'Test Proc OK', 'YesNo'),
+					buildFieldSpec('url', 'URL', 'String'),
+					buildFieldSpec('useFrequency', 'Use Frequency', 'String'),
+					buildFieldSpec('userCount', 'User Count', 'String'),
+					buildFieldSpec('userLocations', 'User Locations', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
 				]
 				break
 			case AssetClass.DATABASE:
-
+				fieldSpecs = [
+					buildFieldSpec('dbFormat', 'Format', 'String'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('size', 'Size', 'String'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
 				break
 			case AssetClass.DEVICE:
 				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('location', 'Location'),
-						buildFieldSpec('name', 'Name'),
-						buildFieldSpec('environment', 'Environment'),
-						buildFieldSpec('assetClass', 'Asset Class'),
+					buildFieldSpec('assetTag', 'Asset Tag', 'String'),
+					buildFieldSpec('assetType', 'Device Type', 'AssetType'),
+					buildFieldSpec('cart', 'Cart', 'String'),
+					buildFieldSpec('ipAddress', 'IP Address', 'String'),
+					buildFieldSpec('maintExpDate', 'Maint Expiration', 'Date'),
+					buildFieldSpec('manufacturer', 'Manufacturer', 'String'),
+					buildFieldSpec('model', 'Model', 'String'),
+					buildFieldSpec('os', 'OS', 'String'),
+					buildFieldSpec('priority', 'Priority', 'Options.Priority'),
+					buildFieldSpec('railType', 'Rail Type', 'InList'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('retireDate', 'Retire Date', 'Date'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('serialNumber', 'Serial #', 'String'),
+					buildFieldSpec('shelf', 'Shelf', 'String'),
+					buildFieldSpec('shortName', 'Alternate Name', 'String'),
+					buildFieldSpec('size', 'Size', 'Number'),
+					buildFieldSpec('sourceBladePosition', 'Source Blade Position', 'Number'),
+					buildFieldSpec('sourceChassis', 'Source Chassis', 'Chassis.S'),
+					buildFieldSpec('locationSource', 'Source Location', 'Location.S'),
+					buildFieldSpec('rackSource', 'Source Rack', 'Rack.S'),
+					buildFieldSpec('sourceRackPosition', 'Source Position', 'Number'),
+					buildFieldSpec('roomSource', 'Source Room', 'Room.S'),
+					buildFieldSpec('targetBladePosition', 'Target Blade Position', 'Number'),
+					buildFieldSpec('targetChassis', 'Target Chassis', 'Chassis.T'),
+					buildFieldSpec('locationTarget', 'Target Location', 'Location.T'),
+					buildFieldSpec('rackTarget', 'Target Rack', 'Rack.T'),
+					buildFieldSpec('targetRackPosition', 'Target Position', 'Number'),
+					buildFieldSpec('roomTarget', 'Target Room', 'Room.T'),
+					buildFieldSpec('truck', 'Truck', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
+				break
+			case ETLDomain.Dependency:
+				fieldSpecs = [
+					buildFieldSpec('id', 'Id', 'Number'),
+					buildFieldSpec('assetName', 'AssetName'),
+					buildFieldSpec('assetType', 'AssetType'),
+					buildFieldSpec('asset', 'Asset'),
+					buildFieldSpec('comment', 'Comment'),
+					buildFieldSpec('status', 'Status'),
+					buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
+					buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
 				]
 				break
 			case CustomDomainService.COMMON:
 				fieldSpecs = [
 					buildFieldSpec('id', 'Id', 'Number'),
-					buildFieldSpec('assetType', 'AssetType'),
-					buildFieldSpec('assetName', 'Name'),
-					buildFieldSpec('assetClass', 'Asset Class'),
-				]
-				break
-			case ETLDomain.Dependency:
-				fieldSpecs = [
-						buildFieldSpec('id', 'Id', 'Number'),
-						buildFieldSpec('assetName', 'AssetName'),
-						buildFieldSpec('assetType', 'AssetType'),
-						buildFieldSpec('asset', 'Asset'),
-						buildFieldSpec('comment', 'Comment'),
-						buildFieldSpec('status', 'Status'),
-						buildFieldSpec('dataFlowFreq', 'DataFlowFreq'),
-						buildFieldSpec('dataFlowDirection', 'DataFlowDirection')
+					buildFieldSpec('assetName', 'Name', 'String'),
+					buildFieldSpec('description', 'Description', 'String'),
+					buildFieldSpec('environment', 'Environment', 'Options.Environment'),
+					buildFieldSpec('externalRefId', 'External Ref Id', 'String'),
+					buildFieldSpec('lastUpdated', 'Modified Date', 'String'),
+					buildFieldSpec('moveBundle', 'Bundle', 'String'),
+					buildFieldSpec('planStatus', 'Plan Status', 'Options.PlanStatus'),
+					buildFieldSpec('supportType', 'Support', 'String'),
+					buildFieldSpec('validation', 'Validation', 'InList'),
+					buildFieldSpec('assetClass', 'Asset Class', 'String'),
 				]
 				break
 			case AssetClass.STORAGE:
-
+				fieldSpecs = [
+					buildFieldSpec('LUN', 'LUN', 'String'),
+					buildFieldSpec('fileFormat', 'Format', 'String'),
+					buildFieldSpec('size', 'Size', 'String'),
+					buildFieldSpec('rateOfChange', 'Rate Of Change', 'Number'),
+					buildFieldSpec('scale', 'Scale', 'String'),
+					buildFieldSpec('custom1', 'Network Interfaces', 'String'),
+					buildFieldSpec('custom2', 'SLA Name', 'String'),
+					buildFieldSpec('custom3', 'Cost Basis', 'String'),
+					buildFieldSpec('custom4', 'OPS Manual', 'String'),
+					buildFieldSpec('custom5', 'DR Plan', 'String'),
+					buildFieldSpec('custom6', 'App Code', 'String'),
+					buildFieldSpec('custom7', 'Latency Timing', 'String'),
+					buildFieldSpec('custom8', 'App ID', 'String'),
+					buildFieldSpec('custom9', 'Backup Plan Complete', 'String'),
+					buildFieldSpec('custom10', 'Custom10', 'String'),
+					buildFieldSpec('custom11', 'Custom11', 'String'),
+					buildFieldSpec('custom12', 'Custom12', 'String'),
+				]
 				break
 		}
 
