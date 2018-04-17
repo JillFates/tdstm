@@ -120,6 +120,10 @@ export function DatabaseEditComponent(template, editModel) {
 			this.activeDialog.close();
 		}
 
+		public onUpdate(): void {
+			console.log(JSON.stringify(this.model.asset));
+		}
+
 	}
 	return DatabaseShowComponent;
 }

@@ -2,7 +2,7 @@
  * Supports Server Side Pagination and Server  Side Filter Search
  */
 
-import {Component, EventEmitter, Input, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 
 @Component({
 	selector: 'tds-combobox',
@@ -18,12 +18,14 @@ export class TDSComboBoxComponent {
 	@Output('close') close: EventEmitter<any> = new EventEmitter();
 	@Output('focus') focus: EventEmitter<any> = new EventEmitter();
 	@Output('blur') blur: EventEmitter<any> = new EventEmitter();
+	@Output() modelChange = new EventEmitter<string>();
 
-	@Input('placeholder') placeholder: string;
+	@Input('model') model: any;
+	@Input('placeholder') placeholder = '';
 	@Input('filterable') filterable: boolean;
 	@Input('required') required: boolean;
 	@Input('disabled') disabled: boolean;
-	@Input('data') data: any[] = [];
+	@Input('data') data: any[] = [{ id: '', text: ''}];
 
 	public onValueChange(value: any): void {
 		this.valueChange.emit(value);

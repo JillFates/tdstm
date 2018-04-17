@@ -55,6 +55,13 @@
 			</kendo-dropdownlist>
 		</ng-template>
 
+		<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
+			<tds-combobox
+					[data]="dependencyClassList"
+					[(model)]="dataItem.assetClass">
+			</tds-combobox>
+		</ng-template>
+
 		<ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
 			<kendo-dropdownlist
 					name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"

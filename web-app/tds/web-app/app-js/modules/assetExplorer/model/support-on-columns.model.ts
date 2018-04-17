@@ -29,7 +29,7 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Name',
-				property: 'name',
+				property: 'assetName',
 				type: 'text',
 				width: 195
 			},

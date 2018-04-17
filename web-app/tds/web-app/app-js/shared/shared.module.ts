@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
@@ -47,6 +48,7 @@ import { DictionaryService } from './services/dictionary.service';
 @NgModule({
 	imports: [
 		CommonModule,
+		FormsModule,
 		PopupModule,
 		DropDownsModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
