@@ -79,7 +79,8 @@
                                     </div>
                                 </ng-template>
                                 <ng-template kendoGridCellTemplate let-dataItem>
-                                        <label class="selectall-checkbox-column text-center k-grid-ignore-click">
+                                        <label *ngIf="dataItem.status.code !== 'COMPLETED'"
+                                               class="selectall-checkbox-column text-center k-grid-ignore-click">
                                         <input type="checkbox"
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
                                                name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
