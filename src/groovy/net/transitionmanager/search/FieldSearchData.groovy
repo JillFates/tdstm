@@ -35,7 +35,8 @@ class FieldSearchData {
                     filter : filter?.trim(),
                     column : column,
                     columnAlias : columnAlias?: column,
-                    useWildcards : false
+                    useWildcards : false,
+                    type: type
             ]
         }
 
@@ -146,5 +147,9 @@ class FieldSearchData {
 
     void setMixedSqlExpression(expression) {
         mixedSqlExpression = expression
+    }
+
+    Class getType() {
+        return searchInfo.type
     }
 }
