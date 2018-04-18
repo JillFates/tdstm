@@ -39,7 +39,7 @@ class Project extends PartyGroup {
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
 	static constraints = {
-		guid size: 36..36//32 //64
+		guid size: 36..36
 		defaultBundle nullable: true
 		client nullable: false
 		depConsoleCriteria nullable: true

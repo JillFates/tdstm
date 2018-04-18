@@ -21,7 +21,7 @@ databaseChangeLog = {
 		}
 
 		addColumn(tableName: 'project') {
-			column(name: 'guid', type: 'varchar(36)') {
+			column(name: 'guid', type: 'char(36)') {
 				constraints(nullable: "false")
 			}
 		}
