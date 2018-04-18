@@ -160,4 +160,14 @@ enum AssetClass {
 	static lookup(Class<? extends AssetEntity> clazz){
 		return assetClassByDomainClassMap[clazz]
 	}
+
+	/**
+	 * Return the corresponding class option value for the given asset.
+	 * @param asset
+	 * @return
+	 */
+	static classOptionValueFor(AssetEntity asset) {
+		String key = getClassOptionForAsset(asset)
+		return classOptions[key]
+	}
 }

@@ -1174,10 +1174,11 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	List<Map> getDependentsOrSupporting(AssetEntity assetEntity, boolean dependents = true) {
 		String targetField = dependents ? 'dependent' : 'asset'
+		String sourceField = dependents? 'asset' : 'dependent'
 		List dependentsInfo = AssetDependency.createCriteria().list {
 			createAlias('asset', 'asset')
 			createAlias('dependent', 'dependent')
-			eq('asset', assetEntity)
+			eq(sourceField, assetEntity)
 			projections {
 				property('id')
 				property('comment')
@@ -1250,12 +1251,12 @@ class AssetEntityService implements ServiceMethods {
 			asset: [
 				id: asset.id,
 				name: asset.assetName,
-				assetType: AssetClass.getClassOptionForAsset(asset)
+				assetType: AssetClass.classOptionValueFor(asset)
 			],
 			dependent: [
 				id: dependent.id,
 				name: dependent.assetName,
-				assetType: AssetClass.getClassOptionForAsset(dependent)
+				assetType: AssetClass.classOptionValueFor(dependent)
 			]
 		]
 	}
