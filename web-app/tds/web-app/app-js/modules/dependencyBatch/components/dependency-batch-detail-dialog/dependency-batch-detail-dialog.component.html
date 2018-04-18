@@ -79,7 +79,7 @@
                                     </div>
                                 </ng-template>
                                 <ng-template kendoGridCellTemplate let-dataItem>
-                                        <label *ngIf="dataItem.status.code !== 'COMPLETED'"
+                                        <label *ngIf="dataItem.status.code === BatchStatus.IGNORED || dataItem.status.code === BatchStatus.PENDING"
                                                class="selectall-checkbox-column text-center k-grid-ignore-click">
                                         <input type="checkbox"
                                                [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
