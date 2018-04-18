@@ -1,4 +1,4 @@
-<kendo-combobox
+<kendo-combobox #innerComboBox
         [data]="datasource"
         [(ngModel)]="model"
         [textField]="'text'"
@@ -16,6 +16,9 @@
         required="required"
         name="testName"
         style="width: 100%;">
+    <ng-template kendoComboBoxItemTemplate let-dataItem>
+        <span [innerHTML]="comboBoxInnerSearch(dataItem)"></span>
+    </ng-template>
     <ng-template kendoComboBoxFooterTemplate>
         <span #dropdownFooter></span>
     </ng-template>

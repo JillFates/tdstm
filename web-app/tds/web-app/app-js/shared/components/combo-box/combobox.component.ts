@@ -3,8 +3,10 @@
  */
 
 import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, ViewChild, ElementRef} from '@angular/core';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ComboBoxSearchModel} from './model/combobox-search-param.model';
 import {ComboBoxSearchResultModel, RESULT_PER_PAGE} from './model/combobox-search-result.model';
+import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
 import {setTimeout} from 'timers';
 import * as R from 'ramda';
 
@@ -19,6 +21,7 @@ declare var jQuery: any;
 export class TDSComboBoxComponent implements OnChanges {
 	// References
 	@ViewChild('dropdownFooter') dropdownFooter: ElementRef;
+	@ViewChild('innerComboBox') innerComboBox: ComboBoxComponent;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	@Output('selectionChange') selectionChange: EventEmitter<any> = new EventEmitter();
@@ -43,6 +46,9 @@ export class TDSComboBoxComponent implements OnChanges {
 	private comboBoxSearchModel: ComboBoxSearchModel;
 	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 
+	constructor(private sanitized: DomSanitizer) {
+	}
+
 	/**
 	 * Hook when the new Value is assigned to the ComboBox
 	 * @param {SimpleChanges} changes
@@ -58,16 +64,32 @@ export class TDSComboBoxComponent implements OnChanges {
 		}
 	}
 
+	/**
+	 * If on the value change the value is undefined and the last combobox value is not empty, it was a canceled filter
+	 * @param value
+	 */
 	public onValueChange(value: any): void {
 		this.valueChange.emit(value);
+		if (!value && this.comboBoxSearchModel && this.comboBoxSearchModel.value && this.comboBoxSearchModel.value !== '') {
+			this.comboBoxSearchModel.query = '';
+			this.comboBoxSearchModel.currentPage = 1;
+			this.getResultSet();
+		}
 	}
 
 	public onSelectionChange(value: any): void {
 		this.selectionChange.emit(value);
 	}
 
+	/**
+	 * Filter is being executed on Server and Client Side
+	 * @param filter
+	 */
 	public onFilterChange(filter: any): void {
 		this.filterChange.emit(filter);
+		this.comboBoxSearchModel.currentPage = 1;
+		this.comboBoxSearchModel.query = filter;
+		this.getNewResultSet();
 	}
 
 	/**
@@ -87,16 +109,31 @@ export class TDSComboBoxComponent implements OnChanges {
 				maxPage: 25
 			};
 			this.getResultSet();
+		} else {
+			this.calculateLastElementShow();
 		}
 	}
 
 	/**
-	 * Populate the Datasource with the a new set
+	 * Populate the Datasource with the set
 	 */
 	private getResultSet(): void {
 		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
 			this.comboBoxSearchResultModel = res;
 			this.datasource = R.concat(this.datasource, this.comboBoxSearchResultModel.result);
+			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
+				this.calculateLastElementShow();
+			}
+		});
+	}
+
+	/**
+	 * Populate the Datasource with a new Complete Set
+	 */
+	private getNewResultSet(): void {
+		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
+			this.comboBoxSearchResultModel = res;
+			this.datasource = this.comboBoxSearchResultModel.result;
 			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
 				this.calculateLastElementShow();
 			}
@@ -139,11 +176,21 @@ export class TDSComboBoxComponent implements OnChanges {
 	 */
 	private onLastElementShow(element: any): void {
 		if (element.offsetHeight + element.scrollTop === element.scrollHeight) {
-			console.log(RESULT_PER_PAGE * this.comboBoxSearchResultModel.page);
 			if ((RESULT_PER_PAGE * this.comboBoxSearchResultModel.page) <= this.comboBoxSearchResultModel.total) {
 				this.comboBoxSearchModel.currentPage++;
 				this.getResultSet();
 			}
 		}
+	}
+
+	/**
+	 * Search for matching text of current comboBox filter
+	 * @param {any} dataItem
+	 * @returns {SafeHtml}
+	 */
+	public comboBoxInnerSearch(dataItem: any): SafeHtml {
+		const regex = new RegExp(this.innerComboBox.text, 'i');
+		const transformedText = dataItem.text.replace(regex, `<b>$&</b>`);
+		return this.sanitized.bypassSecurityTrustHtml(transformedText);
 	}
 }
