@@ -1193,73 +1193,27 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
-		List<Map> results = null
-		if (dependents) {
-			results = generateMapForDependents(assetEntity, dependentsInfo)
-		} else {
-			results = generateMapForSupporting(assetEntity, dependentsInfo)
-		}
-
-		return results
-	}
-
-	/**
-	 * Generate the map with the dependency info for the dependents of this asset.
-	 * @param asset
-	 * @param depInfoList
-	 * @return
-	 */
-	List<Map> generateMapForDependents(AssetEntity asset, List depInfoList) {
 		List<Map> results = []
-		for (depInfo in depInfoList) {
-			AssetEntity dependent = depInfo[6]
-			results << getDependencyMap(asset, dependent, depInfo)
-		}
-		return results
-	}
-
-	/**
-	 * Generate the map with the dependency info for the assets being supported by this asset.
-	 * @param asset
-	 * @param depInfoList
-	 * @return
-	 */
-	List<Map> generateMapForSupporting(AssetEntity asset, List depInfoList) {
-		List<Map> results = []
-		for (depInfo in depInfoList) {
-			AssetEntity supporting = depInfo[6]
-			results << getDependencyMap(supporting, asset, depInfo)
-		}
-		return results
-	}
-
-	/**
-	 * Generate a dependency map for a single asset and a dependent.
-	 * @param asset
-	 * @param dependent
-	 * @param depInfo
-	 * @return
-	 */
-	Map getDependencyMap(AssetEntity asset, AssetEntity dependent, depInfo) {
-		return [
-			id: depInfo[0],
-			comment: depInfo[1],
-			status: depInfo[2],
-			type: depInfo[3],
-			dataFlowDirection: depInfo[4],
-			dataFlowFreq: depInfo[5],
-			asset: [
-				id: asset.id,
-				name: asset.assetName,
-				assetType: AssetClass.classOptionValueFor(asset)
-			],
-			dependent: [
-				id: dependent.id,
-				name: dependent.assetName,
-				assetType: AssetClass.classOptionValueFor(dependent)
+		for (depInfo in dependentsInfo) {
+			AssetEntity target = depInfo[6]
+			results << [
+				id: depInfo[0],
+				comment: depInfo[1],
+				status: depInfo[2],
+				type: depInfo[3],
+				dataFlowDirection: depInfo[4],
+				dataFlowFreq: depInfo[5],
+				asset: [
+					id: target.id,
+					name: target.assetName,
+					assetType: AssetClass.getClassOptionForAsset(target)
+				]
 			]
-		]
+		}
+
+		return results
 	}
+
 
 	/**
 	 * Returns a list of MoveBundles for a project
