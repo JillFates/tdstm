@@ -6,3 +6,5 @@ export class ComboBoxSearchResultModel {
 	public result?: any[];
 	public page?: number;
 }
+
+export const RESULT_PER_PAGE = 24;

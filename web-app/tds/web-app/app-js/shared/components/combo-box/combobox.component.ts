@@ -4,8 +4,9 @@
 
 import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, ViewChild, ElementRef} from '@angular/core';
 import {ComboBoxSearchModel} from './model/combobox-search-param.model';
-import {ComboBoxSearchResultModel} from './model/combobox-search-result.model';
+import {ComboBoxSearchResultModel, RESULT_PER_PAGE} from './model/combobox-search-result.model';
 import {setTimeout} from 'timers';
+import * as R from 'ramda';
 
 declare var jQuery: any;
 
@@ -16,6 +17,8 @@ declare var jQuery: any;
 })
 
 export class TDSComboBoxComponent implements OnChanges {
+	// References
+	@ViewChild('dropdownFooter') dropdownFooter: ElementRef;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	@Output('selectionChange') selectionChange: EventEmitter<any> = new EventEmitter();
@@ -34,12 +37,11 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('filterable') filterable: boolean;
 	@Input('required') required: boolean;
 	@Input('disabled') disabled: boolean;
-	@Input('data') data: any[] = [{id: '', text: ''}];
-
-	@ViewChild('dropdownFooter') dropdownFooter: ElementRef;
-
+	// Inner Params
+	private datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
 	private comboBoxSearchModel: ComboBoxSearchModel;
+	private comboBoxSearchResultModel: ComboBoxSearchResultModel;
 
 	/**
 	 * Hook when the new Value is assigned to the ComboBox
@@ -51,7 +53,7 @@ export class TDSComboBoxComponent implements OnChanges {
 			this.firstChange = changes['model'].firstChange;
 			if (this.firstChange) {
 				let model = changes['model'].currentValue;
-				this.data.push({id: model.id, text: model.text});
+				this.datasource.push({id: model.id, text: model.text});
 			}
 		}
 	}
@@ -77,18 +79,28 @@ export class TDSComboBoxComponent implements OnChanges {
 		// At open the first time, we need to get the list of items to show based on the selected element
 		if (this.firstChange) {
 			this.firstChange = false;
-			this.comboBoxSearchModel  = {
+			this.comboBoxSearchModel = {
 				query: '',
 				currentPage: 1,
 				metaParam: this.model.metaParam,
 				value: this.model.text,
 				maxPage: 25
 			};
-			this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
-				this.data = res.result;
-				this.calculateLastElementShow();
-			});
+			this.getResultSet();
 		}
+	}
+
+	/**
+	 * Populate the Datasource with the a new set
+	 */
+	private getResultSet(): void {
+		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
+			this.comboBoxSearchResultModel = res;
+			this.datasource = R.concat(this.datasource, this.comboBoxSearchResultModel.result);
+			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
+				this.calculateLastElementShow();
+			}
+		});
 	}
 
 	public onClose(): void {
@@ -112,6 +124,7 @@ export class TDSComboBoxComponent implements OnChanges {
 			setTimeout(() => {
 				let nativeElement = this.dropdownFooter.nativeElement;
 				let scrollContainer = jQuery(nativeElement.parentNode).find('.k-list-scroller');
+				jQuery(scrollContainer).off('scroll');
 				jQuery(scrollContainer).on('scroll', (element) => {
 					this.onLastElementShow(element.target);
 				});
@@ -121,11 +134,16 @@ export class TDSComboBoxComponent implements OnChanges {
 
 	/**
 	 * Calculate the visible height + pixel scrolled = total height
+	 * If Result Set Per Page is less than the max total of result found, continue scrolling
 	 * @param element
 	 */
 	private onLastElementShow(element: any): void {
 		if (element.offsetHeight + element.scrollTop === element.scrollHeight) {
-			console.log('End of the Div');
+			console.log(RESULT_PER_PAGE * this.comboBoxSearchResultModel.page);
+			if ((RESULT_PER_PAGE * this.comboBoxSearchResultModel.page) <= this.comboBoxSearchResultModel.total) {
+				this.comboBoxSearchModel.currentPage++;
+				this.getResultSet();
+			}
 		}
 	}
 }
