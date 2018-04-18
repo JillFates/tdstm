@@ -60,4 +60,5 @@ export class DependencySupportModel {
 	public dependencyType: string;
 	public dependencyStatus: string;
 	public assetClass: string;
+	public assetDepend: any;
 }

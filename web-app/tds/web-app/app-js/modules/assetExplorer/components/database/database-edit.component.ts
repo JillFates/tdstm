@@ -4,14 +4,17 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PreferenceService } from '../../../../shared/services/preference.service';
-import { DateUtils} from '../../../../shared/utils/date.utils';
+import {Component, Inject, OnInit} from '@angular/core';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
 import {DependencySupportModel, SupportOnColumnsModel} from '../../model/support-on-columns.model';
+import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import * as R from 'ramda';
+import {Observable} from 'rxjs/Rx';
 
 declare var jQuery: any;
 
@@ -42,7 +45,11 @@ export function DatabaseEditComponent(template, editModel) {
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService,
-			private preference: PreferenceService) {
+			private preference: PreferenceService,
+			private assetExplorerService: AssetExplorerService) {
+
+			this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
+
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 
@@ -50,7 +57,6 @@ export function DatabaseEditComponent(template, editModel) {
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
 
-			// TODO: Create Object Util to initialiaze variables based on their class model definition
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -82,6 +88,11 @@ export function DatabaseEditComponent(template, editModel) {
 				supportAssets.forEach((dependency) => {
 					let dependencySupportModel: DependencySupportModel = {
 						dataFlowFreq: dependency.dataFlowFreq,
+						assetDepend: {
+							id: dependency.asset.id,
+							text: dependency.asset.name,
+							metaParam: dependency.asset.assetType
+						},
 						dependencyType: dependency.type,
 						dependencyStatus: dependency.status,
 						assetClass: dependency.asset.assetType
@@ -122,6 +133,10 @@ export function DatabaseEditComponent(template, editModel) {
 
 		public onUpdate(): void {
 			console.log(JSON.stringify(this.model.asset));
+		}
+
+		public getAssetListForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
+			return this.assetExplorerService.getAssetListForComboBox(searchParam);
 		}
 
 	}

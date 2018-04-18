@@ -4,6 +4,8 @@ import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Permission} from '../../../shared/model/permission.model';
+import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
+import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
@@ -17,6 +19,7 @@ export class AssetExplorerService {
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
 	private ALL_ASSETS = 'All Assets';
+	private assetEntitySearch = 'assetEntity/assetListForSelect2';
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
@@ -200,6 +203,25 @@ export class AssetExplorerService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.isUnique;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * @param searchParams
+	 * @returns {Observable<any>}
+	 */
+	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.results,
+					total: response.total,
+					page: response.page
+				};
+				return comboBoxSearchResultModel;
 			})
 			.catch((error: any) => error.json());
 	}

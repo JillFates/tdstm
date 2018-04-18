@@ -56,10 +56,7 @@
 		</ng-template>
 
 		<ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-			<tds-combobox
-					[data]="dependencyClassList"
-					[(model)]="dataItem.assetClass">
-			</tds-combobox>
+			<tds-combobox [(model)]="dataItem.assetDepend" [serviceRequest]="getAssetListForComboBox"></tds-combobox>
 		</ng-template>
 
 		<ng-template kendoGridCellTemplate *ngIf="column.property === 'dataFlowFreq'" let-dataItem let-rowIndex="rowIndex">
