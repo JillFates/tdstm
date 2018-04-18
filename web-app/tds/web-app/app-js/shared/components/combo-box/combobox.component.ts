@@ -2,9 +2,12 @@
  * Supports Server Side Pagination and Server  Side Filter Search
  */
 
-import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, ViewChild, ElementRef} from '@angular/core';
 import {ComboBoxSearchModel} from './model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from './model/combobox-search-result.model';
+import {setTimeout} from 'timers';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-combobox',
@@ -32,6 +35,8 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('required') required: boolean;
 	@Input('disabled') disabled: boolean;
 	@Input('data') data: any[] = [{id: '', text: ''}];
+
+	@ViewChild('dropdownFooter') dropdownFooter: ElementRef;
 
 	private firstChange = true;
 	private comboBoxSearchModel: ComboBoxSearchModel;
@@ -81,6 +86,7 @@ export class TDSComboBoxComponent implements OnChanges {
 			};
 			this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
 				this.data = res.result;
+				this.calculateLastElementShow();
 			});
 		}
 	}
@@ -95,5 +101,31 @@ export class TDSComboBoxComponent implements OnChanges {
 
 	public onBlur(): void {
 		this.blur.emit();
+	}
+
+	/**
+	 * Keep listening if the element show is the last one
+	 * @returns {any}
+	 */
+	private calculateLastElementShow(): any {
+		if (this.dropdownFooter && this.dropdownFooter.nativeElement) {
+			setTimeout(() => {
+				let nativeElement = this.dropdownFooter.nativeElement;
+				let scrollContainer = jQuery(nativeElement.parentNode).find('.k-list-scroller');
+				jQuery(scrollContainer).on('scroll', (element) => {
+					this.onLastElementShow(element.target);
+				});
+			}, 800);
+		}
+	}
+
+	/**
+	 * Calculate the visible height + pixel scrolled = total height
+	 * @param element
+	 */
+	private onLastElementShow(element: any): void {
+		if (element.offsetHeight + element.scrollTop === element.scrollHeight) {
+			console.log('End of the Div');
+		}
 	}
 }
