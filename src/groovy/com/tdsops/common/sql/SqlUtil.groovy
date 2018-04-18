@@ -1,5 +1,6 @@
 package com.tdsops.common.sql
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringEscapeUtils
@@ -463,7 +464,7 @@ class SqlUtil {
 
 		if (isNumericField(fieldSearchData)) {
 			if (fieldSearchData.filter.isNumber()) {
-				paramValue = parseNumberParameter(fieldSearchData.filter)
+				paramValue = parseNumberParameter(fieldSearchData)
 			}
 		} else {
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
@@ -526,12 +527,20 @@ class SqlUtil {
 	 * @param parameter
 	 * @return numeric representation or null if the parameter is not a number.
 	 */
-	private static Number parseNumberParameter(String parameter) {
-		if (parameter.isNumber()) {
-			return parameter.isLong() ? parameter.toLong() : parameter.toDouble()
-		} else {
-			return null
+	private static Number parseNumberParameter(FieldSearchData fsd) {
+		Class type = fsd.getType()
+		String filter = fsd.getFilter()
+		def parsedNumber = null
+		if (filter.isNumber()) {
+			if (type == Integer) {
+				parsedNumber = NumberUtil.toInteger(filter)
+			} else if (type == Long) {
+				parsedNumber = NumberUtil.toLong(filter)
+			} else {
+				parsedNumber = filter.toFloat()
+			}
 		}
+		return parsedNumber
 
 	}
 
