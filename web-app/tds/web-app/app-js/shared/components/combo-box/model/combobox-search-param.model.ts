@@ -6,5 +6,6 @@ export class ComboBoxSearchModel {
 	public value?: string;
 	public maxPage?: number;
 	public currentPage?: number;
-	public metaParam?: string;
+	// To Pass any extra param required
+	public metaParam?: any;
 }

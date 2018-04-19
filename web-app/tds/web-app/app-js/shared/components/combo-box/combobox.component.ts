@@ -2,7 +2,7 @@
  * Supports Server Side Pagination and Server  Side Filter Search
  */
 
-import {Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, ViewChild, ElementRef} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ViewChild, SimpleChanges, OnChanges, ElementRef} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ComboBoxSearchModel} from './model/combobox-search-param.model';
 import {ComboBoxSearchResultModel, RESULT_PER_PAGE} from './model/combobox-search-result.model';
@@ -33,6 +33,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	// Model
 	@Output() modelChange = new EventEmitter<string>();
 	@Input('model') model: any;
+	@Input('metaParam') metaParam: any;
 	// Passing Callback functions
 	@Input('serviceRequest') serviceRequest: Function;
 	// Params
@@ -87,9 +88,12 @@ export class TDSComboBoxComponent implements OnChanges {
 	 */
 	public onFilterChange(filter: any): void {
 		this.filterChange.emit(filter);
-		this.comboBoxSearchModel.currentPage = 1;
-		this.comboBoxSearchModel.query = filter;
-		this.getNewResultSet();
+		if (filter !== '') {
+			this.initSearchModel();
+			this.comboBoxSearchModel.currentPage = 1;
+			this.comboBoxSearchModel.query = filter;
+			this.getNewResultSet();
+		}
 	}
 
 	/**
@@ -99,19 +103,27 @@ export class TDSComboBoxComponent implements OnChanges {
 	public onOpen(): void {
 		this.open.emit();
 		// At open the first time, we need to get the list of items to show based on the selected element
-		if (this.firstChange) {
+		if (this.firstChange || !this.comboBoxSearchModel || this.comboBoxSearchModel.metaParam !== this.metaParam) {
 			this.firstChange = false;
-			this.comboBoxSearchModel = {
-				query: '',
-				currentPage: 1,
-				metaParam: this.model.metaParam,
-				value: this.model.text,
-				maxPage: 25
-			};
+			this.datasource = [];
+			this.initSearchModel();
 			this.getResultSet();
 		} else {
 			this.calculateLastElementShow();
 		}
+	}
+
+	/**
+	 * The Search model is being separated from the model attached to the comboBox
+	 */
+	private initSearchModel(): void {
+		this.comboBoxSearchModel = {
+			query: '',
+			currentPage: 1,
+			metaParam: this.metaParam,
+			value: (this.model) ? this.model.text : '',
+			maxPage: 25
+		};
 	}
 
 	/**
@@ -120,6 +132,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	private getResultSet(): void {
 		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
 			this.comboBoxSearchResultModel = res;
+			// If in the process the MetaParam is not the same, clean the datasource
 			this.datasource = R.concat(this.datasource, this.comboBoxSearchResultModel.result);
 			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
 				this.calculateLastElementShow();
@@ -150,6 +163,13 @@ export class TDSComboBoxComponent implements OnChanges {
 
 	public onBlur(): void {
 		this.blur.emit();
+	}
+
+	/**
+	 * Reset the Value of the selected Element
+	 */
+	public resetValue(): void {
+		this.comboBoxSearchModel.value = '';
 	}
 
 	/**

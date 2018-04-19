@@ -59,6 +59,6 @@ export class DependencySupportModel {
 	public dataFlowFreq: string;
 	public dependencyType: string;
 	public dependencyStatus: string;
-	public assetClass: string;
+	public assetClass: any;
 	public assetDepend: any;
 }

@@ -28,9 +28,9 @@ export class SupportsDependsComponent implements OnInit {
 		field: 'dateCreated'
 	}];
 	private dataFlowFreqList = [];
+	private dependencyClassList = [];
 	private dependencyTypeList = [];
 	private dependencyStatusList = [];
-	private dependencyClassList = [];
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -62,16 +62,16 @@ export class SupportsDependsComponent implements OnInit {
 		if (this.model.dependencyMap && this.model.dependencyMap.supportAssets) {
 			let supportAssets = R.clone(this.model.dependencyMap.supportAssets);
 			supportAssets.forEach((dependency) => {
+				let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 				let dependencySupportModel: DependencySupportModel = {
 					dataFlowFreq: dependency.dataFlowFreq,
+					assetClass: assetClass,
 					assetDepend: {
 						id: dependency.asset.id,
-						text: dependency.asset.name,
-						metaParam: dependency.asset.assetType
+						text: dependency.asset.name
 					},
 					dependencyType: dependency.type,
 					dependencyStatus: dependency.status,
-					assetClass: dependency.asset.assetType
 				};
 				supportsOn.push(dependencySupportModel);
 			});
@@ -83,7 +83,28 @@ export class SupportsDependsComponent implements OnInit {
 	 * Add a new Support On Dependency
 	 */
 	public onAddSupportsOn(): void {
-		this.dataGridSupportsOnHelper.addDataItem({});
+		this.dataGridSupportsOnHelper.addDataItem({
+			dataFlowFreq: this.dataFlowFreqList[0],
+			assetClass: this.dependencyClassList[0],
+			assetDepend: {
+				id: '',
+				text: '',
+				metaParam: this.dependencyClassList[0].id
+			},
+			dependencyType: this.dependencyTypeList[0],
+			dependencyStatus: this.dependencyStatusList[0],
+		});
+	}
+
+	/**
+	 * On Change the Selected Dependency Class
+	 * @param {DependencySupportModel} dataItem
+	 */
+	public onDependencyClassChange(dataItem: DependencySupportModel): void {
+		dataItem.assetDepend = {
+			id: '',
+			text: '',
+		};
 	}
 
 	/**
