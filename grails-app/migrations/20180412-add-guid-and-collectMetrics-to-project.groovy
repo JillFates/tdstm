@@ -21,13 +21,13 @@ databaseChangeLog = {
 		}
 
 		addColumn(tableName: 'project') {
-			column(name: 'guid', type: 'varchar(36)') {
+			column(name: 'guid', type: 'char(36)') {
 				constraints(nullable: "false")
 			}
 		}
 
 		addColumn(tableName: "project") {
-			column(name: "collect_metrics", type: "Boolean", defaultValue: 1) {
+			column(name: "collect_metrics", type: 'TINYINT(1)', defaultValueNumeric: 1 ) {
 				constraints(nullable: "false")
 			}
 		}
@@ -41,9 +41,9 @@ databaseChangeLog = {
 				Project.all.each { Project project ->
 					project.guid = project.generateGuid()
 					if (project.id != Project.DEFAULT_PROJECT_ID && project.projectType != 'Demo') {
-						project.collectMetrics = true
+						project.collectMetrics = 1
 					} else {
-						project.collectMetrics = false
+						project.collectMetrics = 0
 					}
 					if (!project.save(flush: true)) {
 						throw new RuntimeException('updating project to default bundle failed');

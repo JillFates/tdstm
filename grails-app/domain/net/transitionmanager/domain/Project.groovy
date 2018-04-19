@@ -34,12 +34,12 @@ class Project extends PartyGroup {
 	// used to indicate which of the custom fields will represent the plan methodology setting
 	String planMethodology=''
 
-	Boolean collectMetrics = true
+	Integer collectMetrics = 1
 
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
 	static constraints = {
-		guid size: 36..36//32 //64
+		guid size: 36..36
 		defaultBundle nullable: true
 		client nullable: false
 		depConsoleCriteria nullable: true
@@ -55,6 +55,7 @@ class Project extends PartyGroup {
 		lastAssetId nullable: true
 		runbookOn nullable: true
 		depConsoleCriteria nullable: true
+		collectMetrics range: 0..1
 	}
 
 	static mapping = {
