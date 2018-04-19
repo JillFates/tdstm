@@ -2,19 +2,16 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
-import groovy.sql.GroovyRowResult
-import groovy.sql.Sql
 import net.transitionmanager.domain.Person
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-import javax.sql.DataSource
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
  * A service for dealing with reporting metrics.
  */
 class MetricReportingService {
-	DataSource dataSource
-	Random     randomNumberGenerator
+	Random                     randomNumberGenerator
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	/**
 	 * emum for the metric mode
@@ -133,7 +130,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
-		String date = new Date().format('yyyy-mm-dd')
+		String date = new Date().format('yyyy-MM-dd')
 		List results = Person.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
 
 		results.collect { Object[] row ->
@@ -165,7 +162,7 @@ class MetricReportingService {
 		List wheres = query?.where?.clone() ?: []
 
 		if (domain == AssetEntity.class.simpleName) {
-			wheres << [column: 'moveBundle.useForPlanning', expression: '= true']
+			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
 		}
 
 		String where = getWhere(wheres)
@@ -249,19 +246,8 @@ class MetricReportingService {
 	 * 			value     : row.value
 	 * 		]
 	 */
-	private runSql(String query, List<Long> projectIds) {
-		Sql sql = new Sql(dataSource)
-		List<GroovyRowResult> rows = sql.rows(query, projectIds: projectIds.join(','))
-		return rows.collect { GroovyRowResult row ->
-			[
-					projectId : row.projectId,
-					metricCode: row.metricCode,
-					date      : row.date,
-					label     : row.label,
-					value     : row.value
-			]
-		}
-
+	private List<Map> runSql(String query, List<Long> projectIds) {
+		return namedParameterJdbcTemplate.queryForList(query, [projectIds: projectIds])
 	}
 
 	/**
@@ -280,7 +266,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> testMetric(List<Long> projectIds, String metricCode) {
-		String date = new Date().format('yyyy-mm-dd')
+		String date = new Date().format('yyyy-MM-dd')
 		setUpRandom()
 
 		projectIds.collect { Long projectId ->
