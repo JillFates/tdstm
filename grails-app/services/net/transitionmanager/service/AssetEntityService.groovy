@@ -1206,7 +1206,11 @@ class AssetEntityService implements ServiceMethods {
 				asset: [
 					id: target.id,
 					name: target.assetName,
-					assetType: AssetClass.getClassOptionForAsset(target)
+					assetType: AssetClass.getClassOptionForAsset(target),
+					moveBundle: [
+						id: target.moveBundle?.id,
+						name: target.moveBundle?.name
+					]
 				]
 			]
 		}
