@@ -7,51 +7,17 @@
 	#select2-drop{ width: 200px !important; }
 </style>
 
-<script type="text/javascript">
-	$("#appl_assetName").val($('#gs_assetName').val())
-	$("#appl_sme").val($('#gs_sme').val())
-	$("#appl_validation").val($('#gs_validation').val())
-	$("#appl_planStatus").val($('#gs_planStatus').val())
-	$("#appl_moveBundle").val($('#gs_moveBundle').val())
-	$(document).ready(function() {
-		// Ajax to populate dependency selects in edit pages
-		var assetId = '${applicationInstance.id}'
-		populateDependency(assetId, 'application','edit')
+<div class="modal-content tds-angular-component-content">
+	<div class="modal-header">
+		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
+				aria-hidden="true">×</span></button>
+		<h4 class="modal-title">Application Edit</h4>
+	</div>
 
-		var myOption = "<option value='0'>Add Person...</option>"
-		<tds:hasPermission permission="${Permission.PersonCreate}">
-			$("#sme1 option:first").after(myOption);
-			$("#sme2 option:first").after(myOption);
-			$("#appOwnerEdit option:first").after(myOption);
-		</tds:hasPermission>
-		$("#shutdownByEditId").val('${raw(applicationInstance.shutdownBy)}')
-		$("#startupByEditId").val('${raw(applicationInstance.startupBy)}')
-		$("#testingByEditId").val('${raw(applicationInstance.testingBy)}')
-		if(!isIE7OrLesser)
-			$("select.assetSelect").select2();
-		changeDocTitle('${escapedName}');
-	})
-</script>
-
-<div>
-
-	%{--<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
-	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
-	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
-	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
-	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />--}%
-	<%-- Key field and optimistic locking var --%>
-	%{--<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
-	<input type="hidden" id="version" 	name="version" value="${version}"/>--}%
-	%{--<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
-	<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
-	<input type="hidden" id="tabType" name="tabType" value =""/>
-	<input type="hidden" id="updateView" name="updateView" value=""/>--}%
-	%{--<input type="hidden" name="id" value="${applicationInstance?.id}" />--}%
-	<%-- Used to track dependencies added and deleted --%>
-	%{--<g:render template="../assetEntity/dependentHidden" />--}%
-
-	<table style="border: 0">
+	<div class="modal-body">
+		<div>
+			<form name="storageEditForm">
+				<table style="border: 0">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
@@ -341,16 +307,18 @@
 			</td>
 		</tr>
 	</table>
+			</form>
+		</div>
+	</div>
 
+	<div class="modal-footer form-group-center">
+		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span
+				class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<tds:hasPermission permission="${Permission.AssetDelete}">
+			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span
+					class="glyphicon glyphicon-trash"></span> Delete</button>
+		</tds:hasPermission>
+		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span
+				class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+	</div>
 </div>
-
-<script>
-
-    $(document).ready(function() {
-        $('[data-toggle="popover"]').popover();
-    });
-
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
-	$('#tabType').val($('#assetTypesId').val());
-</script>

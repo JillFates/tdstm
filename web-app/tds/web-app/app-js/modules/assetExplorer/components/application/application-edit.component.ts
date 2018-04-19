@@ -11,7 +11,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 
 export function ApplicationEditComponent(template: string, editModel: any): any {
 	@Component({
-		selector: 'storage-edit',
+		selector: 'application-edit',
 		template: template,
 		providers: [
 			{ provide: 'model', useValue: editModel }
