@@ -15,6 +15,7 @@ import {DependencyBatchRecordDetailDialogComponent} from '../dependency-batch-re
 })
 export class DependencyBatchDetailDialogComponent implements OnInit {
 
+	private BatchStatus = BatchStatus;
 	private columnsModel: ImportBatchRecordDetailColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
