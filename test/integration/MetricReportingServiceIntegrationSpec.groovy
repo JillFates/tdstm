@@ -77,7 +77,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 
 	void "test gatherMetric for query mode"() {
-		setup: 'giving'
+		setup: 'giving a metric definition for a query, that will have results'
 			String date = new Date().format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
 					"metricCode" : "APP-VPS",
@@ -127,7 +127,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void "test gatherMetric for query mode no results"() {
-		setup: 'giving'
+		setup: 'giving metric definition with a query that will not return any results'
 			JSONObject metricDefinition = [
 					"metricCode" : "APP-VPS",
 					"description": "Application counts metrics for Validation/PlanStatus",
@@ -161,7 +161,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void "test gatherMetric for sql mode"() {
-		setup: 'giving'
+		setup: 'giving sql metric definition'
 			String date = new Date().format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
 					"metricCode" : "APP-VPS",
@@ -182,7 +182,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			]
 		when: 'running gatherMetrics on sql query'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-		then: ''
+		then: 'Get Results for the query'
 			results == [
 					[
 							projectId : project.id,
@@ -202,7 +202,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void "test gatherMetric for sql mode invalid sql"() {
-		setup: 'giving'
+		setup: 'giving sql metric definition with errors in the SQL'
 			String date = new Date().format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
 					"metricCode" : "APP-VPS",
@@ -223,7 +223,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			]
 		when: 'running gatherMetrics on sql query'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition, false)
-		then: ''
+		then: 'Get exception for bad sql grammer'
 			thrown BadSqlGrammarException
 	}
 }
