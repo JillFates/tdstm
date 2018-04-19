@@ -8,6 +8,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 
+declare var jQuery: any;
+
 export function StorageEditComponent(template: string, editModel: any): any {
 	@Component({
 		selector: 'storage-edit',
@@ -20,8 +22,22 @@ export function StorageEditComponent(template: string, editModel: any): any {
 		constructor( @Inject('model') private model: any, private activeDialog: UIActiveDialogService, private preference: PreferenceService) {
 		}
 
+		/**
+		 * Initiates The Injected Component
+		 */
 		ngOnInit(): void {
-			console.log('Init storage-edit');
+			jQuery('[data-toggle="popover"]').popover();
+		}
+
+		/***
+		 * Close the Active Dialog
+		 */
+		public cancelCloseDialog(): void {
+			this.activeDialog.close();
+		}
+
+		public onUpdate(): void {
+			console.log(JSON.stringify(this.model.asset));
 		}
 	}
 

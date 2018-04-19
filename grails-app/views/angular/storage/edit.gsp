@@ -148,20 +148,12 @@
                         </td>
                     </tr>
 
+                    <!-- Dependencies -->
                     <tr id="deps">
-                        <g:render template="/angular/common/dependentCreateEdit" model="[whom:'edit', supportAssets:[],dependentAssets:[]]" ></g:render>
+                        <td valign="top" colspan="2">
+                            <tds-supports-depends [(model)]="model"></tds-supports-depends>
+                        </td>
                     </tr>
-
-                    %{--  <tr id="filesDependentId" class="assetDependent">
-                          <td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
-                      </tr>
-                      <tr>
-                          <td colspan="2">
-                              <div class="buttons">
-                                  <g:render template="../assetEntity/editButtons" model="[assetEntity:filesInstance]"></g:render>
-                              </div>
-                          </td>
-                      </tr>--}%
 
                 </table>
             </form>

@@ -143,7 +143,6 @@
 						</td>
 					</tr>
 					<!-- Dependencies -->
-
 					<tr id="deps">
 						<td valign="top" colspan="2">
 							<tds-supports-depends [(model)]="model"></tds-supports-depends>
