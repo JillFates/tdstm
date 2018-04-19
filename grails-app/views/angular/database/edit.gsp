@@ -145,7 +145,9 @@
 					<!-- Dependencies -->
 
 					<tr id="deps">
-						<g:render template="/angular/common/dependentCreateEdit" model="[whom:'edit', supportAssets:[],dependentAssets:[]]" ></g:render>
+						<td valign="top" colspan="2">
+							<tds-supports-depends [(model)]="model"></tds-supports-depends>
+						</td>
 					</tr>
 				</table>
 			</form>

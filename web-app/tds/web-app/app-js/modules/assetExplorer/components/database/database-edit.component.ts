@@ -29,26 +29,11 @@ export function DatabaseEditComponent(template, editModel) {
 	}) class DatabaseShowComponent implements OnInit {
 
 		private dateFormat: string;
-		private dataGridSupportsOnHelper: DataGridOperationsHelper;
-		private dataGridDependsOnHelper: DataGridOperationsHelper;
-		private supportOnColumnModel: SupportOnColumnsModel;
-		private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
-		private initialSort: any = [{
-			dir: 'desc',
-			field: 'dateCreated'
-		}];
-		private dataFlowFreqList = [];
-		private dependencyTypeList = [];
-		private dependencyStatusList = [];
-		private dependencyClassList = [];
 
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService,
-			private preference: PreferenceService,
-			private assetExplorerService: AssetExplorerService) {
-
-			this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
+			private preference: PreferenceService) {
 
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
@@ -62,59 +47,6 @@ export function DatabaseEditComponent(template, editModel) {
 					name: ''
 				};
 			}
-
-			// Lists
-			this.dataFlowFreqList = R.clone(editModel.dataFlowFreq);
-			this.dependencyTypeList = R.clone(editModel.dependencyMap.dependencyType);
-			this.dependencyStatusList = R.clone(editModel.dependencyMap.dependencyStatus);
-			for (let prop in editModel.dependencyMap.assetClassOptions) {
-				if (editModel.dependencyMap.assetClassOptions[prop]) {
-					this.dependencyClassList.push({id: prop, text: editModel.dependencyMap.assetClassOptions[prop]});
-				}
-			}
-			// Supports On
-			this.getSupportOnList();
-			// Depends On
-		}
-
-		/**
-		 * Get the List of Supports On
-		 */
-		private getSupportOnList(): void {
-			this.supportOnColumnModel = new SupportOnColumnsModel();
-			let supportsOn = [];
-			if (editModel.dependencyMap && editModel.dependencyMap.supportAssets) {
-				let supportAssets = R.clone(editModel.dependencyMap.supportAssets);
-				supportAssets.forEach((dependency) => {
-					let dependencySupportModel: DependencySupportModel = {
-						dataFlowFreq: dependency.dataFlowFreq,
-						assetDepend: {
-							id: dependency.asset.id,
-							text: dependency.asset.name,
-							metaParam: dependency.asset.assetType
-						},
-						dependencyType: dependency.type,
-						dependencyStatus: dependency.status,
-						assetClass: dependency.asset.assetType
-					};
-					supportsOn.push(dependencySupportModel);
-				});
-			}
-			this.dataGridSupportsOnHelper = new DataGridOperationsHelper(supportsOn, this.initialSort, this.selectableSettings);
-		}
-
-		/**
-		 * Add a new Support On Dependency
-		 */
-		public onAddSupportsOn(): void {
-			this.dataGridSupportsOnHelper.addDataItem({});
-		}
-
-		/**
-		 * Delete the selected element
-		 */
-		public onDeleteSupport(dataItem: any): void {
-			this.dataGridSupportsOnHelper.removeDataItem(dataItem);
 		}
 
 		/**
@@ -134,11 +66,6 @@ export function DatabaseEditComponent(template, editModel) {
 		public onUpdate(): void {
 			console.log(JSON.stringify(this.model.asset));
 		}
-
-		public getAssetListForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
-			return this.assetExplorerService.getAssetListForComboBox(searchParam);
-		}
-
 	}
 	return DatabaseShowComponent;
 }
