@@ -157,16 +157,16 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @returns {any}
 	 */
 	private calculateLastElementShow(): any {
-		if (this.dropdownFooter && this.dropdownFooter.nativeElement) {
-			setTimeout(() => {
+		setTimeout(() => {
+			if (this.dropdownFooter && this.dropdownFooter.nativeElement) {
 				let nativeElement = this.dropdownFooter.nativeElement;
 				let scrollContainer = jQuery(nativeElement.parentNode).find('.k-list-scroller');
 				jQuery(scrollContainer).off('scroll');
 				jQuery(scrollContainer).on('scroll', (element) => {
 					this.onLastElementShow(element.target);
 				});
-			}, 800);
-		}
+			}
+		}, 800);
 	}
 
 	/**
