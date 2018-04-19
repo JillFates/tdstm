@@ -78,7 +78,8 @@
 			<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 			<td class="valueNW ${standardFieldSpecs.retireDate.imp}">
 			<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
-				<tds:convertDate date="${asset?.retireDate}" />
+                %{--TODO FIX convertDate--}%
+				%{--<tds:convertDate date="${asset?.retireDate}" />--}%
 			</tds:tooltipSpan>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
@@ -90,7 +91,8 @@
 			<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 			<td class="valueNW ${standardFieldSpecs.maintExpDate.imp}">
 			<tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-				<tds:convertDate date="${asset?.maintExpDate}" />
+				%{--TODO FIX convertDate--}%
+				%{--<tds:convertDate date="${asset?.maintExpDate}" />--}%
 			</tdsAngular:tooltipSpan>
 			</td>
 			<tdsAngular:showLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}"/>

@@ -7,54 +7,17 @@
 	#select2-drop{ width: 200px !important; }
 </style>
 
-<script type="text/javascript">
-	$("#appl_assetName").val($('#gs_assetName').val())
-	$("#appl_sme").val($('#gs_sme').val())
-	$("#appl_validation").val($('#gs_validation').val())
-	$("#appl_planStatus").val($('#gs_planStatus').val())
-	$("#appl_moveBundle").val($('#gs_moveBundle').val())
-	$(document).ready(function() {
-		// Ajax to populate dependency selects in edit pages
-		var assetId = '${applicationInstance.id}'
-		populateDependency(assetId, 'application','edit')
+<div class="modal-content tds-angular-component-content">
+	<div class="modal-header">
+		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
+				aria-hidden="true">×</span></button>
+		<h4 class="modal-title">Application Edit</h4>
+	</div>
 
-		var myOption = "<option value='0'>Add Person...</option>"
-		<tds:hasPermission permission="${Permission.PersonCreate}">
-			$("#sme1 option:first").after(myOption);
-			$("#sme2 option:first").after(myOption);
-			$("#appOwnerEdit option:first").after(myOption);
-		</tds:hasPermission>
-		$("#shutdownByEditId").val('${raw(applicationInstance.shutdownBy)}')
-		$("#startupByEditId").val('${raw(applicationInstance.startupBy)}')
-		$("#testingByEditId").val('${raw(applicationInstance.testingBy)}')
-		if(!isIE7OrLesser)
-			$("select.assetSelect").select2();
-		changeDocTitle('${escapedName}');
-	})
-</script>
-<g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
-
-	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
-	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
-	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
-	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
-	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />
-
-	<%-- Key field and optimistic locking var --%>
-	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
-	<input type="hidden" id="version" 	name="version" value="${version}"/>
-
-	<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
-	<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
-	<input type="hidden" id="tabType" name="tabType" value =""/>
-	<input type="hidden" id="updateView" name="updateView" value=""/>
-
-	<input type="hidden" name="id" value="${applicationInstance?.id}" />
-
-	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
-
-	<table style="border: 0">
+	<div class="modal-body">
+		<div>
+			<form name="storageEditForm">
+				<table style="border: 0">
 		<tr>
 			<td colspan="2">
 				<div class="dialog">
@@ -190,8 +153,11 @@
 								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
+								  %{--TODO FIX convertDate--}%
+                                   %{--
 									<input type="text" class="dateRange ${standardFieldSpecs.retireDate.imp?:''}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />">
+									--}%
 								</tds:tooltipSpan>
 								</td>
 
@@ -222,9 +188,10 @@
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
 								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-									<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
+								    %{--TODO FIX convertDate--}%
+									%{--<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
 										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="28"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
+										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">--}%
 								</tds:tooltipSpan>
 								</td>
 
@@ -259,7 +226,9 @@
 								</td>
 								<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 									<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
-								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>
+
+								   %{--<g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>--}%
+
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -279,7 +248,9 @@
 								<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
-								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>
+
+								   %{--<g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>--}%
+
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -292,7 +263,9 @@
 								<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>
+
+								  %{--<g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>--}%
+
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -310,9 +283,10 @@
 							</tr>
 
 							<%-- Custom User Defined Fields Section --%>
+		%{--
 							<tbody class="customTemplate">
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
-							</tbody>
+							</tbody>--}%
 
 						</tbody>
 					</table>
@@ -328,19 +302,23 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>
+					%{--<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>--}%
 				</div>
 			</td>
 		</tr>
 	</table>
-</g:form>
-<script>
+			</form>
+		</div>
+	</div>
 
-    $(document).ready(function() {
-        $('[data-toggle="popover"]').popover();
-    });
-
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
-	$('#tabType').val($('#assetTypesId').val());
-</script>
+	<div class="modal-footer form-group-center">
+		<button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span
+				class="fa fa-fw fa-floppy-o"></span> Update</button>
+		<tds:hasPermission permission="${Permission.AssetDelete}">
+			<button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span
+					class="glyphicon glyphicon-trash"></span> Delete</button>
+		</tds:hasPermission>
+		<button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span
+				class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+	</div>
+</div>
