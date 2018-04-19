@@ -28,6 +28,7 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
 import net.transitionmanager.service.InvalidSyntaxException
