@@ -32,27 +32,24 @@
 		changeDocTitle('${escapedName}');
 	})
 </script>
-<g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
 
-	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
+<div>
+
+	%{--<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
 	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
-	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />
-
+	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />--}%
 	<%-- Key field and optimistic locking var --%>
-	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
-	<input type="hidden" id="version" 	name="version" value="${version}"/>
-
-	<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
+	%{--<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
+	<input type="hidden" id="version" 	name="version" value="${version}"/>--}%
+	%{--<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
 	<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
 	<input type="hidden" id="tabType" name="tabType" value =""/>
-	<input type="hidden" id="updateView" name="updateView" value=""/>
-
-	<input type="hidden" name="id" value="${applicationInstance?.id}" />
-
+	<input type="hidden" id="updateView" name="updateView" value=""/>--}%
+	%{--<input type="hidden" name="id" value="${applicationInstance?.id}" />--}%
 	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+	%{--<g:render template="../assetEntity/dependentHidden" />--}%
 
 	<table style="border: 0">
 		<tr>
@@ -190,8 +187,11 @@
 								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
+								  %{--TODO FIX convertDate--}%
+                                   %{--
 									<input type="text" class="dateRange ${standardFieldSpecs.retireDate.imp?:''}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="27"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />">
+									--}%
 								</tds:tooltipSpan>
 								</td>
 
@@ -222,9 +222,10 @@
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 									</script>
 								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-									<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
+								    %{--TODO FIX convertDate--}%
+									%{--<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
 										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="28"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
+										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">--}%
 								</tds:tooltipSpan>
 								</td>
 
@@ -259,7 +260,9 @@
 								</td>
 								<td class="${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 									<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
-								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>
+
+								   %{--<g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'assetSelect']"></g:render>--}%
+
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -279,7 +282,9 @@
 								<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
-								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>
+
+								   %{--<g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>--}%
+
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -292,7 +297,9 @@
 								<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>
+
+								  %{--<g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'assetSelect']"></g:render>--}%
+
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"
@@ -310,9 +317,10 @@
 							</tr>
 
 							<%-- Custom User Defined Fields Section --%>
+		%{--
 							<tbody class="customTemplate">
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
-							</tbody>
+							</tbody>--}%
 
 						</tbody>
 					</table>
@@ -328,12 +336,14 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>
+					%{--<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>--}%
 				</div>
 			</td>
 		</tr>
 	</table>
-</g:form>
+
+</div>
+
 <script>
 
     $(document).ready(function() {

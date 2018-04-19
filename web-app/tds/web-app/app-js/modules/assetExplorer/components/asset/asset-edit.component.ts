@@ -16,6 +16,7 @@ import { DynamicComponent } from '../../../../shared/components/dynamic.componen
 import { DatabaseEditComponent } from '../database/database-edit.component';
 import { StorageEditComponent } from  '../storage/storage-edit.component';
 import {DeviceEditComponent} from '../device/device-edit.component';
+import { ApplicationEditComponent } from '../application/application-edit.component';
 
 @Component({
 	selector: `asset-database-edit`,
@@ -45,6 +46,8 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 
 				switch (this.asset) {
 					case 'APPLICATION':
+						this.registerAndCreate(ApplicationEditComponent(template, model), this.view);
+						break;
 					case 'DATABASE':
 						this.registerAndCreate(DatabaseEditComponent(template, model), this.view);
 						break;
@@ -52,8 +55,7 @@ export class AssetEditComponent extends DynamicComponent implements AfterViewIni
 						this.registerAndCreate(DeviceEditComponent(template, model), this.view);
 						break;
 					case 'STORAGE':
-						const component: any =  StorageEditComponent(template, model);
-						this.registerAndCreate(component, this.view);
+						this.registerAndCreate(StorageEditComponent(template, model), this.view);
 						break;
 
 				}
