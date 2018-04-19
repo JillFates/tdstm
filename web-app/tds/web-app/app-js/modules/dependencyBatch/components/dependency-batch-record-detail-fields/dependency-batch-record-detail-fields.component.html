@@ -35,7 +35,7 @@
         </kendo-grid-column>
         <kendo-grid-column title="Error(s)">
             <ng-template kendoGridCellTemplate let-dataItem >
-                <div *ngFor="let error of dataItem.errors" style="color: #a94442;">
+                <div *ngFor="let error of dataItem.errors" class="error">
                     * {{error}}
                 </div>
             </ng-template>
