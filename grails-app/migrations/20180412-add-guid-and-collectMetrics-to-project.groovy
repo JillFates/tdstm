@@ -67,4 +67,90 @@ databaseChangeLog = {
 				columnNames: 'guid'
 		)
 	}
+
+/**
+ * TM-10320  This changesets will create the tables metric_definition and metric_result
+ */
+	changeSet(author: 'ecantu', id: 'TM-10320-1') {
+		comment("Create metric_definition table")
+
+		preConditions(onFail:'MARK_RAN') {
+			not {
+				tableExists(schemaName:'tdstm', tableName:'metric_definition')
+			}
+		}
+		createTable(schemaName: "tdstm", tableName: "metric_definition") {
+			column(name: "metric_definition_id", type: "BIGINT(20)", autoIncrement: "true"){
+				constraints( primaryKey:"true", nullable:"false")
+			}
+			column(name: "code", type: "VARCHAR(255)" ) {
+				constraints(nullable:"false")
+			}
+			column(name: "mode", type: "VARCHAR(20)") {
+				constraints(nullable:"false")
+			}
+			column(name: "description", type: "VARCHAR(255)") {
+				constraints(nullable:"false")
+			}
+			column(name: "enabled", type: "INT(1)") {
+				constraints(nullable:"false")
+			}
+			column(name: "definition", type: "json") {
+				constraints(nullable:"false")
+			}
+			column(name: 'date_created', type: 'DATETIME') {
+				constraints(nullable: "false")
+			}
+			column(name: 'last_updated', type: 'DATETIME') {
+				constraints(nullable: "true")
+			}
+		}
+		createIndex(indexName:"metric_definition_code_idx", schemaName:"tdstm", tableName:"metric_definition", unique:true) {
+			column(name:"code")
+		}
+	}
+
+	changeSet(author: 'ecantu', id: 'TM-10320-2') {
+		comment("Create metric_result table")
+
+		preConditions(onFail:'MARK_RAN') {
+			not {
+				tableExists(schemaName:'tdstm', tableName:'metric_result')
+			}
+		}
+		createTable(schemaName: "tdstm", tableName: "metric_result") {
+			column(name: "project_metric_id", type: "BIGINT(20)", autoIncrement: "true"){
+				constraints( primaryKey:"true", nullable:"false")
+			}
+			column(name: 'project_id', type: 'BIGINT') {
+				constraints(nullable: "false")
+			}
+			column(name: "metric_definition_code", type: "VARCHAR(255)") {
+				constraints(nullable:"false")
+			}
+			column(name: 'date', type: 'DATETIME') {
+				constraints(nullable: "false")
+			}
+			column(name: "label", type: "VARCHAR(255)") {
+				constraints(nullable:"false")
+			}
+			column(name: 'value', type: 'BIGINT') {
+				constraints(nullable: "true")
+			}
+		}
+		createIndex(tableName:'metric_result', indexName:'idx_metric_result_project_code_date_label_composite_key', unique:'true') {
+			column(name:'project_id')
+			column(name:'metric_definition_code')
+			column(name:'date')
+			column(name:'label')
+		}
+			addForeignKeyConstraint(
+			"baseColumnNames": 'project_id',
+			"baseTableName": 'metric_result',
+			"constraintName": "fk_metric_result_project_id",
+			"onDelete": "CASCADE",
+			"referencedColumnNames": "project_id",
+			"referencedTableName": "project"
+		)
+	}
 }
