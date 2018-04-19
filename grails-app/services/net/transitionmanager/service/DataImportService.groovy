@@ -386,7 +386,6 @@ class DataImportService implements ServiceMethods {
 		def savePoint = session.createSavepoint()
 
 		Boolean hadError = false
-
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
 		for (fieldName in importContext.fieldNames) {
 
@@ -408,7 +407,7 @@ class DataImportService implements ServiceMethods {
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
-					assetEntityId: domainId,
+					assetEntityId: ( domainId < 0 ? null : domainId ),
 					importValue: field.originalValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
@@ -1711,7 +1710,7 @@ class DataImportService implements ServiceMethods {
 	 * Used to access the error list for the infoFields of a particular field/property
 	 */
 	private List getFieldsInfoFieldErrors(String propertyName, Map fieldsInfo) {
-		return fieldsInfo[propertyName]?.errors
+		return fieldsInfo[propertyName].errors
 	}
 
 	/**
