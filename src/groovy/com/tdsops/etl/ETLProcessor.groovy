@@ -172,6 +172,7 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor read (ReservedWord reservedWord) {
 
 		if (reservedWord == ReservedWord.labels) {
+			columnsMap = [:]
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: fieldNameToLabel(field), index: index)
 				columns.add(column)

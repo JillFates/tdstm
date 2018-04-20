@@ -3,7 +3,9 @@ package com.tdsops.etl
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tds.asset.Files
+import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
@@ -31,6 +33,8 @@ import net.transitionmanager.domain.Room
  */
 class DomainClassQueryHelper {
 
+
+	static final String DOMAIN_ALIAS = 'D'
 	/**
 	 * Executes the HQL query related to the domain defined.
 	 * @param domain an instance of ETLDomain used to defined the correct HQL query to be executed
@@ -85,16 +89,19 @@ class DomainClassQueryHelper {
 	 */
 	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> fieldsSpec) {
 
-		String hqlWhere = hqlWhere(fieldsSpec)
+		String hqlWhere = hqlWhere(clazz, fieldsSpec)
+		String hqlJoins = hqlJoins(clazz, fieldsSpec)
 
 		String hql = """
             select D
-              from AssetEntity D
+              from AssetEntity $DOMAIN_ALIAS
+				   $hqlJoins
              where D.project = :project
                and D.assetClass = :assetClass
-			   and $hqlWhere """.stripIndent()
+			   and $hqlWhere
+			""".stripIndent()
 
-		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(fieldsSpec)
+		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(clazz, fieldsSpec)
 		return AssetEntity.executeQuery(hql, args)
 	}
 
@@ -106,18 +113,16 @@ class DomainClassQueryHelper {
 	 */
 	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> fieldsSpec) {
 
-		String hqlWhere = fieldsSpec.keySet().collect { String field ->
-			" ${field} = :${field}\n".toString()
-		}.join(' and ')
-
-		Map<String, ?> hqlParams = fieldsSpec.collectEntries { String key, def value ->
-			[(key.toString()): nonAssetEntityTransformations[key].transform(value?.toString())]
-		}
+		String hqlWhere = hqlWhere(clazz, fieldsSpec)
+		String hqlJoins = hqlJoins(clazz, fieldsSpec)
+		Map<String, ?> hqlParams = hqlParams(clazz, fieldsSpec)
 
 		String hql = """
-              from ${clazz.simpleName} D
+              from ${clazz.simpleName} $DOMAIN_ALIAS
+			       $hqlJoins
              where D.project = :project
-               and $hqlWhere """.stripIndent()
+               and $hqlWhere 
+		""".stripIndent()
 
 		return clazz.executeQuery(hql, [project: project] + hqlParams)
 	}
@@ -181,6 +186,59 @@ class DomainClassQueryHelper {
 		return Manufacturer.executeQuery(hql, params)
 	}
 
+	static String getNamedParameterForField(Class clazz, String fieldName) {
+		if(clazz.isAssignableFrom(AssetEntity) &&
+			GormUtil.isReferenceProperty(clazz, fieldName)){
+
+
+			return ' not defined yet'
+		} else {
+			return fieldName
+		}
+	}
+
+	static String getPropertyForField(Class clazz, String fieldName) {
+		if(clazz.isAssignableFrom(AssetEntity) &&
+			GormUtil.isReferenceProperty(clazz, fieldName)){
+
+
+			return 'ghghgh'
+		} else {
+			return fieldName
+		}
+	}
+
+	static String getJoinForField(Class clazz, String fieldName) {
+		if(GormUtil.isReferenceProperty(clazz, fieldName)){
+			return " left outer join ${DOMAIN_ALIAS}.${fieldName}".toString()
+		} else {
+			return ''
+		}
+	}
+
+	static String hqlWhere(Class clazz, Map<String, ?> fieldsSpec) {
+		String s = fieldsSpec.keySet().collect { String field ->
+			String property = getPropertyForField(clazz, field)
+			String namedParameter = getNamedParameterForField(clazz, field)
+			" ${DOMAIN_ALIAS}.${property} = :${namedParameter}\n"
+		}.join(' and ')
+
+		return s
+	}
+
+	static Map<String, ?> hqlParams(Class clazz, Map<String, ?> fieldsSpec) {
+		return fieldsSpec.collectEntries { String key, def value ->
+			String namedParameter = getNamedParameterForField(clazz, key)
+			[(namedParameter): value]
+		}
+	}
+
+	static String hqlJoins(Class clazz, Map<String, ?> fieldsSpec) {
+		return fieldsSpec.collect { def item ->
+			getJoinForField(clazz, item.key)
+		}.join('  ')
+	}
+
 	/**
 	 * Helper method used to prepare the where params in a HQL query
 	 * @param fieldsSpec a map with params to be used in the HQL query
@@ -188,7 +246,7 @@ class DomainClassQueryHelper {
 	 */
 	static String hqlWhere(Map<String, ?> fieldsSpec) {
 		fieldsSpec.keySet().collect { String field ->
-			" ${assetEntityTransformations[field].property} = :${assetEntityTransformations[field].namedParamter}\n".
+			" ${assetEntityTransformations[field].property} = :${assetEntityTransformations[field].namedParameter}\n".
 				toString()
 		}.join(' and ')
 	}
@@ -201,8 +259,7 @@ class DomainClassQueryHelper {
 	 */
 	static Map<String, ?> hqlParams(Map<String, ?> fieldsSpec) {
 		fieldsSpec.collectEntries { String key, def value ->
-			[("${assetEntityTransformations[key].namedParamter}".toString()): assetEntityTransformations[key].transform(value?.
-				toString())]
+			[("${assetEntityTransformations[key].namedParameter}".toString()): value]
 		}
 	}
 
@@ -211,68 +268,41 @@ class DomainClassQueryHelper {
 	].withDefault { String key ->
 		[
 			property: "D." + key,
-			namedParamter: key,
+			namedParameter: key,
 			join: "",
 			transform: { String value -> value?.trim() }]
 	}
 
 	//TODO: Review this with John. Where I can put those commons configurations?
 	private static final Map<String, Map> assetEntityTransformations = [
-		"id": [
-			property: "D.id",
-			namedParamter: "id",
-			join: "",
-			transform: { String value -> Long.parseLong(value) }
-		],
-		"moveBundle": [
-			property: "D.moveBundle.name",
-			namedParamter: "moveBundleName",
-			join: "left outer join D.moveBundle",
-			transform: { String value -> value?.trim() }
-		],
-		"project": [
-			property: "D.project.description",
-			namedParamter: "projectDescription",
-			join: "left outer join D.project",
-			transform: { String value -> value?.trim() }
-		],
-		"manufacturer": [
-			property: "D.manufacturer.name",
-			namedParamter: "manufacturerName",
-			join: "left outer join D.manufacturer",
-			transform: { String value -> value?.trim() }
-		],
-		"sme": [
-			property: "D.sme.firstName",
-			namedParamter: "smeFirstName",
-			join: "left outer join D.sme",
-			transform: { String value -> value?.trim() }
-		],
-		"sme2": [
-			property: "D.sme2.firstName",
-			namedParamter: "sme2FirstName",
-			join: "left outer join D.sme2",
-			transform: { String value -> value?.trim() }
-		],
-		"model": [
-			property: "D.model.modelName",
-			namedParamter: "modelModelName",
-			join: "left outer join D.model",
-			transform: { String value -> value?.trim() }
-		],
-		"appOwner": [
-			property: "D.appOwner.firstName",
-			namedParamter: "appOwnerFirstName",
-			join: "left outer join D.appOwner",
-			transform: { String value -> value?.trim() }
-		]
-	].withDefault { String key ->
-		[
-			property: "D." + key,
-			namedParamter: key,
-			join: "",
-			transform: { String value -> value?.trim() }]
+		'id': [property: 'D.id', type: Long, namedParameter: 'id', join: ''],
+		'assetClass': [property: 'str(D.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
+		'moveBundle': [property: 'D.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join D.moveBundle'],
+		'project': [property: 'D.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join D.project'],
+		'manufacturer': [property: 'D.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join D.manufacturer'],
+		'appOwner': [property: SqlUtil.personFullName('appOwner', 'AE'),
+			type: String, namedParameter: 'appOwnerName',
+			join: 'left outer join D.appOwner',
+			alias: 'appOwner'],
+		'sme': [property: SqlUtil.personFullName('sme', 'AE'),
+			type: String,
+			namedParameter: 'smeName',
+			join: 'left outer join D.sme',
+			alias: 'sme'],
+		'sme2': [property: SqlUtil.personFullName('sme2', 'AE'),
+			type: String,
+			namedParameter: 'sme2Name',
+			join: 'left outer join D.sme2',
+			alias: 'sme2'],
+		'model': [property: 'D.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join D.model'],
+		'locationSource': [property: 'D.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join D.roomSource'],
+		'rackSource': [property: 'D.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join D.rackSource'],
+		'roomSource': [property: 'D.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join D.roomSource'],
+		'locationTarget': [property: 'D.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join D.roomTarget'],
+		'rackTarget': [property: 'D.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join D.rackTarget'],
+		'roomTarget': [property: 'D.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join D.roomTarget']
+	].withDefault {
+		String key -> [property: "D." + key, type: String, namedParameter: key, join: "", mode: "where"]
 	}
-
 
 }
