@@ -2,7 +2,7 @@
  * Structure does not allows to introduce other base Modules
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
-import {Component, Inject, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, Input, OnInit, ViewChild} from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from '../../../modules/assetExplorer/model/support-on-columns.model';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
@@ -10,6 +10,8 @@ import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
 import * as R from 'ramda';
 import {Observable} from 'rxjs/Rx';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-supports-depends',
@@ -31,6 +33,7 @@ export class SupportsDependsComponent implements OnInit {
 	private dependencyClassList = [];
 	private dependencyTypeList = [];
 	private dependencyStatusList = [];
+	private dependencyMoveBundleList = [];
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -44,6 +47,9 @@ export class SupportsDependsComponent implements OnInit {
 		this.dataFlowFreqList = R.clone(this.model.dataFlowFreq);
 		this.dependencyTypeList = R.clone(this.model.dependencyMap.dependencyType);
 		this.dependencyStatusList = R.clone(this.model.dependencyMap.dependencyStatus);
+		this.model.moveBundleList.forEach((moveBundle) => {
+			this.dependencyMoveBundleList.push({id: moveBundle.id, text: moveBundle.name});
+		});
 		for (let prop in this.model.dependencyMap.assetClassOptions) {
 			if (this.model.dependencyMap.assetClassOptions[prop]) {
 				this.dependencyClassList.push({id: prop, text: this.model.dependencyMap.assetClassOptions[prop]});
@@ -68,7 +74,11 @@ export class SupportsDependsComponent implements OnInit {
 					assetClass: assetClass,
 					assetDepend: {
 						id: dependency.asset.id,
-						text: dependency.asset.name
+						text: dependency.asset.name,
+						moveBundle: {
+							id: dependency.asset.moveBundle.id,
+							name: dependency.asset.moveBundle.name
+						}
 					},
 					dependencyType: dependency.type,
 					dependencyStatus: dependency.status,
@@ -108,13 +118,38 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	/**
+	 * Calculate the Color for the Move Bundle
+	 * @returns {string}
+	 */
+	public getMoveBundleColor(): string {
+		return 'bundle-dep-no-valid';
+	}
+
+	/**
 	 * Delete the selected element
 	 */
 	public onDeleteSupport(dataItem: any): void {
 		this.dataGridSupportsOnHelper.removeDataItem(dataItem);
 	}
 
+	/**
+	 * Pass Service as Reference
+	 * @param {ComboBoxSearchModel} searchParam
+	 * @returns {Observable<any>}
+	 */
 	public getAssetListForComboBox(searchParam: ComboBoxSearchModel): Observable<any> {
 		return this.assetExplorerService.getAssetListForComboBox(searchParam);
+	}
+
+	/**
+	 * Attach the color to each element
+	 */
+	public onOpenMoveBundle(dropDownFooter: any): void {
+		if (dropDownFooter && dropDownFooter.wrapper && dropDownFooter.wrapper.nativeElement) {
+			setTimeout(() => {
+				jQuery('.k-list-container').addClass('bundle-dep-no-valid');
+				jQuery('.k-list-container ul.k-list li').addClass('move-bundle-item');
+			});
+		}
 	}
 }

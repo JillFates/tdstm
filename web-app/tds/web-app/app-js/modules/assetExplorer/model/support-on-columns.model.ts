@@ -35,7 +35,7 @@ export class SupportOnColumnsModel {
 			},
 			{
 				label: 'Bundle',
-				property: 'bundle',
+				property: 'moveBundle',
 				type: 'text',
 				width: 195
 			},
