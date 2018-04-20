@@ -312,12 +312,12 @@
 												</kendo-dropdownlist>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF'" type="text" class="param-text-input"
+												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'" type="text" class="param-text-input"
 													   name="{{column.property + columnIndex + rowIndex}}-user-defined"
 													   (change)="verifyIsValidForm()"
 													   [(ngModel)]="dataItem.value"
 													   [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"/>
-												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF'"
+												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'"
 																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
 																[data]="dataItem.currentFieldList"
 																[filterable]="true"
@@ -349,8 +349,8 @@
 												<span>{{getAssetClassValue(dataItem.context)}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<span *ngIf="dataItem.context === 'USER_DEF'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
+												<span *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'">{{dataItem.value}}</span>
+												<span *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
 											</div>
 											<div *ngIf="column.type === 'text' && column.property === 'desc'">
 												<span>{{dataItem.desc}}</span>
@@ -423,7 +423,10 @@
 											<div class="col-md-3">
 												<div class="checkbox">
 													<label>
-														<input  type="checkbox" name="apiActionBeforeCall" [(ngModel)]="apiActionModel.eventReactions[7].selected" [disabled]="apiActionModel.eventReactions[7].value.length > 0 || modalType === actionTypes.VIEW"> Before API Call
+														<input  type="checkbox" name="apiActionBeforeCall"
+																(change)="onEventReactionSelect(apiActionModel.eventReactions[7])"
+																[(ngModel)]="apiActionModel.eventReactions[7].selected"
+																[disabled]="(apiActionModel.eventReactions[7].value.length > 0 && apiActionModel.eventReactions[7].value !== eventBeforeCallText) || modalType === actionTypes.VIEW"> Before API Call
 													</label>
 												</div>
 											</div>

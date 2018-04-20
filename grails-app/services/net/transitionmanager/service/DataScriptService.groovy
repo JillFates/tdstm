@@ -292,7 +292,7 @@ class DataScriptService implements ServiceMethods{
                 return parseDataFromJSON(fileName)
 
             case 'CSV':
-                return parseDataFromCSV(fileName)
+                return parseDataFromCSV(fileName, 0, maxRows)
 
             case ['XLS', 'XLSX'] :
                 return parseDataFromXLS(fileName, 0, 0, maxRows)
@@ -352,10 +352,12 @@ class DataScriptService implements ServiceMethods{
 	/**
 	 * Parse CSV file to get the
 	 * @param csvFile
+	 * @param pagination : page (starts on zero)
+	 * @param maxRows : max number of results requested
 	 * @return Map with the description of the CSV File Data
 	 * @throws RuntimeException
 	 */
-	Map parseDataFromCSV (String csvFile) throws RuntimeException {
+	Map parseDataFromCSV (String csvFile, Long page, Long maxRows) throws RuntimeException {
 		tempFile(csvFile)
 
 		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: FileSystemService.temporaryDirectory)
@@ -371,9 +373,17 @@ class DataScriptService implements ServiceMethods{
 			]
 		}
 
+		List<Map> rows = csv.rows()
+		Integer start = page * maxRows
+		Integer end = Math.min(rows.size(), start + (Integer)maxRows)
+		List<Map> filteredRows = []
+		for (Integer i = start; i < end; i++) {
+			filteredRows << rows[i]
+		}
+
 		return [
 				  config: config,
-				  rows  : csv.rows()
+				  rows  : filteredRows
 		]
 	}
 

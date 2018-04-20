@@ -80,7 +80,7 @@ class DataSetFacade {
 	 * Validates if sheet name is correct.
 	 * It checks:
 	 * 1) if DataSetFacade was configured correctly with an instance of ExcelDataset
-	 * 2) If the Workboo in the Excel Driver contains a sheet with sheetName parameter
+	 * 2) If the Workbook in the Excel Driver contains a sheet with sheetName parameter
 	 * @param sheetName a string with the sheet name
 	 */
 	private void validateSheetName(String sheetName) {
@@ -126,5 +126,27 @@ class DataSetFacade {
 		if(!hasSheet){
 			throw ETLProcessorException.invalidSheetNumber(sheetNumber)
 		}
+	}
+
+	/**
+	 * If the Dataset is an ExcelDataSet, it takes the sheet names from its TDSExcelDriver instances.
+	 * @return a list of sheet names
+	 */
+	List<String> getSheetNames() {
+		TDSExcelDriver excelDriver = excelDriver()
+		return excelDriver.sheetNames
+	}
+
+	/**
+	 * Validates if the current DataSet is an instance of ExcelDataSet
+	 * and if it using an instance of TDSExcelDriver.
+	 * If not it throws an ETLProcessorException#invalidExcelDriver exception
+	 * @return the instance of TDSExcelDriver configured for the current DataSet.
+	 */
+	private TDSExcelDriver excelDriver(){
+		if(!dataSet.class.isAssignableFrom(ExcelDataset)){
+			throw ETLProcessorException.invalidExcelDriver()
+		}
+		return (TDSExcelDriver)dataSet.connection.driver
 	}
 }

@@ -98,21 +98,64 @@ abstract class ETLBaseSpec extends Specification {
 
 
 	/**
-	 * Builds a SpreadSheet dataSet from a csv content
-	 * @param csvContent
+	 * Builds a SpreadSheet dataSet for an Excel content
+	 * @param sheetName
+	 * @param sheetContent
 	 * @return
 	 */
-	private List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+	protected List buildSpreadSheetDataSet(String sheetName, String sheetContent) {
+
+		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
+		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
+
+
+		addSheetInWorkBook(workbook, sheetName, sheetContent)
+
+		WorkbookUtil.saveToOutputStream(workbook, outputStream)
+
+		ExcelConnection con = new ExcelConnection(
+			path: service.temporaryDirectory,
+			fileName: fileName,
+			driver: TDSExcelDriver)
+		ExcelDataset dataSet = new ExcelDataset(connection: con, header: true)
+
+		return [fileName, new DataSetFacade(dataSet)]
+	}
+
+	/**
+	 * Adds a Sheet in a Workbook instance using the sheet name and the sheet contents
+	 * @param workbook
+	 * @param sheetName
+	 * @param sheetContent
+	 */
+	protected void addSheetInWorkBook(Workbook workbook, String sheetName, String sheetContent) {
+		Sheet sheet = workbook.createSheet(sheetName)
+		sheetContent.readLines().eachWithIndex { String line, int rowNumber ->
+			XSSFRow currentRow = sheet.createRow(rowNumber)
+			line.split(",").eachWithIndex { String cellContent, int columnNumber ->
+				currentRow.createCell(columnNumber).setCellValue(cellContent)
+			}
+		}
+	}
+
+	/**
+	 * Builds a SpreadSheet dataSet for an Excel content with multiple sheets
+	 * @param sheetsContent
+	 * @return
+	 */
+	protected List buildSpreadSheetDataSetWithMultipleSheets(Map<String, String> sheetsContent) {
 
 		def (String fileName, OutputStream outputStream) = service.createTemporaryFile('unit-test-', 'xlsx')
 		Workbook workbook = WorkbookUtil.createWorkbook('xlsx')
 
 		// Getting the Sheet at index zero
-		Sheet sheet = workbook.createSheet(sheetName)
-		sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
-			XSSFRow currentRow = sheet.createRow(rowNumber)
-			line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
-				currentRow.createCell(columnNumber).setCellValue(cellContent)
+		sheetsContent.each { String sheetName, String sheetContent ->
+			Sheet sheet = workbook.createSheet(sheetName)
+			sheetContent.readLines().eachWithIndex {String line, int rowNumber ->
+				XSSFRow currentRow = sheet.createRow(rowNumber)
+				line.split(",").eachWithIndex{ String cellContent, int columnNumber ->
+					currentRow.createCell(columnNumber).setCellValue(cellContent)
+				}
 			}
 		}
 

@@ -117,6 +117,18 @@ export class APIActionParameterColumnModel {
 	}
 }
 
+export const EVENT_STATUS_TEXT = '// Check the HTTP response code for a 200 OK \n if (response.status == SC.OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}';
+export const EVENT_SUCCESS_TEXT = '// Update the task status that the task completed\n task.done()';
+export const EVENT_DEFAULT_TEXT = '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )';
+export const EVENT_BEFORE_CALL_TEXT  = `// Set the HTTP Method used for the invocation, options GET|POST|PUT|PATCH, default GET
+// request.config.setProperty('HttpMethod', 'POST')
+
+// Setting Content Type, default 'application/json'
+// request.config.setProperty('Content-Type', 'text/csv')
+
+// Setting content type Accepted, default 'application/json'
+// request.config.setProperty('Accept', 'application/xml;q=0.9')`;
+
 export class APIActionModel {
 	id?: number;
 	name: string;
@@ -196,9 +208,9 @@ export class APIActionModel {
 
 	public static createBasicReactions(apiActionModel: APIActionModel): void {
 		apiActionModel.eventReactions = [];
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, '// Check the HTTP response code for a 200 OK \n if (response.status == SC.OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}'));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, '// Update the task status that the task completed\n task.done()'));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )'));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, EVENT_STATUS_TEXT));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, EVENT_SUCCESS_TEXT));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, EVENT_DEFAULT_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));

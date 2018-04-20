@@ -19,20 +19,24 @@ class ImportBatchService implements ServiceMethods {
 	DataImportService dataImportService
 
 	/**
-	 * Return a list with the existing batches for the given project and with
-	 * the given status (optional).
-	 * @param project - if null, the user's current project will be used.
-	 * @param batchStatus - param for filtering by that status.
-	 * @return all the batches for the project.
+	 * Find a all batches and include the records summary information. If a batchId is given,
+	 * it will narrow down the results to that particular Import Batch.
+	 * @param project
+	 * @param batchId
+	 * @param batchStatus
+	 * @return
 	 */
-	Collection listBatches(Project project, ImportBatchStatusEnum batchStatus = null) {
-
+	Map findBatchesWithSummary(Project project, Long batchId = null, ImportBatchStatusEnum batchStatus = null) {
 		/* Query the info batch and the number of records grouped by status.
 		 * This will produce a list of [batch, status, number of records] */
 		List batchStatusList = ImportBatchRecord.createCriteria().list {
 			createAlias('importBatch', 'batch')
 			if (batchStatus){
 				eq('batch.status', batchStatus)
+			}
+
+			if (batchId) {
+				eq('batch.id', batchId)
 			}
 
 			eq('batch.project', project)
@@ -86,6 +90,10 @@ class ImportBatchService implements ServiceMethods {
 				eq('batch.status', batchStatus)
 			}
 
+			if (batchId) {
+				eq('batch.id', batchId)
+			}
+
 			gt('errorCount', (long)0)
 			eq('batch.project', project)
 			projections {
@@ -102,10 +110,32 @@ class ImportBatchService implements ServiceMethods {
 			batchMap['recordsSummary']['erred'] = batchErrorInfo[1]
 		}
 
+		return results
+	}
+
+	/**
+	 * Return a list with the existing batches for the given project and with
+	 * the given status (optional).
+	 * @param project - if null, the user's current project will be used.
+	 * @param batchStatus - param for filtering by that status.
+	 * @return all the batches for the project.
+	 */
+	Collection listBatches(Project project, ImportBatchStatusEnum batchStatus = null) {
+		Map results = findBatchesWithSummary(project)
 		return results.values()
 
 	}
 
+	/**
+	 * Find a Batch given its id.
+	 * @param project
+	 * @param batchId
+	 * @return
+	 */
+	Map findBatch(Project project, Long batchId) {
+		Map batchMap = findBatchesWithSummary(project, batchId)
+		return batchMap[batchId]
+	}
 	/**
 	 * Return a list of the ImportBatchRecords for a given ImportBatch
 	 * the given status (optional).

@@ -35,6 +35,7 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element transform (Closure closure) {
+	    processor.validateStack()
         def code = closure.rehydrate(this, this, this)
         code.resolveStrategy = Closure.DELEGATE_FIRST
         code()
@@ -51,6 +52,7 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element transform (ETLProcessor.ReservedWord reservedWord) {
+	    processor.validateStack()
 	    //TODO: validate invalid reserved words
 	    return this
     }
@@ -65,6 +67,7 @@ class Element implements RangeChecker {
      * @return the element instance that received this command
      */
     Element load (String fieldName) {
+	    processor.validateStack()
         if (processor.hasSelectedDomain()) {
             this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
             processor.addElementLoaded(processor.selectedDomain, this)
@@ -84,6 +87,7 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element initialize (String fieldName) {
+		processor.validateStack()
 		if (processor.hasSelectedDomain()) {
 			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 			this.init = this.value

@@ -143,7 +143,11 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Sheet $sheetNumber is not found in workbook".toString())
     }
 
-	static final String missingPropertyExceptionMessage = "No such property: variableName"
+    static ETLProcessorException invalidExcelDriver () {
+        new ETLProcessorException('Use TDSExcelDriver for an instance of ExcelConnection in an ETL Script')
+    }
+
+    static final String missingPropertyExceptionMessage = "No such property: variableName"
 	static ETLProcessorException missingPropertyException (String variableName) {
 		return new ETLProcessorException(missingPropertyExceptionMessage.replace('variableName', variableName))
 	}
