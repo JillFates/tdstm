@@ -121,8 +121,18 @@ export class SupportsDependsComponent implements OnInit {
 	 * Calculate the Color for the Move Bundle
 	 * @returns {string}
 	 */
-	public getMoveBundleColor(): string {
-		return 'bundle-dep-no-valid';
+	public getMoveBundleColor(dataItem: any): string {
+		if (dataItem.assetDepend.moveBundle) {
+			if (this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.dependencyStatus === 'Validated') {
+				return 'bundle-dep-no-valid';
+			} else {
+				if (dataItem.dependencyStatus !== 'Questioned' && dataItem.dependencyStatus !== 'Validated') {
+					return 'bundle-dep-unknown';
+				}
+				return 'bundle-dep-' + dataItem.dependencyStatus.toLocaleLowerCase();
+			}
+		}
+		return 'nothing';
 	}
 
 	/**
@@ -144,10 +154,10 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Attach the color to each element
 	 */
-	public onOpenMoveBundle(dropDownFooter: any): void {
+	public onOpenMoveBundle(dropDownFooter: any, dataItem: any): void {
 		if (dropDownFooter && dropDownFooter.wrapper && dropDownFooter.wrapper.nativeElement) {
 			setTimeout(() => {
-				jQuery('.k-list-container').addClass('bundle-dep-no-valid');
+				jQuery('.k-list-container').addClass(this.getMoveBundleColor(dataItem));
 				jQuery('.k-list-container ul.k-list li').addClass('move-bundle-item');
 			});
 		}

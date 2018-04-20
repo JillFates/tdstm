@@ -161,18 +161,30 @@
   color: black!important
 
 .bundle-dep-validated
-  background: $color--green3
+  span.k-input, li.move-bundle-item
+    background-color: $color--green3 !important
 .bundle-dep-unknown
-  background: $color--yellow
+  span.k-input, li.move-bundle-item
+    background: $color--yellow !important
 .bundle-dep-questioned
-  background: $color-lightpink
+  span.k-input, li.move-bundle-item
+    background: $color-lightpink !important
 .bundle-dep-not, .bundle-dep-archived, .bundle-dep-future
-  background: $color--grey4
+  span.k-input, li.move-bundle-item
+    background: $color--grey4 !important
 .bundle-dep-no-valid
   span.k-input, li.move-bundle-item
     background-color: $color--red !important
-    height: 30px !important
     color: white !important
+
+.bundle-dep-validated,
+.bundle-dep-unknown,
+.bundle-dep-questioned,
+.bundle-dep-not, .bundle-dep-archived, .bundle-dep-future,
+.bundle-dep-no-valid
+  span.k-input
+    height: 29.2px !important
   li.move-bundle-item .k-state-selected
-    font-weight: bold
+    font-weight: bold !important
+
 

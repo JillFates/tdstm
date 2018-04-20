@@ -72,8 +72,8 @@
                     [textField]="'text'"
                     [valueField]="'id'"
                     [(ngModel)]="dataItem.assetDepend.moveBundle"
-                    [ngClass]="getMoveBundleColor()"
-                    (open)="onOpenMoveBundle(dropdownFooter)"
+                    [ngClass]="getMoveBundleColor(dataItem)"
+                    (open)="onOpenMoveBundle(dropdownFooter, dataItem)"
                     required>
             </kendo-dropdownlist>
         </ng-template>
