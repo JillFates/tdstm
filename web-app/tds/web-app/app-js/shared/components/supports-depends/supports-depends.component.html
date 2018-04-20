@@ -10,7 +10,7 @@
     <!-- Toolbar Template -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">
         <label class="pad-top-7 pad-left-10">Supports On</label>
-        <button (click)="onAddSupportsOn()" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
+        <button (click)="onAddSupportsOn(dependencyType.SUPPORT)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
             <i class="fa fa-fw fa-plus-circle"></i> Add Support
         </button>
     </ng-template>
@@ -62,13 +62,18 @@
         </ng-template>
 
         <ng-template kendoGridCellTemplate *ngIf="column.property === 'assetName'" let-dataItem let-rowIndex="rowIndex">
-            <tds-combobox [(model)]="dataItem.assetDepend" [(metaParam)]="dataItem.assetClass.id" [serviceRequest]="getAssetListForComboBox"></tds-combobox>
+            <tds-combobox
+                    [(model)]="dataItem.assetDepend"
+                    [(metaParam)]="dataItem.assetClass.id"
+                    [serviceRequest]="getAssetListForComboBox"
+                    (selectionChange)="onDependencyChange(dataItem)">
+            </tds-combobox>
         </ng-template>
 
         <ng-template kendoGridCellTemplate *ngIf="column.property === 'moveBundle'" let-dataItem let-rowIndex="rowIndex">
             <kendo-dropdownlist #dropdownFooter
                     name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                    [data]="dependencyMoveBundleList"
+                    [data]="moveBundleList"
                     [textField]="'text'"
                     [valueField]="'id'"
                     [(ngModel)]="dataItem.assetDepend.moveBundle"
@@ -78,20 +83,20 @@
             </kendo-dropdownlist>
         </ng-template>
 
-        <ng-template kendoGridCellTemplate *ngIf="column.property === 'dependencyType'" let-dataItem let-rowIndex="rowIndex">
+        <ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem let-rowIndex="rowIndex">
             <kendo-dropdownlist
                     name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                    [data]="dependencyTypeList"
-                    [(ngModel)]="dataItem.dependencyType"
+                    [data]="typeList"
+                    [(ngModel)]="dataItem.type"
                     required>
             </kendo-dropdownlist>
         </ng-template>
 
-        <ng-template kendoGridCellTemplate *ngIf="column.property === 'dependencyStatus'" let-dataItem let-rowIndex="rowIndex">
+        <ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem let-rowIndex="rowIndex">
             <kendo-dropdownlist
                     name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-                    [data]="dependencyStatusList"
-                    [(ngModel)]="dataItem.dependencyStatus"
+                    [data]="statusList"
+                    [(ngModel)]="dataItem.status"
                     required>
             </kendo-dropdownlist>
         </ng-template>

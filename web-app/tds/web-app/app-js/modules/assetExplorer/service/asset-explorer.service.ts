@@ -19,7 +19,7 @@ export class AssetExplorerService {
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
 	private ALL_ASSETS = 'All Assets';
-	private assetEntitySearch = 'assetEntity/assetListForSelect2';
+	private assetEntitySearch = 'assetEntity';
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
 	}
@@ -213,7 +213,7 @@ export class AssetExplorerService {
 	 * @returns {Observable<any>}
 	 */
 	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
-		return this.http.get(`../${this.assetEntitySearch}?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+		return this.http.get(`../${this.assetEntitySearch}/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
@@ -222,6 +222,19 @@ export class AssetExplorerService {
 					page: response.page
 				};
 				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * @param changeParams
+	 * @returns {Observable<any>}
+	 */
+	retrieveChangedBundle(changeParams: any): Observable<any> {
+		return this.http.post(`../${this.assetEntitySearch}/retrieveChangedBundle`, JSON.stringify(changeParams))
+			.map((res: Response) => {
+				return res;
 			})
 			.catch((error: any) => error.json());
 	}

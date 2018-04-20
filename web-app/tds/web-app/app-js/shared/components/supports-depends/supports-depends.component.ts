@@ -2,12 +2,13 @@
  * Structure does not allows to introduce other base Modules
  * So this is not in the Asset Explorer Module and belongs here instead.
  */
-import {Component, ElementRef, Inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
-import {DependencySupportModel, SupportOnColumnsModel} from '../../../modules/assetExplorer/model/support-on-columns.model';
+import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
 import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
+import {DEPENDENCY_TYPE} from './model/support-depends.model';
 import * as R from 'ramda';
 import {Observable} from 'rxjs/Rx';
 
@@ -31,9 +32,10 @@ export class SupportsDependsComponent implements OnInit {
 	}];
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
-	private dependencyTypeList = [];
-	private dependencyStatusList = [];
-	private dependencyMoveBundleList = [];
+	private typeList = [];
+	private statusList = [];
+	private moveBundleList = [];
+	public dependencyType = DEPENDENCY_TYPE;
 
 	constructor(private assetExplorerService: AssetExplorerService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
@@ -45,10 +47,10 @@ export class SupportsDependsComponent implements OnInit {
 	ngOnInit(): void {
 		// Lists
 		this.dataFlowFreqList = R.clone(this.model.dataFlowFreq);
-		this.dependencyTypeList = R.clone(this.model.dependencyMap.dependencyType);
-		this.dependencyStatusList = R.clone(this.model.dependencyMap.dependencyStatus);
+		this.typeList = R.clone(this.model.dependencyMap.dependencyType);
+		this.statusList = R.clone(this.model.dependencyMap.dependencyStatus);
 		this.model.moveBundleList.forEach((moveBundle) => {
-			this.dependencyMoveBundleList.push({id: moveBundle.id, text: moveBundle.name});
+			this.moveBundleList.push({id: moveBundle.id, text: moveBundle.name});
 		});
 		for (let prop in this.model.dependencyMap.assetClassOptions) {
 			if (this.model.dependencyMap.assetClassOptions[prop]) {
@@ -80,8 +82,9 @@ export class SupportsDependsComponent implements OnInit {
 							name: dependency.asset.moveBundle.name
 						}
 					},
-					dependencyType: dependency.type,
-					dependencyStatus: dependency.status,
+					type: dependency.type,
+					status: dependency.status,
+					dependencyType: DEPENDENCY_TYPE.SUPPORT
 				};
 				supportsOn.push(dependencySupportModel);
 			});
@@ -92,8 +95,8 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Add a new Support On Dependency
 	 */
-	public onAddSupportsOn(): void {
-		this.dataGridSupportsOnHelper.addDataItem({
+	public onAddSupportsOn(dependencyType: string): void {
+		let dependencySupportModel: DependencySupportModel = {
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
@@ -101,9 +104,11 @@ export class SupportsDependsComponent implements OnInit {
 				text: '',
 				metaParam: this.dependencyClassList[0].id
 			},
-			dependencyType: this.dependencyTypeList[0],
-			dependencyStatus: this.dependencyStatusList[0],
-		});
+			type: this.typeList[0],
+			status: this.statusList[0],
+			dependencyType: dependencyType
+		};
+		this.dataGridSupportsOnHelper.addDataItem(dependencySupportModel);
 	}
 
 	/**
@@ -118,18 +123,33 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	/**
+	 * Detects whe
+	 * @param {DependencySupportModel} dataItem
+	 */
+	public onDependencyChange(dataItem: DependencySupportModel): void {
+		let changeParams = {
+			assetId: 0,
+			dependentId: 0,
+			type: 'support'
+		};
+		this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res) => {
+			console.log(res);
+		});
+	}
+
+	/**
 	 * Calculate the Color for the Move Bundle
 	 * @returns {string}
 	 */
 	public getMoveBundleColor(dataItem: any): string {
 		if (dataItem.assetDepend.moveBundle) {
-			if (this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.dependencyStatus === 'Validated') {
+			if (this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.status === 'Validated') {
 				return 'bundle-dep-no-valid';
 			} else {
-				if (dataItem.dependencyStatus !== 'Questioned' && dataItem.dependencyStatus !== 'Validated') {
+				if (dataItem.status !== 'Questioned' && dataItem.status !== 'Validated') {
 					return 'bundle-dep-unknown';
 				}
-				return 'bundle-dep-' + dataItem.dependencyStatus.toLocaleLowerCase();
+				return 'bundle-dep-' + dataItem.status.toLocaleLowerCase();
 			}
 		}
 		return 'nothing';
