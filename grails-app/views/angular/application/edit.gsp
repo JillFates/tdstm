@@ -24,12 +24,12 @@
 					<table>
 						<tbody>
 							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${applicationInstance.assetName}" />
+								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
 								<td colspan="3">
 									<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${applicationInstance.assetName}" />
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.description}" value="${applicationInstance.description}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset.description}"/>
 								<td colspan="3">
 									<tds:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="11" value="${applicationInstance.description}" tooltipDataPlacement="bottom"/>
 								</td>
@@ -47,7 +47,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}" tabindex="14"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.sme}">
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
@@ -59,7 +59,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
 									<g:select id="environment" class="${standardFieldSpecs.environment.imp?:''}" name="environment"
@@ -74,7 +74,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}" tabindex="15"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 								<tds:tooltipSpan field="${standardFieldSpecs.sme2}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
@@ -88,7 +88,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.criticality}" value="${asset.criticality}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.criticality}">
 									<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
@@ -105,7 +105,7 @@
 							<tr>
 								<tds:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}" tabindex="16"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 								<tds:tooltipSpan field="${standardFieldSpecs.appOwner}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
@@ -119,7 +119,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${applicationInstance.moveBundle?.id}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 									<g:select from="${moveBundleList}" id="moveBundle" class="${standardFieldSpecs.moveBundle.imp?:''}" name="moveBundle.id"
@@ -135,7 +135,7 @@
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}" tabindex="26"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
 									<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="36" />
@@ -150,7 +150,7 @@
 								<td></td>
 								<td></td>
 
-								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 								  %{--TODO FIX convertDate--}%
@@ -161,7 +161,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
 									<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
@@ -170,7 +170,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.testProc}" value="${asset.testProc}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.testProc}">
 									<g:select  id="testProc" class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
@@ -182,7 +182,7 @@
 								<td></td>
 								<td></td>
 
-								<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
 										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
@@ -195,7 +195,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.latency}" value="${asset.latency}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.latency}">
 									<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
@@ -203,7 +203,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}"/>
 								<td>
 									<tds:tooltipSpan field="${standardFieldSpecs.startupProc}">
 										<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
@@ -236,7 +236,7 @@
 									</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.shutdownDuration}" tooltipDataPlacement="bottom">
 									<input type="text" id="shutdownDuration" name="shutdownDuration" class="${standardFieldSpecs.shutdownDuration.imp?:''}"
@@ -245,7 +245,7 @@
 								</td>
 							</tr>
 							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
 
@@ -260,7 +260,7 @@
 
 								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}" tabindex="29"/>
 
-								<tds:inputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
 								<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
 
@@ -273,7 +273,7 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabel field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}"/>
+								<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
 								<td>
 								<tds:tooltipSpan field="${standardFieldSpecs.testingDuration}" tooltipDataPlacement="bottom">
 									<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}" name="testingDuration"
