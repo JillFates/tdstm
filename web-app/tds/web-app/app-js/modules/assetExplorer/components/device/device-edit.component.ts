@@ -8,7 +8,6 @@
 import * as R from 'ramda';
 import {Component, Inject, OnInit} from '@angular/core';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {DependencySupportModel, SupportOnColumnsModel} from '../../model/support-on-columns.model';
 import {SelectableSettings} from '@progress/kendo-angular-grid';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';

@@ -7,14 +7,8 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
-import {SelectableSettings} from '@progress/kendo-angular-grid';
-import {DependencySupportModel, SupportOnColumnsModel} from '../../model/support-on-columns.model';
-import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Rx';
 
 declare var jQuery: any;
 
