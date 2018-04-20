@@ -472,7 +472,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<tds:hasPermission permission="${Permission.ReportViewEventDay}">
 					<td style="vertical-align:top"><span class="megamenuSection">Event Day</span><br />
 						<ul>
-							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
+							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">
