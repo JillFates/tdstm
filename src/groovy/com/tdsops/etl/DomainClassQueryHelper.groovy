@@ -93,11 +93,11 @@ class DomainClassQueryHelper {
 		String hqlJoins = hqlJoins(clazz, fieldsSpec)
 
 		String hql = """
-            select D
+            select $DOMAIN_ALIAS
               from AssetEntity $DOMAIN_ALIAS
 				   $hqlJoins
-             where D.project = :project
-               and D.assetClass = :assetClass
+             where ${DOMAIN_ALIAS}.project = :project
+               and ${DOMAIN_ALIAS}.assetClass = :assetClass
 			   and $hqlWhere
 			""".stripIndent()
 
@@ -118,9 +118,10 @@ class DomainClassQueryHelper {
 		Map<String, ?> hqlParams = hqlParams(clazz, fieldsSpec)
 
 		String hql = """
+			  select $DOMAIN_ALIAS	
               from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
-             where D.project = :project
+             where ${DOMAIN_ALIAS}.project = :project
                and $hqlWhere 
 		""".stripIndent()
 
@@ -137,8 +138,8 @@ class DomainClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select D
-              from AssetDependency D
+            select $DOMAIN_ALIAS
+              from AssetDependency $DOMAIN_ALIAS
              where $hqlWhere  
         """.stripIndent()
 
@@ -157,8 +158,8 @@ class DomainClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select D
-              from Model D
+            select $DOMAIN_ALIAS
+              from Model $DOMAIN_ALIAS
              where $hqlWhere  
         """.stripIndent()
 
@@ -177,8 +178,8 @@ class DomainClassQueryHelper {
 		String hqlWhere = hqlWhere(fieldsSpec)
 
 		String hql = """
-            select D
-              from Manufacturer D
+            select $DOMAIN_ALIAS
+              from Manufacturer $DOMAIN_ALIAS
              where $hqlWhere  
         """.stripIndent()
 
