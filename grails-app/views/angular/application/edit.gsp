@@ -35,17 +35,23 @@
 								</td>
 							</tr>
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}" tabindex="13"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}"
+															   value="${asset.appVendor}" ngmodel="model.asset.appVendor" tabindex="13"/>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}" tabindex="22"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}"
+															   value="${asset.supportType}" ngmodel="model.asset.supportType" tabindex="22"/>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}" tabindex="32"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}"
+															   value="${asset.appFunction}" ngmodel="model.asset.appFunction" tabindex="32"/>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}" tabindex="42" tooltipDataPlacement="bottom"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userCount}"
+															   value="${asset.userCount}"  ngmodel="model.asset.userCount"
+															   tabindex="42" tooltipDataPlacement="bottom"/>
 							</tr>
 
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}" tabindex="14"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}"
+															   value="${asset.appVersion}" ngmodel="model.asset.appVersion" tabindex="14"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
@@ -68,11 +74,13 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tabindex="43" tooltipDataPlacement="bottom"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}"
+															   value="${asset.userLocations}" ngmodel="model.asset.userLocations" tabindex="43" tooltipDataPlacement="bottom"/>
 							</tr>
 
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}" tabindex="15"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}"
+															   value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="15"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
@@ -99,11 +107,13 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tabindex="44" tooltipDataPlacement="bottom"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"
+															   value="${asset.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="44" tooltipDataPlacement="bottom"/>
 
 							</tr>
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}" tabindex="16"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}"
+															   value="${asset.appSource}" ngmodel="model.asset.appSource" tabindex="16"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
@@ -127,13 +137,16 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tabindex="45" tooltipDataPlacement="bottom"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}"
+															   value="${asset.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="45" tooltipDataPlacement="bottom"/>
 
 							</tr>
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.license}" value="${applicationInstance.license}" tabindex="17"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}"
+															   value="${asset.license}" ngmodel="model.asset.license" tabindex="17"/>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}" tabindex="26"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}"
+															   value="${asset.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="26"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 								<td>
@@ -142,7 +155,8 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tabindex="46" tooltipDataPlacement="bottom"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}"
+															   value="${asset.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="46" tooltipDataPlacement="bottom"/>
 
 							</tr>
 							<tr>
@@ -213,9 +227,11 @@
 
 							</tr>
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.url}" value="${applicationInstance.url}" tabindex="18"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}"
+															   value="${asset.url}" ngmodel="model.asset.url" tabindex="18"/>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}" tabindex="28"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}"
+															   value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="28"/>
 
 								<td class="label ${standardFieldSpecs.shutdownBy.imp?:''}" nowrap="nowrap">
 									<label for="shutdownBy">
@@ -258,7 +274,8 @@
 								</tds:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}" tabindex="29"/>
+								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}"
+														value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
