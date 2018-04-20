@@ -24,6 +24,7 @@ export class SupportsDependsComponent implements OnInit {
 	@Input('model') model: any;
 
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
+	private dataGridDependsOnHelper: DataGridOperationsHelper;
 	private supportOnColumnModel: SupportOnColumnsModel;
 	private selectableSettings: SelectableSettings = {mode: 'single', checkboxOnly: false};
 	private initialSort: any = [{
@@ -58,44 +59,52 @@ export class SupportsDependsComponent implements OnInit {
 			}
 		}
 
-		this.getSupportOnList();
+		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
+			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
+		});
+
+		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
+			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
+		});
 	}
 
 	/**
-	 * Get the List of Supports On
+	 * Get the List of Dependencies
 	 */
-	private getSupportOnList(): void {
-		this.supportOnColumnModel = new SupportOnColumnsModel();
-		let supportsOn = [];
-		if (this.model.dependencyMap && this.model.dependencyMap.supportAssets) {
-			let supportAssets = R.clone(this.model.dependencyMap.supportAssets);
-			supportAssets.forEach((dependency) => {
-				let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
-				let dependencySupportModel: DependencySupportModel = {
-					dataFlowFreq: dependency.dataFlowFreq,
-					assetClass: assetClass,
-					assetDepend: {
-						id: dependency.asset.id,
-						text: dependency.asset.name,
-						moveBundle: {
-							id: dependency.asset.moveBundle.id,
-							name: dependency.asset.moveBundle.name
-						}
-					},
-					type: dependency.type,
-					status: dependency.status,
-					dependencyType: DEPENDENCY_TYPE.SUPPORT
-				};
-				supportsOn.push(dependencySupportModel);
-			});
-		}
-		this.dataGridSupportsOnHelper = new DataGridOperationsHelper(supportsOn, this.initialSort, this.selectableSettings);
+	private getDependencyList(dependencyMap: string, dependencyType): Observable<DataGridOperationsHelper> {
+		return new Observable(observer => {
+			this.supportOnColumnModel = new SupportOnColumnsModel();
+			let dependencies = [];
+			if (this.model.dependencyMap && this.model.dependencyMap[dependencyMap]) {
+				let assets = R.clone(this.model.dependencyMap[dependencyMap]);
+				assets.forEach((dependency) => {
+					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
+					let dependencySupportModel: DependencySupportModel = {
+						dataFlowFreq: dependency.dataFlowFreq,
+						assetClass: assetClass,
+						assetDepend: {
+							id: dependency.asset.id,
+							text: dependency.asset.name,
+							moveBundle: {
+								id: dependency.asset.moveBundle.id,
+								name: dependency.asset.moveBundle.name
+							}
+						},
+						type: dependency.type,
+						status: dependency.status,
+						dependencyType: dependencyType
+					};
+					dependencies.push(dependencySupportModel);
+				});
+			}
+			observer.next(new DataGridOperationsHelper(dependencies, null, null));
+		});
 	}
 
 	/**
-	 * Add a new Support On Dependency
+	 * Add a new Dependency
 	 */
-	public onAddSupportsOn(dependencyType: string): void {
+	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
 		let dependencySupportModel: DependencySupportModel = {
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
@@ -108,7 +117,7 @@ export class SupportsDependsComponent implements OnInit {
 			status: this.statusList[0],
 			dependencyType: dependencyType
 		};
-		this.dataGridSupportsOnHelper.addDataItem(dependencySupportModel);
+		dataGrid.addDataItem(dependencySupportModel);
 	}
 
 	/**
