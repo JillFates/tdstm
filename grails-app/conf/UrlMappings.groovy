@@ -84,6 +84,12 @@ class UrlMappings {
 					POST: "create"
 			]
 		}
+		"/ws/asset/retrieveBundleChange" {
+			controller = 'wsAsset'
+			action = [
+			    POST: 'retrieveBundleChange'
+			]
+		}
 
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'

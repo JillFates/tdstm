@@ -4,10 +4,12 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
@@ -334,6 +336,44 @@ class WsAssetController implements ControllerMethods {
 			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
 			renderAsJson(model)
 		}
+	}
+
+	/**
+	 * Endpoint that needs to be executed when the user changes the selected
+	 * bundle in dropdowns.
+	 * The request must have: assetId, dependencyId and status.
+	 */
+	@HasPermission(Permission.BundleView)
+	def retrieveBundleChange() {
+		// Fetch the information for this request.
+		BundleChangeCommand command = populateCommandObject(BundleChangeCommand)
+
+		Project project = getProjectForWs()
+
+		// The id of the bundle retrieve from the asset in the dependency (if such dependency exists).
+		Long depBundleId = null
+		// The id of the  bundle for the asset received in the request.
+		Long assetBundleId = null
+		// The status of the dependency.
+		String status = null
+
+		// Can't use fetchDomain because it throws an exception when it doesn't find a result.
+		AssetDependency dependency = GormUtil.findInProject(project, AssetDependency, command.dependencyId, false)
+		// If the dependency exists, use its status and corresponding asset's bundle in the response.
+		if (dependency) {
+			AssetEntity depAsset = (command.type == 'support') ? dependency.asset : dependency.dependent
+			depBundleId = depAsset.moveBundle.id
+			status = dependency.status
+		}
+
+		// Can't use fetchDomain because it throws an exception when it doesn't find a result.
+		AssetEntity asset = GormUtil.findInProject(project, AssetEntity, command.assetId, false)
+		// If the given assetId exists, use that asset's bundle in the response.
+		if (asset) {
+			assetBundleId = asset.moveBundle.id
+		}
+
+		renderAsJson(id: assetBundleId, depBundle: depBundleId, status: status)
 	}
 
 	/**
