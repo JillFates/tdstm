@@ -61,11 +61,14 @@ export class SupportsDependsComponent implements OnInit {
 
 		this.getDependencyList('supportAssets', DEPENDENCY_TYPE.SUPPORT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridSupportsOnHelper = dataGridDependsOnHelper;
+			this.model.dependencyMap.supportAssets = this.dataGridSupportsOnHelper.gridData.data;
 		});
 
 		this.getDependencyList('dependentAssets', DEPENDENCY_TYPE.DEPENDENT).subscribe((dataGridDependsOnHelper) => {
 			this.dataGridDependsOnHelper = dataGridDependsOnHelper;
+			this.model.dependencyMap.dependentAssets = this.dataGridDependsOnHelper.gridData.data;
 		});
+
 	}
 
 	/**
@@ -86,10 +89,7 @@ export class SupportsDependsComponent implements OnInit {
 						assetDepend: {
 							id: dependency.asset.id,
 							text: dependency.asset.name,
-							moveBundle: {
-								id: dependency.asset.moveBundle.id,
-								name: dependency.asset.moveBundle.name
-							}
+							moveBundle: R.clone(dependency.asset.moveBundle)
 						},
 						type: dependency.type,
 						status: dependency.status,

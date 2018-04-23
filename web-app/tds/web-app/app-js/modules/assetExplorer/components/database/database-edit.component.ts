@@ -59,6 +59,7 @@ export function DatabaseEditComponent(template, editModel) {
 
 		public onUpdate(): void {
 			console.log(JSON.stringify(this.model.asset));
+			console.log(this.model);
 		}
 	}
 	return DatabaseShowComponent;
