@@ -39,6 +39,7 @@ class ActionRequest {
 		this.readonly = value
 		this.params.setReadonly(this.readonly)
 		this.headers.setReadonly(this.readonly)
+		this.options.setReadonly(this.readonly)
 	}
 
 }

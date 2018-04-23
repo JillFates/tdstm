@@ -4,6 +4,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.HttpProducerService
 
 /**
@@ -169,8 +170,8 @@ class VMwarevCenterAgent extends AbstractAgent {
 	 * @param actionRequest
 	 * @return
 	 */
-	void invokeHttpRequest(ActionRequest actionRequest) {
-		httpProducerService.executeCall(actionRequest)
+	ApiActionResponse invokeHttpRequest(ActionRequest actionRequest) {
+		return httpProducerService.executeCall(actionRequest)
 	}
 
 }
