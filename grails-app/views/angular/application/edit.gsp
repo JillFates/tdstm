@@ -204,11 +204,11 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.retireDate}">
-								  %{--TODO FIX convertDate--}%
-                                   %{--
-									<input type="text" class="dateRange ${standardFieldSpecs.retireDate.imp?:''}" size="15" style="width: 138px;" name="retireDate" id="retireDate" tabindex="27"
-									value="<tds:convertDate date="${applicationInstance?.retireDate}"  />">
-									--}%
+									<kendo-datepicker
+											name="modelAssetRetireDate"
+											[format]="dateFormat"
+											[(value)]="model.asset.retireDate">
+									</kendo-datepicker>
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -252,14 +252,13 @@
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
-								    <script type="text/javascript" charset="utf-8">
-										jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
-									</script>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
+									<kendo-datepicker
+											name="modelAssetMaintExpDate"
+											[format]="dateFormat"
+											[(value)]="model.asset.maintExpDate">
+									</kendo-datepicker>
 								    %{--TODO FIX convertDate--}%
-									%{--<input type="text" class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
-										size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate" tabindex="28"
-										value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">--}%
 								</tdsAngular:tooltipSpan>
 								</td>
 
