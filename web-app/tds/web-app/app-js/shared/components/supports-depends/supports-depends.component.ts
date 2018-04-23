@@ -5,12 +5,14 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {DataGridOperationsHelper} from '../../utils/data-grid-operations.helper';
 import {DependencySupportModel, SupportOnColumnsModel} from './model/support-on-columns.model';
-import {SelectableSettings} from '@progress/kendo-angular-grid';
 import {AssetExplorerService} from '../../../modules/assetExplorer/service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../combo-box/model/combobox-search-param.model';
 import {DEPENDENCY_TYPE} from './model/support-depends.model';
 import * as R from 'ramda';
 import {Observable} from 'rxjs/Rx';
+import {UIDialogService} from '../../services/ui-dialog.service';
+import {AssetComment} from '../dependent-comment/model/asset-coment.model';
+import {DependentCommentComponent} from '../dependent-comment/dependent-comment.component';
 
 declare var jQuery: any;
 
@@ -26,11 +28,6 @@ export class SupportsDependsComponent implements OnInit {
 	private dataGridSupportsOnHelper: DataGridOperationsHelper;
 	private dataGridDependsOnHelper: DataGridOperationsHelper;
 	private supportOnColumnModel: SupportOnColumnsModel;
-	private selectableSettings: SelectableSettings = {mode: 'single', checkboxOnly: false};
-	private initialSort: any = [{
-		dir: 'desc',
-		field: 'dateCreated'
-	}];
 	private dataFlowFreqList = [];
 	private dependencyClassList = [];
 	private typeList = [];
@@ -38,7 +35,7 @@ export class SupportsDependsComponent implements OnInit {
 	private moveBundleList = [];
 	public dependencyType = DEPENDENCY_TYPE;
 
-	constructor(private assetExplorerService: AssetExplorerService) {
+	constructor(private assetExplorerService: AssetExplorerService, private dialogService: UIDialogService) {
 		this.getAssetListForComboBox = this.getAssetListForComboBox.bind(this);
 	}
 
@@ -93,7 +90,8 @@ export class SupportsDependsComponent implements OnInit {
 						},
 						type: dependency.type,
 						status: dependency.status,
-						dependencyType: dependencyType
+						dependencyType: dependencyType,
+						comment: dependency.comment
 					};
 					dependencies.push(dependencySupportModel);
 				});
@@ -120,7 +118,8 @@ export class SupportsDependsComponent implements OnInit {
 			},
 			type: this.typeList[0],
 			status: this.statusList[0],
-			dependencyType: dependencyType
+			dependencyType: dependencyType,
+			comment: ''
 		};
 		dataGrid.addDataItem(dependencySupportModel);
 	}
@@ -180,6 +179,27 @@ export class SupportsDependsComponent implements OnInit {
 	 */
 	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
 		dataGrid.removeDataItem(dataItem);
+	}
+
+	/**
+	 * Open the Dialog to Edit/Add a comment
+	 * @param dataItem
+	 */
+	public onAddEditComment(dataItem: any): void {
+		let assetComment: AssetComment = {
+			comment: dataItem.comment,
+			dialogTitle: dataItem.assetDepend.text + ' (' + dataItem.dependencyType + ')'
+		};
+		this.dialogService.extra(DependentCommentComponent,
+			[UIDialogService,
+				{
+					provide: AssetComment,
+					useValue: assetComment
+				}
+			], true, false)
+			.then((result) => {
+				dataItem.comment = result.comment;
+			}).catch((error) => console.log(error));
 	}
 
 	/**
