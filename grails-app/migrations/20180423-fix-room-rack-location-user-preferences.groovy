@@ -1,0 +1,47 @@
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import net.transitionmanager.domain.UserPreference
+import net.transitionmanager.service.DatabaseMigrationService
+import org.codehaus.groovy.grails.web.json.JSONObject
+
+databaseChangeLog = {
+	changeSet(author: 'arecordon', id: 'TM-10482-1') {
+		comment('Fix the User Preference value for users who had location/rack/room source/target before TM-9770')
+		grailsChange {
+			change {
+
+				List<UserPreference> userPreferences = UserPreference.createCriteria().list{
+					eq('preferenceCode', UserPreferenceEnum.Asset_Columns.name())
+				}
+
+				// Map where the keys are the incorrect field names and the values are the corrected names.
+				Map<String, String> renameMap = [
+					sourceLocation:	'locationSource',
+					sourceRack: 'rackSource',
+					sourceRoom: 'roomSource',
+					targetLocation:	'locationTarget',
+					targetRack: 'rackTarget',
+					targetRoom: 'roomTarget'
+				]
+
+				Set<String> incorrectFieldNames = renameMap.keySet()
+
+				// Iterate over the fields replacing the field name where needed.
+				Closure updatePreferenceScript = { JSONObject preferenceValueJson ->
+					for (preference in preferenceValueJson.keySet()) {
+						String preferenceValue = preferenceValueJson[preference]
+						if (preferenceValue in incorrectFieldNames) {
+							preferenceValueJson[preference] = renameMap[preferenceValue]
+						}
+					}
+					return preferenceValueJson
+
+				}
+
+				DatabaseMigrationService databaseMigrationService = ctx.getBean("databaseMigrationService")
+				// Update the different settings with the correct names.
+				databaseMigrationService.updateJsonObjects(userPreferences, "value", updatePreferenceScript)
+			}
+		}
+	}
+}
+
