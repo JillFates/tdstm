@@ -17,8 +17,12 @@ class Project extends PartyGroup {
 	transient ProjectService projectService
 	transient PartyRelationshipService partyRelationshipService
 
-	String guid
+	// A code that is use to reference projects with export filename, etc
 	String projectCode
+
+	// A unique string value that will be used when aggregating data across multiple instances
+	String guid
+
 	String description
 	Date startDate   // Date that the project will start
 	Date completionDate   // Date that the project will finish
@@ -34,6 +38,7 @@ class Project extends PartyGroup {
 	// used to indicate which of the custom fields will represent the plan methodology setting
 	String planMethodology=''
 
+	// Flag to indicate if the Daily Reporting Metrics should be collected for the project
 	Integer collectMetrics = 1
 
 	static hasMany = [dataTransferBatch: DataTransferBatch]
