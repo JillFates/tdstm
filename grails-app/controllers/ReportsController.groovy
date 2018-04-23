@@ -21,6 +21,7 @@ import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
+import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.Model
@@ -40,6 +41,7 @@ import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.CustomDomainService
+import net.transitionmanager.service.MetricReportingService
 import net.transitionmanager.service.MoveBundleService
 import net.transitionmanager.service.MoveEventService
 import net.transitionmanager.service.PartyRelationshipService
@@ -49,6 +51,7 @@ import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Font
+import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 import java.text.DateFormat
 import org.hibernate.Criteria
@@ -68,6 +71,7 @@ class ReportsController implements ControllerMethods {
 	ProjectService projectService
 	ReportsService reportsService
 	UserPreferenceService userPreferenceService
+	MetricReportingService metricReportingService
 
 
 	// Generate Report Dialog
@@ -1501,5 +1505,31 @@ class ReportsController implements ControllerMethods {
 		}
 
 		book.write(response.getOutputStream())
+	}
+
+	/**
+	 * Returns a GSP view with the metric definitions.
+	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
+	def metricDefinitions() {
+		render view: 'metricDefinitions', model: metricReportingService.getDefinitions()
+	}
+
+	/**
+	 * Saves metric definitions to the settings table, and returns back what was saved.
+	 *
+	 * @param definitions The metric definitions JSON wrapped in a command object.
+	 * @param version The version of the metric defintions, used by the setting table to avoid conflicts.
+	 *
+	 * @return the JSON that was save to the Settings table.
+	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
+	def saveMetricDefinitions(MetricDefinitionsCommand definitions, Integer version) {
+		if (definitions.hasErrors()) {
+			response.setStatus(HttpStatus.BAD_REQUEST.value())
+			return renderAsJson(definitions.errors)
+		}
+
+		renderAsJson(metricReportingService.saveDefinitions(definitions, version))
 	}
 }

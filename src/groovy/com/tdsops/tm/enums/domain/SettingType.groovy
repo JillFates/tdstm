@@ -7,5 +7,6 @@ enum SettingType {
     CUSTOM_DOMAIN_FIELD_SPEC, // CustomDomainFieldSpec
     SECURITY_LOCAL, // SecurityLocal
     SECURITY_LDAP, // SecurityLDAP
-    MAIL // Mail
+    MAIL, // Mail
+    METRIC_DEF
 }

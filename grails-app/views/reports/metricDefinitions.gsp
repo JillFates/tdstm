@@ -1,0 +1,97 @@
+<%@ page import="com.tdsops.etl.ETLDomain" contentType="text/html;charset=UTF-8" %>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="layout" content="topNav"/>
+
+	<title>Metric Definitions</title>
+	<link rel="stylesheet" href="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.css"/>
+	<style type="text/css">
+	#script {
+		background: url(http://i.imgur.com/2cOaJ.png);
+		background-attachment: local;
+		background-repeat: no-repeat;
+		padding-left: 35px;
+		padding-top: 10px;
+		border-color: #ccc;
+	}
+
+	samp {
+		background: #000;
+		border: 3px groove #ccc;
+		color: #058907;
+		display: block;
+		padding: 5px;
+	}
+	</style>
+</head>
+
+<body>
+
+<form method="post">
+
+	<div class="row" class="form-group">
+		<div class="col-md-6">
+			<fieldset>
+				<legend>Metric Defintions</legend>
+				<br>
+				<textarea class="form-control" name="definitions" id="definitions" rows="20"  style="width: 100%;">${definitions}</textarea>
+				<br>
+
+				<div class="col-md-12">
+
+					<div class="col-md-4">
+						<input name="version" id="version" type="hidden" value="${version}"/>
+						<input class="form-control" type="button" value="Save" onclick="saveMetricDefinitions();">
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.textcomplete/1.8.4/jquery.textcomplete.js"></script>
+<script type="text/javascript" src="https://rawgithub.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.js"></script>
+<script>
+
+	// Saves the current script to the specified DataScript id
+	function saveMetricDefinitions() {
+		var version = parseInt($("#version").val());
+		var definitions = JSON.parse($("#definitions").val());
+		delete Array.prototype.toJSON;
+		var data = {"definitions": definitions};
+
+		$.ajax('/tdstm/reports/saveMetricDefinitions?version=' + version, {
+			type       : 'POST',
+			contentType: "application/json; charset=utf-8",
+			dataType   : "json",
+			data       : JSON.stringify(data),
+			success    : function (data) {
+				$("#definitions").val(JSON.stringify(JSON.parse(data.definitions), undefined, 4));
+				$("#version").val(data.version);
+					alert('Saved!');
+			},
+			error      : function (xhr, status, text) {
+				if (xhr.status == '400') {
+					var response = JSON.parse(xhr.responseText);
+					var result = '';
+					for (var key in response){
+						result = result.concat(JSON.stringify(response[key], undefined, 4), '\n');
+					}
+					alert(result);
+				} else {
+					var msg = xhr.getResponseHeader('X-TM-Error-Message');
+					debugger;
+					if (msg === null) {
+						alert('Error(' + xhr.status + ') ' + xhr.responseText);
+					} else {
+						alert(msg);
+					}
+				}
+			}
+		});
+	}
+</script>
+
+</body>
+</html>
