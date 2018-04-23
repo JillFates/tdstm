@@ -1,4 +1,5 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
+<%@page import="grails.converters.JSON"%>
 <%@page import="com.tds.asset.AssetType"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 
@@ -386,6 +387,16 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}"
                                                         value="${asset.moveBundle?.id}"/>
                                         <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetMoveBundle"
+                                                        [data]="model.moveBundleList"
+                                                        [(ngModel)]="model.asset.moveBundle"
+                                                        [textField]="'name'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                             %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">--}%
                                                 %{--<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"--}%
                                                           %{--value="${asset.moveBundle?.id}" optionKey="id"--}%
@@ -395,9 +406,27 @@
                                             %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
 
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.size}"
-                                                        value="${asset.size}"/>
+                                        <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+                                            <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+                                                ${standardFieldSpecs.size.label}
+                                            </label>
+                                        </td>
                                         <td nowrap="nowrap" class="sizeScale">
+                                                <tdsAngular:inputControl field="${standardFieldSpecs.size}"
+                                                                     size="4" tabindex="410"
+                                                                     value="${asset.size}"
+                                                                     ngmodel="model.asset.size"/>
+                                                <tdsAngular:tooltipSpan field="${standardFieldSpecs.scale}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetScaleName"
+                                                        [data]="${SizeScale.getAsJsonList() as JSON}"
+                                                        [(ngModel)]="model.asset.scale.name"
+                                                        [defaultItem]="''"
+                                                        [textField]="'text'"
+                                                        [valueField]="'value'">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                             %{--<tdsAngular:tooltipSpan tooltipDataPlacement="bottom"--}%
                                                              %{--field="${standardFieldSpecs.size}">--}%
                                                 %{--<input type="text" id="size" name="size"--}%
@@ -417,29 +446,26 @@
                                                                 value="${asset.assetTag}" tabindex="107"
                                                                        ngmodel="model.asset.assetTag"/>
 
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}"
-                                                        value="${asset.retireDate}"/>
-                                        <td valign="top"
-                                            class="value ${hasErrors(bean: assetEntityInstance, field: 'retireDate', 'errors')}">
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.retireDate}">--}%
-                                                %{--<script type="text/javascript" charset="utf-8">--}%
-                                                    %{--jQuery(function ($) {--}%
-                                                        %{--$(".dateRange").kendoDatePicker({--}%
-                                                            %{--animation: false,--}%
-                                                            %{--format: tdsCommon.kendoDateFormat()--}%
-                                                        %{--});--}%
-                                                    %{--});--}%
-                                                %{--</script>--}%
-                                                %{--<input type="text" id="retireDate" name="retireDate"--}%
-                                                       %{--value="<tdsAngular:convertDate date="${assetEntityInstance?.retireDate}"/>"--}%
-                                                       %{--class="dateRange ${standardFieldSpecs.retireDate.imp ?: ''}"--}%
-                                                       %{--size="15" style="width: 138px;"--}%
-                                                       %{--tabindex="230"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
+                                        <td valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')}">
+                                            <kendo-datepicker
+                                                    name="modelAssetRetireDate"
+                                                    [format]="dateFormat"
+                                                    [(value)]="model.asset.retireDate">
+                                            </kendo-datepicker>
                                         </td>
 
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}"
-                                                        value="${asset.planStatus}"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
+                                        <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetPlanStatus"
+                                                        [data]="model.planStatusOptions"
+                                                        [(ngModel)]="model.asset.planStatus">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
                                         <td>
                                             %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">--}%
                                                 %{--<g:select id="planStatus" name="planStatus"--}%

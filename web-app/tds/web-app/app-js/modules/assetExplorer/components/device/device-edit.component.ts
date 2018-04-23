@@ -25,44 +25,23 @@ export function DeviceEditComponent(template, editModel) {
 		]
 	}) class DeviceEditComponent implements OnInit {
 
-		// private dateFormat: string;
-		// private dataGridSupportsOnHelper: DataGridOperationsHelper;
-		// private dataGridDependsOnHelper: DataGridOperationsHelper;
-		// private supportOnColumnModel: SupportOnColumnsModel;
-		// private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
-		// private initialSort: any = [{
-		// 	dir: 'desc',
-		// 	field: 'dateCreated'
-		// }];
-		// private dataFlowFreqList = [];
-		// private dependencyTypeList = [];
-		// private dependencyStatusList = [];
+		private dateFormat: string;
 
 		constructor(
-			@Inject('model') private model: any,
-			private activeDialog: UIActiveDialogService,
-			private preference: PreferenceService) {
-			// this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
-			// this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
-			//
-			// this.model.asset = R.clone(editModel.asset);
-			// this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
-			// this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-			//
-			// // TODO: Create Object Util to initialiaze variables based on their class model definition
-			// if (this.model.asset.scale === null) {
-			// 	this.model.asset.scale = {
-			// 		name: ''
-			// 	};
-			// }
-			//
-			// // Lists
-			// this.dataFlowFreqList = R.clone(editModel.dataFlowFreq);
-			// this.dependencyTypeList = R.clone(editModel.dependencyMap.dependencyType);
-			// this.dependencyStatusList = R.clone(editModel.dependencyMap.dependencyStatus);
-			// // Supports On
-			// this.getSupportOnList();
-			// // Depends On
+					@Inject('model') private model: any,
+					private activeDialog: UIActiveDialogService,
+					private preference: PreferenceService) {
+
+			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
+			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			this.model.asset = R.clone(editModel.asset);
+			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
+			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+			if (this.model.asset.scale === null) {
+				this.model.asset.scale = {
+					name: ''
+				};
+			}
 		}
 
 		/**
