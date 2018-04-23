@@ -56,6 +56,7 @@ export class SupportOnColumnsModel {
 }
 
 export class DependencySupportModel {
+	public id: number;
 	public dataFlowFreq: string;
 	public type: string;
 	public status: string;

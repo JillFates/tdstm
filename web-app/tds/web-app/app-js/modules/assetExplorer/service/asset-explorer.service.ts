@@ -232,9 +232,9 @@ export class AssetExplorerService {
 	 * @returns {Observable<any>}
 	 */
 	retrieveChangedBundle(changeParams: any): Observable<any> {
-		return this.http.post(`../${this.assetEntitySearch}/retrieveChangedBundle`, JSON.stringify(changeParams))
+		return this.http.post(`${this.assetUrl}/retrieveBundleChange`, JSON.stringify(changeParams))
 			.map((res: Response) => {
-				return res;
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}

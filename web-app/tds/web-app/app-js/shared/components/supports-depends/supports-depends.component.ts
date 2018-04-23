@@ -80,6 +80,7 @@ export class SupportsDependsComponent implements OnInit {
 				assets.forEach((dependency) => {
 					let assetClass = this.dependencyClassList.find((dc) => dc.id === dependency.asset.assetType);
 					let dependencySupportModel: DependencySupportModel = {
+						id: dependency.id,
 						dataFlowFreq: dependency.dataFlowFreq,
 						assetClass: assetClass,
 						assetDepend: {
@@ -106,12 +107,16 @@ export class SupportsDependsComponent implements OnInit {
 	 */
 	public onAdd(dependencyType: string, dataGrid: DataGridOperationsHelper): void {
 		let dependencySupportModel: DependencySupportModel = {
+			id: 0,
 			dataFlowFreq: this.dataFlowFreqList[0],
 			assetClass: this.dependencyClassList[0],
 			assetDepend: {
 				id: '',
 				text: '',
-				metaParam: this.dependencyClassList[0].id
+				moveBundle: {
+					id: 0,
+					name: ''
+				}
 			},
 			type: this.typeList[0],
 			status: this.statusList[0],
@@ -128,6 +133,7 @@ export class SupportsDependsComponent implements OnInit {
 		dataItem.assetDepend = {
 			id: '',
 			text: '',
+			moveBundle: dataItem.assetDepend.moveBundle
 		};
 	}
 
@@ -135,14 +141,19 @@ export class SupportsDependsComponent implements OnInit {
 	 * Detects whe
 	 * @param {DependencySupportModel} dataItem
 	 */
-	public onDependencyChange(dataItem: DependencySupportModel): void {
+	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
 		let changeParams = {
-			assetId: 0,
-			dependentId: 0,
-			type: 'support'
+			assetId: dependency.id,
+			dependentId: dataItem.id,
+			type: dataItem.dependencyType
 		};
-		this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res) => {
-			console.log(res);
+		this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res: any) => {
+			if (res.id && res.id !== dataItem.assetDepend.moveBundle.id) {
+				let mb = this.moveBundleList.find((mbi) => mbi.id === res.id);
+				if (mb) {
+					dataItem.assetDepend.moveBundle = mb;
+				}
+			}
 		});
 	}
 
@@ -151,7 +162,7 @@ export class SupportsDependsComponent implements OnInit {
 	 * @returns {string}
 	 */
 	public getMoveBundleColor(dataItem: any): string {
-		if (dataItem.assetDepend.moveBundle) {
+		if (dataItem.assetDepend.moveBundle && dataItem.assetDepend.moveBundle.id !== 0) {
 			if (this.model.asset.moveBundle.id !== dataItem.assetDepend.moveBundle.id && dataItem.status === 'Validated') {
 				return 'bundle-dep-no-valid';
 			} else {
