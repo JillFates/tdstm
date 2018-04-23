@@ -150,7 +150,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 
 		given:
 			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-			device.roomSource = roomTestHelper.createRoom(project)
+			device.roomTarget = roomTestHelper.createRoom(project)
 			device.save(failOnError: true)
 
 		when:
@@ -187,6 +187,135 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 			results.size() == 1
 			results.first().id == rack.id
 	}
+
+
+	void '8. can find a Device by assetType'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetType: device.assetType])
+
+		then:
+			!results.isEmpty()
+			results*.id.contains(device.id)
+	}
+
+	void '9. can find a Device by assetClass'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetClass: AssetClass.DEVICE])
+
+		then:
+			!results.isEmpty()
+			results*.id.contains(device.id)
+	}
+
+	void '10. can find a Device by Bundle name'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [moveBundle: moveBundle.name])
+
+		then:
+			!results.isEmpty()
+			results*.id.contains(device.id)
+	}
+
+	void '11. can find a Device by project'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [project: project.projectCode])
+
+		then:
+			!results.isEmpty()
+			results*.id.contains(device.id)
+	}
+
+	void '12. can find a Device by rackSource'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomSource = roomTestHelper.createRoom(project)
+			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
+			device.rackSource = rack
+			device.save(failOnError: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackSource: rack.tag])
+
+		then:
+			results.size() == 1
+			results.first().id == device.id
+	}
+
+	void '13. can find a Device by rackTarget'() {
+
+		given:
+			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+			device.roomSource = roomTestHelper.createRoom(project)
+			Rack rack = rackTestHelper.createRack(project, device.roomSource, null, null, 'Acme Data Center')
+			device.rackTarget = rack
+			device.save(failOnError: true)
+
+		when:
+			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [rackTarget: rack.tag])
+
+		then:
+			results.size() == 1
+			results.first().id == device.id
+	}
+
+
+
+
+//	void '11. can find a Device by manufacturer'() {
+//
+//		given:
+//			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+//
+//		when:
+//			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetClass: AssetClass.DEVICE])
+//
+//		then:
+//			results.size() == 1
+//			results.first().id == device.id
+//	}
+
+//	void '12. can find a Device by a model instance'() {
+//
+//		given:
+//			AssetEntity device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+//
+//		when:
+//			List results = DomainClassQueryHelper.where(ETLDomain.Device, project, [assetClass: AssetClass.DEVICE])
+//
+//		then:
+//			results.size() == 1
+//			results.first().id == device.id
+//	}
+
+	/*
+		More tests:
+		def manufacturer = Manufacturer.get(336)
+		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [manufacturer: manufacturer.name])
+
+		def model = Model.get(6941)
+		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [model: model.modelName])
+
+		def moveBundle = MoveBundle.get(5926)
+		def results = DomainClassQueryHelper.where(ETLDomain.Device, Project.get(5810), [moveBundle: moveBundle.name])
+
+	 */
 
 
 
