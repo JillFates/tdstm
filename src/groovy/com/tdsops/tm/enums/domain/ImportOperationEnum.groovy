@@ -37,10 +37,13 @@ enum ImportOperationEnum {
 	 * @return
 	 */
 	static ImportOperationEnum lookup(String value) {
-		value = value?.toUpperCase()
+		ImportOperationEnum opValue
 
-		ImportOperationEnum opValue = ImportOperationEnum.values().find {
-			it.name().startsWith(value)
+		if (value) {
+			value = value.toUpperCase()
+			opValue = ImportOperationEnum.values().find {
+				it.name().startsWith(value)
+			}
 		}
 
 		return (opValue ?: ImportOperationEnum.UNDETERMINED)
