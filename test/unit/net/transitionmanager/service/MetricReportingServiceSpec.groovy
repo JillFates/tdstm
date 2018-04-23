@@ -43,7 +43,7 @@ class MetricReportingServiceSpec extends Specification {
 			results.size() == 3
 			results[0].projectId == 1l
 			results[0].metricCode == 'APP-VPS'
-			results[0].date == new Date().format('yyyy-mm-dd')
+			results[0].date == new Date().format('yyyy-MM-dd')
 			results[0].label == 'count'
 			results[0].value >= 0
 			results[0].value <= 500
@@ -202,7 +202,7 @@ class MetricReportingServiceSpec extends Specification {
 					concat(planStatus, :colon, assetType) as label,
 					count(*) as value
 			from AssetEntity
-			where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = true 
+			where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = 1 
 			group by planStatus, assetType, project.id
 			""".stripIndent()
 	}
@@ -234,7 +234,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(planStatus, :colon, assetType) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = true 
+				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 	}
@@ -262,7 +262,7 @@ class MetricReportingServiceSpec extends Specification {
 						'count' as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = true 
+				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
 				group by project.id
 				""".stripIndent()
 	}
