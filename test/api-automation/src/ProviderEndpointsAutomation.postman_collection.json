@@ -1,324 +1,14 @@
 {
-	"id": "e0e75c50-68f9-d482-4683-7691c867a99d",
-	"name": "Provider Endpoints Automation",
-	"description": "Set of requests for testing the Provider endpoints",
-	"order": [
-		"dea31cc8-8e53-d3bb-7f1a-9123ad4849e8",
-		"60e7902e-b52a-c11a-5dd1-212824dfda2b",
-		"ba65d633-6255-eecb-c8bc-5443d13be711",
-		"1b49862e-2dad-d816-7bc5-97a08920ef69",
-		"23dce401-240f-7c8c-b9dc-7468481b4074",
-		"dba35d41-b821-3827-d183-33fbde5d9100",
-		"14b634e5-b788-e30d-ac40-9a3f734d810a"
-	],
-	"folders": [],
-	"folders_order": [],
-	"timestamp": 1516985919158,
-	"owner": 0,
-	"public": false,
-	"events": [],
-	"variables": [],
-	"auth": null,
-	"requests": [
+	"info": {
+		"_postman_id": "e0e75c50-68f9-d482-4683-7691c867a99d",
+		"name": "Provider Endpoints Automation",
+		"description": "Set of requests for testing the Provider endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
 		{
-			"id": "14b634e5-b788-e30d-ac40-9a3f734d810a",
-			"headers": "",
-			"headerData": [],
-			"url": "{{host}}tdstm/ws/dataingestion/provider/{{providerID}}",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "dd1b4ba4-0f24-4f13-8981-795d964ef838",
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"pm.test(\"Provider Deleted\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"deleted\");",
-							"});"
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "DELETE",
-			"data": [],
-			"dataMode": "params",
-			"auth": null,
-			"time": 1517429089836,
-			"name": "Delete a Provider",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});\n\npm.test(\"Provider Deleted\", function () {\n    pm.expect(pm.response.text()).to.include(\"deleted\");\n});",
-			"currentHelper": null,
-			"helperAttributes": null
-		},
-		{
-			"id": "1b49862e-2dad-d816-7bc5-97a08920ef69",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "4a2b464a-36bc-49aa-b46a-150b13ab8097",
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"var response = JSON.parse(responseBody);",
-							"var checkname = response.data.provider.name;",
-							"tests[\"Name was updated\"] = /QAUpdate/.test(checkname);"
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "PUT",
-			"data": [],
-			"dataMode": "raw",
-			"auth": null,
-			"time": 1517429352595,
-			"name": "Update a Provider",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});\n\nvar response = JSON.parse(responseBody);\nvar checkname = response.data.provider.name;\ntests[\"Name was updated\"] = /QAUpdate/.test(checkname);",
-			"currentHelper": null,
-			"helperAttributes": null,
-			"rawModeData": "{\n\t\"name\": \"{{updatedName}}{{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
-		},
-		{
-			"id": "23dce401-240f-7c8c-b9dc-7468481b4074",
-			"headers": "",
-			"headerData": [],
-			"url": "{{host}}/tdstm/ws/dataingestion/provider/validateunique/{{createProvider}}",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "f2d158c2-6420-49ad-8fc4-4a50e7911709",
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"pm.test(\"Unique Name\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"true\");",
-							"});",
-							""
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [],
-			"dataMode": "params",
-			"auth": null,
-			"time": 1517429338034,
-			"name": "Validate Unique Name",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});\n\npm.test(\"Unique Name\", function () {\n    pm.expect(pm.response.text()).to.include(\"true\");\n});\n",
-			"currentHelper": null,
-			"helperAttributes": null
-		},
-		{
-			"id": "60e7902e-b52a-c11a-5dd1-212824dfda2b",
-			"headers": "",
-			"headerData": [],
-			"url": "{{host}}/tdstm/ws/dataingestion/provider/list",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "9cbff9f6-d218-4e1e-9ea3-eebfcec68b6a",
-						"type": "text/javascript",
-						"exec": [
-							"var jsonObject = JSON.parse(responseBody);",
-							"var firstID = jsonObject.data[0].id; ",
-							"",
-							"",
-							"pm.environment.set(\"providerID\", firstID);",
-							"",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});"
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": [],
-			"dataMode": "params",
-			"auth": null,
-			"time": 1517260982997,
-			"name": "List Providers",
-			"description": "Find all the providers for the user's current project.",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "var jsonObject = JSON.parse(responseBody);\nvar firstID = jsonObject.data[0].id; \n\n\npm.environment.set(\"providerID\", firstID);\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});",
-			"currentHelper": null,
-			"helperAttributes": null
-		},
-		{
-			"id": "ba65d633-6255-eecb-c8bc-5443d13be711",
-			"headers": "",
-			"headerData": [],
-			"url": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "b3d55562-0af3-43fc-92c8-a095fe32f56f",
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});"
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "GET",
-			"data": [],
-			"dataMode": "params",
-			"auth": null,
-			"time": 1517429331931,
-			"name": "Get a Provider",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});",
-			"currentHelper": null,
-			"helperAttributes": null
-		},
-		{
-			"id": "dba35d41-b821-3827-d183-33fbde5d9100",
-			"headers": "Content-Type: application/json\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/json",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{host}}/tdstm/ws/dataingestion/provider/",
-			"queryParams": [],
-			"events": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8b1b7a1b-a5e0-4d0e-acb3-d895e67b6e6f",
-						"type": "text/javascript",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"var response = JSON.parse(responseBody);",
-							"var idCreated = response.data.provider.id;",
-							"pm.environment.set(\"providerID\", idCreated);"
-						]
-					}
-				}
-			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [],
-			"dataMode": "raw",
-			"auth": null,
-			"time": 1517429336085,
-			"name": "Create a Provider",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Success\", function () {\n    pm.expect(pm.response.text()).to.include(\"success\");\n});\n\nvar response = JSON.parse(responseBody);\nvar idCreated = response.data.provider.id;\npm.environment.set(\"providerID\", idCreated);",
-			"currentHelper": null,
-			"helperAttributes": null,
-			"rawModeData": "{\n\t\"name\": \"{{createProvider}}\",\n\t\"description\": \"Description for the {{createProvider}} \"\n}"
-		},
-		{
-			"id": "dea31cc8-8e53-d3bb-7f1a-9123ad4849e8",
-			"headers": "Content-Type: application/x-www-form-urlencoded\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\n",
-			"headerData": [
-				{
-					"key": "Content-Type",
-					"value": "application/x-www-form-urlencoded",
-					"description": "",
-					"enabled": true
-				},
-				{
-					"key": "Accept",
-					"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-					"description": "",
-					"enabled": true
-				}
-			],
-			"url": "{{host}}/tdstm/auth/signIn",
-			"queryParams": [],
-			"events": [
+			"name": "Login",
+			"event": [
 				{
 					"listen": "test",
 					"script": {
@@ -342,32 +32,326 @@
 					}
 				}
 			],
-			"pathVariables": {},
-			"pathVariableData": [],
-			"method": "POST",
-			"data": [
-				{
-					"key": "username",
-					"value": "tdsadmin",
-					"type": "text"
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "tdsadmin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "zelda123!",
+							"type": "text"
+						}
+					]
 				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Providers",
+			"event": [
 				{
-					"key": "password",
-					"value": "zelda123!",
-					"type": "text"
+					"listen": "test",
+					"script": {
+						"id": "9cbff9f6-d218-4e1e-9ea3-eebfcec68b6a",
+						"type": "text/javascript",
+						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"var firstID = jsonObject.data[0].id; ",
+							"",
+							"",
+							"pm.environment.set(\"providerID\", firstID);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
 				}
 			],
-			"dataMode": "urlencoded",
-			"auth": null,
-			"time": 1517428056631,
-			"name": "Login",
-			"description": "",
-			"collectionId": "e0e75c50-68f9-d482-4683-7691c867a99d",
-			"responses": [],
-			"preRequestScript": null,
-			"tests": "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"User Dashboard page\", function () {\n    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");\n});\n\npm.test(\"TDS Login\", function () {\n    pm.expect(pm.response.text()).to.include(\"Transition Manager project\");\n});\n\n",
-			"currentHelper": null,
-			"helperAttributes": null
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"list"
+					]
+				},
+				"description": "Find all the providers for the user's current project."
+			},
+			"response": []
+		},
+		{
+			"name": "Get a Provider",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b3d55562-0af3-43fc-92c8-a095fe32f56f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"{{providerID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update a Provider",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a2b464a-36bc-49aa-b46a-150b13ab8097",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var checkname = response.data.provider.name;",
+							"tests[\"Name was updated\"] = /QAUpdate/.test(checkname);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{updatedName}}{{$randomInt}}\",\n\t\"description\": null,\n\t\"comment\": \"some other comment\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/{{providerID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"{{providerID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Unique Name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f2d158c2-6420-49ad-8fc4-4a50e7911709",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Unique Name\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"true\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/validateUnique/{{createProvider}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"validateUnique",
+						"{{createProvider}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a Provider",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8b1b7a1b-a5e0-4d0e-acb3-d895e67b6e6f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var response = JSON.parse(responseBody);",
+							"var idCreated = response.data.provider.id;",
+							"pm.environment.set(\"providerID\", idCreated);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"{{createProvider}}\",\n\t\"description\": \"Description for the {{createProvider}} \"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Provider",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dd1b4ba4-0f24-4f13-8981-795d964ef838",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Provider Deleted\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"deleted\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}tdstm/ws/dataingestion/provider/{{providerID}}",
+					"host": [
+						"{{host}}tdstm"
+					],
+					"path": [
+						"ws",
+						"dataingestion",
+						"provider",
+						"{{providerID}}"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
