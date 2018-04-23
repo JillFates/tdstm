@@ -27,11 +27,25 @@ enum ImportOperationEnum {
     }
 
 	/**
-	 * Safely return the corresponding Enum constant
+	 * Safely return the corresponding Enum constant using the String Value
+	 * It returns the correct instance by matching the first letters of the name (case insensitive)
+	 * i.e.
+	 *    'I'  : Insert
+	 *    'UP' : Update
+	 *    'InS': Insert
 	 * @param value
 	 * @return
 	 */
 	static ImportOperationEnum lookup(String value) {
-		return ImportOperationEnum.enumConstantDirectory().get(value)
+		ImportOperationEnum opValue
+
+		if (value) {
+			value = value.toUpperCase()
+			opValue = ImportOperationEnum.values().find {
+				it.name().startsWith(value)
+			}
+		}
+
+		return (opValue ?: ImportOperationEnum.UNDETERMINED)
 	}
 }

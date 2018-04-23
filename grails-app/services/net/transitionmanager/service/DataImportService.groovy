@@ -464,15 +464,7 @@ class DataImportService implements ServiceMethods {
 			dupsFound = ( rowData.fields.id.size() > 1 ? 1 : 0)
 		}
 
-		// TODO : JPM 2/2018 : TM-9598 Should be able drop this map
-		final Map operationMap = [
-			I: ImportOperationEnum.INSERT,
-			U: ImportOperationEnum.UPDATE,
-			D: ImportOperationEnum.DELETE
-		]
-		ImportOperationEnum OpValue = (operationMap.containsKey(rowData.op) ? operationMap[rowData.op] : ImportOperationEnum.UNDETERMINED)
-		// TODO : JPM 2/2018 : TM-9598 Should be able to use this command
-		// ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op),
+		ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op)
 
 		ImportBatchRecord batchRecord = new ImportBatchRecord(
 			importBatch: batch,
