@@ -511,4 +511,20 @@ class StringUtil {
 	static Boolean containsPlaceholders(String text) {
 		return extractPlaceholders(text).size() > 0
 	}
+
+	/**
+	 * If the value parameter size is bigger than the limit, truncate value to limit.
+	 * Otherwise just return value.
+	 * @param value  The String value
+	 * @param limit  The size limit in chars (If limit == 0, just returns value)
+	 * @throws InvalidParamException  if any parameter is null
+	 */
+	static String truncateIfBigger(String value, int limit) {
+		if (value == null || limit < 0) {
+			throw new InvalidParamException('null parameters not allowed for truncateIfBigger method')
+		}
+
+		return (value.size() < limit) ? value : value.substring(0, limit)
+	}
+
 }

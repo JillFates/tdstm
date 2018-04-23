@@ -83,6 +83,18 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
+	 * Reloads the current batch record.
+	 * @param {ImportBatchModel} batchRecord
+	 */
+	private reloadImportBatch(importBatch: ImportBatchModel) {
+		this.dependencyBatchService.getImportBatch(importBatch.id).subscribe( (response: ApiResponseModel) => {
+			if (response.status === ApiResponseModel.API_SUCCESS) {
+				Object.assign(importBatch, response.data);
+			}
+		});
+	}
+
+	/**
 	 * Get Unarchived Import Batch List.
 	 * Calling the endpoint as a Promise for reuse.
 	 * @returns {Array<ImportBatchModel>}
@@ -131,14 +143,17 @@ export class DependencyBatchListComponent {
 	 */
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		// prevent open detail on column 0
+		let selectedBatch: ImportBatchModel = (cellClick as any).dataItem;
 		if (cellClick.columnIndex === 0 ) {
 			return;
 		}
 		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
 		this.dialogService.open(DependencyBatchDetailDialogComponent, [
-			{ provide: ImportBatchModel, useValue: (cellClick as any).dataItem}
+			{ provide: ImportBatchModel, useValue: selectedBatch}
 		], DIALOG_SIZE.XXL, true).then(result => {
-			// silence is golden
+			if (result) {
+				this.reloadImportBatch(selectedBatch);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -275,9 +290,8 @@ export class DependencyBatchListComponent {
 	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS && result.data.QUEUE) {
-					item.status.code = BatchStatus.QUEUED;
-					item.status.label = 'Queued';
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.reloadImportBatch(item);
 				} else {
 					this.reloadBatchList();
 					this.handleError(result.errors ? result.errors[0] : null);

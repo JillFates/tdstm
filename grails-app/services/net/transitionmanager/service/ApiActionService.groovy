@@ -306,6 +306,9 @@ class ApiActionService implements ServiceMethods {
 				log.debug 'About to invoke the following command: {}.{}, request: {}', agent.name, action.agentMethod, actionRequest
 				try {
 					agent.invoke(action.agentMethod, actionRequest)
+				} catch (Exception e) {
+					log.warn(e.message)
+					taskFacade.error(e.message)
 				} finally {
 					// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)

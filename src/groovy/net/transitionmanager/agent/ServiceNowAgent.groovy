@@ -369,6 +369,9 @@ class ServiceNowAgent extends AbstractAgent {
 
 		Map result = serviceNowService.fetchAssetList(actionRequest)
 		log.debug 'fetchAssetList() Result of fetch assets. {}', result
+		if (result?.status == 'error') {
+			throw new RuntimeException(result.cause as String)
+		}
 
 		return result
 	}
