@@ -178,8 +178,8 @@ export class SupportsDependsComponent implements OnInit {
 	/**
 	 * Delete the selected element
 	 */
-	public onDeleteSupport(dataItem: any): void {
-		this.dataGridSupportsOnHelper.removeDataItem(dataItem);
+	public onDeleteDependencySupport(dataItem: any, dataGrid: DataGridOperationsHelper): void {
+		dataGrid.removeDataItem(dataItem);
 	}
 
 	/**

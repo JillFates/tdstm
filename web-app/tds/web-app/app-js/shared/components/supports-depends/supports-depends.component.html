@@ -1,10 +1,10 @@
 <kendo-grid
         *ngIf="dataGridSupportsOnHelper"
+        class="dependents-grid"
         [data]="dataGridSupportsOnHelper.gridData"
         [sort]="dataGridSupportsOnHelper.state.sort"
         [sortable]="{mode:'single'}"
         [resizable]="true"
-        [height]="210"
         (sortChange)="dataGridSupportsOnHelper.sortChange($event)">
 
     <!-- Toolbar Template -->
@@ -32,7 +32,7 @@
         <!-- Action -->
         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
             <div class="k-grid-ignore-click" style="cursor: default;">
-                <button (click)="onDeleteSupport(dataItem)"
+                <button (click)="onDeleteDependencySupport(dataItem, dataGridSupportsOnHelper)"
                         class="btn btn-action btn-default"
                         title="Delete">
                     <span _ngcontent-c3="" class="fa fa-fw fa-trash"></span>
@@ -100,17 +100,17 @@
                     required>
             </kendo-dropdownlist>
         </ng-template>
-
     </kendo-grid-column>
+    <kendo-grid-messages noRecords="There are no Support Assets to display."> </kendo-grid-messages>
 </kendo-grid>
 
 <kendo-grid
         *ngIf="dataGridDependsOnHelper"
+        class="dependents-grid"
         [data]="dataGridDependsOnHelper.gridData"
         [sort]="dataGridDependsOnHelper.state.sort"
         [sortable]="{mode:'single'}"
         [resizable]="true"
-        [height]="210"
         (sortChange)="dataGridDependsOnHelper.sortChange($event)">
 
     <!-- Toolbar Template -->
@@ -138,7 +138,7 @@
         <!-- Action -->
         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
             <div class="k-grid-ignore-click" style="cursor: default;">
-                <button (click)="onDeleteSupport(dataItem)"
+                <button (click)="onDeleteDependencySupport(dataItem, dataGridDependsOnHelper)"
                         class="btn btn-action btn-default"
                         title="Delete">
                     <span _ngcontent-c3="" class="fa fa-fw fa-trash"></span>
@@ -172,7 +172,7 @@
                     [(model)]="dataItem.assetDepend"
                     [(metaParam)]="dataItem.assetClass.id"
                     [serviceRequest]="getAssetListForComboBox"
-                    (selectionChange)="onDependencyChange(dataItem)">
+                    (selectionChange)="onDependencyChange($event, dataItem)">
             </tds-combobox>
         </ng-template>
 
@@ -208,4 +208,5 @@
         </ng-template>
 
     </kendo-grid-column>
+    <kendo-grid-messages noRecords="There are no Dependency Assets to display."> </kendo-grid-messages>
 </kendo-grid>
