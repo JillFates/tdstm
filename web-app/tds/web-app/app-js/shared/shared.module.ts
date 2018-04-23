@@ -36,6 +36,7 @@ import { CheckActionComponent } from './components/check-action/check-action.com
 import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
 import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
+import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -78,7 +79,8 @@ import { DictionaryService } from './services/dictionary.service';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
-		SupportsDependsComponent
+		SupportsDependsComponent,
+		DependentCommentComponent
 	],
 	providers: [
 		AuthService,
@@ -114,9 +116,12 @@ import { DictionaryService } from './services/dictionary.service';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
-		SupportsDependsComponent
+		SupportsDependsComponent,
+		DependentCommentComponent
 	],
-	entryComponents: [DynamicComponent]
+	entryComponents: [
+		DynamicComponent,
+		DependentCommentComponent]
 })
 export class SharedModule {
 	constructor(private notifier: NotifierService) {

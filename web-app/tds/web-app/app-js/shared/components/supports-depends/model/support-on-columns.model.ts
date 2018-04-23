@@ -12,7 +12,7 @@ export class SupportOnColumnsModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 46,
+				width: 92,
 				locked: true
 			},
 			{
@@ -63,4 +63,5 @@ export class DependencySupportModel {
 	public assetClass: any;
 	public assetDepend: any;
 	public dependencyType: string;
+	public comment: string;
 }
