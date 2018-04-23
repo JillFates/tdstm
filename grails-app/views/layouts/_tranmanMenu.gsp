@@ -502,7 +502,7 @@
                                 <li class="divider"></li>
                                 <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
-                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a>
+                                    <a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a>
                                 </li>
                                 <li class="menu-child-item menu-reports-issue-report">
                                     <a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report">Issue Report</a>
