@@ -25,7 +25,7 @@ databaseChangeLog = {
 
 				Set<String> incorrectFieldNames = renameMap.keySet()
 
-				// Iterate over the fields replacing the field name where needed.
+				// Iterate over the preference map replacing the value where needed.
 				Closure updatePreferenceScript = { JSONObject preferenceValueJson ->
 					for (preference in preferenceValueJson.keySet()) {
 						String preferenceValue = preferenceValueJson[preference]
@@ -38,7 +38,7 @@ databaseChangeLog = {
 				}
 
 				DatabaseMigrationService databaseMigrationService = ctx.getBean("databaseMigrationService")
-				// Update the different settings with the correct names.
+				// Update the preferences' values.
 				databaseMigrationService.updateJsonObjects(userPreferences, "value", updatePreferenceScript)
 			}
 		}
