@@ -155,13 +155,12 @@
                     </ul>
                 </li>
                 <li class="dropdown menu-parent-data-centers">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Centers
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Locations
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
-                        <li class="menu-parent-item">Rooms and Racks</li>
                         <li class="menu-child-item menu-parent-data-centers-list-rooms">
-                            <g:link params="[viewType:'list']" controller="room">List Rooms</g:link>
+                            <g:link params="[viewType:'list']" controller="room">List Locations</g:link>
                         </li>
                         <g:if test="${room}">
                             <li class="menu-child-item menu-parent-data-centers-selected-center">
