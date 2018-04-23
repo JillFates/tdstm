@@ -17,6 +17,7 @@ class Project extends PartyGroup {
 	transient ProjectService projectService
 	transient PartyRelationshipService partyRelationshipService
 
+	String guid
 	String projectCode
 	String description
 	Date startDate   // Date that the project will start
@@ -33,9 +34,12 @@ class Project extends PartyGroup {
 	// used to indicate which of the custom fields will represent the plan methodology setting
 	String planMethodology=''
 
+	Integer collectMetrics = 1
+
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
 	static constraints = {
+		guid size: 36..36
 		defaultBundle nullable: true
 		client nullable: false
 		depConsoleCriteria nullable: true
@@ -51,6 +55,7 @@ class Project extends PartyGroup {
 		lastAssetId nullable: true
 		runbookOn nullable: true
 		depConsoleCriteria nullable: true
+		collectMetrics range: 0..1
 	}
 
 	static mapping = {
@@ -150,6 +155,14 @@ class Project extends PartyGroup {
 	 */
 	String getStatus() {
 		isActive() ? 'active' : 'completed'
+	}
+
+	def beforeInsert() {
+		guid = generateGuid()
+	}
+
+	private String generateGuid(){
+		return UUID.randomUUID()
 	}
 
 	def beforeDelete = {

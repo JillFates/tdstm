@@ -261,7 +261,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			return
 		}
 
-		// closure used to redirect user with an error message for sever issues
+		// closure used to redirect user with an error message for server issues
 		def failWithError = { message ->
 			log.error "upload() failed for user $securityService.currentUsername due to $message"
 			forward action: forwardAction, params: [error: message]

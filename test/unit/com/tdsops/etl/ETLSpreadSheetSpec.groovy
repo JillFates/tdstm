@@ -80,8 +80,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -140,12 +139,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
@@ -188,12 +185,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications Tab'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
@@ -233,12 +228,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						validator)
 
 				when: 'The ETL script is evaluated'
-					new GroovyShell(this.class.classLoader, etlProcessor.binding)
-						.evaluate("""
+					etlProcessor		.evaluate("""
 								sheet 0
 								read labels
-								""".stripIndent(),
-						ETLProcessor.class.name)
+								""".stripIndent())
 
 				then: 'DataSet was modified by the ETL script'
 					etlProcessor.result.domains.size() == 0
@@ -280,12 +273,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 10
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -307,12 +298,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Active Applications'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -335,11 +324,9 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
@@ -382,12 +369,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet '2'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
@@ -431,14 +416,12 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						skip 1
 						read labels
-						
-						""".stripIndent(),
-				ETLProcessor.class.name)
+
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
@@ -481,16 +464,14 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
 						iterate {
 							domain Application
 							extract 'vendor name' load 'Vendor'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 1
@@ -540,7 +521,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 					iterate {
 						extract 'vendor name' load 'Vendor'
 					}
-					
+
 					sheet 'Devices'
 					read labels
 					domain Device
@@ -600,12 +581,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						skip 1
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results contains'
 			etlProcessor.result.domains.size() == 0
@@ -691,8 +670,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						skip 1
 						read labels
@@ -701,8 +679,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						iterate {
 							extract 'vendor name' load 'Vendor'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results contains'
 			etlProcessor.result.domains.size() == 1
@@ -734,21 +711,19 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
-						
+
 						iterate {
 							domain Application
-							
+
 							extract 'vendor name' load 'Vendor'
 							if(CE == 'Microsoft'){
 								ignore row
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results contains'
 			etlProcessor.result.domains.size() == 1
