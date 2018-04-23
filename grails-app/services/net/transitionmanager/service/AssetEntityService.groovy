@@ -2664,7 +2664,12 @@ class AssetEntityService implements ServiceMethods {
 		if (queryParams.size()) {
 			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} else {
-			assetList = jdbcTemplate.queryForList(query.toString())
+			try {
+				assetList = jdbcTemplate.queryForList(query.toString())
+			} catch (e) {
+				log.error "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
+				throw new LogicException("Unabled to perform query based on parameters and user preferences")
+			}
 		}
 
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
