@@ -26,12 +26,15 @@
 							<tr>
 								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
 								<td colspan="3">
-									<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${applicationInstance.assetName}" />
+									<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11"
+															 value="${asset.assetName}"  ngmodel="model.asset.assetName"  />
 								</td>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset.description}"/>
 								<td colspan="3">
-									<tds:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="11" value="${applicationInstance.description}" tooltipDataPlacement="bottom"/>
+									<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="11"
+													  value="${asset.description}"  ngmodel="model.asset.description"
+															 tooltipDataPlacement="bottom"/>
 								</td>
 							</tr>
 							<tr>
@@ -343,8 +346,9 @@
 								</tdsAngular:tooltipSpan>
 								</td>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.startupDuration}"
-														value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="29"/>
+								<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}"
+														value="${asset.startupDuration}"
+															   ngmodel="model.asset.startupDuration" tabindex="29"/>
 
 								<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="testingBy" class="${standardFieldSpecs.testingBy.imp?:''}">
