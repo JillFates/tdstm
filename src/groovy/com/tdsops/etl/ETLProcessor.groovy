@@ -493,7 +493,7 @@ class ETLProcessor implements RangeChecker {
 	def set(final String variableName) {
 		[
 			with: { value ->
-				String localVariable = ETLValueHelper.valueOf(value)
+				Object localVariable = ETLValueHelper.valueOf(value)
 				if(isIterating){
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
@@ -524,7 +524,7 @@ class ETLProcessor implements RangeChecker {
 		lookUpFieldSpecs(selectedDomain, fieldName)
 		[
 		    with: { value ->
-			    String stringValue = ETLValueHelper.valueOf(value)
+			    Object stringValue = ETLValueHelper.valueOf(value)
 			    boolean found = result.lookupInReference(fieldName, stringValue)
 			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
 		    }

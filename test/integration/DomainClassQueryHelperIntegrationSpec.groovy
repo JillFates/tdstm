@@ -10,6 +10,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import test.helper.AssetEntityTestHelper
 import test.helper.RackTestHelper
@@ -87,6 +88,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 	}
 
 
+
 	void '1. can find a Device by its id'() {
 
 		given:
@@ -100,7 +102,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 			results.first().id == device.id
 	}
 
-
+	@IgnoreRest
 	void '2. can find a Device by sourceRoom'() {
 
 		given:

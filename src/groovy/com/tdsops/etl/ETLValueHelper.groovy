@@ -44,6 +44,9 @@ class ETLValueHelper {
 			case SourceField:
 				fieldValue = ((SourceField)value).value // SOURCE.'application id'
 				break
+			case FindingsFacade:
+				fieldValue = ((FindingsFacade)value).result() // FINDINGS.result()
+				break
 			case NOW:
 				fieldValue = String.valueOf(value)
 				break
