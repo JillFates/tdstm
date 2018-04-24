@@ -162,14 +162,6 @@ class Project extends PartyGroup {
 		isActive() ? 'active' : 'completed'
 	}
 
-	def beforeInsert() {
-		guid = generateGuid()
-	}
-
-	private String generateGuid(){
-		return UUID.randomUUID()
-	}
-
 	def beforeDelete = {
 		if (isDefaultProject()) {
 			String msg = "${this}: project is Required by the system and can't be Deleted"
