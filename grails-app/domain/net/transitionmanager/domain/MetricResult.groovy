@@ -34,6 +34,7 @@ class MetricResult {
 	}
 
 	static mapping = {
+		version false
 		id column: 'project_metric_id'
 		date sqlType: 'DATE'
 	}
