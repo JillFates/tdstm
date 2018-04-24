@@ -23,7 +23,7 @@ class MetricReportingServiceSpec extends Specification {
 					"function"   : "testMetric2"
 			]
 		when: 'gatherMetric is called with the JSON'
-			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function, false)
+			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function)
 		then: 'gatherMetric throw and InvalidParameterException'
 			thrown InvalidParamException
 	}
@@ -61,7 +61,7 @@ class MetricReportingServiceSpec extends Specification {
 		when: 'gatherMetric is called with the JSON'
 			List results = service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function)
 		then: 'gatherMetric returns an empty list'
-			results == []
+			thrown InvalidParamException
 	}
 
 	void 'Test gatherMetric for invalid function log error false'() {
@@ -74,7 +74,7 @@ class MetricReportingServiceSpec extends Specification {
 					"function"   : "testMetric2"
 			]
 		when: 'gatherMetric is called with the JSON'
-			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function, false)
+			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function)
 		then: 'gatherMetric throw and InvalidParameterException'
 			thrown InvalidParamException
 	}
@@ -86,7 +86,7 @@ class MetricReportingServiceSpec extends Specification {
 		when: 'getLabel is called with groupBys and aggregation'
 			String label = service.getLabel(groupBys, aggregation)
 		then: 'getLabel returns a hql string for generating the label'
-			label == 'concat(planStatus, :colon, assetType, :colon, os)'
+			label == "concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown'), :colon, COALESCE(os, 'Unknown'))"
 	}
 
 	void 'Test getLabel one groupBy'() {
@@ -96,7 +96,7 @@ class MetricReportingServiceSpec extends Specification {
 		when: 'getLabel is called with groupBys and aggregation'
 			String label = service.getLabel(groupBys, aggregation)
 		then: 'getLabel returns a hql string for generating the label'
-			label == 'concat(planStatus)'
+			label == "concat(COALESCE(planStatus, 'Unknown'))"
 	}
 
 	void 'Test getLabel no groupBy'() {
@@ -199,7 +199,7 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'getQuery returns an HQL string'
 			hql == """
 			select project.id,
-					concat(planStatus, :colon, assetType) as label,
+					concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 					count(*) as value
 			from AssetEntity
 			where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = 1 
@@ -231,7 +231,7 @@ class MetricReportingServiceSpec extends Specification {
 		then: 'getQuery returns an HQL string'
 			hql == """
 				select project.id,
-						concat(planStatus, :colon, assetType) as label,
+						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
 				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 

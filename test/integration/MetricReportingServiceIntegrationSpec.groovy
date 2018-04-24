@@ -222,7 +222,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 						""".stripIndent().toString()
 			]
 		when: 'running gatherMetrics on sql query'
-			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition, false)
+			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 		then: 'Get exception for bad sql grammer'
 			thrown BadSqlGrammarException
 	}
