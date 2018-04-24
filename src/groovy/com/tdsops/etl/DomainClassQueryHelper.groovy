@@ -296,21 +296,5 @@ class DomainClassQueryHelper {
 			namedParameter: 'roomTarget_location',
 			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
 		],
-//		appOwner: [
-//			property: SqlUtil.personFullName('appOwner', DOMAIN_ALIAS),
-//			namedParameter: 'appOwner',
-//			join: 'left outer join ' + DOMAIN_ALIAS + '.appOwner'
-//		],
-//		sme: [
-//			property: SqlUtil.personFullName('sme', DOMAIN_ALIAS),
-//			namedParameter: 'sme',
-//			join: 'left outer join ' + DOMAIN_ALIAS + '.sme'
-//		],
-//		sme2: [
-//			property: SqlUtil.personFullName('sme2', DOMAIN_ALIAS),
-//			namedParameter: 'sme2',
-//			join: 'left outer join ' + DOMAIN_ALIAS + '.sme2'
-//		],
-
 	]
 }
