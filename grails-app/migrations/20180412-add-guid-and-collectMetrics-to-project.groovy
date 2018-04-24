@@ -76,37 +76,37 @@ databaseChangeLog = {
 
 		preConditions(onFail:'MARK_RAN') {
 			not {
-				tableExists(schemaName:'tdstm', tableName:'metric_definition')
+				tableExists(tableName:'metric_definition')
 			}
 		}
-		createTable(schemaName: "tdstm", tableName: "metric_definition") {
-			column(name: "metric_definition_id", type: "BIGINT(20)", autoIncrement: "true"){
-				constraints( primaryKey:"true", nullable:"false")
+		createTable(tableName: 'metric_definition') {
+			column(name: 'metric_definition_id', type: 'BIGINT(20)', autoIncrement: 'true'){
+				constraints( primaryKey:'true', nullable:'false')
 			}
-			column(name: "code", type: "VARCHAR(255)" ) {
-				constraints(nullable:"false")
+			column(name: 'code', type: 'VARCHAR(255)' ) {
+				constraints(nullable:'false')
 			}
-			column(name: "mode", type: "VARCHAR(20)") {
-				constraints(nullable:"false")
+			column(name: 'mode', type: 'VARCHAR(20)') {
+				constraints(nullable:'false')
 			}
-			column(name: "description", type: "VARCHAR(255)") {
-				constraints(nullable:"false")
+			column(name: 'description', type: 'VARCHAR(255)') {
+				constraints(nullable:'false')
 			}
-			column(name: "enabled", type: "INT(1)") {
-				constraints(nullable:"false")
+			column(name: 'enabled', type: 'INT(1)') {
+				constraints(nullable:'false')
 			}
-			column(name: "definition", type: "json") {
-				constraints(nullable:"false")
+			column(name: 'definition', type: 'json') {
+				constraints(nullable:'false')
 			}
 			column(name: 'date_created', type: 'DATETIME') {
-				constraints(nullable: "false")
+				constraints(nullable: 'false')
 			}
 			column(name: 'last_updated', type: 'DATETIME') {
-				constraints(nullable: "true")
+				constraints(nullable: 'true')
 			}
 		}
-		createIndex(indexName:"metric_definition_code_idx", schemaName:"tdstm", tableName:"metric_definition", unique:true) {
-			column(name:"code")
+		createIndex(indexName:'metric_definition_code_idx', tableName:'metric_definition', unique:true) {
+			column(name:'code')
 		}
 	}
 
@@ -115,27 +115,27 @@ databaseChangeLog = {
 
 		preConditions(onFail:'MARK_RAN') {
 			not {
-				tableExists(schemaName:'tdstm', tableName:'metric_result')
+				tableExists(tableName:'metric_result')
 			}
 		}
-		createTable(schemaName: "tdstm", tableName: "metric_result") {
-			column(name: "project_metric_id", type: "BIGINT(20)", autoIncrement: "true"){
-				constraints( primaryKey:"true", nullable:"false")
+		createTable(tableName: 'metric_result') {
+			column(name: 'project_metric_id', type: 'BIGINT(20)', autoIncrement: 'true'){
+				constraints( primaryKey:'true', nullable:'false')
 			}
 			column(name: 'project_id', type: 'BIGINT') {
-				constraints(nullable: "false")
+				constraints(nullable: 'false')
 			}
-			column(name: "metric_definition_code", type: "VARCHAR(255)") {
-				constraints(nullable:"false")
+			column(name: 'metric_definition_code', type: 'VARCHAR(255)') {
+				constraints(nullable:'false')
 			}
 			column(name: 'date', type: 'DATETIME') {
-				constraints(nullable: "false")
+				constraints(nullable: 'false')
 			}
-			column(name: "label", type: "VARCHAR(255)") {
-				constraints(nullable:"false")
+			column(name: 'label', type: 'VARCHAR(255)') {
+				constraints(nullable:'false')
 			}
 			column(name: 'value', type: 'BIGINT') {
-				constraints(nullable: "true")
+				constraints(nullable: 'true')
 			}
 		}
 		createIndex(tableName:'metric_result', indexName:'idx_metric_result_project_code_date_label_composite_key', unique:'true') {
@@ -145,12 +145,12 @@ databaseChangeLog = {
 			column(name:'label')
 		}
 			addForeignKeyConstraint(
-			"baseColumnNames": 'project_id',
-			"baseTableName": 'metric_result',
-			"constraintName": "fk_metric_result_project_id",
-			"onDelete": "CASCADE",
-			"referencedColumnNames": "project_id",
-			"referencedTableName": "project"
+			'baseColumnNames': 'project_id',
+			'baseTableName': 'metric_result',
+			'constraintName': 'fk_metric_result_project_id',
+			'onDelete': 'CASCADE',
+			'referencedColumnNames': 'project_id',
+			'referencedTableName': 'project'
 		)
 	}
 }
