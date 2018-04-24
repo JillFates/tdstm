@@ -71,7 +71,7 @@ databaseChangeLog = {
 /**
  * TM-10320  This changesets will create the tables metric_definition and metric_result
  */
-	changeSet(author: 'ecantu', id: 'TM-10320-1') {
+	changeSet(author: 'ecantu', id: 'TM-10320-3') {
 		comment("Create metric_definition table")
 
 		preConditions(onFail:'MARK_RAN') {
@@ -110,7 +110,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: 'ecantu', id: 'TM-10320-2') {
+	changeSet(author: 'ecantu', id: 'TM-10320-4') {
 		comment("Create metric_result table")
 
 		preConditions(onFail:'MARK_RAN') {
