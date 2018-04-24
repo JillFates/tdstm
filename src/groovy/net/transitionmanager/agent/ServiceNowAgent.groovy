@@ -296,7 +296,7 @@ class ServiceNowAgent extends AbstractAgent {
 							readonly: 0,
 							encoded: 0
 						],
-						tableParam('User defined table name', 0)
+						tableParam('', 0)
 					] + COMMON_PARAMS
 				] )
 		]
