@@ -527,4 +527,12 @@ class StringUtil {
 		return (value.size() < limit) ? value : value.substring(0, limit)
 	}
 
+	/**
+	 * Generate a random GUID.
+	 * @return
+	 */
+	static String generateGuid() {
+		return UUID.randomUUID()
+	}
+
 }

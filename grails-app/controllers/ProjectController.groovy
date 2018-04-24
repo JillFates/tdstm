@@ -7,11 +7,11 @@ import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonSlurper
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -31,15 +31,10 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
-import grails.transaction.Transactional
-import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectController implements ControllerMethods {
@@ -374,6 +369,9 @@ class ProjectController implements ControllerMethods {
 			def partnersIds = params.projectPartners
 
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
+
+			project.guid = StringUtil.generateGuid()
+
 			if (logoFile instanceof String || project.hasErrors() || !project.save(flush:true)) {
 				if (logoFile instanceof String) {
 					flash.message = logoFile

@@ -414,4 +414,18 @@ class StringUtilTests extends Specification {
 			thrown InvalidParamException
 	}
 
+
+	def 'test generateGuid' () {
+		when: 'Generating a GUID'
+			String guid = StringUtil.generateGuid()
+		then: 'No exception'
+			noExceptionThrown()
+		and: 'The length of the GUID is 36'
+			guid.length() == 36
+		when: 'Generating a second guid'
+			String guid2 = StringUtil.generateGuid()
+		then: "The guids don't match."
+			guid != guid2
+	}
+
 }
