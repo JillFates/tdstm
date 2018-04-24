@@ -6,7 +6,6 @@ import com.tds.asset.Files
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
@@ -194,45 +193,51 @@ class DomainClassQueryHelper {
 	}
 
 	static String getNamedParameterForField(Class clazz, String fieldName) {
-		if(clazz.isAssignableFrom(AssetEntity) && GormUtil.isReferenceProperty(clazz, fieldName)){
 
+		if(otherAlternateKeys.containsKey(fieldName)){
+			return otherAlternateKeys[fieldName].namedParameter
+		}
+
+		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
 			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
-			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
 
-			if(alternateKey){
-				return "${fieldName}_${alternateKey}"
+			if(Person.isAssignableFrom(propertyClazz)){
+				return fieldName
 			} else {
-				return 'ghghgh'
+				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
+				return "${fieldName}_${alternateKey}"
 			}
-
 		} else {
 			return fieldName
 		}
 	}
 
-	static Map otherAlternateKeys = [
-		'roomSource': '',
-		'roomTarget': ''
-	]
-
 	static String getPropertyForField(Class clazz, String fieldName) {
-		if(clazz.isAssignableFrom(AssetEntity) && GormUtil.isReferenceProperty(clazz, fieldName)){
 
+		if(otherAlternateKeys.containsKey(fieldName)){
+			return otherAlternateKeys[fieldName].property
+		}
+
+		if(AssetEntity.isAssignableFrom(clazz) && GormUtil.isReferenceProperty(clazz, fieldName)){
 			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
-			String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
-
-			if(alternateKey){
-				return "${fieldName}.${alternateKey}"
+			if(Person.isAssignableFrom(propertyClazz)){
+				return SqlUtil.personFullName(fieldName, DOMAIN_ALIAS)
 			} else {
-				return 'ghghgh'
+				String alternateKey = GormUtil.getAlternateKeyPropertyName(propertyClazz)
+				return "${DOMAIN_ALIAS}.${fieldName}.${alternateKey}"
 			}
 
 		} else {
-			return fieldName
+			return "${DOMAIN_ALIAS}.${fieldName}"
 		}
 	}
 
 	static String getJoinForField(Class clazz, String fieldName) {
+
+		if(otherAlternateKeys.containsKey(fieldName)){
+			return otherAlternateKeys[fieldName].join
+		}
+
 		if(GormUtil.isReferenceProperty(clazz, fieldName)){
 			return " left outer join ${DOMAIN_ALIAS}.${fieldName}".toString()
 		} else {
@@ -240,11 +245,28 @@ class DomainClassQueryHelper {
 		}
 	}
 
+	static String getOperatorForField(Class clazz, String fieldName){
+
+		String operator = '= '
+
+		if(AssetEntity.isAssignableFrom(clazz) &&
+			GormUtil.isDomainProperty(clazz, fieldName) &&
+				GormUtil.isReferenceProperty(clazz, fieldName)){
+			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
+			if(Person.isAssignableFrom(propertyClazz)){
+				operator = 'like'
+			}
+		}
+
+		return operator
+	}
+
 	static String hqlWhere(Class clazz, Map<String, ?> fieldsSpec) {
 		String s = fieldsSpec.keySet().collect { String field ->
 			String property = getPropertyForField(clazz, field)
 			String namedParameter = getNamedParameterForField(clazz, field)
-			" ${DOMAIN_ALIAS}.${property} = :${namedParameter}\n"
+			String comparator = getOperatorForField(clazz, field)
+			" ${property} ${comparator} :${namedParameter}\n"
 		}.join(' and ')
 
 		return s
@@ -263,37 +285,32 @@ class DomainClassQueryHelper {
 		}.join('  ')
 	}
 
-	//TODO: Review this with John. Where I can put those commons configurations?
-	private static final Map<String, Map> assetEntityTransformations = [
-		//'id': [property: 'D.id', type: Long, namedParameter: 'id', join: ''],
-		//'assetClass': [property: 'str(D.assetClass)', type: String, namedParameter: 'assetClass', join: ''],
-		//'moveBundle': [property: 'D.moveBundle.name', type: String, namedParameter: 'moveBundleName', join: 'left outer join D.moveBundle'],
-		// 'project': [property: 'D.project.description', type: String, namedParameter: 'projectDescription', join: 'left outer join D.project'],
-		//'manufacturer': [property: 'D.manufacturer.name', type: String, namedParameter: 'manufacturerName', join: 'left outer join D.manufacturer'],
-		//'model': [property: 'D.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join D.model'],
-		// TODO: John. It looks like an error.
-		// 'roomSource': [property: 'D.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join D.roomSource'],
-		// 'roomTarget': [property: 'D.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join D.roomTarget'],
-		// 'rackSource': [property: 'D.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join D.rackSource'],
-		// 'rackTarget': [property: 'D.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join D.rackTarget'],
-		'appOwner': [property: SqlUtil.personFullName('appOwner', 'AE'),
-			type: String, namedParameter: 'appOwnerName',
-			join: 'left outer join D.appOwner',
-			alias: 'appOwner'],
-		'sme': [property: SqlUtil.personFullName('sme', 'AE'),
-			type: String,
-			namedParameter: 'smeName',
-			join: 'left outer join D.sme',
-			alias: 'sme'],
-		'sme2': [property: SqlUtil.personFullName('sme2', 'AE'),
-			type: String,
-			namedParameter: 'sme2Name',
-			join: 'left outer join D.sme2',
-			alias: 'sme2'],
-		'locationSource': [property: 'D.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join D.roomSource'],
-		'locationTarget': [property: 'D.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join D.roomTarget'],
-	].withDefault {
-		String key -> [property: "D." + key, type: String, namedParameter: key, join: "", mode: "where"]
-	}
+	static Map otherAlternateKeys = [
+		locationSource: [
+			property: DOMAIN_ALIAS + '.roomSource.location',
+			namedParameter: 'roomSource_location',
+			join: 'left outer join ' + DOMAIN_ALIAS + '.roomSource'
+		],
+		locationTarget: [
+			property: DOMAIN_ALIAS + '.roomTarget.location',
+			namedParameter: 'roomTarget_location',
+			join: 'left outer join ' + DOMAIN_ALIAS + '.roomTarget'
+		],
+//		appOwner: [
+//			property: SqlUtil.personFullName('appOwner', DOMAIN_ALIAS),
+//			namedParameter: 'appOwner',
+//			join: 'left outer join ' + DOMAIN_ALIAS + '.appOwner'
+//		],
+//		sme: [
+//			property: SqlUtil.personFullName('sme', DOMAIN_ALIAS),
+//			namedParameter: 'sme',
+//			join: 'left outer join ' + DOMAIN_ALIAS + '.sme'
+//		],
+//		sme2: [
+//			property: SqlUtil.personFullName('sme2', DOMAIN_ALIAS),
+//			namedParameter: 'sme2',
+//			join: 'left outer join ' + DOMAIN_ALIAS + '.sme2'
+//		],
 
+	]
 }
