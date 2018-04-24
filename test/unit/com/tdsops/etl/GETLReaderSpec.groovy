@@ -20,35 +20,6 @@ import spock.lang.Specification
 class GETLReaderSpec extends Specification {
 
 
-    void 'test can create a CSV connection' () {
-
-        given:
-            String pathName = "test/unit/com/tdsops/etl/resources"
-
-        when: 'It creates a new CSV Connection'
-            CSVConnection files = new CSVConnection(config: "csv", path: pathName)
-
-        then: 'It can read all files'
-            files.retrieveObjects().size() == 4
-            files.retrieveObjects().find{ it.name == "applications.csv"}
-            files.retrieveObjects().find{ it.name == "applications.xlsx"}
-            files.retrieveObjects().find{ it.name == "applications.xml"}
-            files.retrieveObjects().find{ it.name == "service_now_applications.csv"}
-
-        and: 'It can read all CSV files'
-            files.retrieveObjects(mask: "(?i).*[.]CSV").size() == 2
-
-        and: 'It can read all Excel files'
-            files.retrieveObjects(mask: "(?i).*[.]xlsx").size() == 1
-
-        and: 'It can read subdirectories'
-            files.retrieveObjects(type: "DIR").size() == 0
-
-        and: 'It can read files from parent directory'
-            files.retrieveObjects(directory: "..").size() == 14
-
-    }
-
     /**
      *
      * CSV tests
