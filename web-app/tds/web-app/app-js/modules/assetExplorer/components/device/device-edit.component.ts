@@ -45,40 +45,6 @@ export function DeviceEditComponent(template, editModel) {
 		}
 
 		/**
-		 * Get the List of Supports On
-		 */
-		// private getSupportOnList(): void {
-		// 	this.supportOnColumnModel = new SupportOnColumnsModel();
-		// 	let supportsOn = [];
-		// 	if (editModel.dependencyMap && editModel.dependencyMap.supportAssets) {
-		// 		let supportAssets = R.clone(editModel.dependencyMap.supportAssets);
-		// 		supportAssets.forEach((dependency) => {
-		// 			let dependencySupportModel: DependencySupportModel = {
-		// 				dataFlowFreq: dependency.dataFlowFreq,
-		// 				dependencyType: dependency.type,
-		// 				dependencyStatus: dependency.status
-		// 			};
-		// 			supportsOn.push(dependencySupportModel);
-		// 		});
-		// 	}
-		// 	this.dataGridSupportsOnHelper = new DataGridOperationsHelper(supportsOn, this.initialSort, this.selectableSettings);
-		// }
-
-		/**
-		 * Add a new Support On Dependency
-		 */
-		// public onAddSupportsOn(): void {
-		// 	this.dataGridSupportsOnHelper.addDataItem({});
-		// }
-
-		/**
-		 * Delete the selected element
-		 */
-		// public onDeleteSupport(dataItem: any): void {
-		// 	this.dataGridSupportsOnHelper.removeDataItem(dataItem);
-		// }
-
-		/**
 		 * Initiates The Injected Component
 		 */
 		ngOnInit(): void {

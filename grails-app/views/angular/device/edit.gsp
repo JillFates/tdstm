@@ -170,18 +170,18 @@
                                         <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
                                             <label for="locationSourceId">Location/Room</label>
                                         </td>
-                                        <td class="${standardFieldSpecs.locationSource.imp ?: ''}"
-                                            style="vertical-align: text-top;" data-for="locationSourceId">
-                                            %{--<tdsAngular:tooltipSpan class="useRoomS" field="${standardFieldSpecs.locationSource}">--}%
-                                                %{--<g:select id="roomSelectS" name="roomSourceId"--}%
-                                                          %{--from="${sourceRoomSelect}"--}%
-                                                          %{--value="${asset.roomSource?.id}"--}%
-                                                          %{--optionKey="id" optionValue="${{ it.value }}"--}%
-                                                          %{--noSelection="${[0: 'Please select...']}"--}%
-                                                          %{--class="${standardFieldSpecs.locationSource.imp ?: ''} assetSelect roomSelectS"--}%
-                                                          %{--onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"--}%
-                                                          %{--tabindex="300"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                        <td class="${standardFieldSpecs.locationSource.imp ?: ''}" style="vertical-align: text-top;" data-for="locationSourceId">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationSource}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="roomSourceId"
+                                                        [(ngModel)]="model.asset.roomSource"
+                                                        [defaultItem]="{id: -2, value: 'Please Select'}"
+                                                        [data]="model.sourceRoomSelect"
+                                                        [textField]="'value'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                             <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                             <span class="newRoomS" style="display:none" data-toggle="popover"
                                                   data-trigger="hover"
@@ -199,18 +199,18 @@
                                             </span>
                                         </td>
                                         <td nowrap style="vertical-align: text-top;"
-                                            class="${standardFieldSpecs.locationSource.imp ?: ''}"
-                                            data-for="locationSourceId">
-                                            %{--<tdsAngular:tooltipSpan class="useRoomT" field="${standardFieldSpecs.locationTarget}">--}%
-                                                %{--<g:select id="roomSelectT" name="roomTargetId"--}%
-                                                          %{--from="${targetRoomSelect}"--}%
-                                                          %{--value="${asset.roomTarget?.id}"--}%
-                                                          %{--optionKey="id" optionValue="${{ it.value }}"--}%
-                                                          %{--noSelection="${[0: 'Please select...']}"--}%
-                                                          %{--class="${standardFieldSpecs.locationTarget.imp ?: ''} assetSelect roomSelectT"--}%
-                                                          %{--onchange="EntityCrud.updateOnRoomSelection(this, 'T', 'Edit')"--}%
-                                                          %{--tabindex="330"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                                    class="${standardFieldSpecs.locationSource.imp ?: ''}" data-for="locationSourceId">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationSource}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="roomTargetId"
+                                                        [(ngModel)]="model.asset.roomTarget"
+                                                        [defaultItem]="{id: -2, value: 'Please Select'}"
+                                                        [data]="model.targetRoomSelect"
+                                                        [textField]="'value'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                             <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                             <span class="newRoomT" style="display:none" data-toggle="popover"
                                                   data-trigger="hover"
@@ -233,12 +233,6 @@
                                                         value="${asset.model}"/>
                                         <td class="${standardFieldSpecs.model.imp ?: ''}" data-for="assetType"
                                             style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">--}%
-                                                %{--<div id="modelSelect" tabindex="104">--}%
-                                                %{--</div>--}%
-                                                %{--<input type="hidden" value="${assetEntityInstance?.model?.id}"--}%
-                                                       %{--id="hiddenModel" name="model">--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
 
                                         <td class="label ${standardFieldSpecs.ipAddress.imp ?: ''}" nowrap="nowrap">
@@ -250,25 +244,19 @@
                                         <td>
                                             <tdsAngular:inputControl field="${standardFieldSpecs.ipAddress}" tabindex="17"
                                                                      value="${asset.ipAddress}" ngmodel="model.asset.ipAddress"/>
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.ipAddress}">--}%
-                                                %{--<input type="text" id="ipAddress" name="ipAddress"--}%
-                                                       %{--value="${asset.ipAddress}"--}%
-                                                       %{--class="${standardFieldSpecs.ipAddress.imp ?: ''}" tabindex="215"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
 
-                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
+                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}" style="display:none"
                                             nowrap="nowrap" id="rackId">
                                             <label for="rackSourceId" data-toggle="popover" data-trigger="hover"
                                                    data-content="Rack/Cabinet">Rack/Cabinet</label>
                                         </td>
-                                        <td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp ?: ''}"
-                                            nowrap="nowrap" id="bladeId" style="display:none">
+                                        <td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp ?: ''}" style="display:none"
+                                            nowrap="nowrap" id="bladeId">
                                             <label for="sourceChassisId" data-toggle="popover" data-trigger="hover"
                                                    data-content="Blade Chassis">Blade Chassis</label>
                                         </td>
-
-                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
+                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}" style="display:none"
                                             data-for="rackSourceId">
                                             %{--<tdsAngular:tooltipSpan class="useRackS" field="${standardFieldSpecs.sourceRack}"--}%
                                                              %{--tooltipDataPlacement="bottom">--}%
@@ -286,7 +274,7 @@
                                                 %{--<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">--}%
                                             %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
-                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
+                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}" style="display:none"
                                             data-for="rackSourceId">
                                             %{--<tdsAngular:tooltipSpan class="useRackT" tooltipDataPlacement="bottom"--}%
                                                              %{--field="${standardFieldSpecs.rackTarget}">--}%
@@ -304,7 +292,6 @@
                                                 %{--<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">--}%
                                             %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
-
                                         <td class="label bladeLabel" style="display:none">
                                             %{--<tdsAngular:tooltipSpan class="useBladeS" tooltipDataPlacement="bottom"--}%
                                                              %{--field="${standardFieldSpecs.sourceChassis}">--}%
@@ -337,11 +324,11 @@
                                                                        ngmodel="model.asset.os" />
 
                                         <%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
-                                        <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}" nowrap="nowrap">
+                                        <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}" style="display: none;" nowrap="nowrap">
                                             <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover"
                                                    data-content="Position">Position</label>
                                         </td>
-                                        <td class="rackLabel"
+                                        <td class="rackLabel" style="display: none;"
                                             data-content="${standardFieldSpecs.sourceRackPosition.tip ?: standardFieldSpecs.sourceRackPosition.label}">
                                             <tdsAngular:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
                                                 <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}"
@@ -351,7 +338,7 @@
                                                 </tdsAngular:inputControl>
                                             </tdsAngular:tooltipSpan>
                                         </td>
-                                        <td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom"
+                                        <td class="rackLabel" style="display: none;" data-toggle="popover" data-trigger="hover" data-placement="bottom"
                                             data-content="${standardFieldSpecs.targetRackPosition.tip ?: standardFieldSpecs.targetRackPosition.label}">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}"
                                                                      size="10" tabindex="350" value="${asset.targetRackPosition}"
@@ -366,14 +353,13 @@
                                                                      ngmodel="model.asset.sourceBladePosition">
                                             </tdsAngular:inputControl>
                                         </td>
-                                        <td class="bladeLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" style="display: none;"
+                                        <td class="bladeLabel" style="display: none;" data-toggle="popover" data-trigger="hover" data-placement="bottom"
                                             data-content="${standardFieldSpecs.targetBladePosition.tip ?: standardFieldSpecs.targetBladePosition.label}">
                                             <tdsAngular:inputControl field="${standardFieldSpecs.targetBladePosition}"
                                                                      size="10" tabindex="350" value="${asset.targetBladePosition}"
                                                                      ngmodel="model.asset.targetBladePosition">
                                             </tdsAngular:inputControl>
                                         </td>
-
                                     </tr>
                                     <tr>
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.serialNumber}"
@@ -397,13 +383,6 @@
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
                                             </tdsAngular:tooltipSpan>
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}">--}%
-                                                %{--<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"--}%
-                                                          %{--value="${asset.moveBundle?.id}" optionKey="id"--}%
-                                                          %{--optionValue="name"--}%
-                                                          %{--class="${standardFieldSpecs.moveBundle.imp ?: ''}"--}%
-                                                          %{--tabindex="360"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
 
                                         <td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
@@ -427,18 +406,6 @@
                                                         [valueField]="'value'">
                                                 </kendo-dropdownlist>
                                             </tdsAngular:tooltipSpan>
-                                            %{--<tdsAngular:tooltipSpan tooltipDataPlacement="bottom"--}%
-                                                             %{--field="${standardFieldSpecs.size}">--}%
-                                                %{--<input type="text" id="size" name="size"--}%
-                                                       %{--class="${standardFieldSpecs.size.imp ?: ''}"--}%
-                                                       %{--value="${asset.size}" tabindex="410"/>--}%
-                                                %{--<g:select id="scale" name="scale"--}%
-                                                          %{--from="${asset.constraints.scale.inList}"--}%
-                                                          %{--optionValue="value" noSelection="${['': 'Please select...']}"--}%
-                                                          %{--value="${asset.scale}"--}%
-                                                          %{--class="${standardFieldSpecs.scale.imp ?: ''}"--}%
-                                                          %{--tabindex="412"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
                                         </td>
                                     </tr>
                                     <tr>
@@ -466,16 +433,6 @@
                                                 </kendo-dropdownlist>
                                             </tdsAngular:tooltipSpan>
                                         </td>
-                                        <td>
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}">--}%
-                                                %{--<g:select id="planStatus" name="planStatus"--}%
-                                                          %{--from="${planStatusOptions}"--}%
-                                                          %{--value="${asset.planStatus}"--}%
-                                                          %{--noSelection="${['': 'Please select']}"--}%
-                                                          %{--class="${standardFieldSpecs.planStatus.imp ?: ''}"--}%
-                                                          %{--tabindex="365"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
-                                        </td>
 
                                         <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}"
                                                                        value="${asset.rateOfChange}" tabindex="420"
@@ -485,39 +442,36 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.railType}"
                                                         value="${asset.railType}"/>
                                         <td>
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.railType}">--}%
-                                                %{--<g:select id="railType" name="railType"--}%
-                                                          %{--from="${railTypeOption}" value="${asset.railType}"--}%
-                                                          %{--noSelection="${['': 'Please select...']}"--}%
-                                                          %{--class="${standardFieldSpecs.railType.imp ?: ''}"--}%
-                                                          %{--tabindex="108"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.railType}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetRailType"
+                                                        [data]="model.railTypeOption"
+                                                        [(ngModel)]="model.asset.railType">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                         </td>
 
-                                        <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}"
-                                                        value="${asset.maintExpDate}"/>
-                                        <td valign="top"
-                                            class="value ${hasErrors(bean: assetEntityInstance, field: 'maintExpDate', 'errors')}">
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.maintExpDate}">--}%
-                                                %{--<input type="text" id="maintExpDate" name="maintExpDate"--}%
-                                                       %{--value="<tdsAngular:convertDate--}%
-                                                               %{--date="${assetEntityInstance?.maintExpDate}"/>"--}%
-                                                       %{--class="dateRange ${standardFieldSpecs.maintExpDate.imp ?: ''}"--}%
-                                                       %{--size="15" style="width: 138px;"--}%
-                                                       %{--tabindex="235"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
+                                        <td valign="top" class="value ${hasErrors(bean:asset,field:'maintExpDate','errors')}">
+                                            <kendo-datepicker
+                                                    name="modelAssetMaintExpDate"
+                                                    [format]="dateFormat"
+                                                    [(value)]="model.asset.maintExpDate">
+                                            </kendo-datepicker>
                                         </td>
 
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.validation}"
-                                                        value="${asset.validation}"/>
+                                                                value="${asset.validation}"/>
                                         <td colspan="2">
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">--}%
-                                                %{--<g:select id="validation" name="validation"--}%
-                                                          %{--from="${asset.constraints.validation.inList}"--}%
-                                                          %{--value="${asset.validation}"--}%
-                                                          %{--class="${standardFieldSpecs.validation.imp ?: ''}"--}%
-                                                          %{--tabindex="370"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetValidation"
+                                                        [data]="${asset.constraints.validation.inList as JSON}"
+                                                        [(ngModel)]="model.asset.validation">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
                                         </td>
                                     </tr>
                                     <tr>
@@ -531,22 +485,21 @@
                                                    data-content="${standardFieldSpecs.truck.tip ?: standardFieldSpecs.truck.label}">Truck/Cart/Shelf</label>
                                         </td>
                                         <td>
-                                            %{--<tdsAngular:tooltipSpan field="${standardFieldSpecs.truck}">--}%
-                                                %{--<input type="text" id="truck" class="${standardFieldSpecs.truck.imp ?: ''}"--}%
-                                                       %{--name="truck" value="${asset.truck}" size=3--}%
-                                                       %{--tabindex="240"/>--}%
-                                                %{--<input type="text" id="cart" class="${standardFieldSpecs.cart.imp ?: ''}"--}%
-                                                       %{--name="cart" value="${asset.cart}" size=3--}%
-                                                       %{--tabindex="241"/>--}%
-                                                %{--<input type="text" id="shelf" class="${standardFieldSpecs.shelf.imp ?: ''}"--}%
-                                                       %{--name="shelf" value="${asset.shelf}" size=2--}%
-                                                       %{--tabindex="242"/>--}%
-                                            %{--</tdsAngular:tooltipSpan>--}%
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.truck}"
+                                                                     size="3" tabindex="240"
+                                                                     value="${asset.size}"
+                                                                     ngmodel="model.asset.truck"/>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.cart}"
+                                                                     size="3" tabindex="241"
+                                                                     value="${asset.size}"
+                                                                     ngmodel="model.asset.cart"/>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.shelf}"
+                                                                     size="2" tabindex="242"
+                                                                     value="${asset.size}"
+                                                                     ngmodel="model.asset.shelf"/>
                                         </td>
                                     </tr>
-                                    %{--<tbody class="customTemplate">--}%
-                                    %{--<g:render template="customEdit"></g:render>--}%
-                                    %{--</tbody>--}%
+                                <g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
                                 </tbody>
                             </table>
                         </div>

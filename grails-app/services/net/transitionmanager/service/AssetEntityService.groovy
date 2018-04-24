@@ -1404,6 +1404,7 @@ class AssetEntityService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 
+		println('entered!')
 		String domain = asset.assetClass.toString()
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
@@ -1420,7 +1421,12 @@ class AssetEntityService implements ServiceMethods {
 			redirectTo: params.redirectTo,
 			version: asset.version,
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs
+			standardFieldSpecs: standardFieldSpecs,
+			railTypeOption: getAssetRailTypeOptions(),
+			sourceRoomSelect: getRoomSelectOptions(project, true, true),
+			targetRoomSelect: getRoomSelectOptions(project, false, true),
+			sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+			targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true)
 		]
 	}
 
