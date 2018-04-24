@@ -1998,7 +1998,7 @@ class AssetEntityService implements ServiceMethods {
 					colPref = ['1': 'sme', '2': 'environment', '3': 'validation', '4': 'planStatus', '5': 'moveBundle']
 					break
 				case PREF.Asset_Columns:
-					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
+					colPref = ['1': 'rackSource','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
 				case PREF.Physical_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
@@ -2421,7 +2421,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS sourceRack, srcRoom.location AS sourceLocation")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
@@ -2473,9 +2473,9 @@ class AssetEntityService implements ServiceMethods {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break
-				case 'rackSource':
-					altColumns.append(", srcRack.tag AS rackSource")
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+				case ~/rackSource|moveBundle/:
+					// Handled by the default columns
 					break
 
 				case ~/(location|room)Target/:
@@ -2664,7 +2664,12 @@ class AssetEntityService implements ServiceMethods {
 		if (queryParams.size()) {
 			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} else {
-			assetList = jdbcTemplate.queryForList(query.toString())
+			try {
+				assetList = jdbcTemplate.queryForList(query.toString())
+			} catch (e) {
+				log.error "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
+				throw new LogicException("Unabled to perform query based on parameters and user preferences")
+			}
 		}
 
 		// Cut the list of selected applications down to only the rows that will be shown in the grid

@@ -23,6 +23,7 @@ import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.TaskService
 import net.transitionmanager.service.UserPreferenceService
+import net.transitionmanager.service.LogicException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -225,10 +226,15 @@ class FilesController implements ControllerMethods {
 		query.append(" ORDER BY $sortIndex $sortOrder")
 
 		def filesList
-		if (queryParams) {
-			filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
-		} else {
-			filesList = jdbcTemplate.queryForList(query.toString())
+		try {
+			if (queryParams) {
+				filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+			} else {
+				filesList = jdbcTemplate.queryForList(query.toString())
+			}
+		} catch(e) {
+			log.error "listJson() encountered SQL error : ${e.getMessage()}"
+			throw new LogicException("Unabled to perform query based on parameters and user preferences")
 		}
 
 		int totalRows = filesList.size()

@@ -11,7 +11,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="topNav" />
 
-		<title>Data Center Room List</title>
+		<title>Location List</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -39,7 +39,7 @@
 		<!-- do nothing -->
 	</g:if>
 	<g:else>
-		<tds:subHeader title="Room List" crumbs="['Data Center', 'Room List']"/>
+		<tds:subHeader title="Location List" crumbs="['Locations List']"/>
 	</g:else>
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body fluid" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
@@ -67,9 +67,9 @@
 
 											<tds:hasPermission permission="${Permission.RoomListActionColumn}"><th><a href="#">Action</a></th></tds:hasPermission>
 
-											<g:sortableColumn property="location" title="Data Center" />
+											<g:sortableColumn property="location" title="Location" />
 
-											<g:sortableColumn property="roomName" title="Room" />
+											<g:sortableColumn property="roomName" title="Room/VPC" />
 
 											<th><a href="#">City</a></th>
 
@@ -109,7 +109,7 @@
 								<div class="buttons">
 									<span class="button">
 									    <tds:hasPermission permission="${Permission.RoomCreate}">
-										   <input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open'); saveData();"/>
+										   <input type="button" class="edit" value="Create" onclick="$('#createRoomDialog').dialog('open'); saveData();"/>
 									    </tds:hasPermission>
 										<tds:hasPermission permission="${Permission.RoomDelete}">
 											<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
@@ -125,7 +125,7 @@
 		</div>
 		<div id="listDialog" title="Asset List" style="display: none;">
 		</div>
-		<div id="createRoomDialog" title="Create Room" style="display: none;">
+		<div id="createRoomDialog" title="Create Location Room/VPC" style="display: none;">
 			<g:form method="post" name="createRoomForm" action="save" onsubmit="return validateForm()">
 				<table>
 					<tbody>
@@ -133,14 +133,14 @@
 							<td colspan="3"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
 						<tr>
-							<td>Data Center<span style="color: red">*</span><td/>
+							<td>Location<span style="color: red">*</span><td/>
 							<td>
 								<input type="hidden" name="project.id" id="projectId" value="${projectId}">
 								<input type="text" name="location" id="locationId" value="${roomInstance.location}">
 							</td>
 						</tr>
 						<tr>
-							<td>Room<span style="color: red">*</span><td/>
+							<td>Room/VPC<span style="color: red">*</span><td/>
 							<td>
 								<input type="text" name="roomName" id="roomNameId" value="${roomInstance.roomName}">
 							</td>

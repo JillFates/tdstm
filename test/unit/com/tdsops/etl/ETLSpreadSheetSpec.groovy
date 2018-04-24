@@ -82,8 +82,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 						sheet 'Applications'
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
 			etlProcessor.result.domains.size() == 0
