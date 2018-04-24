@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -82,6 +83,7 @@ class ProjectUtilController implements ControllerMethods {
 			project = new Project(
 					name: name,
 					projectCode: name,
+					guid: StringUtil.generateGuid(),
 					comment: templateInstance?.comment,
 					description: templateInstance?.description,
 					client: templateInstance?.client,
@@ -89,7 +91,7 @@ class ProjectUtilController implements ControllerMethods {
 					projectType: "Demo",
 					startDate: startDateTime,
 					completionDate: completionDateTime,
-					collectMetrics: false
+					collectMetrics: 0
 			)
 
 			if (!project.hasErrors() && project.save(flush:true)) {
@@ -97,24 +99,24 @@ class ProjectUtilController implements ControllerMethods {
 				def companyParty = PartyGroup.findByName("TDS")
 				partyRelationshipService.savePartyRelationship("PROJ_COMPANY", project, "PROJECT", companyParty, "COMPANY")
 				// create project partner
-				PartyRelationship tempProjectPartner = PartyRelationship.find('''\
+				List<PartyRelationship> tempProjectPartners = PartyRelationship.executeQuery("""
 					from PartyRelationship p
 					where p.partyRelationshipType = 'PROJ_PARTNER'
 					  and p.partyIdFrom = :template
 					  and p.roleTypeCodeFrom = 'PROJECT'
-					  and p.roleTypeCodeTo = 'PARTNER' ''', [template: template])
-				if (tempProjectPartner) {
+					  and p.roleTypeCodeTo = 'PARTNER' """, [template: templateInstance])
+				for (tempProjectPartner in tempProjectPartners) {
 					partyRelationshipService.savePartyRelationship("PROJ_PARTNER", project, "PROJECT",
 					                                               tempProjectPartner.partyIdTo, "PARTNER")
 				}
 
 				/* copy Project staff  */
-				List<PartyRelationship> tempProjectStaff = PartyRelationship.executeQuery('''
+				List<PartyRelationship> tempProjectStaff = PartyRelationship.executeQuery("""
 					from PartyRelationship
 					where partyRelationshipType = 'PROJ_STAFF'
 					  and partyIdFrom = :template
 					  and roleTypeCodeFrom = 'PROJECT'
-				''', [template: template])
+				""", [template: templateInstance])
 
 				for (PartyRelationship staff in tempProjectStaff) {
 					def partyRelationship = new PartyRelationship(
