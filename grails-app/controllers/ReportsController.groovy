@@ -1554,4 +1554,12 @@ class ReportsController implements ControllerMethods {
 		renderSuccessJson(data)
 		renderErrorJson()
 	}
+
+	/**
+	 * Tests Metric definitions, returning map with the number of metrics run, and the number of errors.
+	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
+	def generateDailyMetrics (){
+		renderSuccessJson(metricReportingService.generateDailyMetrics())
+	}
 }
