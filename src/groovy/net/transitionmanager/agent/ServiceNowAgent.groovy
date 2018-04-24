@@ -356,6 +356,7 @@ class ServiceNowAgent extends AbstractAgent {
 	private LinkedHashMap tableParam(String fieldName, int readOnly) {
 		LinkedHashMap<String, ?> table = new LinkedHashMap<>(TABLE_PARAM)
 		table.put('fieldName', fieldName)
+		table.put('value', fieldName)
 		table.put('readOnly', readOnly)
 		return table;
 	}
