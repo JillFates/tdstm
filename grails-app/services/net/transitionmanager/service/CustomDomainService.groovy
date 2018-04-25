@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.tm.enums.domain.AssetClass
@@ -14,7 +15,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class CustomDomainService implements ServiceMethods {
     public static final String ALL_ASSET_CLASSES = 'ASSETS'
 	// Common Domian name (used to gather common fields in Domains)
-	public static final String COMMON = 'COMMON'
+    public static final String COMMON = 'COMMON'
     public static final String CUSTOM_FIELD_NAME_PART = 'custom'
 
     public static final int CUSTOM_USER_FIELD = 1

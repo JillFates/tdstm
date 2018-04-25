@@ -4,6 +4,7 @@ import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.FileCommand
@@ -20,6 +21,7 @@ import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.multipart.MultipartFile
 
 /**
@@ -46,6 +48,7 @@ class HttpProducerService {
      *
      * @param actionRequest - the action request
      */
+    @Transactional(noRollbackFor = [Exception, ResourceAccessException])
     void executeCall(ActionRequest actionRequest) {
         try {
             log.debug('RESTful executeCall action request: {}', actionRequest)

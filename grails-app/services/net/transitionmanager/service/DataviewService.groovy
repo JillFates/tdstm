@@ -559,7 +559,8 @@ class DataviewService implements ServiceMethods {
 						column: propertyFor(column),
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
-						filter: filterFor(column)
+						filter: filterFor(column),
+						type: typeFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -650,6 +651,15 @@ class DataviewService implements ServiceMethods {
 
 	private static String orderFor(Map column) {
 		transformations[column.property].alias ?: propertyFor(column)
+	}
+
+	/**
+	 * Return the type for this column
+	 * @param column
+	 * @return
+	 */
+	private static Class typeFor(Map column) {
+		transformations[column.property].type
 	}
 
 	/**
@@ -892,7 +902,9 @@ class DataviewService implements ServiceMethods {
 		'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
 		'locationTarget' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
 		'rackTarget'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
-		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget']
+		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget'],
+	    'targetRackPosition': [property: "AE.targetRackPosition", type: Integer, namedParameter: 'targetRackPosition', join: "", mode:"where"],
+		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: "", mode:"where"]
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
     }

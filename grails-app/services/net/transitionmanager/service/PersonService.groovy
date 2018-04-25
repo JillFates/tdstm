@@ -689,7 +689,7 @@ class PersonService implements ServiceMethods {
 
 		int cleared = 0
 		boolean deleted = false
-		String messages = []
+		def messages = []
 
 		UserLogin userLogin = person.userLogin
 
@@ -700,7 +700,7 @@ class PersonService implements ServiceMethods {
 			isDeletable = false
 		}
 		if (userLogin && !deleteIfUserLogin) {
-			messages << "$person was unable to be delete due to having user login account"
+			messages << "$person was unable to be deleted due to having an associated UserLogin account"
 			isDeletable = false
 		} else if (userLogin == securityService.userLogin) {
 			messages << "You cannot delete your own user login account while logged in with it"

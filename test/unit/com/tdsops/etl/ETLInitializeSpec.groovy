@@ -106,16 +106,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						initialize 'appVendor' with 'Apple'
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -153,16 +151,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						initialize 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -200,16 +196,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -247,16 +241,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -294,15 +286,13 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' initialize 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -340,15 +330,13 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -373,15 +361,13 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -406,15 +392,13 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with SOURCE.'vendor name'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -439,16 +423,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						init 'appVendor' with DOMAIN.appVendor
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
@@ -473,16 +455,14 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name'
 						init 'appVendor' with CE
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()

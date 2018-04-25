@@ -3,7 +3,34 @@ package com.tdsops.etl
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import getl.data.Field
+import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.ErrorCollector
+import org.codehaus.groovy.control.MultipleCompilationErrorsException
+import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer
+import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+
+import static org.codehaus.groovy.syntax.Types.COMPARE_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_GREATER_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN
+import static org.codehaus.groovy.syntax.Types.COMPARE_LESS_THAN_EQUAL
+import static org.codehaus.groovy.syntax.Types.COMPARE_NOT_EQUAL
+import static org.codehaus.groovy.syntax.Types.DIVIDE
+import static org.codehaus.groovy.syntax.Types.EQUALS
+import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
+import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
+import static org.codehaus.groovy.syntax.Types.MINUS
+import static org.codehaus.groovy.syntax.Types.MINUS_MINUS
+import static org.codehaus.groovy.syntax.Types.MOD
+import static org.codehaus.groovy.syntax.Types.MULTIPLY
+import static org.codehaus.groovy.syntax.Types.NOT
+import static org.codehaus.groovy.syntax.Types.PLUS
+import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
+import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
+import static org.codehaus.groovy.syntax.Types.POWER
 
 /**
  * Class that receives all the ETL initial commands.
@@ -96,6 +123,9 @@ class ETLProcessor implements RangeChecker {
 	ETLDomain selectedDomain
 	ETLFindElement currentFindElement
 
+	// List of command that needs to be completed
+	private Stack<ETLStackableCommand> commandStack = []
+
 	/**
 	 * A set of Global transformations that will be apply over each iteration
 	 */
@@ -151,12 +181,16 @@ class ETLProcessor implements RangeChecker {
 		this.result = new ETLProcessorResult(this)
 	}
 
+	// ------------------------------------
+	// ETL DSL methods
+	// ------------------------------------
 	/**
 	 * Selects a domain or throws an ETLProcessorException in case of an invalid domain
 	 * @param domain a domain String value
 	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor domain (ETLDomain domain) {
+		validateStack()
 		selectedDomain = domain
 		result.releaseRowFoundInLookup()
 		result.addCurrentSelectedDomain(selectedDomain)
@@ -170,7 +204,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor read (ReservedWord reservedWord) {
-
+		validateStack()
 		if (reservedWord == ReservedWord.labels) {
 			columnsMap = [:]
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
@@ -198,6 +232,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return a Map with the next steps in this command.
 	 */
 	def from (int from) {
+		validateStack()
 		[to: { int to ->
 			[iterate: { Closure closure ->
 				from--
@@ -221,7 +256,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def from (int[] numbers) {
-
+		validateStack()
 		[iterate: { Closure closure ->
 			List rowNumbers = numbers as List
 			List rows = this.dataSetFacade.rows()
@@ -245,7 +280,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor ignore (ReservedWord reservedWord) {
-
+		validateStack()
 		if(reservedWord == ReservedWord.row){
 			if (!hasSelectedDomain()) {
 				throw ETLProcessorException.domainMustBeSpecified()
@@ -290,10 +325,12 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Iterates and applies closure to every row in the dataSource
+	 * @todo After discussing with @dcorrea we agreed that he can add a Pre/Post Conditions to the User script (TM-9746) that will run the validations instead of figuring out where do we need to run it.
 	 * @param closure
 	 * @return
 	 */
 	ETLProcessor iterate (Closure closure) {
+		validateStack()
 		doIterate(this.dataSetFacade.rows(), closure)
 	}
 
@@ -303,7 +340,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor console (ReservedWord reservedWord) {
-
+		validateStack()
 		DebugConsole.ConsoleStatus consoleStatus = DebugConsole.ConsoleStatus.values().find { it.name() == reservedWord.name() }
 
 		if (consoleStatus == null) {
@@ -355,7 +392,6 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor replace (String regex, String replacement) {
-
 		globalTransformers.add(Replacer(regex, replacement))
 		debugConsole.info "Global replace regex: $regex wuth replacement: $replacement"
 		return this
@@ -394,6 +430,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor sheet (String sheetName) {
+		currentRowIndex = 0
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		dataSetFacade.setSheetName(sheetName)
 	}
 
@@ -403,6 +441,8 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	ETLProcessor sheet (Integer sheetNumber) {
+		currentRowIndex = 0
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
 		dataSetFacade.setSheetNumber(sheetNumber)
 	}
 
@@ -419,7 +459,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (Integer index) {
-
+		validateStack()
 		index--
 		rangeCheck(index, currentRow.size())
 
@@ -439,6 +479,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def extract (String columnName) {
+		validateStack()
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
 		}
@@ -462,6 +503,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def load(final String fieldName) {
+		validateStack()
 		[
 			with: { value ->
 
@@ -491,6 +533,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def set(final String variableName) {
+		validateStack()
 		[
 			with: { value ->
 				Object localVariable = ETLValueHelper.valueOf(value)
@@ -520,7 +563,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldNames
 	 */
 	def lookup(final String fieldName){
-
+		validateStack()
 		lookUpFieldSpecs(selectedDomain, fieldName)
 		[
 		    with: { value ->
@@ -561,6 +604,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def initialize(String field){
+		validateStack()
 		[
 			with: { defaultValue ->
 
@@ -587,6 +631,7 @@ class ETLProcessor implements RangeChecker {
 	 * @see ETLProcessor#initialize(java.lang.String)
 	 */
 	def init(final String field) {
+		validateStack()
 		initialize(field)
 	}
 
@@ -597,9 +642,11 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def find (ETLDomain domain) {
-        debugConsole.info("find Domain: $domain")
+		debugConsole.info("find Domain: $domain")
+		validateStack()
 		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
 		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
+		pushIntoStack(currentFindElement)
 		return currentFindElement
 	}
 
@@ -608,10 +655,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain
 	 */
 	ETLFindElement elseFind(ETLDomain domain) {
+		validateStack()
 		if (!currentFindElement) {
 			throw ETLProcessorException.notCurrentFindElement()
 		}
 
+		pushIntoStack(currentFindElement)
 		return currentFindElement.elseFind(domain)
 	}
 
@@ -629,6 +678,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current find Element
 	 */
 	FoundElement whenNotFound(final String property) {
+		validateStack()
 		return new WhenNotFoundElement(property, result)
 	}
 
@@ -643,6 +693,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current find Element
 	 */
 	FoundElement whenFound(final String property) {
+		validateStack()
 		return new WhenFoundElement(property, result)
 	}
 
@@ -687,6 +738,37 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor log (Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
 		debugConsole.append(level, ETLValueHelper.valueOf(message))
 		return this
+	}
+
+	// ------------------------------------
+	// Support methods
+	// ------------------------------------
+
+	/**
+	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
+	 * @param expectedObjectOnStack
+	 */
+	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
+
+		boolean stackViolation = false
+		if(expectedObjectOnStack == null && commandStack.size() > 0){
+			stackViolation = true
+		} else if(expectedObjectOnStack &&
+				  (commandStack.size() == 0 || commandStack.peek() != expectedObjectOnStack) ) {
+			stackViolation = true
+		}
+		if(stackViolation){
+			ETLStackableCommand stackableCommand = commandStack.pop()
+			throw new ETLProcessorException(stackableCommand.stackableErrorMessage())
+		}
+	}
+
+	boolean pushIntoStack(command) {
+		commandStack.push(command)
+	}
+
+	ETLStackableCommand popFromStack(){
+		commandStack.pop()
 	}
 
 	/**
@@ -812,7 +894,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param findElement
 	 */
 	void addFindElement(ETLFindElement findElement) {
+		validateStack(findElement)
 		result.addFindElement(findElement)
+		popFromStack()
 	}
 
 	/**
@@ -931,6 +1015,150 @@ class ETLProcessor implements RangeChecker {
 	 */
 	boolean hasSelectedDomain() {
 		return selectedDomain != null
+	}
+
+	// ---------------------------------------------
+	// ETL DSL evaluation/check syntax methods
+	// ---------------------------------------------
+	/**
+	 * It returns the default compiler configuration used by an instance of ETLProceesor.
+	 * It prepares an instance of CompilerConfiguration with an instance of ImportCustomizer
+	 * and an instance of SecureASTCustomizer.
+	 * @see CompilerConfiguration
+	 * @see SecureASTCustomizer
+	 * @see ImportCustomizer
+	 * @return a default instance of CompilerConfiguration
+	 */
+	private CompilerConfiguration defaultCompilerConfiguration(){
+
+		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+		secureASTCustomizer.with {
+			// allow closure creation for the ETL iterate command
+			closuresAllowed = true
+			// disallow method definitions
+			methodDefinitionAllowed = false
+			// Empty withe list means forbid imports
+			importsWhitelist = []
+			starImportsWhitelist = []
+			// Language tokens allowed
+			tokensWhitelist = [
+				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
+				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
+				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
+			].asImmutable()
+			// Types allowed to be used (Including primitive types)
+			constantTypesClassesWhiteList = [
+				Object, Integer, Float, Long, Double, BigDecimal, String,
+				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
+			].asImmutable()
+			// Classes who are allowed to be receivers of method calls
+			receiversClassesWhiteList = [
+			    Object, // TODO: This is too much generic class.
+				Integer, Float, Double, Long, BigDecimal, String
+			].asImmutable()
+		}
+
+		ImportCustomizer customizer = new ImportCustomizer()
+
+		CompilerConfiguration configuration = new CompilerConfiguration()
+		configuration.addCompilationCustomizers customizer, secureASTCustomizer
+		return  configuration
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it evaluates an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script an ETL script content
+	 * @return
+	 */
+	@TimedInterrupt(600l)
+	Object evaluate(String script){
+		return evaluate(script, defaultCompilerConfiguration())
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it evaluates an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * It throws an InterruptedException when checks indicate code ran longer than desired
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script an ETL script content
+	 * @params configuration
+	 * @return the result of evaluate ETL script param
+	 * @see TimedInterrupt
+
+	 */
+	@TimedInterrupt(600l)
+	Object evaluate(String script, CompilerConfiguration configuration){
+		return new GroovyShell(this.class.classLoader, this.binding, configuration)
+			.evaluate(script,ETLProcessor.class.name)
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
+	 * using this instance of the ETLProcessor.
+	 * @see GroovyShell#evaluate(java.lang.String)
+	 * @param script an ETL script content
+	 * @param configuration an instance of CompilerConfiguration
+	 * @return a Map with validSyntax field boolean value and a list of errors
+	 */
+	Map<String, ?> checkSyntax(String script, CompilerConfiguration configuration){
+
+		List<Map<String, ?>> errors = []
+
+		try {
+			new GroovyShell(
+				this.class.classLoader,
+				this.binding,
+				configuration
+			).parse(script?.trim(), ETLProcessor.class.name)
+
+		} catch (MultipleCompilationErrorsException cfe) {
+			ErrorCollector errorCollector = cfe.getErrorCollector()
+			errors = errorCollector.getErrors()
+		}
+
+		List errorsMap = errors.collect { error ->
+
+			if(error instanceof SyntaxErrorMessage){
+				[
+					startLine  : error.cause?.startLine,
+					endLine    : error.cause?.endLine,
+					startColumn: error.cause?.startColumn,
+					endColumn  : error.cause?.endColumn,
+					fatal      : error.cause?.fatal,
+					message    : error.cause?.message
+				]
+			} else {
+				[
+					startLine  : null,
+					endLine    : null,
+					startColumn: null,
+					endColumn  : null,
+					fatal      : true,
+					message    : error.cause?.message
+				]
+
+			}
+		}
+
+		return [
+			validSyntax: errors.isEmpty(),
+			errors     : errorsMap
+		]
+	}
+
+	/**
+	 * Using an instance of GroovyShell, it checks syntax of an ETL script content
+	 * using this instance of the ETLProcessor and its defaultCompilerConfiguration
+	 * @see ETLProcessor#defaultCompilerConfiguration()
+	 * @see GroovyShell#parse(java.lang.String)
+	 * @param script an ETL script content
+	 * @param configuration an instance of CompilerConfiguration
+	 * @return a Map with validSyntax field boolean value and a list of errors
+	 */
+	Map<String, ?>  checkSyntax(String script){
+		return checkSyntax(script, defaultCompilerConfiguration())
 	}
 
 }

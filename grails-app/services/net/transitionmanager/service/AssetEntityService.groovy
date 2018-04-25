@@ -1998,7 +1998,7 @@ class AssetEntityService implements ServiceMethods {
 					colPref = ['1': 'sme', '2': 'environment', '3': 'validation', '4': 'planStatus', '5': 'moveBundle']
 					break
 				case PREF.Asset_Columns:
-					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
+					colPref = ['1': 'rackSource','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
 				case PREF.Physical_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
@@ -2399,6 +2399,7 @@ class AssetEntityService implements ServiceMethods {
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
+		// TODO: arecordon -> fix sorting to account for locationTarget instead of targetLocation
 
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
@@ -2420,7 +2421,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS sourceRack, srcRoom.location AS sourceLocation")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
@@ -2455,7 +2456,7 @@ class AssetEntityService implements ServiceMethods {
 					joinQuery.append("\nLEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
 					break
 
-				case ~/source(Location|Room)/:
+				case ~/(location|room)Source/:
 					// This is a hack for the columns that were moved to the Room domain property map attributes
 					def locOrRoom = Matcher.lastMatcher[0][1]
 
@@ -2463,20 +2464,21 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\nLEFT OUTER JOIN room srcRoom ON srcRoom.room_id=ae.room_source_id ")
 						srcRoomAdded = true
 					}
-					if (locOrRoom == 'Location') {
+					if (locOrRoom == 'location') {
 						// Note that this is added by default above
 						// altColumns.append(', srcRoom.location AS sourceLocation')
-					} else if (locOrRoom == 'Room') {
-						altColumns.append(', srcRoom.room_name AS sourceRoom')
+					} else if (locOrRoom == 'room') {
+						altColumns.append(', srcRoom.room_name AS roomSource')
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break
-				case ~/sourceRack|moveBundle/:
+					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+				case ~/rackSource|moveBundle/:
 					// Handled by the default columns
 					break
 
-				case ~/target(Location|Room)/:
+				case ~/(location|room)Target/:
 					// This is a hack for the columns that were moved to the Room domain property map attributes
 					def locOrRoom = Matcher.lastMatcher[0][1]
 
@@ -2484,17 +2486,17 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\nLEFT OUTER JOIN room tgtRoom ON tgtRoom.room_id=ae.room_target_id ")
 						tgtRoomAdded = true
 					}
-					if (locOrRoom == 'Location') {
-						altColumns.append(', tgtRoom.location AS targetLocation')
-					} else if (locOrRoom == 'Room') {
-						altColumns.append(', tgtRoom.room_name AS targetRoom')
+					if (locOrRoom == 'location') {
+						altColumns.append(', tgtRoom.location AS locationTarget')
+					} else if (locOrRoom == 'room') {
+						altColumns.append(', tgtRoom.room_name AS roomTarget')
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break
-				case 'targetRack':
+				case 'rackTarget':
 					// Property was moved to the Rack domain
-					altColumns.append(", tgtRack.tag AS targetRack")
+					altColumns.append(", tgtRack.tag AS rackTarget")
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
 					break
 				case 'sourceChassis':
@@ -2607,6 +2609,8 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
+
+
 		// Handle the filtering by each column's text field
 		def whereConditions = []
 		def queryParams = [:]
@@ -2660,7 +2664,12 @@ class AssetEntityService implements ServiceMethods {
 		if (queryParams.size()) {
 			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} else {
-			assetList = jdbcTemplate.queryForList(query.toString())
+			try {
+				assetList = jdbcTemplate.queryForList(query.toString())
+			} catch (e) {
+				log.error "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
+				throw new LogicException("Unabled to perform query based on parameters and user preferences")
+			}
 		}
 
 		// Cut the list of selected applications down to only the rows that will be shown in the grid

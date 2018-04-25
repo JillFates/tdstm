@@ -230,4 +230,6 @@ databaseChangeLog = {
 	include file: '20180404-Dataview-add-unique-constraint-trim-tabs-and-spaces.groovy'
 	include file: '20180403-purge-import-batch-and-records.groovy'
 	include file: '20180404-purge-test-apis-credentials-datascripts.groovy'
+	include file: '20180412-add-guid-and-collectMetrics-to-project.groovy'
+	include file: '20180423-fix-room-rack-location-user-preferences.groovy'
 }

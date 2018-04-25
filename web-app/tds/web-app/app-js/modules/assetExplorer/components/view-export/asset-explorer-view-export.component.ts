@@ -21,8 +21,6 @@ export class AssetExplorerViewExportComponent {
 	protected fileName = 'asset_explorer';
 	protected exportFileName = '';
 	protected dataToExport: any[] = [];
-	private defaultLimitRows = 0;
-	private defaultOffset = 0;
 	private allProperties = false;
 
 	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
@@ -63,10 +61,6 @@ export class AssetExplorerViewExportComponent {
 	 * Transform the Data information
 	 */
 	private getExportData(): void {
-
-		this.assetExportModel.assetQueryParams.limit = this.defaultLimitRows;
-		this.assetExportModel.assetQueryParams.offset = this.defaultOffset;
-
 		if (!this.assetExportModel.queryId) {
 			this.assetExpService.previewQuery(this.assetExportModel.assetQueryParams)
 				.subscribe(result => {

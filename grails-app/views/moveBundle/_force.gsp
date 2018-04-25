@@ -149,7 +149,6 @@ var cancelCut = false
 
 // Build the layout model
 function buildMap () {
-
 	// get the default graph configuration
 	var config = getForceConfig()
 	widthCurrent = config.width
@@ -176,7 +175,11 @@ function buildMap () {
 		
 		$('#svgContainerId').removeClass('containsSpinner')
 		GraphUtil.force.on("tick", tick)
-		updateElementPositions()
+		updateElementPositions(function(){
+			GraphUtil.restoreDependencyPanel('Type');
+			GraphUtil.restoreDependencyPanel('Status');
+			GraphUtil.applyShowHideDependencies();
+		});
 	})
 }
 
@@ -510,7 +513,7 @@ function calmTick (n) {
 }
 
 // updates the attributes of all the svg elements
-function updateElementPositions () {
+function updateElementPositions (callback) {
 	var d = null;
 	
 	// set the dynamic attributes for the nodes
@@ -555,6 +558,10 @@ function updateElementPositions () {
 		vis.style('line-height', Math.random())
 
 	drawContextMenu();
+
+	if (callback) {
+		return callback();
+	}
 }
 
 
@@ -869,10 +876,6 @@ function drawContextMenu() {
 	function closeMenu () {
 		$(".customMenu").css('display', "none").children(".tempItem").remove();
 	}
-
-	GraphUtil.restoreDependencyPanel('Type');
-	GraphUtil.restoreDependencyPanel('Status');
-	GraphUtil.applyShowHideDependencies();
 }
 
 function getDimensionsForOptimizing () {

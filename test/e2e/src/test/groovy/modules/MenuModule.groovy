@@ -158,7 +158,7 @@ class MenuModule extends Module {
     }
 
     def assertProjectName(name){
-        projectName.text() == name
+        projectName.text().contains(name)
     }
 
     // TODO Add remains menu items here

@@ -167,11 +167,10 @@ class ETLDataSetSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
-					""".stripIndent(), ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'A column map is created'
 			etlProcessor.column('device id').index == 0
@@ -199,15 +198,13 @@ class ETLDataSetSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							log SOURCE.'device id'
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == jsonDataSet.rowsSize()

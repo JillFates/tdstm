@@ -296,7 +296,7 @@ class ServiceNowAgent extends AbstractAgent {
 							readonly: 0,
 							encoded: 0
 						],
-						tableParam('User defined table name', 0)
+						tableParam('', 0)
 					] + COMMON_PARAMS
 				] )
 		]
@@ -356,6 +356,7 @@ class ServiceNowAgent extends AbstractAgent {
 	private LinkedHashMap tableParam(String fieldName, int readOnly) {
 		LinkedHashMap<String, ?> table = new LinkedHashMap<>(TABLE_PARAM)
 		table.put('fieldName', fieldName)
+		table.put('value', fieldName)
 		table.put('readOnly', readOnly)
 		return table;
 	}
@@ -369,6 +370,9 @@ class ServiceNowAgent extends AbstractAgent {
 
 		Map result = serviceNowService.fetchAssetList(actionRequest)
 		log.debug 'fetchAssetList() Result of fetch assets. {}', result
+		if (result?.status == 'error') {
+			throw new RuntimeException(result.cause as String)
+		}
 
 		return result
 	}

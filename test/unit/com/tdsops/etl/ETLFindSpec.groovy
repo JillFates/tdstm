@@ -139,8 +139,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -150,8 +149,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -243,8 +241,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Application
@@ -252,8 +249,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetId' transform with toLong() load 'id'
 							find Application by 'id' with DOMAIN.id into 'id' 
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -288,6 +284,186 @@ class ETLFindSpec extends ETLBaseSpec {
 					find.matchOn == 0
 				}
 			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void "test exception when [into] keyword is not found"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id }
+			}
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					  .evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' load 'id'
+							find Application by 'id' with DOMAIN.id // <-- Missing into keyword
+						}
+						""".stripIndent(),
+					  ETLProcessor.class.name)
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "find/elseFind statement is missing required [into] keyword"
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void "test exception when [with, into] keywords are not found"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id }
+			}
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					  .evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' load 'id'
+							find Application by 'id' // <-- Missing [with and into] keyword
+						}
+						""".stripIndent(),
+					  ETLProcessor.class.name)
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "find/elseFind statement is missing required [with, into] keywords"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -366,8 +542,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -387,8 +562,7 @@ class ETLFindSpec extends ETLBaseSpec {
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -512,8 +686,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -531,8 +704,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							 	load 'comment' with 'Asset results not found'
 							}
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -583,8 +755,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -593,8 +764,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'asset'
 							find Application by 'id' with DOMAIN.asset into 'asset'   
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -649,8 +819,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -659,8 +828,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'id'
 							find Application by 'id' with 'id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -711,8 +879,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -724,8 +891,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id' 
 							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -824,8 +990,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -836,8 +1001,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id' 
 							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -970,8 +1134,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console on
 					read labels
 					domain Dependency
@@ -990,8 +1153,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						    set commentVar with 'Asset results not found'
 						}
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 
@@ -1042,8 +1204,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console on
 					read labels
 					iterate {
@@ -1054,8 +1215,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				 
 						find Room by 'id' with SOURCE.RoomId into 'room'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1254,8 +1414,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console on
 					read labels
 					iterate {
@@ -1266,8 +1425,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				 
 						find Room 'for' 'room' by 'id' with SOURCE.RoomId
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 
 		then: 'It throws an Exception because find command is incorrect'
@@ -1315,8 +1473,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -1326,8 +1483,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with DOMAIN.id into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1407,8 +1563,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -1418,8 +1573,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with DOMAIN.id into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1484,15 +1638,13 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
 						find Application by 'id' with SOURCE.'application id' into 'id'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1590,16 +1742,14 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
 						extract 'application id' transform with toLong() set appIdVar
 						find Application by 'id' with appIdVar into 'id' 
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -1697,16 +1847,14 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
 						extract 'application id' transform with toLong() set appIdVar
 						find Application by 'id' with appIdVar into 'id' 
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
