@@ -215,35 +215,14 @@ class ETLFindSpec extends ETLBaseSpec {
 					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
 					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
-
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
 				mock.getAssetClass() >> it.assetClass
 				mock.getAssetName() >> it.assetName
 				mock.getEnvironment() >> it.environment
-				mock.getBundle() >> it.bundle
+				mock.getMoveBundle() >> it.bundle
 				mock.getProject() >> it.project
-				mock
-			}
-
-		and:
-			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-			].collect {
-				AssetDependency mock = Mock()
-				mock.getId() >> it.id
-				mock.getType() >> it.type
-				mock.getAsset() >> it.asset
-				mock.getDependent() >> it.dependent
 				mock
 			}
 
@@ -270,7 +249,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						read labels
 						domain Application
 						iterate {
-							extract 'AssetId' load 'id'
+							extract 'AssetId' transform with toLong() load 'id'
 							find Application by 'id' with DOMAIN.id into 'id' 
 						}
 						""".stripIndent(),
@@ -288,24 +267,24 @@ class ETLFindSpec extends ETLBaseSpec {
 				with(data[0].fields.id) {
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151954'
-					find.results == [151954]
+					find.query[0].kv.id == 151954l
+					find.results == [151954l]
 					find.matchOn == 0
 				}
 
 				with(data[1].fields.id) {
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151971'
-					find.results == [151971]
+					find.query[0].kv.id == 151971l
+					find.results == [151971l]
 					find.matchOn == 0
 				}
 
 				with(data[2].fields.id) {
 					find.query.size() == 1
 					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151974'
-					find.results == [151974]
+					find.query[0].kv.id == 151974l
+					find.results == [151974l]
 					find.matchOn == 0
 				}
 			}
@@ -970,16 +949,17 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
+			GroovyMock(AssetEntity, global: true)
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				if (args.containsKey('id')){
 					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == args.id }
 				} else if (args.containsKey('assetName')){
 					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == args.assetName }
 				}
+			}
+
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
 			}
 
 		and:
@@ -997,10 +977,10 @@ class ETLFindSpec extends ETLBaseSpec {
 					domain Dependency
 					iterate {
 					
-						extract 'AssetDependencyId' load 'id'
+						extract 'AssetDependencyId' transform with toLong() load 'id'
 						extract 'AssetId' load 'asset'
 						
-						find Asset by 'assetName' with SOURCE.AssetName into 'asset'
+						find Application by 'assetName' with SOURCE.AssetName into 'asset'
 						// Grab the reference to the FINDINGS to be used later. 
 						def primaryFindings = FINDINGS
 
@@ -1179,7 +1159,6 @@ class ETLFindSpec extends ETLBaseSpec {
 				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
 				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
 				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
-
 			].collect {
 				AssetEntity mock = Mock()
 				mock.getId() >> it.id
@@ -1616,7 +1595,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						find Application by 'id' with SOURCE.'application id' into 'id' 
+						extract 'application id' transform with toLong() set appIdVar
+						find Application by 'id' with appIdVar into 'id' 
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1642,9 +1622,9 @@ class ETLFindSpec extends ETLBaseSpec {
 							results == []
 							matchOn == null
 							with (query[0]){
-								domain == 'Application'
+								domain == ETLDomain.Application.name()
 								with(kv){
-									id == '152254'
+									id == 152254l
 								}
 							}
 						}
@@ -1664,12 +1644,12 @@ class ETLFindSpec extends ETLBaseSpec {
 						errors == []
 						warn == false
 						with (find){
-							results == [152255]
+							results == [152255l]
 							matchOn == 0
 							with (query[0]){
-								domain == 'Application'
+								domain == ETLDomain.Application.name()
 								with(kv){
-									id == '152255'
+									id == 152255l
 								}
 							}
 						}
@@ -1722,7 +1702,8 @@ class ETLFindSpec extends ETLBaseSpec {
 					read labels
 					domain Dependency
 					iterate {
-						find Application by 'id' with SOURCE.'application id' into 'id' 
+						extract 'application id' transform with toLong() set appIdVar
+						find Application by 'id' with appIdVar into 'id' 
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
@@ -1750,7 +1731,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
-									id == '152254'
+									id == 152254l
 								}
 							}
 						}
@@ -1775,169 +1756,13 @@ class ETLFindSpec extends ETLBaseSpec {
 							with (query[0]){
 								domain == 'Application'
 								with(kv){
-									id == '152255'
+									id == 152255l
 								}
 							}
 						}
 					}
 				}
 			}
-
-		cleanup:
-			if(fileName) service.deleteTemporaryFile(fileName)
-	}
-
-	void 'test can find a blades and chassis with their relationships'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceBladeChassisDataSetContent)
-
-		and:
-			List<AssetEntity> applications = [
-				[assetClass: AssetClass.DEVICE, id: 152254l, assetName: "ACME Data Center", manufacturer: 'LINKSYS',project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Another Data Center", manufacturer: 'LINKSYS', project: GMDEMO],
-				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", manufacturer: 'TippingPoint', project: TMDEMO]
-			].collect {
-				AssetEntity mock = Mock()
-				mock.getId() >> it.id
-				mock.getManufacturer() >> it.manufacturer
-				mock.getAssetClass() >> it.assetClass
-				mock.getAssetName() >> it.assetName
-				mock.getProject() >> it.project
-				mock
-			}
-
-			GroovySpy(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
-				return true
-			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll {
-					it.assetName == args.assetName &&
-						it.manufacturer == args.manufacturer &&
-						it.assetType == args.assetType &&
-						it.project.id == args.project.id
-
-				}
-			}
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GMDEMO,
-				dataSet,
-				debugConsole,
-				validator)
-
-		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
-					read labels
-					domain Device
-					iterate {
-						extract 'name' load 'Name'
-						extract 'mfg' load 'manufacturer' set mfgVar
-						extract 'model' load 'model'
-						extract 'type' load 'assetType' set typeVar
-						
-						if (typeVar == 'Blade') {
-							extract 'chassis' load 'sourceChassis' set chassisNameVar
-							// Try to find the Chassis to create the reference
-							// Assumming that the chassis is the same manufacturer as the Blade
-						    find Device by 'assetName', 'manufacturer', 'assetType' with chassisNameVar, mfgVar, 'Blade Chassis' into 'sourceChassis'
-							//elseFind Device by 'assetName', 'assetType' with chassisNameVar, 'Blade Chassis' into 'sourceChassis'
-							
-							whenNotFound 'sourceChassis' create {
-								assetName chassisNameVar
-								assetType 'Blade Chassis'
-								manufacturer mfgVar
-								// Don't know what the model will be at the point we're working with a blade
-							}
-							
-							// Set the slot that the blade is installed into
-							extract 'slot' transform with toInteger() load 'sourceBladePosition'
-						}
-					}
-						""".stripIndent(),
-				ETLProcessor.class.name)
-
-		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'manufacturer', 'model', 'assetType', 'sourceChassis', 'sourceBladePosition'] as Set
-
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.assetName) {
-						originalValue == 'hpchassis01'
-						value == 'hpchassis01'
-						init == null
-						errors == []
-						warn == false
-					}
-				}
-
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.assetName) {
-						originalValue == 'xrayblade01'
-						value == 'xrayblade01'
-						init == null
-						errors == []
-						warn == false
-					}
-
-					with(fields.sourceChassis) {
-						originalValue == 'hpchassis01'
-						value == 'hpchassis01'
-						init == null
-						errors == []
-						warn == false
-						with (find){
-							matchOn == null
-							results == []
-							with (query[0]){
-								domain == ETLDomain.Device.name()
-								with(kv){
-									assetName == 'hpchassis01'
-									manufacturer == 'HP'
-								}
-							}
-//							with (query[1]){
-//								domain == ETLDomain.Device.name()
-//								with(kv){
-//									assetName == 'xrayblade01'
-//									assetType == 'Blade'
-//								}
-//							}
-						}
-
-						with(create){
-							assetName == 'hpchassis01'
-							assetType == 'Blade Chassis'
-							manufacturer == 'HP'
-						}
-					}
-					with(fields.sourceBladePosition) {
-						originalValue == '1'
-						value == 1
-						init == null
-						errors == []
-						warn == false
-					}
-				}
-			}
-
-		where:
-
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
