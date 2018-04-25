@@ -180,7 +180,7 @@ class ScriptProcessorServiceSpec extends Specification {
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load 'id'
+                    extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
                     
@@ -201,23 +201,23 @@ class ScriptProcessorServiceSpec extends Specification {
 					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
-						value == '152254'
-						originalValue == '152254'
-						find.results == [152254]
+						value == 152254l
+						originalValue == 152254l
+						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152254'
+						find.query[0].kv.id == 152254l
 					}
 
 					with(data[1].fields.id) {
-						value == '152255'
-						originalValue == '152255'
-						find.results == [152255]
+						value == 152255l
+						originalValue == 152255l
+						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152255'
+						find.query[0].kv.id == 152255l
 					}
 
 					with(data[0].fields.appVendor) {
@@ -304,7 +304,7 @@ application id,vendor name,technology,location
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load 'id'
+                    extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
                     
@@ -327,23 +327,23 @@ application id,vendor name,technology,location
 					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
-						value == '152254'
-						originalValue == '152254'
-						find.results == [152254]
+						value == 152254l
+						originalValue == 152254l
+						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152254'
+						find.query[0].kv.id == 152254l
 					}
 
 					with(data[1].fields.id) {
-						value == '152255'
-						originalValue == '152255'
-						find.results == [152255]
+						value == 152255l
+						originalValue == 152255l
+						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152255'
+						find.query[0].kv.id == 152255l
 					}
 
 					with(data[0].fields.appVendor) {
