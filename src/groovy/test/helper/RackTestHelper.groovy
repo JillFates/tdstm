@@ -9,16 +9,17 @@ import net.transitionmanager.domain.Room
 class RackTestHelper {
 
 
-	Rack createRack(Project project, Room room, Manufacturer manufacturer = null, Model model = null, String location = 'ACME Data Center'){
-		return buildRacks(project, room, manufacturer, model, location, 'L', 1, 160, 0, 1430, 1430, 0, 'Rack')
+	Rack createRack(Project project, Room room, Manufacturer manufacturer = null, Model model = null, String location = 'ACME Data Center', String tag = 'ACME'){
+		return buildRacks(project, room, manufacturer, model, location, tag, 'L', 1, 160, 0, 1430, 1430, 0, 'Rack')
 	}
 
 	Rack buildRacks(Project project, Room room, Manufacturer manufacturer, Model model, String location,
-	                String front, Integer source, Integer roomX, Integer roomY,
+	                String tag, String front, Integer source, Integer roomX, Integer roomY,
 	                Integer powerA, Integer powerB, Integer powerC, String rackType) {
 		Rack rack = new Rack()
 		rack.project = project
 		rack.room = room
+		rack.tag = tag
 		rack.manufacturer = manufacturer
 		rack.model = model
 		rack.location = location

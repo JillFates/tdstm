@@ -17,6 +17,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class ETLProcessorFindCommandIntegrationTests extends Specification {
@@ -640,11 +641,9 @@ application id,vendor name,technology,location
 						query[1].kv == [appVendor: 'Microsoft']
 
 						results == [152254]
-						matchOn == 0
+						matchOn == 1
 					}
-
-					!fields.id.warn
-					!fields.id.warnMsg
+					fields.id.errors == ['found without asset id field']
 				}
 
 				with(data[1]) {

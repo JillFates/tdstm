@@ -102,7 +102,7 @@ class DomainClassQueryHelperIntegrationSpec extends IntegrationSpec{
 			results.first().id == device.id
 	}
 
-	@IgnoreRest
+
 	void '2. can find a Device by sourceRoom'() {
 
 		given:

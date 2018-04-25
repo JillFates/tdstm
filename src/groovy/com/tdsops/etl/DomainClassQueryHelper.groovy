@@ -192,6 +192,25 @@ class DomainClassQueryHelper {
 		return Manufacturer.executeQuery(hql, params)
 	}
 
+	/**
+	 * Get the named parameter for an HQL query based on a field name
+	 * It uses clazz parameter to detect several scenarios. <br>
+	 * First of all, it validates if fieldName is an alternativeKey.
+	 * See details more details about those fields on otherAlternateKeys map.<br>
+	 * After that step, it validates if AssetEntity.isAssignableFrom(clazz)
+	 * and if field name is a reference property in domain class<br>
+	 * If that is true, then It needs to check if field name is a Person domain reference
+	 * or if it clazz has an alternateKey. Having an alternateKey, it is used
+	 * for domain references.
+	 * <pre>
+	 *
+	 * </pre>
+	 * @param clazz
+	 * @param fieldName
+	 * @return a named parameter value for a HQL query.
+	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
+	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
+	 */
 	static String getNamedParameterForField(Class clazz, String fieldName) {
 
 		if(otherAlternateKeys.containsKey(fieldName)){
