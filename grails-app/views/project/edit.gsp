@@ -198,6 +198,11 @@
 							<td class="valueNW">
 								<tds:convertDateTime date="${projectInstance?.dateCreated}" />
 							</td>
+							<td class="name">
+								<label for="client">Collect Reporting Metrics:</label></td>
+							<td valign="top">
+								<g:field type="checkbox" id="collectMetrics" name="collectMetrics" value="1" checked="${projectInstance?.collectMetrics == 1}"/>
+							</td>
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>

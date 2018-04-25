@@ -302,6 +302,15 @@
 							</td>
 						</tr>
 						<tr class="prop">
+							<td class="name"></td><td class="valueNW"></td>
+							<td class="name">
+								<label for="client">Collect Reporting Metrics:</label>
+							</td>
+							<td valign="top">
+								<input type="checkbox" id="collectMetrics" name="collectMetrics" value="1" checked="checked"/>
+							</td>
+						</tr>
+						<tr class="prop">
 							<td class="name">
 								<label for="workflowCode"><b>Workflow:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
@@ -334,21 +343,20 @@
 								<g:hasErrors bean="${projectInstance}" field="planMethodology">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="planMethodology" /></div>
 								</g:hasErrors>
-							</td>
-                         </tr>
-                     </tbody>
-                 </table>
-             </div>
-             <div class="buttons">
-                 <span class="button">
-                     <input class="save" type="submit" value="Save" tabindex="300" onclick="return validateForm();" />
-                 </span>
-                 <span class="button">
-                     <input type="button" class="cancel" value="Cancel" tabindex="310" onclick="window.history.back()" />
-                 </span>
-             </div>
-         </g:form>
-     </div>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="buttons">
+				<span class="button">
+					<input class="save" type="submit" value="Save" tabindex="300" onclick="return validateForm();" />
+				</span>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" tabindex="310" onclick="window.history.back()" />
+				</span>
+			</div>
+		</g:form>
+	</div>
 
      <%-- DIV for select time zone --%>
 	<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>

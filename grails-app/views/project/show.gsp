@@ -96,6 +96,11 @@
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
+							<td class="name">
+								<label for="client">Collect Reporting Metrics:</label></td>
+							<td valign="top">
+								<g:field type="checkbox" name="collectMetrics" checked="${projectInstance?.collectMetrics == 1}" disabled="true"/>
+							</td>
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
