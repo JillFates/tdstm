@@ -155,23 +155,11 @@ class ScriptProcessorServiceSpec extends Specification {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
 			}
 
 		and:
@@ -277,23 +265,12 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
 			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
 				applications.findAll { it.id == args.id && it.project.id == args.project.id }
 			}
 
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
+			Application.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
 			}
 
 		and:
