@@ -36,6 +36,10 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value="${asset.assetType}"/>
                                     <td class="${standardFieldSpecs.assetType.imp ?: ''}" data-for="model"
                                         style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                        <tds-combobox
+                                                [(model)]="model.asset.manufacturer"
+                                                [serviceRequest]="searchAssetTypes">
+                                        </tds-combobox>
                                         %{--<div id="modelEditId" data-toggle="popover" data-trigger="hover"--}%
                                         %{--data-content="${standardFieldSpecs.assetType.tip ?: standardFieldSpecs.assetType.label}">--}%
                                         %{--<div id="assetTypeSelect" tabindex="102">--}%
@@ -383,6 +387,12 @@
                             </tbody>
                         </table>
                     </div>
+                </td>
+            </tr>
+            <!-- Dependencies -->
+            <tr id="deps">
+                <td valign="top" colspan="2">
+                    <tds-supports-depends [(model)]="model"></tds-supports-depends>
                 </td>
             </tr>
         </table>
