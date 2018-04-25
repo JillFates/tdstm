@@ -202,7 +202,7 @@ class ScriptProcessorServiceSpec extends Specification {
 
 					with(data[0].fields.id) {
 						value == 152254l
-						originalValue == 152254l
+						originalValue == '152254'
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
@@ -212,7 +212,7 @@ class ScriptProcessorServiceSpec extends Specification {
 
 					with(data[1].fields.id) {
 						value == 152255l
-						originalValue == 152255l
+						originalValue == '152255'
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
@@ -328,7 +328,7 @@ application id,vendor name,technology,location
 
 					with(data[0].fields.id) {
 						value == 152254l
-						originalValue == 152254l
+						originalValue == '152254'
 						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
@@ -338,7 +338,7 @@ application id,vendor name,technology,location
 
 					with(data[1].fields.id) {
 						value == 152255l
-						originalValue == 152255l
+						originalValue == '152255'
 						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
