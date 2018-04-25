@@ -1184,7 +1184,7 @@ class DataImportService implements ServiceMethods {
 		if ( value && (value instanceof CharSequence) ) {
 			Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
 			entities = GormUtil.findDomainByAlternateKey(domainClass, value, context.project)
-			log.debug 'findDomainByAlternateProperty() found={}',entities.size()
+			log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
 		}
 		return entities
 	}

@@ -11,7 +11,8 @@ enum ImportBatchStatusEnum {
 	IGNORED('Ignored'),
 	PENDING('Pending'),
 	QUEUED('Queued'),
-	RUNNING('Running')
+	RUNNING('Running'),
+	STOPPED('Stopped')
 
 
 	final String label
