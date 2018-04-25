@@ -1,7 +1,10 @@
 <%@page import="com.tds.asset.Application"%>
+<%@page import="com.tds.asset.AssetType"%>
+<%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />
+<%@page import="grails.converters.JSON"%>
 
 <style>
 	#select2-drop{ width: 200px !important; }
@@ -216,16 +219,18 @@
 								<td>
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}">
 								%{--// TODO add data--}%
+
 									<kendo-dropdownlist
 											class="select"
 											name="modelAssetValidation"
-											[(ngModel)]="model.asset.validation"
-											[defaultItem]="'Please Select'"
-											[data]="">
+											[data]="${asset.constraints.validation.inList as JSON}"
+											[(ngModel)]="model.asset.validation">
 									</kendo-dropdownlist>
-%{--									<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
-										from="${applicationInstance.constraints.validation.inList }"
-										value="${applicationInstance.validation}" tabindex="37" />--}%
+
+																	%{--<g:select  id="validation"	class="${standardFieldSpecs.validation.imp?:''}" name="validation"
+																		from="${applicationInstance.constraints.validation.inList }"
+																		value="${applicationInstance.validation}" tabindex="37" />--}%
+
 								</tdsAngular:tooltipSpan>
 								</td>
 
@@ -271,7 +276,7 @@
 											name="modelAssetLatency"
 											[(ngModel)]="model.asset.latency"
 											[defaultItem]="'Please Select'"
-											[data]="">
+											[data]="${asset.constraints.latency.inList as JSON}">
 									</kendo-dropdownlist>
 
 								%{--	<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
@@ -377,6 +382,8 @@
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>--}%
 
+
+
 						</tbody>
 					</table>
 				</div></td>
@@ -385,6 +392,11 @@
 		<%-- Dependency Edit Block --%>
 		<tr id="applicationDependentId" class="assetDependent">
 			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
+		</tr>
+
+								<!-- Dependencies -->
+		<tr id="deps">
+			<tds-supports-depends [(model)]="model"></tds-supports-depends>
 		</tr>
 
 		<%-- Action Buttons --%>
