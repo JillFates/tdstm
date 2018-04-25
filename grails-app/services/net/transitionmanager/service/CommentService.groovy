@@ -252,6 +252,9 @@ class CommentService implements ServiceMethods {
 					assetComment.resolvedBy = currentPerson
 				}
 			}
+			if (assetComment.commentType == 'comment') {
+				assetComment.isResolved = 0
+			}
 
 			// Actual Start/Finish are handled by the statusUpdate function
 			// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
