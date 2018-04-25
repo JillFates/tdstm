@@ -1404,11 +1404,11 @@ class AssetEntityService implements ServiceMethods {
 	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Map params) {
 
-		println('entered!')
 		String domain = asset.assetClass.toString()
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
+		Map map =
 		[	assetId: asset.id,
 			environmentOptions: getAssetEnvironmentOptions(),
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
@@ -1422,12 +1422,20 @@ class AssetEntityService implements ServiceMethods {
 			version: asset.version,
 			customs: customFields,
 			standardFieldSpecs: standardFieldSpecs,
-			railTypeOption: getAssetRailTypeOptions(),
-			sourceRoomSelect: getRoomSelectOptions(project, true, true),
-			targetRoomSelect: getRoomSelectOptions(project, false, true),
-			sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
-			targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true)
 		]
+
+		// Required lists for Device type
+		if (asset.assetClass == AssetClass.DEVICE) {
+			map << [
+					railTypeOption: getAssetRailTypeOptions(),
+					sourceRoomSelect: getRoomSelectOptions(project, true, true),
+					targetRoomSelect: getRoomSelectOptions(project, false, true),
+					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true)
+			]
+		}
+
+		map
 	}
 
 	/**
