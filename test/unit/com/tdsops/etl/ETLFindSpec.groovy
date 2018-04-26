@@ -226,8 +226,8 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				assetEntities.findAll { it.id == args.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id }
 			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
@@ -863,11 +863,11 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				if (args.containsKey('id')) {
-					applications.findAll { it.getId() == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				if (namedParams.containsKey('id')) {
+					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }
 				} else {
-					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
+					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }
 				}
 			}
 
@@ -978,7 +978,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				throw new RuntimeException('Invalid query for this Spec')
 			}
 
@@ -1114,11 +1114,11 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				if (args.containsKey('id')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == args.id }
-				} else if (args.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == args.assetName }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				if (namedParams.containsKey('id')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }
+				} else if (namedParams.containsKey('assetName')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }
 				}
 			}
 
@@ -1730,8 +1730,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
@@ -1835,8 +1835,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
