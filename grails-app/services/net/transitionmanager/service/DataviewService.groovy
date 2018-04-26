@@ -552,7 +552,7 @@ class DataviewService implements ServiceMethods {
 		// Iterate over each column
 		dataviewSpec.columns.each { Map column ->
 
-			// Check if the user provided a filter expressio.
+			// Check if the user provided a filter expression.
 			if (filterFor(column)) {
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
@@ -900,10 +900,8 @@ class DataviewService implements ServiceMethods {
 		'locationSource' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
 		'rackSource'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
 		'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'roomSourceName', join: 'left outer join AE.roomSource'],
-		//'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
 		'locationTarget' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
 		'rackTarget'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
-		// 'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget'],
 		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'roomTargetName', join: 'left outer join AE.roomTarget'],
 	    'targetRackPosition': [property: "AE.targetRackPosition", type: Integer, namedParameter: 'targetRackPosition', join: "", mode:"where"],
 		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: "", mode:"where"]
