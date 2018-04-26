@@ -59,17 +59,4 @@ class DomainClassQueryHelperSpec extends Specification {
 			ETLDomain.Rack.getClazz()       | 'room'           || 'left outer join D.room'
 			ETLDomain.Dependency.getClazz() | 'asset'          || 'left outer join D.asset'
 	}
-
-	@Unroll
-	void 'test can get hql operation for field for clazz #clazz and field #field'() {
-
-		expect:
-			DomainClassQueryHelper.getOperatorForField(clazz, field) == result
-
-		where:
-			clazz                            | field      || result
-			ETLDomain.Device.getClazz()      | 'id'       || '= '
-			ETLDomain.Application.getClazz() | 'sme'      || 'like'
-			ETLDomain.Device.getClazz()      | 'appOwner' || 'like'
-	}
 }

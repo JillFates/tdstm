@@ -19,7 +19,7 @@ import net.transitionmanager.domain.Room
  * For example it transform:
  *
  * <pre>
- *     find Application of id by id with SOURCE.'application id'
+ *     find Application by 'id' with SOURCE.'application id' into 'id'
  * </pre>
  *
  * In to this HQL query:
@@ -32,47 +32,49 @@ import net.transitionmanager.domain.Room
  */
 class DomainClassQueryHelper {
 
-
+	/**
+	 * Static variable to define alias in every hql query used in this class
+	 */
 	static final String DOMAIN_ALIAS = 'D'
 	/**
 	 * Executes the HQL query related to the domain defined.
 	 * @param domain an instance of ETLDomain used to defined the correct HQL query to be executed
 	 * @param project a project instance used as a param in the HQL query
-	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @param paramsMap a map with params to be used in the HQL query
 	 * @return a list of assets returned by an HQL query
 	 * @trows an exception if domain is not correctly
 	 */
-	static List where(ETLDomain domain, Project project, Map<String, ?> fieldsSpec) {
+	static List where(ETLDomain domain, Project project, Map<String, ?> paramsMap) {
 
 		List assets
 
 		switch(domain.clazz){
 			case { AssetEntity.isAssignableFrom(it) }:
-				assets = assetEntities(domain.clazz, project, fieldsSpec)
+				assets = assetEntities(domain.clazz, project, paramsMap)
 				break
 			case { AssetDependency.isAssignableFrom(it) }:
-				assets = assetDependencies(fieldsSpec)
+				assets = assetDependencies(paramsMap)
 				break
 			case { Rack.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Rack, project, fieldsSpec)
+				assets = nonAssetEntities(Rack, project, paramsMap)
 				break
 			case { Room.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Room, project, fieldsSpec)
+				assets = nonAssetEntities(Room, project, paramsMap)
 				break
 			case { Manufacturer.isAssignableFrom(it) }:
-				assets = manufacturers(fieldsSpec)
+				assets = manufacturers(paramsMap)
 				break
 			case { MoveBundle.isAssignableFrom(it) }:
-				assets = nonAssetEntities(MoveBundle, project, fieldsSpec)
+				assets = nonAssetEntities(MoveBundle, project, paramsMap)
 				break
 			case { Model.isAssignableFrom(it) }:
-				assets = models(fieldsSpec)
+				assets = models(paramsMap)
 				break
 			case { Person.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Person, project, fieldsSpec)
+				assets = nonAssetEntities(Person, project, paramsMap)
 				break
 			case { Files.isAssignableFrom(it) }:
-				assets = nonAssetEntities(Files, project, fieldsSpec)
+				assets = nonAssetEntities(Files, project, paramsMap)
 				break
 			default:
 				throw ETLProcessorException.incorrectDomain(domain)
@@ -83,13 +85,13 @@ class DomainClassQueryHelper {
 	/**
 	 * Executes an HQL query looking for those all assets referenced by params.
 	 * @param project a project instance used as a param in the HQL query
-	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @param paramsMap a map with params to be used in the HQL query
 	 * @return a list of assets returned by an HQL query
 	 */
-	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> fieldsSpec) {
+	static List<? extends AssetEntity> assetEntities(Class<? extends AssetEntity> clazz, Project project, Map<String, ?> paramsMap) {
 
-		String hqlWhere = hqlWhere(clazz, fieldsSpec)
-		String hqlJoins = hqlJoins(clazz, fieldsSpec)
+		String hqlWhere = hqlWhere(clazz, paramsMap)
+		String hqlJoins = hqlJoins(clazz, paramsMap)
 
 		String hql = """
             select $DOMAIN_ALIAS
@@ -100,21 +102,21 @@ class DomainClassQueryHelper {
 			   and $hqlWhere
 			""".stripIndent()
 
-		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(clazz, fieldsSpec)
-		return AssetEntity.executeQuery(hql, args)
+		Map args = [project: project, assetClass: AssetClass.lookup(clazz)] + hqlParams(clazz, paramsMap)
+		return AssetEntity.executeQuery(hql, args, [readOnly: true])
 	}
 
 	/**
 	 *
 	 * @param clazz
-	 * @param fieldsSpec
+	 * @param paramsMap
 	 * @return
 	 */
-	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> fieldsSpec) {
+	static <T> List<T> nonAssetEntities(Class<T> clazz, Project project, Map<String, ?> paramsMap) {
 
-		String hqlWhere = hqlWhere(clazz, fieldsSpec)
-		String hqlJoins = hqlJoins(clazz, fieldsSpec)
-		Map<String, ?> hqlParams = hqlParams(clazz, fieldsSpec)
+		String hqlWhere = hqlWhere(clazz, paramsMap)
+		String hqlJoins = hqlJoins(clazz, paramsMap)
+		Map<String, ?> hqlParams = hqlParams(clazz, paramsMap)
 
 		String hql = """
 			  select $DOMAIN_ALIAS	
@@ -124,18 +126,18 @@ class DomainClassQueryHelper {
                and $hqlWhere 
 		""".stripIndent()
 
-		return clazz.executeQuery(hql, [project: project] + hqlParams)
+		return clazz.executeQuery(hql, [project: project] + hqlParams, [readOnly: true])
 	}
 
 	/**
 	 * Executes an HQL query looking for those all asset dependencies referenced by params.
-	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @param mapParams a map with params to be used in the HQL query
 	 * @return a list of asset dependencies returned by an HQL query
 	 */
-	static List<AssetDependency> assetDependencies(Map<String, ?> fieldsSpec) {
+	static List<AssetDependency> assetDependencies(Map<String, ?> mapParams) {
 
-		String hqlWhere = hqlWhere(AssetDependency, fieldsSpec)
-		String hqlJoins = hqlJoins(AssetDependency, fieldsSpec)
+		String hqlWhere = hqlWhere(AssetDependency, mapParams)
+		String hqlJoins = hqlJoins(AssetDependency, mapParams)
 
 		String hql = """
             select $DOMAIN_ALIAS
@@ -144,20 +146,20 @@ class DomainClassQueryHelper {
              where $hqlWhere  
         """.stripIndent()
 
-		Map<String, ?> params = hqlParams(AssetDependency, fieldsSpec)
-		return AssetDependency.executeQuery(hql, params)
+		Map<String, ?> params = hqlParams(AssetDependency, mapParams)
+		return AssetDependency.executeQuery(hql, params, [readOnly: true])
 	}
 
 	/**
 	 * Executes an HQL query looking for those all models referenced by params.
-	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @param mapParams a map with params to be used in the HQL query
 	 * @return a list of Model returned by an HQL query
 	 * @see Model
 	 */
-	static List<Model> models(Map<String, ?> fieldsSpec) {
+	static List<Model> models(Map<String, ?> mapParams) {
 
-		String hqlWhere = hqlWhere(Model, fieldsSpec)
-		String hqlJoins = hqlJoins(Model, fieldsSpec)
+		String hqlWhere = hqlWhere(Model, mapParams)
+		String hqlJoins = hqlJoins(Model, mapParams)
 
 		String hql = """
             select $DOMAIN_ALIAS
@@ -166,20 +168,20 @@ class DomainClassQueryHelper {
              where $hqlWhere  
         """.stripIndent()
 
-		Map<String, ?> params = hqlParams(Model, fieldsSpec)
-		return Model.executeQuery(hql, params)
+		Map<String, ?> params = hqlParams(Model, mapParams)
+		return Model.executeQuery(hql, params, [readOnly: true])
 	}
 
 	/**
 	 * Executes an HQL query looking for those all manufacturers referenced by params.
-	 * @param fieldsSpec a map with params to be used in the HQL query
+	 * @param mapParams a map with params to be used in the HQL query
 	 * @return a list of manufacturers returned by an HQL query
 	 * @see Model
 	 */
-	static List<Manufacturer> manufacturers(Map<String, ?> fieldsSpec) {
+	static List<Manufacturer> manufacturers(Map<String, ?> mapParams) {
 
-		String hqlWhere = hqlWhere(Manufacturer, fieldsSpec)
-		String hqlJoins = hqlJoins(Manufacturer, fieldsSpec)
+		String hqlWhere = hqlWhere(Manufacturer, mapParams)
+		String hqlJoins = hqlJoins(Manufacturer, mapParams)
 
 		String hql = """
             select $DOMAIN_ALIAS
@@ -188,8 +190,8 @@ class DomainClassQueryHelper {
              where $hqlWhere  
         """.stripIndent()
 
-		Map<String, ?> params = hqlParams(Model, fieldsSpec)
-		return Manufacturer.executeQuery(hql, params)
+		Map<String, ?> params = hqlParams(Model, mapParams)
+		return Manufacturer.executeQuery(hql, params, [readOnly: true])
 	}
 
 	/**
@@ -315,77 +317,43 @@ class DomainClassQueryHelper {
 	}
 
 	/**
-	 * Get operator based on Field Name and clazz parameter.
-	 * If field name belongs to a domain property class Person.
-	 * <pre>
-	 *  assert DomainClassQueryHelper.getOperatorForField(ETLDomain.Device.getClazz(), 'id') == '= '
-	 *  assert DomainClassQueryHelper.getOperatorForField(ETLDomain.Application.getClazz(), 'sme') == 'like'
-	 *  assert DomainClassQueryHelper.getOperatorForField(ETLDomain.Device.getClazz(), 'appOwner') == 'like'
-	 * </pre>
-	 * @param clazz
-	 * @param fieldName
-	 * @return an operator value for a HQL query.
-	 * @see GormUtil#isReferenceProperty(java.lang.Class, java.lang.String)
-	 * @see GormUtil#isDomainProperty(java.lang.Class, java.lang.String)
-	 * @see GormUtil#getAlternateKeyPropertyName(java.lang.Class)
-	 */
-	static String getOperatorForField(Class clazz, String fieldName){
-
-		String operator = '= '
-		if(AssetEntity.isAssignableFrom(clazz) &&
-			GormUtil.isDomainProperty(clazz, fieldName) &&
-				GormUtil.isReferenceProperty(clazz, fieldName)){
-			Class propertyClazz = GormUtil.getDomainClassOfProperty(clazz, fieldName)
-			if(Person.isAssignableFrom(propertyClazz)){
-				operator = 'like'
-			}
-		}
-
-		return operator
-	}
-
-	/**
 	 * Prepare el hql where for an HQL query.
 	 * @param clazz
-	 * @param fieldsSpec
-	 * @return where sentence oart for an HQL query using Clazz and field Specs.
+	 * @param mapParams
+	 * @return where sentence oart for an HQL query using Clazz and field params Map.
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
-	 * @see DomainClassQueryHelper#getOperatorForField(java.lang.Class, java.lang.String)
 	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
 	 */
-	static String hqlWhere(Class clazz, Map<String, ?> fieldsSpec) {
-		String s = fieldsSpec.keySet().collect { String field ->
+	static String hqlWhere(Class clazz, Map<String, ?> mapParams) {
+		return mapParams.keySet().collect { String field ->
 			String property = getPropertyForField(clazz, field)
 			String namedParameter = getNamedParameterForField(clazz, field)
-			String comparator = getOperatorForField(clazz, field)
-			" ${property} ${comparator} :${namedParameter}\n"
+			" ${property} = :${namedParameter}\n"
 		}.join(' and ')
-
-		return s
 	}
 
 	/**
-	 * Collects an hql params from field specs based on clazz parameters.
+	 * Collects an hql params from fields mapParams based on paramsMap.
 	 * @param clazz
-	 * @param fieldsSpec
+	 * @param mapParams
 	 * @return a Map instance with hql params.
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 */
-	static Map<String, ?> hqlParams(Class clazz, Map<String, ?> fieldsSpec) {
-		return fieldsSpec.collectEntries { String key, def value ->
+	static Map<String, ?> hqlParams(Class clazz, Map<String, ?> mapParams) {
+		return mapParams.collectEntries { String key, def value ->
 			String namedParameter = getNamedParameterForField(clazz, key)
 			[(namedParameter): value]
 		}
 	}
 
 	/**
-	 * Prepares all the necessary joins clause based on field specs and clazz parameters.
+	 * Prepares all the necessary joins clause based on paramsMap and clazz parameters.
 	 * @param clazz
-	 * @param fieldsSpec
+	 * @param mapParams
 	 * @return a string content with join clause for an HQL query
 	 */
-	static String hqlJoins(Class clazz, Map<String, ?> fieldsSpec) {
-		return fieldsSpec.collect { def item ->
+	static String hqlJoins(Class clazz, Map<String, ?> mapParams) {
+		return mapParams.collect { def item ->
 			getJoinForField(clazz, item.key)
 		}.join('  ')
 	}
