@@ -1099,7 +1099,7 @@ digraph runbook {
 	def editTask() {
 		Project project = controllerService.getProjectForPage(this)
 		if (! project) return
-		def apiActionList = apiActionService.list(project)
+		def apiActionList = apiActionService.list(project, true,[producesData:0] )
 
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
