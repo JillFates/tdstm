@@ -9,7 +9,7 @@ class ProjectDailyMetric {
 
 	Project project
 	Date metricDate
-	Long planningServers = 0
+	Long planningServers = 0 // quantity used second column
 	Long planningApplications = 0
 	Long planningDatabases = 0
 	Long planningPhysicalStorages = 0

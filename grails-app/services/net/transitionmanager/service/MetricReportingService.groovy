@@ -5,6 +5,7 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
@@ -21,6 +22,8 @@ class MetricReportingService {
 	Random                     randomNumberGenerator
 	SettingService             settingService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+	private static String DateFormat = 'yyyy-MM-dd'
 
 	/**
 	 * emum for the metric mode
@@ -145,7 +148,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
-		String date = new Date().format('yyyy-MM-dd')
+		String date = new Date().format(DateFormat)
 		List results = Person.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
 
 		results.collect { Object[] row ->
@@ -284,7 +287,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> testMetricFunction(List<Long> projectIds, String metricCode) {
-		String date = new Date().format('yyyy-MM-dd')
+		String date = new Date().format(DateFormat)
 		setUpRandom()
 
 		projectIds.collect { Long projectId ->
@@ -407,7 +410,7 @@ class MetricReportingService {
 		MetricResult result = MetricResult.findOrCreateWhere(
 				project: Project.load(data.projectId),
 				metricDefinitionCode: data.metricCode,
-				date: Date.parse('yyyy-MM-dd', data.date),
+				date: Date.parse(DateFormat, data.date),
 				label: data.label
 		)
 
@@ -431,5 +434,93 @@ class MetricReportingService {
 		}
 
 		return gatherMetric(projectIds, metricCode, metricDefinition)
+	}
+
+	/**
+	 * Queries metrics based on start/end date, guid, metric code and projectId
+	 *
+	 * @param startDate The start date range to query for.
+	 * @param endDate The end date range to query for.
+	 * @param projectGuid Optional to query for the guid
+	 * @param metricCodes Optional to query for metrics codes, will be split on a ,
+	 * @param projectId Optional to query based on the project.
+	 *
+	 * @return A list of maps containing the metric results with
+	 * projectGuid, metricCode, date, label, value  if not filtering by project or
+	 * metricCode, date, label, value if filtering by project.
+	 */
+	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid = '', String metricCodes ='', Integer projectId = null){
+		DetachedCriteria metrics = MetricResult.where {
+			date >= startDate && date <= endDate
+		}
+
+		if(projectGuid){
+			metrics.where {
+				project.guid == projectGuid
+			}
+		}else{
+			metrics.where {
+				project.collectMetrics == 1
+			}
+		}
+
+		if(metricCodes){
+			List<String> codes = metricCodes.split(',')
+
+			metrics.where{
+				metricDefinitionCode in codes
+			}
+		}
+
+		if(projectId){
+			metrics.where {
+				project.id == projectId
+			}
+		}
+
+		List<MetricResult> results = metrics.list()
+
+		if(projectId){
+			return metricResultsProjectMap(results)
+		}
+
+		return metricResultsMap(results)
+	}
+
+	/**
+	 * Collects the metric results for not filtering by project.
+	 *
+	 * @param results A list of metrics results.
+	 *
+	 * @return A list of maps of metrics results that can be rendered as JSON/
+	 */
+	private List<Map> metricResultsMap(List<MetricResult> results) {
+		return results.collect { MetricResult result ->
+			[
+					projectGuid: result.project.guid,
+					metricCode : result.metricDefinitionCode,
+					date       : result.date.format(DateFormat),
+					label      : result.label,
+					value      : result.value,
+			]
+		}
+	}
+
+	/**
+	 * Collects the metric results for filtering by project.
+	 *
+	 * @param results A list of metrics results.
+	 *
+	 * @return A list of maps of metrics results that can be rendered as JSON/
+	 */
+	private List<Map> metricResultsProjectMap(List<MetricResult> results) {
+		return results.collect { MetricResult result ->
+			[
+					metricCode: result.metricDefinitionCode,
+					date      : result.date.format(DateFormat),
+					label     : result.label,
+					value     : result.value,
+			]
+		}
 	}
 }

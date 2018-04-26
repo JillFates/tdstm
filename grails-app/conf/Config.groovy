@@ -455,3 +455,5 @@ graph {
 //	targetDir = '/var/www/tdstm/images/tmp/'
 //	targetURI = '/../images/tmp/'
 }
+
+grails.databinding.dateFormats = ['yyyyMMdd']
