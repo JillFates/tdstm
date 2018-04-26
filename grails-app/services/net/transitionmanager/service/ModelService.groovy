@@ -10,9 +10,13 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
 import grails.transaction.Transactional
-import net.transitionmanager.domain.*
+import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelAlias
+import net.transitionmanager.domain.ModelConnector
+import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.UserLogin
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -356,6 +360,7 @@ class ModelService implements ServiceMethods {
 		}
 	}
 
+	@Transactional
 	boolean update(Model model, GrailsParameterMap params) {
 		if (isValidName(model.modelName, model.id, model.manufacturer.id) && model.save(flush: true)) {
 			String deletedAka = params.deletedAka
@@ -440,13 +445,15 @@ class ModelService implements ServiceMethods {
 
 				def assetCableMaps = AssetCableMap.findAllByAssetFrom(assetEntity)
 				assetCableMaps.each {assetCableMap ->
-					if (!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)) {
-						AssetCableMap.executeUpdate('''
-									update AssetCableMap
-									set cableStatus=?, assetTo=null, assetToPort=null
-									where assetToPort=?
-								''', [AssetCableStatus.UNKNOWN, assetCableMap.assetFromPort])
-						AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = :aeId", [aeId: assetCableMap.assetFromPort?.id])
+					ModelConnector assetFromPort = assetCableMap.assetFromPort
+					if (assetFromPort && !assetConnectors.id?.contains(assetFromPort.id)) {
+						AssetCableMap.executeUpdate("""
+								update AssetCableMap
+								set cableStatus=?, assetTo=null, assetToPort=null
+								where assetToPort=?
+							""", [AssetCableStatus.UNKNOWN, assetCableMap.assetFromPort])
+
+						AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = :assetFromPort", [assetFromPort: assetFromPort])
 					}
 				}
 			}
