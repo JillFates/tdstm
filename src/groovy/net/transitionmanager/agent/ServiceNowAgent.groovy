@@ -218,7 +218,7 @@ class ServiceNowAgent extends AbstractAgent {
 							readonly: 0,
 							encoded: 0
 						],
-						tableParam('cmdb_ci_server', 1)
+						tableParam('cmdb_ci_database', 1)
 					] + COMMON_PARAMS
 				] ),
 			MSDList:
