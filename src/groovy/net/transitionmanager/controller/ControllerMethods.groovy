@@ -84,7 +84,7 @@ trait ControllerMethods {
 	 *
 	 * @param fileName The file name of the csv file defaults to filename.
 	 */
-	void renderASCSV(List<Map> data, String fileName = 'filename') {
+	void renderAsCSV(List<Map> data, String fileName = 'filename') {
 		OutputStreamWriter writer
 
 		try {
@@ -102,8 +102,6 @@ trait ControllerMethods {
 				rowArray = (row.values()*.toString()).toArray()
 				csvWriter.writeNext(rowArray)
 			}
-		}catch(Exception e) {
-			log.error('Error rendering csv', e)
 		} finally {
 			writer.flush()
 			writer.close()

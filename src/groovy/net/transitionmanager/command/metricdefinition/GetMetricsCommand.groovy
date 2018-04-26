@@ -14,15 +14,25 @@ import grails.validation.Validateable
  */
 @Validateable
 class GetMetricsCommand {
-	Date startDate = new Date().clearTime() -1
-	Date endDate = new Date().clearTime() -1
+	Date startDate = new Date().clearTime() - 1
+	Date endDate = new Date().clearTime() - 1
 	String projectGuid
 	String metricCodes
 	String format = 'csv'
 
+	List<String> codes(){
+		if(metricCodes) {
+			return metricCodes.split(',').collect { String code ->
+				code.trim()
+			}
+		}
+
+		return []
+	}
+
 	static constraints = {
 		projectGuid nullable: true
 		metricCodes nullable: true
-		format nullable: true
+		format nullable: true, inList: ['csv','json']
 	}
 }

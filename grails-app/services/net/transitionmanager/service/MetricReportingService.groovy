@@ -449,7 +449,7 @@ class MetricReportingService {
 	 * projectGuid, metricCode, date, label, value  if not filtering by project or
 	 * metricCode, date, label, value if filtering by project.
 	 */
-	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid = '', String metricCodes ='', Integer projectId = null){
+	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null){
 		DetachedCriteria metrics = MetricResult.where {
 			date >= startDate && date <= endDate
 		}
@@ -465,10 +465,8 @@ class MetricReportingService {
 		}
 
 		if(metricCodes){
-			List<String> codes = metricCodes.split(',')
-
 			metrics.where{
-				metricDefinitionCode in codes
+				metricDefinitionCode in metricCodes
 			}
 		}
 
