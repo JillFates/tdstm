@@ -37,8 +37,9 @@
                                     <td class="${standardFieldSpecs.assetType.imp ?: ''}" data-for="model"
                                         style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
                                         <tds-combobox
-                                                [(model)]="model.asset.manufacturer"
-                                                [serviceRequest]="searchAssetTypes">
+                                                [(model)]="model.asset.assetTypeSelectValue"
+                                                [serviceRequest]="searchAssetTypes"
+                                                [searchOnScroll]="false">
                                         </tds-combobox>
                                         %{--<div id="modelEditId" data-toggle="popover" data-trigger="hover"--}%
                                         %{--data-content="${standardFieldSpecs.assetType.tip ?: standardFieldSpecs.assetType.label}">--}%
@@ -63,18 +64,23 @@
                                     <td class="label_sm">Target</td>
                                 </tr>
                                 <tr>
-                                    <td *ngIf="model.asset.manufacturer && model.asset.manufacturer.id"
-                                        class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.manufacturer.imp ?: ''}" nowrap="nowrap">
                                         <label for="manufacturer" data-toggle="popover" data-trigger="hover"
                                                data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">
-                                            <a href='javascript:showManufacturer(${asset.manufacturer?.id})'
+                                            <a *ngIf="model.asset.manufacturer && model.asset.manufacturer.id" href='javascript:showManufacturer(${asset.manufacturer?.id})'
                                                style='color:#00E'>Manufacturer</a>
+                                            <label *ngIf="!model.asset.manufacturer">Manufacturer</label>
                                         </label>
                                     </td>
-                                    <tdsAngular:inputLabel *ngIf="!model.asset.manufacturer || !model.asset.manufacturer.id"
-                                                           field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
+                                    %{--<tdsAngular:inputLabel *ngIf="!model.asset.manufacturer || !model.asset.manufacturer.id"--}%
+                                                           %{--field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>--}%
                                     <td class="${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer"
                                         style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                            <tds-combobox
+                                                    [(model)]="model.asset.manufacturerSelectValue"
+                                                    [serviceRequest]="searchManufacturers"
+                                                    [searchOnScroll]="false">
+                                            </tds-combobox>
                                         %{--<div id="manufacturerEditId" style="display:inline" data-toggle="popover"--}%
                                         %{--data-trigger="hover"--}%
                                         %{--data-content="${standardFieldSpecs.manufacturer.tip ?: standardFieldSpecs.manufacturer.label}">--}%

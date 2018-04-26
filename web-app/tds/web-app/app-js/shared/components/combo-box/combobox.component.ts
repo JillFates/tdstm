@@ -41,6 +41,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('filterable') filterable: boolean;
 	@Input('required') required: boolean;
 	@Input('disabled') disabled: boolean;
+	@Input('searchOnScroll') searchOnScroll = true;
 	// Inner Params
 	private datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
@@ -134,7 +135,7 @@ export class TDSComboBoxComponent implements OnChanges {
 			this.comboBoxSearchResultModel = res;
 			// If in the process the MetaParam is not the same, clean the datasource
 			this.datasource = R.concat(this.datasource, this.comboBoxSearchResultModel.result);
-			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
+			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
 				this.calculateLastElementShow();
 			}
 		});
@@ -147,7 +148,7 @@ export class TDSComboBoxComponent implements OnChanges {
 		this.serviceRequest(this.comboBoxSearchModel).subscribe((res: ComboBoxSearchResultModel) => {
 			this.comboBoxSearchResultModel = res;
 			this.datasource = this.comboBoxSearchResultModel.result;
-			if (this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
+			if (this.searchOnScroll && this.comboBoxSearchResultModel.total > RESULT_PER_PAGE) {
 				this.calculateLastElementShow();
 			}
 		});
@@ -209,6 +210,9 @@ export class TDSComboBoxComponent implements OnChanges {
 	 * @returns {SafeHtml}
 	 */
 	public comboBoxInnerSearch(dataItem: any): SafeHtml {
+		if (!dataItem.text) {
+			dataItem.text = '';
+		}
 		const regex = new RegExp(this.innerComboBox.text, 'i');
 		const transformedText = dataItem.text.replace(regex, `<b>$&</b>`);
 		return this.sanitized.bypassSecurityTrustHtml(transformedText);

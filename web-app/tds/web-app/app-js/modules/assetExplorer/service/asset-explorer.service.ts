@@ -240,13 +240,40 @@ export class AssetExplorerService {
 	}
 
 	getAssetTypesForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
-		searchModel.query = 'term=&manufacturerId=';
 		return this.http.get(`../${this.assetEntitySearch}/assetTypesOf?${searchModel.query}`)
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
 					result: response.data.assetTypes,
 					total: response.data.assetTypes.length,
+					page: 1
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getManufacturersForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/manufacturer?${searchModel.query}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data.manufacturers,
+					total: response.data.manufacturers.length,
+					page: 1
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getModelsForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/modelsOf?${searchModel.query}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data.manufacturers,
+					total: response.data.manufacturers.length,
 					page: 1
 				};
 				return comboBoxSearchResultModel;
