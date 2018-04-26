@@ -48,8 +48,9 @@
 
 		<g:if test="${success}">
 			<h2 class="emailStatus">Check Your Email</h2>
-			<p class="instructions">We sent you an email with a link to reset your password. It may take a few minutes to reach your inbox.
-			If you don’t see the email, be sure to check your spam folder.
+			<p class="instructions">Thank you for requesting a password reset. If your account is currently active, 
+			you will receive an email with a reset link. If you do not receive this email, 
+			please check your spam filter or contact your system administrator to confirm your account is still active.
 			</p>
 			<br>
 			<div style="text-align: center;"><g:link action="login" class="light">Back to Login</g:link></div>
