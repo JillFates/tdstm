@@ -104,7 +104,7 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme2}">
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+									<div class="swapper-image" (click)="shufflePerson('sme1', 'sme2')" title="Swap Contacts"></div>
 								<kendo-dropdownlist
 									class="select"
 									name="modelAssetSme2"
@@ -156,8 +156,7 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.appOwner}">
-
-								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+									<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwnerEdit')" title="Swap Contacts"></div>
 									<kendo-dropdownlist
 											class="select"
 											name="modelAssetappOwner"

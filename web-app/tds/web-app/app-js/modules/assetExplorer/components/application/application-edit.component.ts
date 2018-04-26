@@ -19,8 +19,13 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 	})
 	class ApplicationShowComponent {
 		constructor( @Inject('model') private model: any, private activeDialog: UIActiveDialogService, private preference: PreferenceService) {}
+
 		ngOnInit(): void {
 			console.log('Loading application-edit.component');
+		}
+
+		shufflePerson(control1: string, control2: string) {
+			console.log('Swapping controls');
 		}
 	}
 
