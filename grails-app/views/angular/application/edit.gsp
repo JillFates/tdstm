@@ -62,7 +62,15 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme}">
-
+									<kendo-dropdownlist
+											class="select"
+											name="modelAssetSme"
+											[(ngModel)]="model.asset.sme.id"
+											[defaultItem]="'Please Select'"
+											[textField]="'fullName'"
+											[valueField]="'personId'"
+											[data]="${personList as JSON}">
+									</kendo-dropdownlist>
 								%{--	<g:select from="${personList}" id="sme1" name="sme.id" class="${standardFieldSpecs.sme.imp?:''} personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}"
@@ -97,7 +105,15 @@
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme2}">
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-
+								<kendo-dropdownlist
+									class="select"
+									name="modelAssetSme2"
+									[(ngModel)]="model.asset.sme2.id"
+									[defaultItem]="'Please Select'"
+									[textField]="'fullName'"
+									[valueField]="'personId'"
+									[data]="${personList as JSON}">
+								</kendo-dropdownlist>
 							%{--		<g:select from="${personList}" id="sme2" name="sme2.id" class="${standardFieldSpecs.sme2.imp?:''} suffleSelect personContact assetSelect" optionKey="personId"
 										optionValue="${{it.fullName}}"
 										onchange="openPersonDiv(this.value, this.id)"
@@ -142,6 +158,15 @@
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.appOwner}">
 
 								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+									<kendo-dropdownlist
+											class="select"
+											name="modelAssetappOwner"
+											[(ngModel)]="model.asset.appOwner.id"
+											[defaultItem]="'Please Select'"
+											[textField]="'fullName'"
+											[valueField]="'personId'"
+											[data]="${personList as JSON}">
+									</kendo-dropdownlist>
 %{--
 									<g:select from="${personList}" id="appOwnerEdit" class="${standardFieldSpecs.appOwner.imp?:''} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="personId"
 										optionValue="${{it.fullName}}"
