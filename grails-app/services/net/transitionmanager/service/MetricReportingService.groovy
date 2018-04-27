@@ -149,7 +149,7 @@ class MetricReportingService {
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
 		String date = new Date().format(DateFormat)
-		List results = Person.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
+		List results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
 
 		results.collect { Object[] row ->
 			[
