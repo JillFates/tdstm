@@ -370,7 +370,9 @@ class MetricReportingService {
 		definitions.each { Map definition ->
 			if (definition.enabled) {
 				try {
-					gatherMetric(projectIds, (String) definition.metricCode, new JSONObject(definition)).each { Map data ->
+					List <Map> metricsData = gatherMetric(projectIds, (String) definition.metricCode, new JSONObject(definition))
+
+					metricsData.each { Map data ->
 						writeMetricData(data)
 						metrics++
 					}
