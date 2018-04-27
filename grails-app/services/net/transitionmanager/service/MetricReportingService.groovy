@@ -7,10 +7,12 @@ import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import net.transitionmanager.ProjectDailyMetric
+import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang.math.RandomUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -18,7 +20,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
  * A service for dealing with reporting metrics.
  */
 class MetricReportingService {
-	Random                     randomNumberGenerator
 	SettingService             settingService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
@@ -187,7 +188,7 @@ class MetricReportingService {
 	 */
 	String getLabel(List groupBy, String aggregation) {
 		if (groupBy) {
-			List sanitizedGroupBy = groupBy.collect{ String group ->
+			List sanitizedGroupBy = groupBy.collect { String group ->
 				return "COALESCE($group, 'Unknown')"
 			}
 			return "concat(${sanitizedGroupBy.join(', :colon, ')})"
@@ -329,7 +330,13 @@ class MetricReportingService {
 	 * @return A Map of the saved JSON, and the version of the metrics.
 	 */
 	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version) {
-		settingService.save(SettingType.METRIC_DEF, 'MetricDefinitions', (definitions.toMap() as JSON).toString(), version)
+		settingService.save(
+				SettingType.METRIC_DEF,
+				'MetricDefinitions',
+				(definitions.toMap() as JSON).toString(),
+				version
+		)
+
 		return getDefinitions()
 	}
 
@@ -428,28 +435,28 @@ class MetricReportingService {
 	 * projectGuid, metricCode, date, label, value  if not filtering by project or
 	 * metricCode, date, label, value if filtering by project.
 	 */
-	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null){
+	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null) {
 		DetachedCriteria metrics = MetricResult.where {
 			date >= startDate && date <= endDate
 		}
 
-		if(projectGuid){
+		if (projectGuid) {
 			metrics.where {
 				project.guid == projectGuid
 			}
-		}else{
+		} else {
 			metrics.where {
 				project.collectMetrics == 1
 			}
 		}
 
-		if(metricCodes){
-			metrics.where{
+		if (metricCodes) {
+			metrics.where {
 				metricDefinitionCode in metricCodes
 			}
 		}
 
-		if(projectId){
+		if (projectId) {
 			metrics.where {
 				project.id == projectId
 			}
@@ -457,7 +464,7 @@ class MetricReportingService {
 
 		List<MetricResult> results = metrics.list()
 
-		if(projectId){
+		if (projectId) {
 			return metricResultsProjectMap(results)
 		}
 
