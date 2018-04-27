@@ -1,4 +1,4 @@
-import {Component, ViewChild, ViewChildren, HostListener, QueryList, Renderer2, ElementRef} from '@angular/core';
+import {Component, ViewChild, ViewChildren, HostListener, QueryList} from '@angular/core';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {CredentialModel, AUTH_METHODS, REQUEST_MODE} from '../../model/credential.model';
@@ -12,7 +12,6 @@ import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
-import {Observable} from 'rxjs/Observable';
 
 declare var jQuery: any;
 
@@ -26,6 +25,9 @@ declare var jQuery: any;
 		.invalid-form {
 			color: red;
 			font-weight: bold;
+		}
+		.script-error {
+			margin-bottom: 18px;
 		}
 		#httpMethod {
 			width: 75px;
@@ -55,9 +57,9 @@ export class CredentialViewEditComponent {
 	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
-	@ViewChild('credentialsContainer') credentialsContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
+
 	public credentialModel: CredentialModel;
 	public providerList = new Array<ProviderModel>();
 	public statusList = new Array<any>();
@@ -72,18 +74,13 @@ export class CredentialViewEditComponent {
 	public isEditing = false;
 	public checkActionModel = CHECK_ACTION;
 	public operationStatusModel = new OperationStatusModel();
-	public validExpressionResult = {
-		valid: true,
-		error: ''
-	};
 	constructor(
 		public originalModel: CredentialModel,
 		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
-		private dataIngestionService: DataIngestionService,
-		private renderer: Renderer2) {
+		private dataIngestionService: DataIngestionService) {
 
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
@@ -166,29 +163,9 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
-	 * Execute the flow to create/save/update a credential
+	 * Create a new DataScript
 	 */
 	protected onSaveCredential(): void {
-		// Cookie and Header requires an extra validation before to save the credential
-		if (this.credentialModel.authMethod === this.authMethods.COOKIE || this.credentialModel.authMethod === this.authMethods.HEADER) {
-			this.validateExpressionCheck().subscribe((result) => {
-				if (result) {
-					this.validExpressionResult = result;
-					if (this.validExpressionResult.valid) {
-						this.saveCredential();
-					}
-				}
-			});
-		} else {
-			// For other Auth methods rather than Cookie or Header
-			this.saveCredential();
-		}
-	}
-
-	/**
-	 * Createm Save or Update the Credential forom the model
-	 */
-	private saveCredential(): void {
 		this.dataIngestionService.saveCredential(this.credentialModel).subscribe(
 			(result: any) => {
 				if (result && result.id) {
@@ -196,6 +173,7 @@ export class CredentialViewEditComponent {
 				}
 			},
 			(err) => console.log(err));
+
 	}
 
 	/**
@@ -214,15 +192,11 @@ export class CredentialViewEditComponent {
 			this.promptService.open(
 				'Confirmation Required',
 				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
-				.then(confirm => {
-					if (confirm) {
+				'Confirm', 'Cancel').then(result => {
+					if (result) {
 						this.activeDialog.dismiss();
-					} else {
-						this.focusForm();
 					}
-				})
-				.catch((error) => console.log(error));
+				});
 		} else {
 			this.activeDialog.dismiss();
 		}
@@ -232,7 +206,7 @@ export class CredentialViewEditComponent {
 	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
 	 * @param {KeyboardEvent} event
 	 */
-	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+	@HostListener('document:keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
 		if (event && event.code === KEYSTROKE.ESCAPE) {
 			this.cancelCloseDialog();
 		}
@@ -243,7 +217,6 @@ export class CredentialViewEditComponent {
 	 */
 	protected changeToEditCredential(): void {
 		this.modalType = this.actionTypes.EDIT;
-		this.focusForm();
 	}
 
 	/**
@@ -276,41 +249,11 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
-	 * Listener that wait a subscribe, so it can be attached as a callback-promise to the save of the credential.
-	 */
-	protected onValidateExpression(): void {
-		this.validateExpressionCheck().subscribe();
-	}
-
-	/**
-	 * Verify against the endpoint if the expression is valid.
-	 * @returns {Observable<any>}
-	 */
-	private validateExpressionCheck(): Observable<any> {
-		return new Observable(observer => {
-		this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
-			(result: any) => {
-				this.validExpressionResult = result;
-				observer.next(result);
-			},
-			(err) => console.log(err));
-		});
-	}
-
-	/**
 	 * Keep Data Signature Clean even when there are so many values incoming
 	 * @param property
 	 * @param value
 	 */
 	private modifySignatureByProperty(property: any): void {
 		this.dataSignature = ObjectUtils.modifySignatureByProperty(this.dataSignature, property, this.credentialModel[property]);
-	}
-
-	private focusForm() {
-		this.credentialsContainer.nativeElement.focus();
-	}
-
-	protected isCheckSyntaxDisabled(): boolean {
-		return this.operationStatusModel.state === CHECK_ACTION.VALID;
 	}
 }
