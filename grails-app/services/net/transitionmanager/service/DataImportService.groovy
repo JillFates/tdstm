@@ -31,7 +31,6 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.InvalidSyntaxException
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -387,6 +386,11 @@ class DataImportService implements ServiceMethods {
 		def savePoint = session.createSavepoint()
 
 		Boolean hadError = false
+
+		// If the domain id is null or negative, default it to zero.
+		if (!domainId || domainId < 0) {
+			domainId = 0
+		}
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
 		for (fieldName in importContext.fieldNames) {
 
@@ -408,7 +412,7 @@ class DataImportService implements ServiceMethods {
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
-					assetEntityId: ( domainId < 0 ? null : domainId ),
+					assetEntityId: domainId,
 					importValue: field.originalValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
