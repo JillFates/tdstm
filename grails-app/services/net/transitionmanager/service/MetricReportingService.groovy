@@ -53,38 +53,8 @@ class MetricReportingService {
 		}
 	}
 
-	/**
-	 * sets up a random instance with a seed.
-	 *
-	 * @param seed a seed for random, for testing.If null the seed becomes currentTimeMillis + freeMemory
-	 */
-	void setUpRandom(Long seed = null) {
-		if (seed == null) {
-			seed = System.currentTimeMillis() + Runtime.runtime.freeMemory()
-		}
-
-		if (randomNumberGenerator == null) {
-			randomNumberGenerator = new Random(seed)
-		}
-	}
-
-	/**
-	 * A random number generator I copied from my Groovy talk on Meta programming:
-	 * https://github.com/virtualdogbert/MetaProgrammingMagicRevealed/blob/master/Dgenerator.groovy
-	 *
-	 * @param min Lower bound for the generated number.
-	 * @param max Upper bound for the generated number.
-	 * @param seed An optional seed for the generator, using for testing.
-	 *
-	 * @return A random integer between min and max, using a seed for the generator.
-	 */
-	int generateRandomInt(int min, int max, Long seed = null) {
-		setUpRandom(seed)
-		return min + ((max - min) * randomNumberGenerator.nextDouble()) as int
-	}
-
-	Date getMetricCollectionDate(){
-		new Date().clearTime() -1
+	Date getMetricCollectionDate() {
+		new Date().clearTime() - 1
 	}
 
 	/**
@@ -292,7 +262,6 @@ class MetricReportingService {
 	 */
 	private List<Map> testMetricFunction(List<Long> projectIds, String metricCode) {
 		String date = metricCollectionDate.format(DateFormat)
-		setUpRandom()
 
 		projectIds.collect { Long projectId ->
 			[
@@ -300,7 +269,7 @@ class MetricReportingService {
 					metricCode: metricCode,
 					date      : date,
 					label     : 'count',
-					value     : generateRandomInt(1, 500)
+					value     : RandomUtils.nextInt(499) + 1
 			]
 		}
 	}
