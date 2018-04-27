@@ -87,6 +87,8 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-rest:1.5.4'
 		compile ":rest-client-builder:2.1.0"
 
+		compile "org.grails.plugins:cascade-validation:0.1.5"
+
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'

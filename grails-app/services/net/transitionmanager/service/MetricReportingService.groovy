@@ -2,6 +2,9 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
+import com.tdsops.tm.enums.domain.SettingType
+import grails.converters.JSON
+import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.Person
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -11,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
  */
 class MetricReportingService {
 	Random                     randomNumberGenerator
+	SettingService             settingService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	/**
@@ -21,8 +25,23 @@ class MetricReportingService {
 		sql,
 		function
 
+		/**
+		 * Looks up a MetricMode based on it's string code.
+		 *
+		 * @param code The code of the MetricMode to lookup.
+		 *
+		 * @return The MetricMode Looked up, by it's code.
+		 */
 		static MetricMode lookup(String code) {
 			return MetricMode.enumConstantDirectory().get(code)
+		}
+
+		/**
+		 * Gets a list of the values of the modes.
+		 * @return
+		 */
+		static List<String> list() {
+			return values()*.name()
 		}
 	}
 
@@ -278,5 +297,32 @@ class MetricReportingService {
 					value     : generateRandomInt(1, 500)
 			]
 		}
+	}
+
+	/**
+	 * Gets the definitions JSON for the GSP page, pretty printed with the version.
+	 *
+	 * @return A Map containing the definitions JSON and their version.
+	 */
+	Map getDefinitions() {
+		Map definitions = settingService.getAsMap(SettingType.METRIC_DEF, 'MetricDefinitions') ?: [:]
+		int version = definitions?.version ?: 0
+		definitions.remove('version')
+		String definition = (definitions.definitions as JSON).toString(true) ?: ''
+
+		return [definitions: definition, version: version]
+	}
+
+	/**
+	 * Saves the Definitions as a Stringified JSON to the setting table.
+	 *
+	 * @param definitions The definitions command object that contains the metrics JSON.
+	 * @param version The version of the metrics for the Settings table.
+	 *
+	 * @return A Map of the saved JSON, and the version of the metrics.
+	 */
+	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version){
+		settingService.save(SettingType.METRIC_DEF, 'MetricDefinitions', (definitions.toMap() as JSON).toString(), version)
+		return getDefinitions()
 	}
 }
