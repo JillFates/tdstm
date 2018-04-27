@@ -12,7 +12,6 @@ import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.jfree.util.Log
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
@@ -377,7 +376,7 @@ class MetricReportingService {
 
 		}
 
-		Log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
+		log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
 		return [metrics: metrics, errors: errors]
 	}
 
