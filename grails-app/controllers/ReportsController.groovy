@@ -1532,4 +1532,26 @@ class ReportsController implements ControllerMethods {
 
 		renderAsJson(metricReportingService.saveDefinitions(definitions, version))
 	}
+
+	/**
+	 * Tests Metric definitions, returning a list of maps, as data or any errors.
+	 */
+	@HasPermission(Permission.AdminUtilitiesAccess)
+	def testMetricDefinitions(){
+		List<Map> data = []
+		String metricCodesString = request.JSON.metricCodes
+
+		if(!metricCodesString){
+			return renderErrorJson('Metric codes can not be empty')
+		}
+
+		List<String> codes =  request.JSON.metricCodes.split(',')
+
+		codes.each { String metricCode ->
+			data.addAll(metricReportingService.testMetric(metricCode.trim()))
+		}
+
+		renderSuccessJson(data)
+		renderErrorJson()
+	}
 }

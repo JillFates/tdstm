@@ -4,8 +4,11 @@ import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.SettingType
 import grails.converters.JSON
+import grails.transaction.Transactional
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
+import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Person
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -79,7 +82,7 @@ class MetricReportingService {
 	 * A map of functions that can be run by gatherMetric if the mode is function.
 	 */
 	private Map functions = [
-			testMetric: { List<Long> projectIds, String metricCode -> testMetric(projectIds, metricCode) }
+			testMetric: { List<Long> projectIds, String metricCode -> testMetricFunction(projectIds, metricCode) }
 	]
 
 	/**
@@ -284,7 +287,7 @@ class MetricReportingService {
 	 * 			value     : row.value
 	 * 		]
 	 */
-	private List<Map> testMetric(List<Long> projectIds, String metricCode) {
+	private List<Map> testMetricFunction(List<Long> projectIds, String metricCode) {
 		String date = new Date().format('yyyy-MM-dd')
 		setUpRandom()
 
@@ -305,12 +308,41 @@ class MetricReportingService {
 	 * @return A Map containing the definitions JSON and their version.
 	 */
 	Map getDefinitions() {
-		Map definitions = settingService.getAsMap(SettingType.METRIC_DEF, 'MetricDefinitions') ?: [:]
+		Map definitions = getMetricDefinitions()
 		int version = definitions?.version ?: 0
 		definitions.remove('version')
 		String definition = (definitions.definitions as JSON).toString(true) ?: ''
 
 		return [definitions: definition, version: version]
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	Map getMetricDefinitions() {
+		settingService.getAsMap(SettingType.METRIC_DEF, 'MetricDefinitions') ?: [:]
+	}
+
+	/**
+	 *
+	 * @param code
+	 * @return
+	 */
+	JSONObject getDefinition(String code) {
+		List definitions = getMetricDefinitions().definitions ?: [:]
+
+		Map metricDefinition = definitions.find { Map definition ->
+			if (definition.metricCode == code) {
+				return definition
+			}
+		}
+
+		if (!metricDefinition) {
+			throw new InvalidParamException("Metric definition doesn't exist for $code")
+		}
+
+		return new JSONObject(metricDefinition)
 	}
 
 	/**
@@ -324,5 +356,33 @@ class MetricReportingService {
 	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version){
 		settingService.save(SettingType.METRIC_DEF, 'MetricDefinitions', (definitions.toMap() as JSON).toString(), version)
 		return getDefinitions()
+	}
+
+	/**
+	 * Gets a list of project ids for metrics, that have collectMetrics set to 1.
+	 *
+	 * @return A list of Long project ids, that have collectMetrics enabled.
+	 */
+	List<Long> projectIdsForMetrics() {
+		return Project.where { collectMetrics == 1 }.projections {
+			property 'id'
+		}.list()
+	}
+	/**
+	 * This runs a test for a metric based on a metric code, against projects that have collectMetrics set to 1.
+	 *
+	 * @param metricCode the code of the metric to run.
+	 *
+	 * @return A list of maps containing the metric data gathered.
+	 */
+	List<Map> testMetric(String metricCode) {
+		List<Long> projectIds = projectIdsForMetrics()
+		JSONObject metricDefinition = getDefinition(metricCode)
+
+		if (!metricDefinition) {
+			throw new InvalidParamException("Metric definition doesn't exist for $metricCode")
+		}
+
+		return gatherMetric(projectIds, metricCode, metricDefinition, false)
 	}
 }
