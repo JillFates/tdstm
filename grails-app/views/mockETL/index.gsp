@@ -158,8 +158,8 @@
                             </tr>
                             <g:each in="${etlProcessor?.rows}" var="row">
                                 <tr>
-                                    <g:each in="${row.elements}" var="element">
-                                        <td>${element.value}</td>
+                                    <g:each in="${row.dataSetValues}" var="element">
+                                        <td>${element}</td>
                                     </g:each>
                                 </tr>
                             </g:each>
