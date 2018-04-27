@@ -363,7 +363,7 @@ class ImportBatchService implements ServiceMethods {
 			// Now set those batches to the proper status based on what was completed before the
 			// batch stalled (a.k.a. runtime error encountered and stopped)
 			stalledBatches.each {
-				dataImportService.updateBatchProgress(it, 1, 1, ImportBatchStatusEnum.STOPPED)
+				dataImportService.updateBatchStatus(it)
 			}
 			remainingBatches = ids - stalledBatches
 		}
@@ -375,7 +375,7 @@ class ImportBatchService implements ServiceMethods {
 				project == project
 				id in ids
 				status == ImportBatchStatusEnum.RUNNING
-			}.updateAll([processStopFlag: 1, status: ImportBatchStatusEnum.STOPPED])
+			}.updateAll([processStopFlag: 1])
 		}
 
 		return updated
