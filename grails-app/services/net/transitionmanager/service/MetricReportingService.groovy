@@ -89,19 +89,24 @@ class MetricReportingService {
 	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition) {
 		MetricMode mode = MetricMode.lookup((String) metricDefinition.mode)
 
-		if (mode == MetricMode.query) {
-			runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
-		} else if (mode == MetricMode.sql) {
-			return runSql((String) metricDefinition.sql, projectIds)
-		} else if (mode == MetricMode.function) {
-			Closure function = functions[(String) metricDefinition.function]
-			if (!function) {
-				throw new InvalidParamException('Function for metric not implemented.')
-			}
+		switch (mode) {
+			case MetricMode.query:
+				runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
+				break
+			case MetricMode.sql:
+				return runSql((String) metricDefinition.sql, projectIds)
+				break
+			case MetricMode.function:
+				Closure function = functions[(String) metricDefinition.function]
 
-			return function(projectIds, metricCode)
-		} else {
-			throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
+				if (!function) {
+					throw new InvalidParamException('Function for metric not implemented.')
+				}
+
+				return function(projectIds, metricCode)
+				break
+			default:
+				throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
 		}
 	}
 
