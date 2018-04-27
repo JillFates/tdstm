@@ -77,6 +77,11 @@
 			dataType   : "json",
 			data       : JSON.stringify(data),
 			success    : function (data) {
+				if (data.status === "error") {
+					alert(data.errors);
+					return
+				}
+
 				$("#definitions").val(JSON.stringify(JSON.parse(data.definitions), undefined, 4));
 				$("#version").val(data.version);
 				alert('Saved!');
@@ -114,7 +119,7 @@
 			dataType   : "json",
 			data       : JSON.stringify(data),
 			success    : function (responseData) {
-				if(responseData.status === "error"){
+				if (responseData.status === "error") {
 					alert(responseData.errors);
 					return
 				}

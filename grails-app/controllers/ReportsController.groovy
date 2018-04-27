@@ -1524,11 +1524,9 @@ class ReportsController implements ControllerMethods {
 	 * @return the JSON that was save to the Settings table.
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
-	def saveMetricDefinitions(MetricDefinitionsCommand definitions, Integer version) {
-		if (definitions.hasErrors()) {
-			response.setStatus(HttpStatus.BAD_REQUEST.value())
-			return renderAsJson(definitions.errors)
-		}
+	def saveMetricDefinitions(Integer version) {
+		MetricDefinitionsCommand definitions = populateCommandObject(MetricDefinitionsCommand.class)
+		validateCommandObject(definitions)
 
 		renderAsJson(metricReportingService.saveDefinitions(definitions, version))
 	}

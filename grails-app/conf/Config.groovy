@@ -457,3 +457,4 @@ graph {
 }
 
 xssSanitizer.enabled = true
+grails.databinding.dateFormats = ['yyyyMMdd']

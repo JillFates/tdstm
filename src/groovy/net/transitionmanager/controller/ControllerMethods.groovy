@@ -1,5 +1,6 @@
 package net.transitionmanager.controller
 
+import au.com.bytecode.opencsv.CSVWriter
 import com.google.gson.JsonSyntaxException
 import com.tdsops.common.exceptions.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
@@ -74,6 +75,37 @@ trait ControllerMethods {
 
 	void renderWarningJson(warningStringOrList) {
 		renderAsJson warnings(warningStringOrList)
+	}
+
+	/**
+	 * Renders a list of maps to a CSV file.
+	 *
+	 * @param data a list of maps to render to a csv file
+	 *
+	 * @param fileName The file name of the csv file defaults to filename.
+	 */
+	void renderAsCSV(List<Map> data, String fileName = 'filename') {
+		OutputStreamWriter writer
+
+		try {
+			response.setHeader("Content-disposition", "attachment; filename=${fileName}.csv")
+			setContentTypeCsv()
+			OutputStream outputStream = response.outputStream
+			writer = new OutputStreamWriter(outputStream)
+			CSVWriter csvWriter = new CSVWriter(writer)
+
+			//write headers
+			String[] rowArray = (data[0].keySet()).toArray()
+			csvWriter.writeNext(rowArray)
+
+			data.each { Map row ->
+				rowArray = (row.values()*.toString()).toArray()
+				csvWriter.writeNext(rowArray)
+			}
+		} finally {
+			writer.flush()
+			writer.close()
+		}
 	}
 
 	Map success(data = [:]) {
