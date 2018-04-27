@@ -291,10 +291,11 @@
 			});
 		}
 		$(document).ready(function() {
-			$("#editDialog,#createRoomDialog,#listDialog").dialog({modal: true, autoOpen: false,open:function(){
+			$("#editDialog,#createRoomDialog").dialog({modal: true, autoOpen: false,open:function(){
 				$('.ui-dialog-titlebar-close').html('')
 				.append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			},close:function(){ location.reload();} });
+			$("#editEntityView").dialog({close:function(){ location.reload();} });
 			$("#manufacturerShowDialog,#modelShowDialog").dialog({modal: true,autoOpen: false})
 			$("#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({modal: true, autoOpen: false })
 			$("#editCommentDialog,#editManufacturerView").dialog({modal: true, autoOpen: false})
