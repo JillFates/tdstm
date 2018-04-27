@@ -1,6 +1,7 @@
 package test.helper
 
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.domain.*
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
@@ -78,6 +79,7 @@ class ProjectTestHelper {
 			completionDate = startDate + 30
 			workflowCode = 'STD_PROCESS'
 			timezone = Timezone.findByCode('GMT')
+			guid = StringUtil.generateGuid()
 		}
 		project.save(failOnError:true)
 

@@ -3,6 +3,7 @@ package net.transitionmanager.service
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.SettingType
+import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
 import grails.transaction.Transactional
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
@@ -10,6 +11,7 @@ import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.jfree.util.Log
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
@@ -107,31 +109,22 @@ class MetricReportingService {
 	 * 			value     : row.value
 	 * 		]
 	 */
-	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition, boolean logError = true) {
+	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition) {
 		MetricMode mode = MetricMode.lookup((String) metricDefinition.mode)
 
-		try {
-			if (mode == MetricMode.query) {
-				runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
-			} else if (mode == MetricMode.sql) {
-				return runSql((String) metricDefinition.sql, projectIds)
-			} else if (mode == MetricMode.function) {
-				Closure function = functions[(String) metricDefinition.function]
-				if (!function) {
-					throw new InvalidParamException('Function for metric not implemented.')
-				}
+		if (mode == MetricMode.query) {
+			runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
+		} else if (mode == MetricMode.sql) {
+			return runSql((String) metricDefinition.sql, projectIds)
+		} else if (mode == MetricMode.function) {
+			Closure function = functions[(String) metricDefinition.function]
+			if (!function) {
+				throw new InvalidParamException('Function for metric not implemented.')
+			}
 
-				return function(projectIds, metricCode)
-			} else {
-				throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
-			}
-		} catch (Exception e) {
-			if (logError) {
-				log.error(e)
-				return []
-			} else {
-				throw e
-			}
+			return function(projectIds, metricCode)
+		} else {
+			throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
 		}
 	}
 
@@ -213,7 +206,10 @@ class MetricReportingService {
 	 */
 	String getLabel(List groupBy, String aggregation) {
 		if (groupBy) {
-			return "concat(${groupBy.join(', :colon, ')})"
+			List sanitizedGroupBy = groupBy.collect{ String group ->
+				return "COALESCE($group, 'Unknown')"
+			}
+			return "concat(${sanitizedGroupBy.join(', :colon, ')})"
 		}
 
 		return "'${aggregation.split(/\(/)[0]}'"
@@ -353,7 +349,7 @@ class MetricReportingService {
 	 *
 	 * @return A Map of the saved JSON, and the version of the metrics.
 	 */
-	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version){
+	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version) {
 		settingService.save(SettingType.METRIC_DEF, 'MetricDefinitions', (definitions.toMap() as JSON).toString(), version)
 		return getDefinitions()
 	}
@@ -368,6 +364,57 @@ class MetricReportingService {
 			property 'id'
 		}.list()
 	}
+
+	/**
+	 * This runs all the metrics enabled against all the projects that have collectMetrics enabled.
+	 */
+	Map generateDailyMetrics() {
+		List<Long> projectIds = projectIdsForMetrics()
+		List definitions = getMetricDefinitions().definitions ?: []
+		int errors = 0
+		int metrics = 0
+		StopWatch stopwatch = new StopWatch()
+
+		log.info 'generateDailyMetrics started'
+		stopwatch.start()
+
+		definitions.each { Map definition ->
+			if (definition.enabled) {
+				try {
+					gatherMetric(projectIds, (String) definition.metricCode, new JSONObject(definition)).each { Map data ->
+						writeMetricData(data)
+						metrics++
+					}
+				} catch (Exception e) {
+					errors++
+					log.error("$definition.metricCode failed", e)
+				}
+			}
+
+		}
+
+		Log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
+		return [metrics: metrics, errors: errors]
+	}
+
+	/**
+	 * Writes metric data to the metric result table.
+	 *
+	 * @param data The metric result data to write to the db.
+	 */
+	@Transactional
+	void writeMetricData(Map<String, ?> data) {
+		MetricResult result = MetricResult.findOrCreateWhere(
+				project: Project.load(data.projectId),
+				metricDefinitionCode: data.metricCode,
+				date: Date.parse('yyyy-MM-dd', data.date),
+				label: data.label
+		)
+
+		result.value = data.value
+		result.save(failOnError: true)
+	}
+
 	/**
 	 * This runs a test for a metric based on a metric code, against projects that have collectMetrics set to 1.
 	 *
@@ -383,6 +430,6 @@ class MetricReportingService {
 			throw new InvalidParamException("Metric definition doesn't exist for $metricCode")
 		}
 
-		return gatherMetric(projectIds, metricCode, metricDefinition, false)
+		return gatherMetric(projectIds, metricCode, metricDefinition)
 	}
 }
