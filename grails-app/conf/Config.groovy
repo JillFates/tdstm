@@ -456,4 +456,5 @@ graph {
 //	targetURI = '/../images/tmp/'
 }
 
+xssSanitizer.enabled = true
 grails.databinding.dateFormats = ['yyyyMMdd']
