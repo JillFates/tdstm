@@ -27,7 +27,9 @@ module.exports = function (env) {
 		module: {
 			rules: [
 				{test: /\.tsx?$/, loader: 'ts-loader'},
-				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'}
+				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
+				// Ignore warnings about System.import in Angular
+				{ test: /[\/\\]@angular[\/\\].+\.js$/, parser: { system: true } },
 			]
 		},
 		resolve: {
@@ -39,7 +41,7 @@ module.exports = function (env) {
 				filename: '[name].js.map'
 			}),
 			new webpack.ContextReplacementPlugin(
-				/angular(\\|\/)core(\\|\/)(@angular|esm5)/,
+				/\@angular(\\|\/)core(\\|\/)esm5/,
 				path.resolve(__dirname, "app-js")
 			)
 			// Uncomment if you want to take a peek to the structure of dependencies
