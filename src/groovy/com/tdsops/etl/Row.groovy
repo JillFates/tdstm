@@ -4,50 +4,46 @@ import com.tds.asset.AssetEntity
 
 class Row {
 
-    List<Element> elements
+	/**
+	 * List of values recovered from GETL Dataset mapped by column index
+	 */
+	List values
+    //List<Element> elements
     Integer index
     AssetEntity instance
+	ETLProcessor processor
 
     Row () {
-        elements = []
+	    values = []
     }
 
     Row (Integer index, List<?> values, ETLProcessor processor) {
         this.index = index
-        this.elements = values.withIndex().collect { def value, int i ->
-            new Element(
-                    originalValue: value,
-                    value: "${value?:''}".toString(),
-                    rowIndex: index,
-                    columnIndex: i,
-                    processor: processor)
-        }
-    }
-
-    Element addNewElement (Object value) {
-        Element newElement = new Element(originalValue: value,
-                value: value,
-                rowIndex: index,
-                columnIndex: elements.size())
-        elements.add(newElement)
-        newElement
+	    this.processor = processor
+	    this.values = values
     }
 
 	Element addNewElement (Object value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
 		Element newElement = new Element(originalValue: value,
 			value: value,
 			rowIndex: index,
-			columnIndex: elements.size(),
+			columnIndex: values.size(),
 			fieldSpec: fieldSpec,
 			processor: processor)
-		elements.add(newElement)
+		//elements.add(newElement)
 		newElement
 	}
 	Element getElement (Integer index) {
-        elements[index]
+		Object value = values[index]
+		return new Element(
+			originalValue: value,
+			value: value?:'',
+			rowIndex: index,
+			columnIndex: index,
+			processor: processor)
     }
 
     int size () {
-        elements.size()
+	    values.size()
     }
 }
