@@ -110,7 +110,9 @@
 	//
 	function testMetricDefinitions() {
 		var metricCodes = $("#metricCodes").val();
-		var data = {"metricCodes": metricCodes};
+		var definitions = JSON.parse($("#definitions").val());
+		delete Array.prototype.toJSON;
+		var data = {"definitions": definitions, "metricCodes": metricCodes};
 		$('#data').empty();
 
 		$.ajax('/tdstm/reports/testMetricDefinitions', {

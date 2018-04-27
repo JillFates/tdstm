@@ -305,14 +305,13 @@ class MetricReportingService {
 	 * @param code
 	 * @return
 	 */
-	JSONObject getDefinition(String code) {
-		List definitions = getMetricDefinitions().definitions ?: [:]
+	JSONObject getDefinition(String code, MetricDefinitionsCommand definitions) {
 
-		Map metricDefinition = definitions.find { Map definition ->
+		Map metricDefinition = definitions.definitions.find { MetricDefinitionCommand definition ->
 			if (definition.metricCode == code) {
 				return definition
 			}
-		}
+		}.toMap()
 
 		if (!metricDefinition) {
 			throw new InvalidParamException("Metric definition doesn't exist for $code")
@@ -405,9 +404,9 @@ class MetricReportingService {
 	 *
 	 * @return A list of maps containing the metric data gathered.
 	 */
-	List<Map> testMetric(String metricCode) {
+	List<Map> testMetric(String metricCode, MetricDefinitionsCommand definitions) {
 		List<Long> projectIds = projectIdsForMetrics()
-		JSONObject metricDefinition = getDefinition(metricCode)
+		JSONObject metricDefinition = getDefinition(metricCode, definitions)
 
 		if (!metricDefinition) {
 			throw new InvalidParamException("Metric definition doesn't exist for $metricCode")
