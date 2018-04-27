@@ -449,9 +449,9 @@ class ModelService implements ServiceMethods {
 					if (assetFromPort && !assetConnectors.id?.contains(assetFromPort.id)) {
 						AssetCableMap.executeUpdate("""
 								update AssetCableMap
-								set cableStatus=?, assetTo=null, assetToPort=null
-								where assetToPort=?
-							""", [AssetCableStatus.UNKNOWN, assetCableMap.assetFromPort])
+								set cableStatus=:cableStatus, assetTo=null, assetToPort=null
+								where assetToPort=:assetToPort
+							""", [cableStatus: AssetCableStatus.UNKNOWN, assetToPort: assetCableMap.assetFromPort])
 
 						AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = :assetFromPort", [assetFromPort: assetFromPort])
 					}
