@@ -62,11 +62,11 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 								<td data-for="sme" class="${standardFieldSpecs.sme.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme}">
-									<kendo-dropdownlist
+									<kendo-dropdownlist #controlSme
 											class="select"
 											name="modelAssetSme"
 											[(ngModel)]="model.asset.sme.id"
-											[defaultItem]="'Please Select'"
+											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
 											[data]="${personList as JSON}">
@@ -104,12 +104,12 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 								<td data-for="sme2" class="${standardFieldSpecs.sme2.imp?:''} suffleTd" >
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.sme2}">
-									<div class="swapper-image" (click)="shufflePerson('sme1', 'sme2')" title="Swap Contacts"></div>
-								<kendo-dropdownlist
+									<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
+								<kendo-dropdownlist  #controlSme2
 									class="select"
 									name="modelAssetSme2"
 									[(ngModel)]="model.asset.sme2.id"
-									[defaultItem]="'Please Select'"
+									[defaultItem]="defaultItem"
 									[textField]="'fullName'"
 									[valueField]="'personId'"
 									[data]="${personList as JSON}">
@@ -134,7 +134,7 @@
 											name="modelAssetCriticality"
 											[(ngModel)]="model.asset.criticality"
 											[defaultItem]="'Please Select'"
-											[data]="">
+											[data]="${asset.constraints.criticality.inList as JSON}">
 									</kendo-dropdownlist>
 
 								%{--	<g:select id="criticality" class="${standardFieldSpecs.criticality.imp?:''}" name="criticality"
@@ -156,12 +156,12 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 								<td class="suffleTd ${standardFieldSpecs.appOwner.imp?:''}" data-for="appOwner">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.appOwner}">
-									<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwnerEdit')" title="Swap Contacts"></div>
+									<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 									<kendo-dropdownlist
 											class="select"
 											name="modelAssetappOwner"
 											[(ngModel)]="model.asset.appOwner.id"
-											[defaultItem]="'Please Select'"
+											[defaultItem]="defaultItem"
 											[textField]="'fullName'"
 											[valueField]="'personId'"
 											[data]="${personList as JSON}">
@@ -212,7 +212,6 @@
 											class="select"
 											name="modelAssetPlanStatus"
 											[(ngModel)]="model.asset.planStatus"
-											[defaultItem]="'Please Select'"
 											[data]="model.planStatusOptions">
 									</kendo-dropdownlist>
 									%{--<g:select from="${planStatusOptions}" id="planStatus" class="${standardFieldSpecs.planStatus.imp?:''}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="36" />--}%
@@ -266,8 +265,8 @@
 											class="select"
 											name="modelAssetTestProc"
 											[(ngModel)]="model.asset.testProc"
-											[defaultItem]="'Please Select'"
-											[data]="">
+											[defaultItem]="'?'"
+											[data]="yesNoList">
 									</kendo-dropdownlist>
 									%{--
 									<g:select  id="testProc" class="${standardFieldSpecs.testProc.imp?:''} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
@@ -299,8 +298,8 @@
 											class="select"
 											name="modelAssetLatency"
 											[(ngModel)]="model.asset.latency"
-											[defaultItem]="'Please Select'"
-											[data]="${asset.constraints.latency.inList as JSON}">
+											[defaultItem]="'?'"
+											[data]="yesNoList">
 									</kendo-dropdownlist>
 
 								%{--	<g:select  id="latency" class="${standardFieldSpecs.latency.imp?:''} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
@@ -315,8 +314,8 @@
 												class="select"
 												name="modelAssetStartupProc"
 												[(ngModel)]="model.asset.startupProc"
-												[defaultItem]="'Please Select'"
-												[data]="">
+												[defaultItem]="'?'"
+												[data]="yesNoList">
 										</kendo-dropdownlist>
 
 									%{--	<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
