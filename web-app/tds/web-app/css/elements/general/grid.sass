@@ -1,14 +1,31 @@
 .tds-kendo-grid
-  .k-grid-content-locked .k-grid-table tbody td:not(:first-child)
-    cursor: pointer
-  .k-grid-content .k-grid-table tbody td
-    cursor: pointer
   .k-grid
+    .k-grid-header
+      .k-grid-header-locked
+        th.k-header
+          border-width: 0px 1px 1px 0px
+          border-style: solid
+      th.k-header
+        a.k-link
+          text-align: center
+          div.sortable-column
+            float: none
+            label.action-header
+              text-align: center
+              float: none
+    .k-filter-row
+      td
+        border-width: 0px 1px 1px 0px
     tr.k-state-selected
       background-color: rgba(95, 159, 207, 0.25) !important
     kendo-datepicker
       height: 31px
-
+  .k-grid-content,
+  .k-grid-content-locked
+    outline: 0px solid transparent
+  .k-grid-content .k-grid-table tbody td,
+  .k-grid-content-locked .k-grid-table tbody td:not(:first-child)
+    cursor: pointer
   .reload-grid-button
     margin: 6px 13px 0px 13px
     cursor: pointer
@@ -17,8 +34,7 @@
       top: 3px
       font-weight: bold
 
-  .sortable-column,.sortable-column label
-    width: 90%
+  .sortable-column, .sortable-column label
     float: left
     cursor: pointer
 

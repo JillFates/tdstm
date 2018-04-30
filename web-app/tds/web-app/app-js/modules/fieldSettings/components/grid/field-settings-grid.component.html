@@ -6,7 +6,7 @@
     </div>
     <div class="col-xs-3 col-md-3 col-lg-2">
         <div class="form-group has-feedback" style="margin-bottom:0px;">
-            <input type="text" class="form-control searchFilterInput" (keyup.enter)="onFilter()" name="search" id="search" [(ngModel)]="gridState.filter.search"
+            <input type="text" class="form-control searchFilterInput" (keyup.enter)="onFilter()" name="search" [(ngModel)]="gridState.filter.search"
                 placeholder="{{'FIELD_SETTINGS.ENTER_FIELD_NAME_FILTER' | translate}}" value="">
             <span style="cursor:pointer;color:#000;pointer-events:all" (click)="onClearTextFilter()" class="fa fa-times form-control-feedback"
                 aria-hidden="true"></span>
