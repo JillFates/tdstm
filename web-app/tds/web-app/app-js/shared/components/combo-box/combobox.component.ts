@@ -42,6 +42,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Input('required') required: boolean;
 	@Input('disabled') disabled: boolean;
 	@Input('searchOnScroll') searchOnScroll = true;
+	@Input('reloadOnOpen') reloadOnOpen = false;
 	// Inner Params
 	private datasource: any[] = [{id: '', text: ''}];
 	private firstChange = true;
@@ -104,7 +105,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	public onOpen(): void {
 		this.open.emit();
 		// At open the first time, we need to get the list of items to show based on the selected element
-		if (this.firstChange || !this.comboBoxSearchModel || this.comboBoxSearchModel.metaParam !== this.metaParam) {
+		if (this.reloadOnOpen || this.firstChange || !this.comboBoxSearchModel || this.comboBoxSearchModel.metaParam !== this.metaParam) {
 			this.firstChange = false;
 			this.datasource = [];
 			this.initSearchModel();

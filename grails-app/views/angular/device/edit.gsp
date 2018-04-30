@@ -39,7 +39,9 @@
                                         <tds-combobox
                                                 [(model)]="model.asset.assetTypeSelectValue"
                                                 [serviceRequest]="searchAssetTypes"
-                                                [searchOnScroll]="false">
+                                                [searchOnScroll]="false"
+                                                [reloadOnOpen]="true"
+                                                (valueChange)="onAssetTypeValueChange($event)">
                                         </tds-combobox>
                                         %{--<div id="modelEditId" data-toggle="popover" data-trigger="hover"--}%
                                         %{--data-content="${standardFieldSpecs.assetType.tip ?: standardFieldSpecs.assetType.label}">--}%
@@ -79,7 +81,9 @@
                                             <tds-combobox
                                                     [(model)]="model.asset.manufacturerSelectValue"
                                                     [serviceRequest]="searchManufacturers"
-                                                    [searchOnScroll]="false">
+                                                    [searchOnScroll]="false"
+                                                    [reloadOnOpen]="true"
+                                                    (valueChange)="onManufacturerValueChange($event)" >
                                             </tds-combobox>
                                         %{--<div id="manufacturerEditId" style="display:inline" data-toggle="popover"--}%
                                         %{--data-trigger="hover"--}%
@@ -162,6 +166,13 @@
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
                                     <td class="${standardFieldSpecs.model.imp ?: ''}" data-for="assetType" style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+                                        <tds-combobox
+                                                [(model)]="model.asset.modelSelectValue"
+                                                [serviceRequest]="searchModels"
+                                                [searchOnScroll]="false"
+                                                [reloadOnOpen]="true"
+                                                (valueChange)="onModelValueChange($event)">
+                                        </tds-combobox>
                                     </td>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}"
                                                                    tabindex="105" ngmodel="model.asset.ipAddress"/>

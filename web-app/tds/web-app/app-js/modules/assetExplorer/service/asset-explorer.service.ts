@@ -272,8 +272,8 @@ export class AssetExplorerService {
 			.map((res: Response) => {
 				let response = res.json();
 				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
-					result: response.data.manufacturers,
-					total: response.data.manufacturers.length,
+					result: response.data.models,
+					total: response.data.models.length,
 					page: 1
 				};
 				return comboBoxSearchResultModel;

@@ -65,6 +65,11 @@ export function DeviceEditComponent(template, editModel) {
 				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
 				this.model.asset.manufacturerSelectValue.text = this.model.asset.manufacturer.text;
 			}
+			this.model.asset.modelSelectValue = {id: null};
+			if (this.model.asset.model) {
+				this.model.asset.modelSelectValue.id = this.model.asset.model.id;
+				this.model.asset.modelSelectValue.text = this.model.asset.model.text;
+			}
 		}
 
 		/***
@@ -75,18 +80,48 @@ export function DeviceEditComponent(template, editModel) {
 		}
 
 		protected searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
-			searchModel.query = 'term=&manufacturerId=';
+			searchModel.query = `manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}`;
 			return this.assetExplorerService.getAssetTypesForComboBox(searchModel);
 		}
 
 		protected searchManufacturers = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
-			searchModel.query = 'assetEntity/manufacturer?term=&assetType=';
+			searchModel.query = `assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
 			return this.assetExplorerService.getManufacturersForComboBox(searchModel);
 		}
 
 		protected searchModels = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
-			searchModel.query = 'modelsOf?id=&manufacturerId=&assetType=&term=';
+			searchModel.query = `id=
+			&manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}
+			&assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
 			return this.assetExplorerService.getModelsForComboBox(searchModel);
+		}
+
+		protected onAssetTypeValueChange(value: any): void {
+			if (!value) {
+				value = {id: null};
+			}
+			this.model.asset.assetTypeSelectValue = value;
+			console.log(this.model.asset.assetTypeSelectValue);
+			// this.model.asset.manufacturerSelectValue = {id: null};
+			this.model.asset.modelSelectValue = {id: null};
+		}
+
+		protected onManufacturerValueChange(value: any): void {
+			if (!value) {
+				value = {id: null};
+			}
+			this.model.asset.manufacturerSelectValue = value;
+			console.log(this.model.asset.manufacturerSelectValue);
+			// this.model.asset.assetTypeSelectValue = {id: null};
+			this.model.asset.modelSelectValue = {id: null};
+		}
+
+		protected onModelValueChange(value: any): void {
+			this.model.asset.assetTypeSelectValue.id = value.assetType;
+			this.model.asset.manufacturerSelectValue.id = value.manufacturerId;
+			this.model.asset.modelSelectValue.id = value.id;
+			this.model.asset.modelSelectValue.text = value.text;
+			console.log(this.model.asset.modelSelectValue);
 		}
 
 	}
