@@ -33,10 +33,11 @@ class MetricController implements ControllerMethods {
 			return renderAsJson(params.errors)
 		}
 
-		List<Map> metricData = metricReportingService.getMetrics(params.startDate,
-																 params.endDate,
-																 params.projectGuid,
-																 params.codes())
+		List<Map> metricData = metricReportingService.getMetrics(
+				params.startDate,
+				params.endDate,
+				params.projectGuid,
+				params.codes())
 
 		withFormat {
 			csv {
