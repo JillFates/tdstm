@@ -23,6 +23,8 @@ class MetricReportingService {
 	SettingService             settingService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
+	private static String MetricDefinitions = 'METRIC_DEFINITIONS'
+
 	private static String DateFormat = 'yyyy-MM-dd'
 
 	/**
@@ -300,7 +302,7 @@ class MetricReportingService {
 	 * @return
 	 */
 	Map getMetricDefinitions() {
-		settingService.getAsMap(SettingType.METRIC_DEF, 'MetricDefinitions') ?: [:]
+		settingService.getAsMap(SettingType.METRIC_DEF, MetricDefinitions) ?: [:]
 	}
 
 	/**
@@ -334,7 +336,7 @@ class MetricReportingService {
 	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version) {
 		settingService.save(
 				SettingType.METRIC_DEF,
-				'MetricDefinitions',
+				MetricDefinitions,
 				(definitions.toMap() as JSON).toString(),
 				version
 		)
