@@ -3,6 +3,9 @@
  * Update all projects to set "default_bundle_id" and update asset_entity move_bundle_id to default bundle if null
  * and set asset_entity's move_bundle_id column to not null
  */
+
+import com.tdssrc.grails.StringUtil
+import groovy.sql.GroovyRowResult
 import net.transitionmanager.domain.Project
 
 databaseChangeLog = {
@@ -33,20 +36,27 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "tpelletier", id: "20180412 TM-10301-2") {
+	changeSet(author: "tpelletier", id: "20180412 TM-10301-2B") {
 		comment('Update all projects to set "guid"')
 
 		grailsChange {
 			change {
-				Project.all.each { Project project ->
-					project.guid = project.generateGuid()
-					if (project.id != Project.DEFAULT_PROJECT_ID && project.projectType != 'Demo') {
-						project.collectMetrics = 1
-					} else {
-						project.collectMetrics = 0
+				List<GroovyRowResult> projects = sql.rows("select p.project_id AS id, pg.name AS name from project p join party_group pg on p.project_id = pg.party_group_id")
+
+				sql.withBatch('UPDATE project SET guid = ? where project_id = ?') { stmt ->
+					projects.each { GroovyRowResult project ->
+
+						stmt.addBatch([StringUtil.generateGuid(), project.id])
 					}
-					if (!project.save(flush: true)) {
-						throw new RuntimeException('updating project to default bundle failed');
+				}
+
+				sql.withBatch('UPDATE project SET collect_metrics = ? where project_id = ?') { stmt ->
+					projects.each { GroovyRowResult project ->
+						if (project.id != Project.DEFAULT_PROJECT_ID && !project.name.toLowerCase().contains('demo')) {
+							stmt.addBatch([1, project.id])
+						} else {
+							stmt.addBatch([0, project.id])
+						}
 					}
 				}
 			}
