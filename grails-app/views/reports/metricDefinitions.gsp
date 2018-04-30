@@ -67,7 +67,13 @@
 	// Saves the current script to the specified DataScript id
 	function saveMetricDefinitions() {
 		var version = parseInt($("#version").val());
-		var definitions = JSON.parse($("#definitions").val());
+		var definitions = {}
+		try {
+			definitions = JSON.parse($("#definitions").val());
+		}catch(error){
+			alert("Invalid JSON for metric definitions.");
+		}
+
 		delete Array.prototype.toJSON;
 		var data = {"definitions": definitions};
 
