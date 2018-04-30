@@ -40,15 +40,11 @@
 
 
 				<div class="col-md-12">
-					<div class="col-md-4">
-						<input name="metricCodes" id="metricCodes" type="text">
+					<div class="col-md-6">
+						<input style="width:100%;" name="metricCodes" id="metricCodes" type="text" placeholder="Enter comma delimited list of codes to test">
+						<input style="width:30%;" class="form-control" type="button" value="Test" onclick="testMetricDefinitions();">
 					</div>
-
-					<div class="col-md-4">
-						<input class="form-control" type="button" value="Test" onclick="testMetricDefinitions();">
-					</div>
-
-					<div class="col-md-4">
+					<div class="col-md-6">
 						<input name="version" id="version" type="hidden" value="${version}"/>
 						<input class="form-control" type="button" value="Save" onclick="saveMetricDefinitions();">
 					</div>
