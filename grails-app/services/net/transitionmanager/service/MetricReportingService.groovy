@@ -130,9 +130,14 @@ class MetricReportingService {
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
 		String date = metricCollectionDate.format(DateFormat)
+		List results
 
-		// the colon is in the parameters because any colon in the query will be seen an a parameter, so this is workaround.
-		List results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
+		if (query.groupBy) {
+			// the colon is in the parameters because any colon in the query will be seen an a parameter, so this is workaround.
+			results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
+		} else {
+			results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds])
+		}
 
 		results.collect { Object[] row ->
 			[
