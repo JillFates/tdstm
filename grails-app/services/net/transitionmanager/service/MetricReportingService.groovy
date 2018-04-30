@@ -83,6 +83,10 @@ class MetricReportingService {
 		return min + ((max - min) * randomNumberGenerator.nextDouble()) as int
 	}
 
+	Date getMetricCollectionDate(){
+		new Date().clearTime() -1
+	}
+
 	/**
 	 * A map of functions that can be run by gatherMetric if the mode is function.
 	 */
@@ -148,7 +152,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
-		String date = new Date().format(DateFormat)
+		String date = metricCollectionDate.format(DateFormat)
 		List results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
 
 		results.collect { Object[] row ->
@@ -287,7 +291,7 @@ class MetricReportingService {
 	 * 		]
 	 */
 	private List<Map> testMetricFunction(List<Long> projectIds, String metricCode) {
-		String date = new Date().format(DateFormat)
+		String date = metricCollectionDate.format(DateFormat)
 		setUpRandom()
 
 		projectIds.collect { Long projectId ->
@@ -310,7 +314,7 @@ class MetricReportingService {
 		Map definitions = getMetricDefinitions()
 		int version = definitions?.version ?: 0
 		definitions.remove('version')
-		String definition = (definitions.definitions as JSON).toString(true) ?: ''
+		String definition = ((definitions.definitions ?: [:]) as JSON).toString(true) ?: ''
 
 		return [definitions: definition, version: version]
 	}
@@ -363,7 +367,10 @@ class MetricReportingService {
 	 * @return A list of Long project ids, that have collectMetrics enabled.
 	 */
 	List<Long> projectIdsForMetrics() {
-		return Project.where { collectMetrics == 1 }.projections {
+		Date collectionDate = metricCollectionDate
+		return Project.where {
+			collectMetrics == 1 && startDate <= collectionDate && completionDate >= collectionDate
+		}.projections {
 			property 'id'
 		}.list()
 	}
