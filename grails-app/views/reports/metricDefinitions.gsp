@@ -68,6 +68,7 @@
 			definitions = JSON.parse($("#definitions").val());
 		}catch(error){
 			alert("Invalid JSON for metric definitions.");
+			return
 		}
 
 		delete Array.prototype.toJSON;
