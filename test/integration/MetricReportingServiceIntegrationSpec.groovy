@@ -78,7 +78,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test gatherMetric for query mode"() {
 		setup: 'giving a metric definition for a query, that will have results'
-			String date = new Date().format('yyyy-MM-dd')
+			String date = (new Date() - 1).format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
 					"metricCode" : "APP-VPS",
 					"description": "Application counts metrics for Validation/PlanStatus",
