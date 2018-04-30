@@ -252,8 +252,9 @@ class CommentService implements ServiceMethods {
 					assetComment.resolvedBy = currentPerson
 				}
 			}
-			if (assetComment.commentType == 'comment') {
-				assetComment.isResolved = 0
+			// TM-10112 - Make sure isResolved == 0 (setDateResolved() sets isResolved to 0 internally)
+			if (isNew && assetComment.commentType == 'comment') {
+				assetComment.setDateResolved(null)
 			}
 
 			// Actual Start/Finish are handled by the statusUpdate function
