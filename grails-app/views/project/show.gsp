@@ -32,31 +32,31 @@
 				<table class="show-project-table" style="border-style:solid solid none solid;">
 					<tbody>
 						<tr class="prop">
-							<td class="name">Client:</td>
+							<td class="name"><label>Client:</label></td>
 							<td class="valueNW">${projectInstance?.client}</td>
-							<td class="name">Project Code:</td>
+							<td class="name"><label>Project Code:</label></td>
 							<td class="valueNW">${fieldValue(bean:projectInstance, field:'projectCode')}</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Project Name:</td>
+							<td class="name"><label>Project Name:</label></td>
 							<td class="valueNW"><b>${fieldValue(bean:projectInstance, field:'name')}</b></td>
-							<td class="name">Project Type:</td>
+							<td class="name"><label>Project Type:</label></td>
 							<td class="valueNW">${fieldValue(bean:projectInstance, field:'projectType')}</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Description:</td>
+							<td class="name"><label>Description:</label></td>
 							<td class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'description')}</textarea></td>
-							<td class="name">Comment:</td>
+							<td class="name"><label>Comment:</label></td>
 							<td class="valueNW"><textarea cols="40"	rows="3" readOnly="true" >${fieldValue(bean:projectInstance, field:'comment')}</textarea></td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Start Date:</td>
+							<td class="name"><label>Start Date:</label></td>
 							<td class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" /></td>
-							<td class="name">Completion Date:</td>
+							<td class="name"><label>Completion Date:</td>
 							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" /></td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Associated Partner(s):</td>
+							<td class="name"><label>Associated Partner(s):</label></td>
 							<td class="valueNW">
 								<ul>
 								<g:each status="i" in="${projectPartners}" var="partner">
@@ -64,13 +64,13 @@
 								</g:each>
 								</ul>
 							</td>
-							<td class="name">Project Logo:</td>
+							<td class="name"><label>Project Logo:</label></td>
 							<td class="valueNW">
 								<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
 							</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Project Manager:</td>
+							<td class="name"><label>Project Manager:</label></td>
 							<td class="valueNW">
 								<ul>
 									<g:each status="i" in="${projectManagers}" var="manager">
@@ -82,22 +82,22 @@
 								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR', clientStaff: '1']">Manage</g:link>
 								</tds:hasPermission>
 							</td>
-							<td class="name">Default Bundle:</td>
+							<td class="name"><label>Default Bundle:</label></td>
 							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Workflow:</td>
+							<td class="name"><label>Workflow:</label></td>
 							<td class="valueNW" nowrap="nowrap">
 								${fieldValue(bean:projectInstance, field:'workflowCode')}
 							</td>
-							<td class="name">Time Zone:</td>
+							<td class="name"><label >Time Zone:</label></td>
 							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>
 						</tr>
 						<tr class="prop">
-							<td class="name"><label for="dateCreated">Date Created:</label></td>
+							<td class="name"><label >Date Created:</label></label></td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
 							<td class="name">
-								<label for="client">Collect Reporting Metrics:</label></td>
+								<label>Collect Reporting Metrics:</label></td>
 							<td valign="top">
 								<g:field type="checkbox" name="collectMetrics" checked="${projectInstance?.collectMetrics == 1}" disabled="true"/>
 							</td>
@@ -137,7 +137,7 @@
 			currentMenuId = "#projectMenu";
 			$('.menu-projects-current-project').addClass('active');
 			$('.menu-parent-projects').addClass('active');
-			
+
 		</script>
 	</body>
 </html>

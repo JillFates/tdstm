@@ -144,7 +144,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="client">Client:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'client','errors')}">
 								<select id="clientId" name="client.id" tabindex="100"
@@ -161,7 +161,7 @@
 								</g:hasErrors>
 							</td>
 							<td class="name">
-								<label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="projectCode">Project Code:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
 								<input type="text" id="projectCode" name="projectCode" tabindex="110" maxlength="20" value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
@@ -174,7 +174,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="name">Project Name:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
 								<input type="text" id="name" name="name" tabindex="120" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
@@ -185,7 +185,7 @@
 								</g:hasErrors>
 							</td>
 							<td class="name">
-								<label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="projectType">Project Type:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
 								<g:select id="projectType" name="projectType" tabindex="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
@@ -243,7 +243,7 @@
 							</td>
 							<td class="name">
 								<label for="completionDate">
-									<b>Completion Date:&nbsp;<span style="color: red">*</span></b>
+									Completion Date:&nbsp;<span style="color: red">*</span>
 								</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
@@ -295,7 +295,7 @@
 							<td class="valueNW">
 								<input type="text" id="projectManagerId" name="projectManagerId" tabindex="200">
 							</td>
-							<td class="name">Time Zone:</td>
+							<td class="name"><label for="timezone">Time Zone:</label></td>
 							<td class="valueNW">
 								<input type="text" id="timezone" name="timezone" value="${defaultTimeZone}" readonly style="width: 200px; padding-right: 20px">
 								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');" tabindex="210">
@@ -312,7 +312,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="workflowCode"><b>Workflow:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="workflowCode">Workflow:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
@@ -328,7 +328,7 @@
 								</g:hasErrors>
 							</td>
 							<td class="name">
-								<label for="projectType"><b>Plan Methodology:&nbsp;</b></label>
+								<label for="projectType">Plan Methodology:&nbsp;</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'planMethodology','errors')}">
 								<g:if test="${planMethodologies}">

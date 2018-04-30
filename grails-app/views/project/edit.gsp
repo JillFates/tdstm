@@ -25,11 +25,11 @@
 							<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Client:</td>
+							<td class="name"><label>Client:</label></td>
 
 							<td class="valueNW">${projectInstance?.client}</td>
 
-							<td class="name">Project Code:</td>
+							<td class="name"><label>Project Code:</label></td>
 
 							<td class="valueNW ${hasErrors(bean:projectInstance, field:'projectCode','errors')}">
 								<input type="text" id="projectCode" name="projectCode" indextab="110" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
@@ -135,7 +135,7 @@
 								<div id="partnersContainer"></div>
 							</td>
 							<td class="name">
-								<label for="client">Project Logo:</label>
+								<label for="isLogoDeleted">Project Logo:</label>
 							</td>
                             <g:if test="${projectLogoForProject}">
                                 <td class="valueNW" id="imageLogo">
@@ -160,7 +160,7 @@
 									</g:each>
 								</ul>
 							</td>
-							<td class="name">Default Bundle:</td>
+							<td class="name"><label>Default Bundle:</label></td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
 								<g:select id="defaultBundle" name="defaultBundle.id"
 									indextab="220"
@@ -170,7 +170,7 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="workflowCode"><b>Workflow:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="workflowCode">Workflow:&nbsp;<span style="color: red">*</span></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
@@ -186,7 +186,7 @@
 								</g:hasErrors>
 							</td>
 
-							<td class="name">Time Zone:</td>
+							<td class="name"><label>Time Zone:</label></td>
 							<td class="valueNW">
 								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
 								<input type="button" value="Change" indextab="240" onclick="Project.showTimeZoneSelect('timezone');">
@@ -199,7 +199,7 @@
 								<tds:convertDateTime date="${projectInstance?.dateCreated}" />
 							</td>
 							<td class="name">
-								<label for="client">Collect Reporting Metrics:</label></td>
+								<label for="collectMetrics">Collect Reporting Metrics:</label></td>
 							<td valign="top">
 								<g:field type="checkbox" id="collectMetrics" name="collectMetrics" value="1" checked="${projectInstance?.collectMetrics == 1}"/>
 							</td>
