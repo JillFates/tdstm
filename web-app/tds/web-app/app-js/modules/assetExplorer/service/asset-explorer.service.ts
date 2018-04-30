@@ -280,4 +280,25 @@ export class AssetExplorerService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	getRacksForRoom(roomId: number, sourceTarget: 'S'|'T'): Observable<any> {
+		const request = {
+			roomId: roomId,
+			rackId: null,
+			sourceTarget: sourceTarget,
+			forWhom: 'Edit'
+		};
+
+		let mockResponse = [
+			{id: 0, text: 'Please Select'},
+			{id: 1, text: 'Add Rack...'},
+			{id: 14240, text: 'TBD'},
+		];
+		return this.http.post(`../${this.assetEntitySearch}/retrieveRackSelectForRoom`, JSON.stringify(request))
+			.map((res: Response) => {
+				console.log(res);
+				return mockResponse;
+			})
+			.catch((error: any) => error.json());
+	}
 }

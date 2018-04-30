@@ -14,6 +14,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs/Observable';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
+import {is} from '@uirouter/core';
 
 declare var jQuery: any;
 
@@ -28,15 +29,21 @@ export function DeviceEditComponent(template, editModel) {
 	}) class DeviceEditComponent implements OnInit {
 
 		private dateFormat: string;
+		private showRackFields = true;
+		private showRackInput: 'none'|'new'|'select' = 'none';
+		private showChassisFields = true;
+		private rackSourceOptions: Array<any> = [];
 
 		constructor(
 					@Inject('model') private model: any,
 					private activeDialog: UIActiveDialogService,
 					private preference: PreferenceService,
 					private assetExplorerService: AssetExplorerService) {
-			this.initModel();
+
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
+			this.initModel();
+			this.toggleAssetTypeFields();
 		}
 
 		/**
@@ -50,6 +57,8 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
+			this.model.asset.newLocationSource = null;
+			this.model.asset.newRoomSource = null;
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -72,6 +81,55 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Taken from entity.crud.js
+		 */
+		private toggleAssetTypeFields(): void {
+			const assetType = this.model.asset.assetTypeSelectValue.id;
+			switch (assetType) {
+				case 'Blade':
+					this.showRackOrBladeFields(false, false); // pub.hideRackFields();
+					// this.showVMFields = false; // pub.hideVMFields();
+					this.showChassisFields = true; // pub.showChassisFields();
+					break;
+				case 'VM':
+					this.showRackOrBladeFields(false, false); // pub.hideRackFields();
+					this.showChassisFields = false; // pub.hideChassisFields();
+					// this.showVMFields = true; // pub.showVMFields();
+					// pub.hideNonVMFields()
+					break;
+				default:
+					// Rack-able device
+					this.showChassisFields = false; // pub.hideChassisFields();
+					// this.showVMFields = false; // pub.hideVMFields();
+					this.showRackOrBladeFields(true, true); // pub.showRackFields();
+			}
+		}
+
+		private populateRackOrChassisSelect(isRack: boolean): void {
+			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
+			if (roomId && roomId > 0) {
+				this.showRackInput = 'select';
+				this.assetExplorerService.getRacksForRoom(roomId, 'S').subscribe(response => {
+					this.rackSourceOptions = response;
+				});
+			} else if (roomId && roomId === -1) { /* -1 (New Room)*/
+				this.showRackInput = 'new';
+			} else {
+				this.showRackInput = 'none';
+			}
+		}
+
+		private showRackOrBladeFields(show: boolean, isRack: boolean): void {
+			this.showRackFields = show; // pub.showRackFields();
+			if (!show) {
+				this.showRackInput = 'none';
+			} else {
+				this.populateRackOrChassisSelect(isRack);
+			}
+
+		}
+
 		/***
 		 * Close the Active Dialog
 		 */
@@ -90,8 +148,7 @@ export function DeviceEditComponent(template, editModel) {
 		}
 
 		protected searchModels = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
-			searchModel.query = `id=
-			&manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}
+			searchModel.query = `manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}
 			&assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
 			return this.assetExplorerService.getModelsForComboBox(searchModel);
 		}
@@ -104,6 +161,7 @@ export function DeviceEditComponent(template, editModel) {
 			console.log(this.model.asset.assetTypeSelectValue);
 			// this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
+			this.toggleAssetTypeFields();
 		}
 
 		protected onManufacturerValueChange(value: any): void {
@@ -122,6 +180,11 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset.modelSelectValue.id = value.id;
 			this.model.asset.modelSelectValue.text = value.text;
 			console.log(this.model.asset.modelSelectValue);
+			this.toggleAssetTypeFields();
+		}
+
+		protected onSourceRoomValueChange(event: any): void {
+			this.toggleAssetTypeFields();
 		}
 
 	}
