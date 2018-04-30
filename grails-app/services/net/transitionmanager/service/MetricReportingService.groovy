@@ -292,7 +292,7 @@ class MetricReportingService {
 		Map definitions = getMetricDefinitions()
 		int version = definitions?.version ?: 0
 		definitions.remove('version')
-		String definition = ((definitions.definitions ?: [:]) as JSON).toString(true) ?: ''
+		String definition = definitions.definitions ?  (definitions.definitions as JSON).toString(true) : '[]'
 
 		return [definitions: definition, version: version]
 	}
