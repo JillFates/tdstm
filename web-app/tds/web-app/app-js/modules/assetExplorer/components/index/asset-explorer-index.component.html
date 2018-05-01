@@ -11,7 +11,7 @@
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
 								<a (click)="selectFolder(folder)" href="javascript:void(0)">
-									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder.name}}
+									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
 									<span class="label label-primary pull-right">{{folder.items.length}}</span>
 								</a>
 							</li>
@@ -25,7 +25,7 @@
 			<div class="col-md-10 asset-explorer-index-container">
 				<div class="box box-primary">
 					<div class="box-header with-border">
-						<h3 class="box-title box-title-grid-list">{{selectedFolder.name}}</h3>
+						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
                         <div class="box-tools-actions" *ngIf="isCreateAvailable()" style="vertical-align: super;">
                             <button (click)="onCreateReport()" class="btn btn-primary">
                                 <i class="fa fa-plus-square"></i> {{'GLOBAL.CREATE' | translate}}
@@ -46,12 +46,34 @@
 								<thead>
 									<tr>
 										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
-										<th class="text-center">{{'ASSET_EXPLORER.INDEX.FAVORITE' | translate}}</th>
-										<th>{{'ASSET_EXPLORER.INDEX.NAME' | translate}}</th>
-										<th>{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}</th>
-										<th>{{'ASSET_EXPLORER.INDEX.CREATED_ON' | translate}}</th>
-										<th>{{'ASSET_EXPLORER.INDEX.UPDATED_ON' | translate}}</th>
-										<th class="text-center">{{'ASSET_EXPLORER.INDEX.SHARED' | translate}}</th>
+										<th (click)="changeSort(sortByIsFavorite)" class="text-center">{{'ASSET_EXPLORER.INDEX.FAVORITE' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsFavorite.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByIsFavorite.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByName)">{{'ASSET_EXPLORER.INDEX.NAME' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByName.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByName.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByCreatedBy)">{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByCreatedBy.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByCreatedBy.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByCreatedOn)">{{'ASSET_EXPLORER.INDEX.CREATED_ON' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByCreatedOn.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByCreatedOn.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByUpdatedOn)">{{'ASSET_EXPLORER.INDEX.UPDATED_ON' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByUpdatedOn.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByUpdatedOn.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByIsShared)" class="text-center">{{'ASSET_EXPLORER.INDEX.SHARED' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsShared.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByIsShared.property && !sortInfo.isAscending}"></span>
+										</th>
+										<th (click)="changeSort(sortByIsSystem)" class="text-center">{{'ASSET_EXPLORER.INDEX.SYSTEM' | translate}}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsSystem.property && sortInfo.isAscending,
+												  'k-i-sort-desc-sm': sortInfo.property === sortByIsSystem.property && !sortInfo.isAscending}"></span>
+										</th>
 										<!-- <th class="text-center">Subscribe</th> -->
 									</tr>
 								</thead>
@@ -83,7 +105,11 @@
 											{{report.updatedOn}}
 										</td>
 										<td class="text-center">
-											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared || report.isSystem"></span>
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isShared"></span>
+										</td>
+
+										<td class="text-center">
+											<span class="glyphicon glyphicon-ok" *ngIf="report.isSystem"></span>
 										</td>
 										<!-- <td class="text-center"><span class="glyphicon glyphicon-ok" *ngIf="report.subscribe"></span></td> -->
 									</tr>

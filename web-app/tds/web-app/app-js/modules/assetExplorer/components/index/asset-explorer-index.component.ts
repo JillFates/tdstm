@@ -1,8 +1,9 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewGroupModel, ViewModel, ViewType } from '../../model/view.model';
 import { Observable } from 'rxjs/Observable';
+import { zip } from 'rxjs/observable/zip';
 
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
@@ -13,36 +14,64 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import { SortInfo, SortUtils } from '../../../../shared/utils/sort.utils';
 
 @Component({
 	selector: 'asset-explorer-index',
 	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
 })
-export class AssetExplorerIndexComponent {
+export class AssetExplorerIndexComponent implements OnInit {
 
 	private reportGroupModels = Array<ViewGroupModel>();
 	private searchText: String;
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 
+	private sortInfo: SortInfo;
+	private sortByName: SortInfo;
+	private sortByCreatedBy: SortInfo;
+	private sortByCreatedOn: SortInfo;
+	private sortByUpdatedOn: SortInfo;
+	private sortByIsShared: SortInfo;
+	private sortByIsSystem: SortInfo;
+	private sortByIsFavorite: SortInfo;
+	private userDateFormat: string;
+
 	constructor(
 		private stateService: StateService,
-		@Inject('reports') report: Observable<ViewGroupModel[]>,
+		@Inject('reports') private report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
-		private dictionary: DictionaryService) {
-		report.subscribe(
-			(result) => {
-				this.reportGroupModels = result;
+		private dictionary: DictionaryService,
+		private preferenceService: PreferenceService) {
+	}
+	ngOnInit() {
+		this.sortInfo = { property: 'name', isAscending: true, type: 'string' };
+		this.sortByName = { property: 'name', isAscending: true, type: 'string'};
+		this.sortByCreatedBy =  { property: 'createdBy', isAscending: true, type: 'string'};
+		this.sortByIsShared =  { property: 'isShared', isAscending: true, type: 'boolean'};
+		this.sortByIsSystem =  { property: 'isSystem', isAscending: true, type: 'boolean'};
+		this.sortByCreatedOn =  { property: 'createdOn', isAscending: true, type: 'date'};
+		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: true, type: 'date'};
+		this.sortByIsFavorite = { property: 'isFavorite', isAscending: true, type: 'boolean'};
+
+		zip(this.report, this.preferenceService.getPreference('CURR_DT_FORMAT'))
+			.subscribe((result: any[]) => {
+				const [reportResult, dateFormat] = result;
+
+				this.userDateFormat = dateFormat.CURR_DT_FORMAT;
+				this.reportGroupModels = reportResult;
 				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
-			},
-			(err) => console.log(err));
+				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat);
+		}, (err) => console.log(err.message || err));
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel): void {
+
 		this.dictionary.set(LAST_SELECTED_FOLDER, folderOpen);
 		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
@@ -103,7 +132,21 @@ export class AssetExplorerIndexComponent {
 			.subscribe(result => {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
+
+				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
 			});
+	}
+
+	protected changeSort(sort: SortInfo) {
+		if (this.sortInfo.property === sort.property) {
+			this.sortInfo.isAscending = !this.sortInfo.isAscending;
+		} else {
+			sort.isAscending = true; // reset ascending
+			this.sortInfo =  sort;
+		}
+
+		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
+		return ;
 	}
 
 	/**
