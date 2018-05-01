@@ -270,12 +270,14 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.numberOfLicenses = 0
 				licState.goodAfterDate = null
 				licState.goodBeforeDate = null
+				licState.type = null
 			}else {
 				License licObj = getLicenseObj(license)
 				int max = licObj?.numberOfLicenses ?: 0
 				licState.numberOfLicenses = max
-				licState.goodAfterDate = licObj?.goodAfterDate
-				licState.goodBeforeDate = licObj?.goodBeforeDate
+				licState.goodAfterDate = licObj.goodAfterDate ? new Date(licObj.goodAfterDate) : null
+				licState.goodBeforeDate = licObj.goodBeforeDate ? new Date(licObj.goodBeforeDate) : null
+				licState.type = license.type
 
 				if(licObj == null){
 					licState.state = State.UNLICENSED

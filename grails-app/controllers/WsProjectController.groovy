@@ -1,3 +1,4 @@
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -5,6 +6,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.ProjectService
 
 /**
@@ -40,5 +42,22 @@ class WsProjectController implements ControllerMethods {
 		dataMap.projects = results
 
 		renderSuccessJson(dataMap)
+	}
+
+	/**
+	 * Returns a list of projects, and their licence data.
+	 *
+	 * @return A list of projects, and their licence data.
+	 */
+	@HasPermission(Permission.ProjectView)
+	def projects() {
+		ProjectStatus projectStatus =  ProjectStatus.ANY
+		if (params.status) {
+			projectStatus = ProjectStatus.lookup(params.status)
+			if (! projectStatus) {
+				throw new InvalidParamException('Invalid value for parameter status, options are: ANY, ACTIVE or COMPLETED')
+			}
+		}
+		renderSuccessJson(projectService.projects( projectStatus ))
 	}
 }

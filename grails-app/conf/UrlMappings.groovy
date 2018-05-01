@@ -332,6 +332,11 @@ class UrlMappings {
 			action = [GET:"retrieveNext"]
 		}
 
+		"/ws/projects" {
+			controller = "wsProject"
+			action = [GET: "projects"]
+		}
+
 		"/ws/project/userProjects" {
 			controller = "wsProject"
 			action = [GET:"userProjects"]
