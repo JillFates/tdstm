@@ -746,7 +746,7 @@ class ProjectService implements ServiceMethods {
 		MoveBundle moveBundle
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
 		if (!project.defaultBundle) {
-			
+
 			// TM-8319 - the name was being set to null
 			String bundleName = defaultBundleName ?: 'TBD'
 
@@ -1793,8 +1793,9 @@ class ProjectService implements ServiceMethods {
 	 *
 	 * @return A list of maps containing project and licence information.
 	 */
-	List<Map> projects(){
-		List<Project> projects = getUserProjectsOrderBy(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+	List<Map> projects(ProjectStatus projectStatus=ProjectStatus.ANY) {
+//		List<Project> projects = getUserProjectsOrderBy(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+		List<Project> projects = getUserProjectsOrderBy(securityService.hasPermission(Permission.ProjectShowAll), projectStatus)
 
 		projects.collect { Project project ->
 			Map licenseData = licenseAdminService.getLicenseStateMap(project)
@@ -1805,7 +1806,7 @@ class ProjectService implements ServiceMethods {
 					projectName          : project.name,
 					projectCode          : project.projectCode,
 					clientName           : project.client.name,
-					description          : project.description,
+					description          : project.description ?: '',
 					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_TIME_6),
 					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_TIME_6),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',

@@ -23,7 +23,17 @@ enum ProjectStatus {
 
 	String toString() { value }
 
-	static ProjectStatus valueOfParam(String param) {
-		values().find { it.value == param }
+	/**
+	 * Safely return the corresponding Enum constant
+	 * @param value
+	 * @return
+	 */
+	static ProjectStatus lookup(String value) {
+		ProjectStatus projectStatus
+		try {
+			projectStatus = ProjectStatus.valueOf(value)
+		} catch (e) {}
+		return projectStatus
 	}
+
 }
