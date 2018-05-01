@@ -21,11 +21,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
  */
 class MetricReportingService {
 	SettingService             settingService
+	LicenseAdminService        licenseAdminService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	private static String MetricDefinitions = 'METRIC_DEFINITIONS'
 
 	private static String DateFormat = 'yyyy-MM-dd'
+
+	private static String ImagesUsedLabel      = 'used'
+	private static String ImagesIssuedLabel    = 'issued'
+	private static String ImagesAvailableLabel = 'available'
 
 	/**
 	 * emum for the metric mode
@@ -63,7 +68,8 @@ class MetricReportingService {
 	 * A map of functions that can be run by gatherMetric if the mode is function.
 	 */
 	private Map functions = [
-			testMetric: { List<Long> projectIds, String metricCode -> testMetricFunction(projectIds, metricCode) }
+			testMetric   : { List<Long> projectIds, String metricCode -> testMetricFunction(projectIds, metricCode) },
+			licenseMetric: { List<Long> projectIds, String metricCode -> licenseMetricFunction(projectIds, metricCode) }
 	]
 
 	/**
@@ -286,6 +292,47 @@ class MetricReportingService {
 					value     : RandomUtils.nextInt(499) + 1
 			]
 		}
+	}
+
+	/**
+	 * Gets License metrics for images issued, used and available
+	 * .
+	 * @param projectIds The project Ids go get license metrics for.
+	 * @param metricCode the metric code to use for the license metrics.
+	 *
+	 * @return A List of maps containing the license metrics.
+	 */
+	private List<Map> licenseMetricFunction(List<Long> projectIds, String metricCode) {
+		Date date = metricCollectionDate
+		List<Map> licenseMetrics = []
+		long imagesIssued
+		long imagesUsed
+		Project project
+
+
+		projectIds.each { Long id ->
+			project = Project.get(id)
+			imagesIssued = licenseAdminService.getLicenseStateMap(project)?.numberOfLicenses ?: 0
+			imagesUsed = ProjectDailyMetric.findByProjectAndMetricDate(project, date)?.planningServers ?: 0
+
+			Map metrics = [
+					(ImagesUsedLabel)     : imagesUsed,
+					(ImagesIssuedLabel)   : imagesIssued,
+					(ImagesAvailableLabel): imagesIssued - imagesUsed
+			]
+
+			metrics.each { String label, Long value ->
+				licenseMetrics << [
+						projectId : project.id,
+						metricCode: metricCode,
+						date      : date,
+						label     : label,
+						value     : value
+				]
+			}
+		}
+
+		return licenseMetrics
 	}
 
 	/**
