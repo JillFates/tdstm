@@ -701,12 +701,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param index
 	 * @return current instance of ETLProcessor
 	 */
-	ETLProcessor debug (Integer index) {
+	ETLProcessor debug(Integer index) {
 
-		if (index in (0..currentRow.size())) {
+		if(index in (0..currentRow.size())){
 			currentColumnIndex = index
-			doDebug currentRow.getElement(currentColumnIndex)
-		} else {
+			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
+		} else{
 			throw ETLProcessorException.missingColumn(index)
 		}
 		return this
@@ -717,12 +717,12 @@ class ETLProcessor implements RangeChecker {
 	 * @param columnName
 	 * @return current instance of ETLProcessor
 	 */
-	ETLProcessor debug (String columnName) {
+	ETLProcessor debug(String columnName) {
 
-		if (columnsMap.containsKey(columnName)) {
+		if(columnsMap.containsKey(columnName)){
 			currentColumnIndex = columnsMap[columnName].index
-			doDebug currentRow.getElement(currentColumnIndex)
-		} else {
+			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
+		} else{
 			throw ETLProcessorException.missingColumn(columnName)
 		}
 		return this
@@ -828,9 +828,8 @@ class ETLProcessor implements RangeChecker {
 	 * Adds a message debug with element content in console
 	 * @param element
 	 */
-	private def doDebug (Element element) {
-		debugConsole.debug "${[position: [element.columnIndex, element.rowIndex], value: element.value]}"
-		element
+	private def doDebug(Integer columnIndex, Integer rowIndex, Object value) {
+		debugConsole.debug "${[position: [rowIndex, columnIndex], value: value]}"
 	}
 
 	/**
@@ -868,7 +867,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	private def doExtract () {
-		Element element = currentRow.getElement(currentColumnIndex)
+		Element element = currentRow.getDataSetElement(currentColumnIndex)
 
 		addCurrentElementToBinding(element)
 
@@ -1047,13 +1046,13 @@ class ETLProcessor implements RangeChecker {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 			    Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String
+				Integer, Float, Double, Long, BigDecimal, String, Map,
 			].asImmutable()
 		}
 
