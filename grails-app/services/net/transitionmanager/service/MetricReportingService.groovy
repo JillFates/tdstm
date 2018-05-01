@@ -7,21 +7,23 @@ import com.tdssrc.grails.StopWatch
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import net.transitionmanager.ProjectDailyMetric
+import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
 import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.domain.MetricResult
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import org.apache.commons.lang.math.RandomUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.jfree.util.Log
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 /**
  * A service for dealing with reporting metrics.
  */
 class MetricReportingService {
-	Random                     randomNumberGenerator
 	SettingService             settingService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+	private static String MetricDefinitions = 'METRIC_DEFINITIONS'
 
 	private static String DateFormat = 'yyyy-MM-dd'
 
@@ -53,38 +55,8 @@ class MetricReportingService {
 		}
 	}
 
-	/**
-	 * sets up a random instance with a seed.
-	 *
-	 * @param seed a seed for random, for testing.If null the seed becomes currentTimeMillis + freeMemory
-	 */
-	void setUpRandom(Long seed = null) {
-		if (seed == null) {
-			seed = System.currentTimeMillis() + Runtime.runtime.freeMemory()
-		}
-
-		if (randomNumberGenerator == null) {
-			randomNumberGenerator = new Random(seed)
-		}
-	}
-
-	/**
-	 * A random number generator I copied from my Groovy talk on Meta programming:
-	 * https://github.com/virtualdogbert/MetaProgrammingMagicRevealed/blob/master/Dgenerator.groovy
-	 *
-	 * @param min Lower bound for the generated number.
-	 * @param max Upper bound for the generated number.
-	 * @param seed An optional seed for the generator, using for testing.
-	 *
-	 * @return A random integer between min and max, using a seed for the generator.
-	 */
-	int generateRandomInt(int min, int max, Long seed = null) {
-		setUpRandom(seed)
-		return min + ((max - min) * randomNumberGenerator.nextDouble()) as int
-	}
-
-	Date getMetricCollectionDate(){
-		new Date().clearTime() -1
+	Date getMetricCollectionDate() {
+		new Date().clearTime() - 1
 	}
 
 	/**
@@ -119,19 +91,24 @@ class MetricReportingService {
 	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition) {
 		MetricMode mode = MetricMode.lookup((String) metricDefinition.mode)
 
-		if (mode == MetricMode.query) {
-			runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
-		} else if (mode == MetricMode.sql) {
-			return runSql((String) metricDefinition.sql, projectIds)
-		} else if (mode == MetricMode.function) {
-			Closure function = functions[(String) metricDefinition.function]
-			if (!function) {
-				throw new InvalidParamException('Function for metric not implemented.')
-			}
+		switch (mode) {
+			case MetricMode.query:
+				runQuery((JSONObject) metricDefinition.query, projectIds, metricCode)
+				break
+			case MetricMode.sql:
+				return runSql((String) metricDefinition.sql, projectIds)
+				break
+			case MetricMode.function:
+				Closure function = functions[(String) metricDefinition.function]
 
-			return function(projectIds, metricCode)
-		} else {
-			throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
+				if (!function) {
+					throw new InvalidParamException('Function for metric not implemented.')
+				}
+
+				return function(projectIds, metricCode)
+				break
+			default:
+				throw new InvalidParamException("Mode $mode is an invalid mode for GatherMetric")
 		}
 	}
 
@@ -153,7 +130,14 @@ class MetricReportingService {
 	 */
 	private List<Map> runQuery(JSONObject query, List<Long> projectIds, String metricCode) {
 		String date = metricCollectionDate.format(DateFormat)
-		List results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
+		List results
+
+		if (query.groupBy && query.groupBy.size > 1) {
+			// the colon is in the parameters because any colon in the query will be seen an a parameter, so this is workaround.
+			results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
+		} else {
+			results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds])
+		}
 
 		results.collect { Object[] row ->
 			[
@@ -213,7 +197,7 @@ class MetricReportingService {
 	 */
 	String getLabel(List groupBy, String aggregation) {
 		if (groupBy) {
-			List sanitizedGroupBy = groupBy.collect{ String group ->
+			List sanitizedGroupBy = groupBy.collect { String group ->
 				return "COALESCE($group, 'Unknown')"
 			}
 			return "concat(${sanitizedGroupBy.join(', :colon, ')})"
@@ -292,7 +276,6 @@ class MetricReportingService {
 	 */
 	private List<Map> testMetricFunction(List<Long> projectIds, String metricCode) {
 		String date = metricCollectionDate.format(DateFormat)
-		setUpRandom()
 
 		projectIds.collect { Long projectId ->
 			[
@@ -300,7 +283,7 @@ class MetricReportingService {
 					metricCode: metricCode,
 					date      : date,
 					label     : 'count',
-					value     : generateRandomInt(1, 500)
+					value     : RandomUtils.nextInt(499) + 1
 			]
 		}
 	}
@@ -314,7 +297,7 @@ class MetricReportingService {
 		Map definitions = getMetricDefinitions()
 		int version = definitions?.version ?: 0
 		definitions.remove('version')
-		String definition = ((definitions.definitions ?: [:]) as JSON).toString(true) ?: ''
+		String definition = definitions.definitions ?  (definitions.definitions as JSON).toString(true) : '[]'
 
 		return [definitions: definition, version: version]
 	}
@@ -324,7 +307,7 @@ class MetricReportingService {
 	 * @return
 	 */
 	Map getMetricDefinitions() {
-		settingService.getAsMap(SettingType.METRIC_DEF, 'MetricDefinitions') ?: [:]
+		settingService.getAsMap(SettingType.METRIC_DEF, MetricDefinitions) ?: [:]
 	}
 
 	/**
@@ -332,14 +315,13 @@ class MetricReportingService {
 	 * @param code
 	 * @return
 	 */
-	JSONObject getDefinition(String code) {
-		List definitions = getMetricDefinitions().definitions ?: [:]
+	JSONObject getDefinition(String code, MetricDefinitionsCommand definitions) {
 
-		Map metricDefinition = definitions.find { Map definition ->
+		Map metricDefinition = definitions.definitions.find { MetricDefinitionCommand definition ->
 			if (definition.metricCode == code) {
 				return definition
 			}
-		}
+		}.toMap()
 
 		if (!metricDefinition) {
 			throw new InvalidParamException("Metric definition doesn't exist for $code")
@@ -357,7 +339,13 @@ class MetricReportingService {
 	 * @return A Map of the saved JSON, and the version of the metrics.
 	 */
 	Map saveDefinitions(MetricDefinitionsCommand definitions, Integer version) {
-		settingService.save(SettingType.METRIC_DEF, 'MetricDefinitions', (definitions.toMap() as JSON).toString(), version)
+		settingService.save(
+				SettingType.METRIC_DEF,
+				MetricDefinitions,
+				(definitions.toMap() as JSON).toString(),
+				version
+		)
+
 		return getDefinitions()
 	}
 
@@ -391,7 +379,9 @@ class MetricReportingService {
 		definitions.each { Map definition ->
 			if (definition.enabled) {
 				try {
-					gatherMetric(projectIds, (String) definition.metricCode, new JSONObject(definition)).each { Map data ->
+					List <Map> metricsData = gatherMetric(projectIds, (String) definition.metricCode, new JSONObject(definition))
+
+					metricsData.each { Map data ->
 						writeMetricData(data)
 						metrics++
 					}
@@ -403,7 +393,7 @@ class MetricReportingService {
 
 		}
 
-		Log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
+		log.info("generateDailyMetrics completed, duration ${stopwatch.endDuration()}, metrics created $metrics, errors encountered $errors")
 		return [metrics: metrics, errors: errors]
 	}
 
@@ -432,9 +422,9 @@ class MetricReportingService {
 	 *
 	 * @return A list of maps containing the metric data gathered.
 	 */
-	List<Map> testMetric(String metricCode) {
+	List<Map> testMetric(String metricCode, MetricDefinitionsCommand definitions) {
 		List<Long> projectIds = projectIdsForMetrics()
-		JSONObject metricDefinition = getDefinition(metricCode)
+		JSONObject metricDefinition = getDefinition(metricCode, definitions)
 
 		if (!metricDefinition) {
 			throw new InvalidParamException("Metric definition doesn't exist for $metricCode")
@@ -456,28 +446,28 @@ class MetricReportingService {
 	 * projectGuid, metricCode, date, label, value  if not filtering by project or
 	 * metricCode, date, label, value if filtering by project.
 	 */
-	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null){
+	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null) {
 		DetachedCriteria metrics = MetricResult.where {
 			date >= startDate && date <= endDate
 		}
 
-		if(projectGuid){
+		if (projectGuid) {
 			metrics.where {
 				project.guid == projectGuid
 			}
-		}else{
+		} else {
 			metrics.where {
 				project.collectMetrics == 1
 			}
 		}
 
-		if(metricCodes){
-			metrics.where{
+		if (metricCodes) {
+			metrics.where {
 				metricDefinitionCode in metricCodes
 			}
 		}
 
-		if(projectId){
+		if (projectId) {
 			metrics.where {
 				project.id == projectId
 			}
@@ -485,7 +475,7 @@ class MetricReportingService {
 
 		List<MetricResult> results = metrics.list()
 
-		if(projectId){
+		if (projectId) {
 			return metricResultsProjectMap(results)
 		}
 

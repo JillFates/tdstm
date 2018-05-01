@@ -8,9 +8,11 @@ import grails.validation.Validateable
 @Validateable
 class MetricDefinitionsCommand {
 	List<MetricDefinitionCommand> definitions
+	String metricCodes
 
 	static constraints = {
 		definitions cascade: true
+		metricCodes nullable: true
 	}
 
 	/**
@@ -22,5 +24,13 @@ class MetricDefinitionsCommand {
 		[definitions :definitions.collect{MetricDefinitionCommand definition->
 			return definition.toMap()
 		}]
+	}
+
+	List<String> testCodes() {
+		if (metricCodes) {
+			return metricCodes.split(',')*.trim()
+		}
+
+		return []
 	}
 }

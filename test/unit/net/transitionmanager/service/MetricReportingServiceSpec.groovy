@@ -43,7 +43,7 @@ class MetricReportingServiceSpec extends Specification {
 			results.size() == 3
 			results[0].projectId == 1l
 			results[0].metricCode == 'APP-VPS'
-			results[0].date == new Date().format('yyyy-MM-dd')
+			results[0].date == (new Date() -1).format('yyyy-MM-dd')
 			results[0].label == 'count'
 			results[0].value >= 0
 			results[0].value <= 500
