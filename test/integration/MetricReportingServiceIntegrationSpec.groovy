@@ -266,7 +266,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	void 'test writeMetricData'() {
 
-		setup: ''
+		setup: 'Given a metric data map.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date date = new Date().clearTime() - 1
@@ -278,11 +278,11 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 					label     : 'someLabel',
 					value     : 5
 			]
-		when: ''
+		when: 'writeMetricData is called on the map of data.'
 			metricReportingService.writeMetricData(metricData)
 			MetricResult result = MetricResult.findByProjectAndDate(project1, date)
 
-		then: ''
+		then: 'The results can be retrieved from the database.'
 			result.project.id == project1.id
 			result.metricDefinitionCode == 'someCode'
 			result.label == 'someLabel'
@@ -290,7 +290,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void 'test getMetrics'() {
-		setup: ''
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date previousDate = new Date().clearTime() - 1
@@ -324,9 +324,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			metrics.each { Map metricData ->
 				metricReportingService.writeMetricData(metricData)
 			}
-		when: ''
+		when: 'get metrics is called filtering to just one of those records based on date.'
 			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, null, null)
-		then: ''
+		then: 'The one metric is returned.'
 			metricData.size() == 1
 			metricData[0].projectGuid == project1.guid
 			metricData[0].metricCode == 'someCode'
@@ -336,7 +336,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void 'test getMetrics filter guid'() {
-		setup: ''
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date previousDate = new Date().clearTime() - 1
@@ -370,9 +370,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			metrics.each { Map metricData ->
 				metricReportingService.writeMetricData(metricData)
 			}
-		when: ''
+		when: 'Calling getMetrics filtering by the project guid.'
 			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, project1.guid, null)
-		then: ''
+		then: 'The metric data is returned.'
 			metricData.size() == 1
 			metricData[0].projectGuid == project1.guid
 			metricData[0].metricCode == 'someCode'
@@ -382,7 +382,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void 'test getMetrics filter invalid guid'() {
-		setup: ''
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date previousDate = new Date().clearTime() - 1
@@ -416,14 +416,14 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			metrics.each { Map metricData ->
 				metricReportingService.writeMetricData(metricData)
 			}
-		when: ''
+		when: 'Calling getMetrics with an invalid project guid.'
 			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, 'invalid', null)
-		then: ''
+		then: 'No metric data is returned.'
 			metricData.size() == 0
 	}
 
 	void 'test getMetrics metric code'() {
-		setup: ''
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date previousDate = new Date().clearTime() - 1
@@ -457,9 +457,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			metrics.each { Map metricData ->
 				metricReportingService.writeMetricData(metricData)
 			}
-		when: ''
+		when: 'Calling getMetrics filtering with a metric code'
 			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate  + 1, null, ['someCode'])
-		then: ''
+		then: 'The metric data is returned.'
 			metricData.size() == 1
 			metricData[0].projectGuid == project1.guid
 		    metricData[0].metricCode == 'someCode'
@@ -469,7 +469,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void 'test getMetrics invalid metric code'() {
-			setup: ''
+			setup: 'Given a list of metrics saved to the DB with a range of dates.'
 				test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 				Project project1 = projectTestHelper.createProject()
 				Date previousDate = new Date().clearTime() - 1
@@ -503,14 +503,14 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				metrics.each { Map metricData ->
 					metricReportingService.writeMetricData(metricData)
 				}
-			when: ''
+			when: 'Calling getMetrics filtering with an invalid metric code'
 				List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate  + 1, null, ['invalid'])
-			then: ''
+			then: 'No data is returned.'
 				metricData.size() == 0
 		}
 
 	void 'test getMetrics by project id'() {
-		setup: ''
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
 			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
 			Project project1 = projectTestHelper.createProject()
 			Date previousDate = new Date().clearTime() - 1
@@ -544,9 +544,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			metrics.each { Map metricData ->
 				metricReportingService.writeMetricData(metricData)
 			}
-		when: ''
+		when: 'Calling getMetrics filtering by project id'
 			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, null, null, project1.id)
-		then: ''
+		then: 'The metric data is returned without the project guid.'
 			metricData.size() == 1
 			metricData[0].projectGuid == null
 			metricData[0].metricCode == 'someCode'

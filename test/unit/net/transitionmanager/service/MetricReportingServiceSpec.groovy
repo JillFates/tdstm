@@ -313,7 +313,7 @@ class MetricReportingServiceSpec extends Specification {
 
 	void 'test saveDefinitions sql definition'() {
 
-		setup: ''
+		setup: 'Given a MetricDefinitionsCommand object with a SQL definition.'
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
@@ -330,10 +330,10 @@ class MetricReportingServiceSpec extends Specification {
 
 			metricDefinitions.definitions = [definition]
 
-		when: ''
+		when: 'The definition is saved using the service.'
 			Map definitions = service.saveDefinitions(metricDefinitions, 0)
 
-		then: ''
+		then: 'The definition returned is the sql definition, as JSON.'
 			definitions.definitions == """[{
    "mode": "sql",
    "function": null,
@@ -347,7 +347,7 @@ class MetricReportingServiceSpec extends Specification {
 
 	void 'test saveDefinitions function definition'() {
 
-		setup: ''
+		setup: 'Given a MetricDefinitionsCommand object with a function definition.'
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
@@ -364,10 +364,10 @@ class MetricReportingServiceSpec extends Specification {
 
 			metricDefinitions.definitions = [definition]
 
-		when: ''
+		when: 'The definition is saved using the service.'
 			Map definitions = service.saveDefinitions(metricDefinitions, 0)
 
-		then: ''
+		then: 'The definition returned is the function definition, as JSON.'
 			definitions.definitions == """[{
    "mode": "function",
    "function": "TestFunction",
@@ -381,7 +381,7 @@ class MetricReportingServiceSpec extends Specification {
 
 	void 'test saveDefinitions query definition'() {
 
-		setup: ''
+		setup: 'Given a MetricDefinitionsCommand object with a query definition'
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
@@ -411,10 +411,10 @@ class MetricReportingServiceSpec extends Specification {
 
 			metricDefinitions.definitions = [definition]
 
-		when: ''
+		when: 'The definition is saved using the service'
 			Map definitions = service.saveDefinitions(metricDefinitions, 0)
 
-		then: ''
+		then: 'The definition returned is the query definition, as JSON.'
 			definitions.definitions == '''[{
    "mode": "query",
    "function": null,
@@ -440,7 +440,7 @@ class MetricReportingServiceSpec extends Specification {
 
 	void 'test getDefinitions function definition'() {
 
-		setup: ''
+		setup: 'Given a function definition is saved to the DB'
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
 			MetricDefinitionCommand definition = new MetricDefinitionCommand()
@@ -458,10 +458,10 @@ class MetricReportingServiceSpec extends Specification {
 			metricDefinitions.definitions = [definition]
 			service.saveDefinitions(metricDefinitions, 0)
 
-		when: ''
+		when: 'When getDefinitions is called.'
 			Map definitions = service.getDefinitions()
 
-		then: ''
+		then: 'The function definition is returned, as JSON'
 			definitions.definitions == """[{
    "mode": "function",
    "function": "TestFunction",
@@ -477,7 +477,7 @@ class MetricReportingServiceSpec extends Specification {
 	@ConfineMetaClassChanges([MetricReportingService])
 	void 'test generateDailyMetrics'() {
 
-		setup: ''
+		setup: 'Givne a function definition is saved to the database.'
 			service.metaClass.projectIdsForMetrics = { -> [1, 2, 3] }
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
@@ -496,11 +496,11 @@ class MetricReportingServiceSpec extends Specification {
 			metricDefinitions.definitions = [definition]
 			service.saveDefinitions(metricDefinitions, 0)
 
-		when: ''
+		when: 'generateDailyMetrics is called'
 			Map metrics = service.generateDailyMetrics()
 			List<MetricResult> results = MetricResult.list()
 
-		then: ''
+		then: 'The results are 3 metrics run, and 3 results in the db.'
 			metrics == [metrics: 3, errors: 0]
 			results.size() == 3
 	}
@@ -508,7 +508,7 @@ class MetricReportingServiceSpec extends Specification {
 	@ConfineMetaClassChanges([MetricReportingService])
 	void 'test testMetric'() {
 
-		setup: ''
+		setup: 'Given a function metric definition.'
 			service.metaClass.projectIdsForMetrics = { -> [1] }
 			service.settingService = new SettingService()
 			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
@@ -526,9 +526,9 @@ class MetricReportingServiceSpec extends Specification {
 
 			metricDefinitions.definitions = [definition]
 
-		when: ''
+		when: 'When that definition is tested using testMetric.'
 			List<Map> metrics = service.testMetric('The code...',metricDefinitions)
-		then: ''
+		then: 'The results are returned.'
 			metrics[0].projectId == 1
 			metrics[0].metricCode == 'The code...'
 			metrics[0].date == (new Date() - 1).format('yyyy-MM-dd')
