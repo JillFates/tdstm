@@ -1,3 +1,4 @@
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -47,6 +48,7 @@ class WsProjectController implements ControllerMethods {
 	 *
 	 * @return A list of projects, and their licence data.
 	 */
+	@HasPermission(Permission.ProjectView)
 	def projects(){
 		renderSuccessJson(projectService.projects())
 	}
