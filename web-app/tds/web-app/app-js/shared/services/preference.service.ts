@@ -58,5 +58,7 @@ export class PreferenceService {
 // add constants as needed
 export const PREFERENCES_LIST = {
 	ASSET_JUST_PLANNING: 'assetJustPlanning',
-	ASSET_LIST_SIZE : 'assetListSize'
+	ASSET_LIST_SIZE : 'assetListSize',
+	DEFAULT_SORT_VIEW_MANAGER: 'defaultSortViewManager',
+	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT'
 };

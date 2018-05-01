@@ -14,7 +14,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 import { SortInfo, SortUtils } from '../../../../shared/utils/sort.utils';
 
 @Component({
@@ -49,20 +49,34 @@ export class AssetExplorerIndexComponent implements OnInit {
 		private preferenceService: PreferenceService) {
 	}
 	ngOnInit() {
-		this.sortInfo = { property: 'name', isAscending: true, type: 'string' };
+
 		this.sortByName = { property: 'name', isAscending: true, type: 'string'};
 		this.sortByCreatedBy =  { property: 'createdBy', isAscending: true, type: 'string'};
 		this.sortByIsShared =  { property: 'isShared', isAscending: true, type: 'boolean'};
 		this.sortByIsSystem =  { property: 'isSystem', isAscending: true, type: 'boolean'};
-		this.sortByCreatedOn =  { property: 'createdOn', isAscending: true, type: 'date'};
-		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: true, type: 'date'};
+		this.sortByCreatedOn =  { property: 'createdOn', isAscending: false, type: 'date'};
+		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: false, type: 'date'};
 		this.sortByIsFavorite = { property: 'isFavorite', isAscending: true, type: 'boolean'};
 
-		zip(this.report, this.preferenceService.getPreference('CURR_DT_FORMAT'))
-			.subscribe((result: any[]) => {
-				const [reportResult, dateFormat] = result;
+		this.sortInfo = this.sortByCreatedOn;
 
-				this.userDateFormat = dateFormat.CURR_DT_FORMAT;
+		const getDefaultSorting = (sortPreference: string) => {
+			const sortItems = [this.sortByName, this.sortByCreatedBy, this.sortByIsShared, this.sortByIsSystem, this.sortByCreatedOn, this.sortByUpdatedOn, this.sortByIsFavorite];
+			if (sortPreference === null) {
+				sortPreference = 'createdOn';
+			}
+
+			return sortItems.find((sortItem: SortInfo) => sortItem.property === sortPreference);
+		};
+
+		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER}`;
+		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
+			.subscribe((result: any[]) => {
+				const [reportResult, preferences] = result;
+
+				this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+				this.sortInfo = getDefaultSorting(preferences[PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER]);
+
 				this.reportGroupModels = reportResult;
 				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
@@ -144,6 +158,12 @@ export class AssetExplorerIndexComponent implements OnInit {
 			sort.isAscending = true; // reset ascending
 			this.sortInfo =  sort;
 		}
+
+		/*
+		Uncomment when backend changes to persis setting default sort view manager is done
+		this.preferenceService.setPreference(PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER, sort.property)
+			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
+		*/
 
 		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
 		return ;
