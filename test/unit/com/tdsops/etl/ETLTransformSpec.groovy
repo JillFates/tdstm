@@ -863,10 +863,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -886,10 +886,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -911,10 +911,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can transform globally a field value using replace command using a range in the iteration'() {
@@ -935,7 +935,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
@@ -955,10 +955,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -979,10 +979,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -1003,10 +1003,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 

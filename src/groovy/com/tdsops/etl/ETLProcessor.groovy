@@ -85,7 +85,7 @@ class ETLProcessor implements RangeChecker {
 	DataSetFacade dataSetFacade
 	/**
 	 * An instance of this interface should be assigned
-	 * to be used in fieldSpec validations
+	 * to be used in fieldDefinition validations
 	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
@@ -506,10 +506,11 @@ class ETLProcessor implements RangeChecker {
 		[
 			with: { value ->
 
-				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
-				Element newElement = currentRow.addNewElement(ETLValueHelper.valueOf(value), fieldSpec, this)
-				addElementLoaded(selectedDomain, newElement)
-				newElement
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, fieldName))
+				element.originalValue = ETLValueHelper.valueOf(value)
+				element.value = element.originalValue
+				addElementLoaded(selectedDomain, element)
+				element
 			}
 		]
 
@@ -602,17 +603,15 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def initialize(String field){
+	def initialize(String field) {
 		validateStack()
 		[
 			with: { defaultValue ->
 
-				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
-
-				Element newElement = currentRow.addNewElement("", fieldSpec, this)
-				newElement.init = ETLValueHelper.valueOf(defaultValue)
-				addElementLoaded(selectedDomain, newElement)
-				newElement
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, field))
+				element.init = ETLValueHelper.valueOf(defaultValue)
+				addElementLoaded(selectedDomain, element)
+				element
 			}
 		]
 	}
@@ -776,16 +775,16 @@ class ETLProcessor implements RangeChecker {
 	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
 	 * <br>
 	 * Validation is based on the transformation from {@link ETLDomain#clazz} field.
-	 * Then it builds an instance of ETLFieldSpec with all the necessary data used in ETLProcessorResult
+	 * Then it builds an instance of ETLFieldDefinition with all the necessary data used in ETLProcessorResult
 	 * @param an instance of ETLDomain used to validate fieldName parameter
 	 * @param fieldName field name used in the lookup process
-	 * @return an instance of {@link  ETLFieldSpec}
-	 * @see ETLFieldSpec
+	 * @return an instance of {@link  ETLFieldDefinition}
+	 * @see ETLFieldDefinition
 	 * @see ETLProcessorResult
 	 */
-	ETLFieldSpec lookUpFieldSpecs (ETLDomain domain, String field) {
+	ETLFieldDefinition lookUpFieldSpecs (ETLDomain domain, String field) {
 
-		ETLFieldSpec fieldSpec
+		ETLFieldDefinition fieldSpec
 
 		if (ETLDomain.External != domain) {
 
@@ -867,10 +866,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	private def doExtract () {
-		Element element = currentRow.getDataSetElement(currentColumnIndex)
-
-		addCurrentElementToBinding(element)
-
+		Element element = createCurrentElement(currentColumnIndex)
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
@@ -884,7 +880,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
 		result.loadElement(element)
-		debugConsole.info "Adding element ${element.fieldSpec.getName()}='${element.value}' to domain ${domain} results"
+		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
 	}
 
 	/**
@@ -893,6 +889,8 @@ class ETLProcessor implements RangeChecker {
 	 */
 	void addFindElement(ETLFindElement findElement) {
 		validateStack(findElement)
+		// TODO: review it with John.
+		findOrCreateCurrentElement(findElement.currentFind.fieldDefinition)
 		result.addFindElement(findElement)
 		popFromStack()
 	}
@@ -921,10 +919,32 @@ class ETLProcessor implements RangeChecker {
 	 * @param element a selected Element
 	 * @return the curent element selected in ETLProcessor
 	 */
-	private Element addCurrentElementToBinding (Element element) {
+	private Element bindCurrentElement(Element element) {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
 		return currentElement
+	}
+
+	/**
+	 * Find or create a current element based onf field definition
+	 * @param fieldDefinition
+	 * @return
+	 */
+	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
+		if(currentElement?.fieldDefinition?.name == fieldDefinition.name){
+			return currentElement
+		} else{
+			return bindCurrentElement(currentRow.addNewElement(null, fieldDefinition, this))
+		}
+	}
+
+	/**
+	 *
+	 * @param currentColumnIndex
+	 * @return
+	 */
+	private Element createCurrentElement(Integer currentColumnIndex) {
+		return bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex))
 	}
 
 	/**

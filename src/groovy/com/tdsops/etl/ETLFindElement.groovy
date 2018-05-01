@@ -78,6 +78,7 @@ class ETLFindElement implements ETLStackableCommand{
 	ETLFindElement into(String property) {
 		validateReference(property)
 		currentFind.property = property
+		currentFind.fieldDefinition = processor.lookUpFieldSpecs(currentDomain, property)
 		processor.addFindElement(this)
 		return this
 	}
@@ -190,11 +191,11 @@ class ETLFindElement implements ETLStackableCommand{
 	}
 
 	/**
-	 * Checks a fieldSpec based on asset field name
+	 * Checks a fieldDefinition based on asset field name
 	 * using the selected domain in the current script
 	 * @param fieldName an asset field name
 	 */
-	private ETLFieldSpec checkAssetFieldSpec(String fieldName) {
+	private ETLFieldDefinition checkAssetFieldSpec(String fieldName) {
 		return processor.lookUpFieldSpecs(currentDomain, fieldName)
 	}
 

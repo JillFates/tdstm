@@ -32,14 +32,14 @@ class Row {
 	    elementsMap = [:]
     }
 
-	Element addNewElement (Object value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
+	Element addNewElement (Object value, ETLFieldDefinition fieldDefinition, ETLProcessor processor) {
 		dataSetValues.add(value)
 		Integer columnIndex = dataSetValues.size()
 		Element newElement = new Element(originalValue: value,
 			value: value,
 			rowIndex: rowIndex,
 			columnIndex:columnIndex ,
-			fieldSpec: fieldSpec,
+			fieldDefinition: fieldDefinition,
 			processor: processor)
 		elementsMap[columnIndex] = newElement
 		newElement

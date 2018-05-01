@@ -21,7 +21,7 @@ class Element implements RangeChecker {
     ETLDomain domain
     ETLProcessor processor
 
-    ETLFieldSpec fieldSpec
+    ETLFieldDefinition fieldDefinition
 
     /**
      * Transform command on an element with a closure to be executed
@@ -69,7 +69,7 @@ class Element implements RangeChecker {
     Element load (String fieldName) {
 	    processor.validateStack()
         if (processor.hasSelectedDomain()) {
-            this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+            this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
             processor.addElementLoaded(processor.selectedDomain, this)
             return this
         } else {
@@ -89,7 +89,7 @@ class Element implements RangeChecker {
 	Element initialize (String fieldName) {
 		processor.validateStack()
 		if (processor.hasSelectedDomain()) {
-			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
 			this.init = this.value
 			this.originalValue = ''
 			this.value = ''
