@@ -315,72 +315,24 @@ class MetricReportingService {
 			imagesIssued = licenseAdminService.getLicenseStateMap(project)?.numberOfLicenses ?: 0
 			imagesUsed = ProjectDailyMetric.findByProjectAndMetricDate(project, date)?.planningServers ?: 0
 
-			licenseMetrics << getImagesUsed(project, date, metricCode, imagesUsed)
-			licenseMetrics << getImagesIssued(project, date, metricCode, imagesIssued)
-			licenseMetrics << getImagesAvailable(project, date, metricCode, imagesIssued - imagesUsed)
+			Map metrics = [
+					(ImagesUsedLabel)     : imagesUsed,
+					(ImagesIssuedLabel)   : imagesIssued,
+					(ImagesAvailableLabel): imagesIssued - imagesUsed
+			]
+
+			metrics.each { String label, Long value ->
+				licenseMetrics << [
+						projectId : project.id,
+						metricCode: metricCode,
+						date      : date,
+						label     : label,
+						value     : value
+				]
+			}
 		}
 
 		return licenseMetrics
-	}
-
-	/**
-	 * Gets the maps for images used.
-	 *
-	 * @param project The project the metric is for.
-	 * @param date The date of the metric.
-	 * @param metricCode The metric code for licencing.
-	 * @param imagesUsed the number of images used.
-	 *
-	 * @return The map of the metric data for images used.
-	 */
-	Map getImagesUsed(Project project, Date date, String metricCode, long imagesUsed) {
-		[
-				projectId : project.id,
-				metricCode: metricCode,
-				date      : date,
-				label     : ImagesUsedLabel,
-				value     : imagesUsed
-		]
-	}
-
-	/**
-	 * Gets the maps for images issued.
-	 *
-	 * @param project The project the metric is for.
-	 * @param date The date of the metric.
-	 * @param metricCode The metric code for licencing.
-	 * @param imagesIssued the number of images issued.
-	 *
-	 * @return The map of the metric data for images issued.
-	 */
-	Map getImagesIssued(Project project, Date date, String metricCode, long imagesIssued) {
-		[
-				projectId : project.id,
-				metricCode: metricCode,
-				date      : date,
-				label     : ImagesIssuedLabel,
-				value     : imagesIssued
-		]
-	}
-
-	/**
-	 * Gets the maps for images available.
-	 *
-	 * @param project The project the metric is for.
-	 * @param date The date of the metric.
-	 * @param metricCode The metric code for licencing.
-	 * @param imagesUsed the number of images available.
-	 *
-	 * @return The map of the metric data for images available.
-	 */
-	Map getImagesAvailable(Project project, Date date, String metricCode, long imagesAvailable) {
-		[
-				projectId : project.id,
-				metricCode: metricCode,
-				date      : date,
-				label     : ImagesAvailableLabel,
-				value     : imagesAvailable
-		]
 	}
 
 	/**
