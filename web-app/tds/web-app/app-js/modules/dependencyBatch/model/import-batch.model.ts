@@ -40,7 +40,7 @@ export class ImportBatchModel {
 	processed: number;
 	ignored: number;
 	currentProgress?: number;
-	stalledCounter? = 0;
+	stalledCounter ? = 0;
 }
 
 /**
