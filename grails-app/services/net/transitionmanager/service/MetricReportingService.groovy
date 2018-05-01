@@ -493,29 +493,29 @@ class MetricReportingService {
 	 * projectGuid, metricCode, date, label, value  if not filtering by project or
 	 * metricCode, date, label, value if filtering by project.
 	 */
-	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Integer projectId = null) {
+	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Long projectId = null) {
 		DetachedCriteria metrics = MetricResult.where {
 			date >= startDate && date <= endDate
 		}
 
 		if (projectGuid) {
-			metrics.where {
+			metrics = metrics.where {
 				project.guid == projectGuid
 			}
 		} else {
-			metrics.where {
+			metrics = metrics.where {
 				project.collectMetrics == 1
 			}
 		}
 
 		if (metricCodes) {
-			metrics.where {
+			metrics = metrics.where {
 				metricDefinitionCode in metricCodes
 			}
 		}
 
 		if (projectId) {
-			metrics.where {
+			metrics = metrics.where {
 				project.id == projectId
 			}
 		}
