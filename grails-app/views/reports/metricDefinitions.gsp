@@ -141,13 +141,13 @@
 						table.addClass('table-condensed');
 						table.addClass('table-hover');
 						table.prop("id", item.metricCode);
-						table.append("<th>Project Id</th><th>Metric Code</th><th>Date</th><th>Label</th><th>Value</th>");
+						table.append("<th>Project Id</th><th>Date</th><th>Metric Code</th><th>Label</th><th>Value</th>");
 					}
 
 					var $tr = $('<tr>').append(
 						$('<td>').text(item.projectId),
-						$('<td>').text(item.metricCode),
 						$('<td>').text(item.date),
+						$('<td>').text(item.metricCode),
 						$('<td>').text(item.label),
 						$('<td>').text(item.value)
 					);
