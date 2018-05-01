@@ -26,17 +26,17 @@ class MetricController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def index() {
-		GetMetricsCommand co = populateCommandObject(GetMetricsCommand)
-		if (co.hasErrors()) {
-			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(co) ) )
+		GetMetricsCommand commandObj = populateCommandObject(GetMetricsCommand)
+		if (commandObj.hasErrors()) {
+			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObj) ) )
 			return
 		}
 
 		List<Map> metricData = metricReportingService.getMetrics(
-			co.startDate,
-			co.endDate,
-			co.projectGuid,
-			co.codes())
+			commandObj.startDate,
+			commandObj.endDate,
+			commandObj.projectGuid,
+			commandObj.codes())
 
 		withFormat {
 			csv {
