@@ -184,7 +184,7 @@ class MetricReportingService {
 					$label as label,
 					$aggregation as value
 			from $domain
-			where project.id in (:projectIds) $where 
+			where project.id in (:projectIds) $where
 			$groupBy
 		""".stripIndent()
 	}
@@ -496,27 +496,19 @@ class MetricReportingService {
 	List<Map> getMetrics(Date startDate, Date endDate, String projectGuid, List<String> metricCodes, Long projectId = null) {
 		DetachedCriteria metrics = MetricResult.where {
 			date >= startDate && date <= endDate
-		}
 
-		if (projectGuid) {
-			metrics = metrics.where {
+			// Filter on the projectGuid, projectId or all projects that have collectMetrics set
+			if (projectGuid) {
 				project.guid == projectGuid
-			}
-		} else {
-			metrics = metrics.where {
+			} else if (projectId) {
+				project.id == projectId
+			} else {
 				project.collectMetrics == 1
 			}
-		}
 
-		if (metricCodes) {
-			metrics = metrics.where {
+			// Filter on a list of metric codes
+			if (metricCodes) {
 				metricDefinitionCode in metricCodes
-			}
-		}
-
-		if (projectId) {
-			metrics = metrics.where {
-				project.id == projectId
 			}
 		}
 
