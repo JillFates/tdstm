@@ -21,11 +21,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
  */
 class MetricReportingService {
 	SettingService             settingService
+	LicenseAdminService        licenseAdminService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
 	private static String MetricDefinitions = 'METRIC_DEFINITIONS'
 
 	private static String DateFormat = 'yyyy-MM-dd'
+
+	private static String ImagesManagedLabel   = 'Images Managed'
+	private static String ImagesAllocatedLabel = 'Images Allocated'
+	private static String ImagesAvailableLabel = 'Images Available'
 
 	/**
 	 * emum for the metric mode
@@ -63,7 +68,8 @@ class MetricReportingService {
 	 * A map of functions that can be run by gatherMetric if the mode is function.
 	 */
 	private Map functions = [
-			testMetric: { List<Long> projectIds, String metricCode -> testMetricFunction(projectIds, metricCode) }
+			testMetric   : { List<Long> projectIds, String metricCode -> testMetricFunction(projectIds, metricCode) },
+			licenseMetric: { List<Long> projectIds, String metricCode -> licenseMetricFunction(projectIds, metricCode) }
 	]
 
 	/**
@@ -286,6 +292,57 @@ class MetricReportingService {
 					value     : RandomUtils.nextInt(499) + 1
 			]
 		}
+	}
+
+	private List<Map> licenseMetricFunction(List<Long> projectIds, String metricCode) {
+		Date date = metricCollectionDate
+		List<Map> licenseMetrics = []
+		long imagesAllocated
+		long imagesManaged
+		Project project
+
+
+		projectIds.each { Long id ->
+			project = Project.get(id)
+			imagesAllocated = licenseAdminService.getLicenseStateMap(project)?.numberOfLicenses ?: 0
+			imagesManaged = ProjectDailyMetric.findByProjectAndMetricDate(project, date)?.planningServers ?: 0
+
+			licenseMetrics << getImagesManaged(project, date, metricCode, imagesManaged)
+			licenseMetrics << getImagesAllocated(project, date, metricCode, imagesAllocated)
+			licenseMetrics << getImagesAvailable(project, date, metricCode, imagesAllocated - imagesManaged)
+		}
+
+		return licenseMetrics
+	}
+
+	Map getImagesManaged(Project project, Date date, String metricCode, long imagesManaged) {
+		[
+				projectId : project.id,
+				metricCode: metricCode,
+				date      : date,
+				label     : ImagesManagedLabel,
+				value     : imagesManaged
+		]
+	}
+
+	Map getImagesAllocated(Project project, Date date, String metricCode, long imagesAllocated) {
+		[
+				projectId : project.id,
+				metricCode: metricCode,
+				date      : date,
+				label     : ImagesAllocatedLabel,
+				value     : imagesAllocated
+		]
+	}
+
+	Map getImagesAvailable(Project project, Date date, String metricCode, long imagesAvailable) {
+		[
+				projectId : project.id,
+				metricCode: metricCode,
+				date      : date,
+				label     : ImagesAvailableLabel,
+				value     : imagesAvailable
+		]
 	}
 
 	/**

@@ -267,8 +267,16 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.message = "A license is required in order to enable all features of the application."
 				licState.valid = false
 				licState.banner = ""
+				licState.numberOfLicenses = 0
+				licState.goodAfterDate = null
+				licState.goodBeforeDate = null
 			}else {
 				License licObj = getLicenseObj(license)
+				int max = licObj?.numberOfLicenses ?: 0
+				licState.numberOfLicenses = max
+				licState.goodAfterDate = licObj?.goodAfterDate
+				licState.goodBeforeDate = licObj?.goodBeforeDate
+
 				if(licObj == null){
 					licState.state = State.UNLICENSED
 					licState.message = "A license is required in order to enable all features of the application."
@@ -328,7 +336,6 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 
 				Date now = new Date()
 				long nowTime = now.getTime()
-				int max = licObj.numberOfLicenses;
 
 				if (nowTime >= licObj.goodAfterDate && nowTime <= licObj.goodBeforeDate) {
 					long numServers = assetEntityService.countServers(project)
