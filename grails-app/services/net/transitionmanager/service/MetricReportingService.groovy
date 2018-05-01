@@ -132,7 +132,7 @@ class MetricReportingService {
 		String date = metricCollectionDate.format(DateFormat)
 		List results
 
-		if (query.groupBy) {
+		if (query.groupBy && query.groupBy.size > 1) {
 			// the colon is in the parameters because any colon in the query will be seen an a parameter, so this is workaround.
 			results = MetricResult.executeQuery(getQuery(query), [projectIds: projectIds, colon: ':'])
 		} else {
