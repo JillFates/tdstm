@@ -205,19 +205,19 @@ class MetricReportingServiceSpec extends Specification {
 							]
 					]
 			] as JSONObject
+			String expected = """
+				select project.id,
+						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
+						count(*) as value
+				from AssetEntity
+				where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = 1
+				group by planStatus, assetType, project.id
+				""".stripIndent()
 
 		when: 'getQuery is called with the JSON query'
-			String hql = service.getQuery(query)
-
+			String hql = service.getQuery(query).stripIndent()
 		then: 'getQuery returns an HQL string'
-			hql == """
-			select project.id,
-					concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
-					count(*) as value
-			from AssetEntity
-			where project.id in (:projectIds) and validation in ('BundleReady', 'Confirmed') and moveBundle.useForPlanning = 1 
-			group by planStatus, assetType, project.id
-			""".stripIndent()
+			expected == hql
 	}
 
 	void 'test getQuery no where'() {
@@ -247,7 +247,7 @@ class MetricReportingServiceSpec extends Specification {
 						concat(COALESCE(planStatus, 'Unknown'), :colon, COALESCE(assetType, 'Unknown')) as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
+				where project.id in (:projectIds) and moveBundle.useForPlanning = 1
 				group by planStatus, assetType, project.id
 				""".stripIndent()
 	}
@@ -278,7 +278,7 @@ class MetricReportingServiceSpec extends Specification {
 							concat(COALESCE(planStatus, 'Unknown')) as label,
 							count(*) as value
 					from AssetEntity
-					where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
+					where project.id in (:projectIds) and moveBundle.useForPlanning = 1
 					group by planStatus, project.id
 					""".stripIndent()
 	}
@@ -306,7 +306,7 @@ class MetricReportingServiceSpec extends Specification {
 						'count' as label,
 						count(*) as value
 				from AssetEntity
-				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
+				where project.id in (:projectIds) and moveBundle.useForPlanning = 1
 				group by project.id
 				""".stripIndent()
 	}
