@@ -28,9 +28,9 @@ class MetricReportingService {
 
 	private static String DateFormat = 'yyyy-MM-dd'
 
-	private static String ImagesManagedLabel   = 'Images Managed'
-	private static String ImagesAllocatedLabel = 'Images Allocated'
-	private static String ImagesAvailableLabel = 'Images Available'
+	private static String ImagesUsedLabel      = 'used'
+	private static String ImagesIssuedLabel    = 'issued'
+	private static String ImagesAvailableLabel = 'available'
 
 	/**
 	 * emum for the metric mode
@@ -294,47 +294,85 @@ class MetricReportingService {
 		}
 	}
 
+	/**
+	 * Gets License metrics for images issued, used and available
+	 * .
+	 * @param projectIds The project Ids go get license metrics for.
+	 * @param metricCode the metric code to use for the license metrics.
+	 *
+	 * @return A List of maps containing the license metrics.
+	 */
 	private List<Map> licenseMetricFunction(List<Long> projectIds, String metricCode) {
 		Date date = metricCollectionDate
 		List<Map> licenseMetrics = []
-		long imagesAllocated
-		long imagesManaged
+		long imagesIssued
+		long imagesUsed
 		Project project
 
 
 		projectIds.each { Long id ->
 			project = Project.get(id)
-			imagesAllocated = licenseAdminService.getLicenseStateMap(project)?.numberOfLicenses ?: 0
-			imagesManaged = ProjectDailyMetric.findByProjectAndMetricDate(project, date)?.planningServers ?: 0
+			imagesIssued = licenseAdminService.getLicenseStateMap(project)?.numberOfLicenses ?: 0
+			imagesUsed = ProjectDailyMetric.findByProjectAndMetricDate(project, date)?.planningServers ?: 0
 
-			licenseMetrics << getImagesManaged(project, date, metricCode, imagesManaged)
-			licenseMetrics << getImagesAllocated(project, date, metricCode, imagesAllocated)
-			licenseMetrics << getImagesAvailable(project, date, metricCode, imagesAllocated - imagesManaged)
+			licenseMetrics << getImagesUsed(project, date, metricCode, imagesUsed)
+			licenseMetrics << getImagesIssued(project, date, metricCode, imagesIssued)
+			licenseMetrics << getImagesAvailable(project, date, metricCode, imagesIssued - imagesUsed)
 		}
 
 		return licenseMetrics
 	}
 
-	Map getImagesManaged(Project project, Date date, String metricCode, long imagesManaged) {
+	/**
+	 * Gets the maps for images used.
+	 *
+	 * @param project The project the metric is for.
+	 * @param date The date of the metric.
+	 * @param metricCode The metric code for licencing.
+	 * @param imagesUsed the number of images used.
+	 *
+	 * @return The map of the metric data for images used.
+	 */
+	Map getImagesUsed(Project project, Date date, String metricCode, long imagesUsed) {
 		[
 				projectId : project.id,
 				metricCode: metricCode,
 				date      : date,
-				label     : ImagesManagedLabel,
-				value     : imagesManaged
+				label     : ImagesUsedLabel,
+				value     : imagesUsed
 		]
 	}
 
-	Map getImagesAllocated(Project project, Date date, String metricCode, long imagesAllocated) {
+	/**
+	 * Gets the maps for images issued.
+	 *
+	 * @param project The project the metric is for.
+	 * @param date The date of the metric.
+	 * @param metricCode The metric code for licencing.
+	 * @param imagesIssued the number of images issued.
+	 *
+	 * @return The map of the metric data for images issued.
+	 */
+	Map getImagesIssued(Project project, Date date, String metricCode, long imagesIssued) {
 		[
 				projectId : project.id,
 				metricCode: metricCode,
 				date      : date,
-				label     : ImagesAllocatedLabel,
-				value     : imagesAllocated
+				label     : ImagesIssuedLabel,
+				value     : imagesIssued
 		]
 	}
 
+	/**
+	 * Gets the maps for images available.
+	 *
+	 * @param project The project the metric is for.
+	 * @param date The date of the metric.
+	 * @param metricCode The metric code for licencing.
+	 * @param imagesUsed the number of images available.
+	 *
+	 * @return The map of the metric data for images available.
+	 */
 	Map getImagesAvailable(Project project, Date date, String metricCode, long imagesAvailable) {
 		[
 				projectId : project.id,
