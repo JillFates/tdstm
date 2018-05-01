@@ -1,13 +1,26 @@
 package net.transitionmanager.service
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.test.mixin.web.ControllerUnitTestMixin
+import net.transitionmanager.command.metricdefinition.MetricDefinitionCommand
+import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
+import net.transitionmanager.command.metricdefinition.QueryCommand
+import net.transitionmanager.command.metricdefinition.WhereCommand
+import net.transitionmanager.domain.MetricResult
+import net.transitionmanager.domain.PartyGroup
+import net.transitionmanager.domain.PartyType
+import net.transitionmanager.domain.Project
+import net.transitionmanager.domain.Setting
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 
 @TestFor(MetricReportingService)
-@TestMixin(GrailsUnitTestMixin)
+@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin])
+@Mock([PartyGroup, PartyType, Project, Setting, MetricResult])
 class MetricReportingServiceSpec extends Specification {
 
 
@@ -43,7 +56,7 @@ class MetricReportingServiceSpec extends Specification {
 			results.size() == 3
 			results[0].projectId == 1l
 			results[0].metricCode == 'APP-VPS'
-			results[0].date == (new Date() -1).format('yyyy-MM-dd')
+			results[0].date == (new Date() - 1).format('yyyy-MM-dd')
 			results[0].label == 'count'
 			results[0].value >= 0
 			results[0].value <= 500
@@ -239,6 +252,37 @@ class MetricReportingServiceSpec extends Specification {
 				""".stripIndent()
 	}
 
+	void 'test getQuery one groupBy'() {
+
+		setup: 'Given a query JSON structure no where'
+			JSONObject query = [
+					"groupBy"    : [
+							"planStatus"
+					],
+					"domain"     : "Device",
+					"join"       : [
+							[
+									"domain": "Dependency",
+									"on"    : "Dependency.asset.id = Application.id"
+							]
+					],
+					"aggregation": "count(*)"
+			] as JSONObject
+
+		when: 'getQuery is called with the JSON query'
+			String hql = service.getQuery(query)
+
+		then: 'getQuery returns an HQL string'
+			hql == """
+					select project.id,
+							concat(COALESCE(planStatus, 'Unknown')) as label,
+							count(*) as value
+					from AssetEntity
+					where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
+					group by planStatus, project.id
+					""".stripIndent()
+	}
+
 	void 'test getQuery no groupBy'() {
 
 		setup: 'Given a query JSON structure no where'
@@ -265,5 +309,231 @@ class MetricReportingServiceSpec extends Specification {
 				where project.id in (:projectIds) and moveBundle.useForPlanning = 1 
 				group by project.id
 				""".stripIndent()
+	}
+
+	void 'test saveDefinitions sql definition'() {
+
+		setup: ''
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'sql'
+				query = null
+				function = null
+				sql = 'Select * from Table'
+			}
+
+			metricDefinitions.definitions = [definition]
+
+		when: ''
+			Map definitions = service.saveDefinitions(metricDefinitions, 0)
+
+		then: ''
+			definitions.definitions == """[{
+   "mode": "sql",
+   "function": null,
+   "query": null,
+   "description": "A description.",
+   "enabled": 1,
+   "metricCode": "The code...",
+   "sql": "Select * from Table"
+}]"""
+	}
+
+	void 'test saveDefinitions function definition'() {
+
+		setup: ''
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'function'
+				query = null
+				function = 'TestFunction'
+				sql = null
+			}
+
+			metricDefinitions.definitions = [definition]
+
+		when: ''
+			Map definitions = service.saveDefinitions(metricDefinitions, 0)
+
+		then: ''
+			definitions.definitions == """[{
+   "mode": "function",
+   "function": "TestFunction",
+   "query": null,
+   "description": "A description.",
+   "enabled": 1,
+   "metricCode": "The code...",
+   "sql": null
+}]"""
+	}
+
+	void 'test saveDefinitions query definition'() {
+
+		setup: ''
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			WhereCommand whereCommand = new WhereCommand()
+			whereCommand.column = 'validation'
+			whereCommand.expression = "in ('BundleReady', 'Confirmed')"
+
+			QueryCommand queryCommand = new QueryCommand()
+			queryCommand.with {
+				domain = 'Device'
+				aggregation = 'count(*)'
+				groupBy = ['planStatus', 'assetType']
+				where = [whereCommand]
+			}
+
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'query'
+				query = queryCommand
+				function = null
+				sql = null
+			}
+
+			metricDefinitions.definitions = [definition]
+
+		when: ''
+			Map definitions = service.saveDefinitions(metricDefinitions, 0)
+
+		then: ''
+			definitions.definitions == '''[{
+   "mode": "query",
+   "function": null,
+   "query": {
+      "domain": "Device",
+      "aggregation": "count(*)",
+      "where": [{
+         "expression": "in ('BundleReady', 'Confirmed')",
+         "column": "validation"
+      }],
+      "groupBy": [
+         "planStatus",
+         "assetType"
+      ]
+   },
+   "description": "A description.",
+   "enabled": 1,
+   "metricCode": "The code...",
+   "sql": null
+}]'''
+	}
+
+
+	void 'test getDefinitions function definition'() {
+
+		setup: ''
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'function'
+				query = null
+				function = 'TestFunction'
+				sql = null
+			}
+
+			metricDefinitions.definitions = [definition]
+			service.saveDefinitions(metricDefinitions, 0)
+
+		when: ''
+			Map definitions = service.getDefinitions()
+
+		then: ''
+			definitions.definitions == """[{
+   "mode": "function",
+   "function": "TestFunction",
+   "query": null,
+   "description": "A description.",
+   "enabled": 1,
+   "metricCode": "The code...",
+   "sql": null
+}]"""
+	}
+
+
+	@ConfineMetaClassChanges([MetricReportingService])
+	void 'test generateDailyMetrics'() {
+
+		setup: ''
+			service.metaClass.projectIdsForMetrics = { -> [1, 2, 3] }
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'function'
+				query = null
+				function = 'testMetric'
+				sql = null
+			}
+
+			metricDefinitions.definitions = [definition]
+			service.saveDefinitions(metricDefinitions, 0)
+
+		when: ''
+			Map metrics = service.generateDailyMetrics()
+			List<MetricResult> results = MetricResult.list()
+
+		then: ''
+			metrics == [metrics: 3, errors: 0]
+			results.size() == 3
+	}
+
+	@ConfineMetaClassChanges([MetricReportingService])
+	void 'test testMetric'() {
+
+		setup: ''
+			service.metaClass.projectIdsForMetrics = { -> [1] }
+			service.settingService = new SettingService()
+			MetricDefinitionsCommand metricDefinitions = new MetricDefinitionsCommand()
+			MetricDefinitionCommand definition = new MetricDefinitionCommand()
+
+			definition.with {
+				metricCode = 'The code...'
+				description = 'A description.'
+				enabled = 1
+				mode = 'function'
+				query = null
+				function = 'testMetric'
+				sql = null
+			}
+
+			metricDefinitions.definitions = [definition]
+
+		when: ''
+			List<Map> metrics = service.testMetric('The code...',metricDefinitions)
+		then: ''
+			metrics[0].projectId == 1
+			metrics[0].metricCode == 'The code...'
+			metrics[0].date == (new Date() - 1).format('yyyy-MM-dd')
+			metrics[0].label == 'count'
+			metrics[0].value >= 1
+			metrics[0].value <= 500
 	}
 }
