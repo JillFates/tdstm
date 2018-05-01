@@ -41,4 +41,13 @@ class WsProjectController implements ControllerMethods {
 
 		renderSuccessJson(dataMap)
 	}
+
+	/**
+	 * Returns a list of projects, and their licence data.
+	 *
+	 * @return A list of projects, and their licence data.
+	 */
+	def projects(){
+		renderSuccessJson(projectService.projects())
+	}
 }
