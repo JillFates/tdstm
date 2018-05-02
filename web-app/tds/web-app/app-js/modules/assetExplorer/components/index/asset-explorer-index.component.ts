@@ -92,6 +92,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 		if (this.selectedFolder) {
 			this.selectedFolder.open = true;
 		}
+		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat);
 	}
 
 	protected onClearTextFilter(): void {
