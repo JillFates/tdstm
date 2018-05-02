@@ -38,6 +38,20 @@ class UrlMappings {
 		 * Asset WS
 		 ********************************************************/
 
+		"/ws/asset" {
+			controller = "wsAsset"
+			action = [
+			    POST: "saveAsset"
+			]
+		}
+
+		"/ws/asset/$id" {
+			controller = "wsAsset"
+			action = [
+				PUT: "updateAsset"
+			]
+		}
+
 		"/ws/asset/checkForUniqueName" {
 			controller = "wsAsset"
 			action = [
