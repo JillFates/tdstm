@@ -7,6 +7,7 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
 
@@ -27,7 +28,8 @@ export function DatabaseEditComponent(template, editModel) {
 		constructor(
 			@Inject('model') private model: any,
 			private activeDialog: UIActiveDialogService,
-			private preference: PreferenceService) {
+			private preference: PreferenceService,
+			private assetExplorerService: AssetExplorerService) {
 
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
@@ -58,8 +60,9 @@ export function DatabaseEditComponent(template, editModel) {
 		}
 
 		public onUpdate(): void {
-			console.log(JSON.stringify(this.model.asset));
-			console.log(this.model);
+			this.assetExplorerService.saveAsset(this.model).subscribe((res) => {
+				console.log(res);
+			});
 		}
 	}
 	return DatabaseShowComponent;

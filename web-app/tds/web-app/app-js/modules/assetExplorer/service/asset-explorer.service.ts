@@ -301,4 +301,29 @@ export class AssetExplorerService {
 			})
 			.catch((error: any) => error.json());
 	}
+
+	/**
+	 * Save the Asset
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	saveAsset(model: any): Observable<any> {
+		const request: any = {
+			assetClass: model.asset.assetClass.name,
+			data: {
+				asset: model.asset,
+				dependencyMap: {
+					supportAssets: model.dependencyMap.supportAssets,
+					dependentAssets: model.dependencyMap.dependentAssets
+				}
+			}
+		};
+		console.log(request);
+		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
+			})
+			.catch((error: any) => error.json());
+	}
 }
