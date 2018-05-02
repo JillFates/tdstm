@@ -289,15 +289,25 @@ export class AssetExplorerService {
 			forWhom: 'Edit'
 		};
 
-		let mockResponse = [
+		let mockSourceResponse = [
 			{id: 0, text: 'Please Select'},
 			{id: 1, text: 'Add Rack...'},
 			{id: 14240, text: 'TBD'},
 		];
+		let mockTargetResponse = [
+			{id: 0, text: 'Please Select'},
+			{id: -1, text: 'Add Rack...'},
+			{id: 13173, text: 'B5'},
+			{id: 13161, text: 'B6'},
+		];
 		return this.http.post(`../${this.assetEntitySearch}/retrieveRackSelectForRoom`, JSON.stringify(request))
 			.map((res: Response) => {
 				console.log(res);
-				return mockResponse;
+				if (sourceTarget === 'S') {
+					return mockSourceResponse;
+				} else {
+					return mockTargetResponse;
+				}
 			})
 			.catch((error: any) => error.json());
 	}

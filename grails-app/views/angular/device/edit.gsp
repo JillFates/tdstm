@@ -167,98 +167,69 @@
                                         <label for="rackSourceId" data-toggle="popover" data-trigger="hover"
                                                data-content="Rack/Cabinet">Rack/Cabinet</label>
                                     </td>
-
                                     <td *ngIf="showChassisFields" class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp ?: ''}" style="display:none"
                                         nowrap="nowrap" id="bladeId">
                                         <label for="sourceChassisId" data-toggle="popover" data-trigger="hover"
                                                data-content="Blade Chassis">Blade Chassis</label>
                                     </td>
 
-                                    <td *ngIf="showRackFields && showRackSourceInput === 'select'">
-                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.rackSource}">
-                                            <kendo-dropdownlist
-                                                    class="select useRackS"
-                                                    name="modelAssetRackSource"
-                                                    [(ngModel)]="model.asset.rackSource"
-                                                    [defaultItem]="'Please Select'"
-                                                    [data]="rackSourceOptions"
-                                                    [textField]="'text'"
-                                                    [valueField]="'id'">
-                                            </kendo-dropdownlist>
-                                            <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === 1">
-                                                <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
-                                                                         size="20" tabindex="311"
-                                                                         value=""
-                                                                         ngmodel="model.asset.newRackSource">
-                                                </tdsAngular:inputControl>
-                                            </span>
-                                        </tdsAngular:tooltipSpan>
+                                    <td class="rackLabel">
+                                        <div *ngIf="showRackFields && showRackSourceInput === 'select'">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.rackSource}">
+                                                <kendo-dropdownlist
+                                                        class="select useRackS"
+                                                        name="modelAssetRackSource"
+                                                        [(ngModel)]="model.asset.rackSource"
+                                                        [defaultItem]="'Please Select'"
+                                                        [data]="rackSourceOptions"
+                                                        [textField]="'text'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                                <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === 1">
+                                                    <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
+                                                                             size="20" tabindex="311"
+                                                                             value=""
+                                                                             ngmodel="model.asset.newRackSource">
+                                                    </tdsAngular:inputControl>
+                                                </span>
+                                            </tdsAngular:tooltipSpan>
+                                        </div>
+                                        <div *ngIf="showRackFields && showRackSourceInput === 'new'">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
+                                                                     size="20" tabindex="311"
+                                                                     value="${asset.rackSource}"
+                                                                     ngmodel="model.asset.newRackSource">
+                                            </tdsAngular:inputControl>
+                                        </div>
                                     </td>
-                                    <td *ngIf="showRackFields && showRackSourceInput === 'new'" class="rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
-                                        data-for="rackSourceId">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
-                                                                 size="20" tabindex="311"
-                                                                 value="${asset.rackSource}"
-                                                                 ngmodel="model.asset.newRackSource">
-                                        </tdsAngular:inputControl>
-                                        %{--<tdsAngular:tooltipSpan class="useRackS" field="${standardFieldSpecs.sourceRack}"--}%
-                                        %{--tooltipDataPlacement="bottom">--}%
-                                        %{--<g:render template="deviceRackSelect"--}%
-                                        %{--model="[clazz    : standardFieldSpecs.sourceRack?.imp ?: '', options: sourceRackSelect, rackId: assetEntityInstance?.rackSource?.id,--}%
-                                        %{--rackDomId: 'rackSourceId', rackDomName: 'rackSourceId', sourceTarget: 'S', forWhom: 'Edit', tabindex: '310']"/>--}%
-                                        %{--</tdsAngular:tooltipSpan>--}%
-                                        %{--<tdsAngular:tooltipSpan class="newRackS" tooltipDataPlacement="bottom"--}%
-                                        %{--field="${standardFieldSpecs.sourceRack}">--}%
-                                        %{--<input type="text" id="sourceRackId" name="sourceRack" value=""--}%
-                                        %{--placeholder="New rack name"--}%
-                                        %{--class="${standardFieldSpecs.sourceRack?.imp ?: ''}"--}%
-                                        %{--xstyle="display:none"--}%
-                                        %{--size=20 tabindex="311"/>--}%
-                                        %{--<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">--}%
-                                        %{--</tdsAngular:tooltipSpan>--}%
-                                    </td>
-                                    <td *ngIf="showRackFields && showRackTargetInput === 'select'">
-                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.rackTarget}">
-                                            <kendo-dropdownlist
-                                                    class="select useRackT"
-                                                    name="modelAssetRackTarget"
-                                                    [(ngModel)]="model.asset.rackTarget"
-                                                    [defaultItem]="'Please Select'"
-                                                    [data]="rackTargetOptions"
-                                                    [textField]="'text'"
-                                                    [valueField]="'id'">
-                                            </kendo-dropdownlist>
-                                            <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === 1">
-                                                <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
-                                                                         size="20" tabindex="311"
-                                                                         value=""
-                                                                         ngmodel="model.asset.newRackTarget">
-                                                </tdsAngular:inputControl>
-                                            </span>
-                                        </tdsAngular:tooltipSpan>
-                                    </td>
-                                    <td *ngIf="showRackFields && showRackTargetInput === 'new'" class="rackLabel ${standardFieldSpecs.rackTarget.imp ?: ''}"
-                                        data-for="rackSourceId">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
-                                                                 size="20" tabindex="311"
-                                                                 value=""
-                                                                 ngmodel="model.asset.newRackTarget">
-                                        </tdsAngular:inputControl>
-                                        %{--<tdsAngular:tooltipSpan class="useRackS" field="${standardFieldSpecs.sourceRack}"--}%
-                                        %{--tooltipDataPlacement="bottom">--}%
-                                        %{--<g:render template="deviceRackSelect"--}%
-                                        %{--model="[clazz    : standardFieldSpecs.sourceRack?.imp ?: '', options: sourceRackSelect, rackId: assetEntityInstance?.rackSource?.id,--}%
-                                        %{--rackDomId: 'rackSourceId', rackDomName: 'rackSourceId', sourceTarget: 'S', forWhom: 'Edit', tabindex: '310']"/>--}%
-                                        %{--</tdsAngular:tooltipSpan>--}%
-                                        %{--<tdsAngular:tooltipSpan class="newRackS" tooltipDataPlacement="bottom"--}%
-                                        %{--field="${standardFieldSpecs.sourceRack}">--}%
-                                        %{--<input type="text" id="sourceRackId" name="sourceRack" value=""--}%
-                                        %{--placeholder="New rack name"--}%
-                                        %{--class="${standardFieldSpecs.sourceRack?.imp ?: ''}"--}%
-                                        %{--xstyle="display:none"--}%
-                                        %{--size=20 tabindex="311"/>--}%
-                                        %{--<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">--}%
-                                        %{--</tdsAngular:tooltipSpan>--}%
+                                    <td class="rackLabel">
+                                        <div *ngIf="showRackFields && showRackTargetInput === 'select'">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.rackTarget}">
+                                                <kendo-dropdownlist
+                                                        class="select useRackT"
+                                                        name="modelAssetRackTarget"
+                                                        [(ngModel)]="model.asset.rackTarget"
+                                                        [defaultItem]="'Please Select'"
+                                                        [data]="rackTargetOptions"
+                                                        [textField]="'text'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                                <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === -1">
+                                                    <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
+                                                                             size="20" tabindex="311"
+                                                                             value=""
+                                                                             ngmodel="model.asset.newRackTarget">
+                                                    </tdsAngular:inputControl>
+                                                </span>
+                                            </tdsAngular:tooltipSpan>
+                                        </div>
+                                        <div *ngIf="showRackFields && showRackTargetInput === 'new'">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
+                                                                     size="20" tabindex="311"
+                                                                     value=""
+                                                                     ngmodel="model.asset.newRackTarget">
+                                            </tdsAngular:inputControl>
+                                        </div>
                                     </td>
 
                                     <td *ngIf="showChassisFields" class="label bladeLabel" style="display:none">
@@ -292,22 +263,25 @@
                                         <label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover"
                                                data-content="Position">Position</label>
                                     </td>
-                                    <td *ngIf="showRackFields && (showRackInput === 'new' || (model.asset.rackSource && model.asset.rackSource.id > 0))" class="rackLabel"
-                                        data-content="${standardFieldSpecs.sourceRackPosition.tip ?: standardFieldSpecs.sourceRackPosition.label}">
-                                        <tdsAngular:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}"
-                                                                     size="10" tabindex="320"
-                                                                     value="${asset.sourceRackPosition}"
-                                                                     ngmodel="model.asset.sourceRackPosition">
-                                            </tdsAngular:inputControl>
-                                        </tdsAngular:tooltipSpan>
+                                    <td class="rackLabel" data-content="${standardFieldSpecs.sourceRackPosition.tip ?: standardFieldSpecs.sourceRackPosition.label}">
+                                        <div *ngIf="showRackFields && (showRackSourceInput === 'new' || (model.asset.rackSource && model.asset.rackSource.id > 0))" >
+                                            <tdsAngular:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
+                                                <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}"
+                                                                         size="10" tabindex="320"
+                                                                         value="${asset.sourceRackPosition}"
+                                                                         ngmodel="model.asset.sourceRackPosition">
+                                                </tdsAngular:inputControl>
+                                            </tdsAngular:tooltipSpan>
+                                        </div>
                                     </td>
-                                    <td class="rackLabel" style="display: none;" data-toggle="popover" data-trigger="hover" data-placement="bottom"
-                                        data-content="${standardFieldSpecs.targetRackPosition.tip ?: standardFieldSpecs.targetRackPosition.label}">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}"
-                                                                 size="10" tabindex="350" value="${asset.targetRackPosition}"
-                                                                 ngmodel="model.asset.targetRackPosition">
-                                        </tdsAngular:inputControl>
+                                    <td class="rackLabel" data-content="${standardFieldSpecs.targetRackPosition.tip ?: standardFieldSpecs.targetRackPosition.label}">
+                                        <div *ngIf="showRackFields && (showRackTargetInput === 'new' ||
+                                               (model.asset.rackTarget && (model.asset.rackTarget.id === -1 || model.asset.rackTarget.id > 0)))">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}"
+                                                                     size="10" tabindex="350" value="${asset.targetRackPosition}"
+                                                                     ngmodel="model.asset.targetRackPosition">
+                                            </tdsAngular:inputControl>
+                                        </div>
                                     </td>
                                     <td *ngIf="showChassisFields" class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}" style="display: none;"
                                         data-toggle="popover" data-placement="bottom" data-trigger="hover"
