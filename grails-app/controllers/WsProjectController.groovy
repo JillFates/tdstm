@@ -22,7 +22,7 @@ class WsProjectController implements ControllerMethods {
 	 * Gets the projects associated to a user
 	 */
 	def userProjects() {
-		def projectStatus = ProjectStatus.valueOfParam(params.status) ?: ProjectStatus.ANY
+		def projectStatus = ProjectStatus.lookup(params.status) ?: ProjectStatus.ANY
 		// TODO : JPM 2/2018 : This should be a Command Object
 		Map searchParams = [
 			maxRows: params.maxRows,

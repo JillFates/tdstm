@@ -73,7 +73,7 @@ class ProjectController implements ControllerMethods {
 		                    sortOn: ProjectSortProperty.valueOfParam(sortIndex),
 		                    sortOrder: SortOrder.valueOfParam(sortOrder), params: params]
 
-		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive) ?: ProjectStatus.COMPLETED
+		ProjectStatus projectStatus = ProjectStatus.lookup(params.isActive) ?: ProjectStatus.COMPLETED
 
 		def projectList = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
 
