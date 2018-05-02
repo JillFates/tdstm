@@ -160,11 +160,9 @@ export class AssetExplorerIndexComponent implements OnInit {
 			this.sortInfo =  sort;
 		}
 
-		/*
-		Uncomment when backend changes to persis setting default sort view manager is done
 		this.preferenceService.setPreference(PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER, sort.property)
 			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
-		*/
+		
 
 		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
 		return ;
