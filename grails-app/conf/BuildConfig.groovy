@@ -84,7 +84,10 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-acl:2.0.0'
 		compile ':greenmail:1.3.4'
 
-		compile ':spring-security-rest:1.5.4'
+		compile (':spring-security-rest:1.5.4') {
+			// Remove old Guava files packed in spring-security-rest plugin
+			excludes 'guava-io'
+		}
 		compile ":rest-client-builder:2.1.0"
 
 		compile "org.grails.plugins:cascade-validation:0.1.5"
@@ -110,11 +113,4 @@ grails.project.dependency.resolution = {
 
 		test ':functional-test:1.2.7'
 	}
-}
-
-grails.war.resources = { stagingDir ->
-	// Remove old Guava files packed in spring-security-rest plugin
-	delete(file: "${stagingDir}/WEB-INF/lib/guava-base-r03.jar")
-	delete(file: "${stagingDir}/WEB-INF/lib/guava-annotations-r03.jar")
-	delete(file: "${stagingDir}/WEB-INF/lib/guava-io-r03.jar")
 }
