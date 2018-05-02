@@ -30,9 +30,11 @@ export function DeviceEditComponent(template, editModel) {
 
 		private dateFormat: string;
 		private showRackFields = true;
-		private showRackInput: 'none'|'new'|'select' = 'none';
-		private showChassisFields = true;
+		private showRackSourceInput: 'none'|'new'|'select' = 'none';
+		private showRackTargetInput: 'none'|'new'|'select' = 'none';
 		private rackSourceOptions: Array<any> = [];
+		private rackTargetOptions: Array<any> = [];
+		private showChassisFields = true;
 
 		constructor(
 					@Inject('model') private model: any,
@@ -57,8 +59,10 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-			this.model.asset.newLocationSource = null;
+			this.model.asset.locationSource = null;
 			this.model.asset.newRoomSource = null;
+			this.model.asset.locationTarget = null;
+			this.model.asset.newRoomTarget = null;
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -106,35 +110,43 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
-		private populateRackOrChassisSelect(isRack: boolean): void {
+		private populateRackOrBladeSelect(isRack: boolean): void {
+			// source fields
 			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
 			if (roomId && roomId > 0) {
-				this.showRackInput = 'select';
+				this.showRackSourceInput = 'select';
 				this.assetExplorerService.getRacksForRoom(roomId, 'S').subscribe(response => {
 					this.rackSourceOptions = response;
 				});
 			} else if (roomId && roomId === -1) { /* -1 (New Room)*/
-				this.showRackInput = 'new';
+				this.showRackSourceInput = 'new';
 			} else {
-				this.showRackInput = 'none';
+				this.showRackSourceInput = 'none';
+			}
+
+			// target fields
+			const targetRoomId = this.model.asset.roomTarget ? this.model.asset.roomTarget.id : null;
+			if (targetRoomId && targetRoomId > 0) {
+				this.showRackSourceInput = 'select';
+				this.assetExplorerService.getRacksForRoom(targetRoomId, 'S').subscribe(response => {
+					this.rackSourceOptions = response;
+				});
+			} else if (targetRoomId && targetRoomId === -1) { /* -1 (New Room)*/
+				this.showRackSourceInput = 'new';
+			} else {
+				this.showRackSourceInput = 'none';
 			}
 		}
 
 		private showRackOrBladeFields(show: boolean, isRack: boolean): void {
 			this.showRackFields = show; // pub.showRackFields();
 			if (!show) {
-				this.showRackInput = 'none';
+				this.showRackSourceInput = 'none';
+				this.showRackTargetInput = 'none';
 			} else {
-				this.populateRackOrChassisSelect(isRack);
+				this.populateRackOrBladeSelect(isRack);
 			}
 
-		}
-
-		/***
-		 * Close the Active Dialog
-		 */
-		public cancelCloseDialog(): void {
-			this.activeDialog.close();
 		}
 
 		protected searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
@@ -183,8 +195,19 @@ export function DeviceEditComponent(template, editModel) {
 			this.toggleAssetTypeFields();
 		}
 
-		protected onSourceRoomValueChange(event: any): void {
+		protected onRoomSourceValueChange(event: any): void {
 			this.toggleAssetTypeFields();
+		}
+
+		protected onRoomTargetValueChange(event: any): void {
+			this.toggleAssetTypeFields();
+		}
+
+		/***
+		 * Close the Active Dialog
+		 */
+		private cancelCloseDialog(): void {
+			this.activeDialog.close();
 		}
 
 	}
