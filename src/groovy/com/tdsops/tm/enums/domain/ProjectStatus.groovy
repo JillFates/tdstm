@@ -1,8 +1,6 @@
 package com.tdsops.tm.enums.domain
 
-import com.tdssrc.grails.EnumUtil
 import groovy.transform.CompileStatic
-
 /**
  * Define all the possible status that can have a project
  *
@@ -31,7 +29,7 @@ enum ProjectStatus {
 	static ProjectStatus lookup(String value) {
 		ProjectStatus projectStatus
 		try {
-			projectStatus = ProjectStatus.valueOf(value)
+			projectStatus = ProjectStatus.valueOf(value.toUpperCase())
 		} catch (e) {}
 		return projectStatus
 	}
