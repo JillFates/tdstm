@@ -29,7 +29,6 @@ import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.InvalidSyntaxException
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -774,17 +773,19 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
 	@NotTransactional()
-	private void updateBatchStatus(ImportBatch batch) {
+	private void updateBatchStatus(Long batchId) {
 		Integer count = ImportBatchRecord.where {
-			importBatch.id == batch.id
+			importBatch.id == batchId
 			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
 		}.count()
 		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
 
-		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batch.id, count, status.name()
+		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batchId, count, status.name()
 
-		batch.status = status
-		batch.save()
+		ImportBatch.where {
+			id == batchId
+			status != status
+		}.updateAll([status: status])
 	}
 
 	/**
