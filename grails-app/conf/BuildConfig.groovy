@@ -111,3 +111,10 @@ grails.project.dependency.resolution = {
 		test ':functional-test:1.2.7'
 	}
 }
+
+grails.war.resources = { stagingDir ->
+	// Remove old Guava files packed in spring-security-rest plugin
+	delete(file: "${stagingDir}/WEB-INF/lib/guava-base-r03.jar")
+	delete(file: "${stagingDir}/WEB-INF/lib/guava-annotations-r03.jar")
+	delete(file: "${stagingDir}/WEB-INF/lib/guava-io-r03.jar")
+}
