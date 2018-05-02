@@ -703,10 +703,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor debug(Integer index) {
 
-		if(index in (0..currentRow.size())){
+		if (index in (0..currentRow.size())){
 			currentColumnIndex = index
 			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
-		} else{
+		} else {
 			throw ETLProcessorException.missingColumn(index)
 		}
 		return this
@@ -719,10 +719,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor debug(String columnName) {
 
-		if(columnsMap.containsKey(columnName)){
+		if (columnsMap.containsKey(columnName)){
 			currentColumnIndex = columnsMap[columnName].index
 			doDebug(currentRowIndex, currentColumnIndex, currentRow.getDataSetValue(currentColumnIndex))
-		} else{
+		} else {
 			throw ETLProcessorException.missingColumn(columnName)
 		}
 		return this
