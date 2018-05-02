@@ -22,7 +22,6 @@ class Row {
 	 */
     Map<Integer, Element> elementsMap
     Integer rowIndex
-    AssetEntity instance
 	ETLProcessor processor
 
     Row (Integer rowIndex, List<?> dataSetValues, ETLProcessor processor) {
@@ -37,7 +36,7 @@ class Row {
 		Integer columnIndex = dataSetValues.size()
 		Element newElement = new Element(originalValue: value,
 			value: value,
-			rowIndex: rowIndex,
+			rowIndex: processor.currentRowIndex,
 			columnIndex:columnIndex ,
 			fieldDefinition: fieldDefinition,
 			processor: processor)
@@ -50,7 +49,7 @@ class Row {
 		Element element = new Element(
 			originalValue: value,
 			value: value,
-			rowIndex: rowIndex,
+			rowIndex: processor.currentRowIndex,
 			columnIndex: columnIndex,
 			processor: processor)
 

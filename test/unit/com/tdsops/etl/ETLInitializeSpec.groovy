@@ -372,8 +372,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
+				data.collect { it.fields.appVendor.value } == [null, null]
+				data.collect { it.fields.appVendor.originalValue } == [null, null]
 				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
 			}
 	}
@@ -407,8 +407,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
+				data.collect { it.fields.appVendor.value } == [null, null]
+				data.collect { it.fields.appVendor.originalValue } == [null, null]
 				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
 			}
 	}
@@ -442,8 +442,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
+				data.collect { it.fields.appVendor.value } == [null, null]
+				data.collect { it.fields.appVendor.originalValue } == [null, null]
 				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
 			}
 	}
@@ -514,8 +514,8 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
+				data.collect { it.fields.appVendor.value } == [null, null]
+				data.collect { it.fields.appVendor.originalValue } == [null, null]
 				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
 			}
 	}

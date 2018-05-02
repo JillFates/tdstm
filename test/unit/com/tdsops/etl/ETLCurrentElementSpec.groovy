@@ -198,6 +198,21 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				fieldDefinition == null
 			}
 
+		and: 'Results contains the following values'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == [] as Set
+				with(data[0]){
+					op == 'I'
+					errorCount == 0
+					warn == false
+					duplicate == false
+					errors == []
+					fields == [:]
+				}
+			}
+
 		cleanup:
 			if(fileName){
 				service.deleteTemporaryFile(fileName)
@@ -236,6 +251,30 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				with(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
+				}
+			}
+
+		and: 'Results contains the following values'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == ['assetName'] as Set
+				with(data[0]){
+					op == 'I'
+					errorCount == 0
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.assetName){
+						originalValue == 'xraysrv01'
+						value == 'xraysrv01'
+						errors == []
+						warn == false
+						with(find){
+							query == []
+						}
+					}
 				}
 			}
 
@@ -280,6 +319,31 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				}
 			}
 
+		and: 'Results contains the following values'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == ['assetName'] as Set
+				with(data[0]){
+					op == 'I'
+					errorCount == 0
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.assetName){
+						originalValue == null
+						value == null
+						init == 'Initial Name'
+						errors == []
+						warn == false
+						with(find){
+							query == []
+						}
+					}
+				}
+			}
+
 		cleanup:
 			if(fileName){
 				service.deleteTemporaryFile(fileName)
@@ -292,6 +356,15 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				[]
+			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -318,6 +391,37 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				with(fieldDefinition){
 					name == 'id'
 					label == 'Id'
+				}
+			}
+
+		and: 'Results contains the following values'
+			etlProcessor.result.domains.size() == 1
+			with(etlProcessor.result.domains[0]) {
+				domain == ETLDomain.Device.name()
+				fieldNames == ['id'] as Set
+				with(data[0]){
+					op == 'I'
+					errorCount == 0
+					warn == false
+					duplicate == false
+					errors == []
+					rowNum == 1
+					with(fields.id){
+						originalValue == null
+						value == null
+						errors == []
+						warn == false
+						with(find){
+							query.size() == 1
+							with(query[0]){
+								domain == ETLDomain.Device.name()
+								with(kv){
+									model: 'PE2950'
+								}
+							}
+
+						}
+					}
 				}
 			}
 
