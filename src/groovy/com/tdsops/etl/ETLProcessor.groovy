@@ -310,7 +310,7 @@ class ETLProcessor implements RangeChecker {
 			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			binding.addDynamicVariable(NOW_VARNAME, new NOW())
 
-			closure(addCrudRowData(currentRowIndex, row))
+			closure(addCrudRowData(row))
 
 			result.removeIgnoredRows()
 
@@ -855,8 +855,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param rowIndex
 	 * @param row
 	 */
-	private Row addCrudRowData (Integer rowIndex, Map row) {
-		currentRow = new Row(rowIndex, dataSetFacade.fields().collect { row[it.name] }, this)
+	private Row addCrudRowData (Map row) {
+		currentRow = new Row(dataSetFacade.fields().collect { row[it.name] }, this)
 		rows.add(currentRow)
 		return currentRow
 	}
@@ -879,8 +879,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-		element.rowIndex = this.currentRowIndex
-		result.loadElement(element)
+		result.loadElement(element, this.currentRowIndex)
 		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
 	}
 

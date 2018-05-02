@@ -149,10 +149,10 @@ class ETLProcessorResult {
 	 *
 	 * @param element
 	 */
-	void loadElement(Element element) {
+	void loadElement(Element element, Integer rowIndex) {
 
 		Map<String, ?> currentData = currentRowData()
-		currentData.rowNum = element.rowIndex
+		currentData.rowNum = rowIndex
 
 		if(currentData.fields[element.fieldDefinition.name]) {
 			updateFieldDataMap(currentData, element)
