@@ -457,4 +457,7 @@ graph {
 }
 
 xssSanitizer.enabled = true
-grails.databinding.dateFormats = ['yyyyMMdd']
+
+// JPM 5/2018 : TM-10317 - Tried using both formats but the 2nd would not work correctly
+// grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
+grails.databinding.dateFormats = ['yyyy-MM-dd']

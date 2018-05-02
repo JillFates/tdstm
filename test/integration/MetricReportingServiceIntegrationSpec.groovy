@@ -3,6 +3,7 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
+import net.transitionmanager.domain.MetricResult
 import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataImportService
@@ -55,8 +56,12 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
-		otherProjectDevice = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, otherProject,
-																	 moveBundleTestHelper.createBundle(otherProject, null))
+		otherProjectDevice = assetEntityTestHelper.createAssetEntity(
+				AssetClass.DEVICE,
+				otherProject,
+				moveBundleTestHelper.createBundle(otherProject, null)
+		)
+
 		context = dataImportService.initContextForProcessBatch(project, ETLDomain.Dependency)
 		context.record = new ImportBatchRecord(sourceRowId: 1)
 
@@ -225,5 +230,328 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 		then: 'Get exception for bad sql grammer'
 			thrown BadSqlGrammarException
+	}
+
+	void 'test projectIdsForMetrics'() {
+
+		setup: 'Given 3 new projects, 1 that has a start/completion date in the range for projectIdsForMetrics'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Project project2 = projectTestHelper.createProject()
+			Project project3 = projectTestHelper.createProject()
+
+			project1.collectMetrics = 1
+			project1.startDate = new Date() - 5
+			project1.save(flush: true, failOnError: true)
+
+			project2.collectMetrics = 1
+			project2.startDate = project2.startDate + 5
+			project2.save(flush: true, failOnError: true)
+
+			project3.collectMetrics = 1
+			project3.completionDate = new Date() - 1
+			project3.save(flush: true, failOnError: true)
+
+		when: 'projectIdsForMetrics() is run'
+			List<Long> projectIds = metricReportingService.projectIdsForMetrics()
+
+		then: 'The resulting list will have the first project, but not the others.'
+
+			projectIds.contains(project1.id)
+			!projectIds.contains(project2.id)
+			!projectIds.contains(project3.id)
+
+	}
+
+
+	void 'test writeMetricData'() {
+
+		setup: 'Given a metric data map.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date date = new Date().clearTime() - 1
+
+			Map metricData = [
+					projectId : project1.id,
+					metricCode: 'someCode',
+					date      : date.format('yyyy-MM-dd'),
+					label     : 'someLabel',
+					value     : 5
+			]
+		when: 'writeMetricData is called on the map of data.'
+			metricReportingService.writeMetricData(metricData)
+			MetricResult result = MetricResult.findByProjectAndDate(project1, date)
+
+		then: 'The results can be retrieved from the database.'
+			result.project.id == project1.id
+			result.metricDefinitionCode == 'someCode'
+			result.label == 'someLabel'
+			result.value == 5
+	}
+
+	void 'test getMetrics'() {
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date previousDate = new Date().clearTime() - 1
+			Date startDate = new Date().clearTime() + 5
+			Date beyondDate = new Date().clearTime() + 10
+
+			List<Map> metrics = [
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : previousDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : startDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : beyondDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					]
+			]
+
+			metrics.each { Map metricData ->
+				metricReportingService.writeMetricData(metricData)
+			}
+		when: 'get metrics is called filtering to just one of those records based on date.'
+			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, null, null)
+		then: 'The one metric is returned.'
+			metricData.size() == 1
+			metricData[0].projectGuid == project1.guid
+			metricData[0].metricCode == 'someCode'
+			metricData[0].date == startDate.format('yyyy-MM-dd')
+			metricData[0].label == 'someLabel'
+			metricData[0].value == 5
+	}
+
+	void 'test getMetrics filter guid'() {
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date previousDate = new Date().clearTime() - 1
+			Date startDate = new Date().clearTime() + 5
+			Date beyondDate = new Date().clearTime() + 10
+
+			List<Map> metrics = [
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : previousDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : startDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : beyondDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					]
+			]
+
+			metrics.each { Map metricData ->
+				metricReportingService.writeMetricData(metricData)
+			}
+		when: 'Calling getMetrics filtering by the project guid.'
+			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, project1.guid, null)
+		then: 'The metric data is returned.'
+			metricData.size() == 1
+			metricData[0].projectGuid == project1.guid
+			metricData[0].metricCode == 'someCode'
+			metricData[0].date == startDate.format('yyyy-MM-dd')
+			metricData[0].label == 'someLabel'
+			metricData[0].value == 5
+	}
+
+	void 'test getMetrics filter invalid guid'() {
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date previousDate = new Date().clearTime() - 1
+			Date startDate = new Date().clearTime() + 5
+			Date beyondDate = new Date().clearTime() + 10
+
+			List<Map> metrics = [
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : previousDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : startDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : beyondDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					]
+			]
+
+			metrics.each { Map metricData ->
+				metricReportingService.writeMetricData(metricData)
+			}
+		when: 'Calling getMetrics with an invalid project guid.'
+			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, 'invalid', null)
+		then: 'No metric data is returned.'
+			metricData.size() == 0
+	}
+
+	void 'test getMetrics metric code'() {
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date previousDate = new Date().clearTime() - 1
+			Date startDate = new Date().clearTime() + 5
+			Date beyondDate = new Date().clearTime() + 10
+
+			List<Map> metrics = [
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : previousDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : startDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : beyondDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					]
+			]
+
+			metrics.each { Map metricData ->
+				metricReportingService.writeMetricData(metricData)
+			}
+		when: 'Calling getMetrics filtering with a metric code'
+			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate  + 1, null, ['someCode'])
+		then: 'The metric data is returned.'
+			metricData.size() == 1
+			metricData[0].projectGuid == project1.guid
+		    metricData[0].metricCode == 'someCode'
+			metricData[0].date == startDate.format('yyyy-MM-dd')
+			metricData[0].label == 'someLabel'
+			metricData[0].value == 5
+	}
+
+	void 'test getMetrics invalid metric code'() {
+			setup: 'Given a list of metrics saved to the DB with a range of dates.'
+				test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+				Project project1 = projectTestHelper.createProject()
+				Date previousDate = new Date().clearTime() - 1
+				Date startDate = new Date().clearTime() + 5
+				Date beyondDate = new Date().clearTime() + 10
+
+				List<Map> metrics = [
+						[
+								projectId : project1.id,
+								metricCode: 'someCode',
+								date      : previousDate.format('yyyy-MM-dd'),
+								label     : 'someLabel',
+								value     : 5
+						],
+						[
+								projectId : project1.id,
+								metricCode: 'someCode',
+								date      : startDate.format('yyyy-MM-dd'),
+								label     : 'someLabel',
+								value     : 5
+						],
+						[
+								projectId : project1.id,
+								metricCode: 'someCode',
+								date      : beyondDate.format('yyyy-MM-dd'),
+								label     : 'someLabel',
+								value     : 5
+						]
+				]
+
+				metrics.each { Map metricData ->
+					metricReportingService.writeMetricData(metricData)
+				}
+			when: 'Calling getMetrics filtering with an invalid metric code'
+				List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate  + 1, null, ['invalid'])
+			then: 'No data is returned.'
+				metricData.size() == 0
+		}
+
+	void 'test getMetrics by project id'() {
+		setup: 'Given a list of metrics saved to the DB with a range of dates.'
+			test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+			Project project1 = projectTestHelper.createProject()
+			Date previousDate = new Date().clearTime() - 1
+			Date startDate = new Date().clearTime() + 5
+			Date beyondDate = new Date().clearTime() + 10
+
+			List<Map> metrics = [
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : previousDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : startDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					],
+					[
+							projectId : project1.id,
+							metricCode: 'someCode',
+							date      : beyondDate.format('yyyy-MM-dd'),
+							label     : 'someLabel',
+							value     : 5
+					]
+			]
+
+			metrics.each { Map metricData ->
+				metricReportingService.writeMetricData(metricData)
+			}
+		when: 'Calling getMetrics filtering by project id'
+			List<Map> metricData = metricReportingService.getMetrics(startDate - 1, startDate + 1, null, null, project1.id)
+		then: 'The metric data is returned without the project guid.'
+			metricData.size() == 1
+			metricData[0].projectGuid == null
+			metricData[0].metricCode == 'someCode'
+			metricData[0].date == startDate.format('yyyy-MM-dd')
+			metricData[0].label == 'someLabel'
+			metricData[0].value == 5
 	}
 }

@@ -786,17 +786,20 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
 	@NotTransactional()
-	private void updateBatchStatus(ImportBatch batch) {
-		Integer count = ImportBatchRecord.where {
-			importBatch.id == batch.id
-			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
-		}.count()
-		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
+	private void updateBatchStatus(Long id) {
+		ImportBatch batch = ImportBatch.get(id)
+		if (batch) {
+			Integer count = ImportBatchRecord.where {
+				importBatch.id == id
+				status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
+			}.count()
+			ImportBatchStatusEnum status = (count == 0 ? ImportBatchStatusEnum.COMPLETED : ImportBatchStatusEnum.PENDING)
 
-		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batch.id, count, status.name()
+			log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', id, count, status.name()
 
-		batch.status = status
-		batch.save()
+			batch.status = status
+			batch.save()
+		}
 	}
 
 	/**
@@ -1184,7 +1187,7 @@ class DataImportService implements ServiceMethods {
 		if ( value && (value instanceof CharSequence) ) {
 			Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
 			entities = GormUtil.findDomainByAlternateKey(domainClass, value, context.project)
-			log.debug 'findDomainByAlternateProperty() found={}',entities.size()
+			log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
 		}
 		return entities
 	}
