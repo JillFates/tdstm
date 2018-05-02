@@ -467,8 +467,6 @@ class SqlUtil {
 				paramValue = parseNumberParameter(fieldSearchData)
 			}
 		} else { // we treat the field as a String
-			// TM-10488 Just be sure that we are comparing apples with apples
-			searchColumn = "str(${searchColumn})"
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
 
