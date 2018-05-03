@@ -70,7 +70,7 @@ enum UserPreferenceEnum {
 	EVENTDB_REFRESH('RefreshEventDB'),
 	TASKGRAPH_REFRESH('RefreshTaskGraph'),
 	TIMELINE_REFRESH('RefreshTimeline'),
-	DEFAULT_SORT_VIEW_MANAGER('defaultSortViewManager')
+	VIEW_MANAGER_DEFAULT_SORT('viewManagerDefaultSort')
 
 	static final List<UserPreferenceEnum> importPreferenceKeys = [ImportApplication, ImportServer, ImportDatabase,
 	                                                              ImportStorage, ImportDependency, ImportCabling,
