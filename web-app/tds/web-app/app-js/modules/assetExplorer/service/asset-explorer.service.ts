@@ -310,12 +310,10 @@ export class AssetExplorerService {
 	saveAsset(model: any): Observable<any> {
 		const request: any = {
 			assetClass: model.asset.assetClass.name,
-			data: {
-				asset: model.asset,
-				dependencyMap: {
-					supportAssets: model.dependencyMap.supportAssets,
-					dependentAssets: model.dependencyMap.dependentAssets
-				}
+			asset: model.asset,
+			dependencyMap: {
+				supportAssets: model.dependencyMap.supportAssets,
+				dependentAssets: model.dependencyMap.dependentAssets
 			}
 		};
 		console.log(request);
