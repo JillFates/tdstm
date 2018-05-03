@@ -18,8 +18,7 @@ export class AssetExplorerService {
 	private FAVORITES_MAX_SIZE = 10;
 	private ALL_ASSETS = 'All Assets';
 
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
-	}
+	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)

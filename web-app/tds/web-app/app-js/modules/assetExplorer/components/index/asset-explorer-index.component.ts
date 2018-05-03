@@ -15,11 +15,13 @@ import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
 import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
-import { SortInfo, SortUtils } from '../../../../shared/utils/sort.utils';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
+import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
 
 @Component({
 	selector: 'asset-explorer-index',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html',
 })
 export class AssetExplorerIndexComponent implements OnInit {
 
@@ -28,15 +30,9 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 
-	private sortInfo: SortInfo;
-	private sortByName: SortInfo;
-	private sortByCreatedBy: SortInfo;
-	private sortByCreatedOn: SortInfo;
-	private sortByUpdatedOn: SortInfo;
-	private sortByIsShared: SortInfo;
-	private sortByIsSystem: SortInfo;
-	private sortByIsFavorite: SortInfo;
+	private currentGridColumn: GridColumnModel;
 	private userDateFormat: string;
+	private gridColumns: GridColumnModel[];
 
 	constructor(
 		private stateService: StateService,
@@ -49,40 +45,21 @@ export class AssetExplorerIndexComponent implements OnInit {
 		private preferenceService: PreferenceService) {
 	}
 	ngOnInit() {
+		this.gridColumns = ViewManagerColumnsHelper.createColumns();
 
-		this.sortByName = { property: 'name', isAscending: true, type: 'string'};
-		this.sortByCreatedBy =  { property: 'createdBy', isAscending: true, type: 'string'};
-		this.sortByIsShared =  { property: 'isShared', isAscending: true, type: 'boolean'};
-		this.sortByIsSystem =  { property: 'isSystem', isAscending: true, type: 'boolean'};
-		this.sortByCreatedOn =  { property: 'createdOn', isAscending: false, type: 'date', dateFormat: null};
-		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: false, type: 'date', dateFormat: null};
-		this.sortByIsFavorite = { property: 'isFavorite', isAscending: true, type: 'boolean'};
-
-		this.sortInfo = this.sortByCreatedOn;
-
-		const getDefaultSorting = (sortPreference: string) => {
-			const sortItems = [this.sortByName, this.sortByCreatedBy, this.sortByIsShared, this.sortByIsSystem, this.sortByCreatedOn, this.sortByUpdatedOn, this.sortByIsFavorite];
-			if (sortPreference === null) {
-				sortPreference = 'createdOn';
-			}
-
-			return sortItems.find((sortItem: SortInfo) => sortItem.property === sortPreference);
-		};
-
-		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER}`;
+		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
 		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
 			.subscribe((result: any[]) => {
 				const [reportResult, preferences] = result;
 
 				this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-				this.sortByCreatedOn.dateFormat = this.userDateFormat;
-				this.sortByUpdatedOn.dateFormat = this.userDateFormat;
-				this.sortInfo = getDefaultSorting(preferences[PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER]);
+				ViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
+				this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT] || 'createdOn');
 
 				this.reportGroupModels = reportResult;
 				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
-				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo);
+				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
 		}, (err) => console.log(err.message || err));
 	}
 
@@ -94,7 +71,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 		if (this.selectedFolder) {
 			this.selectedFolder.open = true;
 		}
-		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo);
+		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 	}
 
 	protected onClearTextFilter(): void {
@@ -150,22 +127,17 @@ export class AssetExplorerIndexComponent implements OnInit {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 
-				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo);
+				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 			});
 	}
 
-	protected changeSort(sort: SortInfo) {
-		if (this.sortInfo.property === sort.property) {
-			this.sortInfo.isAscending = !this.sortInfo.isAscending;
-		} else {
-			sort.isAscending = true; // reset ascending
-			this.sortInfo =  sort;
-		}
+	protected changeSort(propertyName: string) {
+		this.gridColumns = ViewManagerColumnsHelper.setColumnAsSorted(propertyName);
 
-		this.preferenceService.setPreference(PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER, sort.property)
+		this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT, propertyName)
 			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
 
-		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo);
+		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 		return ;
 	}
 

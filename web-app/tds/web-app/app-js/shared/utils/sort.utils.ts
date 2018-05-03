@@ -1,10 +1,9 @@
 import {DateUtils} from './date.utils';
+import { GridColumnModel } from '../model/data-list-grid.model';
 
 export interface SortInfo {
-	property: string;
+	isSorting: boolean;
 	isAscending: boolean;
-	type: string;
-	dateFormat?: string;
 }
 
 /**
@@ -49,7 +48,7 @@ export class SortUtils {
 	 * @param sortInfo Contains the current state of the sorting
 	 * @returns {number}
 	 */
-	public static sort(items: any[], sortInfo: SortInfo): any[] {
+	public static sort(items: any[], sortInfo: GridColumnModel): any[] {
 		return [...items].sort(this.formatAndSort(sortInfo));
 	}
 
@@ -61,7 +60,7 @@ export class SortUtils {
 	 * @param itemB Second element to compare
 	 * @returns {valueA, valueB} formatted according to its data type
 	 */
-	private static formatItemsToCompare(sortInfo: SortInfo,  itemA: any, itemB: any): {valueA: any, valueB: any}  {
+	private static formatItemsToCompare(sortInfo: GridColumnModel,  itemA: any, itemB: any): {valueA: any, valueB: any}  {
 		const valueA = itemA[sortInfo.property];
 		const valueB = itemB[sortInfo.property];
 
@@ -69,7 +68,7 @@ export class SortUtils {
 			'boolean': (a, b) => ({valueA: a.toString(), valueB: b.toString()}),
 			'string': (a, b) => ({valueA: (a || '').toUpperCase(), valueB: (b || '').toUpperCase()}),
 			'number': (a, b) => ({a, b}),
-			'date': (a, b) => ({valueA: DateUtils.convertDateToUnixTime(sortInfo.dateFormat, a), valueB: DateUtils.convertDateToUnixTime(sortInfo.dateFormat, b)}),
+			'date': (a, b) => ({valueA: DateUtils.convertDateToUnixTime(sortInfo.format, a), valueB: DateUtils.convertDateToUnixTime(sortInfo.format, b)}),
 			'default': (a, b) => ({a, b})
 		};
 
@@ -85,14 +84,14 @@ export class SortUtils {
 	/**
 	 * Return the sort predicate used by the sort function with the format function curried
 	 +
-	 * @param sortInfo Contains the current property to evaluate and dateFormat if the property is a date
+	 * @param sortInfo Contains the current property to evaluate and format if the property is a date
 	 * @returns {function}
 	 */
-	private static formatAndSort(sortInfo: SortInfo): any  {
+	private static formatAndSort(sortInfo: GridColumnModel): any  {
 		return (a, b) => {
 			const {valueA, valueB} = this.formatItemsToCompare(sortInfo, a, b);
 
-			if (sortInfo.isAscending) {
+			if (sortInfo.sort.isAscending) {
 				if (valueA < valueB) { return -1; }
 				if (valueA > valueB) { return 1;  }
 			}

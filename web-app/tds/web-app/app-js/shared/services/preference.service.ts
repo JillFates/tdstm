@@ -59,6 +59,6 @@ export class PreferenceService {
 export const PREFERENCES_LIST = {
 	ASSET_JUST_PLANNING: 'assetJustPlanning',
 	ASSET_LIST_SIZE : 'assetListSize',
-	DEFAULT_SORT_VIEW_MANAGER: 'defaultSortViewManager',
+	VIEW_MANAGER_DEFAULT_SORT: 'viewManagerDefaultSort',
 	CURRENT_DATE_FORMAT: 'CURR_DT_FORMAT'
 };

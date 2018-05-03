@@ -46,35 +46,12 @@
 								<thead>
 									<tr>
 										<th class="text-center">{{'ASSET_EXPLORER.INDEX.ACTION' | translate}}</th>
-										<th (click)="changeSort(sortByIsFavorite)" class="text-center">{{'ASSET_EXPLORER.INDEX.FAVORITE' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsFavorite.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByIsFavorite.property && !sortInfo.isAscending}"></span>
+
+										<th (click)="changeSort(column.property)" *ngFor="let column of gridColumns" [ngClass]="{'text-center': column?.property === 'isFavorite'}">
+											{{ column.label | translate }}
+											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': column?.sort?.isSorting && column.sort.isAscending ,
+												  'k-i-sort-desc-sm': column?.sort?.isSorting && !column.sort.isAscending}"></span>
 										</th>
-										<th (click)="changeSort(sortByName)">{{'ASSET_EXPLORER.INDEX.NAME' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByName.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByName.property && !sortInfo.isAscending}"></span>
-										</th>
-										<th (click)="changeSort(sortByCreatedBy)">{{'ASSET_EXPLORER.INDEX.CREATED_BY' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByCreatedBy.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByCreatedBy.property && !sortInfo.isAscending}"></span>
-										</th>
-										<th (click)="changeSort(sortByCreatedOn)">{{'ASSET_EXPLORER.INDEX.CREATED_ON' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByCreatedOn.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByCreatedOn.property && !sortInfo.isAscending}"></span>
-										</th>
-										<th (click)="changeSort(sortByUpdatedOn)">{{'ASSET_EXPLORER.INDEX.UPDATED_ON' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByUpdatedOn.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByUpdatedOn.property && !sortInfo.isAscending}"></span>
-										</th>
-										<th (click)="changeSort(sortByIsShared)" class="text-center">{{'ASSET_EXPLORER.INDEX.SHARED' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsShared.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByIsShared.property && !sortInfo.isAscending}"></span>
-										</th>
-										<th (click)="changeSort(sortByIsSystem)" class="text-center">{{'ASSET_EXPLORER.INDEX.SYSTEM' | translate}}
-											<span class="k-icon " [ngClass]="{ 'k-i-sort-asc-sm': sortInfo.property === sortByIsSystem.property && sortInfo.isAscending,
-												  'k-i-sort-desc-sm': sortInfo.property === sortByIsSystem.property && !sortInfo.isAscending}"></span>
-										</th>
-										<!-- <th class="text-center">Subscribe</th> -->
 									</tr>
 								</thead>
 								<tbody *ngIf="selectedFolder">
