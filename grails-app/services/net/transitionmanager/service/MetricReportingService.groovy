@@ -325,7 +325,7 @@ class MetricReportingService {
 				licenseMetrics << [
 						projectId : project.id,
 						metricCode: metricCode,
-						date      : date,
+						date      : date.format(DateFormat),
 						label     : label,
 						value     : value
 				]
