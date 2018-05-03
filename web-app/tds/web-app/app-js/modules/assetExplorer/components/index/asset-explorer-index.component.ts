@@ -54,8 +54,8 @@ export class AssetExplorerIndexComponent implements OnInit {
 		this.sortByCreatedBy =  { property: 'createdBy', isAscending: true, type: 'string'};
 		this.sortByIsShared =  { property: 'isShared', isAscending: true, type: 'boolean'};
 		this.sortByIsSystem =  { property: 'isSystem', isAscending: true, type: 'boolean'};
-		this.sortByCreatedOn =  { property: 'createdOn', isAscending: false, type: 'date'};
-		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: false, type: 'date'};
+		this.sortByCreatedOn =  { property: 'createdOn', isAscending: false, type: 'date', dateFormat: null};
+		this.sortByUpdatedOn = { property: 'updatedOn', isAscending: false, type: 'date', dateFormat: null};
 		this.sortByIsFavorite = { property: 'isFavorite', isAscending: true, type: 'boolean'};
 
 		this.sortInfo = this.sortByCreatedOn;
@@ -75,12 +75,14 @@ export class AssetExplorerIndexComponent implements OnInit {
 				const [reportResult, preferences] = result;
 
 				this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+				this.sortByCreatedOn.dateFormat = this.userDateFormat;
+				this.sortByUpdatedOn.dateFormat = this.userDateFormat;
 				this.sortInfo = getDefaultSorting(preferences[PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER]);
 
 				this.reportGroupModels = reportResult;
 				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
-				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat);
+				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo);
 		}, (err) => console.log(err.message || err));
 	}
 
@@ -92,7 +94,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 		if (this.selectedFolder) {
 			this.selectedFolder.open = true;
 		}
-		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat);
+		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, this.sortInfo);
 	}
 
 	protected onClearTextFilter(): void {
@@ -148,7 +150,7 @@ export class AssetExplorerIndexComponent implements OnInit {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 
-				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
+				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo);
 			});
 	}
 
@@ -162,9 +164,8 @@ export class AssetExplorerIndexComponent implements OnInit {
 
 		this.preferenceService.setPreference(PREFERENCES_LIST.DEFAULT_SORT_VIEW_MANAGER, sort.property)
 			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
-		
 
-		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo, this.userDateFormat );
+		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, this.sortInfo);
 		return ;
 	}
 

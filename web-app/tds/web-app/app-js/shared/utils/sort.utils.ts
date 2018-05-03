@@ -4,6 +4,7 @@ export interface SortInfo {
 	property: string;
 	isAscending: boolean;
 	type: string;
+	dateFormat?: string;
 }
 
 /**
@@ -45,46 +46,63 @@ export class SortUtils {
 	 * Sort a set of items, ascending/ descending
 	 +
 	 * @param items Set of items
-	 * @sortInfo Contains the current state of the sorting
-	 * @dateFormat Contains the date format user preference, this is required to order by dates
+	 * @param sortInfo Contains the current state of the sorting
 	 * @returns {number}
 	 */
-	public static sort(items: any[], sortInfo: SortInfo, dateFormat: string) {
+	public static sort(items: any[], sortInfo: SortInfo): any[] {
+		return [...items].sort(this.formatAndSort(sortInfo));
+	}
 
-		const applyFormat = (formatItemsToCompare, valA: any, valB: any): {valA: any, valB: any} => {
-			const getAs = {
-				'boolean': (a, b) => ({valA: a.toString(), valB: b.toString()}),
-				'string': (a, b) => ({valA: (a || '').toUpperCase(), valB: (b || '').toUpperCase()}),
-				'number': (a, b) => ({a, b}),
-				'date': (a, b) => ({valA: DateUtils.convertDateToUnixTime(dateFormat, a), valB: DateUtils.convertDateToUnixTime(dateFormat, b)}),
-				'default': (a, b) => ({a, b})
-			};
+	/**
+	 * Get the items to compare formatted according to its data type
+	 +
+	 * @param sortInfo Contains the current property to evaluate and dateFormat if the property is a date
+	 * @param itemA First element to compare
+	 * @param itemB Second element to compare
+	 * @returns {valueA, valueB} formatted according to its data type
+	 */
+	private static formatItemsToCompare(sortInfo: SortInfo,  itemA: any, itemB: any): {valueA: any, valueB: any}  {
+		const valueA = itemA[sortInfo.property];
+		const valueB = itemB[sortInfo.property];
 
-			let formatFunction = 'default';
-
-			if (['boolean', 'number', 'string', 'date'].indexOf(formatItemsToCompare) >= 0) {
-				formatFunction = formatItemsToCompare;
-			}
-
-			return getAs[formatFunction](valA, valB);
+		const getAs = {
+			'boolean': (a, b) => ({valueA: a.toString(), valueB: b.toString()}),
+			'string': (a, b) => ({valueA: (a || '').toUpperCase(), valueB: (b || '').toUpperCase()}),
+			'number': (a, b) => ({a, b}),
+			'date': (a, b) => ({valueA: DateUtils.convertDateToUnixTime(sortInfo.dateFormat, a), valueB: DateUtils.convertDateToUnixTime(sortInfo.dateFormat, b)}),
+			'default': (a, b) => ({a, b})
 		};
 
-		const compare = (a, b) => {
-			const {valA, valB} = applyFormat(sortInfo.type, a[sortInfo.property], b[sortInfo.property]);
+		let dataType = 'default';
+
+		if (['boolean', 'number', 'string', 'date'].indexOf(sortInfo.type) >= 0) {
+			dataType = sortInfo.type;
+		}
+
+		return getAs[dataType](valueA, valueB);
+	};
+
+	/**
+	 * Return the sort predicate used by the sort function with the format function curried
+	 +
+	 * @param sortInfo Contains the current property to evaluate and dateFormat if the property is a date
+	 * @returns {function}
+	 */
+	private static formatAndSort(sortInfo: SortInfo): any  {
+		return (a, b) => {
+			const {valueA, valueB} = this.formatItemsToCompare(sortInfo, a, b);
 
 			if (sortInfo.isAscending) {
-				if (valA < valB) { return -1; }
-				if (valA > valB) { return 1;  }
+				if (valueA < valueB) { return -1; }
+				if (valueA > valueB) { return 1;  }
 			}
 
 			// descending
-			if (valA < valB) { return 1; }
-			if (valA > valB) { return -1;  }
+			if (valueA < valueB) { return 1; }
+			if (valueA > valueB) { return -1;  }
 
-			// names must be equal
+			// values area equal
 			return 0;
 		};
-
-		return [...items].sort(compare);
-	}
+	};
 }
