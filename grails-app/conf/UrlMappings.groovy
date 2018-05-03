@@ -106,6 +106,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/retrieveRackSelectOptions/$id" {
+			controller = 'wsAsset'
+			action = [
+				GET: 'retrieveRackSelectOptions'
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}
