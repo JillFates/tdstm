@@ -528,6 +528,85 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to update the ImportBatch to the Queued status
+	 * @param batchId - the ID of the batch to be updated
+	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time
+	 */
+	@NotTransactional()
+	void setBatchToQueued(Long batchId) {
+		ImportBatch.withNewTransaction { session ->
+			ImportBatch batch = ImportBatch.get(batchId)
+
+			// if batch is already queued then return
+			if (ImportBatchStatusEnum.QUEUED == batch.status) {
+				log.debug 'setBatchToQueued() batch {}, status {}', batchId, batch.status
+				return
+			}
+
+			// Let's lock the batch for a moment so we can check out if it is okay to start
+			// processing this batch.
+			batch.project.lock()
+
+			// Now make sure nobody altered the batch in the meantime
+			// Can only enqueue a batch if it was PENDING
+			if (ImportBatchStatusEnum.PENDING != batch.status) {
+				log.debug 'setBatchToQueued() batch {}, status {}', batchId, batch.status
+				throw new DomainUpdateException('Unable to enqueue batch due to change in status')
+			}
+
+			Date queuedAtTime = new Date()
+
+			// Update the batch to the QUEUED state
+			batch.with {
+				status = ImportBatchStatusEnum.QUEUED
+				processProgress = 0
+				processLastUpdated = queuedAtTime
+				queuedAt = queuedAtTime
+				processStopFlag = 0
+			}
+			log.debug 'setBatchToQueued() dirtyProperties {}', batch.dirtyPropertyNames
+			batch.save(failOnError:true, flush:true)
+		}
+	}
+
+	/**
+	 * Used to get the next ImportBatch to be processed withing the provided project
+	 * @param projectId - the ID of the project where to look for import batches
+	 */
+	@NotTransactional()
+	Long getNextBatchToProcess(Long projectId) {
+		ImportBatch.withNewTransaction { session ->
+
+			// Check to see if there are any other batches in the RUNNING state
+			int count = ImportBatch.where {
+				project.id == projectId
+				status == ImportBatchStatusEnum.RUNNING
+			}.count()
+
+			// if there is another batch job running for the same project just return
+			if (count > 0) {
+				log.info('Found another batch already running while getting next batch to process.')
+				return null
+			}
+
+			// Get the list of the ImportBatch IDs that can be processed
+			List<Long> batchIds = ImportBatch.where {
+				project.id == projectId
+				status == ImportBatchStatusEnum.QUEUED
+			}
+			.projections { property('id') }
+			.list(sortBy: 'queuedAt')
+
+			if (batchIds) {
+				return batchIds.get(0)
+			} else {
+				// there are no import batches in Queued status
+				return null
+			}
+		}
+	}
+
+	/**
 	 * Used to update the ImportBatch to the Running status
 	 * @param id - the ID of the batch to be updated
 	 * @throws DomainUpdateException if ImportBatch.status was not PENDING at the current time

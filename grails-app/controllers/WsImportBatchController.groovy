@@ -93,11 +93,7 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				// impacted = importBatchService.queueBatchesForProcessing(project, actionCmd.ids)
-				//
-				// For the time being we are calling the process batch directly but this eventually will be done by
-				// triggering a Quartz job.
-				impacted = dataImportService.processBatch(project, actionCmd.ids[0])
+				importBatchService.scheduleJob(project, actionCmd.ids[0])
 				break
 
 			case ImportBatchActionEnum.EJECT:

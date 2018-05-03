@@ -12,11 +12,16 @@ import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
 import org.apache.commons.lang3.BooleanUtils
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 @Slf4j
 class ImportBatchService implements ServiceMethods {
 
 	DataImportService dataImportService
+	Scheduler quartzScheduler
+	SecurityService securityService
 
 	/**
 	 * Find a all batches and include the records summary information. If a batchId is given,
@@ -454,5 +459,31 @@ class ImportBatchService implements ServiceMethods {
 	 */
 	ImportBatch fetchBatch(Project project, Long batchId) {
 		return GormUtil.findInProject(project, ImportBatch, batchId, true)
+	}
+
+	/**
+	 * Schedule a quartz job for the batch import process
+	 * @param project - user current project
+	 * @param batchId - the id of the batch to be queued
+	 */
+	void scheduleJob(Project project, Long batchId) {
+		// Setup the Quartz job that will execute the actual posting process
+
+		// The triggerName/Group will allow us to controller on import
+		Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
+
+		String triggerName = 'TM-ImportBatch-' + project.id + '-' + batchId
+		Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
+
+		trigger.jobDataMap.batchId = batchId
+		trigger.jobDataMap.username = securityService.currentUsername
+		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
+		trigger.jobDataMap.projectId = project.id
+		trigger.setJobName('ImportBatchJob') 			// Please note that the JobName must match the class file name
+		trigger.setJobGroup('tdstm-import-batch') 		// and that the group should be specified in the Job
+
+		quartzScheduler.scheduleJob(trigger)
+
+		log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 	}
 }

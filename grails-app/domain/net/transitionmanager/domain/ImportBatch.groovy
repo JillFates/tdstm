@@ -55,6 +55,9 @@ class ImportBatch {
 	// Will contain the last time that the processProgress was last updated
 	Date processLastUpdated
 
+	// Will contain the time when the batch was queued to be processed
+	Date queuedAt
+
 	// Is used to trigger the halting of a batch being processed
 	Integer processStopFlag
 
@@ -99,6 +102,7 @@ class ImportBatch {
 		nullIndicator nullable:true, blank:true, size: 0..255
 		processProgress nullable: true, size: 0..100
 		processLastUpdated nullable: true
+		queuedAt nullable: true
 		processStopFlag nullable: true, range: 0..1
 		progressInfoJob nullable: true
 		provider nullable: true
@@ -117,6 +121,7 @@ class ImportBatch {
 		originalFilename sqltype: 'VARCHAR(255)'
 		processProgress sqltype: 'TINYINT(3)'
 		processLastUpdated sqltype: 'DATETIME'
+		queuedAt sqltype: 'DATETIME'
 		processStopFlag sqltype: 'TINYINT(1)'
 		progressInfoJob sqltype: 'VARCHAR(255)'
 		nullIndicator sqltype: 'VARCHAR(255)'
