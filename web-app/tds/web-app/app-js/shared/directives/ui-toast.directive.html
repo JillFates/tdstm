@@ -1,20 +1,20 @@
 <div class="message-wrapper">
     <div class="message-wrapper-container" *ngIf="showsPopUp">
         <div class="alert alert-danger alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.DANGER">
-            <button type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-            <h5><i class="icon fa fa-ban"></i> <span ng-if="alert.danger.status"></span> {{alertModel.message}}</h5>
+            <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+            <h5><i class="icon fa fa-ban"></i>{{alertModel.message}}</h5>
         </div>
         <div class="alert alert-warning alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.WARNING">
-            <button type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-            <h5><i class="icon fa fa-warning"></i> <span ng-if="alert.warning.status"></span> {{alertModel.message}}</h5>
+            <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+            <h5><i class="icon fa fa-warning"></i>{{alertModel.message}}</h5>
         </div>
         <div class="alert alert-success alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.SUCCESS">
-            <button type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-            <h5><i class="icon fa fa-check"></i><span ng-if="alert.success.status"></span> {{alertModel.message}}</h5>
+            <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+            <h5><i class="icon fa fa-check"></i>{{alertModel.message}}</h5>
         </div>
         <div class="alert alert-info alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.INFO">
-            <button type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
-            <h5><i class="icon fa fa-info"></i><span ng-if="alert.info.status"></span> {{alertModel.message}}</h5>
+            <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
+            <h5><i class="icon fa fa-info"></i>{{alertModel.message}}</h5>
         </div>
     </div>
 </div>
