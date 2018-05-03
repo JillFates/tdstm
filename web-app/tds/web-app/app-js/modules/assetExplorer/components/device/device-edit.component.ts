@@ -127,14 +127,14 @@ export function DeviceEditComponent(template, editModel) {
 			// target fields
 			const targetRoomId = this.model.asset.roomTarget ? this.model.asset.roomTarget.id : null;
 			if (targetRoomId && targetRoomId > 0) {
-				this.showRackSourceInput = 'select';
-				this.assetExplorerService.getRacksForRoom(targetRoomId, 'S').subscribe(response => {
-					this.rackSourceOptions = response;
+				this.showRackTargetInput = 'select';
+				this.assetExplorerService.getRacksForRoom(targetRoomId, 'T').subscribe(response => {
+					this.rackTargetOptions = response;
 				});
 			} else if (targetRoomId && targetRoomId === -1) { /* -1 (New Room)*/
-				this.showRackSourceInput = 'new';
+				this.showRackTargetInput = 'new';
 			} else {
-				this.showRackSourceInput = 'none';
+				this.showRackTargetInput = 'none';
 			}
 		}
 
