@@ -417,7 +417,8 @@ class WsAssetController implements ControllerMethods {
 		// Populate the command with the data coming from the request.
 		AssetCommand command = populateCommandObject(AssetCommand)
 		// Save the new asset.
-		saveOrUpdateAsset(command)
+		assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson('Success!')
 	}
 
 	/**
@@ -429,83 +430,9 @@ class WsAssetController implements ControllerMethods {
 		// Populate the command with the data coming from the request.
 		AssetCommand command = populateCommandObject(AssetCommand)
 		// Update the asset.
-		saveOrUpdateAsset(command)
-	}
-
-	/**
-	 * Save or update an asset.
-	 *
-	 * @param command
-	 */
-	private void saveOrUpdateAsset(AssetCommand command) {
-		// Determine the right asset to save the asset.
-		def assetService = getServiceForAssetClass(command.assetClass)
-		// Do the actual saving.
-		String errorMsg = controllerService.saveUpdateAssetHandler(this, assetService, command.data)
-		if (errorMsg) {
-			session.AE?.JQ_FILTERS = command.data
-		}
-		updateSessionPostAssetSaveOrUpdate(command)
-	}
-
-	/**
-	 * Update the Session object after saving/updating an asset.
-	 * @param command
-	 * @return
-	 */
-	def updateSessionPostAssetSaveOrUpdate(AssetCommand command) {
-		String assetPrefix
-		switch(command.assetClass){
-		// Applications
-			case AssetClass.APPLICATION:
-				assetPrefix = "APP"
-				session.setAttribute('USE_FILTERS','true')
-				break
-		// Databases
-			case AssetClass.DATABASE:
-				assetPrefix = "DB"
-				break
-		// Files
-			case AssetClass.STORAGE:
-				assetPrefix = "FILES"
-				break
-		// Devices
-			case AssetClass.DEVICE:
-				assetPrefix = "AE"
-				break
-		}
-		session[assetPrefix]?.JQ_FILTERS = command.data
+		assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson('Success!')
 	}
 
 
-
-	/**
-	 * Return the corresponding service for the given asset class.
-	 *
-	 * @param assetClass
-	 * @return
-	 */
-	private def getServiceForAssetClass(AssetClass assetClass) {
-		def assetService
-		switch(assetClass){
-		// Applications
-			case AssetClass.APPLICATION:
-				assetService = applicationService
-				break
-		// Databases
-			case AssetClass.DATABASE:
-				assetService = databaseService
-				break
-		// Files
-			case AssetClass.STORAGE:
-				assetService = storageService
-				break
-		// Devices
-			case AssetClass.DEVICE:
-				assetService = deviceService
-				break
-		}
-
-		return assetService
-	}
 }

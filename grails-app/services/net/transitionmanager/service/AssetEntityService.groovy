@@ -34,6 +34,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.KeyValue
@@ -49,6 +50,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -604,6 +606,18 @@ class AssetEntityService implements ServiceMethods {
 			throw new DomainUpdateException(error)
 		}
 	}
+
+	void createOrUpdateDependencies(Project project, AssetEntity assetEntity, Map params) {
+
+		// Delete dependencies marked for deletion
+		if (params.deletedDep) {
+			AssetDependency.where {
+				id in params.deletedDep
+			}.deleteAll()
+		}
+	}
+
+
 
 	/**
 	 * Helper Method to de Delete a Dependency from an Asset Entity
@@ -3104,6 +3118,16 @@ class AssetEntityService implements ServiceMethods {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Create or update an asset based on the command object received.
+	 * @param command
+	 * @return
+	 */
+	AssetEntity saveOrUpdateAsset(AssetCommand command) {
+		AssetSaveUpdateStrategy strategy = AssetSaveUpdateStrategy.getInstanceFor(command)
+		return strategy.saveOrUpdateAsset()
 	}
 
 }

@@ -18,10 +18,17 @@ class AssetCommand {
 	 * The 'form' data. This is defined as generic as possible to
 	 * be able to reuse it for all the different assets.
 	 */
-	Map data
+	Map asset
+
+	/**
+	 * Map with the dependency information
+	 */
+	Map dependencyMap
 
 	static constraints = {
 		assetClass nullable: false
-		data nullable: false
+		asset nullable: false
+		dependencyMap nullable: false
+
 	}
 }

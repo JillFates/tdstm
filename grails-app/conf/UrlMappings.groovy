@@ -45,13 +45,6 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/asset/$id" {
-			controller = "wsAsset"
-			action = [
-				PUT: "updateAsset"
-			]
-		}
-
 		"/ws/asset/checkForUniqueName" {
 			controller = "wsAsset"
 			action = [
@@ -69,7 +62,8 @@ class UrlMappings {
 		"/ws/asset/$id" {
 			controller = "wsAsset"
 			action = [
-					GET:"getAsset"
+					GET:"getAsset",
+					PUT: "updateAsset"
 			]
 		}
 
