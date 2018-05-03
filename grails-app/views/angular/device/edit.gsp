@@ -180,12 +180,12 @@
                                                         class="select useRackS"
                                                         name="modelAssetRackSource"
                                                         [(ngModel)]="model.asset.rackSource"
-                                                        [defaultItem]="'Please Select'"
-                                                        [data]="rackSourceOptions"
-                                                        [textField]="'text'"
+                                                        [defaultItem]="{id: -2, value: 'Please Select'}"
+                                                        [data]="model.sourceRackSelect"
+                                                        [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
-                                                <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === 1">
+                                                <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === -1">
                                                     <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
                                                                              size="20" tabindex="311"
                                                                              value=""
@@ -209,9 +209,9 @@
                                                         class="select useRackT"
                                                         name="modelAssetRackTarget"
                                                         [(ngModel)]="model.asset.rackTarget"
-                                                        [defaultItem]="'Please Select'"
-                                                        [data]="rackTargetOptions"
-                                                        [textField]="'text'"
+                                                        [defaultItem]="{id: -2, value: 'Please Select'}"
+                                                        [data]="model.targetRackSelect"
+                                                        [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
                                                 <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === -1">
@@ -264,7 +264,8 @@
                                                data-content="Position">Position</label>
                                     </td>
                                     <td class="rackLabel" data-content="${standardFieldSpecs.sourceRackPosition.tip ?: standardFieldSpecs.sourceRackPosition.label}">
-                                        <div *ngIf="showRackFields && (showRackSourceInput === 'new' || (model.asset.rackSource && model.asset.rackSource.id > 0))" >
+                                        <div *ngIf="showRackFields && (showRackSourceInput === 'new' ||
+                                                    (model.asset.rackSource && (model.asset.rackTarget.id === -1 || model.asset.rackTarget.id > 0)))" >
                                             <tdsAngular:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
                                                 <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}"
                                                                          size="10" tabindex="320"
