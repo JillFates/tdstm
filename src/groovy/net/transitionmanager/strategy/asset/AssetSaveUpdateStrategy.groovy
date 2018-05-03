@@ -93,7 +93,7 @@ abstract class AssetSaveUpdateStrategy {
 	 */
 	protected void formatCommandFields() {
 		formatDateFields()
-		command.asset.scale = SizeScale.asEnum(command.asset.scale.name)
+		command.asset.scale = SizeScale.asEnum(command.asset.scale)
 	}
 
 	/**
