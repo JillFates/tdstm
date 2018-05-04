@@ -74,6 +74,11 @@ export function DatabaseEditComponent(template, editModel) {
 					modelRequest.asset[custom.field.toString()] = customValue.value;
 				}
 			});
+			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+			delete modelRequest.asset.moveBundle;
+			// Date Formats
+			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
+			// modelRequest.asset.retireDate
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
 				console.log(res);
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
