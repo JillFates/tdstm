@@ -26,6 +26,8 @@ abstract class AssetSaveUpdateStrategy {
 
 	protected static SecurityService securityService = Holders.grailsApplication.mainContext.getBean('securityService')
 
+	protected final static String DEFAULT_DATE_FORMAT = TimeUtil.FORMAT_DATE_TIME_6
+
 
 	/**
 	 * Constructor that takes a command as argument.
@@ -121,7 +123,7 @@ abstract class AssetSaveUpdateStrategy {
 	private void formatDateFields() {
 		String[] dateFields = ['maintExpDate', 'purchaseDate', 'retireDate']
 		for (String dateField in dateFields) {
-			command.asset[dateField] = TimeUtil.parseDate(command.asset['dateField'])
+			command.asset[dateField] = TimeUtil.parseDateTime(command.asset[dateField], DEFAULT_DATE_FORMAT)
 		}
 	}
 
