@@ -1,7 +1,6 @@
 import com.tds.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.eav.EavAttribute
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods

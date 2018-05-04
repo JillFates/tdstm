@@ -3,7 +3,6 @@ package net.transitionmanager.service
 import com.tds.asset.AssetType
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import net.transitionmanager.domain.Project
 
