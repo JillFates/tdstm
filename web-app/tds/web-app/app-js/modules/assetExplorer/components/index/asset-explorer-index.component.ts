@@ -29,8 +29,6 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private searchText: String;
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
-
-	private userDateFormat: string;
 	private gridColumns: GridColumnModel[];
 
 	constructor(
@@ -45,7 +43,6 @@ export class AssetExplorerIndexComponent implements OnInit {
 	}
 	ngOnInit() {
 		this.gridColumns = ViewManagerColumnsHelper.createColumns();
-
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
 		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
 			.subscribe(this.setupDefaultSettings.bind(this), (err) => console.log(err.message || err));
@@ -54,15 +51,13 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private setupDefaultSettings(defaultSettings: any[]) {
 		const [reportResult, preferences] = defaultSettings;
 
-		this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
-
+		const userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(userDateFormat);
 		this.reportGroupModels = reportResult;
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
-		this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT] || 'createdOn');
+		this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
 		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
-
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel): void {

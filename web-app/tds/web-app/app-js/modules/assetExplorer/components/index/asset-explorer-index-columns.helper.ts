@@ -57,6 +57,10 @@ export const ViewManagerColumnsHelper = {
 	 * @returns {GridColumnModel[]}
 	 */
 	setColumnAsSorted(columnName: string): GridColumnModel[] {
+		if (!columnName) {
+			columnName = DEFAULT_COLUMN_NAME;
+		}
+
 		const restartedSort = { sort: { isSorting: false, isAscending: false } };
 
 		columns = columns.map((column: GridColumnModel) => {
