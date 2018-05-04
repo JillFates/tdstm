@@ -5,15 +5,17 @@
 const webpack = require('webpack'); //to access built-in plugins
 const path = require('path');
 const pkg = require('./package.json');  //loads npm config file
-let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const helpers = require('./server-utils/helpers');
+// let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Peek into dependencies
 
-module.exports = function (env, argv) {
+module.exports = function (env) {
 
 	let devEnv = (env !== 'prod');
 
 	console.log('Production Environment: ' + (!devEnv));
 
 	return {
+		mode: 'production',
 		entry: {
 			app: './web-app/app-js/main.ts',
 			vendor: Object.keys(pkg.dependencies) //get npm vendors deps from config
@@ -24,8 +26,10 @@ module.exports = function (env, argv) {
 		},
 		module: {
 			rules: [
-				{ test: /\.tsx?$/, loader: 'ts-loader' },
-				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'}
+				{test: /\.tsx?$/, loader: 'ts-loader'},
+				{test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader'},
+				// Ignore warnings about System.import in Angular
+				{ test: /[\/\\]@angular[\/\\].+\.js$/, parser: { system: true } },
 			]
 		},
 		resolve: {
@@ -34,23 +38,27 @@ module.exports = function (env, argv) {
 		},
 		plugins: [
 			new webpack.SourceMapDevToolPlugin({
-				filename: '[name].js.map',
-				exclude: ['vendor.js']
+				filename: '[name].js.map'
 			}),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: ['app', 'vendor']
-			}),
-			new webpack.optimize.UglifyJsPlugin({
-				comments: false,
-				sourceMap: devEnv,
-				exclude: [/\.min\.js$/gi] // skip pre-minified libs
-			}),
-			new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
-				/angular(\\|\/)core(\\|\/)@angular/,
+			new webpack.ContextReplacementPlugin(
+				/\@angular(\\|\/)core(\\|\/)esm5/,
 				path.resolve(__dirname, "app-js")
-			),
-			//new BundleAnalyzerPlugin()
+			)
+			// Uncomment if you want to take a peek to the structure of dependencies
+			// new BundleAnalyzerPlugin()
 		],
+		optimization: {
+			splitChunks: {
+				name: true,
+				cacheGroups: {
+					commons: {
+						test: /[\\/]node_modules[\\/]/,
+						name: "vendor",
+						chunks: "all"
+					}
+				}
+			}
+		},
 		cache: true,
 		context: __dirname,
 		watch: devEnv,

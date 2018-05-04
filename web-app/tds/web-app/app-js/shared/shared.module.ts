@@ -29,7 +29,6 @@ import { FilterPipe } from './pipes/filter.pipe';
 // Shared Components
 import { PopupLegendsComponent } from './modules/popup/legends/popup-legends.component';
 import { HeaderComponent } from './modules/header/header.component';
-import { FormlyInputHorizontal } from './modules/formly/formly-input-horizontal.component';
 import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component';
 import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
@@ -67,7 +66,6 @@ import { DictionaryService } from './services/dictionary.service';
 		UIDialogDirective,
 		HeaderComponent,
 		PopupLegendsComponent,
-		FormlyInputHorizontal,
 		UIPromptDirective,
 		UISVGIconDirectiveDirective,
 		UIFloatingHeaderKGridDirective,
@@ -110,7 +108,6 @@ import { DictionaryService } from './services/dictionary.service';
 		FilterPipe,
 		HeaderComponent,
 		PopupLegendsComponent,
-		FormlyInputHorizontal,
 		DynamicComponent,
 		CodeMirrorComponent,
 		CheckActionComponent,
