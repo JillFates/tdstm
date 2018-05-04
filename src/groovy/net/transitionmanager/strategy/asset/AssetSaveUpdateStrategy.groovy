@@ -57,7 +57,7 @@ abstract class AssetSaveUpdateStrategy {
 		assetEntity.save(failOnError: true)
 
 		// Assign the asset to the corresponding Move Bundle.
-		assetEntityService.assignAssetToBundle(project, assetEntity, command.asset['moveBundle']['id'].toString())
+		assetEntityService.assignAssetToBundle(project, assetEntity, command.asset['moveBundleId'].toString())
 
 		// Create/Update dependencies as needed.
 		//assetEntityService.createOrUpdateAssetEntityAndDependencies(project, assetEntity, command.dependencyMap)
