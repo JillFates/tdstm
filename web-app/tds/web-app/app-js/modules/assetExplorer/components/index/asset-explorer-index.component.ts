@@ -30,7 +30,6 @@ export class AssetExplorerIndexComponent implements OnInit {
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
 
-	private currentGridColumn: GridColumnModel;
 	private userDateFormat: string;
 	private gridColumns: GridColumnModel[];
 
@@ -53,12 +52,12 @@ export class AssetExplorerIndexComponent implements OnInit {
 				const [reportResult, preferences] = result;
 
 				this.userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-				ViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
-				this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT] || 'createdOn');
+				this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(this.userDateFormat);
 
 				this.reportGroupModels = reportResult;
 				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
+				this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT] || 'createdOn');
 				this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
 		}, (err) => console.log(err.message || err));
 	}

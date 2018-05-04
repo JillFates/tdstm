@@ -39,13 +39,13 @@ export const ViewManagerColumnsHelper = {
 	createColumns: (): GridColumnModel[] => {
 		columns = [];
 
-		addColumn({ property: 'isFavorite', label: 'ASSET_EXPLORER.INDEX.FAVORITE', sort: { isSorting: false, isAscending: true  }, type: 'boolean', width: 100 });
-		addColumn({ property: 'name', label: 'ASSET_EXPLORER.INDEX.NAME', sort: { isSorting: false, isAscending: true  }, type: 'string', width: 100 });
-		addColumn({ property: 'createdBy', label: 'ASSET_EXPLORER.INDEX.CREATED_BY', sort: { isSorting: false, isAscending: true  }, type: 'string', width: 100 });
-		addColumn({ property: 'createdOn', label: 'ASSET_EXPLORER.INDEX.CREATED_ON', sort: { isSorting: false, isAscending: false  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: false  }, type: 'date', format: null, width: 100 });
-		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: true  }, type: 'boolean', width: 100 });
-		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: true  }, type: 'boolean', width: 100 });
+		addColumn({ property: 'isFavorite', label: 'ASSET_EXPLORER.INDEX.FAVORITE', sort: { isSorting: false, isAscending: false  }, type: 'boolean', width: 100 });
+		addColumn({ property: 'name', label: 'ASSET_EXPLORER.INDEX.NAME', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
+		addColumn({ property: 'createdBy', label: 'ASSET_EXPLORER.INDEX.CREATED_BY', sort: { isSorting: false, isAscending: false  }, type: 'string', width: 100 });
+		addColumn({ property: 'createdOn', label: 'ASSET_EXPLORER.INDEX.CREATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
+		addColumn({ property: 'updatedOn', label: 'ASSET_EXPLORER.INDEX.UPDATED_ON', sort: { isSorting: false, isAscending: true  }, type: 'date', format: null, width: 100 });
+		addColumn({ property: 'isShared', label: 'ASSET_EXPLORER.INDEX.SHARED',  sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100 });
+		addColumn({ property: 'isSystem', label: 'ASSET_EXPLORER.INDEX.SYSTEM', sort: { isSorting: false,  isAscending: false  }, type: 'boolean', width: 100 });
 
 		return columns;
 	},
@@ -64,7 +64,6 @@ export const ViewManagerColumnsHelper = {
 			return Object.assign({}, column, sort);
 		});
 
-		// return getColumnByName(columnName);
 		return columns;
 	},
 	/**
