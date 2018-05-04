@@ -1,8 +1,9 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { AssetExplorerStates } from '../../asset-explorer-routing.states';
 import { ViewGroupModel, ViewModel, ViewType } from '../../model/view.model';
 import { Observable } from 'rxjs/Observable';
+import { zip } from 'rxjs/observable/zip';
 
 import { AssetExplorerService } from '../../service/asset-explorer.service';
 
@@ -13,42 +14,61 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { DictionaryService } from '../../../../shared/services/dictionary.service';
 import { LAST_SELECTED_FOLDER } from '../../../../shared/model/constants';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
+import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import { ViewManagerColumnsHelper } from './asset-explorer-index-columns.helper';
 
 @Component({
 	selector: 'asset-explorer-index',
-	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html'
+	templateUrl: '../tds/web-app/app-js/modules/assetExplorer/components/index/asset-explorer-index.component.html',
 })
-export class AssetExplorerIndexComponent {
+export class AssetExplorerIndexComponent implements OnInit {
 
 	private reportGroupModels = Array<ViewGroupModel>();
 	private searchText: String;
 	private viewType = ViewType;
 	private selectedFolder: ViewGroupModel;
+	private gridColumns: GridColumnModel[];
 
 	constructor(
 		private stateService: StateService,
-		@Inject('reports') report: Observable<ViewGroupModel[]>,
+		@Inject('reports') private report: Observable<ViewGroupModel[]>,
 		private permissionService: PermissionService,
 		private assetExpService: AssetExplorerService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
-		private dictionary: DictionaryService) {
-		report.subscribe(
-			(result) => {
-				this.reportGroupModels = result;
-				const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
-				this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
-			},
-			(err) => console.log(err));
+		private dictionary: DictionaryService,
+		private preferenceService: PreferenceService) {
+	}
+	ngOnInit() {
+		this.gridColumns = ViewManagerColumnsHelper.createColumns();
+		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
+		zip(this.report, this.preferenceService.getPreferences(preferencesCodes))
+			.subscribe(this.setupDefaultSettings.bind(this), (err) => console.log(err.message || err));
+	}
+
+	private setupDefaultSettings(defaultSettings: any[]) {
+		const [reportResult, preferences] = defaultSettings;
+
+		const userDateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+		this.gridColumns =  ViewManagerColumnsHelper.setFormatToDateColumns(userDateFormat);
+		this.reportGroupModels = reportResult;
+		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
+		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
+		this.gridColumns =  ViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
+		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel): void {
+
 		this.dictionary.set(LAST_SELECTED_FOLDER, folderOpen);
 		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
 		if (this.selectedFolder) {
 			this.selectedFolder.open = true;
 		}
+		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 	}
 
 	protected onClearTextFilter(): void {
@@ -103,7 +123,19 @@ export class AssetExplorerIndexComponent {
 			.subscribe(result => {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
+
+				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 			});
+	}
+
+	protected changeSort(propertyName: string) {
+		this.gridColumns = ViewManagerColumnsHelper.setColumnAsSorted(propertyName);
+
+		this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT, propertyName)
+			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
+
+		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, ViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
+		return ;
 	}
 
 	/**
