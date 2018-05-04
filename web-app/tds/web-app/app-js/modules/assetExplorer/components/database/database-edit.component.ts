@@ -11,6 +11,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
 import {AssetShowComponent} from '../asset/asset-show.component';
+import {NotifierService} from "../../../../shared/services/notifier.service";
 
 declare var jQuery: any;
 
@@ -31,7 +32,8 @@ export function DatabaseEditComponent(template, editModel) {
 			private activeDialog: UIActiveDialogService,
 			private preference: PreferenceService,
 			private assetExplorerService: AssetExplorerService,
-			private dialogService: UIDialogService) {
+			private dialogService: UIDialogService,
+			private notifierService: NotifierService) {
 
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
@@ -80,7 +82,9 @@ export function DatabaseEditComponent(template, editModel) {
 			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
 			// modelRequest.asset.retireDate
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
-				console.log(res);
+				this.notifierService.broadcast({
+					name: 'reloadCurrentAssetList'
+				});
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 			});
 		}

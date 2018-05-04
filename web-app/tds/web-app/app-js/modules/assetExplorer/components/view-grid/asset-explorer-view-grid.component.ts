@@ -117,9 +117,21 @@ export class AssetExplorerViewGridComponent {
 				};
 			});
 		}, (err) => console.log(err));
+
+		// Listen to any Changes outside the model, like Asset Edit Views
+		this.eventListeners();
 	}
 	private getPreferences(): Observable<any> {
 		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
+	}
+
+	/**
+	 * Reload the current Kendo List when an event that requires the changes occurs completely out of the context.
+	 */
+	private eventListeners() {
+		this.notifier.on('reloadCurrentAssetList', (event) => {
+			this.onReload();
+		});
 	}
 
 	/**
