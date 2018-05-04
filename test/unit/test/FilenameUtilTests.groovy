@@ -164,8 +164,8 @@ class FilenameUtilTests extends AbstractUnitSpec {
 		" ABCDEFGHIJKLM "   | 'ABCDEFGHIJKLM'
 		" NOPQRSTUVWXYZ "   | 'NOPQRSTUVWXYZ'
 		" 01234567890 "     | '01234567890'
-		"!@#\$%^&*()-_=+`~" | '!@#$%^&*()-_=+`~'
-		"',.<>/?\\"         | '\',.<>/?\\'
+	//	"!@#\$%^&*()-_=+`~" | '!@#$%^&*()-_=+`~'
+	//	"',.<>/?\\"         | '\',.<>/?\\'
 		" CR\r. "           | 'CR+.'
 		" LF\n. "           | 'LF+.'
 		" FF\f. "           | 'FF+.'
@@ -181,5 +181,36 @@ class FilenameUtilTests extends AbstractUnitSpec {
 		" .\u00850085. "    | '.~0085.'
 		" [\u007f007f] "    | '[~007f]'
 		" [\u008f008f] "    | '[~008f]'
+	}
+
+		@See('TM-9050')
+		def '13. Test sanitation for invalid filename characters for Windows and Linux filesystems'() {
+
+		expect:
+		FilenameUtil.safeFilename(value) == result
+
+		where:
+		value		|	result
+		'abc#d'		|	'abc_d'
+		'abcd<<'	|	'abcd__'
+		'ab$cd'		|	'ab_cd'
+		'ab%cd'		|	'ab_cd'
+		'ab>cd'		|	'ab_cd'
+		'ab!cd'		|	'ab_cd'
+		'ab`cd'		|	'ab_cd'
+		'ab&cd'		|	'ab_cd'
+		'ab*cd'		|	'ab_cd'
+		'ab“cd'		|	'ab_cd'
+		'ab|cd'		|	'ab_cd'
+		'ab{cd'		|	'ab_cd'
+		'ab?cd'		|	'ab_cd'
+		'ab”cd'		|	'ab_cd'
+		'ab}cd'		|	'ab_cd'
+		'ab/cd'		|	'ab_cd'
+		'ab:cd'		|	'ab_cd'
+		'ab\\bcd'	|	'ab_cd'
+		'ab=cd'		|	'ab_cd'
+		'ab@cd'		|	'ab_cd'
+
 	}
 }
