@@ -95,6 +95,10 @@ class MetricReportingService {
 	 * 		]
 	 */
 	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition) {
+		if(!projectIds){
+			throw new InvalidParamException('There are no projects, that have collect metrics enabled, or are currently active.')
+		}
+
 		MetricMode mode = MetricMode.lookup((String) metricDefinition.mode)
 
 		switch (mode) {
