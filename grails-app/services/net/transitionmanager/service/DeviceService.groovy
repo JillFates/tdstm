@@ -104,18 +104,6 @@ class DeviceService implements ServiceMethods {
 			deleteChassisWarning = count > 0
 		}
 
-		// Removed by TM-6779 - this is not being used since field specs fields implementation
-//		String frontEndLabel ="test sidar"
-//		for (EavEntityAttribute it in EavEntityAttribute.findAllByEavAttributeSet(assetEntity.attributeSet, [sort: 'sortOrder'])) {
-//			String code = it.attribute.attributeCode
-//			if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) && code != 'currentStatus' && code != 'usize') {
-//				frontEndLabel = it.attribute.frontendLabel
-//				if (assetEntityService.customLabels.contains(frontEndLabel)) {
-//					frontEndLabel = project[code] ?: frontEndLabel
-//				}
-//			}
-//		}
-
 		def model = [
 			assetEntity: assetEntity,
 			/*label: frontEndLabel,*/

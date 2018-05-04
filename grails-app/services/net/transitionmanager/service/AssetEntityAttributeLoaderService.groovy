@@ -193,93 +193,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		!map.containsValue(null)
 	}
 
-	// get StringArray from StringList
-	// TODO : JPM - Why not just use String.split(",") ?
-	def getStringArray(def stringList){
-		def list = []
-		def token = new StringTokenizer(stringList, ",")
-		while (token.hasMoreTokens()) {
-			list.add(token.nextToken())
-		}
-		return list
-	}
-
-	/*
-	 * get Team - #Asset count corresponding to Bundle
-	 */
-	def getTeamAssetCount (def bundleInstance, def rackPlan, def role) {
-		def teamAssetCounts = []
-		//def bundleInstance = MoveBundle.get(bundleId)
-		def projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
-		def assetEntityInstanceList = AssetEntity.findAllByMoveBundle(bundleInstance)
-		if (rackPlan == 'RerackPlan') {
-			projectTeamInstanceList.each {projectTeam ->
-				def assetCount = assetEntityInstanceList.findAll{it[targetTeamType.get(role)]?.id == projectTeam.id}?.size()
-				teamAssetCounts << [teamCode: projectTeam.teamCode , assetCount:assetCount]
-			}
-			def unAssignCount = assetEntityInstanceList.findAll{!it[targetTeamType.get(role)]?.id}?.size()
-			teamAssetCounts << [teamCode: "UnAssigned" , assetCount:unAssignCount]
-
-		} else {
-			projectTeamInstanceList.each { projectTeam ->
-				def assetCount = assetEntityInstanceList.findAll{it[sourceTeamType.get(role)]?.id == projectTeam.id}?.size()
-				teamAssetCounts << [teamCode: projectTeam.teamCode , assetCount:assetCount]
-			}
-			def unAssignCount = assetEntityInstanceList.findAll{!it[sourceTeamType.get(role)]?.id}?.size()
-			teamAssetCounts << [teamCode: "UnAssigned" , assetCount:unAssignCount]
-		}
-		return teamAssetCounts
-	}
-
-
-	//	get Cart - #Asset count corresponding to Bundle
-	List getCartAssetCounts (def bundleId) {
-		List cartAssetCounts = []
-		MoveBundle bundleInstance = MoveBundle.get(bundleId)
-		def cartList = AssetEntity.executeQuery("select ma.cart from AssetEntity ma where ma.moveBundle=$bundleInstance.id group by ma.cart")
-		cartList.each { assetCart ->
-			def cartAssetCount = AssetEntity.countByMoveBundleAndCart(bundleInstance, assetCart)
-			def AssetEntityList = AssetEntity.findAllByMoveBundleAndCart(bundleInstance, assetCart)
-			def usize = 0
-			for (int AssetEntityRow = 0; AssetEntityRow < AssetEntityList.size(); AssetEntityRow++) {
-				try {
-					usize = usize + Integer.parseInt(AssetEntityList[AssetEntityRow]?.model?.usize? (AssetEntityList[AssetEntityRow]?.model?.usize).trim() : "0")
-				} catch (Exception e) {
-					println "uSize containing blank value."
-				}
-			}
-			cartAssetCounts << [cart:assetCart, cartAssetCount:cartAssetCount,usizeUsed:usize]
-		}
-		return cartAssetCounts
-	}
-
-	//get assetsList  corresponding to selected bundle to update assetsList dynamically
-
-	List getAssetList (def assetEntityList, rackPlan, bundleInstance, role) {
-		List assetEntity = []
-		List projectTeam =[]
-		List projectTeamInstanceList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = $bundleInstance.id and pt.role = '$role' ")
-		projectTeamInstanceList.each { teams ->
-			projectTeam << [teamCode: teams.teamCode]
-		}
-
-		for (int assetRow = 0; assetRow < assetEntityList.size(); assetRow++) {
-			def displayTeam
-			if (rackPlan == "RerackPlan") {
-				displayTeam = assetEntityList[assetRow][targetTeamType.get(role)]?.teamCode
-			}else {
-				displayTeam = assetEntityList[assetRow][sourceTeamType.get(role)]?.teamCode
-			}
-			def assetEntityInstance = AssetEntity.get(assetEntityList[assetRow].id)
-			assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance?.model?.toString(),
-				sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack,
-				targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack,
-				sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition,
-				uSize:assetEntityInstance?.model?.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart,
-				shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
-		}
-		return assetEntity
-	}
 	/**
 	 * To Validate the Import Process If any Errors update DataTransferBatch and DataTransferValue
 	 * @author Srinivas
@@ -820,37 +733,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated, cachable: cachable]
 	}
 
-	/* To get DataTransferValue Asset Manufacturer
-	 * @param dataTransferValue
-	 * @author Lokanada Reddy
-	 */
-	@Transactional
-	List findOrCreateManufacturer(UserLogin userLogin, String mfgName, boolean canCreateMfgAndModel) {
-		Manufacturer mfg
-		String errorMsg
-
-		if (mfgName) {
-			mfg = Manufacturer.findByName(mfgName)
-			if (! mfg) {
-				mfg = ManufacturerAlias.findByName(mfgName)?.manufacturer
-				if (! mfg) {
-					if (canCreateMfgAndModel) {
-						mfg = new Manufacturer(name: mfgName)
-						save mfg,  true
-						if (mfg.hasErrors()) {
-							errorMsg = "Unable to create manufacturer ($mfgName): ${GormUtil.allErrorsString(mfg)}"
-						} else {
-							logger.info 'Manufacturer ({}) was created', mfgName
-						}
-					} else {
-						errorMsg = "Unable to find manufacturer $mfgName"
-					}
-				}
-			}
-		}
-		return [mfg, errorMsg]
-	}
-
 	/**
 	 * Used to retrieve a list of all manufacturers and their aliases that have the same name
 	 * @param name - the name to lookup
@@ -919,27 +801,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		return [model, errorMsg]
 	}
 
-	/* To get DataTransferValue source/target Team
-	 * @param dataTransferValue,moveBundle
-	 * @author srinivas
-	 */
-	@Transactional
-	def getdtvTeam(def dtv, def bundleInstance, def role) {
-		def teamInstance
-		if (dtv.correctedValue && bundleInstance) {
-			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue, bundleInstance)
-			if (!teamInstance &&!teamInstance.find{it.role==role}){
-				teamInstance = new ProjectTeam(teamCode:dtv.correctedValue, moveBundle:bundleInstance, role:role).save()
-			}
-		} else if (dtv.importValue && bundleInstance) {
-			teamInstance = ProjectTeam.findByTeamCodeAndMoveBundle(dtv.importValue, bundleInstance)
-			if (!teamInstance &&!teamInstance.find{it.role==role}){
-				teamInstance = new ProjectTeam(name:dtv.importValue, teamCode:dtv.importValue, moveBundle:bundleInstance, role:role).save()
-			}
-		}
-		return teamInstance
-	}
-
 	// TODO: Move to AssetEntityService and change the code to check for existing connectors (see TM-3308)
 	/*
 	*  Create asset_cabled_Map for all asset model connectors
@@ -994,62 +855,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				save assetCableMap
 			}
 		}
-	}
-
-	 /**
-	  * Storing imported asset type in EavAttributeOptions table if not exist .
-	  * @param assetTypeName : assetTypeName is imported assetTypeName
-	  * @param create : create (Boolean) a flag to determine assetType will get created or not
-	  * @return
-	  */
-	@Transactional
-	def findOrCreateAssetType(assetTypeName, def create = false){
-		 def typeAttribute = EavAttribute.findByAttributeCode("assetType")
-		 def assetType = EavAttributeOption.findByValueAndAttribute(assetTypeName, typeAttribute)
-		 if (!assetType && create){
-			 save new EavAttributeOption('value':assetTypeName, 'attribute':typeAttribute, 'sort':0), true
-		 }
-		 return assetType
-	}
-
-	// TODO: Move to AssetEntityService
-	/**
-	 * This method is used to find a person object after importing and if not found create it
-	 * @param importValue is value what is there in excel file consist firstName and LastName
-	 * @param create : create is flag which will determine if person does not exist in db should they create record or not
-	 * @return instance of person
-	 */
-	@Transactional
-	def findOrCreatePerson(importValue, def create = false){
-		Project project = securityService.userCurrentProject
-		def firstName
-		def lastName
-		if (importValue.contains(",")){
-			def splittedName = importValue.split(",")
-			firstName = splittedName[1].trim()
-			lastName = splittedName[0].trim()
-		} else if (StringUtils.containsAny(importValue, " ")){
-			def splittedName = importValue.split("\\s+")
-			firstName = splittedName[0].trim()
-			lastName = splittedName[1].trim()
-		} else {
-			firstName = importValue.trim()
-		}
-
-		//Serching Person in compnies staff list .
-		def personList = partyRelationshipService.getCompanyStaff(project.clientId)
-		def person = personList.find { it.firstName == firstName && it.lastName == lastName }
-		if (!person && firstName && create) {
-			logger.debug 'Person {} {} not found in selected company', firstName, lastName
-			person = new Person(firstName: firstName, lastName: lastName, staffType: 'Contractor')
-			save person, true
-
-			save new PartyRelationship(partyRelationshipType: PartyRelationshipType.load("STAFF"),
-				 partyIdFrom: Party.load(project.clientId), roleTypeCodeFrom: RoleType.load("COMPANY"), partyIdTo:person,
-				 roleTypeCodeTo: RoleType.load("STAFF"), statusCode: "ENABLED")
-		 }
-
-		return person
 	}
 
 	/**
