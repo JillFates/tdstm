@@ -78,12 +78,10 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset.manufacturerSelectValue = {id: null};
 			if (this.model.asset.manufacturer) {
 				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
-				this.model.asset.manufacturerSelectValue.text = this.model.asset.manufacturer.text;
 			}
 			this.model.asset.modelSelectValue = {id: null};
 			if (this.model.asset.model) {
 				this.model.asset.modelSelectValue.id = this.model.asset.model.id;
-				this.model.asset.modelSelectValue.text = this.model.asset.model.text;
 			}
 		}
 

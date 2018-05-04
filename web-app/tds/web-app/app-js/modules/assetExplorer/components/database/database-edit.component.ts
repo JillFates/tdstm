@@ -10,7 +10,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import * as R from 'ramda';
-import {AssetShowComponent} from "../asset/asset-show.component";
+import {AssetShowComponent} from '../asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -79,7 +79,6 @@ export function DatabaseEditComponent(template, editModel) {
 				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
 			});
 		}
-
 
 		private showAssetDetailView(assetClass: string, id: number) {
 			this.dialogService.replace(AssetShowComponent, [
