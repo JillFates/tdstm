@@ -147,6 +147,10 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException('Use TDSExcelDriver for an instance of ExcelConnection in an ETL Script')
     }
 
+    static ETLProcessorException invalidETLVariableName (String variableName) {
+        new ETLProcessorException("Invalid variable name: ${variableName}. Valid ETL variable names must end with 'Var'".toString())
+    }
+
     static final String missingPropertyExceptionMessage = "No such property: variableName"
 	static ETLProcessorException missingPropertyException (String variableName) {
 		return new ETLProcessorException(missingPropertyExceptionMessage.replace('variableName', variableName))

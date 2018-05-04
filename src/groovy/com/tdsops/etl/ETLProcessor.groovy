@@ -533,6 +533,9 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 */
 	def set(final String variableName) {
+		if(!binding.isValidETLVariableName(variableName)){
+			throw ETLProcessorException.invalidETLVariableName(variableName)
+		}
 		validateStack()
 		[
 			with: { value ->
