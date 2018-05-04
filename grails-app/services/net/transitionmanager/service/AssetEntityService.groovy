@@ -1445,7 +1445,9 @@ class AssetEntityService implements ServiceMethods {
 					sourceRoomSelect: getRoomSelectOptions(project, true, true),
 					targetRoomSelect: getRoomSelectOptions(project, false, true),
 					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
-					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true)
+					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
+                    sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
+                    targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
 			]
 		}
 

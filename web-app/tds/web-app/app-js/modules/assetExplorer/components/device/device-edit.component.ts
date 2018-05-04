@@ -34,7 +34,9 @@ export function DeviceEditComponent(template, editModel) {
 		private showRackTargetInput: 'none'|'new'|'select' = 'none';
 		private rackSourceOptions: Array<any> = [];
 		private rackTargetOptions: Array<any> = [];
-		private showChassisFields = true;
+		private showBladeFields = true;
+		private showBladeSourceInput: 'none'|'new'|'select' = 'none';
+		private showBladeTargetInput: 'none'|'new'|'select' = 'none';
 
 		constructor(
 					@Inject('model') private model: any,
@@ -91,27 +93,33 @@ export function DeviceEditComponent(template, editModel) {
 		private toggleAssetTypeFields(): void {
 			const assetType = this.model.asset.assetTypeSelectValue.id;
 			switch (assetType) {
-				case 'Blade':
-					this.showRackOrBladeFields(false, false); // pub.hideRackFields();
-					// this.showVMFields = false; // pub.hideVMFields();
-					this.showChassisFields = true; // pub.showChassisFields();
+				case 'Blade': /* TODO: should 'Blade Chassis' also be considered here ??*/
+					this.showHideRackFields(false); // pub.hideRackFields();
+					this.showHideBladeFields(true); // pub.showChassisFields();
 					break;
 				case 'VM':
-					this.showRackOrBladeFields(false, false); // pub.hideRackFields();
-					this.showChassisFields = false; // pub.hideChassisFields();
-					// this.showVMFields = true; // pub.showVMFields();
-					// pub.hideNonVMFields()
+					this.showHideRackFields(false); // pub.hideRackFields();
+					this.showHideBladeFields(false); // pub.hideChassisFields();
 					break;
 				default:
 					// Rack-able device
-					this.showChassisFields = false; // pub.hideChassisFields();
-					// this.showVMFields = false; // pub.hideVMFields();
-					this.showRackOrBladeFields(true, true); // pub.showRackFields();
+					this.showHideRackFields(true); // pub.showRackFields();
+					this.showHideBladeFields(false); // pub.hideChassisFields();
 			}
 		}
 
-		private populateRackOrBladeSelect(isRack: boolean): void {
-			// source fields
+		private showHideRackFields(show: boolean): void {
+			this.showRackFields = show; // pub.showRackFields();
+			if (!show) {
+				this.showRackSourceInput = 'none';
+				this.showRackTargetInput = 'none';
+			} else {
+				this.populateRackSelect();
+			}
+		}
+
+		private populateRackSelect(): void {
+			// source room field
 			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
 			if (roomId && roomId > 0) {
 				this.showRackSourceInput = 'select';
@@ -124,7 +132,7 @@ export function DeviceEditComponent(template, editModel) {
 				this.showRackSourceInput = 'none';
 			}
 
-			// target fields
+			// target room fields
 			const targetRoomId = this.model.asset.roomTarget ? this.model.asset.roomTarget.id : null;
 			if (targetRoomId && targetRoomId > 0) {
 				this.showRackTargetInput = 'select';
@@ -138,15 +146,38 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
-		private showRackOrBladeFields(show: boolean, isRack: boolean): void {
-			this.showRackFields = show; // pub.showRackFields();
+		private showHideBladeFields(show: boolean): void {
+			this.showBladeFields = show; // pub.showRackFields();
 			if (!show) {
-				this.showRackSourceInput = 'none';
-				this.showRackTargetInput = 'none';
+				this.showBladeSourceInput = 'none';
+				this.showBladeTargetInput = 'none';
 			} else {
-				this.populateRackOrBladeSelect(isRack);
+				this.populateBladeSelect();
+			}
+		}
+
+		private populateBladeSelect(): void {
+			// source room field
+			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
+			if (roomId && roomId > 0) {
+				this.showBladeSourceInput = 'select';
+				// this.assetExplorerService.getRacksForRoom(roomId, 'S').subscribe(response => {
+				// 	this.rackSourceOptions = response;
+				// });
+			} else {
+				this.showBladeSourceInput = 'none';
 			}
 
+			// target room field
+			const targetRoomId = this.model.asset.roomTarget ? this.model.asset.roomTarget.id : null;
+			if (targetRoomId && targetRoomId > 0) {
+				this.showRackTargetInput = 'select';
+				// this.assetExplorerService.getRacksForRoom(targetRoomId, 'T').subscribe(response => {
+				// 	this.rackTargetOptions = response;
+				// });
+			} else {
+				this.showRackTargetInput = 'none';
+			}
 		}
 
 		protected searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
