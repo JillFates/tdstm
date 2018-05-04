@@ -434,5 +434,29 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson('Success!')
 	}
 
+	/**
+	 * Retrieve the Chassis options for the given room.
+	 * @param id
+	 * @return
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def retrieveChassisSelectOptions(Long id) {
+		Project project = getProjectForWs()
+		List chassisOptions = assetEntityService.getChassisSelectOptions(project, id)
+		renderSuccessJson(chassisOptions)
+	}
+
+	/**
+	 * Retrieve the Rack options for the given room.
+	 * @param id
+	 * @return
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def retrieveRackSelectOptions(Long id) {
+		Project project = getProjectForWs()
+		List rackOptions = assetEntityService.getRackSelectOptions(project, id, true)
+		renderSuccessJson(rackOptions)
+	}
+
 
 }

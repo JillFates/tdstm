@@ -99,6 +99,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/retrieveChassisSelectOptions/$id" {
+			controller = 'wsAsset'
+			action = [
+			    GET: 'retrieveChassisSelectOptions'
+			]
+		}
+
+		"/ws/asset/retrieveRackSelectOptions/$id" {
+			controller = 'wsAsset'
+			action = [
+				GET: 'retrieveRackSelectOptions'
+			]
+		}
+
 		"/ws/asset/showTemplate" (controller:'wsAsset', action:'getTemplate', method:'GET') {
 			mode = 'show'
 		}
