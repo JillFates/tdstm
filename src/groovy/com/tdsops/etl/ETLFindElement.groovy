@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tdssrc.grails.GormUtil
+
 /**
  * ETL find command implementation.
  * <code>
@@ -128,6 +131,8 @@ class ETLFindElement implements ETLStackableCommand{
 				}
 				currentFind.errors.add(all.getMessage())
 			}
+
+			currentFind.kv = currentFind.kv.collectEntries { [(it.key): GormUtil.isDomainClass(it.value)?it?.value?.id:it?.value] }
 
 			results = [
 				objects : [],
