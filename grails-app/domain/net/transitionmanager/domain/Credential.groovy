@@ -183,7 +183,7 @@ class Credential {
 	 */
 	static Closure httpMethodValidator = { value, target ->
 		// TODO : JPM 2/2018 : Need to validate if JWT is always POST
-		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (value == null) {
 				return 'default.null.message'
