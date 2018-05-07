@@ -34,6 +34,7 @@ import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
 import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
 import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
+import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
 import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
 import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 // Dictionaries
@@ -77,6 +78,7 @@ import { DictionaryService } from './services/dictionary.service';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
+		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent
 	],
@@ -113,6 +115,7 @@ import { DictionaryService } from './services/dictionary.service';
 		CheckActionComponent,
 		URLViewerComponent,
 		TDSComboBoxComponent,
+		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
 		DependentCommentComponent
 	],

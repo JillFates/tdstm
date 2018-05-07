@@ -318,6 +318,7 @@
 												[data]="yesNoList">
 										</kendo-dropdownlist>
 
+
 									%{--	<g:select  id="startupProc" class="${standardFieldSpecs.startupProc.imp?:''} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 											 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="48"/>--}%
 
@@ -363,6 +364,9 @@
 								<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 								<td colspan="1" nowrap="nowrap" data-for="startupBy" class="${standardFieldSpecs.startupBy.imp?:''}">
 								<tdsAngular:tooltipSpan field="${standardFieldSpecs.startupBy}">
+
+									<tds-combobox-group></tds-combobox-group>
+
 
 								   %{--<g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'assetSelect']" tabindex="19"></g:render>--}%
 

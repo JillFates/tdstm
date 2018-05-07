@@ -39,6 +39,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 		}
 
 		private initModel(): void {
+
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
@@ -52,6 +53,14 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 					name: ''
 				};
 			}
+
+			this.model.asset.startUpBySelectedValue = { id: null, text: 'Please Select'};
+			if (this.model.asset.startUpBySelectedValue) {
+				this.model.asset.startUpBySelectedValue.id = this.model.asset.startupBy;
+				// this.model.asset.startUpBySelectedValue.text = 'Temp value';
+			}
+
+			/*
 			this.model.asset.assetTypeSelectValue = {id: null};
 			if (this.model.asset.assetType) {
 				this.model.asset.assetTypeSelectValue.id = this.model.asset.assetType;
@@ -62,6 +71,7 @@ export function ApplicationEditComponent(template: string, editModel: any): any 
 				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
 				this.model.asset.manufacturerSelectValue.text = this.model.asset.manufacturer.text;
 			}
+			*/
 		}
 
 		getCurrentValue(control: string) {
