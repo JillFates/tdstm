@@ -7,7 +7,6 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetOptions
 import com.tds.asset.AssetType
 import com.tds.asset.Database
@@ -968,7 +967,6 @@ class AssetEntityService implements ServiceMethods {
 		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
 
 		ProjectAssetMap.where { asset in assets }.deleteAll()
-		AssetEntityVarchar.where { assetEntity in assets }.deleteAll()
 
 		ProjectTeam.executeUpdate('UPDATE ProjectTeam SET latestAsset=null WHERE latestAsset.id in (:assets)', [assets: assetIds])
 
@@ -2215,23 +2213,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Add the css for the labels which fieldImportance is 'C','I'
-	 * @deprecated
-	 * TM-6617
-	 */
-	Map getHighlightedInfo(forWhom, assetEntity, configMap, projectAttributes = null) {
-		throw new RuntimeException('getHighlightedInfo no longer used')
-		def highlightMap = [:]
-		(projectService.getFields(forWhom, projectAttributes) + projectService.getCustoms(projectAttributes)).each { f ->
-			def configMaps = configMap.config
-			if (configMaps.(f.label) in ['C','I'] && (assetEntity && !assetEntity.(f.label))) {
-				highlightMap[f.label] = 'highField'
-			}
-		}
-		return highlightMap
-	}
-
-	/**
 	 * This is used to escape quotes in a string to be used in Javascript
 	 * TODO : JPM 9/2014 : getEscapeName should be refactored into a reusable function in String or HtmlUtil as it should not be SOOOOO tied to an asset
 	 */
@@ -2968,28 +2949,6 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to get Key,values of Help Text and append to asset cruds.
-	 * @param entityType type of entity.
-	 * @param project to look for
-	 * @return tooltips map
-	 * TODO : REMOVE TM-6722
-	 */
-	@Deprecated
-	Map<String, String> retrieveTooltips(String entityType, Project project) {
-		Map<String, String> returnMap = [:]
-		String category = EntityType.getListAsCategory(entityType)
-		try {
-			for (String attributeCode in projectService.getAttributes(entityType)*.attributeCode) {
-				KeyValue keyMap = KeyValue.findAllByCategoryAndKey(category, attributeCode).find { it.project == project }
-				returnMap[attributeCode] = keyMap?.value
-			}
-		}catch(Exception ex) {
-			log.error("An error occurred : $ex.message", ex)
-		}
-		return returnMap
-	}
-
-	/**
 	 * Return the map of information for editing dependencies.
 	 * @param project
 	 * @param asset
@@ -3011,55 +2970,6 @@ class AssetEntityService implements ServiceMethods {
 			nonNetworkTypes: AssetType.nonNetworkTypes,
 			supportAssets: getDependentsOrSupporting(asset, false)
 		]
-	}
-
-	/**
-	 * Used to retrieve the model used to display Asset Dependencies Edit view
-	 * @param params - the Request params
-	 * @return a Map of all properties used by the view
-	 */
-	@Transactional(readOnly = true)
-	Map dependencyEditMap(params) {
-		Project project = securityService.userCurrentProject
-		Long id = params.long('id')
-		if (! id) {
-			throw new InvalidRequestException('An invalid asset id was requested')
-		}
-
-		AssetEntity assetEntity = AssetEntity.get(id)
-		if (!assetEntity) {
-			securityService.reportViolation('attempted to access an asset unassociated to current project')
-			throw new InvalidRequestException('Unable to find requested asset')
-		}
-
-		if (assetEntity.project.id != project.id) {
-			securityService.reportViolation('attempted to access an asset unassociated to current project')
-			throw new InvalidRequestException('Unable to find requested asset')
-		}
-
-		// TODO - JPM 8/2014 - Why do we have this? Seems like we should NOT be passing that to the template...
-		List nonNetworkTypes = [
-			AssetType.SERVER,
-			AssetType.APPLICATION,
-			AssetType.VM,
-			AssetType.FILES,
-		    AssetType.DATABASE,
-		    AssetType.BLADE
-		]*.toString()
-
-		Map map = [
-			assetClassOptions: AssetClass.classOptions,
-			assetEntity: assetEntity,
-			dependencyStatus: getDependencyStatuses(),
-			dependencyType: getDependencyTypes(),
-			whom: params.whom,
-			nonNetworkTypes: nonNetworkTypes,
-			supportAssets: getSupportingAssets(assetEntity),
-			dependentAssets: getDependentAssets(assetEntity),
-			moveBundleList: getMoveBundles(project)
-		]
-
-		return map
 	}
 
 	/**

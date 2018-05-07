@@ -2,8 +2,6 @@ package net.transitionmanager.domain
 
 import com.tds.asset.AssetEntity
 import com.tdsops.commons.lang.exception.PersistenceException
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import groovy.util.logging.Slf4j
@@ -178,12 +176,6 @@ class Model {
 			executeUpdate('update AssetEntity set model=null where model=?', [this])
 			executeUpdate('delete ModelAlias where model=?', [this])
 		}*/
-	}
-
-	private List<String> getAssetTypeList() {
-		EavAttributeOption.findAllByAttribute(
-				EavAttribute.findByAttributeCode('assetType'),
-				[sort: 'value', order: 'asc'])*.value*.trim().findAll()
 	}
 
 	int getNoOfConnectors() {

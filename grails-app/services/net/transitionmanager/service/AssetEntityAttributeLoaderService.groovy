@@ -6,11 +6,6 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -18,9 +13,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.domain.DataTransferAttributeMap
 import net.transitionmanager.domain.DataTransferBatch
-import net.transitionmanager.domain.DataTransferSet
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.ManufacturerAlias
@@ -28,19 +21,10 @@ import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.ModelConnector
 import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Party
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRelationshipType
-import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 @Slf4j(value='logger')
@@ -53,126 +37,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'
 	private static final String UNKNOWN_MFG_MODEL = 'Unknown'
-
-	/**
-	 * upload records in to EavAttribute table from from AssetEntity.xls
-	 */
-	@Transactional
-	void uploadEavAttribute(InputStream stream) {
-		EavEntityType entityType = EavEntityType.findByEntityTypeCode('AssetEntity')
-		int sheetNo = 0
-		def map = ["Attribute Code": null, Label: null, Type: null, sortOrder: null, Note: null, Mode: null,
-		           "Input type": null, Required: null, Unique: null, "Business Rules (hard/soft errors)": null,
-		           "Spreadsheet Sheet Name": null, "Spreadsheet Column Name": null, Options: null,
-		           "Walkthru Sheet Name": null, "Walkthru Column Name": null]
-		try {
-			Workbook workbook = new HSSFWorkbook(stream)
-			Sheet sheet = workbook.getSheetAt(sheetNo)
-			int col =  WorkbookUtil.getColumnsCount(sheet)
-			boolean checkCol = checkHeader(col, map, sheet)
-			// Statement to check Headers if header are not found it will return Error message
-			if (!checkCol) {
-				println "headers not matched "
-			} else {
-
-				// Iterate over the spreadsheet rows and populate the EavAttribute table appropriately
-				for (int r = 1; r < sheet.getLastRowNum(); r++) {
-					// get fields
-					def attributeCode = WorkbookUtil.getStringCellValue(sheet, map["Attribute Code"], r)
-					def backEndType = WorkbookUtil.getStringCellValue(sheet, map["Type"], r)
-					def frontEndInput = WorkbookUtil.getStringCellValue(sheet, map["Input type"], r)
-					def fronEndLabel = WorkbookUtil.getStringCellValue(sheet, map["Label"], r)
-					def isRequired = WorkbookUtil.getStringCellValue(sheet, map["Required"], r)
-					def isUnique = WorkbookUtil.getStringCellValue(sheet, map["Unique"], r)
-					def note = WorkbookUtil.getStringCellValue(sheet, map["Note"], r)
-					def mode = WorkbookUtil.getStringCellValue(sheet, map["Mode"], r)
-					def sortOrder = WorkbookUtil.getStringCellValue(sheet, map["sortOrder"], r)
-					def validation = WorkbookUtil.getStringCellValue(sheet, map["Business Rules (hard/soft errors)"], r)
-					def options = WorkbookUtil.getStringCellValue(sheet, map["Options"], r)
-					def spreadSheetName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Sheet Name"], r)
-					def spreadColumnName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Column Name"], r)
-					def walkthruSheetName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Sheet Name"], r)
-					def walkthruColumnName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Column Name"], r)
-					// save data in to db(eavAttribute)
-
-					// Only save "Actual" or "Reference" attributes for the time being
-					if (!"AR".contains(mode)) continue
-
-					def eavAttribute = new EavAttribute(attributeCode:attributeCode, note: note, backendType: backEndType,
-							frontendInput: frontEndInput, entityType: entityType, frontendLabel: fronEndLabel,
-							defaultValue: "null", validation: validation, isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0,
-							isUnique: isUnique.equalsIgnoreCase("X") ? 1 : 0, sortOrder: sortOrder)
-
-					save eavAttribute
-					if (eavAttribute.hasErrors()) {
-						continue
-					}
-
-					//create DataTransferAttributeMap records related to the DataTransferSet
-					//def dataTransferSetId
-					try {
-						save new DataTransferAttributeMap(
-							columnName: spreadColumnName,
-							sheetName: spreadSheetName,
-							dataTransferSet: DataTransferSet.findByTitle("TDS Master Spreadsheet"),
-							eavAttribute: eavAttribute,
-							validation: validation,
-							isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					// create DataTransferAttributeMap records (WalkThrough columns)related to the DataTransferSet
-
-					try {
-						save new DataTransferAttributeMap(
-							columnName:walkthruColumnName,
-							sheetName:walkthruSheetName,
-							dataTransferSet: DataTransferSet.findByTitle("TDS Walkthru"),
-							eavAttribute:eavAttribute,
-							validation:validation,
-							isRequired: isRequired.equalsIgnoreCase("X") ? 1 : 0)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					//populate the EavEntityAttribute map associating each of the attributes to the set
-					def eavAttributeSetId
-					def eavAttributeSet
-					try {
-						eavAttributeSetId = 1
-						eavAttributeSet = EavAttributeSet.get(eavAttributeSetId)
-
-						save new EavEntityAttribute(
-							attribute:eavAttribute,
-							eavAttributeSet:eavAttributeSet,
-							sortOrder:sortOrder)
-					}
-					catch (e) {
-						logger.error e.message, e
-					}
-
-					/*
-					 * After eavAttribute saved it will check for any options is there corresponding to current attribute
-					 * If there then eavAttributeOptions.save() will be called corresponding to current attribute
-					 */
-					if (options) {
-						for (String option in options.split(',')) {
-							save new EavAttributeOption(
-								attribute: eavAttribute,
-								sortOrder: sortOrder,
-								value: option.trim())
-						}
-					}
-				}
-			}
-		}
-		catch(e) {
-			logger.error e.message, e
-		}
-	}
 
 	/**
 	 * Check the sheet headers.
@@ -885,7 +749,7 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	}
 
 	/**
-	 * A helper method used to do the initial lookup of an asset and perform the EAV attribute validation. If the asset was not found then it will
+	 * A helper method used to do the initial lookup of an asset. If the asset was not found then it will
 	 * create a new asset and initialize various properties. If the asset was modified since the export and import then it will return null
 	 * @param The class to use (e.g. AssetEntity or Application)
 	 * @param The asset id to lookup
@@ -905,7 +769,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		Long assetId,
 		DataTransferBatch dataTransferBatch,
 		List<DataTransferValue> dtvList,
-		EavAttributeSet eavAttributeSet,
 		Integer errorCount,
 		Integer errorConflictCount,
 		List<String> ignoredAssets,
@@ -962,7 +825,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			asset = clazz.newInstance()
 			asset.project = project
 			asset.owner = project.client
-//			asset.attributeSet = eavAttributeSet
 			asset.assetType = clazzMap[clazzName]
 
 			logger.debug 'findAndValidateAsset() Created {}', clazzName
