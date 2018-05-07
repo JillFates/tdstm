@@ -575,7 +575,7 @@ class ControlAngularTagLib {
 	 * @param value - the current value to set on the select
 	 * @param label - an alternate label that user sees, if null then option is used
 	 */
-	private Object selectOption(String option='', String value='', String label='') {
+	private Map<String, String> selectOption(String option='', String value='', String label='') {
 		if (option==null) option = ''
 		if (value==null) value = ''
 		if (label==null) label = ''
