@@ -37,6 +37,8 @@ export function DeviceEditComponent(template, editModel) {
 		private showBladeFields = true;
 		private showBladeSourceInput: 'none'|'new'|'select' = 'none';
 		private showBladeTargetInput: 'none'|'new'|'select' = 'none';
+		private bladeSourceOptions: Array<any> = [];
+		private bladeTargetOptions: Array<any> = [];
 
 		constructor(
 					@Inject('model') private model: any,
@@ -83,6 +85,18 @@ export function DeviceEditComponent(template, editModel) {
 			if (this.model.asset.model) {
 				this.model.asset.modelSelectValue.id = this.model.asset.model.id;
 			}
+			if (this.model.sourceRackSelect) {
+				this.rackSourceOptions = this.model.sourceRackSelect;
+			}
+			if (this.model.targetRackSelect) {
+				this.rackTargetOptions = this.model.targetRackSelect;
+			}
+			if (this.model.sourceChassisSelect) {
+				this.bladeSourceOptions = this.model.sourceChassisSelect;
+			}
+			if (this.model.targetChassisSelect) {
+				this.bladeTargetOptions = this.model.targetChassisSelect;
+			}
 		}
 
 		/**
@@ -122,7 +136,7 @@ export function DeviceEditComponent(template, editModel) {
 			if (roomId && roomId > 0) {
 				this.showRackSourceInput = 'select';
 				this.assetExplorerService.getRacksForRoom(roomId, 'S').subscribe(response => {
-					this.rackSourceOptions = response;
+					this.rackSourceOptions = response.data;
 				});
 			} else if (roomId && roomId === -1) { /* -1 (New Room)*/
 				this.showRackSourceInput = 'new';
@@ -135,7 +149,7 @@ export function DeviceEditComponent(template, editModel) {
 			if (targetRoomId && targetRoomId > 0) {
 				this.showRackTargetInput = 'select';
 				this.assetExplorerService.getRacksForRoom(targetRoomId, 'T').subscribe(response => {
-					this.rackTargetOptions = response;
+					this.rackTargetOptions = response.data;
 				});
 			} else if (targetRoomId && targetRoomId === -1) { /* -1 (New Room)*/
 				this.showRackTargetInput = 'new';
@@ -159,9 +173,9 @@ export function DeviceEditComponent(template, editModel) {
 			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
 			if (roomId && roomId > 0) {
 				this.showBladeSourceInput = 'select';
-				// this.assetExplorerService.getRacksForRoom(roomId, 'S').subscribe(response => {
-				// 	this.rackSourceOptions = response;
-				// });
+				this.assetExplorerService.getChassisForRoom(roomId).subscribe(response => {
+					this.bladeSourceOptions = response;
+				});
 			} else {
 				this.showBladeSourceInput = 'none';
 			}
@@ -169,12 +183,12 @@ export function DeviceEditComponent(template, editModel) {
 			// target room field
 			const targetRoomId = this.model.asset.roomTarget ? this.model.asset.roomTarget.id : null;
 			if (targetRoomId && targetRoomId > 0) {
-				this.showRackTargetInput = 'select';
-				// this.assetExplorerService.getRacksForRoom(targetRoomId, 'T').subscribe(response => {
-				// 	this.rackTargetOptions = response;
-				// });
+				this.showBladeTargetInput = 'select';
+				this.assetExplorerService.getChassisForRoom(targetRoomId).subscribe(response => {
+					this.bladeTargetOptions = response;
+				});
 			} else {
-				this.showRackTargetInput = 'none';
+				this.showBladeTargetInput = 'none';
 			}
 		}
 

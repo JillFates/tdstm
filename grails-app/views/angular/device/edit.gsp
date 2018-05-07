@@ -176,7 +176,7 @@
                                                         name="modelAssetRackSource"
                                                         [(ngModel)]="model.asset.rackSource"
                                                         [defaultItem]="{id: -2, value: 'Please Select'}"
-                                                        [data]="model.sourceRackSelect"
+                                                        [data]="rackSourceOptions"
                                                         [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
@@ -205,7 +205,7 @@
                                                         name="modelAssetRackTarget"
                                                         [(ngModel)]="model.asset.rackTarget"
                                                         [defaultItem]="{id: -2, value: 'Please Select'}"
-                                                        [data]="model.targetRackSelect"
+                                                        [data]="rackTargetOptions"
                                                         [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
@@ -241,7 +241,7 @@
                                                         name="modelAssetBladeSource"
                                                         [(ngModel)]="model.asset.sourceChassis"
                                                         [defaultItem]="{id: -2, value: 'Please Select'}"
-                                                        [data]="model.sourceChassisSelect"
+                                                        [data]="bladeSourceOptions"
                                                         [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
@@ -249,14 +249,14 @@
                                         </div>
                                     </td>
                                     <td *ngIf="showBladeFields" class="bladeLabel">
-                                        <div *ngIf="showBladeSourceInput === 'select'">
+                                        <div *ngIf="showBladeTargetInput === 'select'">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.targetChassis}">
                                                 <kendo-dropdownlist
                                                         class="select"
                                                         name="modelAssetBladeTarget"
                                                         [(ngModel)]="model.asset.targetChassis"
                                                         [defaultItem]="{id: -2, value: 'Please Select'}"
-                                                        [data]="model.targetChassisSelect"
+                                                        [data]="bladeTargetOptions"
                                                         [textField]="'value'"
                                                         [valueField]="'id'">
                                                 </kendo-dropdownlist>
