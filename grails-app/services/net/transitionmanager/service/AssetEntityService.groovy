@@ -34,6 +34,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.KeyValue
@@ -49,6 +50,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -604,6 +606,18 @@ class AssetEntityService implements ServiceMethods {
 			throw new DomainUpdateException(error)
 		}
 	}
+
+	void createOrUpdateDependencies(Project project, AssetEntity assetEntity, Map params) {
+
+		// Delete dependencies marked for deletion
+		if (params.deletedDep) {
+			AssetDependency.where {
+				id in params.deletedDep
+			}.deleteAll()
+		}
+	}
+
+
 
 	/**
 	 * Helper Method to de Delete a Dependency from an Asset Entity
@@ -1167,6 +1181,59 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Return a list with the information for the dependents for this asset.
+	 * @param assetEntity
+	 * @param dependents : true -> dependents; false -> supporting
+	 * @return
+	 */
+	List<Map> getDependentsOrSupporting(AssetEntity assetEntity, boolean dependents = true) {
+		String targetField = dependents ? 'dependent' : 'asset'
+		String sourceField = dependents? 'asset' : 'dependent'
+		List dependentsInfo = AssetDependency.createCriteria().list {
+			createAlias('asset', 'asset')
+			createAlias('dependent', 'dependent')
+			eq(sourceField, assetEntity)
+			projections {
+				property('id')
+				property('comment')
+				property('status')
+				property('type')
+				property('dataFlowDirection')
+				property('dataFlowFreq')
+				property("${targetField}")
+
+				order("${targetField}.assetType")
+				order("${targetField}.assetName")
+			}
+		}
+
+		List<Map> results = []
+		for (depInfo in dependentsInfo) {
+			AssetEntity target = depInfo[6]
+			results << [
+				id: depInfo[0],
+				comment: depInfo[1],
+				status: depInfo[2],
+				type: depInfo[3],
+				dataFlowDirection: depInfo[4],
+				dataFlowFreq: depInfo[5],
+				asset: [
+					id: target.id,
+					name: target.assetName,
+					assetType: AssetClass.getClassOptionForAsset(target),
+					moveBundle: [
+						id: target.moveBundle?.id,
+						name: target.moveBundle?.name
+					]
+				]
+			]
+		}
+
+		return results
+	}
+
+
+	/**
 	 * Returns a list of MoveBundles for a project
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
@@ -1355,6 +1422,7 @@ class AssetEntityService implements ServiceMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
+		Map map =
 		[	assetId: asset.id,
 			environmentOptions: getAssetEnvironmentOptions(),
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
@@ -1367,8 +1435,23 @@ class AssetEntityService implements ServiceMethods {
 			redirectTo: params.redirectTo,
 			version: asset.version,
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs
+			standardFieldSpecs: standardFieldSpecs,
 		]
+
+		// Required lists for Device type
+		if (asset.assetClass == AssetClass.DEVICE) {
+			map << [
+					railTypeOption: getAssetRailTypeOptions(),
+					sourceRoomSelect: getRoomSelectOptions(project, true, true),
+					targetRoomSelect: getRoomSelectOptions(project, false, true),
+					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
+                    sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
+                    targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
+			]
+		}
+
+		map
 	}
 
 	/**
@@ -2907,6 +2990,30 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Return the map of information for editing dependencies.
+	 * @param project
+	 * @param asset
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyEditMap(Project project, AssetEntity asset) {
+
+		if (!asset) {
+			throw new InvalidRequestException('An invalid asset id was requested')
+		}
+
+		return [
+			assetClassOptions: AssetClass.classOptions,
+			dependentAssets: getDependentsOrSupporting(asset, true),
+			dependencyStatus: getDependencyStatuses(),
+			dependencyType: getDependencyTypes(),
+			moveBundleList: getMoveBundles(project),
+			nonNetworkTypes: AssetType.nonNetworkTypes,
+			supportAssets: getDependentsOrSupporting(asset, false)
+		]
+	}
+
+	/**
 	 * Used to retrieve the model used to display Asset Dependencies Edit view
 	 * @param params - the Request params
 	 * @return a Map of all properties used by the view
@@ -3013,6 +3120,16 @@ class AssetEntityService implements ServiceMethods {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Create or update an asset based on the command object received.
+	 * @param command
+	 * @return
+	 */
+	AssetEntity saveOrUpdateAsset(AssetCommand command) {
+		AssetSaveUpdateStrategy strategy = AssetSaveUpdateStrategy.getInstanceFor(command)
+		return strategy.saveOrUpdateAsset()
 	}
 
 }

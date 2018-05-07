@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { PopupModule } from '@progress/kendo-angular-popup';
+import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
+import { GridModule } from '@progress/kendo-angular-grid';
 import { HttpServiceProvider } from '../shared/providers/http-interceptor.provider';
 // Shared Services
 import { AuthService } from '../shared/services/auth.service';
@@ -30,6 +33,10 @@ import { CodeMirrorComponent } from './modules/code-mirror/code-mirror.component
 import { DynamicComponent } from './components/dynamic.component';
 import { CheckActionComponent } from './components/check-action/check-action.component';
 import { URLViewerComponent } from './components/url-viewer/url-viewer.component';
+import { TDSComboBoxComponent} from './components/combo-box/combobox.component';
+import { TDSComboBoxGroupComponent} from './components/combo-box-group/combo-box-group.component';
+import { SupportsDependsComponent } from './components/supports-depends/supports-depends.component';
+import { DependentCommentComponent } from './components/dependent-comment/dependent-comment.component';
 // Dictionaries
 import { en_DICTIONARY } from './i18n/en.dictionary';
 // Pages
@@ -44,7 +51,10 @@ import { DictionaryService } from './services/dictionary.service';
 @NgModule({
 	imports: [
 		CommonModule,
+		FormsModule,
 		PopupModule,
+		DropDownsModule,
+		GridModule,
 		UIRouterModule.forChild({ states: SHARED_STATES })
 	],
 	declarations: [
@@ -66,7 +76,11 @@ import { DictionaryService } from './services/dictionary.service';
 		DynamicComponent,
 		CodeMirrorComponent,
 		CheckActionComponent,
-		URLViewerComponent
+		URLViewerComponent,
+		TDSComboBoxComponent,
+		TDSComboBoxGroupComponent,
+		SupportsDependsComponent,
+		DependentCommentComponent
 	],
 	providers: [
 		AuthService,
@@ -99,9 +113,15 @@ import { DictionaryService } from './services/dictionary.service';
 		DynamicComponent,
 		CodeMirrorComponent,
 		CheckActionComponent,
-		URLViewerComponent
+		URLViewerComponent,
+		TDSComboBoxComponent,
+		TDSComboBoxGroupComponent,
+		SupportsDependsComponent,
+		DependentCommentComponent
 	],
-	entryComponents: [DynamicComponent]
+	entryComponents: [
+		DynamicComponent,
+		DependentCommentComponent]
 })
 export class SharedModule {
 	constructor(private notifier: NotifierService) {

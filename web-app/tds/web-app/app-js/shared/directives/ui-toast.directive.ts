@@ -35,7 +35,7 @@ export class UIToastDirective {
 		this.showsPopUp = true;
 		this.alertModel.alertType = alertType;
 		this.alertModel.message = message;
-		setTimeout( ()=>{
+		setTimeout(() => {
 			this.closePopUpDialog.nativeElement.focus();
 		}, 300);
 	}

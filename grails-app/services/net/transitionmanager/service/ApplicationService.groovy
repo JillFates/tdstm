@@ -10,6 +10,7 @@ import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.MoveEvent
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.service.PartyRelationshipService
 
 /**
  * The application service handles the logic for CRUD applications
@@ -21,6 +22,7 @@ class ApplicationService implements ServiceMethods {
 	AssetEntityService assetEntityService
 	ControllerService controllerService
 	SecurityService securityService
+	PartyRelationshipService partyRelationshipService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
@@ -85,9 +87,12 @@ class ApplicationService implements ServiceMethods {
 		def startupById = startupBy instanceof Person ? startupBy.id : -1
 		def testingById = testingBy instanceof Person ? testingBy.id : -1
 
+		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
-		        shutdownById: shutdownById, startupById: startupById, testingById: testingById] +
+		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
+		        personList: personList] +
 		        assetEntityService.getCommonModelForShows('Application', project, params, app)
 	}
 
