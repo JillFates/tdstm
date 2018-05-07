@@ -10,7 +10,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AssetShowComponent} from '../asset/asset-show.component';
-import {NotifierService} from "../../../../shared/services/notifier.service";
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
 
 declare var jQuery: any;

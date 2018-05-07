@@ -23,12 +23,13 @@ export function StorageEditComponent(template: string, editModel: any): any {
 		]
 	})
 	class StorageShowComponent implements  OnInit {
-		constructor( @Inject('model') private model: any,
-		             private activeDialog: UIActiveDialogService,
-		             private preference: PreferenceService,
-		             private assetExplorerService: AssetExplorerService,
-		             private dialogService: UIDialogService,
-		             private notifierService: NotifierService) {
+		constructor(
+			@Inject('model') private model: any,
+			private activeDialog: UIActiveDialogService,
+			private preference: PreferenceService,
+			private assetExplorerService: AssetExplorerService,
+			private dialogService: UIDialogService,
+			private notifierService: NotifierService) {
 		}
 
 		/**
