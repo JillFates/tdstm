@@ -258,7 +258,7 @@ class FilenameUtil {
 		if (str) {
 			str = StringUtil.sanitize(str).replaceAll(/\s/, "_")
 			// TM-9050 Replaces all the invalid characters for filenames on Windows and Linux with a '_'.
-			str= str.replaceAll(/\#|<|\$|%|>|!|`|&|\*|“|\||\{|\?|”|}|\/|:|\\b|\\|=|@/,'_')
+			str= str.replaceAll(/\#|<|\$|%|>|!|`|&|\*|“|\||\{|\?|”|}|\/|:|\\b|\\|=|@|\+/,'_')
 		}
 		return str
 	}
