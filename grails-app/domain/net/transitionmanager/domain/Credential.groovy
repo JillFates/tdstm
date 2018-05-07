@@ -127,7 +127,7 @@ class Credential {
 	static Closure sessionNameValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (StringUtil.isBlank(value)) {
+			if (value == null || StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			} else {
 				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/)) {
@@ -141,21 +141,25 @@ class Credential {
 	 * Used to validate if the validationExpression is syntactically correct
 	 */
 	static Closure validationExpressionValidator = { value, target ->
-		if (StringUtil.isBlank(value)) {
-			return true
-		}
-
-		try {
-			new CredentialValidationExpression(value)
-			return true
-		} catch (e) {
-			return 'credential.invalid.validation.expression'
+		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
+		if ( target.authenticationMethod in methodsThatRequireProp ) {
+			if (value == null || StringUtil.isBlank(value)) {
+				return 'default.blank.message'
+			}
+			else {
+				try {
+					new CredentialValidationExpression(value)
+					return true
+				} catch (e) {
+					return 'credential.invalid.validation.expression'
+				}
+			}
 		}
 	}
 
 	/**
 	 * Used to validate if the authenticationUrl property is set for AuthenticationMethods that is require a value
-	 * based on the authentication method. This propoerty is required for COOKIE, HEADER and JWT methods.
+	 * based on the authentication method. This property is required for COOKIE, HEADER and JWT methods.
 	 */
 	static Closure authenticationUrlValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
@@ -174,6 +178,9 @@ class Credential {
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
 			if (value == null || value.trim() == '') {
 				return 'default.blank.message'
+			}
+			if (value == target.authenticationUrl) { // renewTokenUrl cannot be the same as authenticationUrl
+				return 'credential.invalid.url.value'
 			}
 		}
 	}
