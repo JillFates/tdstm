@@ -14,6 +14,8 @@ import net.transitionmanager.service.AssetEntityService
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.SecurityService
 
+import java.text.DateFormat
+
 abstract class AssetSaveUpdateStrategy {
 
 	protected AssetCommand command
@@ -122,8 +124,9 @@ abstract class AssetSaveUpdateStrategy {
 	 */
 	private void formatDateFields() {
 		String[] dateFields = ['maintExpDate', 'purchaseDate', 'retireDate']
+		DateFormat dateFormat = TimeUtil.createFormatter(DEFAULT_DATE_FORMAT)
 		for (String dateField in dateFields) {
-			command.asset[dateField] = TimeUtil.parseDateTime(command.asset[dateField], DEFAULT_DATE_FORMAT)
+			command.asset[dateField] = TimeUtil.parseDate(command.asset[dateField], dateFormat)
 		}
 	}
 
