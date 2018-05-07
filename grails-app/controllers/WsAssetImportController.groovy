@@ -192,10 +192,11 @@ class WsAssetImportController implements ControllerMethods {
 
 		tmpList = []
 		where = DataScript.where { project == project }.readOnly(true)
-		where.list(order:'name').each() {
+		where.list().each() {
 			tmpList << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
 		}
 
+		tmpList = tmpList.sort { it.name }
 		map.dataScripts = tmpList
 
 		renderAsJson map

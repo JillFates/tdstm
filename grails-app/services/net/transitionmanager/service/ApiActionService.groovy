@@ -116,7 +116,7 @@ class ApiActionService implements ServiceMethods {
 				}
 			}
 		}
-		return dictionary
+		return dictionary.sort {it.value.name}
 	}
 
 	/**
