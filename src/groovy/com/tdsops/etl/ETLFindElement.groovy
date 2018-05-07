@@ -132,6 +132,7 @@ class ETLFindElement implements ETLStackableCommand{
 				currentFind.errors.add(all.getMessage())
 			}
 
+			// For import process, in case of Domain classes we only need the id value. 
 			currentFind.kv = currentFind.kv.collectEntries { [(it.key): GormUtil.isDomainClass(it.value)?it?.value?.id:it?.value] }
 
 			results = [
