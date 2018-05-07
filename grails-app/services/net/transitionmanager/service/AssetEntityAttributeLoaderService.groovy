@@ -51,12 +51,6 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 	SecurityService securityService
 	MoveBundleService moveBundleService
 
-	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
-	protected static final Map<String, String> targetTeamType = [MOVE_TECH: 'targetTeamMt', CLEANER: 'targetTeamLog',
-	                                                             SYS_ADMIN: 'targetTeamSa', DB_ADMIN: 'targetTeamDba']
-	protected static sourceTeamType = [MOVE_TECH:'sourceTeamMt', CLEANER: 'sourceTeamLog',
-	                                   SYS_ADMIN:'sourceTeamSa', DB_ADMIN:'sourceTeamDba']
-
 	private static final String DEFAULT_DEVICE_TYPE = 'Server'
 	private static final String UNKNOWN_MFG_MODEL = 'Unknown'
 

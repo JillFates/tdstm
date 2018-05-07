@@ -220,11 +220,8 @@ class DataTransferBatchController implements ControllerMethods {
 		def currentValues
 		dataTransferErrorList.each {
 			AssetEntity assetEntity = AssetEntity.get(it.asset_entity_id)
-			if (AssetEntityService.bundleMoveAndClientTeams.contains(it.attribute_code) ) {
-				currentValues = assetEntity?.(it.attribute_code).name
-			} else {
-				currentValues = assetEntity?.(it.attribute_code)
-			}
+			currentValues = assetEntity?.(it.attribute_code)
+
 			completeDataTransferErrorList << [assetName: assetEntity.assetName, assetTag: assetEntity.assetTag, attribute: it.attribute_code,
 			                                  error: it.error_text, currentValue: currentValues,
 			                                  importValue: it.import_value]

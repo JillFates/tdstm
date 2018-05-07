@@ -69,21 +69,12 @@ class AssetEntityService implements ServiceMethods {
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
 	protected static final List<String> customLabels = (1..Project.CUSTOM_FIELD_COUNT).collect { 'Custom' + it }.asImmutable()
 
-	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
-	protected static final List<String> bundleMoveAndClientTeams = [
-		'sourceTeamMt', 'sourceTeamLog', 'sourceTeamSa',
-		'sourceTeamDba', 'targetTeamMt', 'targetTeamLog',
-		'targetTeamSa', 'targetTeamDba' ].asImmutable()
-
 	// properties that should be excluded from the custom column select list
 	private static final Map<String, List<String>> COLUMN_PROPS_TO_EXCLUDE = [
 			(AssetClass.APPLICATION): [ 'assetName' ],
 			(AssetClass.DATABASE): [ 'assetName' ],
 			(AssetClass.DEVICE): [
-				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
-				// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
-				'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt',
-				'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
+				'assetName', 'assetType', 'manufacturer', 'model', 'planStatus', 'moveBundle', 'sourceLocation'
 			],
 			(AssetClass.STORAGE): [ 'assetName' ]
 	].asImmutable()

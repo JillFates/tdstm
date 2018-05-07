@@ -402,8 +402,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			ProjectTeam.executeUpdate('update ProjectTeam set latestAsset=null where latestAsset=?', [assetEntity])
 			AssetEntity.executeUpdate('''
 				update AssetEntity
-				set moveBundle=null, project=null, sourceTeamMt=null, targetTeamMt=null, sourceTeamLog=null,
-				    targetTeamLog=null, sourceTeamSa=null, targetTeamSa=null, sourceTeamDba=null, targetTeamDba=null
+				set moveBundle=null, project=null
 				where id=?''', assetEntity.id)
 			flash.message = "AssetEntity $assetEntity.assetName Removed from Project"
 		}
@@ -425,7 +424,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def items = entityAttributes.collect { EavEntityAttribute entityAttribute ->
 			EavAttribute attribute = entityAttribute.attribute
 			String code = attribute.attributeCode
-			if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) && code != "currentStatus" && code != "usize") {
+			if (code != "usize") {
 				String frontEndLabel = attribute.frontendLabel
 				if (AssetEntityService.customLabels.contains(frontEndLabel)) {
 					frontEndLabel = project[code] ?: frontEndLabel
@@ -457,8 +456,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					[sort: 'value', order: 'asc'])
 				def options = attributeOptions.collect { option -> [option: option.value] }
 				String code = it.attribute.attributeCode
-				if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) &&
-					 	code != "moveBundle" && code != "currentStatus" && code != "usize") {
+				if (code != "moveBundle" && code != "usize") {
 					def frontEndLabel = it.attribute.frontendLabel
 					if (AssetEntityService.customLabels.contains(frontEndLabel)) {
 						frontEndLabel = project[code] ?: frontEndLabel
@@ -481,8 +479,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				[attributeSetId: AssetEntity.load(params.assetId).attributeSetId])
 			for (EavEntityAttribute it in entityAttributes) {
 				String code = it.attribute.attributeCode
-				if (!AssetEntityService.bundleMoveAndClientTeams.contains(code) &&
-						code != "currentStatus" && code != "usize") {
+				if (code != "usize") {
 					items << [attributeCode: code, frontendInput: it.attribute.frontendInput]
 				}
 			}
