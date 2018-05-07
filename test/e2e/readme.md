@@ -48,8 +48,8 @@ Run a single test locally:
     
     --info and -- debug parameters are optional
     
-    -Dtm.creds.username=<userName> -Dtm.creds.password=<Password> these parameters allows
-    the user to run the test using non-defualt credentials.
+    -Dtm.creds.username=<userName> -Dtm.creds.password=<Password> these parameters allow
+    the user to run the tests using non-default credentials.
     
 The ./gradlew clean command:
 
@@ -59,7 +59,7 @@ Replace `./gradlew` with `gradlew.bat` or `gradlew` in the above examples if you
 
 [Gradle User Manual]
 
-##Keeping the Chorme and ChormeDriver versions up-to-Date:
+##Keeping the Chrome and ChromeDriver versions up-to-date:
 
 Latest chromeDriver Versions and the Chrome version each one supports are to be found [here].
 
