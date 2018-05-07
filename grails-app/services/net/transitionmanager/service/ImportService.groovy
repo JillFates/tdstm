@@ -9,7 +9,6 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StopWatch
@@ -141,7 +140,7 @@ class ImportService implements ServiceMethods {
 			throw new InvalidParamException('Unable to find the specified batch')
 		}
 
-		if (dataTransferBatch.eavEntityType?.domainName != domainNameFor(assetClass)) {
+		if (AssetClass.domainNameFor(dataTransferBatch.assetClass) != domainNameFor(assetClass)) {
 			throw new InvalidParamException("Specified batch is not for the asset class $assetClass")
 		}
 
@@ -264,7 +263,7 @@ class ImportService implements ServiceMethods {
 		}
 
 		// <SL> TODO: requires to update tables (data_transfer_batch, eav_entity_type) to use AssetClass instead
-		boolean batchIsForDevices = dtb.eavEntityType?.domainName == "AssetEntity"
+		boolean batchIsForDevices = AssetClass.domainNameFor(dtb.assetClass) == "AssetEntity"
 
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
@@ -555,7 +554,7 @@ class ImportService implements ServiceMethods {
 
 					if (!errorMsg) {
 						// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
-						String domainName = dtb.eavEntityType?.domainName
+						String domainName = AssetClass.domainNameFor(dbt.assetClass)
 						assert domainName
 						String servicMethodName = 'process' + domainName + 'Import'
 
@@ -2751,7 +2750,7 @@ class ImportService implements ServiceMethods {
 				statusCode: "PENDING", transferMode: "I", dataTransferSet: dataTransferSet,
 				project: project, userLogin: securityService.loadCurrentUserLogin(),
 				// exportDatetime: GormUtil.convertInToGMT(exportTime, tzId),
-				exportDatetime: exportTime, eavEntityType: EavEntityType.findByDomainName(entityClassName))
+				exportDatetime: exportTime, asssetClass: AssetClass.safeValueOf(entityClassName))
 
 		if (!dtb.save()) {
 			log.error "createTransferBatch() failed save - ${GormUtil.allErrorsString(dtb)}"

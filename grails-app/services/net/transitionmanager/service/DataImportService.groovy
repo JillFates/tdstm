@@ -6,9 +6,9 @@ import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
-import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -228,15 +228,11 @@ class DataImportService implements ServiceMethods {
 			dts = DataTransferSet.get(1)
 		}
 
-		String transDomainName = LEGACY_DOMAIN_CLASSES[importContext.domainClass]
-
-		// Check if the domain class is valid
-		EavEntityType eavEntityType = EavEntityType.findByDomainName(
-			(transDomainName.equals('Device') ? 'AssetEntity' : transDomainName)
-		)
+		Class<?> clazz = LEGACY_DOMAIN_CLASSES[importContext.domainClass].getClazz()
+		AssetClass assetClass = AssetClass.lookup(clazz)
 
 		// If the asset class is invalid, return null
-		if (! eavEntityType) {
+		if (! assetClass) {
 			importContext.errors << "Import does not support domain type ${transDomainName}"
 			return null
 		}
@@ -246,7 +242,7 @@ class DataImportService implements ServiceMethods {
 				userLogin: importContext.userLogin,
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
-				eavEntityType: eavEntityType,
+				assetClass: assetClass,
 				dataTransferSet: dts
 			)
 
