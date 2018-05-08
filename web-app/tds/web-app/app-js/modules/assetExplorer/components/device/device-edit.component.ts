@@ -7,7 +7,7 @@
 
 import * as R from 'ramda';
 import {Component, Inject, OnInit} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -15,6 +15,8 @@ import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model
 import {Observable} from 'rxjs/Observable';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {is} from '@uirouter/core';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AssetShowComponent} from '../asset/asset-show.component';
 
 declare var jQuery: any;
 
@@ -44,7 +46,9 @@ export function DeviceEditComponent(template, editModel) {
 					@Inject('model') private model: any,
 					private activeDialog: UIActiveDialogService,
 					private preference: PreferenceService,
-					private assetExplorerService: AssetExplorerService) {
+					private assetExplorerService: AssetExplorerService,
+					private dialogService: UIDialogService,
+					private notifierService: NotifierService) {
 
 			this.dateFormat = this.preference.preferences['CURR_DT_FORMAT'];
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
@@ -59,6 +63,9 @@ export function DeviceEditComponent(template, editModel) {
 			jQuery('[data-toggle="popover"]').popover();
 		}
 
+		/**
+		 * Init model with necessary changes to support UI components.
+		 */
 		private initModel(): void {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
@@ -99,6 +106,45 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		private onUpdate(): void {
+			let modelRequest = R.clone(this.model);
+
+			// roomSourceId, roomSource(new)
+			modelRequest.asset.roomSourceId = '-1';
+			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
+				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
+			}
+			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
+			delete modelRequest.asset.newRoomSource;
+
+			// roomTargetId, roomTarget(new)
+			modelRequest.asset.roomTargetId = '-1';
+			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
+				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
+			}
+			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
+			delete modelRequest.asset.newRoomTarget;
+
+			// MoveBundle
+			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
+			delete modelRequest.asset.moveBundle;
+			// Scale Format
+			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+			// Custom Fields
+			this.model.customs.forEach((custom: any) => {
+				let customValue = modelRequest.asset[custom.field.toString()];
+				if (customValue && customValue.value) {
+					modelRequest.asset[custom.field.toString()] = customValue.value;
+				}
+			});
+			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
+				this.notifierService.broadcast({
+					name: 'reloadCurrentAssetList'
+				});
+				this.showAssetDetailView(this.model.asset.assetClass.name, this.model.assetId);
+			});
+		}
+
 		/**
 		 * Taken from entity.crud.js
 		 */
@@ -120,6 +166,10 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Show/Hide Rack fields logic.
+		 * @param {boolean} show
+		 */
 		private showHideRackFields(show: boolean): void {
 			this.showRackFields = show; // pub.showRackFields();
 			if (!show) {
@@ -130,6 +180,9 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Calls endpoints to populate Rack selects.
+		 */
 		private populateRackSelect(): void {
 			// source room field
 			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
@@ -158,6 +211,10 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Show/Hide Blade(Chassis) fields logic.
+		 * @param {boolean} show
+		 */
 		private showHideBladeFields(show: boolean): void {
 			this.showBladeFields = show; // pub.showRackFields();
 			if (!show) {
@@ -168,6 +225,9 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Calls endpoints to populate Blade(Chassis) selects
+		 */
 		private populateBladeSelect(): void {
 			// source room field
 			const roomId = this.model.asset.roomSource ? this.model.asset.roomSource.id : null;
@@ -192,22 +252,41 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * Function that handles the request of the Asset Types tds-combobox
+		 * @param {ComboBoxSearchModel} searchModel
+		 * @returns {Observable<ComboBoxSearchResultModel>}
+		 */
 		protected searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
 			searchModel.query = `manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}`;
 			return this.assetExplorerService.getAssetTypesForComboBox(searchModel);
 		}
 
+		/**
+		 * Function that handles the request of the Manufacturers tds-combobox
+		 * @param {ComboBoxSearchModel} searchModel
+		 * @returns {Observable<ComboBoxSearchResultModel>}
+		 */
 		protected searchManufacturers = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
 			searchModel.query = `assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
 			return this.assetExplorerService.getManufacturersForComboBox(searchModel);
 		}
 
+		/**
+		 * Function that handles the request of the Models tds-combobox
+		 * @param {ComboBoxSearchModel} searchModel
+		 * @returns {Observable<ComboBoxSearchResultModel>}
+		 */
 		protected searchModels = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
 			searchModel.query = `manufacturerId=${this.model.asset.manufacturerSelectValue.id ? this.model.asset.manufacturerSelectValue.id : ''}
 			&assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
 			return this.assetExplorerService.getModelsForComboBox(searchModel);
 		}
 
+		/**
+		 * On Asset Types combobox change.
+		 * @param value
+		 */
 		protected onAssetTypeValueChange(value: any): void {
 			if (!value) {
 				value = {id: null};
@@ -219,6 +298,10 @@ export function DeviceEditComponent(template, editModel) {
 			this.toggleAssetTypeFields();
 		}
 
+		/**
+		 * On Manufacturers combobox change.
+		 * @param value
+		 */
 		protected onManufacturerValueChange(value: any): void {
 			if (!value) {
 				value = {id: null};
@@ -229,6 +312,10 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset.modelSelectValue = {id: null};
 		}
 
+		/**
+		 * On Models combobox change.
+		 * @param value
+		 */
 		protected onModelValueChange(value: any): void {
 			this.model.asset.assetTypeSelectValue.id = value.assetType;
 			this.model.asset.manufacturerSelectValue.id = value.manufacturerId;
@@ -238,12 +325,27 @@ export function DeviceEditComponent(template, editModel) {
 			this.toggleAssetTypeFields();
 		}
 
+		/**
+		 * On Source Room dropdown select change.
+		 * @param event
+		 */
 		protected onRoomSourceValueChange(event: any): void {
 			this.toggleAssetTypeFields();
 		}
 
+		/**
+		 * On Target Room dropdown select change.
+		 * @param event
+		 */
 		protected onRoomTargetValueChange(event: any): void {
 			this.toggleAssetTypeFields();
+		}
+
+		private showAssetDetailView(assetClass: string, id: number) {
+			this.dialogService.replace(AssetShowComponent, [
+					{ provide: 'ID', useValue: id },
+					{ provide: 'ASSET', useValue: assetClass }],
+				'lg');
 		}
 
 		/***

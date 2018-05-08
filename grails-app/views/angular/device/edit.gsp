@@ -92,11 +92,11 @@
                                             </kendo-dropdownlist>
                                         </tdsAngular:tooltipSpan>
                                     </td>
-                                    <td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
+                                    <td class="label ${standardFieldSpecs.roomSource.imp?:''}" nowrap="nowrap">
                                         <label for="locationSourceId">Location/Room</label>
                                     </td>
                                     <td style="vertical-align: text-top;">
-                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationSource}">
+                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.roomSource}">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="roomSourceId"
@@ -122,7 +122,7 @@
                                         </span>
                                     </td>
                                     <td style="vertical-align: text-top;">
-                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.locationTarget}">
+                                        <tdsAngular:tooltipSpan field="${standardFieldSpecs.roomTarget}">
                                             <kendo-dropdownlist
                                                     class="select"
                                                     name="roomTargetId"
