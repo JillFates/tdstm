@@ -9,6 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
+import { DateUtils } from './../../../../shared/utils/date.utils';
 import {
 	COLUMN_MIN_WIDTH,
 	Flatten,
@@ -63,10 +64,10 @@ export class CredentialListComponent {
 			this.state.skip = this.skip;
 			credentials
 			.subscribe((result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-			},
-			(err) => console.log(err));
+					this.resultSet = result;
+					this.gridData = process(this.resultSet, this.state);
+				},
+				(err) => console.log(err));
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -106,11 +107,20 @@ export class CredentialListComponent {
 
 		if (column.type === 'date') {
 			if (!filter) {
+				const {init, end} = DateUtils.getInitEndFromDate(column.filter);
+
 				root.filters.push({
 					field: column.property,
 					operator: 'gte',
-					value: column.filter,
+					value: init,
 				});
+
+				root.filters.push({
+					field: column.property,
+					operator: 'lte',
+					value: end
+				});
+
 			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
@@ -124,9 +134,12 @@ export class CredentialListComponent {
 
 	protected clearValue(column: any): void {
 		column.filter = '';
-		if (this.state.filter && this.state.filter.filters.length > 0) {
-			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
-			this.state.filter.filters.splice(filterIndex, 1);
+
+		// column = Object.assign({}, column, { filter: ''});
+		const filters = (this.state.filter && this.state.filter.filters) || [];
+
+		if (filters.length > 0) {
+			this.state.filter.filters =  filters.filter((r) => r['field'] !== column.property );
 			this.filterChange(this.state.filter);
 		}
 	}
