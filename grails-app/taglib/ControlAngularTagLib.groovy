@@ -163,6 +163,9 @@ class ControlAngularTagLib {
 		// This parameter is optional to modify default tooltip positioning
 		// Also checks that the value is one of the valid data-placement element values
 		String tooltipDataPlacement = attrs.tooltipDataPlacement ?: null
+
+		String placeholder = attrs.placeholder ?: ''
+
 		if (tooltipDataPlacement !=null && !TOOLTIP_DATA_PLACEMENT_VALUES.contains(tooltipDataPlacement)) {
 			throw new InvalidParamException('<tdsAngular:inputControl> tag optional argument tooltipDataPlacement requires its value to be in ' + TOOLTIP_DATA_PLACEMENT_VALUES)
 		}
@@ -178,7 +181,7 @@ class ControlAngularTagLib {
 
 			case ControlType.STRING.toString():
 			default:
-				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
+				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
 		}
 	}
 
@@ -267,8 +270,8 @@ class ControlAngularTagLib {
 	 * @param tooltipDataPlacement - the tooltip data placement value used to override the default placement (optional)
 	 * @return the INPUT Component HTML
 	 */
-	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
 	/**

@@ -174,7 +174,7 @@ export function DeviceEditComponent(template, editModel) {
 			if (roomId && roomId > 0) {
 				this.showBladeSourceInput = 'select';
 				this.assetExplorerService.getChassisForRoom(roomId).subscribe(response => {
-					this.bladeSourceOptions = response;
+					this.bladeSourceOptions = response.data;
 				});
 			} else {
 				this.showBladeSourceInput = 'none';
@@ -185,7 +185,7 @@ export function DeviceEditComponent(template, editModel) {
 			if (targetRoomId && targetRoomId > 0) {
 				this.showBladeTargetInput = 'select';
 				this.assetExplorerService.getChassisForRoom(targetRoomId).subscribe(response => {
-					this.bladeTargetOptions = response;
+					this.bladeTargetOptions = response.data;
 				});
 			} else {
 				this.showBladeTargetInput = 'none';
