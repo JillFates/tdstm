@@ -139,7 +139,7 @@ class WsImportBatchController implements ControllerMethods {
 				affected = importBatchService.toggleIgnoreOnRecords(importBatch, actionCmd.ids, false)
 				break
 
-			case ImportRecordActionEnum.PROCESS:
+			case ImportRecordActionEnum.PROCESS: // TODO: change to Queue when implementing TM-10242 Quartz-Task
 				affected = importBatchService.dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
 				break
 
@@ -148,7 +148,7 @@ class WsImportBatchController implements ControllerMethods {
 				return
 		}
 
-		dataImportService.updateBatchStatus(importBatch)
+		dataImportService.updateBatchStatus(importBatch.id)
 		renderSuccessJson( (actionCmd.action.toString()) : affected )
 	}
 

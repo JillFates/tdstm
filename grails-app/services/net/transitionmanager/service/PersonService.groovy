@@ -696,7 +696,7 @@ class PersonService implements ServiceMethods {
 		// Determine if person can be deleted based on if there are key referenced or if there is a user account for the person
 		boolean isDeletable = true
 		if (! deleteIfAssocWithAssets && hasKeyReferences(person)) {
-			messages << "$person was unable to be delete due to being associated with assets"
+			messages << "$person was unable to be deleted due to being associated with assets"
 			isDeletable = false
 		}
 		if (userLogin && !deleteIfUserLogin) {
@@ -802,7 +802,7 @@ class PersonService implements ServiceMethods {
 							skipped++
 						}
 						log.info("bulkDelete() ${deleteResultMap["messages"]}")
-						messages << deleteResultMap["messages"]
+						messages.addAll(deleteResultMap["messages"])
 
 					} else {
 						messages << 'Invalid ID(s) were submitted in the request'

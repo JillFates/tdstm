@@ -2032,6 +2032,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					def colorByGroupIds = [group: it.bundle, bundle: it.moveBundleId, event: moveEventId, environment: environment, sourceLocation: sourceRoomId, targetLocation: targetRoomId]
 					def colorByGroupNames = [group: 'Group ' + it.bundle, bundle: it.moveBundleName, event: moveEventName, environment: environment, sourceLocation: sourceLocationName, targetLocation: targetLocationName]
 
+					// TM-10537 Group naming for 'Group 0' was changed to 'Remnants'
+					if(it.bundle == 0) {
+						colorByGroupNames['group'] = 'Remnants'
+					}
 
 					// add these groups to the master group set
 					colorByGroupLabels.each {
