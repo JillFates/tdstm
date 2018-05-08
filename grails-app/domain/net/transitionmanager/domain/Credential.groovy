@@ -127,7 +127,7 @@ class Credential {
 	static Closure sessionNameValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null || StringUtil.isBlank(value)) {
+			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			} else {
 				if (!(value ==~ /^[A-Za-z0-9_\-]+@{1}?(header|cookie|json):{1}?[A-Za-z0-9_\-]+$/)) {
@@ -143,7 +143,7 @@ class Credential {
 	static Closure validationExpressionValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null || StringUtil.isBlank(value)) {
+			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			}
 			else {
@@ -164,7 +164,7 @@ class Credential {
 	static Closure authenticationUrlValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.COOKIE, AuthenticationMethod.HEADER, AuthenticationMethod.JWT]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null || value.trim() == '') {
+			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			}
 		}
@@ -176,7 +176,7 @@ class Credential {
 	static Closure renewTokenUrlValidator = { value, target ->
 		List methodsThatRequireProp = [AuthenticationMethod.JWT]
 		if ( target.authenticationMethod in methodsThatRequireProp ) {
-			if (value == null || value.trim() == '') {
+			if (StringUtil.isBlank(value)) {
 				return 'default.blank.message'
 			}
 			if (value == target.authenticationUrl) { // renewTokenUrl cannot be the same as authenticationUrl
