@@ -164,8 +164,8 @@ class WsAssetImportController implements ControllerMethods {
 	def manualFormOptions() {
 		Project project = getProjectForWs()
 
-		Map map = [ : ]
-		List<Map> tmpList = []
+		Map results = [ : ]
+		List<Map> actions = []
 
 		def where = ApiAction.where { project == project && producesData == 1}.readOnly(true)
 				/*
@@ -179,27 +179,26 @@ class WsAssetImportController implements ControllerMethods {
 				*/
 
 		where.list().each() {
-			tmpList << [
+			actions << [
 					id: it.id,
 					name: "${it.provider.name} - ${it.name}",
 					provider:it.provider.name,
 					defaultDataScriptId: (it.defaultDataScript?.id ?: 0)
 			]
 		}
-		tmpList = tmpList.sort { it.name }
-		map.actions = tmpList
+		actions = actions.sort { it.name }
+		results.actions = actions
 
 
-		tmpList = []
+		List<Map> dataScripts = []
 		where = DataScript.where { project == project }.readOnly(true)
 		where.list().each() {
-			tmpList << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
+			dataScripts << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
 		}
+		dataScripts = dataScripts.sort { it.name }
+		results.dataScripts = dataScripts
 
-		tmpList = tmpList.sort { it.name }
-		map.dataScripts = tmpList
-
-		renderAsJson map
+		renderAsJson results
 	}
 
 	/**

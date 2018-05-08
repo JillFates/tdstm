@@ -79,7 +79,7 @@ class ApiActionService implements ServiceMethods {
 			agents << info
 		}
 
-		return agents
+		return agents.sort {it.name}
 	}
 
 	/**
