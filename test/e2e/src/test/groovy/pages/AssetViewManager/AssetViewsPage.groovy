@@ -1,8 +1,7 @@
 package pages.AssetViewManager
 import geb.Page
-import modules.MyViewsModule
 import modules.CreateViewModule
-
+import modules.ViewsModule
 
 class AssetViewsPage extends Page{
 
@@ -15,9 +14,14 @@ class AssetViewsPage extends Page{
         viewMgrPageWindow           (wait:true) { $("div","class":"col-md-2 asset-explorer-index-left-menu")}
         viewsMenu                   {viewMgrPageWindow.find("ul",class:"nav nav-pills nav-stacked")}
         viewOptions                 {viewMgrPageWindow.find("a")}
+        viewMgrAllViews             {viewOptions[0]}
+        viewMgrFavoriteViews        {viewOptions[1]}
         viewMgrMyViews              {viewOptions[2]}
+        viewMgrSharedViews          {viewOptions[3]}
+        viewMgrSystemViews          {viewOptions[4]}
+
         //>>>>>>>>> MODULES
-        viewsModule                 { module MyViewsModule}
+        allViewsModule              { module ViewsModule}
         createViewModule            { module CreateViewModule}
 
         avPageTitle                 { $("section", 	class:"content-header").find("h1") }
@@ -36,7 +40,15 @@ class AssetViewsPage extends Page{
     def goToMyViews(){
         viewMgrMyViews.click()
     }
+    def goToAllViews(){
+        viewMgrAllViews.click()
+    }
+
     def filterViewByName(String name){
         filter=name
     }
+    def goToFavourites(){
+        viewMgrFavoriteViews.click()
+    }
+
 }

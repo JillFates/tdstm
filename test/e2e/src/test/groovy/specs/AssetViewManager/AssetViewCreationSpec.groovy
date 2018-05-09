@@ -36,18 +36,17 @@ class AssetViewCreationSpec extends GebReportingSpec {
         when: "I click on My Views"
             waitFor {viewMgrMyViews.click() }
         then: "I am taken to My Views page"
-            viewsModule.displayed
+            allViewsModule.displayed
     }
-    def "2. Validates user can reach Create View Modulew"() {
+    def "2. Validates user can reach Create View Module"() {
         testKey = "TM-8500"
         given: "I am in My Views"
-            viewsModule.displayed
+            allViewsModule.displayed
         when: "I click on the CREATE button"
-            waitFor{viewsModule.clickCreateView()}
+            waitFor{allViewsModule.clickCreateView()}
         then: "The Create View Module is displayed"
             createViewModule.displayed
     }
-    //
     def "3. Validates user can go back to asset class by Clicking on the tab"() {
         testKey = "TM-8500"
         given: "I am in the Create View Module"
@@ -87,7 +86,6 @@ class AssetViewCreationSpec extends GebReportingSpec {
         then: "Only the UNSELECTED checkboxes are visible"
             createViewModule.unselectedCheckboxesDisplayed()
     }
-    //
     def "7. Validate user can filter by field name"() {
         testKey = "TM-8500"
         given: "The filter by name is present and all fields are diplayed"
@@ -138,6 +136,6 @@ class AssetViewCreationSpec extends GebReportingSpec {
         when: "I click on it"
             waitFor{vwGrid.find("tr")[1].find("a")[1].click()}
         then: "I am taken to the view's page"
-        at ViewPage
+            at ViewPage
     }
 }
