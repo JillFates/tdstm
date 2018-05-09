@@ -198,6 +198,8 @@ class ETLProcessorResult {
 
 		if(reference.data.isEmpty()){
 			reference.data.add(initialRowDataMap())
+		} else if(processor.selectedDomain.isNew) {
+			reference.data.add(initialRowDataMap())
 		} else if (reference.data.last().rowNum &&
 			reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())

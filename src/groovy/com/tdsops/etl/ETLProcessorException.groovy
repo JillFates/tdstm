@@ -153,12 +153,20 @@ class ETLProcessorException extends GroovyRuntimeException {
 		return new ETLProcessorException(invalidReadCommandMessage)
 	}
 
-	/**
+    /**
      * Exception being thrown when no domain is specified upon load clause
      * @return
      */
-	static ETLProcessorException domainMustBeSpecified () {
-		new ETLProcessorException('A domain must be specified')
-	}
+    static ETLProcessorException domainMustBeSpecified () {
+        new ETLProcessorException('A domain must be specified')
+    }
+
+    /**
+     * Exception being thrown domain command is incorrectly used
+     * @return
+     */
+    static ETLProcessorException invalidDomainComand () {
+        new ETLProcessorException('Incorrect use of "domain" command. Use: "domain Application" or "domain Application as newer"')
+    }
 }
 

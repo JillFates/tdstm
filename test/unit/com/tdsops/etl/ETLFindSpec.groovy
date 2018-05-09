@@ -1594,4 +1594,146 @@ class ETLFindSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
+
+	void 'test can create new results using domain command'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				Primary App,Primary Server,Supporting App,Supporting Server
+				ERP,xraysrv001,Oracle7-Cluster,zuludb01""")
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+			read labels
+			iterate {
+				extract 'Primary App' set primaryAppVar
+				extract 'Primary Server' set primaryServerVar
+				extract 'Supporting App' set supportAppVar
+				extract 'Supporting Server' set supportServerVar
+
+				// Primary App
+				domain Application
+				lookup 'assetName' with primaryAppVar
+				if (LOOKUP.notFound()) {
+					find Application by 'assetName' with primaryAppVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' primaryAppVar
+					}
+				}
+
+				// Supporting App
+				domain Application using newer
+				lookup 'assetName' with supportAppVar
+				if (LOOKUP.notFound()) {
+					find Application by 'assetName' with supportAppVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' supportAppVar
+					}
+				}
+
+				// Primary Server
+				domain Device
+				lookup 'assetName' with primaryServerVar
+				if (LOOKUP.notFound()) {
+					find Device by 'assetName' with primaryServerVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' primaryServerVar
+					}
+				}
+
+				// Supporting Server
+				domain Device using newer
+				lookup 'assetName' with supportServerVar
+				if (LOOKUP.notFound()) {
+					find Device by 'assetName' with supportServerVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' supportServerVar
+					}
+				}
+
+				// Create App - App Dependency
+				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, supportAppVar
+				load 'asset' with primaryAppVar
+				load 'dependent' with supportAppVar
+				load 'type' with 'Communicates With'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+
+				// Create Primary App - Primary Server
+				domain Dependency using newer
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, primaryServerVar
+				load 'asset' with primaryAppVar
+				load 'dependent' with primaryServerVar
+				load 'type' with 'Runs On'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+
+				// Create Supporting App - Supporting Server
+				domain Dependency using newer
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with supportAppVar, supportServerVar
+				load 'asset' with supportAppVar
+				load 'dependent' with supportServerVar
+				load 'type' with 'Runs On'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+
+			}
+		""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+
+			with(etlProcessor.result.toMap()) {
+				domains.size() == 3
+
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+				}
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					data.size() == 2
+				}
+				with(domains[2]) {
+					domain == ETLDomain.Dependency.name()
+					data.size() == 3
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+
+	}
 }

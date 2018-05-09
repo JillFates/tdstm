@@ -187,7 +187,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			 """.stripIndent())
 
 		then: 'A domain is selected'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
 			etlProcessor.result.domains.size() == 1
@@ -216,7 +216,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			 """.stripIndent())
 
 		then: 'A domain is selected'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
 			with(etlProcessor.result) {
@@ -259,7 +259,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
-			etlProcessor.selectedDomain == ETLDomain.Storage
+			etlProcessor.selectedDomain.domain == ETLDomain.Storage
 
 		and: 'A new result was added in the result'
 			etlProcessor.result.domains.size() == 3
@@ -296,7 +296,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'The last domain selected could be recovered'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
 			etlProcessor.result.domains.size() == 2

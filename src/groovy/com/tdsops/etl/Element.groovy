@@ -66,8 +66,8 @@ class Element implements RangeChecker {
      */
     Element load (String fieldName) {
         if (processor.hasSelectedDomain()) {
-            this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-            processor.addElementLoaded(processor.selectedDomain, this)
+            this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
+            processor.addElementLoaded(processor.selectedDomain.domain, this)
             return this
         } else {
             throw ETLProcessorException.domainMustBeSpecified()
@@ -85,11 +85,11 @@ class Element implements RangeChecker {
 	 */
 	Element initialize (String fieldName) {
 		if (processor.hasSelectedDomain()) {
-			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.fieldSpec = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
 			this.init = this.value
 			this.originalValue = ''
 			this.value = ''
-			processor.addElementLoaded(processor.selectedDomain, this)
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
 			return this
 		} else {
 			throw ETLProcessorException.domainMustBeSpecified()

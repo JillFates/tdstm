@@ -114,7 +114,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'A domain is selected'
-			etlProcessor.selectedDomain == ETLDomain.Application
+			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
 			with(etlProcessor.result) {
