@@ -260,7 +260,7 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
 		if (this.state && this.state.$current && this.state.$current.data) {
-			this.state.$current.data.hasPendingChanges = result;
+			this.state.$current.data.hasPendingChanges = result && !this.collapsed;
 		}
 		return result;
 	}
@@ -494,6 +494,10 @@ export class AssetExplorerViewConfigComponent implements OnInit {
 		this.applyFilters();
 	}
 
+	/**
+	 * Switch between View and Edit
+	 * if is on the Edit and then move in to the View disables the confirm dialog
+	 */
 	protected onToggleConfig(): void {
 		this.collapsed = !this.collapsed;
 		setTimeout(() => {
