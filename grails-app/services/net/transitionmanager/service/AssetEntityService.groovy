@@ -2973,6 +2973,56 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Used to retrieve the model used to display Asset Dependencies Edit view
+	 * @param params - the Request params
+	 * @return a Map of all properties used by the view
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyEditMap(params) {
+		Project project = securityService.userCurrentProject
+		Long id = params.long('id')
+		if (!id) {
+			throw new InvalidRequestException('An invalid asset id was requested')
+		}
+
+		AssetEntity assetEntity = AssetEntity.get(id)
+		if (!assetEntity) {
+			securityService.reportViolation('attempted to access an asset unassociated to current project')
+			throw new InvalidRequestException('Unable to find requested asset')
+		}
+
+		if (assetEntity.project.id != project.id) {
+			securityService.reportViolation('attempted to access an asset unassociated to current project')
+			throw new InvalidRequestException('Unable to find requested asset')
+		}
+
+		// TODO - JPM 8/2014 - Why do we have this? Seems like we should NOT be passing that to the template...
+		List nonNetworkTypes = [
+			AssetType.SERVER,
+			AssetType.APPLICATION,
+			AssetType.VM,
+			AssetType.FILES,
+			AssetType.DATABASE,
+			AssetType.BLADE
+		]*.toString()
+
+		Map map = [
+			assetClassOptions: AssetClass.classOptions,
+			assetEntity      : assetEntity,
+			dependencyStatus : getDependencyStatuses(),
+			dependencyType   : getDependencyTypes(),
+			whom             : params.whom,
+			nonNetworkTypes  : nonNetworkTypes,
+			supportAssets    : getSupportingAssets(assetEntity),
+			dependentAssets  : getDependentAssets(assetEntity),
+			moveBundleList   : getMoveBundles(project)
+		]
+
+		return map
+	}
+
+
+	/**
 	 * Used to clone an asset and optionally the dependencies associated with the asset
 	 * @param assetId - the id of the asset to be cloned
 	 * @param name - the name to set the new asset name to
