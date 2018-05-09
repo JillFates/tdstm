@@ -70,10 +70,6 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset = R.clone(editModel.asset);
 			this.model.asset.retireDate = DateUtils.compose(this.model.asset.retireDate);
 			this.model.asset.maintExpDate = DateUtils.compose(this.model.asset.maintExpDate);
-			this.model.asset.locationSource = null;
-			this.model.asset.newRoomSource = null;
-			this.model.asset.locationTarget = null;
-			this.model.asset.newRoomTarget = null;
 			if (this.model.asset.scale === null) {
 				this.model.asset.scale = {
 					name: ''
@@ -106,10 +102,29 @@ export function DeviceEditComponent(template, editModel) {
 			}
 		}
 
+		/**
+		 * On Update button click save the current model form.
+		 * Method makes proper model modification to send the correct information to
+		 * the endpoint.
+		 */
 		private onUpdate(): void {
 			let modelRequest = R.clone(this.model);
 
-			// roomSourceId, roomSource(new)
+			// currentAssetType, manufacturerId, modelId
+			modelRequest.asset.manufacturerId = null;
+			if ( this.model.asset.manufacturerSelectValue.id > 0 ) {
+				modelRequest.asset.manufacturerId = this.model.asset.manufacturerSelectValue.id.toString();
+			}
+			modelRequest.asset.currentAssetType = null;
+			if (this.model.asset.assetTypeSelectValue.id > 0) {
+				modelRequest.asset.currentAssetType = this.model.asset.assetTypeSelectValue.id.toString();
+			}
+			modelRequest.asset.modelId = null;
+			if (this.model.asset.modelSelectValue.id > 0) {
+				modelRequest.asset.modelId = this.model.asset.modelSelectValue.id.toString();
+			}
+
+			// roomSourceId, roomSource(new room)
 			modelRequest.asset.roomSourceId = '-1';
 			if (this.model.asset.roomSource && this.model.asset.roomSource.id > 0) {
 				modelRequest.asset.roomSourceId = this.model.asset.roomSource.id.toString();
@@ -117,7 +132,7 @@ export function DeviceEditComponent(template, editModel) {
 			modelRequest.asset.roomSource = this.model.asset.newRoomSource;
 			delete modelRequest.asset.newRoomSource;
 
-			// roomTargetId, roomTarget(new)
+			// roomTargetId, roomTarget(new room)
 			modelRequest.asset.roomTargetId = '-1';
 			if (this.model.asset.roomTarget && this.model.asset.roomTarget.id > 0) {
 				modelRequest.asset.roomTargetId = this.model.asset.roomTarget.id.toString();
@@ -125,11 +140,43 @@ export function DeviceEditComponent(template, editModel) {
 			modelRequest.asset.roomTarget = this.model.asset.newRoomTarget;
 			delete modelRequest.asset.newRoomTarget;
 
+			// rackSourceId, rackSource (new rack)
+			modelRequest.asset.rackSourceId = '-1';
+			if (this.model.asset.rackSource && this.model.asset.rackSource.id > 0) {
+				modelRequest.asset.rackSourceId = this.model.asset.rackSource.id.toString();
+			}
+			modelRequest.asset.rackSource = this.model.asset.newRackSource;
+			delete modelRequest.asset.newRackSource;
+
+			// rackTargetId, rackTarget(new rack)
+			modelRequest.asset.rackTargetId = '-1';
+			if (this.model.asset.rackTarget && this.model.asset.rackTarget.id > 0) {
+				modelRequest.asset.rackTargetId = this.model.asset.rackTarget.id.toString();
+			}
+			modelRequest.asset.rackTarget = this.model.asset.newRackTarget;
+			delete modelRequest.asset.newRackTarget;
+
+			// sourceChassis
+			if (this.model.asset.sourceChassis && this.model.asset.sourceChassis.id > 0) {
+				modelRequest.asset.sourceChassis = this.model.asset.sourceChassis.id.toString();
+			} else {
+				modelRequest.asset.sourceChassis = '0';
+			}
+
+			// targetChassis
+			if (this.model.asset.targetChassis && this.model.asset.targetChassis.id > 0) {
+				modelRequest.asset.targetChassis = this.model.asset.targetChassis.id.toString();
+			} else {
+				modelRequest.asset.targetChassis = '0';
+			}
+
 			// MoveBundle
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
+
 			// Scale Format
 			modelRequest.asset.scale = (modelRequest.asset.scale.name.value) ? modelRequest.asset.scale.name.value : modelRequest.asset.scale.name;
+
 			// Custom Fields
 			this.model.customs.forEach((custom: any) => {
 				let customValue = modelRequest.asset[custom.field.toString()];
@@ -137,6 +184,7 @@ export function DeviceEditComponent(template, editModel) {
 					modelRequest.asset[custom.field.toString()] = customValue.value;
 				}
 			});
+
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'

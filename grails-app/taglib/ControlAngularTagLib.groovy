@@ -179,6 +179,9 @@ class ControlAngularTagLib {
 				out << renderYesNoInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement)
 				break
 
+			case ControlType.NUMBER.toString():
+				out << renderNumberInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
+				break
 			case ControlType.STRING.toString():
 			default:
 				out << renderStringInput(fieldSpec, value, attrs.ngmodel, tabIndex, tabOffset, size, tooltipDataPlacement, placeholder)
@@ -272,6 +275,10 @@ class ControlAngularTagLib {
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
 		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'text') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
+	}
+
+	private String renderNumberInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String placeholder) {
+		'<input [(ngModel)]="'+ ngmodel +'" ' + attribute('type', 'number') + attribute('placeholder', placeholder) + commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) + '/>'
 	}
 
 	/**

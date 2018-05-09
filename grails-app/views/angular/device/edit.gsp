@@ -190,7 +190,7 @@
                                             </tdsAngular:tooltipSpan>
                                         </div>
                                         <div *ngIf="showRackSourceInput === 'new'">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}"
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
                                                                      size="20" tabindex="311" placeholder="New Rack Name"
                                                                      value=""
                                                                      ngmodel="model.asset.newRackSource">
@@ -211,7 +211,7 @@
                                                 </kendo-dropdownlist>
                                                 <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === -1">
                                                     <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
-                                                                             size="20" tabindex="311" placeholder="New Rack"
+                                                                             size="20" tabindex="311" placeholder="New Rack Name"
                                                                              value=""
                                                                              ngmodel="model.asset.newRackTarget">
                                                     </tdsAngular:inputControl>
