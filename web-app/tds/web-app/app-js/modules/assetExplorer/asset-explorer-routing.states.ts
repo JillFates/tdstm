@@ -170,8 +170,7 @@ export const assetExplorerReportShowState: Ng2StateDeclaration = <Ng2StateDeclar
 			menu: ['ASSETS.ASSETS', { text: 'ASSET_EXPLORER.ASSET_EXPLORER', navigateTo: AssetExplorerStates.REPORT_SELECTOR.name }, 'ASSET_EXPLORER.SHOW'],
 			topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-assets-asset-explorer'}
 		},
-		requiresAuth: true,
-		hasPendingChanges: false
+		requiresAuth: true
 	},
 	views: {
 		'headerView@tds': { component: HeaderComponent },
