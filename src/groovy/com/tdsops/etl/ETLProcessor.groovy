@@ -185,7 +185,8 @@ class ETLProcessor implements RangeChecker {
 	// ETL DSL methods
 	// ------------------------------------
 	/**
-	 * Selects a domain or throws an ETLProcessorException in case of an invalid domain
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param domain a domain String value
 	 * @return the current instance of ETLProcessor
 	 */
@@ -193,6 +194,7 @@ class ETLProcessor implements RangeChecker {
 		validateStack()
 		selectedDomain = domain
 		result.releaseRowFoundInLookup()
+		bindCurrentElement(null)
 		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
 		return this
@@ -295,9 +297,12 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Iterates a list of rows applying a closure
+	 * It initialize context variables in the ETL Binding context
+	 *
 	 * @param rows
 	 * @param closure
-	 * @return
+	 * @return the ETLProcesor instance
+	 * @see ETLBinding#getVariable(java.lang.String)
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
@@ -306,9 +311,10 @@ class ETLProcessor implements RangeChecker {
 			isIterating = true
 			currentColumnIndex = 0
 			result.releaseRowFoundInLookup()
-			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
-			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			binding.addDynamicVariable(NOW_VARNAME, new NOW())
+			bindCurrentElement(null)
+			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
+			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
+			bindVariable(NOW_VARNAME, new NOW())
 
 			closure(addCrudRowData(row))
 
@@ -923,6 +929,15 @@ class ETLProcessor implements RangeChecker {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
 		return currentElement
+	}
+
+	/**
+	 * Bind in ETL Content variables using name parameters
+	 * @param name a String name for a variable
+	 * @param value the Object instance to be bound in the ETL context
+	 */
+	private void bindVariable(String name, Object value) {
+		binding.addDynamicVariable(name, value)
 	}
 
 	/**

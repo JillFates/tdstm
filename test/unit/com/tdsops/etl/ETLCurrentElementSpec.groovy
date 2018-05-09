@@ -569,4 +569,94 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 	}
 
+	void 'test can define CE as null at the beginning of every iteration'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				xraysrv02,Dell,PE2951,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				iterate {
+					assert null == CE
+					extract 'name' load 'assetName'
+					assert null != CE
+				}
+			""".stripIndent())
+
+		then: 'Current element should contains values'
+			with(etlProcessor.currentElement){
+				originalValue == 'xraysrv02'
+				value == 'xraysrv02'
+				init == null
+				with(fieldDefinition){
+					name == 'assetName'
+					label == 'Name'
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can define CE after using domain command'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				iterate {
+					assert null == CE
+					extract 'name' load 'assetName'
+					assert null != CE
+					domain Device
+					assert null == CE
+					extract 'name' load 'assetName'
+					assert null != CE
+				}
+			""".stripIndent())
+
+		then: 'Current element should contains values'
+			with(etlProcessor.currentElement){
+				originalValue == 'xraysrv01'
+				value == 'xraysrv01'
+				init == null
+				with(fieldDefinition){
+					name == 'assetName'
+					label == 'Name'
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
 }
