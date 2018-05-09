@@ -114,9 +114,6 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		if (this.stateService && this.stateService.$current && this.stateService.$current.data) {
-			this.stateService.$current.data.hasPendingChanges = result;
-		}
 		return result;
 	}
 
