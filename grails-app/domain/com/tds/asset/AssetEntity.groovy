@@ -45,6 +45,15 @@ class AssetEntity {
 		'validation'
 	]
 
+	static final List<String> RAIL_TYPES = [
+		'Rails',
+		'Snap Rails',
+		'Screw Rails',
+		'Ears',
+		'Shelf',
+		'None'
+	]
+
 	static String alternateKey = 'assetName'
 
 	AssetClass assetClass = DEVICE
@@ -258,7 +267,7 @@ class AssetEntity {
 		truck nullable: true
 		cart nullable: true
 		shelf nullable: true
-		railType nullable: true
+		railType nullable: true, inList: RAIL_TYPES
 
 		// TODO : owner should not be nullable - remove and test
 		owner nullable: true
@@ -285,6 +294,7 @@ class AssetEntity {
 	}
 
 	static mapping = {
+		version false
 		appOwner column: 'app_owner_id'
 		autoTimestamp false
 		id column: 'asset_entity_id'

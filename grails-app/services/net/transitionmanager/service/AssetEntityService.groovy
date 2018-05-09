@@ -19,11 +19,8 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdsops.tm.enums.domain.EntityType
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -36,7 +33,6 @@ import grails.transaction.Transactional
 import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
-import net.transitionmanager.domain.KeyValue
 import net.transitionmanager.domain.Manufacturer
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.MoveBundle
@@ -1133,16 +1129,7 @@ class AssetEntityService implements ServiceMethods {
 	 * @return List of RailTypes
 	 */
 	List<String> getAssetRailTypeOptions() {
-		EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode('railType'))*.value
-	}
-
-	/**
-	 * Used to retrieve the assettype attribute object
-	 * @param the name of the attribute
-	 * @return the Attribute object
-	 */
-	Object getPropertyAttribute(String property) {
-		EavAttribute.findByAttributeCode(property)
+		AssetEntity.RAIL_TYPES
 	}
 
 	/**
