@@ -1,4 +1,5 @@
 import com.tds.asset.Application
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
@@ -66,6 +67,12 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
 	Map context
 
+	@Shared
+	AssetDependency dependency1
+
+	@Shared
+	AssetDependency dependency2
+
 	void setup() {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
@@ -101,6 +108,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		otherProjectDevice.assetType = device.assetType
 		otherProjectDevice.validation = 'Discovery'
 		otherProjectDevice.save(flush: true, failOnError: true)
+
+		dependency1  = new AssetDependency(asset: application1, dependent: device, status: 'awesome').save(flush: true, failOnError: true)
+		dependency2  = new AssetDependency(asset: application2, dependent: device2, status: 'awesome').save(flush: true, failOnError: true)
 	}
 
 
@@ -155,29 +165,57 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	}
 
 	void "test gatherMetric for TM-10662 filtering out non-planning assets"() {
+		setup: 'giving a metric definition for a query, that will have results'
+			String date = (new Date() - 1).format('yyyy-MM-dd')
+			JSONObject metricDefinition = [
+				"metricCode" : "App-Count",
+				"description": "count of applications",
+				"enabled"    : 1,
+				"mode"       : "query",
+				"query"      : [
+					"domain"     : "Application",
+					"aggregation": "count(*)"
+				]
+			] as JSONObject
+		when: 'running gatherMetrics on query mode'
+			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+		then: 'We get a list of map results'
+			results == [
+				[
+					projectId : project.id,
+					metricCode: 'App-Count',
+					date      : date,
+					label     : 'count',
+					value     : 1
+				]
+			]
+	}
+
+	void "test gatherMetric for TM-10647 query Dependency"() {
 			setup: 'giving a metric definition for a query, that will have results'
 				String date = (new Date() - 1).format('yyyy-MM-dd')
 				JSONObject metricDefinition = [
-						"metricCode" : "App-Count",
-						"description": "count of applications",
-						"enabled"    : 1,
-						"mode"       : "query",
-						"query"      : [
-								"domain"     : "Application",
-								"aggregation": "count(*)"
-						]
+					"metricCode" : "Dependency",
+					"description": "Dependency counts metrics DependencyStatus",
+					"enabled": 1,
+					"mode"   : "query",
+					"query"  : [
+						"domain"     : "Dependency",
+						"aggregation": "count(*)",
+						"groupBy"    : ["status"]
+					]
 				] as JSONObject
 			when: 'running gatherMetrics on query mode'
 				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 			then: 'We get a list of map results'
 				results == [
-						[
-								projectId : project.id,
-								metricCode: 'App-Count',
-								date      : date,
-								label     : 'count',
-								value     : 1
-						]
+					[
+						projectId : project.id,
+						metricCode: 'Dependency',
+						date      : date,
+						label     : 'awesome',
+						value     : 2
+					]
 				]
 		}
 
