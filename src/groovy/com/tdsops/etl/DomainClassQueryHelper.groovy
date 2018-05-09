@@ -118,12 +118,14 @@ class DomainClassQueryHelper {
 		String hqlJoins = hqlJoins(clazz, paramsMap)
 		Map<String, ?> hqlParams = hqlParams(clazz, paramsMap)
 
+// TODO : check if domain has  property 'project' and add to the where clause
+
 		String hql = """
-			  select $DOMAIN_ALIAS	
+			  select $DOMAIN_ALIAS
               from ${clazz.simpleName} $DOMAIN_ALIAS
 			       $hqlJoins
              where ${DOMAIN_ALIAS}.project = :project
-               and $hqlWhere 
+               and $hqlWhere
 		""".stripIndent()
 
 		return clazz.executeQuery(hql, [project: project] + hqlParams, [readOnly: true])
@@ -143,7 +145,7 @@ class DomainClassQueryHelper {
             select $DOMAIN_ALIAS
               from AssetDependency $DOMAIN_ALIAS
 				   $hqlJoins
-             where $hqlWhere  
+             where $hqlWhere
         """.stripIndent()
 
 		Map<String, ?> params = hqlParams(AssetDependency, mapParams)
@@ -165,7 +167,7 @@ class DomainClassQueryHelper {
             select $DOMAIN_ALIAS
               from Model $DOMAIN_ALIAS
 				   $hqlJoins
-             where $hqlWhere  
+             where $hqlWhere
         """.stripIndent()
 
 		Map<String, ?> params = hqlParams(Model, mapParams)
@@ -187,7 +189,7 @@ class DomainClassQueryHelper {
             select $DOMAIN_ALIAS
               from Manufacturer $DOMAIN_ALIAS
 				   $hqlJoins
-             where $hqlWhere  
+             where $hqlWhere
         """.stripIndent()
 
 		Map<String, ?> params = hqlParams(Model, mapParams)
@@ -324,12 +326,39 @@ class DomainClassQueryHelper {
 	 * @see DomainClassQueryHelper#getNamedParameterForField(java.lang.Class, java.lang.String)
 	 * @see DomainClassQueryHelper#getPropertyForField(java.lang.Class, java.lang.String)
 	 */
-	static String hqlWhere(Class clazz, Map<String, ?> mapParams) {
-		return mapParams.keySet().collect { String field ->
+	static String hqlWhere(Project project, Class clazz, Map<String, ?> mapParams) {
+		List projectReferences = []
+		Map map mapParams.keySet().collect { String field, Object value ->
 			String property = getPropertyForField(clazz, field)
 			String namedParameter = getNamedParameterForField(clazz, field)
-			" ${property} = :${namedParameter}\n"
+			String query
+			boolean addProjectParam = false
+			if (shouldQueryById(clazz, field, value) ) {
+				boolean hasProjectProperty = GormUtil.isDomainProperty(clazz[field], 'project')
+				property += '.id'
+				addProjectParam = true
+				query = " ${property} = :${namedParameter}\n" + (hasProjectProperty ? " ${property}.project =:${namedParameter}_project \n" : '')
+			} else {
+				query = " ${property} = :${namedParameter}\n"
+			}
+			return query
 		}.join(' and ')
+
+		if (addProjectParam) {
+			mapParams.add("${namedParameter}_project".toString(), project)
+		}
+		return map
+	}
+
+	/**
+	 * Used to determine if the field to be queried is a reference and the value is the ID
+	 * @param clazz - domain class
+	 * @param field - field name
+	 * @param value - value to query with
+	 * @return true if should query using the ID
+	 */
+	static private boolean shouldQueryById(clazz, field, value) {
+		return (value instanceof Long) && field != 'id' && GormUtil.isReferenceProperty(clazz, field)
 	}
 
 	/**
