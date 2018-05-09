@@ -20,7 +20,7 @@ import static net.transitionmanager.integration.ReactionScriptCode.ERROR
 import static net.transitionmanager.integration.ReactionScriptCode.SUCCESS
 
 @TestMixin(GrailsUnitTestMixin)
-class ApiActionScriptProcessorSpec extends Specification {
+class ApiActionScriptSpec extends Specification {
 
 	static doWithSpring = {
 		messageSourceService(MessageSourceService) { bean ->
@@ -123,27 +123,25 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.PRE)
 
 		when: 'The PRE script is evaluated'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-						
-						request.params.format = 'json'
-						request.headers.add('header1', 'value1')
-						
-						// Set the socket and connect to 5 seconds
-						request.config.setProperty('httpClient.socketTimeout', 5000)
-						request.config.setProperty('httpClient.connectionTimeout', 5000)
-						
-						// Set up a proxy for the call
-						request.config.setProperty('proxyAuthHost', '123.88.23.42')
-						request.config.setProperty('proxyAuthPort', 8080)
-						
-						// Set the charset for the exchange
-						request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
-						
-						// Set the content-type to JSON
-						request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
-						
-					""".stripIndent(), ApiActionScriptBinding.class.name)
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				request.params.format = 'json'
+				request.headers.add('header1', 'value1')
+				
+				// Set the socket and connect to 5 seconds
+				request.config.setProperty('httpClient.socketTimeout', 5000)
+				request.config.setProperty('httpClient.connectionTimeout', 5000)
+				
+				// Set up a proxy for the call
+				request.config.setProperty('proxyAuthHost', '123.88.23.42')
+				request.config.setProperty('proxyAuthPort', 8080)
+				
+				// Set the charset for the exchange
+				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
+				
+				// Set the content-type to JSON
+				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
+				
+			""".stripIndent())
 
 		then: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
@@ -175,17 +173,16 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.PRE)
 
 		when: 'The PRE script is evaluated'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-						request.params.format = 'json'
-						request.headers.add('header1', 'value1')
-						
-						if (response.status == SC.OK) {
-						   return SUCCESS
-						} else {
-						   return ERROR
-						}
-					""".stripIndent(), ApiActionScriptBinding.class.name)
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				request.params.format = 'json'
+				request.headers.add('header1', 'value1')
+				
+				if (response.status == SC.OK) {
+				   return SUCCESS
+				} else {
+				   return ERROR
+				}
+			""".stripIndent())
 
 		then: 'A ApiActionException is thrown'
 			ApiActionException e = thrown(ApiActionException)
@@ -212,17 +209,16 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.PRE)
 
 		when: 'The PRE script is evaluated'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-						request.params.format = 'json'
-						request.headers.add('header1', 'value1')
-						
-						if (response.status == SC.OK) {
-						   return SUCCESS
-						} else {
-						   return ERROR
-						}
-					""".stripIndent(), ApiActionScriptBinding.class.name)
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				request.params.format = 'json'
+				request.headers.add('header1', 'value1')
+				
+				if (response.status == SC.OK) {
+				   return SUCCESS
+				} else {
+				   return ERROR
+				}
+			""".stripIndent())
 
 		then: 'A ApiActionException is thrown'
 			ApiActionException e = thrown(ApiActionException)
@@ -248,14 +244,13 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.STATUS)
 
 		expect: 'The evaluation of the script returns a ReactionScriptCode'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-						if (response.status == SC.OK) {
-						   return SUCCESS
-						} else {
-						   return ERROR
-						}
-					""".stripIndent(), ApiActionScriptBinding.class.name) == reaction
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				if (response.status == SC.OK) {
+				   return SUCCESS
+				} else {
+				   return ERROR
+				}
+			""".stripIndent()) == reaction
 
 		and: 'And all the variables were bound correctly'
 			scriptBinding.hasVariable('request') == hasRequest
@@ -297,13 +292,12 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.SUCCESS)
 
 		when: 'The script is evaluated'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-					// Check to see if the asset is a VM
-					if ( asset.isaDevice() || asset.isaDatabase() ) {
-					   task.done()
-					} 
-					""".stripIndent(), ApiActionScriptBinding.class.name)
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				// Check to see if the asset is a VM
+				if ( asset.isaDevice() || asset.isaDatabase() ) {
+				   task.done()
+				} 
+				""".stripIndent())
 
 		then: 'The asset and task object received the correct messages'
 			task.isDone()
@@ -343,11 +337,10 @@ class ApiActionScriptProcessorSpec extends Specification {
 					.build(ReactionScriptCode.FINAL)
 
 		when: 'The script is evaluated'
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.evaluate("""
-						// Complete the task 
-						task.done()
-					""".stripIndent(), ApiActionScriptBinding.class.name)
+			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
+				// Complete the task 
+				task.done()
+			""".stripIndent())
 
 		then: 'The asset and task object received the correct messages'
 			task.isDone()
