@@ -168,7 +168,8 @@ class MetricReportingService {
 	 * @return and hql string that can be run to get metric data.
 	 */
 	String getQuery(JSONObject query) {
-		String domain = ETLDomain.lookup((String) query.domain).clazz.simpleName
+		Class domainClass = ETLDomain.lookup((String) query.domain).clazz
+		String domain = domainClass.simpleName
 		String aggregation = query.aggregation
 		List groupBys = query?.groupBy?.clone() ?: []
 		String label = getLabel(groupBys, aggregation)
@@ -177,7 +178,7 @@ class MetricReportingService {
 		groupBys << 'project.id'
 		List wheres = query?.where?.clone() ?: []
 
-		if (domain == AssetEntity.class.simpleName) {
+		if (domainClass in AssetEntity) {
 			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
 		}
 
