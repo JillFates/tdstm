@@ -2,7 +2,7 @@ package pages.AssetViewManager
 import geb.Page
 import modules.MyViewsModule
 import modules.CreateViewModule
-
+import org.openqa.selenium.By
 
 class AssetViewsPage extends Page{
 
@@ -16,6 +16,7 @@ class AssetViewsPage extends Page{
         viewsMenu                   {viewMgrPageWindow.find("ul",class:"nav nav-pills nav-stacked")}
         viewOptions                 {viewMgrPageWindow.find("a")}
         viewMgrMyViews              {viewOptions[2]}
+        viewSystemViews             {viewOptions[4]}
         //>>>>>>>>> MODULES
         viewsModule                 { module MyViewsModule}
         createViewModule            { module CreateViewModule}
@@ -38,5 +39,11 @@ class AssetViewsPage extends Page{
     }
     def filterViewByName(String name){
         filter=name
+    }
+
+    def openViewByName(name){
+        filterViewByName name
+        def link = $(By.xpath("//tr/td/a[text()='${name}']"))
+        link.click()
     }
 }
