@@ -79,7 +79,7 @@ class ApiActionService implements ServiceMethods {
 			agents << info
 		}
 
-		return agents
+		return agents.sort {it.name}
 	}
 
 	/**
@@ -116,7 +116,7 @@ class ApiActionService implements ServiceMethods {
 				}
 			}
 		}
-		return dictionary
+		return dictionary.sort {it.value.name}
 	}
 
 	/**
