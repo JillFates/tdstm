@@ -231,9 +231,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param from
 	 * @return a Map with the next steps in this command.
 	 */
-	def from (int from) {
+	Map<String, ?> from (int from) {
 		validateStack()
-		[to: { int to ->
+		return [to: { int to ->
 			[iterate: { Closure closure ->
 				from--
 				to
@@ -255,9 +255,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
-	def from (int[] numbers) {
+	Map<String, ?> from (int[] numbers) {
 		validateStack()
-		[iterate: { Closure closure ->
+		return [iterate: { Closure closure ->
 			List rowNumbers = numbers as List
 			List rows = this.dataSetFacade.rows()
 			List subList = rowNumbers.collect { int number ->
@@ -402,14 +402,16 @@ class ETLProcessor implements RangeChecker {
 	 * @param control
 	 * @return
 	 */
-	def replace (ReservedWord reservedWord) {
+	Map<String, ?> replace (ReservedWord reservedWord) {
 		debugConsole.info "Global trm status changed: $reservedWord"
 		if (reservedWord == ReservedWord.ControlCharacters) {
-			[
+			return [
 				with: { y ->
 					globalTransformers.add(Replacer(ControlCharactersRegex, y))
 				}
 			]
+		} else {
+			throw ETLProcessorException.invalidReplaceCommand()
 		}
 	}
 
@@ -458,7 +460,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param index
 	 * @return
 	 */
-	def extract (Integer index) {
+	Element extract (Integer index) {
 		validateStack()
 		index--
 		rangeCheck(index, currentRow.size())
@@ -478,7 +480,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param columnName
 	 * @return
 	 */
-	def extract (String columnName) {
+	Element extract (String columnName) {
 		validateStack()
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
@@ -502,9 +504,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldName
 	 * @return
 	 */
-	def load(final String fieldName) {
+	Map<String, ?> load(final String fieldName) {
 		validateStack()
-		[
+		return [
 			with: { value ->
 
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
@@ -532,7 +534,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	Object set(final String variableName) {
+	Map<String, ?> set(final String variableName) {
 		if(!binding.isValidETLVariableName(variableName)){
 			throw ETLProcessorException.invalidETLVariableName(variableName)
 		}
@@ -566,10 +568,10 @@ class ETLProcessor implements RangeChecker {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	def lookup(final String fieldName){
+	Map<String, ?> lookup(final String fieldName){
 		validateStack()
 		lookUpFieldSpecs(selectedDomain, fieldName)
-		[
+		return [
 		    with: { value ->
 			    Object stringValue = ETLValueHelper.valueOf(value)
 			    boolean found = result.lookupInReference(fieldName, stringValue)
@@ -607,9 +609,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def initialize(String field){
+	Map<String, ?> initialize(String field){
 		validateStack()
-		[
+		return [
 			with: { defaultValue ->
 
 				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
@@ -634,7 +636,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 * @see ETLProcessor#initialize(java.lang.String)
 	 */
-	def init(final String field) {
+	Map<String, ?> init(final String field) {
 		validateStack()
 		initialize(field)
 	}
@@ -645,7 +647,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain
 	 * @return
 	 */
-	def find (ETLDomain domain) {
+	ETLFindElement find (ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
 		validateStack()
 		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
@@ -849,7 +851,7 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Add a variable within the script as a global variable.
-	 * Tipically this variable is defined ouside a iterate command
+	 * Tipically this variable is defined outside a iterate command
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
@@ -872,7 +874,7 @@ class ETLProcessor implements RangeChecker {
 	 * Private method that executes extract method command internally.
 	 * @return
 	 */
-	private def doExtract () {
+	private Element doExtract () {
 		Element element = currentRow.getElement(currentColumnIndex)
 
 		addCurrentElementToBinding(element)

@@ -165,8 +165,12 @@ class ETLProcessorException extends GroovyRuntimeException {
      * Exception being thrown when no domain is specified upon load clause
      * @return
      */
-	static ETLProcessorException domainMustBeSpecified () {
-		new ETLProcessorException('A domain must be specified')
-	}
+    static ETLProcessorException domainMustBeSpecified () {
+        new ETLProcessorException('A domain must be specified')
+    }
+
+    static ETLProcessorException invalidReplaceCommand() {
+        new ETLProcessorException("Use 'replace on/off' command")
+    }
 }
 
