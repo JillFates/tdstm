@@ -347,7 +347,7 @@ class ImportBatchService implements ServiceMethods {
 			noProgressInPast2Min = noProgressInPast2Min - 2.minutes
 		}
 
-		List stalledBatches = ImportBatch.where {
+		List<Long> stalledBatches = ImportBatch.where {
 			project == project
 			id in ids
 			status == ImportBatchStatusEnum.RUNNING
@@ -362,7 +362,9 @@ class ImportBatchService implements ServiceMethods {
 
 			// Now set those batches to the proper status based on what was completed before the
 			// batch stalled (a.k.a. runtime error encountered and stopped)
-			stalledBatches.each { dataImportService.updateBatchProgress(it, 1, 1) }
+			stalledBatches.each {
+				dataImportService.updateBatchStatus(it)
+			}
 			remainingBatches = ids - stalledBatches
 		}
 

@@ -459,20 +459,20 @@ class SqlUtil {
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
-
+		String searchColumn = fieldSearchData.column
 		Object paramValue
 
 		if (isNumericField(fieldSearchData)) {
 			if (fieldSearchData.filter.isNumber()) {
 				paramValue = parseNumberParameter(fieldSearchData)
 			}
-		} else {
+		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
 
 		// Calculate the expression only if there's a valid value to be added to the query.
 		if (paramValue) {
-			String expression = getSingleValueExpression(fieldSearchData.column, fieldSearchData.columnAlias, operator)
+			String expression = getSingleValueExpression(searchColumn, fieldSearchData.columnAlias, operator)
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
 		}

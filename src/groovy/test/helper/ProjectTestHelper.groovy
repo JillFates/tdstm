@@ -80,6 +80,7 @@ class ProjectTestHelper {
 			guid = StringUtil.generateGuid()
 			workflowCode = 'STD_PROCESS'
 			timezone = Timezone.findByCode('GMT')
+			guid = StringUtil.generateGuid()
 		}
 		project.save(failOnError:true)
 

@@ -386,6 +386,11 @@ class DataImportService implements ServiceMethods {
 		def savePoint = session.createSavepoint()
 
 		Boolean hadError = false
+
+		// If the domain id is null or negative, default it to zero.
+		if (!domainId || domainId < 0) {
+			domainId = 0
+		}
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
 		for (fieldName in importContext.fieldNames) {
 
@@ -407,7 +412,7 @@ class DataImportService implements ServiceMethods {
 				DataTransferValue batchRecord = new DataTransferValue(
 					dataTransferBatch: batch,
 					fieldName: fieldName,
-					assetEntityId: ( domainId < 0 ? null : domainId ),
+					assetEntityId: domainId,
 					importValue: field.originalValue,
 					correctedValue: fieldValue,
 					rowId: rowNum
@@ -1173,7 +1178,7 @@ class DataImportService implements ServiceMethods {
 		if ( value && (value instanceof CharSequence) ) {
 			Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
 			entities = GormUtil.findDomainByAlternateKey(domainClass, value, context.project)
-			log.debug 'findDomainByAlternateProperty() found={}',entities.size()
+			log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
 		}
 		return entities
 	}

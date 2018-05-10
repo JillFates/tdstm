@@ -73,7 +73,7 @@ class ProjectController implements ControllerMethods {
 		                    sortOn: ProjectSortProperty.valueOfParam(sortIndex),
 		                    sortOrder: SortOrder.valueOfParam(sortOrder), params: params]
 
-		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive) ?: ProjectStatus.COMPLETED
+		ProjectStatus projectStatus = ProjectStatus.lookup(params.isActive) ?: ProjectStatus.COMPLETED
 
 		def projectList = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
 
@@ -228,6 +228,7 @@ class ProjectController implements ControllerMethods {
 			}
 			params.timezone = retrievetimeZone(params.timezone)
 
+			params.collectMetrics = params.collectMetrics == "1" ? 1: 0
 			params.runbookOn = 1
 			project.properties = params
 
@@ -363,6 +364,7 @@ class ProjectController implements ControllerMethods {
 			}
 			params.runbookOn =  1	// Default to ON
 			params.timezone = retrievetimeZone(params.timezone)
+			params.collectMetrics = params.collectMetrics == "1" ? 1: 0
 
 			Project project = new Project(params)
 
