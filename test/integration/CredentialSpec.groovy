@@ -17,7 +17,7 @@ class CredentialSpec extends IntegrationSpec {
 
 	void 'Test the Session/Cookie name and ValidationExpression validation of Credential'() {
 		expect:
-		createTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
+			createTestCredential(method, sessionName, valExp, authUrl, renewUrl, httpMethod, requestMode).validate() == result
 
 		where:
 		method				| sessionName	| valExp				 | authUrl		 | renewUrl		| httpMethod 	| requestMode		| result
