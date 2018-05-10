@@ -23,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Shared
 
@@ -89,11 +90,7 @@ class ETLInitializeSpec extends ETLBaseSpec {
 		applicationFieldsValidator = new DomainClassFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 	/**
@@ -102,10 +99,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize field defined before the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -151,10 +144,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize field defined after the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -200,10 +189,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can init field defined before the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -249,10 +234,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can init field defined after the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -298,10 +279,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize an element with defined value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -346,10 +323,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using a literal String'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -381,10 +354,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using an implicit String'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -416,10 +385,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using an SOURCE value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -451,10 +416,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using an DOMAIN value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -487,10 +448,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using CE value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,

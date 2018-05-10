@@ -91,6 +91,13 @@ class FindingsFacade {
 	}
 
 	/**
+	 * Returns the first element collected in results
+	 * @return
+	 */
+	Object result(){
+		return findElement.firstResult()
+	}
+	/**
 	 * It checks if find Element contains results
 	 * and those results are instance of clazz parameter
 	 * @param clazz a Class definition
