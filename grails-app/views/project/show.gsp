@@ -105,8 +105,14 @@
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
+							<td class="name"><label >GUID:</label></td>
+							<td class="valueNW"> ${projectInstance.guid} </td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>g
 							<td class="name"><label>Plan Methodology:</label></td>
-							<td class="valueNW"> ${planMethodology?.label} </td>
+							<td class="valueNW">${planMethodology?.label}</td>
 						</tr>
 					</tbody>
 				</table>

@@ -142,7 +142,12 @@ a:hover {
 							</td>
 						</tr>
 						<tr class="even">
-							<td colspan="2">
+							<td>
+								<tds:hasPermission permission="${Permission.AdminUtilitiesAccess }">
+									<g:link controller="reports" action="metricDefinitions" style="color:black">Edit Metric Definitions</g:link>
+								</tds:hasPermission>
+							</td>
+							<td>
 								<tds:hasPermission permission="${Permission.ApplicationRestart}">
 									<g:link controller="admin" action="restartAppServiceForm" style="color:black">Restart Application Service</g:link>
 								</tds:hasPermission>
