@@ -119,11 +119,22 @@ databaseChangeLog = {
 			sqlCheck(expectedResult: '0', "SELECT count(*) FROM asset_options WHERE type = 'ASSET_TYPE'")
 		}
 		sql("""
-				INSERT INTO asset_options (type, value)
-				SELECT 'ASSET_TYPE', value
-						FROM eav_attribute_option ao
-						JOIN eav_attribute ea ON ao.attribute_id = ea.attribute_id
-						WHERE ea.attribute_code = 'assetType';
+				INSERT INTO asset_options (value, type)
+				SELECT DISTINCT value, 'ASSET_TYPE'
+				FROM eav_attribute_option ao
+				JOIN eav_attribute ea ON ao.attribute_id = ea.attribute_id
+				WHERE ea.attribute_code = 'assetType';
+		""")
+
+		sql("""
+				INSERT INTO asset_options (value, type) 
+				SELECT DISTINCT asset_type, 'ASSET_TYPE'
+				FROM model
+				WHERE asset_type NOT IN(
+					SELECT value 
+					FROM asset_options 
+					WHERE type = 'ASSET_TYPE'
+				);
 		""")
 	}
 
