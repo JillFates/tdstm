@@ -83,10 +83,12 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset.manufacturerSelectValue = {id: null};
 			if (this.model.asset.manufacturer) {
 				this.model.asset.manufacturerSelectValue.id = this.model.asset.manufacturer.id;
+				this.model.asset.manufacturerSelectValue.text = this.model.manufacturerName;
 			}
 			this.model.asset.modelSelectValue = {id: null};
 			if (this.model.asset.model) {
 				this.model.asset.modelSelectValue.id = this.model.asset.model.id;
+				this.model.asset.modelSelectValue.text = this.model.modelName;
 			}
 			if (this.model.sourceRackSelect) {
 				this.rackSourceOptions = this.model.sourceRackSelect;
@@ -116,7 +118,7 @@ export function DeviceEditComponent(template, editModel) {
 				modelRequest.asset.manufacturerId = this.model.asset.manufacturerSelectValue.id.toString();
 			}
 			modelRequest.asset.currentAssetType = null;
-			if (this.model.asset.assetTypeSelectValue.id > 0) {
+			if (this.model.asset.assetTypeSelectValue.id) {
 				modelRequest.asset.currentAssetType = this.model.asset.assetTypeSelectValue.id.toString();
 			}
 			modelRequest.asset.modelId = null;
@@ -340,8 +342,6 @@ export function DeviceEditComponent(template, editModel) {
 				value = {id: null};
 			}
 			this.model.asset.assetTypeSelectValue = value;
-			console.log(this.model.asset.assetTypeSelectValue);
-			// this.model.asset.manufacturerSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
 			this.toggleAssetTypeFields();
 		}
@@ -355,8 +355,6 @@ export function DeviceEditComponent(template, editModel) {
 				value = {id: null};
 			}
 			this.model.asset.manufacturerSelectValue = value;
-			console.log(this.model.asset.manufacturerSelectValue);
-			// this.model.asset.assetTypeSelectValue = {id: null};
 			this.model.asset.modelSelectValue = {id: null};
 		}
 
@@ -369,7 +367,6 @@ export function DeviceEditComponent(template, editModel) {
 			this.model.asset.manufacturerSelectValue.id = value.manufacturerId;
 			this.model.asset.modelSelectValue.id = value.id;
 			this.model.asset.modelSelectValue.text = value.text;
-			console.log(this.model.asset.modelSelectValue);
 			this.toggleAssetTypeFields();
 		}
 
