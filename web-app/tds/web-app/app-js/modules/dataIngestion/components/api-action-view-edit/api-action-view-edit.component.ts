@@ -816,7 +816,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getAssetClassValue(context: any): string {
 		let assetClass = this.assetClassesForParameters.find((param) => {
-			return param.assetClass === context;
+			return param.assetClass === context || param.assetClass === context.assetClass;
 		});
 		if (assetClass && assetClass.value) {
 			return assetClass.value;
