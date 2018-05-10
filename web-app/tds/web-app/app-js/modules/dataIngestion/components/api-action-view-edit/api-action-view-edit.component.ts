@@ -301,7 +301,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
-					this.modalType = this.actionTypes.EDIT;
+					this.modalType = this.actionTypes.VIEW;
 					this.getModalTitle();
 					this.apiActionModel.id = result.id;
 					this.apiActionModel.version = result.version;
