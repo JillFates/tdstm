@@ -12,7 +12,6 @@ class ViewsModule extends Module {
         viewListTableBody {$("tbody")}
         viewsListed       {$("[uisref]")}
         viewsContainer    { $( "div", class:"content body")}
-        viewsListed       {$("[uisref]")}
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         vwGrid            (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows        (required: false, wait:true) { vwGrid.find("tbody tr")}
@@ -31,9 +30,6 @@ class ViewsModule extends Module {
     }
     def clickCreateView(){
         createViewButton.click()
-    }
-    def listedViews(){
-        def rows = viewsListed
     }
     def moduleTitleIsCorrect(String title){
         moduleTitle.text()==title
@@ -67,7 +63,12 @@ class ViewsModule extends Module {
      * number of rows should be the same as number of ticks.
      */
     def validateIsShared(){
-        def validation=(sharedViews.size()==vwGridRows.size())
+        if(sharedViews.size()>0){
+            sharedViews.size()==vwGridRows.size()
+        }else{
+            println("No Shared views are displayed")
+        }
+
     }
     /**
      * System Views will have no author (created by field empty)
@@ -75,10 +76,34 @@ class ViewsModule extends Module {
     def systemViewsOnly(){
         createdBy.text()==""
     }
+    /**
+     * This validates that a view is listed
+     * @param viewName
+     * @return
+     */
     def validateViewIsListed(String viewName){
-        listedViews().find {
+        viewsListed.find {
             if (it.text()==viewName) return true
             return false
         }
+    }
+    /**
+     * Here, we validata that ALL of th rows contain the text, therefore
+     * the filtering was successfull
+     * @param text
+     * @return
+     */
+    def validateFilteredList(String text){
+        boolean validList=true
+        for (view in viewsListed){
+           println(view.text())
+           if(!view.text().contains(text)){
+               validList=false
+           }
+        }
+        validList
+    }
+    def clickFirstViewOfTheList(){
+        vwGrid.find("tr")[1].find("a")[1].click()
     }
 }
