@@ -159,11 +159,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test CE should appear upon extract command'() {
@@ -362,24 +358,25 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				[]
+
+			AssetEntity.executeQuery(_, _, _) >> { query, namedParams, metaParams ->
+				return []
 			}
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
-				GroovyMock(DebugConsole),
+				debugConsole,
 				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				console on
 				read labels
-				domain Device
+				domain Application
 				iterate {
-					find Device by 'model' with SOURCE.'model' into 'id'
+					find Application by 'Name' with SOURCE.'model' into 'id'
 				}
 			""".stripIndent())
 
@@ -397,7 +394,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 		and: 'Results contains the following values'
 			etlProcessor.result.domains.size() == 1
 			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
+				domain == ETLDomain.Application.name()
 				fieldNames == ['id'] as Set
 				with(data[0]){
 					op == 'I'
@@ -409,14 +406,14 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 					with(fields.id){
 						originalValue == null
 						value == null
-						errors == []
+						//errors == []
 						warn == false
 						with(find){
 							query.size() == 1
 							with(query[0]){
-								domain == ETLDomain.Device.name()
+								domain == ETLDomain.Application.name()
 								with(kv){
-									model: 'PE2950'
+									assetName: 'PE2950'
 								}
 							}
 

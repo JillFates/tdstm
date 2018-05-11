@@ -93,8 +93,8 @@ class ETLFindElement implements ETLStackableCommand{
 	 */
 	ETLFindElement by(String... fields) {
 		for(field in fields){
-			ETLFieldSpec fieldSpec = checkAssetFieldSpec(field)
-			currentFind.fields.add(fieldSpec.name)
+			ETLFieldDefinition fieldDefinition = checkAssetFieldSpec(field)
+			currentFind.fields.add(fieldDefinition.name)
 		}
 		return this
 	}
