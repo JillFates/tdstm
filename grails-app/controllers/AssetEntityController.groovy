@@ -1518,8 +1518,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		def assetType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
 		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
-		 dependencyStatus: dependencyStatus, environment: environment]
+		 dependencyStatus: dependencyStatus, environment: environment, assetType: assetType]
 	}
 
 	/**
@@ -1545,6 +1546,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				assetOption.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
 				assetOption.value = params.environment
 				break
+			case 'assetType':
+				assetOption.type = AssetOptions.AssetOptionsType.ASSET_TYPE
+				assetOption.value = params.assetType
+				break
 			default:
 				assetOption.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 				assetOption.value = params.dependencyStatus
@@ -1568,6 +1573,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			case 'Priority':    idParamName = 'priorityId'; break
 			case 'dependency':  idParamName = 'dependecyId'; break
 			case 'environment': idParamName = 'environmentId'; break
+			case 'assetType':   idParamName = 'assetTypeId'; break
 			default:            idParamName = 'dependecyId'; break
 		}
 
