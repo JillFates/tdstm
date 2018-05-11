@@ -17,9 +17,9 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-ui-dialog',
 	template: `
-        <div class="modal fade" id="tdsUiDialog" data-backdrop="static" tabindex="-1"
+        <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
              role="dialog">
-            <div class="modal-dialog modal-{{size}}" role="document" tabindex="-1" #modalDialog>
+            <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
                 <div class="modal-content">
                     <div #view></div>
                 </div>
@@ -108,9 +108,17 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			instance.open(event.resolve, event.reject, cmpRef, event.enableEsc, event.draggable);
 		});
 
+		/**
+		 * Listener to replace the current dialog for another, this is helpful for Asset since it is compiled on fly
+		 * use dialog.open for a normal context.
+		 * @type {() => void}
+		 */
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
 			if (this.cmpRef) {
 				this.cmpRef.destroy();
+				// Pass params to override the current opened dialog behavior
+				this.size = event.size;
+
 				this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 				this.activeDialog.componentInstance = this.cmpRef;
 			}

@@ -117,9 +117,21 @@ export class AssetExplorerViewGridComponent {
 				};
 			});
 		}, (err) => console.log(err));
+
+		// Listen to any Changes outside the model, like Asset Edit Views
+		this.eventListeners();
 	}
 	private getPreferences(): Observable<any> {
 		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
+	}
+
+	/**
+	 * Reload the current Kendo List when an event that requires the changes occurs completely out of the context.
+	 */
+	private eventListeners() {
+		this.notifier.on('reloadCurrentAssetList', (event) => {
+			this.onReload();
+		});
 	}
 
 	/**
@@ -207,7 +219,6 @@ export class AssetExplorerViewGridComponent {
 	}
 
 	apply(data: any): void {
-		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		this.gridMessage = 'ASSET_EXPLORER.GRID.NO_RECORDS';
 		this.bulkItems = {};
 		data.assets.map(c => c.common_id).forEach(id => {
@@ -221,13 +232,16 @@ export class AssetExplorerViewGridComponent {
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
 	clear(): void {
 		this.showMessage = true;
 		this.gridMessage = 'ASSET_EXPLORER.GRID.SCHEMA_CHANGE';
 		this.gridData = null;
-		jQuery('.k-grid-content-locked').css('height', '0px'); // when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 		this.state = {
 			skip: 0,
 			take: this.state.take,
@@ -269,7 +283,9 @@ export class AssetExplorerViewGridComponent {
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
 			DIALOG_SIZE.LG, true).then(x => {
-				this.createDependencyPromise(x.assetClass, x.id);
+				if (x) {
+					this.createDependencyPromise(x.assetClass, x.id);
+				}
 			}).catch(x => {
 				console.log(x);
 			});

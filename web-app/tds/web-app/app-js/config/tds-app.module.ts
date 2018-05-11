@@ -6,9 +6,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
-
-// import {TranslateModule, TranslateLoader, TranslateStaticLoader} from 'ng2-translate';
-
 import { TDSAppComponent } from './tds-app.component';
 // Feature modules
 import { SharedModule } from '../shared/shared.module';

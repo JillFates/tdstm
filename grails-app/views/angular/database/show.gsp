@@ -1,3 +1,4 @@
+<!-- database-show.component.ts -->
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
@@ -120,6 +121,7 @@
         </div>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Close</button>
+        <button class="btn btn-default pull-left" (click)="showAssetEditView()" type="button"><span  class="glyphicon glyphicon-pencil"></span> Edit</button>
+        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span  class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
     </div>
 </div>

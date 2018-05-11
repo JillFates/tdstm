@@ -1,0 +1,55 @@
+<!--<div>-->
+
+<kendo-combobox #innerComboBoxGroup
+                [data]="dataSource"
+                [(ngModel)]="model"
+                [textField]="'text'"
+                [valueField]="'id'"
+                [filterable]="true"
+                name="testName"
+                class="theCombo"
+                style="width: 100%;">
+    <ng-template kendoComboBoxItemTemplate let-dataItem class="super-template">
+        <div class="sme-group" *ngIf="dataItem.category === 'sme'">
+            {{dataItem.text}}
+            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
+        </div>
+
+        <div class="team-group" *ngIf="dataItem.category === 'team'" >
+            {{dataItem.text}}
+            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
+        </div>
+
+        <div class="person-group" *ngIf="dataItem.category === 'person'" >
+            {{dataItem.text}}
+            <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
+        </div>
+    </ng-template>
+</kendo-combobox>
+
+<!--</div>-->
+
+<!--
+<kendo-combobox #innerComboBoxGroup
+                [data]="datasource"
+                [(ngModel)]="model"
+                [textField]="'text'"
+                [valueField]="'id'"
+                [filterable]="true"
+                name="testName"
+                style="width: 100%;">
+</kendo-combobox>
+-->
+
+
+<!--(valueChange)="onValueChange($event)"-->
+<!--(selectionChange)="onSelectionChange($event)"-->
+<!--(filterChange)="onFilterChange($event)"-->
+<!--(open)="onOpen()"-->
+<!--(close)="onClose()"-->
+<!--(focus)="onFocus()"-->
+<!--(blur)="onBlur()"-->
+<!--[suggest]="true"-->
+<!--[disabled]="disabled"-->
+<!--required="required"-->
+<!--[placeholder]="placeholder"-->

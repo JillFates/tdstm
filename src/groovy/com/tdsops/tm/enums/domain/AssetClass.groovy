@@ -160,4 +160,5 @@ enum AssetClass {
 	static lookup(Class<? extends AssetEntity> clazz){
 		return assetClassByDomainClassMap[clazz]
 	}
+	
 }
