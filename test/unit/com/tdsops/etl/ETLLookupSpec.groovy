@@ -56,12 +56,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}

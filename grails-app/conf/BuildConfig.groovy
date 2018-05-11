@@ -84,7 +84,10 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-acl:2.0.0'
 		compile ':greenmail:1.3.4'
 
-		compile ':spring-security-rest:1.5.4'
+		compile (':spring-security-rest:1.5.4') {
+			// Remove old Guava files packed in spring-security-rest plugin
+			excludes 'guava-io'
+		}
 		compile ":rest-client-builder:2.1.0"
 
 		compile "org.grails.plugins:cascade-validation:0.1.5"

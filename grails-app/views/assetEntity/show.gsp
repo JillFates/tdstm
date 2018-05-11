@@ -51,12 +51,12 @@
 						<td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
 							<label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
 						</td>
-												<td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}" >
+												<td class="valueNW ${standardFieldSpecs.locationSource.imp?:''}" >
 														<tds:tooltipSpan field="${standardFieldSpecs.locationSource}" >
 																${assetEntity.sourceLocation}
 														</tds:tooltipSpan>
 												</td>
-												<td class="valueNW nonVMLabel ${standardFieldSpecs.locationTarget.imp?:''}" >
+												<td class="valueNW ${standardFieldSpecs.locationTarget.imp?:''}" >
 														<tds:tooltipSpan field="${standardFieldSpecs.locationTarget}" >
 																${assetEntity.targetLocation}
 														</tds:tooltipSpan>

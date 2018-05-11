@@ -1,3 +1,4 @@
+import com.tdssrc.grails.GormUtil
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.metricdefinition.GetMetricsCommand
@@ -16,27 +17,26 @@ class MetricController implements ControllerMethods {
 	MetricReportingService metricReportingService
 
 	/**
-	 * Gets the metric results based on a GetMetricsCommand object.
+	 * Gets the metric results based on a GetMetricsCommand object
 	 *
-	 * @param params a GetMetricsCommand object which incduled stateDate, endDate,
-	 * projectGuid, and metricCodes(csv delimited). it also includes a format,
-	 * csv/json defaulting to csv
+	 * @param params a GetMetricsCommand object which includes stateDate, endDate,
+	 * projectGuid, metricCodes(csv delimited) and format (csv|json, default csv)
 	 *
-	 * @return if the format is csv, or default, then this returns a csv file,
-	 * with the metrics results queried for, else it returns JSON with the
-	 * metrics results queried for.
+	 * @return the metric data formated as csv or json based on format specified
 	 */
 	@HasPermission(Permission.AdminUtilitiesAccess)
-	def index(GetMetricsCommand params) {
-		if (params.hasErrors()) {
-			response.setStatus(HttpStatus.BAD_REQUEST.value())
-			return renderAsJson(params.errors)
+	def index() {
+		GetMetricsCommand commandObj = populateCommandObject(GetMetricsCommand)
+		if (commandObj.hasErrors()) {
+			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObj) ) )
+			return
 		}
 
-		List<Map> metricData = metricReportingService.getMetrics(params.startDate,
-																 params.endDate,
-																 params.projectGuid,
-																 params.codes())
+		List<Map> metricData = metricReportingService.getMetrics(
+			commandObj.startDate,
+			commandObj.endDate,
+			commandObj.projectGuid,
+			commandObj.codes())
 
 		withFormat {
 			csv {

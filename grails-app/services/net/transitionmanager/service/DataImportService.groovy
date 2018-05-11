@@ -468,15 +468,7 @@ class DataImportService implements ServiceMethods {
 			dupsFound = ( rowData.fields.id.size() > 1 ? 1 : 0)
 		}
 
-		// TODO : JPM 2/2018 : TM-9598 Should be able drop this map
-		final Map operationMap = [
-			I: ImportOperationEnum.INSERT,
-			U: ImportOperationEnum.UPDATE,
-			D: ImportOperationEnum.DELETE
-		]
-		ImportOperationEnum OpValue = (operationMap.containsKey(rowData.op) ? operationMap[rowData.op] : ImportOperationEnum.UNDETERMINED)
-		// TODO : JPM 2/2018 : TM-9598 Should be able to use this command
-		// ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op),
+		ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op)
 
 		ImportBatchRecord batchRecord = new ImportBatchRecord(
 			importBatch: batch,
@@ -786,17 +778,19 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
 	@NotTransactional()
-	private void updateBatchStatus(ImportBatch batch) {
+	private void updateBatchStatus(Long batchId) {
 		Integer count = ImportBatchRecord.where {
-			importBatch.id == batch.id
+			importBatch.id == batchId
 			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
 		}.count()
 		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
 
-		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batch.id, count, status.name()
+		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batchId, count, status.name()
 
-		batch.status = status
-		batch.save()
+		ImportBatch.where {
+			id == batchId
+			status != status
+		}.updateAll([status: status])
 	}
 
 	/**
@@ -1184,7 +1178,7 @@ class DataImportService implements ServiceMethods {
 		if ( value && (value instanceof CharSequence) ) {
 			Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
 			entities = GormUtil.findDomainByAlternateKey(domainClass, value, context.project)
-			log.debug 'findDomainByAlternateProperty() found={}',entities.size()
+			log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
 		}
 		return entities
 	}

@@ -1538,19 +1538,25 @@ class ReportsController implements ControllerMethods {
 	def testMetricDefinitions(){
 		List<Map> data = []
 		String metricCodesString = request.JSON.metricCodes
+		MetricDefinitionsCommand definitions = populateCommandObject(MetricDefinitionsCommand.class)
+		validateCommandObject(definitions)
 
 		if(!metricCodesString){
 			return renderErrorJson('Metric codes can not be empty')
 		}
 
-		List<String> codes =  request.JSON.metricCodes.split(',')
+		List<String> codes =  definitions.testCodes()
 
 		codes.each { String metricCode ->
-			data.addAll(metricReportingService.testMetric(metricCode.trim()))
+			data.addAll(metricReportingService.testMetric(metricCode.trim(), definitions))
+		}
+
+		if(!data){
+			return renderErrorJson('No data found.')
 		}
 
 		renderSuccessJson(data)
-		renderErrorJson()
+
 	}
 
 	/**

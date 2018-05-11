@@ -21,10 +21,8 @@ class GetMetricsCommand {
 	String format = 'csv'
 
 	List<String> codes(){
-		if(metricCodes) {
-			return metricCodes.split(',').collect { String code ->
-				code.trim()
-			}
+		if (metricCodes) {
+			return metricCodes.split(',')*.trim()
 		}
 
 		return []

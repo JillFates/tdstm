@@ -57,6 +57,42 @@ trait ControllerMethods {
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
 
+	/**
+	 * Renders a list of maps to a CSV file.
+	 *
+	 * @param data a list of maps to render to a csv file
+	 *
+	 * @param fileName The file name of the csv file defaults to filename.
+	 */
+	void renderAsCSV(List<Map> data, String fileName = 'filename') {
+		OutputStreamWriter writer
+
+		try {
+			response.setHeader("Content-disposition", "attachment; filename=${fileName}.csv")
+			setContentTypeCsv()
+			OutputStream outputStream = response.outputStream
+			writer = new OutputStreamWriter(outputStream)
+			if (data) {
+				CSVWriter csvWriter = new CSVWriter(writer)
+
+				// write headers
+				String[] rowArray = (data[0].keySet()).toArray()
+				csvWriter.writeNext(rowArray)
+
+				// Iterate over the rows to write out the data
+				data.each { Map row ->
+					rowArray = (row.values()*.toString()).toArray()
+					csvWriter.writeNext(rowArray)
+				}
+			} else {
+				writer.write('no results found')
+			}
+		} finally {
+			writer.flush()
+			writer.close()
+		}
+	}
+
 	void renderAsJson(data) {
 		render(data as JSON)
 	}
@@ -75,37 +111,6 @@ trait ControllerMethods {
 
 	void renderWarningJson(warningStringOrList) {
 		renderAsJson warnings(warningStringOrList)
-	}
-
-	/**
-	 * Renders a list of maps to a CSV file.
-	 *
-	 * @param data a list of maps to render to a csv file
-	 *
-	 * @param fileName The file name of the csv file defaults to filename.
-	 */
-	void renderAsCSV(List<Map> data, String fileName = 'filename') {
-		OutputStreamWriter writer
-
-		try {
-			response.setHeader("Content-disposition", "attachment; filename=${fileName}.csv")
-			setContentTypeCsv()
-			OutputStream outputStream = response.outputStream
-			writer = new OutputStreamWriter(outputStream)
-			CSVWriter csvWriter = new CSVWriter(writer)
-
-			//write headers
-			String[] rowArray = (data[0].keySet()).toArray()
-			csvWriter.writeNext(rowArray)
-
-			data.each { Map row ->
-				rowArray = (row.values()*.toString()).toArray()
-				csvWriter.writeNext(rowArray)
-			}
-		} finally {
-			writer.flush()
-			writer.close()
-		}
 	}
 
 	Map success(data = [:]) {
@@ -171,7 +176,10 @@ trait ControllerMethods {
 	/**
 	 * Used to respond with a 400 Bad Request
 	 */
-	void sendBadRequest() {
+	void sendBadRequest(String errorMsg='') {
+		if (errorMsg) {
+			response.addHeader(ERROR_MESG_HEADER, errorMsg)
+		}
 		response.sendError(400, 'Bad Request')
 	}
 

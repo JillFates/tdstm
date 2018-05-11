@@ -17,6 +17,7 @@ import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import spock.lang.Shared
@@ -48,6 +49,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
+	ETLFieldsValidator validator
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -149,6 +151,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
+
+		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test can transform a field value with uppercase transformation'() {
@@ -572,10 +576,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can append strings and element in a transformation chain using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -654,10 +654,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can plus strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
 		and:
@@ -693,10 +689,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can append strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -731,10 +723,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can append strings and elements in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -770,10 +758,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use a set element in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -809,10 +793,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use a set element in a transformation closure'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,

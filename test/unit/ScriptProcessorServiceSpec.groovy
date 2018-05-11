@@ -155,23 +155,11 @@ class ScriptProcessorServiceSpec extends Specification {
 
 		and:
 			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+			}
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
 				return true
-			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
-			}
-
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
 			}
 
 		and:
@@ -180,7 +168,7 @@ class ScriptProcessorServiceSpec extends Specification {
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load 'id'
+                    extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
                     
@@ -201,23 +189,23 @@ class ScriptProcessorServiceSpec extends Specification {
 					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
-						value == '152254'
+						value == 152254l
 						originalValue == '152254'
-						find.results == [152254]
+						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152254'
+						find.query[0].kv.id == 152254l
 					}
 
 					with(data[1].fields.id) {
-						value == '152255'
+						value == 152255l
 						originalValue == '152255'
-						find.results == [152255]
+						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152255'
+						find.query[0].kv.id == 152255l
 					}
 
 					with(data[0].fields.appVendor) {
@@ -277,23 +265,12 @@ application id,vendor name,technology,location
 
 		and:
 			GroovyMock(AssetEntity, global: true)
-			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz ->
-				return true
-			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
-		and:
-			GroovyMock(GormUtil, global: true)
-			GormUtil.isDomainProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
-			}
-			GormUtil.isDomainIdentifier(_, _) >> { Class<?> clazz, String propertyName ->
-				propertyName == 'id'
-			}
-			GormUtil.isReferenceProperty(_, _) >> { Object domainObject, String propertyName ->
-				true
+			Application.isAssignableFrom(_) >> { Class<?> clazz ->
+				return true
 			}
 
 		and:
@@ -304,7 +281,7 @@ application id,vendor name,technology,location
                 read labels
                 iterate {
                     domain Application
-                    extract 'application id' load 'id'
+                    extract 'application id' transform with toLong() load 'id'
                     extract 'vendor name' load 'Vendor'
                     load 'environment' with 'Production'
                     
@@ -327,23 +304,23 @@ application id,vendor name,technology,location
 					fieldNames == ['id', 'appVendor', 'environment'] as Set
 
 					with(data[0].fields.id) {
-						value == '152254'
+						value == 152254l
 						originalValue == '152254'
-						find.results == [152254]
+						find.results == [152254l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152254'
+						find.query[0].kv.id == 152254l
 					}
 
 					with(data[1].fields.id) {
-						value == '152255'
+						value == 152255l
 						originalValue == '152255'
-						find.results == [152255]
+						find.results == [152255l]
 						find.matchOn == 0
 						find.query.size() == 1
 						find.query[0].domain == ETLDomain.Application.name()
-						find.query[0].kv.id == '152255'
+						find.query[0].kv.id == 152255l
 					}
 
 					with(data[0].fields.appVendor) {

@@ -17,6 +17,8 @@ class Rack {
 	String rackType = 'Rack'
 	String front = 'L'
 
+	static String alternateKey = 'tag'
+
 	static hasMany = [sourceAssets: AssetEntity, targetAssets: AssetEntity]
 	static mappedBy = [sourceAssets: 'rackSource', targetAssets: 'rackTarget']
 
