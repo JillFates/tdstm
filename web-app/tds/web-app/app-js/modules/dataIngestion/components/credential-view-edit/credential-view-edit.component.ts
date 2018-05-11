@@ -23,24 +23,24 @@ declare var jQuery: any;
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
-		.invalid-form {
-			color: red;
-			font-weight: bold;
-		}
-		#httpMethod {
-			width: 75px;
-		}
+        .invalid-form {
+            color: red;
+            font-weight: bold;
+        }
+        #httpMethod {
+            width: 75px;
+        }
         .radio-aligned {
             margin: 4px 4px 0;
             vertical-align: top;
         }
-		.label-detail {
+        .label-detail {
             font-weight: normal;
-			cursor: pointer;
-		}
-		.check-action {
-			margin-left: 12px !important;
-		}
+            cursor: pointer;
+        }
+        .check-action {
+            margin-left: 12px !important;
+        }
 	`]
 })
 export class CredentialViewEditComponent {
@@ -288,12 +288,12 @@ export class CredentialViewEditComponent {
 	 */
 	private validateExpressionCheck(): Observable<any> {
 		return new Observable(observer => {
-		this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
-			(result: any) => {
-				this.validExpressionResult = result;
-				observer.next(result);
-			},
-			(err) => console.log(err));
+			this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
+				(result: any) => {
+					this.validExpressionResult = result;
+					observer.next(result);
+				},
+				(err) => console.log(err));
 		});
 	}
 

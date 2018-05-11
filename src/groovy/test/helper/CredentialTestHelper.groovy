@@ -43,6 +43,41 @@ class CredentialTestHelper {
 	}
 
 	/**
+	 * Create and return a Credential domain object
+	 * @param project
+	 * @param provider
+	 * @param  authMethod
+	 * @param  sessionName
+	 * @param  validationExp
+	 * @param  authUrl
+	 * @param  renewUrl
+	 * @param  httpMethod
+	 * @param  requestMode
+	 * @return  The Credential domain object
+	 */
+	Credential createCredential(Project project, Provider provider, authMethod, sessionName, validationExp, authUrl, renewUrl, httpMethod, requestMode) {
+
+		def credential = new Credential()
+
+		credential.username = 'username'
+		credential.name = RandomStringUtils.randomAlphanumeric(10)
+		credential.salt = AESCodec.instance.generateRandomSalt().substring(0,16)
+		credential.password = AESCodec.instance.encode('password', credential.salt)
+		credential.environment = CredentialEnvironment.SANDBOX
+		credential.status = CredentialStatus.ACTIVE
+		credential.project = project
+		credential.provider = provider
+		credential.authenticationMethod = authMethod
+		credential.sessionName = sessionName
+		credential.validationExpression = validationExp
+		credential.authenticationUrl = authUrl
+		credential.renewTokenUrl = renewUrl
+		credential.httpMethod = httpMethod
+		credential.requestMode = requestMode
+		return credential
+	}
+
+	/**
 	 * Create and save a Credential domain object
 	 * @param project
 	 * @param provider

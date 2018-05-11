@@ -309,7 +309,7 @@ class AssetEntity extends EavEntity {
 	}
 
 	/*
-	 *  methods for JMESA filter/sort
+	 *  methods for filter/sort
 	 */
 	String getModelName() {
 		model?.modelName

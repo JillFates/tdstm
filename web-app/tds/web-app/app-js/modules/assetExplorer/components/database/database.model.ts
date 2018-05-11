@@ -1,5 +1,11 @@
-import * as R from 'ramda';
-
+/**
+ * This is not longer use since the custom are created on fly
+ * However, it has the structure of possible values for the Database Model
+ * up to date 13/03/2018
+ *
+ * This can be also used to get the definition of an element, useful for some data being empty like Scale
+ * that requires an structure to work with widgets, and so on.
+ */
 export class DatabaseModel {
 	assetName: string;
 	description: string;
@@ -17,6 +23,7 @@ export class DatabaseModel {
 	planStatus: string;
 	externalRefId: string;
 	validation: string;
+	asset: any;
 
 	constructor() {
 		this.assetName = '';
@@ -35,5 +42,6 @@ export class DatabaseModel {
 		this.planStatus = '';
 		this.externalRefId = '';
 		this.validation = '';
+		this.asset = {};
 	}
 }

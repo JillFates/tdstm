@@ -13,13 +13,12 @@ import {TASK_MANAGER_STATES} from './task-manager-routing.states';
 import {TaskListComponent} from './components/list/task-list.component';
 import {TaskCreateComponent} from './components/create/task-create.component';
 import {SharedModule} from '../../shared/shared.module';
-import {FormlyInputHorizontal} from '../../shared/modules/formly/formly-input-horizontal.component';
 // Services
 import {TaskService} from './service/task.service';
 // Import Kendo Modules
 import {GridModule} from '@progress/kendo-angular-grid';
-// Formly
-import {FormlyModule, FormlyBootstrapModule} from 'ng-formly';
+import {DynamicFormsCoreModule} from '@ng-dynamic-forms/core';
+import {DynamicFormsKendoUIModule} from '@ng-dynamic-forms/ui-kendo';
 
 @NgModule({
 	imports: [
@@ -28,19 +27,8 @@ import {FormlyModule, FormlyBootstrapModule} from 'ng-formly';
 		GridModule,
 		FormsModule,
 		ReactiveFormsModule,
-		FormlyModule.forRoot({
-			wrappers: [
-				{
-					name: 'FormlyInputHorizontal',
-					component: FormlyInputHorizontal,
-					types: ['formlyInputHorizontalWrapper', 'formlySelectHorizontalWrapper']
-				}],
-			types: [
-				{name: 'formlyInputHorizontalWrapper', extends: 'textarea'},
-				{name: 'formlySelectHorizontalWrapper', extends: 'select'}
-			]
-		}),
-		FormlyBootstrapModule,
+		DynamicFormsCoreModule.forRoot(),
+		DynamicFormsKendoUIModule,
 		UIRouterModule.forChild({states: TASK_MANAGER_STATES}), // Same as { states: [state1, state2 ] }
 	],
 	providers: [TaskService],

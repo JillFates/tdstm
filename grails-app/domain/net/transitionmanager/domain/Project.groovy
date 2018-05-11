@@ -35,6 +35,8 @@ class Project extends PartyGroup {
 	MoveBundle defaultBundle
 	Timezone timezone
 
+	static String alternateKey = 'projectCode'
+
 	// used to indicate which of the custom fields will represent the plan methodology setting
 	String planMethodology=''
 

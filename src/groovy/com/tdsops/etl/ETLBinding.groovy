@@ -38,7 +38,7 @@ class ETLBinding extends Binding {
 	        // TM-10103: We are (in a nasty way) forcing local variables ending with this sufix names
 	        // Now set command is working with:
 	        // set environmentVar with 'Production'
-	        if(name.endsWith('Var')){
+	        if(isValidETLVariableName(name)){
 		        result = name
 	        } else {
 		        throw ETLProcessorException.missingPropertyException(name)
@@ -75,5 +75,15 @@ class ETLBinding extends Binding {
     void removeAllDynamicVariables () {
         dynamicVariables.each {variables.remove(it)}
     }
+
+	/**
+	 * Validates if an ETL variable name is correctly defined.
+	 * An ETL variable name must end with 'Var' postfix.
+	 * @param variableName
+	 * @return true if variable name is valid or false in all the other cases.
+	 */
+	boolean isValidETLVariableName(String variableName){
+		return variableName?.endsWith('Var')
+	}
 
 }
