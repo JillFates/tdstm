@@ -1,6 +1,5 @@
 package net.transitionmanager.service
 
-//import com.tdsops.common.builder.HttpRouteBuilder
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdsops.tm.enums.domain.CredentialEnvironment
@@ -8,6 +7,7 @@ import com.tdsops.tm.enums.domain.CredentialStatus
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.UrlUtil
+import com.tdssrc.grails.XmlUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
@@ -16,19 +16,23 @@ import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.integration.*
 import net.transitionmanager.task.TaskFacade
+import org.apache.commons.io.IOUtils
 import org.apache.http.Consts
 import org.apache.http.Header
 import org.apache.http.HeaderIterator
 import org.apache.http.HttpRequest
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
+import org.apache.http.NameValuePair
 import org.apache.http.auth.Credentials
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.client.config.RequestConfig
+import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.http.client.methods.HttpDelete
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase
 import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPatch
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.client.methods.HttpPut
 import org.apache.http.client.methods.HttpRequestBase
@@ -47,6 +51,7 @@ import org.apache.http.impl.auth.BasicScheme
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager
+import org.apache.http.message.BasicNameValuePair
 import org.apache.http.util.EntityUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -62,6 +67,7 @@ import java.nio.charset.Charset
 import java.security.SecureRandom
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
+import java.util.regex.Pattern
 
 /**
  * Service class to execute HTTP requests used by ApiActions for Data Ingestion
@@ -76,8 +82,15 @@ class HttpProducerService {
     private static final String DEFAULT_ACCEPT_HEADER = MediaType.APPLICATION_JSON_VALUE
     private static final int DEFAULT_REQUEST_TIMEOUT = -1
     private static final Charset DEFAULT_CHARSET = Consts.UTF_8
+    private static final Pattern JSON = ~/.*${MediaType.APPLICATION_JSON_VALUE}.*/
+    private static final Pattern XML = ~/.*${MediaType.APPLICATION_XML_VALUE}.*/
+    private static final Pattern FORM_URLENCODED = ~/.*${MediaType.APPLICATION_FORM_URLENCODED_VALUE}.*/
+    private static final Pattern TXT = ~/.*${MediaType.TEXT_PLAIN_VALUE}.*/
+    private static final Pattern CSV = ~/.*application\/csv.*/
+    private static final Pattern TXT_CSV = ~/.*text\/csv.*/
+    private static final Pattern XLS = ~/.*application\/vnd.ms-excel.*/
+    private static final Pattern XLSX = ~/.*application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet.*/
 
-//    HttpRouteBuilder httpRouteBuilder
     TaskService taskService
     ApiActionService apiActionService
     FileSystemService fileSystemService
@@ -127,11 +140,8 @@ class HttpProducerService {
         AssetFacade assetFacade = ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.ASSET_FACADE)
         ApiActionJob apiActionJob = new ApiActionJob()
 
-        byte[] body = EntityUtils.toByteArray(httpResponse?.entity)
-        String contentType = httpResponse?.entity?.contentType?.value
-        // we must update the entity in the HttpResponse for fourther usage, note that at this point
-        // the input stream is closed, so we need to update it.
-        EntityUtils.updateEntity(httpResponse, new InputStreamEntity(new ByteArrayInputStream(body)))
+        // obtain content type from httpResponse header
+        String contentType = httpResponse.getFirstHeader(HttpHeaders.CONTENT_TYPE)?.value as String
 
         // constructs ApiActionResponse object
         ApiActionResponse apiActionResponse = new ApiActionResponse()
@@ -162,7 +172,7 @@ class HttpProducerService {
             apiActionResponse.error = httpResponse?.statusLine
             apiActionResponse.data = null
         } else {
-            InputStream is = new ByteArrayInputStream(body)
+            InputStream is = httpResponse?.entity?.content
             if (actionRequest.options.producesData == 1) {
                 // if the api action call produces data, it means that a file is being downloaded
                 // and therefore it requires to be saved into the file system
@@ -327,18 +337,20 @@ class HttpProducerService {
 	 * @return
 	 */
 	// TODO : SL - 04/2018 : Move to FileSystemService or util class
-	private Object getFileExtensionForContentType(String contentType) {
-		if (contentType =~ /.*application\/json.*/) {
+	private String getFileExtensionForContentType(String contentType) {
+		if (contentType =~ JSON) {
 			return 'json'
-		} else if (contentType =~ /.*application\/csv.*/) {
+		} else if (contentType =~ CSV) {
 			return 'csv'
-		} else if (contentType =~ /.*text\/plain.*/) {
+		} else if (contentType =~ TXT) {
 			return 'txt'
-		} else if (contentType =~ /.*text\/csv.*/) {
+		} else if (contentType =~ TXT_CSV) {
 			return 'csv'
-		} else if (contentType =~ /.*application\/vnd.ms-excel.*/) {
+		} else if (contentType =~ XML) {
+			return 'xml'
+		} else if (contentType =~ XLS) {
 			return 'xls'
-		} else if (contentType =~ /.*application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet.*/) {
+		} else if (contentType =~ XLSX) {
 			return 'xlsx'
 		} else {
 			return 'bin'
@@ -356,11 +368,12 @@ class HttpProducerService {
             return null
         }
 
-        if (contentType =~ /.*application\/json.*/) {
-            JSONObject jsonObject = JsonUtil.parseFile(is)
-            return jsonObject
-        } else if (contentType =~ /.*text\/plain.*/) {
-            return is.text
+        if (contentType =~ JSON) {
+            return JsonUtil.parseFile(is)
+        } else if (contentType =~ TXT) {
+            return IOUtils.toString(is)
+        } else if (contentType =~ XML) {
+            return new XmlSlurper().parseText(IOUtils.toString(is))
         } else {
             return is
         }
@@ -477,7 +490,12 @@ class HttpProducerService {
                 baseRequest = new HttpDelete(url.toURI());
                 baseRequest.setProtocolVersion(HttpVersion.HTTP_1_1);
                 break;
+            case HttpMethod.PATCH:
+                baseRequest = new HttpPatch(url.toURI());
+                baseRequest.setProtocolVersion(HttpVersion.HTTP_1_1);
+                break;
             default:
+                throw new InvalidParamException('method not supported')
                 break;
         }
 
@@ -496,7 +514,7 @@ class HttpProducerService {
                     baseRequest.addHeader(basicScheme.authenticate(credentials, baseRequest, HttpClientContext.create()))
                     break
                 case AuthenticationMethod.HEADER:
-                    // TODO <SL> need to find a way to determine when to pass "Bearer" as part of the header value
+                    // TODO : SL - 04/2018 : need to find a way to determine when to pass "Bearer" as part of the header value
                     // e.g. Authentication: Bearer VERTIFRyYW5zaXRpb24gTWFuYWdlcg==
                     // Ticket added for this TM-9868
                     Map<String, ?> authentication = credentialService.authenticate(credential)
@@ -504,7 +522,7 @@ class HttpProducerService {
                     break
                 case AuthenticationMethod.COOKIE:
                     Map<String, ?> authentication = credentialService.authenticate(credential)
-                    baseRequest.addHeader('Cookie', authentication.sessionName + '=' + authentication.sessionValue)
+                    baseRequest.addHeader(HttpHeaders.COOKIE, authentication.sessionName + '=' + authentication.sessionValue)
                     break
                 default:
                     throw new RuntimeException("Authentication method ${credential.authenticationMethod} has not been implemented in HttpRouteBuilder")
@@ -518,21 +536,53 @@ class HttpProducerService {
 
         // setting HTTP request body and its type
         if (httpElements.extraParams && baseRequest instanceof HttpEntityEnclosingRequestBase) {
-            StringEntity input = new StringEntity(JsonUtil.convertMapToJsonString(httpElements.extraParams))
-            input.setContentType(actionRequest.headers.get(HttpHeaders.CONTENT_TYPE))
-            ((HttpEntityEnclosingRequestBase)baseRequest).setEntity(input)
+            String contentType = actionRequest.headers.get(HttpHeaders.CONTENT_TYPE)
+
+            if (contentType =~ JSON) {
+                // construct a JSON string entity
+                StringEntity input = new StringEntity(JsonUtil.convertMapToJsonString(httpElements.extraParams))
+                input.setContentType(contentType)
+                ((HttpEntityEnclosingRequestBase)baseRequest).setEntity(input)
+            } else if (contentType =~ FORM_URLENCODED) {
+                // construct the list of name value pairs
+                List<NameValuePair> nvpList = new ArrayList<>(httpElements.extraParams.size());
+                for (Map.Entry<String, String> entry : httpElements.extraParams.entrySet()) {
+                    nvpList.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+                }
+                // construct a URL encoded form entity
+                UrlEncodedFormEntity input = UrlEncodedFormEntity(nvpList, DEFAULT_CHARSET.toString())
+                input.setContentType(contentType)
+                ((HttpEntityEnclosingRequestBase)baseRequest).setEntity(input)
+            } else if (contentType =~ XML) {
+                // construct a XML string entity
+                StringEntity input = new StringEntity(XmlUtil.convertMapToXmlString(httpElements.extraParams))
+                input.setContentType(contentType)
+                ((HttpEntityEnclosingRequestBase)baseRequest).setEntity(input)
+            } else {
+                throw new RuntimeException('Content type not supported: ' + contentType)
+            }
         }
 
-        CloseableHttpResponse response = null
+        // execute http method
+        CloseableHttpResponse closeableHttpResponse = null
         if (baseRequest instanceof HttpEntityEnclosingRequestBase) {
-            response = httpClient.execute((HttpEntityEnclosingRequestBase)baseRequest)
+            closeableHttpResponse = httpClient.execute((HttpEntityEnclosingRequestBase)baseRequest)
         } else {
-            response = httpClient.execute((HttpRequestBase)baseRequest)
+            closeableHttpResponse = httpClient.execute((HttpRequestBase)baseRequest)
         }
-        log.debug('HTTP response status line: {}', response.getStatusLine())
+        log.debug('HTTP response status line: {}', closeableHttpResponse.getStatusLine())
 
-        // return HTTP response
-        return response
+        // create a temporary file with the http response input stream
+        def (String tmpFilename, OutputStream os) = fileSystemService.createTemporaryFile('ApiActionResponse')
+        IOUtils.copy(closeableHttpResponse?.entity?.content, os)
+        os.flush()
+        os.close()
+
+        // update httpResponse, set httpEntity with the temporary file input stream
+        EntityUtils.updateEntity(closeableHttpResponse, new InputStreamEntity(fileSystemService.openTemporaryFile(tmpFilename)))
+
+        //  return HTTP response
+        return closeableHttpResponse
     }
 
     /**
