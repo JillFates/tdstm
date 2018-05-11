@@ -1651,7 +1651,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 
 				// Supporting App
-				domain Application using newer
+				domain Application
 				lookup 'assetName' with supportAppVar
 				if (LOOKUP.notFound()) {
 					find Application by 'assetName' with supportAppVar into 'id'
@@ -1671,7 +1671,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				}
 
 				// Supporting Server
-				domain Device using newer
+				domain Device
 				lookup 'assetName' with supportServerVar
 				if (LOOKUP.notFound()) {
 					find Device by 'assetName' with supportServerVar into 'id'
@@ -1691,7 +1691,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				load 'dataFlowFreq' with 'constant'
 
 				// Create Primary App - Primary Server
-				domain Dependency using newer
+				domain Dependency
 				// Note that this doesn't work correctly yet.... I'll update this shortly
 				// find Dependency by 'asset', 'dependency' with primaryAppVar, primaryServerVar
 				load 'asset' with primaryAppVar
@@ -1701,7 +1701,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				load 'dataFlowFreq' with 'constant'
 
 				// Create Supporting App - Supporting Server
-				domain Dependency using newer
+				domain Dependency
 				// Note that this doesn't work correctly yet.... I'll update this shortly
 				// find Dependency by 'asset', 'dependency' with supportAppVar, supportServerVar
 				load 'asset' with supportAppVar

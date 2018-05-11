@@ -2,7 +2,6 @@ package com.tdsops.etl
 
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.domain.Manufacturer

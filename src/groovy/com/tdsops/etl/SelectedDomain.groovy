@@ -1,30 +1,26 @@
 package com.tdsops.etl
 
-import com.tdsops.etl.ETLProcessor.ReservedWord
-
 /**
  * Defines a selected ETL domain behaviour.
  * <pre>
  *     domain Application
- *     domain Application as newest
  * </pre>
  */
 class SelectedDomain {
 
+	/**
+	 * ETL Domain selected using 'domain' command
+	 */
 	ETLDomain domain
-	boolean isNew
+	/**
+	 * Defines if a new row should be created next time ETLProcessor and a result in an ETLProcessResult
+	 * @see ETLProcessor#domain(com.tdsops.etl.ETLDomain)
+	 * @see ETLProcessorResult#currentRowData()
+	 */
+	boolean addNewRow
 
 	SelectedDomain(ETLDomain selected){
 		this.domain = selected
-		isNew = false
+		this.addNewRow = false
 	}
-
-	SelectedDomain using( ReservedWord  reservedWord) {
-		if(reservedWord == ReservedWord.newer){
-			this.isNew = true
-			return this
-		}
-		throw ETLProcessorException.invalidDomainComand()
-	}
-
 }

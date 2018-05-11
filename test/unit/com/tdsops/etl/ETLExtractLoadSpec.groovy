@@ -2212,4 +2212,59 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-10678')
+	void 'test can load a new row using twice the domain command'() {
+
+		given:
+			ETLFieldsValidator validator = new DomainClassFieldsValidator()
+			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'appVendor'
+					extract 'application id' load 'id'
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.result.toMap()){
+				ETLInfo.originalFilename == applicationDataSet.fileName()
+				domains.size() == 1
+
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
+					}
+
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
+					}
+				}
+
+
+
+
+			}
+	}
+
 }

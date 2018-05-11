@@ -184,7 +184,13 @@ class ETLProcessor implements RangeChecker {
 	 * @return the current instance of ETLProcessor
 	 */
 	SelectedDomain domain (ETLDomain domain) {
-		selectedDomain = new SelectedDomain(domain)
+
+		if(selectedDomain?.domain == domain){
+			selectedDomain.addNewRow = true
+		} else {
+			selectedDomain = new SelectedDomain(domain)
+		}
+
 		result.releaseRowFoundInLookup()
 		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
