@@ -1,6 +1,5 @@
 package net.transitionmanager.integration
 
-//import org.apache.camel.Exchange
 import spock.lang.Specification
 
 class ActionRequestSpec extends Specification {
@@ -90,20 +89,20 @@ class ActionRequestSpec extends Specification {
     }
 
     // TODO : SL - 05/2018 : Fix when Camel deps gets completely removed
-//    def 'test set config value will set the expected value' () {
-//        setup: 'giving an ActionRequest object'
-//            ActionRequest actionRequest = new ActionRequest()
-//        when: 'trying to set a new configuration property'
-//            actionRequest.config.setProperty(Exchange.CONTENT_TYPE, 'application/json')
-//        then: 'the new configuration value should be written and red as expected'
-//            actionRequest.config.getProperty(Exchange.CONTENT_TYPE) == 'application/json'
-//    }
-//
-//    def 'test get non existing config value will return null' () {
-//        setup: 'giving an ActionRequest object'
-//            ActionRequest actionRequest = new ActionRequest()
-//        expect: 'null should be received if trying to read a non existing configuration value'
-//            null == actionRequest.config.getProperty(Exchange.CONTENT_TYPE)
-//    }
+    def 'test set config value will set the expected value' () {
+        setup: 'giving an ActionRequest object'
+            ActionRequest actionRequest = new ActionRequest()
+        when: 'trying to set a new configuration property'
+            actionRequest.config.setProperty('Content-Type', 'application/json')
+        then: 'the new configuration value should be written and red as expected'
+            actionRequest.config.getProperty('Content-Type') == 'application/json'
+    }
+
+    def 'test get non existing config value will return null' () {
+        setup: 'giving an ActionRequest object'
+            ActionRequest actionRequest = new ActionRequest()
+        expect: 'null should be received if trying to read a non existing configuration value'
+            null == actionRequest.config.getProperty('Content-Type')
+    }
 
 }
