@@ -56,12 +56,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -79,8 +74,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -96,8 +90,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -120,8 +113,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -137,8 +129,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -203,8 +194,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -218,8 +208,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -280,8 +269,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -297,8 +285,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -363,8 +350,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -378,8 +364,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 1
@@ -428,7 +413,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test when lookup does not find results that the current result is new.'() {
+	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
@@ -447,8 +432,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
 
@@ -510,8 +494,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 							load 'dataFlowFreq' with 'constant'
 							initialize 'comment' with 'From RVTools'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
 			etlProcessor.result.domains.size() == 3

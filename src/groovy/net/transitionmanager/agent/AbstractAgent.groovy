@@ -120,6 +120,8 @@ class AbstractAgent {
 					if (task.assetEntity) {
 						// This line prevents the @CompileStatic
 						value = task.assetEntity[param.fieldName]
+					} else {
+						value = null
 					}
 					break
 				case ContextType.USER_DEF:
@@ -129,10 +131,10 @@ class AbstractAgent {
 					// Shouldn't actually ever get here but just in case - put a bullet in this execution
 					throw new InvalidRequestException("Parameter context ${param.context} is not supported")
 			}
-			if (param.encoded == 1) {
+			if (value && param.encoded == 1) {
 				value = UrlUtil.decode(value)
 			}
-			methodParams.put(param.paramName,value)
+			methodParams.put(param.paramName, value)
 		}
 		return methodParams
 	}

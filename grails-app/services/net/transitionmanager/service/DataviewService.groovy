@@ -552,14 +552,15 @@ class DataviewService implements ServiceMethods {
 		// Iterate over each column
 		dataviewSpec.columns.each { Map column ->
 
-			// Check if the user provided a filter expressio.
+			// Check if the user provided a filter expression.
 			if (filterFor(column)) {
 				// Create a basic FieldSearchData with the info for filtering an individual field.
 				FieldSearchData fieldSearchData = new FieldSearchData([
 						column: propertyFor(column),
 						columnAlias: namedParameterFor(column),
 						domain: domainFor(column),
-						filter: filterFor(column)
+						filter: filterFor(column),
+						type: typeFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -650,6 +651,15 @@ class DataviewService implements ServiceMethods {
 
 	private static String orderFor(Map column) {
 		transformations[column.property].alias ?: propertyFor(column)
+	}
+
+	/**
+	 * Return the type for this column
+	 * @param column
+	 * @return
+	 */
+	private static Class typeFor(Map column) {
+		transformations[column.property].type
 	}
 
 	/**
@@ -889,10 +899,19 @@ class DataviewService implements ServiceMethods {
 		'model'          : [property: 'AE.model.modelName', type: String, namedParameter: 'modelModelName', join: 'left outer join AE.model'],
 		'locationSource' : [property: 'AE.roomSource.location', type: String, namedParameter: 'sourceLocation', join: 'left outer join AE.roomSource'],
 		'rackSource'     : [property: 'AE.rackSource.tag', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.rackSource'],
-		'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'sourceRack', join: 'left outer join AE.roomSource'],
+		'roomSource'     : [property: 'AE.roomSource.roomName', type: String, namedParameter: 'roomSourceName', join: 'left outer join AE.roomSource'],
 		'locationTarget' : [property: 'AE.roomTarget.location', type: String, namedParameter: 'targetLocation', join: 'left outer join AE.roomTarget'],
 		'rackTarget'     : [property: 'AE.rackTarget.tag', type: String, namedParameter: 'targetRack', join: 'left outer join AE.rackTarget'],
-		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'targetRack', join: 'left outer join AE.roomTarget']
+		'roomTarget'     : [property: 'AE.roomTarget.roomName', type: String, namedParameter: 'roomTargetName', join: 'left outer join AE.roomTarget'],
+	    'targetRackPosition': [property: "AE.targetRackPosition", type: Integer, namedParameter: 'targetRackPosition', join: "", mode:"where"],
+		'sourceRackPosition': [property: "AE.sourceRackPosition", type: Integer, namedParameter: 'sourceRackPosition', join: "", mode:"where"],
+	    'sourceChassis': [property: "AE.sourceChassis.assetName", type: String, namedParameter: 'sourceChassis', join: 'left outer join AE.sourceChassis'],
+		'targetChassis': [property: "AE.targetChassis.assetName", type: String, namedParameter: 'targetChassis', join: 'left outer join AE.targetChassis'],
+		'lastUpdated': [property: "str(AE.lastUpdated)", type: Date, namedParameter: 'lastUpdated', join: ''],
+		'maintExpDate': [property: "str(AE.maintExpDate)", type: Date, namedParameter: 'maintExpDate', join: ''],
+		'purchaseDate': [property: "str(AE.purchaseDate)", type: Date, namedParameter: 'purchaseDate', join: ''],
+		'retireDate': [property: "str(AE.retireDate)", type: Date, namedParameter: 'retireDate', join: ''],
+
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
     }

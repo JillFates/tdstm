@@ -501,7 +501,7 @@ class RoomController implements ControllerMethods {
 			""")
 		if (entities) {
 			entities.eachWithIndex{ obj, i ->
-				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position');closeAssignAssetListDialog();">
+				html.append("""<tr class="${i % 2 == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('$obj.assetClass',$obj.id,'$source','$params.rack','$params.roomName','$params.location','$params.position', false, closeAssignAssetListDialog);">
 					<td>$obj.assetName</td>
 					<td>$obj.assetTag</td>
 					<td>${obj.model ? obj.model.modelName : ''}</td>

@@ -23,6 +23,7 @@ import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.TaskService
+import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.UserPreferenceService
 import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.JdbcTemplate
@@ -291,11 +292,15 @@ class ApplicationController implements ControllerMethods {
 		query << ' ORDER BY ' << sortIndex <<  ' '  << sortOrder
 
 		List appsList
-		if (queryParams) {
-			appsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
-		}
-		else {
-			appsList = jdbcTemplate.queryForList(query.toString())
+		try {
+			if (queryParams) {
+				appsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+			} else {
+				appsList = jdbcTemplate.queryForList(query.toString())
+			}
+		} catch (e) {
+			log.error "listJson() encountered SQL error : ${e.getMessage()}"
+			throw new LogicException("Unabled to perform query based on parameters and user preferences")
 		}
 
 		//def appsList = jdbcTemplate.queryForList(query.toString())

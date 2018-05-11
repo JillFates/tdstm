@@ -528,8 +528,7 @@ class MoveBundleService implements ServiceMethods {
 						isNumber = true
 						break
 					case "assetEntity":
-						cellValue = currentTask."${columnList[c]}"?.assetType == "Application" ?
-								String.valueOf(currentTask."${columnList[c]}"?.assetName) : ''
+						cellValue = currentTask."${columnList[c]}"?.assetName
 						break
 					case "commentAssetEntity":
 						cellValue = currentTask.assetEntity ?  String.valueOf(currentTask.assetEntity?.assetName) : ''

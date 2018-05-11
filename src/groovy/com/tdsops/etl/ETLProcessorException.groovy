@@ -143,7 +143,15 @@ class ETLProcessorException extends GroovyRuntimeException {
         new ETLProcessorException("Sheet $sheetNumber is not found in workbook".toString())
     }
 
-	static final String missingPropertyExceptionMessage = "No such property: variableName"
+    static ETLProcessorException invalidExcelDriver () {
+        new ETLProcessorException('Use TDSExcelDriver for an instance of ExcelConnection in an ETL Script')
+    }
+
+    static ETLProcessorException invalidETLVariableName (String variableName) {
+        new ETLProcessorException("Invalid variable name: ${variableName}. Valid ETL variable names must end with 'Var'".toString())
+    }
+
+    static final String missingPropertyExceptionMessage = "No such property: variableName"
 	static ETLProcessorException missingPropertyException (String variableName) {
 		return new ETLProcessorException(missingPropertyExceptionMessage.replace('variableName', variableName))
 	}
@@ -157,8 +165,12 @@ class ETLProcessorException extends GroovyRuntimeException {
      * Exception being thrown when no domain is specified upon load clause
      * @return
      */
-	static ETLProcessorException domainMustBeSpecified () {
-		new ETLProcessorException('A domain must be specified')
-	}
+    static ETLProcessorException domainMustBeSpecified () {
+        new ETLProcessorException('A domain must be specified')
+    }
+
+    static ETLProcessorException invalidReplaceCommand() {
+        new ETLProcessorException("Use 'replace on/off' command")
+    }
 }
 

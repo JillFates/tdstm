@@ -26,10 +26,11 @@ import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.Manufacturer
+import net.transitionmanager.domain.ManufacturerAlias
 import net.transitionmanager.domain.Model
+import net.transitionmanager.domain.ModelAlias
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.service.InvalidSyntaxException
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.dataingestion.ScriptProcessorService
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -61,11 +62,10 @@ class DataImportService implements ServiceMethods {
 	static final String FIND_FOUND_MULTIPLE_REFERENCES_MSG = 'Multiple records found for find/elseFind criteria'
 	static final String ALTERNATE_LOOKUP_FOUND_MULTIPLE_MSG = 'Multiple records found with current value'
 
-	static final String propertyName = ''
 	// TODO : JPM 4/2018 : Augusto - Get these to work first
-	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field ${-> propertyName} can not be set by 'whenNotFound create' statement"
-	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field ${-> propertyName} was not found in ETL dataset"
-	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field ${-> propertyName} in domain"
+	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
+	static final String PROPERTY_NAME_NOT_IN_FIELDS = "Field {propertyName} was not found in ETL dataset"
+	static final String PROPERTY_NAME_NOT_IN_DOMAIN = "Invalid field {propertyName} in domain"
 
 	static final Integer NOT_FOUND_BY_ID = -1
 	static final Integer FOUND_MULTIPLE = -2
@@ -387,6 +387,10 @@ class DataImportService implements ServiceMethods {
 
 		Boolean hadError = false
 
+		// If the domain id is null or negative, default it to zero.
+		if (!domainId || domainId < 0) {
+			domainId = 0
+		}
 		// Iterate over the list of field names that the ETL metadata indicates are in the rowData object
 		for (fieldName in importContext.fieldNames) {
 
@@ -464,15 +468,7 @@ class DataImportService implements ServiceMethods {
 			dupsFound = ( rowData.fields.id.size() > 1 ? 1 : 0)
 		}
 
-		// TODO : JPM 2/2018 : TM-9598 Should be able drop this map
-		final Map operationMap = [
-			I: ImportOperationEnum.INSERT,
-			U: ImportOperationEnum.UPDATE,
-			D: ImportOperationEnum.DELETE
-		]
-		ImportOperationEnum OpValue = (operationMap.containsKey(rowData.op) ? operationMap[rowData.op] : ImportOperationEnum.UNDETERMINED)
-		// TODO : JPM 2/2018 : TM-9598 Should be able to use this command
-		// ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op),
+		ImportOperationEnum OpValue =  ImportOperationEnum.lookup(rowData.op)
 
 		ImportBatchRecord batchRecord = new ImportBatchRecord(
 			importBatch: batch,
@@ -782,17 +778,19 @@ class DataImportService implements ServiceMethods {
 	 * @param batch - the batch that the ImportBatchRecord
 	 */
 	@NotTransactional()
-	private void updateBatchStatus(ImportBatch batch) {
+	private void updateBatchStatus(Long batchId) {
 		Integer count = ImportBatchRecord.where {
-			importBatch.id == batch.id
+			importBatch.id == batchId
 			status != ImportBatchStatusEnum.COMPLETED && status != ImportBatchStatusEnum.IGNORED
 		}.count()
 		ImportBatchStatusEnum status = (count == 0 ?  ImportBatchStatusEnum.COMPLETED :  ImportBatchStatusEnum.PENDING)
 
-		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batch.id, count, status.name()
+		log.debug 'updateBatchStatus() called for batch {}, Pending count {}, status {}', batchId, count, status.name()
 
-		batch.status = status
-		batch.save()
+		ImportBatch.where {
+			id == batchId
+			status != status
+		}.updateAll([status: status])
 	}
 
 	/**
@@ -1180,7 +1178,7 @@ class DataImportService implements ServiceMethods {
 		if ( value && (value instanceof CharSequence) ) {
 			Class domainClass = GormUtil.getDomainClassOfProperty(context.domainClass, propertyName)
 			entities = GormUtil.findDomainByAlternateKey(domainClass, value, context.project)
-			log.debug 'findDomainByAlternateProperty() found={}',entities.size()
+			log.debug 'findDomainByAlternateProperty() found={}',entities?.size()
 		}
 		return entities
 	}
@@ -1254,7 +1252,7 @@ class DataImportService implements ServiceMethods {
 		log.debug 'classOfDomainProperty() for property {}', propertyName
 
 		if (! GormUtil.isDomainProperty(context.domainClass, propertyName)) {
-			errorMsg = PROPERTY_NAME_NOT_IN_DOMAIN.toString()
+			errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
 		}
 		while ( ! errorMsg ) {
 			Boolean isIdentifierProperty = GormUtil.isDomainIdentifier(context.domainClass, propertyName)
@@ -1262,7 +1260,7 @@ class DataImportService implements ServiceMethods {
 			log.debug 'classOfDomainProperty() for property {}, isIdentifierProperty {}, isReferenceProperty {}', propertyName, isIdentifierProperty, isReferenceProperty
 
 			if (! fieldsInfo.containsKey(propertyName)) {
-				errorMsg = PROPERTY_NAME_NOT_IN_FIELDS
+				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_NOT_IN_FIELDS, [propertyName:propertyName])
 				break
 			}
 			// propertyName MUST be a reference or identifier for this function otherwise record an error
@@ -1450,7 +1448,7 @@ class DataImportService implements ServiceMethods {
 			// TODO : JPM 4/2018 : Lookup the FieldSpecs for assets to get the label names for errors
 			if ( (propertyName in propertiesThatCannotBeSet) ) {
 				// errorMsg = "Field ${propertyName} can not be set by 'whenNotFound create' statement"
-				errorMsg = PROPERTY_NAME_CANNOT_BE_SET_MSG
+				errorMsg = StringUtil.replacePlaceholders(PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName])
 				break
 			} else {
 				if (! GormUtil.isDomainProperty(domainInstance, propertyName)) {

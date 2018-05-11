@@ -45,7 +45,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		Person currentPerson = securityService.loadCurrentPerson()
 		Project currentProject = securityService.userCurrentProject
 		List<Dataview> dataviews = dataviewService.list(currentPerson, currentProject)
-		List<Map> listMap = dataviews*.toMap(currentPerson.id)
+		List<Map> listMap = dataviews*.toMap(currentPerson.id).sort{a, b -> a.name?.compareToIgnoreCase b.name}
 		renderSuccessJson(listMap)
 	}
 
@@ -170,9 +170,12 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 			return
 		}
 
-		Integer limit = Pagination.maxRowForParam(userParams.limit as String)
-		userParams.limit = limit
-		userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
+        if (!userParams.forExport) {
+            Integer limit = Pagination.maxRowForParam(userParams.limit as String)
+            userParams.limit = limit
+            userPreferenceService.setPreference(UserPreferenceEnum.ASSET_LIST_SIZE, limit)
+        }
+
 		Map queryResult = dataviewService.query(project, dataview, userParams)
 
         renderSuccessJson(queryResult)

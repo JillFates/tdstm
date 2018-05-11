@@ -13,7 +13,6 @@ enum ImportBatchStatusEnum {
 	QUEUED('Queued'),
 	RUNNING('Running')
 
-
 	final String label
 
 	private ImportBatchStatusEnum(String label) {

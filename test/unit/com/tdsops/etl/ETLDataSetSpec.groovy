@@ -23,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Shared
 
@@ -153,11 +154,7 @@ class ETLDataSetSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test can read labels from dataSource and create a map of columns'() {
@@ -170,11 +167,10 @@ class ETLDataSetSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
-					""".stripIndent(), ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'A column map is created'
 			etlProcessor.column('device id').index == 0
@@ -202,15 +198,13 @@ class ETLDataSetSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							log SOURCE.'device id'
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'The current row index is the last row in data source'
 			etlProcessor.currentRowIndex == jsonDataSet.rowsSize()

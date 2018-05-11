@@ -360,6 +360,11 @@ class UrlMappings {
 			action = [GET:"retrieveNext"]
 		}
 
+		"/ws/projects" {
+			controller = "wsProject"
+			action = [GET: "projects"]
+		}
+
 		"/ws/project/userProjects" {
 			controller = "wsProject"
 			action = [GET:"userProjects"]
@@ -929,6 +934,10 @@ class UrlMappings {
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")
+
+		// API via /ws/ endpoints
+		"/ws/${controller}s"(version: "1.0", namespace: "v1", method: "GET")
+
 
 		// REST API
 		"/api/projects/heartbeat"(controller: 'project', action: 'heartbeat', namespace:"v1", method: "GET")

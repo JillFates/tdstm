@@ -31,6 +31,7 @@ export const en_DICTIONARY: Object = {
 			'CREATED_ON': 'Created On',
 			'UPDATED_ON': 'Updated On',
 			'SHARED': 'Shared',
+			'SYSTEM': 'System',
 		},
 		'SYSTEM_VIEW': 'System View'
 	},

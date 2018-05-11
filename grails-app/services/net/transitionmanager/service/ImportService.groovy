@@ -1128,9 +1128,10 @@ class ImportService implements ServiceMethods {
 							break
 
 						// case ~/^(location|room|rack)(Source|Target)\.(.+)/:
-						case ~/(source|target)(Location|Room|Rack)/:
+						case ~/(location|room|rack)(Source|Target)/:
 							// def field = Matcher.lastMatcher[0][1]
-							def disposition = Matcher.lastMatcher[0][1]
+							def disposition = Matcher.lastMatcher[0][2]
+							disposition = disposition.toLowerCase()
 							log.debug "*** disposition=$disposition"
 							// def child = Matcher.lastMatcher[0][3]
 
@@ -1246,12 +1247,14 @@ class ImportService implements ServiceMethods {
 						}
 
 						if (validChassisRoom) {
+							// Need to capitalize the disposition to form the property names correctly
+							disposition = disposition.capitalize()
 							errors = deviceService.assignDeviceToLocationRoomRack(
 								asset,
-								d[disposition + 'Location'],
-								d[disposition + 'Room'],
-								d[disposition + 'Rack'],
-								(disposition == 'source'))
+								d['location' + disposition],
+								d['room' + disposition],
+								d['rack' + disposition],
+								(disposition == 'Source'))
 						}
 						if (errors) {
 							warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"

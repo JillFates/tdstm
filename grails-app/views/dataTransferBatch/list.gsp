@@ -230,7 +230,9 @@
                     type: "json",
                     transport: {
                         read: {
-                            url: contextPath + '/DataTransferBatch/retrieveManageBatchList'
+                            // with this param "max=0" we force the endpoint to retreive all batches list
+                            // and allow pagination to occur on full client side.
+                            url: contextPath + '/DataTransferBatch/retrieveManageBatchList?max=0'
                         }
                     },
                     schema: {

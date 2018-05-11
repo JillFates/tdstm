@@ -342,7 +342,7 @@ class AssetComment {
 	}
 
 	// task Manager column header names and its labels
-	static final Map<String, List<String>> taskCustomizeFieldAndLabel = [
+	static final Map<String, String> taskCustomizeFieldAndLabel = [
 		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
 		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
 		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',

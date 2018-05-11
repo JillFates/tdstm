@@ -1084,13 +1084,16 @@ var EntityCrud = (function ($) {
 	}
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
-	var fetchAssetEditView = function (controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
+	var fetchAssetEditView = function (controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback) {
 		var url = tdsCommon.createAppURL('/' + controller + '/edit/' + assetId);
 		jQuery.ajax({
 			url: url,
 			type: 'POST',
 			success: function (resp) {
 				// Load the edit entity view
+				if (callback) {
+					callback();
+				}
 				return presentAssetEditView(resp, fieldType, source, rackOrBladeId, roomId, location, position, isBlade);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -1136,20 +1139,20 @@ var EntityCrud = (function ($) {
 	};
 	// Used to display the various asset class edit modal views
 	// This replaces editEntity()
-	pub.showAssetEditView = function (assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
+	pub.showAssetEditView = function (assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback) {
 		assetUpdateInvoked = false;	// Reset the update invoked flag
 		switch (assetClass) {
 			case "APPLICATION":
-				return fetchAssetEditView('application', 'Application', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
+				return fetchAssetEditView('application', 'Application', assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback);
 				break;
 			case "DATABASE":
-				return fetchAssetEditView('database', 'Database', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
+				return fetchAssetEditView('database', 'Database', assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback);
 				break;
 			case "STORAGE":
-				return fetchAssetEditView('files', 'Logical Storage', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
+				return fetchAssetEditView('files', 'Logical Storage', assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback);
 				break;
 			case "DEVICE":
-				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
+				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rackOrBladeId, roomId, location, position, isBlade, callback);
 				break;
 			default:
 				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");

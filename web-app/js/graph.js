@@ -46,12 +46,14 @@ var GraphUtil = (function ($) {
 	// Stored only on the current page session
 	public.dependencyPanelConfig = {
 		dependencyStatus: {
+			dirty: false,
 			status: 'true',
 			show: [],
 			highlight: [],
 			groupingControl: []
 		},
 		dependencyType: {
+			dirty: false,
 			status: 'true',
 			show: [],
 			highlight: [],
@@ -1156,7 +1158,13 @@ var GraphUtil = (function ($) {
 		if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'true'){
 			$('#dependency' + type + 'Control_show_all').prop('checked', true);
 			$('#dependency' + type + 'Control_show_all').attr('state', 1);
-			$('.dependency' + type + 'ControlsShow').prop('checked', true);
+			if (!GraphUtil.dependencyPanelConfig['dependency' + type].dirty) {
+				$('.dependency' + type + 'ControlsShow').prop('checked', true);
+			} else {
+				$('.dependency' + type + 'ControlsShow').each(function () {
+					$(this).prop('checked', GraphUtil.dependencyPanelConfig['dependency' + type].show.indexOf($(this).val()) !== -1);
+				});
+			}
 		} else if(GraphUtil.dependencyPanelConfig['dependency' + type].status === 'false') {
 			$('#dependency' + type + 'Control_show_all').prop('checked', false);
 			$('#dependency' + type + 'Control_show_all').attr('state', 3);
@@ -1268,9 +1276,11 @@ var GraphUtil = (function ($) {
 
 		public.dependencyPanelConfig.dependencyType.show = showTypeItems;
 		public.dependencyPanelConfig.dependencyType.highlight = highlightTypeItems;
+		public.dependencyPanelConfig.dependencyType.dirty = true;
 
 		public.dependencyPanelConfig.dependencyStatus.show = showStatusItems;
 		public.dependencyPanelConfig.dependencyStatus.highlight = highlightStatusItems;
+		public.dependencyPanelConfig.dependencyStatus.dirty = true;
 
 		public.updateAllClasses(function(){
 			$('.link').show();

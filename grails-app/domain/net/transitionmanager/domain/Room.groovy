@@ -21,6 +21,8 @@ class Room {
 	// Value of 1 indicates that the room is a source location otherwise it is a target room
 	Integer source = 1
 
+	static String alternateKey = 'roomName'
+
 	static hasMany = [racks: Rack, sourceAssets: AssetEntity, targetAssets: AssetEntity]
 	static mappedBy = [sourceAssets: 'roomSource', targetAssets: 'roomTarget']
 

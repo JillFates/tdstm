@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tdssrc.grails.GormUtil
+
 /**
  * ETL find command implementation.
  * <code>
@@ -12,7 +15,7 @@ package com.tdsops.etl
  * @param values
  * @return
  */
-class ETLFindElement {
+class ETLFindElement implements ETLStackableCommand{
 
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
@@ -89,8 +92,8 @@ class ETLFindElement {
 	 */
 	ETLFindElement by(String... fields) {
 		for(field in fields){
-			checkAssetFieldSpec(field)
-			currentFind.fields.add(field)
+			ETLFieldSpec fieldSpec = checkAssetFieldSpec(field)
+			currentFind.fields.add(fieldSpec.name)
 		}
 		return this
 	}
@@ -105,7 +108,6 @@ class ETLFindElement {
 	 * @return
 	 */
 	ETLFindElement with(Object... values) {
-
 		checkProject()
 		currentFind.values = checkValues(values)
 
@@ -129,6 +131,9 @@ class ETLFindElement {
 				}
 				currentFind.errors.add(all.getMessage())
 			}
+
+			// For import process, in case of Domain classes we only need the id value. 
+			currentFind.kv = currentFind.kv.collectEntries { [(it.key): GormUtil.isDomainClass(it.value)?it?.value?.id:it?.value] }
 
 			results = [
 				objects : [],
@@ -253,5 +258,37 @@ class ETLFindElement {
 	def methodMissing(String methodName, args) {
 		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissingInFindCommand(methodName, args)
+	}
+
+	/**
+	 * Evaluates the required properties of the command object and
+	 * return an error string if there are any missing in the form:
+	 *    missing [x, y, z] keywords
+	 *
+	 * or an empty string if no problem was found
+	 * @return string with errors or empty
+	 */
+	String stackableErrorMessage() {
+		String error = ''
+
+		Set<String> missingProperties = []
+
+		if (! currentFind.fields ) {
+			missingProperties << 'by'
+		}
+
+		if (! currentFind.values ) {
+			missingProperties << 'with'
+		}
+
+		if (! currentFind.property ) {
+			missingProperties << 'into'
+		}
+
+		if (missingProperties) {
+			error = "find/elseFind statement is missing required ${missingProperties} ${(missingProperties.size() < 2) ? 'keyword' : 'keywords'}"
+		}
+
+		return error
 	}
 }
