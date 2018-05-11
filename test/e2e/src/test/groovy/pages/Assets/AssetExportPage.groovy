@@ -1,0 +1,60 @@
+package pages.Assets
+
+import geb.Page
+import geb.error.RequiredPageContentNotPresent
+import geb.Browser
+import utils.CommonActions
+import modules.CommonsModule
+
+class AssetExportPage extends Page{
+
+    static at = {
+        sectionTitle.text() == "Export Assets"
+        exportButton.isDisplayed()
+    }
+
+    static content = {
+        commonsModule { module CommonsModule }
+        sectionTitle (wait:true){$("section.content-header h1")}
+        exportButton {$("button", id:"exportButton")}
+        bundleOptions {$("select#bundleId option")}
+        assetOptions {$('li.list-group-item input[type=checkbox]')}
+        assetCheckedOptions {$('li.list-group-item input[checked*=checked]')}
+    }
+
+    static initializeCommonActions(){
+        new CommonActions()
+    }
+
+    def randomSelectBundle(){
+        // Planning bundle default selected, clean selection to random select
+        browser.driver.executeScript('$("[value=useForPlanning]").removeAttr("selected")')
+        def randomOption = initializeCommonActions().getRandomOption bundleOptions
+        randomOption.click()
+    }
+
+    def randomChooseItemsToExport(){
+        try {
+            // because remembers previous selection, cleans if needed.
+            if (assetCheckedOptions.size() > 0) {
+                initializeCommonActions().uncheckCheckboxes assetCheckedOptions
+            }
+            randomCheckOptions()
+        } catch (RequiredPageContentNotPresent e) {
+            // assetCheckedOptions selector not found so no checked options
+            randomCheckOptions()
+        }
+    }
+
+    def randomCheckOptions(){
+        // getting 3 random checkboxes to click because export process succeeds default timeout
+        def randomElements = initializeCommonActions().getRandomOptions assetOptions, 3
+        randomElements.each { element ->
+            element.click()
+        }
+    }
+
+    def clickOnExportExcel(){
+        exportButton.click()
+    }
+}
