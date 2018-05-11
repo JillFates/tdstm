@@ -170,7 +170,7 @@ class FilenameUtilTests extends AbstractUnitSpec {
 		" LF\n. "           | 'LF_.'
 		" FF\f. "           | 'FF_.'
 		" TAB\t. "          | 'TAB_.'
-		" DQuote\". "       | 'DQuote".'
+		" DQuote\". "       | 'DQuote_.'
 		' SQuote\'. '       | 'SQuote\'.'
 		" \t White\t. \t "  | 'White_.'
 		" .\bBACKSPACE. "   | '.~BACKSPACE.'
@@ -212,6 +212,7 @@ class FilenameUtilTests extends AbstractUnitSpec {
 		'ab=cd'		|	'ab_cd'
 		'ab@cd'		|	'ab_cd'
 		'ab+cd'		|	'ab_cd'
+		'ab"cd'		|	'ab_cd'
 
 	}
 }
