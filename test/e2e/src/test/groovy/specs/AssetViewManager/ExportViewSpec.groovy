@@ -8,7 +8,6 @@ import pages.AssetViewManager.AssetViewsPage
 import pages.AssetViewManager.ViewPage
 import jodd.util.RandomString
 import pages.Downloads.HomeUserDownloadsPage
-import utils.CommonActions
 
 @Stepwise
 class ExportViewSpec extends GebReportingSpec {
@@ -19,9 +18,6 @@ class ExportViewSpec extends GebReportingSpec {
     //Define the names of the Application you will Create and Edit
     static randStr =  RandomString.getInstance().randomAlphaNumeric(3)
     static fileName = "ExportSystemAllAssets" + randStr
-    static initializeCommonActions(){
-        new CommonActions()
-    }
 
     def setupSpec() {
         testCount = 0
@@ -66,7 +62,7 @@ class ExportViewSpec extends GebReportingSpec {
             clickOnExportViewButton()
         and: 'The user waits the modal displayed'
             waitForDisplayedModalContainer()
-            initializeCommonActions().waitForLoader()
+            commonsModule.waitForLoader()
         and: 'The user sets a random file name'
             setExportFileName fileName
         and: 'The user clicks on Export button'

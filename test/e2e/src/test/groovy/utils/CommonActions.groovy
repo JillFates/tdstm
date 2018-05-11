@@ -24,9 +24,4 @@ class CommonActions {
         def random = new Random()
         options.getAt(random.nextInt(options.size()))
     }
-
-    def waitForLoader(){
-        waitFor{$('#main-loader')}
-        waitFor{!$('#main-loader')}
-    }
 }

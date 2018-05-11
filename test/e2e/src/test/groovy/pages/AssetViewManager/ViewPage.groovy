@@ -1,6 +1,6 @@
 package pages.AssetViewManager
 import geb.Page
-
+import modules.CommonsModule
 
 class ViewPage extends Page{
 
@@ -16,6 +16,7 @@ class ViewPage extends Page{
         fileNameField {exportModalContainer.find("input", id: "fileName")}
         exportModalButton {exportModalContainer.find("button span", class: "fa-download")}
         cancelModalButton {exportModalContainer.find("button span", class: "glyphicon-ban-circle")}
+        commonsModule { module CommonsModule }
     }
 
     def verifyViewTitle(title) {
