@@ -95,10 +95,6 @@ class MetricReportingService {
 	 * 		]
 	 */
 	List<Map> gatherMetric(List<Long> projectIds, String metricCode, JSONObject metricDefinition) {
-		if(!projectIds){
-			throw new InvalidParamException('There are no projects, that have collect metrics enabled, or are currently active.')
-		}
-
 		MetricMode mode = MetricMode.lookup((String) metricDefinition.mode)
 
 		switch (mode) {
@@ -407,11 +403,18 @@ class MetricReportingService {
 	 */
 	List<Long> projectIdsForMetrics() {
 		Date collectionDate = metricCollectionDate
-		return Project.where {
+
+		List<Long> projectIds = Project.where {
 			collectMetrics == 1 && startDate <= collectionDate && completionDate >= collectionDate
 		}.projections {
 			property 'id'
 		}.list()
+
+		if (!projectIds) {
+			throw new EmptyResultException('No projects found with collect metrics enabled that are currently active.')
+		}
+
+		return projectIds
 	}
 
 	/**
