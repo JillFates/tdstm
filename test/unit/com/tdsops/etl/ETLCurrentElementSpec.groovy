@@ -182,7 +182,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
+					assert null == CE
 					extract 'name'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -235,7 +237,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
+					assert null == CE
 					extract 'name' load 'assetName'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -300,7 +304,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
+					assert null == CE
 					init 'assetName' with 'Initial Name'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -376,7 +382,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
+					assert null == CE
 					find Application by 'Name' with SOURCE.'model' into 'id'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -448,7 +456,9 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
+					assert null == CE
 					load 'assetName' with SOURCE.'name'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -489,8 +499,11 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				read labels
 				domain Device
 				iterate {
+					assert null == CE
 					extract 'name' load 'assetName'
+					assert null != CE
 					extract 'mfg' load 'manufacturer'
+					assert null != CE
 				}
 			""".stripIndent())
 
@@ -648,6 +661,64 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 				with(fieldDefinition){
 					name == 'assetName'
 					label == 'Name'
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can release all variables after an iteration'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				""".stripIndent())
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+
+			AssetEntity.executeQuery(_, _, _) >> { query, namedParams, metaParams ->
+				return []
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				domain Device
+				iterate {
+					assert null == CE
+					assert null == FINDINGS
+					extract 'name' load 'assetName'
+					assert null != CE
+					assert null == FINDINGS
+					find Application by 'Name' with SOURCE.'model' into 'id'
+					assert null != CE
+					assert null != FINDINGS
+				}
+			""".stripIndent())
+
+		then: 'Current element should contains values'
+			with(etlProcessor.currentElement){
+				originalValue == null
+				value == null
+				init == null
+				with(fieldDefinition){
+					name == 'id'
+					label == 'Id'
 				}
 			}
 

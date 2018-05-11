@@ -193,8 +193,7 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
 		selectedDomain = domain
-		result.releaseRowFoundInLookup()
-		bindCurrentElement(null)
+		cleanUpBindingAndReleaseLookup()
 		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
 		return this
@@ -311,8 +310,7 @@ class ETLProcessor implements RangeChecker {
 		rows.each { def row ->
 			isIterating = true
 			currentColumnIndex = 0
-			result.releaseRowFoundInLookup()
-			bindCurrentElement(null)
+			cleanUpBindingAndReleaseLookup()
 			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
 			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
 			bindVariable(NOW_VARNAME, new NOW())
@@ -324,6 +322,7 @@ class ETLProcessor implements RangeChecker {
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
+
 		isIterating = false
 		currentRowIndex--
 		return this
@@ -655,8 +654,7 @@ class ETLProcessor implements RangeChecker {
 	ETLFindElement find (ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
 		validateStack()
-		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
-		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
+		bindCurrentFindElement(new ETLFindElement(this, domain, this.currentRowIndex))
 		pushIntoStack(currentFindElement)
 		return currentFindElement
 	}
@@ -935,6 +933,29 @@ class ETLProcessor implements RangeChecker {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
 		return currentElement
+	}
+
+	/**
+	 * Add an ETLFindElement as FINDINGS_VARNAME value as variable within the binding script context.
+	 * If @findElement is not null an instance of FindingsFacade will be bound in the ETLBinding context.
+	 * If @findElement is null, the null value will be bound in order to use it in an ETL script
+	 * @param ETLFindElement a selected findElement
+	 * @return the currentFindElement selected in ETLProcessor
+	 */
+	private ETLFindElement bindCurrentFindElement(ETLFindElement findElement) {
+		currentFindElement = findElement
+		binding.addDynamicVariable(FINDINGS_VARNAME, findElement ? new FindingsFacade(currentFindElement) : findElement)
+		return currentFindElement
+	}
+
+	/**
+	 * A clean up method to release variables in the context and
+	 * release lookup references
+	 */
+	private void cleanUpBindingAndReleaseLookup() {
+		result.releaseRowFoundInLookup()
+		bindCurrentElement(null)
+		bindCurrentFindElement(null)
 	}
 
 	/**
