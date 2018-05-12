@@ -164,22 +164,55 @@ class FilenameUtilTests extends AbstractUnitSpec {
 		" ABCDEFGHIJKLM "   | 'ABCDEFGHIJKLM'
 		" NOPQRSTUVWXYZ "   | 'NOPQRSTUVWXYZ'
 		" 01234567890 "     | '01234567890'
-		"!@#\$%^&*()-_=+`~" | '!@#$%^&*()-_=+`~'
-		"',.<>/?\\"         | '\',.<>/?\\'
-		" CR\r. "           | 'CR+.'
-		" LF\n. "           | 'LF+.'
-		" FF\f. "           | 'FF+.'
-		" TAB\t. "          | 'TAB+.'
-		" DQuote\". "       | 'DQuote".'
+		"!@#\$%^&*()-_=+`~" | '_____^__()-____~'
+		"',.<>/?\\"         | '\',._____'
+		" CR\r. "           | 'CR_.'
+		" LF\n. "           | 'LF_.'
+		" FF\f. "           | 'FF_.'
+		" TAB\t. "          | 'TAB_.'
+		" DQuote\". "       | 'DQuote_.'
 		' SQuote\'. '       | 'SQuote\'.'
-		" \t White\t. \t "  | 'White+.'
+		" \t White\t. \t "  | 'White_.'
 		" .\bBACKSPACE. "   | '.~BACKSPACE.'
 		" .\u2028LineSep"   | '.~LineSep'
 		" .\u2029ParaSep"   | '.~ParaSep'
 		" .\u00000000. "    | '.~0000.'
-		" .\u00090009. "    | '.+0009.'
+		" .\u00090009. "    | '._0009.'
 		" .\u00850085. "    | '.~0085.'
 		" [\u007f007f] "    | '[~007f]'
 		" [\u008f008f] "    | '[~008f]'
+	}
+
+		@See('TM-9050')
+		def '13. Test sanitation for invalid filename characters for Windows and Linux filesystems'() {
+
+		expect:
+		FilenameUtil.safeFilename(value) == result
+
+		where:
+		value		|	result
+		'abc#d'		|	'abc_d'
+		'abcd<<'	|	'abcd__'
+		'ab$cd'		|	'ab_cd'
+		'ab%cd'		|	'ab_cd'
+		'ab>cd'		|	'ab_cd'
+		'ab!cd'		|	'ab_cd'
+		'ab`cd'		|	'ab_cd'
+		'ab&cd'		|	'ab_cd'
+		'ab*cd'		|	'ab_cd'
+		'ab“cd'		|	'ab_cd'
+		'ab|cd'		|	'ab_cd'
+		'ab{cd'		|	'ab_cd'
+		'ab?cd'		|	'ab_cd'
+		'ab”cd'		|	'ab_cd'
+		'ab}cd'		|	'ab_cd'
+		'ab/cd'		|	'ab_cd'
+		'ab:cd'		|	'ab_cd'
+		'ab\\bcd'	|	'ab_cd'
+		'ab=cd'		|	'ab_cd'
+		'ab@cd'		|	'ab_cd'
+		'ab+cd'		|	'ab_cd'
+		'ab"cd'		|	'ab_cd'
+
 	}
 }
