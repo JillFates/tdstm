@@ -1518,7 +1518,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		def assetType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
+		def assetTypes = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE)
+
+		def assetType = assetTypes.collect{ AssetOptions option ->
+			[type: option.type, value: option.value, canDelete: !assetEntityService.assetTypesOf(null, option.value).size()]
+		}
+
 		[planStatusOptions: planStatusOptions, priorityOption: priorityOption, dependencyType: dependencyType,
 		 dependencyStatus: dependencyStatus, environment: environment, assetType: assetType]
 	}
@@ -1568,7 +1573,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def deleteAssetOptions() {
 		String idParamName
-		switch(params.assetOptionType) {
+		String optionType = params.assetOptionType
+
+		switch(optionType) {
 			case 'planStatus':  idParamName = 'assetStatusId'; break
 			case 'Priority':    idParamName = 'priorityId'; break
 			case 'dependency':  idParamName = 'dependecyId'; break
@@ -1578,6 +1585,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 
 		AssetOptions assetOption = AssetOptions.get(params[idParamName])
+
+		if(optionType == 'assetType' && assetEntityService.assetTypesOf(null, assetOption.value)){
+			throw new InvalidRequestException('You cannot delete an assetType, that is being used, by a model.')
+		}
+
 		assetOption.delete(flush: true)
 		render assetOption.id
 	}

@@ -13,10 +13,14 @@
 				<g:each in="${assetType}" status="i" var="assetTypeIt">
 					<tr id="assetType_${assetTypeIt.id}">
 						<td>${assetTypeIt.value}</td>
-						<td><span class=" deleteAssetType clear_filter"
-							style="display: none; cursor: pointer;"
-							onClick="deleteAssetStatus(${assetTypeIt.id},$('#assetTypeHiddenId').val())"><b>X</b>
-						</span></td>
+						<td>
+							<g:if test="${assetTypeIt.canDelete}">
+								<span class=" deleteAssetType clear_filter"
+								      style="display: none; cursor: pointer;"
+								      onClick="deleteAssetStatus(${assetTypeIt.id}, $('#assetTypeHiddenId').val())"><b>X</b>
+								</span>
+							</g:if>
+						</td>
 					</tr>
 				</g:each>
 		</table>
