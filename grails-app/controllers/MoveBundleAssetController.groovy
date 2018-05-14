@@ -1,10 +1,8 @@
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.common.security.spring.HasPermission
-import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.ProjectTeam
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
@@ -12,7 +10,6 @@ import net.transitionmanager.service.PartyRelationshipService
 import net.transitionmanager.service.UserPreferenceService
 import org.springframework.jdbc.core.JdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class MoveBundleAssetController implements ControllerMethods {
 
@@ -226,7 +223,7 @@ class MoveBundleAssetController implements ControllerMethods {
 	@HasPermission(Permission.BundleView)
 	def retrieveRacksForBundles() {
 		def assetEntityList = AssetEntity.findAllByMoveBundle(MoveBundle.load(params.bundleId))
-		renderAsJson(assetEntityList.collect { [id: it.sourceRack, name: it.sourceRack] })
+		renderAsJson(assetEntityList.collect { [id: it.rackSource?.tag, name: it.rackSource?.tag] })
 	}
 
 	@HasPermission(Permission.RackView)
@@ -296,7 +293,7 @@ class MoveBundleAssetController implements ControllerMethods {
 				if (it.type == "Blade") {
 					def chassisAsset = AssetEntity.findWhere(assetTag: it.chassis, moveBundle: MoveBundle.get(it.bundle))
 					def pos = it.bladePos ? "-" + it.bladePos : ""
-					it.rack = chassisAsset?.sourceRack + pos
+					it.rack = chassisAsset?.rackSource?.tag + pos
 					it.assetName = chassisAsset?.assetName
 				}
 				else {
