@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetEntity
+import com.tds.asset.AssetOptions
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -249,15 +250,19 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 		def performCreateMfgModel = { mfgObj, createModelName, createDeviceType, createUsize ->
 			logger.debug '{}.performCreateMfgModel() mfg={}, createModelName={}, createDeviceType={}, createUsize={}',
 					methodName, mfgObj, createModelName, createDeviceType, createUsize
+
 			if (mfgObj instanceof String) {
 				mfgName = mfgObj
+
 				if (canCreateMfgAndModel) {
 					mfg = new Manufacturer(name: mfgName)
 					save mfg, true
+
 					if (mfg.hasErrors()) {
 						errorMsg = "An error occured while trying to create the new manufacturer ($mfgName)"
 						return
 					}
+
 					logger.info '{}.performCreateMfgModel() Manufacturer {} was just created (${})', methodName, mfgName, mfg.id
 					mfgWasCreated = true
 				} else {
@@ -271,10 +276,12 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 
 			if (canCreateMfgAndModel) {
 				modelName = createModelName
+
 				try {
 					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  NumberUtil.toInteger(createUsize), userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
+					AssetOptions.findOrSaveWhere(type: AssetOptions.AssetOptionsType.ASSET_TYPE, value: createDeviceType)
 					logger.info '{}.performCreateMfgModel() Model {} was created (id {})', methodName, modelName, model.id
 				} catch (e) {
 					errorMsg = e.message
