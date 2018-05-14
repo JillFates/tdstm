@@ -32,4 +32,26 @@ class DatascriptCreationSpec extends GebReportingSpec{
     }
 
 
+    def "1. The user navigates to the Providers Section"() {
+        testKey = "TM-XXXX"
+        given: 'The User landed on the Menu Page after login'
+            at MenuPage
+        when: 'The user goes to the Datascripts page'
+            menuModule.goToDatascripts()
+
+        then: 'The Providers Page loads with no problem'
+            at DatascriptsPage
+    }
+
+    def "2. Open the Create Datascripts Page"() {
+        testKey = "TM-XXXX"
+        given: 'The user is on the Datascript landing page'
+            at DatascriptsPage
+        when: 'The user clicks the Create Datascripts Button'
+            createBtn.click()
+
+        then: 'The Create Datascripts pop up loads with no problem'
+            //at
+    }
+
 }
