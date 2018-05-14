@@ -1151,7 +1151,9 @@ class AdminController implements ControllerMethods {
 		}
 
 		def deletedTypes = []
-		AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value.each { type ->
+		List<String> assetTypeOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value']).value
+
+		assetTypeOptions.each { type ->
 			int assetCount = AssetEntity.countByAssetType(type)
 			int modelCount = Model.countByAssetType(type)
 
