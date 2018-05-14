@@ -455,3 +455,9 @@ graph {
 //	targetDir = '/var/www/tdstm/images/tmp/'
 //	targetURI = '/../images/tmp/'
 }
+
+xssSanitizer.enabled = true
+
+// JPM 5/2018 : TM-10317 - Tried using both formats but the 2nd would not work correctly
+// grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
+grails.databinding.dateFormats = ['yyyy-MM-dd']

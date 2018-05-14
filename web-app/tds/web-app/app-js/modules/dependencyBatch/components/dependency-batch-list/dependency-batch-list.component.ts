@@ -27,6 +27,7 @@ import {EnumModel} from '../../../../shared/model/enum.model';
 })
 export class DependencyBatchListComponent {
 
+	private BatchStatus = BatchStatus;
 	private columnsModel: DependencyBatchColumnsModel;
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: false};
 	private dataGridOperationsHelper: DataGridOperationsHelper;
@@ -41,6 +42,7 @@ export class DependencyBatchListComponent {
 	private batchStatusLooper: any;
 	private readonly PROGRESS_MAX_TRIES = 10;
 	private readonly PROGRESS_CHECK_INTERVAL = 10 * 1000;
+	private readonly STOP_BATCH_CONFIRMATION = 'IMPORT_BATCH.LIST.STOP_BATCH_CONFIRMATION';
 	private readonly ARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEM_CONFIRMATION';
 	private readonly ARCHIVE_ITEMS_CONFIRMATION = 'IMPORT_BATCH.LIST.ARCHIVE_ITEMS_CONFIRMATION';
 	private readonly UNARCHIVE_ITEM_CONFIRMATION = 'IMPORT_BATCH.LIST.UNARCHIVE_ITEM_CONFIRMATION';
@@ -79,6 +81,18 @@ export class DependencyBatchListComponent {
 		this.getUnarchivedBatches().then( batchList => {
 			this.dataGridOperationsHelper.reloadData(batchList);
 			this.setBatchStatusLooper();
+		});
+	}
+
+	/**
+	 * Reloads the current batch record.
+	 * @param {ImportBatchModel} batchRecord
+	 */
+	private reloadImportBatch(importBatch: ImportBatchModel) {
+		this.dependencyBatchService.getImportBatch(importBatch.id).subscribe( (response: ApiResponseModel) => {
+			if (response.status === ApiResponseModel.API_SUCCESS) {
+				Object.assign(importBatch, response.data);
+			}
 		});
 	}
 
@@ -131,14 +145,17 @@ export class DependencyBatchListComponent {
 	 */
 	private openBatchDetail(cellClick: CellClickEvent): void {
 		// prevent open detail on column 0
+		let selectedBatch: ImportBatchModel = (cellClick as any).dataItem;
 		if (cellClick.columnIndex === 0 ) {
 			return;
 		}
 		this.dataGridOperationsHelper.selectCell(cellClick); // mark row as selected
 		this.dialogService.open(DependencyBatchDetailDialogComponent, [
-			{ provide: ImportBatchModel, useValue: (cellClick as any).dataItem}
+			{ provide: ImportBatchModel, useValue: selectedBatch}
 		], DIALOG_SIZE.XXL, true).then(result => {
-			// silence is golden
+			if (result) {
+				this.reloadImportBatch(selectedBatch);
+			}
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
@@ -275,9 +292,8 @@ export class DependencyBatchListComponent {
 	private onPlayButton(item: ImportBatchModel): void {
 		const ids = [item.id];
 		this.dependencyBatchService.queueImportBatches(ids).subscribe( (result: ApiResponseModel) => {
-				if (result.status === ApiResponseModel.API_SUCCESS && result.data.QUEUE) {
-					item.status.code = BatchStatus.QUEUED;
-					item.status.label = 'Queued';
+				if (result.status === ApiResponseModel.API_SUCCESS) {
+					this.reloadImportBatch(item);
 				} else {
 					this.reloadBatchList();
 					this.handleError(result.errors ? result.errors[0] : null);
@@ -305,10 +321,31 @@ export class DependencyBatchListComponent {
 	}
 
 	/**
-	 * On Stop action button clicked, stop import batch.
+	 * On Stop action button clicked, confirm then stop import batch.
 	 * @param item
 	 */
 	private onStopButton(batch: ImportBatchModel): void {
+		this.confirmStopAction(batch);
+	}
+
+	/**
+	 * Confirmation dialog pops up when stop button is clicked.
+	 */
+	private confirmStopAction(batch: ImportBatchModel): void {
+		this.promptService.open(
+			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform(this.STOP_BATCH_CONFIRMATION),
+			'Confirm', 'Cancel').then(result => {
+			if (result) {
+				this.stopBatch(batch);
+			}
+		}, /* on rejected do nothing */);
+	}
+
+	/**
+	 * Stop batch calling the endpoint.
+	 */
+	private stopBatch(batch: ImportBatchModel): void {
 		const ids = [batch.id];
 		this.dependencyBatchService.stopImportBatch(ids).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {

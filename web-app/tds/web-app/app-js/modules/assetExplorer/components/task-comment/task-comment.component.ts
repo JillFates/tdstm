@@ -31,11 +31,11 @@ import { TaskCommentService } from '../../service/task-comment.service';
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
-	@Input('pref-value') prefValue?= false;
-	@Input('view-unpublished-value') viewUnpublishedValue?= false;
-	@Input('has-publish-permission') hasPublishPermission?= false;
-	@Input('can-edit-comments') canEdit?= false;
-	@Input('can-edit-tasks') canEditTasks?= false;
+	@Input('pref-value') prefValue ? = false;
+	@Input('view-unpublished-value') viewUnpublishedValue ? = false;
+	@Input('has-publish-permission') hasPublishPermission ? = false;
+	@Input('can-edit-comments') canEdit ? = false;
+	@Input('can-edit-tasks') canEditTasks ? = false;
 
 	showAll: boolean;
 	comments: any[] = [];

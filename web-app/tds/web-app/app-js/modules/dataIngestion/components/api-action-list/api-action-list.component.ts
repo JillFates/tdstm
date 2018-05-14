@@ -82,74 +82,13 @@ export class APIActionListComponent {
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(x => x.field === column.property);
-
-		if (!column.filter) {
-			column.filter = '';
-		}
-
-		if (column.type === 'text') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'date') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'gte',
-					value: column.filter,
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'boolean') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'eq',
-					value: (column.filter === 'True')
-				});
-			} else {
-				if (column.filter === this.defaultBooleanFilterData) {
-					this.clearValue(column);
-				} else {
-					filter = root.filters.find((r) => {
-						return r['field'] === column.property;
-					});
-					filter.value = (column.filter === 'True');
-				}
-			}
-		}
-
+		const root = this.dataIngestionService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		column.filter = '';
-		if (this.state.filter && this.state.filter.filters.length > 0) {
-			const filterIndex = this.state.filter.filters.findIndex((r: any) => r.field === column.property);
-			this.state.filter.filters.splice(filterIndex, 1);
-			this.filterChange(this.state.filter);
-		}
+		this.dataIngestionService.clearFilter(column, this.state);
+		this.filterChange(this.state.filter);
 	}
 
 	/**

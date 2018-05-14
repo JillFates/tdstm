@@ -28,7 +28,7 @@ class HttpAgent extends AbstractAgent {
 				docUrl: '',
 				method: 'invokeHttpRequest',
 				producesData: 0,
-				params: queueParams()
+				params: []
             ])
         ] )
 

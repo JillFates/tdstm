@@ -34,6 +34,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
+import net.transitionmanager.command.AssetCommand
 import net.transitionmanager.controller.ServiceResults
 import net.transitionmanager.domain.AppMoveEvent
 import net.transitionmanager.domain.KeyValue
@@ -49,6 +50,7 @@ import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.strategy.asset.AssetSaveUpdateStrategy
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
@@ -604,6 +606,18 @@ class AssetEntityService implements ServiceMethods {
 			throw new DomainUpdateException(error)
 		}
 	}
+
+	void createOrUpdateDependencies(Project project, AssetEntity assetEntity, Map params) {
+
+		// Delete dependencies marked for deletion
+		if (params.deletedDep) {
+			AssetDependency.where {
+				id in params.deletedDep
+			}.deleteAll()
+		}
+	}
+
+
 
 	/**
 	 * Helper Method to de Delete a Dependency from an Asset Entity
@@ -1167,6 +1181,59 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Return a list with the information for the dependents for this asset.
+	 * @param assetEntity
+	 * @param dependents : true -> dependents; false -> supporting
+	 * @return
+	 */
+	List<Map> getDependentsOrSupporting(AssetEntity assetEntity, boolean dependents = true) {
+		String targetField = dependents ? 'dependent' : 'asset'
+		String sourceField = dependents? 'asset' : 'dependent'
+		List dependentsInfo = AssetDependency.createCriteria().list {
+			createAlias('asset', 'asset')
+			createAlias('dependent', 'dependent')
+			eq(sourceField, assetEntity)
+			projections {
+				property('id')
+				property('comment')
+				property('status')
+				property('type')
+				property('dataFlowDirection')
+				property('dataFlowFreq')
+				property("${targetField}")
+
+				order("${targetField}.assetType")
+				order("${targetField}.assetName")
+			}
+		}
+
+		List<Map> results = []
+		for (depInfo in dependentsInfo) {
+			AssetEntity target = depInfo[6]
+			results << [
+				id: depInfo[0],
+				comment: depInfo[1],
+				status: depInfo[2],
+				type: depInfo[3],
+				dataFlowDirection: depInfo[4],
+				dataFlowFreq: depInfo[5],
+				asset: [
+					id: target.id,
+					name: target.assetName,
+					assetType: AssetClass.getClassOptionForAsset(target),
+					moveBundle: [
+						id: target.moveBundle?.id,
+						name: target.moveBundle?.name
+					]
+				]
+			]
+		}
+
+		return results
+	}
+
+
+	/**
 	 * Returns a list of MoveBundles for a project
 	 * @param project - the Project object to look for
 	 * @return list of MoveBundles
@@ -1355,6 +1422,7 @@ class AssetEntityService implements ServiceMethods {
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, domain)
 		List customFields = getCustomFieldsSettings(project, domain, true)
 
+		Map map =
 		[	assetId: asset.id,
 			environmentOptions: getAssetEnvironmentOptions(),
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
@@ -1367,8 +1435,23 @@ class AssetEntityService implements ServiceMethods {
 			redirectTo: params.redirectTo,
 			version: asset.version,
 			customs: customFields,
-			standardFieldSpecs: standardFieldSpecs
+			standardFieldSpecs: standardFieldSpecs,
 		]
+
+		// Required lists for Device type
+		if (asset.assetClass == AssetClass.DEVICE) {
+			map << [
+					railTypeOption: getAssetRailTypeOptions(),
+					sourceRoomSelect: getRoomSelectOptions(project, true, true),
+					targetRoomSelect: getRoomSelectOptions(project, false, true),
+					sourceRackSelect: getRackSelectOptions(project, asset?.roomSourceId, true),
+					targetRackSelect: getRackSelectOptions(project, asset?.roomTargetId, true),
+                    sourceChassisSelect: getChassisSelectOptions(project, asset?.roomSourceId),
+                    targetChassisSelect: getChassisSelectOptions(project, asset?.roomTargetId)
+			]
+		}
+
+		map
 	}
 
 	/**
@@ -1998,7 +2081,7 @@ class AssetEntityService implements ServiceMethods {
 					colPref = ['1': 'sme', '2': 'environment', '3': 'validation', '4': 'planStatus', '5': 'moveBundle']
 					break
 				case PREF.Asset_Columns:
-					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
+					colPref = ['1': 'rackSource','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
 					break
 				case PREF.Physical_Columns:
 					colPref = ['1': 'sourceRack','2': 'environment','3': 'assetTag','4': 'serialNumber','5': 'validation']
@@ -2399,6 +2482,7 @@ class AssetEntityService implements ServiceMethods {
 
 		// Lookup the field name reference for the sort
 		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
+		// TODO: arecordon -> fix sorting to account for locationTarget instead of targetLocation
 
 		// This is used by the JQ-Grid some how
 		session.AE = [:]
@@ -2420,7 +2504,7 @@ class AssetEntityService implements ServiceMethods {
 		StringBuilder joinQuery = new StringBuilder()
 
 		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append("\n, srcRack.tag AS sourceRack, srcRoom.location AS sourceLocation")
+		altColumns.append("\n, srcRack.tag AS rackSource, srcRoom.location AS locationSource ")
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
@@ -2463,16 +2547,17 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\nLEFT OUTER JOIN room srcRoom ON srcRoom.room_id=ae.room_source_id ")
 						srcRoomAdded = true
 					}
-					if (locOrRoom == 'Location') {
+					if (locOrRoom == 'location') {
 						// Note that this is added by default above
 						// altColumns.append(', srcRoom.location AS sourceLocation')
-					} else if (locOrRoom == 'Room') {
-						altColumns.append(', srcRoom.room_name AS sourceRoom')
+					} else if (locOrRoom == 'room') {
+						altColumns.append(', srcRoom.room_name AS roomSource')
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break
-				case ~/sourceRack|moveBundle/:
+					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+				case ~/rackSource|moveBundle/:
 					// Handled by the default columns
 					break
 
@@ -2484,17 +2569,17 @@ class AssetEntityService implements ServiceMethods {
 						joinQuery.append("\nLEFT OUTER JOIN room tgtRoom ON tgtRoom.room_id=ae.room_target_id ")
 						tgtRoomAdded = true
 					}
-					if (locOrRoom == 'Location') {
-						altColumns.append(', tgtRoom.location AS targetLocation')
-					} else if (locOrRoom == 'Room') {
-						altColumns.append(', tgtRoom.room_name AS targetRoom')
+					if (locOrRoom == 'location') {
+						altColumns.append(', tgtRoom.location AS locationTarget')
+					} else if (locOrRoom == 'room') {
+						altColumns.append(', tgtRoom.room_name AS roomTarget')
 					} else {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break
-				case 'targetRack':
+				case 'rackTarget':
 					// Property was moved to the Rack domain
-					altColumns.append(", tgtRack.tag AS targetRack")
+					altColumns.append(", tgtRack.tag AS rackTarget")
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
 					break
 				case 'sourceChassis':
@@ -2607,6 +2692,8 @@ class AssetEntityService implements ServiceMethods {
 			}
 		}
 
+
+
 		// Handle the filtering by each column's text field
 		def whereConditions = []
 		def queryParams = [:]
@@ -2660,7 +2747,12 @@ class AssetEntityService implements ServiceMethods {
 		if (queryParams.size()) {
 			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		} else {
-			assetList = jdbcTemplate.queryForList(query.toString())
+			try {
+				assetList = jdbcTemplate.queryForList(query.toString())
+			} catch (e) {
+				log.error "getDeviceDataForList() encountered SQL error : ${e.getMessage()}"
+				throw new LogicException("Unabled to perform query based on parameters and user preferences")
+			}
 		}
 
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
@@ -2907,6 +2999,30 @@ class AssetEntityService implements ServiceMethods {
 	}
 
 	/**
+	 * Return the map of information for editing dependencies.
+	 * @param project
+	 * @param asset
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	Map dependencyEditMap(Project project, AssetEntity asset) {
+
+		if (!asset) {
+			throw new InvalidRequestException('An invalid asset id was requested')
+		}
+
+		return [
+			assetClassOptions: AssetClass.classOptions,
+			dependentAssets: getDependentsOrSupporting(asset, true),
+			dependencyStatus: getDependencyStatuses(),
+			dependencyType: getDependencyTypes(),
+			moveBundleList: getMoveBundles(project),
+			nonNetworkTypes: AssetType.nonNetworkTypes,
+			supportAssets: getDependentsOrSupporting(asset, false)
+		]
+	}
+
+	/**
 	 * Used to retrieve the model used to display Asset Dependencies Edit view
 	 * @param params - the Request params
 	 * @return a Map of all properties used by the view
@@ -3013,6 +3129,16 @@ class AssetEntityService implements ServiceMethods {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Create or update an asset based on the command object received.
+	 * @param command
+	 * @return
+	 */
+	AssetEntity saveOrUpdateAsset(AssetCommand command) {
+		AssetSaveUpdateStrategy strategy = AssetSaveUpdateStrategy.getInstanceFor(command)
+		return strategy.saveOrUpdateAsset()
 	}
 
 }

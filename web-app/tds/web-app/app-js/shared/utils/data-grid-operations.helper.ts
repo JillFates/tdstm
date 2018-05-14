@@ -254,4 +254,24 @@ export class DataGridOperationsHelper {
 			this.gridData = process(this.resultSet, this.state);
 		}
 	}
+
+	/**
+	 * Add one element to the list
+	 * @param item
+	 */
+	public addDataItem(item: any): void {
+		this.gridData.data.push(item);
+	}
+
+	/**
+	 * Remove one element from to the list
+	 * @param item
+	 */
+	public removeDataItem(item: any): void {
+		let index = this.gridData.data.indexOf(item);
+		if (index >= 0) {
+			this.gridData.data.splice(index, 1);
+			this.reloadData(this.gridData.data);
+		}
+	}
 }

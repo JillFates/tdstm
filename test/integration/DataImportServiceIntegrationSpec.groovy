@@ -5,6 +5,9 @@ import com.tds.asset.Database
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.NumberUtil
+import grails.test.spock.IntegrationSpec
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.command.UploadFileCommand
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.ImportBatchRecord
@@ -14,31 +17,13 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
+import org.apache.commons.lang3.RandomStringUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Ignore
 import spock.lang.Shared
-
-import grails.test.spock.IntegrationSpec
-import grails.validation.ValidationException
-import org.codehaus.groovy.grails.web.json.JSONObject
-import net.transitionmanager.service.DataImportService
-import net.transitionmanager.domain.ImportBatchRecord
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import com.tds.asset.Application
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetEntity
-import com.tds.asset.Database
 import test.helper.AssetEntityTestHelper
-import test.helper.MoveBundleTestHelper
-import test.helper.ProjectTestHelper
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.etl.ETLDomain
-import org.apache.commons.lang3.RandomStringUtils
 
 class DataImportServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
@@ -46,6 +31,9 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 
 	@Shared
     DataImportService dataImportService
+
+	@Shared
+	DataScriptTestHelper dataScriptTestHelper = new DataScriptTestHelper()
 
 	@Shared
 	FileSystemService fileSystemService
@@ -337,8 +325,12 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		when: 'called for an invalid property name'
 			String propertyName = 'xyzzy'
 			clazz = dataImportService.classOfDomainProperty(propertyName, fieldsInfo, context)
-		then: 'a Person domain class should be returned'
-			[dataImportService.PROPERTY_NAME_NOT_IN_FIELDS.toString()] == context.record.errorListAsList()
+			String expectedError = StringUtil.replacePlaceholders(dataImportService.PROPERTY_NAME_NOT_IN_DOMAIN, [propertyName:propertyName])
+			List errorsFound = context.record.errorListAsList()
+		then: 'an error should be reported'
+			1 == errorsFound.size()
+		and: 'the error message should be what is expected'
+			expectedError == errorsFound[0]
 
 		// when: 'called for a non-asset reference property (Person)'
 		// 	clazz = dataImportService.classOfDomainProperty('createdBy', fieldsInfo, context)
@@ -346,12 +338,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// 	clazz == Person
 
 		when: 'called for the a non-identity or reference field'
+			fieldsInfo['c1'] = [errors:[]]
 			clazz = dataImportService.classOfDomainProperty('c1', fieldsInfo, context)
 			List errors = dataImportService.getFieldsInfoFieldErrors('c1', fieldsInfo)
 		then: 'no domain class should be returned'
 			clazz == null
 		and: 'there should be an error on the field'
-			errors.size() == 1
+			1 == errors.size()
 		and: 'the error message should be what is expected'
 			dataImportService.WHEN_NOT_FOUND_PROPER_USE_MSG == errors[0]
 
@@ -805,8 +798,6 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 		// generateMd5OfQuery
 	}
 
-	@Ignore
-	// TODO : Augusto 4/2018 : This was Ignored because of an error with the cleanup and deleting the file is not working correctly
 	void '14. test transformData method'() {
 
 		setup: 'Create a DataScript, a Provider and other required data'
@@ -814,21 +805,20 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 				read labels
 				domain Dependency
 				iterate {
-				    extract serverName load asset set srvNameVar
-				    find Device by assetName with srvNameVar into asset
-				    whenNotFound asset create {
-				        assetName srvNameVar
-				    }
+					extract 'serverName' load 'asset' set srvNameVar
+					find Device by 'assetName' with 'srvNameVar' into 'asset'
+					whenNotFound 'asset' create {
+						assetName srvNameVar
+					}
 
-				    extract appName load dependent set appNameVar
-				    find Application by assetName with appNameVar into dependent
-				    whenNotFound dependent create {
-				        assetName appNameVar
-				    }
+					extract 'appName' load 'dependent' set appNameVar
+					find Application by 'assetName' with appNameVar into 'dependent'
+					whenNotFound 'dependent' create {
+						assetName appNameVar
+					}
 
-				    load c1 with ''
-				    load status with 'UnknownStatus'
-				    initialize c1 with 'from initialize command'
+					load 'status' with 'UnknownStatus'
+					initialize 'c1' with 'from initialize command'
 				}"""
 
 			String sampleData = 'serverName,appName\nxraysrv01,bigapp'
@@ -887,13 +877,13 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			String propertyName = 'version'
 			error = dataImportService.setDomainPropertyWithValue(application, 'version', 123, parentProperty, fieldsInfo, context)
 		then: 'an appropriate error message should be returned'
-			dataImportService.PROPERTY_NAME_CANNOT_BE_SET_MSG == error
+			StringUtil.replacePlaceholders(dataImportService.PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName]) == error
 
 	}
 
 	@Ignore
 	// TODO : JPM 4/2018 : This is not working and the code was disabled because the toSet is fucking with the order of the original list
-	void '15. Test fixOrderInWhichToProcessFields method'() {
+	void '16. Test fixOrderInWhichToProcessFields method'() {
 		expect:
 			expectedList == dataImportService.fixOrderInWhichToProcessFields(set)
 		where:
@@ -902,5 +892,29 @@ class DataImportServiceIntegrationSpec extends IntegrationSpec {
 			['a','manufacturer','b','model','c'].toSet()	| ['a','manufacturer','b','model','c']
 			['a','model','b','manufacturer','c'].toSet()	| ['a','manufacturer','b','model','c']
 			['model','b','manufacturer','c'].toSet()		| ['manufacturer','b','model','c']
+	}
+
+	void '17. Test the findReferenceDomainByAlternateKey method'() {
+		// 	List findReferenceDomainByAlternateKey(Object entity, String refDomainPropName, String searchValue, String parentPropertyName, Map fieldsInfo, Map context)
+		setup:
+			AssetEntity domainObject = new AssetEntity()
+			List results
+			Map fieldsInfo = initFieldsInfo()
+
+		when: 'Calling for a known Manufacturer'
+			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'HP', 'asset', fieldsInfo, context)
+		then: 'one result should be returned'
+			1 == results.size()
+
+		when: 'Calling for a known alias of Manufacturer'
+			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'Hewlett Packard', 'asset', fieldsInfo, context)
+		then: 'one result should be returned'
+			1 == results.size()
+
+		when: 'Calling for a non-existent Manufacturer'
+			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'WillNotFindThisMfg', 'asset', fieldsInfo, context)
+		then: 'one result should be returned'
+			0 == results.size()
+		// and: 'An error should be logged'
 	}
 }

@@ -84,19 +84,25 @@ grails.project.dependency.resolution = {
 		compile ':spring-security-acl:2.0.0'
 		compile ':greenmail:1.3.4'
 
-		compile ':spring-security-rest:1.5.4'
+		compile (':spring-security-rest:1.5.4') {
+			// Remove old Guava files packed in spring-security-rest plugin
+			excludes 'guava-io'
+		}
 		compile ":rest-client-builder:2.1.0"
+
+		compile "org.grails.plugins:cascade-validation:0.1.5"
 
 		runtime ':database-migration:1.4.0'
 		runtime ':grails-melody:1.54.0'
 		runtime ':hibernate4:4.3.10'
-		runtime ':jmesa:2.0.4-SNAPSHOT-0.1'
 		runtime ':jqgrid:3.8.0.1'
 		runtime ':jquery-ui:1.8.15'
 		runtime ':jquery:1.11.1'
 		runtime ':mail:1.0.7'
 		runtime ':resources:1.2.14' // TODO ':asset-pipeline:2.9.1'
 		runtime ':console:1.5.12'
+		runtime ':xss-sanitizer:0.4.0'
+
 		/*
 		 TODO: oluna - the next plugins help to work with the resources and the Browsers Cache
 		 they may be removed after switching to asset-pipeline, I just leave it as a reference

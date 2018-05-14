@@ -191,13 +191,12 @@ int minPasswordLength = tds.minPasswordLength()
 					</tr></table>
 				</div>
 			</li>
-			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Data Centers</a>
+			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Locations</a>
 				<div class="megamenu rooms inActive" id="racksMegaMenu">
 					<table class="mmtable room_rack" ><tr>
 					<td style="vertical-align:top">
-						<span class="megamenuSection">Rooms and Racks</span><br />
 						<ul >
-							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Rooms</g:link></li>
+							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Locations</g:link></li>
 							<g:if test="${roomId}">
 								<li><g:link class="mmlink" params="[roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
 							</g:if>
@@ -472,7 +471,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<tds:hasPermission permission="${Permission.ReportViewEventDay}">
 					<td style="vertical-align:top"><span class="megamenuSection">Event Day</span><br />
 						<ul>
-							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
+							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Event Results</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
 							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
 							<tds:hasPermission permission="${Permission.HelpMenuView}">

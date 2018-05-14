@@ -33,14 +33,15 @@ export class ImportBatchModel {
 	fieldNameList: Array<string>;
 	dateCreated: Date;
 	lastUpdated: Date;
-	// TODO: check if this is going to be implemented on backend ..
-	records: number;
-	errors: number;
-	pending: number;
-	processed: number;
-	ignored: number;
+	recordsSummary: {
+		count: number,
+		erred: number,
+		ignored: number,
+		pending: number,
+		processed: number
+	};
 	currentProgress?: number;
-	stalledCounter? = 0;
+	stalledCounter ? = 0;
 }
 
 /**
@@ -52,14 +53,6 @@ export class DependencyBatchColumnsModel {
 
 	constructor() {
 		this.columns = [
-			// {
-			// 	label: 'Action',
-			// 	property: 'action',
-			// 	type: 'action',
-			// 	width: 70,
-			// 	locked: false,
-			// 	cellStyle: {'text-align': 'center'}
-			// },
 			{
 				label: 'Id',
 				property: 'id',
@@ -76,7 +69,7 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Imported At',
-				property: 'dateCreated',
+				property: 'lastUpdated',
 				type: 'date',
 				format: '{0:d}',
 				width: 200,
@@ -119,35 +112,35 @@ export class DependencyBatchColumnsModel {
 			},
 			{
 				label: 'Records',
-				property: 'records',
+				property: 'recordsSummary.count',
 				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Erred',
-				property: 'errors',
+				property: 'recordsSummary.erred',
 				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Pending',
-				property: 'pending',
+				property: 'recordsSummary.pending',
 				type: 'number',
 				width: 80,
 				locked: false
 			},
 			{
 				label: 'Processed',
-				property: 'processed',
+				property: 'recordsSummary.processed',
 				type: 'number',
 				width: 100,
 				locked: false
 			},
 			{
 				label: 'Ignored',
-				property: 'ignored',
+				property: 'recordsSummary.ignored',
 				type: 'number',
 				width: 80,
 				locked: false

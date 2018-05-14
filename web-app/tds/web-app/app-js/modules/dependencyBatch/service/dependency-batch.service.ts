@@ -54,7 +54,7 @@ export class DependencyBatchService {
 	getImportBatch(id: number): Observable<any> {
 		return this.http.get(`${this.importBatchUrl}/${id}`)
 			.map( (res: Response) => {
-				return res;
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}

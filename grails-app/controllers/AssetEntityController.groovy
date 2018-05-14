@@ -1032,7 +1032,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 			// Deal with the parameters
 			def taskPref = assetEntityService.getExistingPref(PREF.Task_Columns)
-			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
+			def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
 			def modelPref = [:]
 			taskPref.each { key, value -> modelPref[key] = assetCommentFields[value] }
 			long filterEvent = NumberUtil.toPositiveLong(params.moveEvent, 0L)
@@ -2213,8 +2213,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.depGroup = params.dependencyBundle
 				model.dependencyType = entities.dependencyType
 				model.dependencyStatus = entities.dependencyStatus
-				model.connectionTypes = '{}'
-				model.statusTypes = '{}'
+				model.connectionTypes = '[]'
+				model.statusTypes = '[]'
 				if (project.depConsoleCriteria) {
 					def depConsoleCriteria = JsonUtil.parseJson(project.depConsoleCriteria)
 					if (depConsoleCriteria.connectionTypes) {

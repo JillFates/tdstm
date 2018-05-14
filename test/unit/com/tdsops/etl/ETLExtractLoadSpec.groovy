@@ -59,7 +59,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	DataSetFacade nonSanitizedDataSet
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
-	ETLFieldsValidator applicationFieldsValidator
 	Project GMDEMO
 	ETLFieldsValidator validator
 
@@ -152,9 +151,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 
-		applicationFieldsValidator = new DomainClassFieldsValidator()
-		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
 		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
 		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
@@ -166,11 +162,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test can define a the primary domain'() {
@@ -529,10 +521,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load a field using a string literal'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -580,10 +568,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load a field using CE'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -631,10 +615,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load a field using DOMAIN.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -700,10 +680,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load a field using SOURCE.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -769,10 +745,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load a field with a local variable'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -821,10 +793,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can load field many times with the same extracted value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -938,10 +906,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can extract a field value and load into a domain object property name'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -985,9 +949,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test correct trimming of spaces in column names'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 			name , mfg, model
 			xraysrv01,Dell,PE2950
@@ -1073,11 +1034,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can create new results loading values without extract previously'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1096,7 +1052,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 						domain Device
 						extract 1 load 'id'
-						load 'location' with 'Development'
+						load 'description' with 'Development'
 					}
 				""".stripIndent())
 
@@ -1170,7 +1126,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 				with(data[0]) {
 					rowNum == 1
-					with(fields.location) {
+					with(fields.description) {
 						originalValue == 'Development'
 						value == 'Development'
 					}
@@ -1186,7 +1142,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 				with(data[0]) {
 					rowNum == 1
-					with(fields.location) {
+					with(fields.description) {
 						originalValue == 'Development'
 						value == 'Development'
 					}
@@ -1297,10 +1253,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can evaluate a value loaded into the DOMAIN.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1434,10 +1386,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can evaluate a value loaded into the SOURCE.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1522,11 +1470,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can ignore current row based on some condition'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1594,12 +1537,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can ignore current row more than once in the same iteration'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1690,12 +1627,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can ignore even if results are empty'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1728,12 +1659,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can ignore rows without loading values previously'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -1766,12 +1691,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can ignore rows in the middle of a data set'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				sixRowsDataSet,
@@ -1818,12 +1737,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can set a local variable with a string literal'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
@@ -1879,12 +1792,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can set a local variable with a SOURCE.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
@@ -1941,12 +1848,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can set a local variable with a DOMAIN.property'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
@@ -2012,12 +1913,6 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	void 'test can set a multiple local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Database, buildFieldSpecsFor(AssetClass.DATABASE))
-
-		and:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
@@ -2212,58 +2107,141 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	@See('TM-10678')
-	void 'test can load a new row using twice the domain command'() {
+	void 'test can throw an Exception if variable names does not end with Var postfix'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				applicationDataSet,
-				new DebugConsole(buffer: new StringBuffer()),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				set myLocalVariable with 'Custom Name'
+				iterate {
+					domain Device
+					load 'Name' with myLocalVar
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == 'No such property: myLocalVariable'
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	void 'test can throw an Exception if variable names is used incorrectly in second time'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				set myLocalVar with 'Custom Name'
+				iterate {
+					domain Device
+					set myLocalVar with 'Another value'
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Invalid variable name: Custom Name. Valid ETL variable names must end with 'Var'".toString()
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-10678')
+	void 'test can load a new row using twice the domain command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
 				validator)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
 				read labels
-				domain Application
+				
 				iterate {
-					extract 'vendor name' load 'appVendor'
-					extract 'application id' load 'id'
+					domain Device
+					extract 'name' load 'Name'
+					domain Device
+					extract 'model' load 'model'
 				}
 			""".stripIndent())
 
 		then: 'Results should contain domain results associated'
 			with(etlProcessor.result.toMap()){
-				ETLInfo.originalFilename == applicationDataSet.fileName()
+				ETLInfo.originalFilename == fileName
 				domains.size() == 1
 
 				with(domains[0]) {
-					domain == ETLDomain.Application.name()
+					domain == ETLDomain.Device.name()
 					data.size() == 2
 					with(data[0]) {
 						rowNum == 1
-						with(fields.appVendor) {
-							value == 'Microsoft'
-							originalValue == 'Microsoft'
+						with(fields.assetName) {
+							value == 'xraysrv01'
+							originalValue == 'xraysrv01'
+							init == null
 						}
 					}
 
 					with(data[1]) {
-						rowNum == 2
-						with(fields.appVendor) {
-							value == 'Mozilla'
-							originalValue == 'Mozilla'
+						rowNum == 1
+						with(fields.model) {
+							value == 'PE2950'
+							originalValue == 'PE2950'
+							init == null
 						}
 					}
 				}
 
+			}
 
-
-
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
 			}
 	}
 

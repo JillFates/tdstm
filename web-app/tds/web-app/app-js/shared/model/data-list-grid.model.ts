@@ -25,13 +25,13 @@ export class GridColumnModel {
 	type: string;
 	format?: string;
 	width: number;
-	locked? = false;
-	hidden? = false;
+	locked ? = false;
+	hidden ? = false;
 	filter?: any;
 	headerStyle?: any;
 	headerClass?: Array<string>;
 	cellStyle?: any;
-	cellClass?: string|Array<string>;
+	cellClass?: string | Array<string>;
 	sort?: SortInfo;
 
 	constructor() {

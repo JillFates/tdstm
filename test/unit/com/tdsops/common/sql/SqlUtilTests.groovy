@@ -99,11 +99,11 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters.size() == 1
 			fsd.sqlSearchParameters["assetName"] == parameter
 		where:
-		filter			|		expression					|	parameter
-			"-alpha"			|	"assetName NOT LIKE :assetName"	|	"%alpha%"
+		filter				|		expression					|	parameter
+			"-alpha"		|	"assetName NOT LIKE :assetName"	|	"%alpha%"
 			"<>alpha"		|	"assetName NOT LIKE :assetName"	|	"%alpha%"
-			"\"alpha\""		|	"assetName = :assetName"			|	"alpha"
-			"!alpha"			|	"assetName <> :assetName"			|	"alpha"
+			"\"alpha\""		|	"assetName = :assetName"		|	"alpha"
+			"!alpha"		|	"assetName <> :assetName"		|	"alpha"
 	}
 
 	void 'Test parseParameter on a string field for IN/NOT IN LIST scenarios'() {
@@ -119,10 +119,10 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters["assetName__0"] == param0
 			fsd.sqlSearchParameters["assetName__1"] == param1
 		where:
-			filter			|		expression									|	param0	|	param1
-			"ab|bc"			|	"assetName IN (:assetName__0, :assetName__1)"		|	"ab"		|	"bc"
-			"-ab|bc"			|	"assetName NOT IN (:assetName__0, :assetName__1)"	|	"ab"		|	"bc"
-			"!ab|bc"			|	"assetName NOT IN (:assetName__0, :assetName__1)"	|	"ab"		|	"bc"
+			filter			|		expression										|	param0	|	param1
+			"ab|bc"			|	"assetName IN (:assetName__0, :assetName__1)"		|	"ab"	|	"bc"
+			"-ab|bc"		|	"assetName NOT IN (:assetName__0, :assetName__1)"	|	"ab"	|	"bc"
+			"!ab|bc"		|	"assetName NOT IN (:assetName__0, :assetName__1)"	|	"ab"	|	"bc"
 
 	}
 
@@ -139,10 +139,10 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters["assetName__0"] == param0
 			fsd.sqlSearchParameters["assetName__1"] == param1
 		where:
-			filter			|		expression																|	param0	|	param1
+			filter			|	expression																|	param0	|	param1
 			"ab:bc"			|	"(assetName LIKE :assetName__0 OR assetName LIKE :assetName__1)"				|	"%ab%"	|	"%bc%"
-			"!ab:bc"			|	"(assetName NOT LIKE :assetName__0 AND assetName NOT LIKE :assetName__1)"		|	"%ab%"	|	"%bc%"
-			"-ab:bc"			|	"(assetName NOT LIKE :assetName__0 AND assetName NOT LIKE :assetName__1)"		|	"%ab%"	|	"%bc%"
+			"!ab:bc"		|	"(assetName NOT LIKE :assetName__0 AND assetName NOT LIKE :assetName__1)"		|	"%ab%"	|	"%bc%"
+			"-ab:bc"		|	"(assetName NOT LIKE :assetName__0 AND assetName NOT LIKE :assetName__1)"		|	"%ab%"	|	"%bc%"
 
 	}
 
@@ -159,10 +159,10 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters["assetName"] == parameter
 		where:
 			filter			|		expression				|	parameter
-			"alpha%"			|	"assetName LIKE :assetName"	|	"alpha%"
-			"alpha*"			|	"assetName LIKE :assetName"	|	"alpha%"
-			"%alpha"			|	"assetName LIKE :assetName"	|	"%alpha"
-			"*alpha"			|	"assetName LIKE :assetName"	|	"%alpha"
+			"alpha%"		|	"assetName LIKE :assetName"	|	"alpha%"
+			"alpha*"		|	"assetName LIKE :assetName"	|	"alpha%"
+			"%alpha"		|	"assetName LIKE :assetName"	|	"%alpha"
+			"*alpha"		|	"assetName LIKE :assetName"	|	"%alpha"
 			"%alpha%"		|	"assetName LIKE :assetName"	|	"%alpha%"
 			"*alpha*"		|	"assetName LIKE :assetName"	|	"%alpha%"
 

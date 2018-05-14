@@ -6,7 +6,8 @@ import {
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	EventReaction,
-	EventReactionType
+	EventReactionType,
+	EVENT_BEFORE_CALL_TEXT
 } from '../../model/api-action.model';
 import {ProviderModel} from '../../model/provider.model';
 import {DataIngestionService} from '../../service/data-ingestion.service';
@@ -83,6 +84,7 @@ export class APIActionViewEditComponent implements OnInit {
 	private dataSignature: string;
 	private dataParameterListSignature: string;
 	private intervals = INTERVALS;
+	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
 	public selectedInterval = {value: 0, interval: ''};
 	public selectedLapsed = {value: 0, interval: ''};
@@ -299,7 +301,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
-					this.modalType = this.actionTypes.EDIT;
+					this.modalType = this.actionTypes.VIEW;
 					this.getModalTitle();
 					this.apiActionModel.id = result.id;
 					this.apiActionModel.version = result.version;
@@ -814,7 +816,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getAssetClassValue(context: any): string {
 		let assetClass = this.assetClassesForParameters.find((param) => {
-			return param.assetClass === context;
+			return param.assetClass === context || param.assetClass === context.assetClass;
 		});
 		if (assetClass && assetClass.value) {
 			return assetClass.value;
@@ -841,6 +843,16 @@ export class APIActionViewEditComponent implements OnInit {
 	protected isCheckSyntaxSectionDisabled(sectionIndex: number): boolean {
 		const eventReaction: EventReaction = this.apiActionModel.eventReactions[sectionIndex];
 		return eventReaction.value === '' || eventReaction.state === CHECK_ACTION.VALID;
+	}
+
+	public onEventReactionSelect(eventReaction: EventReaction): void {
+		if (eventReaction.type === EventReactionType.PRE) {
+			if (eventReaction.selected && eventReaction.value === '') {
+				eventReaction.value = this.eventBeforeCallText;
+			} else {
+				eventReaction.value = '';
+			}
+		}
 	}
 
 }
