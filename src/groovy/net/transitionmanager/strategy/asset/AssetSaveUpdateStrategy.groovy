@@ -264,8 +264,8 @@ abstract class AssetSaveUpdateStrategy {
 	 */
 	private List<Long> collectDependencies(boolean isDependent) {
 		List<Long> dependencies = []
-		Map depMaps = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
-		for (depMap in dependentMaps) {
+		List depList = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
+		for (depMap in depList) {
 			Long id = NumberUtil.toLong(depMap.id)
 			if (id) {
 				dependencies << id
@@ -299,8 +299,8 @@ abstract class AssetSaveUpdateStrategy {
 	private List<Long> collectRelatedAssets(boolean dependents) {
 		List<Long> ids = []
 		String label = dependents ? "dependent" : "supporting"
-		Map depMaps = dependents ? command.dependencyMap.dependentAssets : command.dependencyMap.supportAssets
-		for (depMap in depMaps) {
+		List<Map> depList = dependents ? command.dependencyMap.dependentAssets : command.dependencyMap.supportAssets
+		for (depMap in depList) {
 			Long id = depMap.assetDepend.id
 			if (id) {
 				if (id in ids) {
