@@ -2912,7 +2912,17 @@ class AssetEntityService implements ServiceMethods {
 	 * @param term the term to be searched
 	 * @return the map of asset types
 	 */
-	def assetTypesOf(manufacturerId, term) {
+	def assetTypesOf(String manufacturerId, String term) {
+		if(StringUtils.isBlank(manufacturerId) && StringUtils.isBlank(term)){
+			List<AssetOptions> assetOptions =  AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ASSET_TYPE, [sort: 'value'])
+
+			List<Map> results = assetOptions.collect { options ->
+				[id: options.value, text : options.value]
+			}
+
+			return results
+		}
+
 		def hql = "SELECT distinct m.assetType as assetType FROM Model m WHERE m.assetType is not null "
 		def joinTables = " "
 		def condition = ""
