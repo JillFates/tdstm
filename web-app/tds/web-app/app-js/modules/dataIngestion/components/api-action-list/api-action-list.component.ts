@@ -105,7 +105,10 @@ export class APIActionListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openAPIActionDialogViewEdit(dataItem, ActionType.EDIT);
+		let apiAction: APIActionModel = dataItem as APIActionModel;
+		this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+			this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -131,8 +134,11 @@ export class APIActionListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openAPIActionDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
+			this.selectRow(apiAction.id);
+			this.dataIngestionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+			}, error => console.log(error));
 		}
 	}
 
@@ -147,11 +153,17 @@ export class APIActionListComponent {
 						this.selectRow(this.openLastItemId);
 						let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === this.openLastItemId);
 						this.openLastItemId = 0;
-						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW);
+						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW, lastApiActionModel);
 					}, 700);
 				}
 			},
 			(err) => console.log(err));
+	}
+
+	private reloadItem(originalModel: APIActionModel): void {
+		this.dataIngestionService.getAPIAction(originalModel.id).subscribe((response: APIActionModel) => {
+			Object.assign(originalModel, response);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -159,15 +171,18 @@ export class APIActionListComponent {
 	 * @param {APIActionModel} apiActionModel
 	 * @param {number} actionType
 	 */
-	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number): void {
+	private openAPIActionDialogViewEdit(apiActionModel: APIActionModel, actionType: number, originalModel?: APIActionModel): void {
 		this.dialogService.open(APIActionViewEditComponent, [
 			{ provide: APIActionModel, useValue: apiActionModel },
 			{ provide: Number, useValue: actionType }
 		], DIALOG_SIZE.XLG, false).then(result => {
-			if (actionType === ActionType.CREATE) {
-				this.openLastItemId = result.id;
+			if (result) {
+				if (actionType === ActionType.CREATE) {
+					this.reloadData();
+				} else {
+					this.reloadItem(originalModel);
+				}
 			}
-			this.reloadData();
 		}).catch(result => {
 			this.reloadData();
 			console.log('Dismissed Dialog');
