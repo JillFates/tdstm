@@ -149,12 +149,18 @@ export class CredentialListComponent {
 					if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
 						this.selectRow(this.lastCreatedRecordId);
 						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
-						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
+						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW, lastCredentialModel);
 						this.lastCreatedRecordId = 0;
 					}
 				}, 500);
 			},
 			(err) => console.log(err));
+	}
+
+	private reloadItem(originalModel: CredentialModel): void {
+		this.dataIngestionService.getCredential(originalModel.id).subscribe( (response: CredentialModel) => {
+			Object.assign(originalModel, response);
+		}, err => console.log(err));
 	}
 
 	/**
@@ -172,10 +178,11 @@ export class CredentialListComponent {
 					this.lastCreatedRecordId = result.id;
 					this.reloadData();
 				} else {
-					Object.assign(originalModel, result);
+					this.reloadItem(originalModel);
 				}
 			}
 		}).catch(result => {
+			this.reloadData();
 			console.log('Dismissed Dialog');
 		});
 	}
