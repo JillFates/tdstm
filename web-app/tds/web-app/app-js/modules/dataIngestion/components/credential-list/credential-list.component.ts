@@ -103,7 +103,10 @@ export class CredentialListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openCredentialDialogViewEdit(dataItem, ActionType.EDIT);
+		let credential: CredentialModel = dataItem;
+		this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+			this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
+		}, err => console.log(err));
 	}
 
 	/**
@@ -129,8 +132,11 @@ export class CredentialListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openCredentialDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			let credential: CredentialModel = event['dataItem'] as CredentialModel;
+			this.selectRow(credential.id);
+			this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+				this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
+			}, err => console.log(err));
 		}
 	}
 
@@ -156,15 +162,17 @@ export class CredentialListComponent {
 	 * @param {CredentialModel} credentialModel
 	 * @param {number} actionType
 	 */
-	private openCredentialDialogViewEdit(credentialModel: CredentialModel, actionType: number): void {
+	private openCredentialDialogViewEdit(credentialModel: CredentialModel, actionType: number, originalModel?: CredentialModel): void {
 		this.dialogService.open(CredentialViewEditComponent, [
 			{ provide: CredentialModel, useValue: credentialModel },
 			{ provide: Number, useValue: actionType }
-		], DIALOG_SIZE.XLG, false).then(result => {
-			this.reloadData();
-			if (actionType === ActionType.CREATE) {
-				if (result && result.id) {
+		], DIALOG_SIZE.XLG, false).then( (result: CredentialModel) => {
+			if (result && result.id) {
+				if (actionType === ActionType.CREATE) {
 					this.lastCreatedRecordId = result.id;
+					this.reloadData();
+				} else {
+					Object.assign(originalModel, result);
 				}
 			}
 		}).catch(result => {
