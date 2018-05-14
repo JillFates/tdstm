@@ -19,7 +19,11 @@ export interface DecoratorOptions {
 const SCROLLBAR_BORDER = 5;
 const TOP_MARGIN = -30;
 
-@Directive({ selector: '[tds-ui-window-decorator]' })
+/**
+ * Enable full screen and resizable capabilities to modal windows
+ */
+
+@Directive({ selector: '[tds-ui-modal-decorator]' })
 export class UIModalDecoratorDirective implements AfterViewInit {
 	private isMaximized = false;
 	private defaultOptions: DecoratorOptions = {isFullScreen: false, isCentered: true, isResizable: false, isDraggable: true};
