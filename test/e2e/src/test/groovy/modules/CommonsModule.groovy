@@ -1,7 +1,7 @@
 package modules
 
 import geb.Module
-import geb.error.RequiredPageContentNotPresent
+import geb.waiting.WaitTimeoutException
 
 class CommonsModule extends Module {
 
@@ -15,7 +15,7 @@ class CommonsModule extends Module {
             // there are big pages where lot of information is loaded
             waitFor { $('#main-loader') }
             waitFor { !$('#main-loader') }
-        } catch (RequiredPageContentNotPresent e) {
+        } catch (WaitTimeoutException e) {
             // nothing to do here, in case server manage fast the page information
             // and the loader icon is not detected, just prevent test fails
         }
