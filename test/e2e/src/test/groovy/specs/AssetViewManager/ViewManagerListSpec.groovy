@@ -37,7 +37,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         when: "I click on All Views"
             waitFor {viewMgrAllViews.click()}
         then: "I see at least the All Assets View"
-            allViewsModule.validateViewIsListed("All Assets")
+            allViewsModule.validateRowNames("All Assets", true)
         and: "The title on the section is correct"
             allViewsModule.moduleTitleIsCorrect("All")
     }
@@ -83,7 +83,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         when : "I filter views by name"
             filterViewByName "All Assets"
         then: "Only views with names containing the text are listed"
-            allViewsModule.validateFilteredList("All Assets")
+            allViewsModule.validateRowNames("All Assets", false)
 
     }
     def "6. Validates the listed views in System Views are correct"(){

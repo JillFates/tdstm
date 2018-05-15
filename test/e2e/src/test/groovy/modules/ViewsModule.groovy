@@ -60,15 +60,14 @@ class ViewsModule extends Module {
         !voidStars.displayed
     }
     /**
-     * number of rows should be the same as number of ticks.
+     * Shared views willhave a tick on the "Shared" column
+     * In This section the number of rows should be the same as number of ticks.
+     * This method validates the the condition of equal number of ticks and rows is met
+     * and it assumes that there will always be at least one shared view,which is the all assets view.
+     *
      */
     def validateIsShared(){
-        if(sharedViews.size()>0){
-            sharedViews.size()==vwGridRows.size()
-        }else{
-            println("No Shared views are displayed")
-        }
-
+        sharedViews.size()==vwGridRows.size()
     }
     /**
      * System Views will have no author (created by field empty)
@@ -103,6 +102,33 @@ class ViewsModule extends Module {
         }
         validList
     }
+    /**
+     * This method validates how the mame of a view is listed in a grid.
+     * If the parameter isListed receives TRUE the method will check whether
+     * a view name is LISTED at lest once in the grid, while receiving FALSE will have the
+     * method to check whether each view name CONTAINS the text in the viewName parameter.
+     * @param viewName
+     * @param isListed
+     * @return
+     */
+    def validateRowNames(String viewName, boolean isListed){
+        def found=false
+        def element
+        def elements
+        if(isListed){
+            element=viewsListed.find{el -> el.text()==viewName}
+            if(element) found = true
+        }else{
+            elements=viewsListed.findAll{els -> els.text().contains(viewName)}
+            if(elements.size()==viewsListed.size())
+                found = true
+        }
+        found
+    }
+    /**
+     * Clicks on the first row
+     * @return
+     */
     def clickFirstViewOfTheList(){
         vwGrid.find("tr")[1].find("a")[1].click()
     }
