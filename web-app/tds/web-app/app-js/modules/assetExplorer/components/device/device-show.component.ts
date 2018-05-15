@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
-import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
 import {AssetEditComponent} from '../asset/asset-edit.component';
 
 declare var jQuery: any;
@@ -16,7 +16,12 @@ export function DeviceShowComponent(template, modelId: number) {
 		mainAsset = modelId;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
+		}
 
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
+			}
 		}
 
 		/**

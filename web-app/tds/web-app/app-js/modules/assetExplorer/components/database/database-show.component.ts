@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
-import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, DOMAIN, KEYSTROKE} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -17,6 +17,12 @@ export function DatabaseShowComponent(template, modelId: number) {
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 			jQuery('[data-toggle="popover"]').popover();
+		}
+
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
+			}
 		}
 
 		/**

@@ -6,7 +6,7 @@
  */
 
 import * as R from 'ramda';
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, HostListener, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -14,9 +14,9 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {ComboBoxSearchModel} from '../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs/Observable';
 import {ComboBoxSearchResultModel} from '../../../../shared/components/combo-box/model/combobox-search-result.model';
-import {is} from '@uirouter/core';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -54,6 +54,12 @@ export function DeviceEditComponent(template, editModel) {
 			this.dateFormat = this.dateFormat.toLowerCase().replace(/m/g, 'M');
 			this.initModel();
 			this.toggleAssetTypeFields();
+		}
+
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
+			}
 		}
 
 		/**
