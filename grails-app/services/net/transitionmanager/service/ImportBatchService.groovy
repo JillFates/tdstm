@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdssrc.grails.GormUtil
@@ -467,22 +468,35 @@ class ImportBatchService implements ServiceMethods {
 	 * @param batchId - the id of the batch to be queued
 	 */
 	void scheduleJob(Project project, Long batchId) {
+		// fetch batch
+		ImportBatch importBatch = fetchBatch(project, batchId)
+
+		// set batch to queued if this is the first time the user tries to schedule the import batch
+		if (!importBatch.queuedAt && !importBatch.queuedBy) {
+			dataImportService.setBatchToQueued(importBatch.id)
+		}
+
 		// Setup the Quartz job that will execute the actual posting process
 
 		// The triggerName/Group will allow us to controller on import
 		Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
 
-		String triggerName = 'TM-ImportBatch-' + project.id + '-' + batchId
+		// making import batch trigger name this way to let quartz to fail if there are multiple scheduled jobs going to run at the same time
+		String triggerName = 'TM-ImportBatch-' + project.id
 		Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
 
-		trigger.jobDataMap.batchId = batchId
+		trigger.jobDataMap.batchId = importBatch.id
 		trigger.jobDataMap.username = securityService.currentUsername
 		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		trigger.jobDataMap.projectId = project.id
 		trigger.setJobName('ImportBatchJob') 			// Please note that the JobName must match the class file name
 		trigger.setJobGroup('tdstm-import-batch') 		// and that the group should be specified in the Job
 
-		quartzScheduler.scheduleJob(trigger)
+		try {
+			quartzScheduler.scheduleJob(trigger)
+		} catch (Exception e) {
+			log.info('Could not schedule import batch. {}\\n{}', e.message, ExceptionUtil.stackTraceToString(e))
+		}
 
 		log.info('scheduleJob() {} kicked of an batch import process for batch ({})', securityService.currentUsername, batchId)
 	}

@@ -1,4 +1,6 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.event.ImportBatchJobSchedulerEvent
+import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.IdsCommand
@@ -93,7 +95,9 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				importBatchService.scheduleJob(project, actionCmd.ids[0])
+				//importBatchService.scheduleJob(project, actionCmd.ids[0])
+				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails = new ImportBatchJobSchedulerEventDetails(project, actionCmd.ids[0], securityService.currentUsername)
+				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
 				break
 
 			case ImportBatchActionEnum.EJECT:

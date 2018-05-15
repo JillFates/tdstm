@@ -546,6 +546,7 @@ class DataImportService implements ServiceMethods {
 			// Let's lock the batch for a moment so we can check out if it is okay to start
 			// processing this batch.
 			batch.project.lock()
+			batch = batch.refresh()
 
 			// Now make sure nobody altered the batch in the meantime
 			// Can only enqueue a batch if it was PENDING
@@ -562,6 +563,7 @@ class DataImportService implements ServiceMethods {
 				processProgress = 0
 				processLastUpdated = queuedAtTime
 				queuedAt = queuedAtTime
+				queuedBy = securityService.currentUsername
 				processStopFlag = 0
 			}
 			log.debug 'setBatchToQueued() dirtyProperties {}', batch.dirtyPropertyNames
@@ -577,25 +579,14 @@ class DataImportService implements ServiceMethods {
 	Long getNextBatchToProcess(Long projectId) {
 		ImportBatch.withNewTransaction { session ->
 
-			// Check to see if there are any other batches in the RUNNING state
-			int count = ImportBatch.where {
-				project.id == projectId
-				status == ImportBatchStatusEnum.RUNNING
-			}.count()
-
-			// if there is another batch job running for the same project just return
-			if (count > 0) {
-				log.info('Found another batch already running while getting next batch to process.')
-				return null
-			}
-
 			// Get the list of the ImportBatch IDs that can be processed
 			List<Long> batchIds = ImportBatch.where {
 				project.id == projectId
 				status == ImportBatchStatusEnum.QUEUED
 			}
 			.projections { property('id') }
-			.list(sortBy: 'queuedAt')
+			.sort('queuedAt')
+			.list(max: 1)
 
 			if (batchIds) {
 				return batchIds.get(0)

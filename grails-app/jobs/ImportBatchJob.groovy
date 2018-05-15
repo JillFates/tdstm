@@ -1,45 +1,48 @@
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.event.ImportBatchJobSchedulerEvent
+import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import com.tdssrc.grails.GormUtil
+import grails.plugin.springevents.AsyncEventPublisher
+import grails.transaction.NotTransactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.domain.ImportBatch
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.DataImportService
-import net.transitionmanager.service.ImportBatchService
-import net.transitionmanager.service.ProgressService
 import org.quartz.JobExecutionContext
+import org.springframework.context.ApplicationEvent
+import org.springframework.context.ApplicationEventPublisher
 
 @Slf4j
-class ImportBatchJob extends SecureJob {
+class ImportBatchJob extends SecureJob implements ApplicationEventPublisher {
 	String group = 'tdstm-import-batch'
 	static triggers = {}
 
-	ImportBatchService importBatchService
+	AsyncEventPublisher asyncEventPublisher
 	DataImportService dataImportService
-	ProgressService progressService
 
 	/**
 	 * Invokes an asset import process job to post assets to the inventory.
 	 */
+	@NotTransactional()
 	void execute(JobExecutionContext context) {
 		Map dataMap = initialize(context)
 
-		long batchId = dataMap.getLongValue('batchId')
 		long projectId = dataMap.getLongValue('projectId')
 
 		try {
-			log.debug('userLoginId = {}', dataMap.userLoginId)
+			long batchId = dataMap.getLongValue('batchId')
 			long userLoginId = dataMap.getLongValue('userLoginId')
+			log.debug('userLoginId = {}', dataMap.userLoginId)
 
 			log.debug('execute() batchId={}, projectId={}, userLoginId={}', batchId, projectId, userLoginId)
 
-			dataImportService.setBatchToQueued(batchId)
-			Long nextBatchId = dataImportService.getNextBatchToProcess(projectId)
-			if (nextBatchId) {
+			if (batchId) {
 				log.info('execute() is about to invoke dataImportService.processBatch(...) to start processing batch ({})', batchId)
 
 				// call process batch
-				dataImportService.processBatch(Project.get(projectId), batchId)
+				Integer processedRows = dataImportService.processBatch(Project.get(projectId), batchId)
 
-				log.info('execute() return from dataImportService.processBatch(...) : results={}', null)
+				log.info('execute() return from dataImportService.processBatch(...) : processed rows={}', processedRows)
 			} else {
 				log.info('execute() did not find a import batch candidate to start processing.')
 			}
@@ -48,13 +51,19 @@ class ImportBatchJob extends SecureJob {
 		} finally {
 			// find if there are more queued jobs to start processing different than the current one
 			Long nextBatchId = dataImportService.getNextBatchToProcess(projectId)
-			if (nextBatchId && batchId != nextBatchId) {
-				// if there is a next batch to process, then launch it by scheduling it
-				importBatchService.scheduleJob(Project.get(projectId), nextBatchId)
+			if (nextBatchId) {
+				// if there is a next batch to process, then trigger an application event to schedule it
+				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails = new ImportBatchJobSchedulerEventDetails(Project.get(projectId), nextBatchId, ImportBatch.get(nextBatchId).queuedBy)
+				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
 			}
 
 			GormUtil.releaseLocalThreadMemory()
 		}
+	}
+
+	@Override
+	void publishEvent(ApplicationEvent applicationEvent) {
+		asyncEventPublisher.publishEvent(applicationEvent)
 	}
 
 }

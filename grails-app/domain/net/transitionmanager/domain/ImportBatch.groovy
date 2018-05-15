@@ -58,6 +58,9 @@ class ImportBatch {
 	// Will contain the time when the batch was queued to be processed
 	Date queuedAt
 
+	// Will contain the username that queued the batch
+	String queuedBy
+
 	// Is used to trigger the halting of a batch being processed
 	Integer processStopFlag
 
@@ -103,6 +106,7 @@ class ImportBatch {
 		processProgress nullable: true, size: 0..100
 		processLastUpdated nullable: true
 		queuedAt nullable: true
+		queuedBy nullable: true
 		processStopFlag nullable: true, range: 0..1
 		progressInfoJob nullable: true
 		provider nullable: true
@@ -122,6 +126,7 @@ class ImportBatch {
 		processProgress sqltype: 'TINYINT(3)'
 		processLastUpdated sqltype: 'DATETIME'
 		queuedAt sqltype: 'DATETIME'
+		queuedBy sqltype: 'VARCHAR(50)'
 		processStopFlag sqltype: 'TINYINT(1)'
 		progressInfoJob sqltype: 'VARCHAR(255)'
 		nullIndicator sqltype: 'VARCHAR(255)'
@@ -173,6 +178,8 @@ class ImportBatch {
 				autoProcess: autoProcess,
 				warnOnChangesAfter: warnOnChangesAfter,
 				fieldNameList: fieldNameListAsList(),
+				queuedAt: queuedAt,
+				queuedBy: queuedBy,
 				dateCreated: dateCreated,
 				lastUpdated: lastUpdated
 			]
