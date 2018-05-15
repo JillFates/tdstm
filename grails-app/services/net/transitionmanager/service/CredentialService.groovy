@@ -111,7 +111,7 @@ class CredentialService implements ServiceMethods {
 
         if (count > 0) {
             // TODO : JPM 2/2018 : change to use standard service method to throw message that is i18n
-            throw DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
+            throw new DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
         }
 
         credential.delete()
