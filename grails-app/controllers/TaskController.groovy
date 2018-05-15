@@ -330,7 +330,7 @@ class TaskController implements ControllerMethods {
 			if (securityService.hasPermission(Permission.ActionInvoke)) {
 				if (comment.isActionInvocable() && !comment.isAutomatic()) {
 					actionBar << [label   : 'Invoke', icon: 'ui-icon-gear', actionType: 'invokeAction', newStatus: STARTED,
-								  redirect: 'taskManager', disabled: comment.status != READY]
+								  redirect: 'taskManager', disabled: !(comment.status in [READY, STARTED])]
 				}
 			}
 
