@@ -51,14 +51,6 @@ grails.project.dependency.resolution = {
 
 		// test 'com.canoo.webtest:webtest:3.0'
 		test 'org.grails:grails-datastore-test-support:1.0.2-grails-2.4'
-
-		/*
-		//testRuntime ("org.apache.camel:camel-test:${camelVersion}") {
-		test ("org.apache.camel:camel-test:${camelVersion}") {
-			excludes( [name: 'junit'] )//
-
-		*/
-
 	}
 
 	plugins {
