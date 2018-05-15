@@ -1,10 +1,8 @@
-<button type="button" class="btn btn-default"
+<button type="button" class="btn btn-default" [ngClass]="class"
         (click)="onCheckThumbBindAction()"
         [disabled]="disabled">
-    <i aria-hidden="true" class="fa"
-       [ngClass]="{'fa-thumbs-o-up': model.state == checkActionModel.UNKNOWN,
-       'fa-check green': model.state == checkActionModel.VALID,
-       'fa-thumbs-down red': model.state == checkActionModel.INVALID }">
+    <i aria-hidden="true"
+       [ngClass]="getIcon()">
     </i>
     <span *ngIf="name" style="margin-right: 3px;"> {{name}} </span>
 </button>
