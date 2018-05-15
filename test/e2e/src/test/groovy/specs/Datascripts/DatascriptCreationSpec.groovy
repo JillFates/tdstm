@@ -73,6 +73,7 @@ class DatascriptCreationSpec extends GebReportingSpec{
             waitFor{providerDropdown.click()}
             //We select the latest provider that was created
             waitFor{latestProvider.click()}
+            waitFor{datascriptDescField.click()}
             datascriptDescField = datascriptDescription
             datascriptNameField = datascriptName
             waitFor {datascriptSaveBtn.isDisplayed()}
