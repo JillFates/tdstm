@@ -117,7 +117,7 @@ class ETLSandboxingSpec  extends ETLBaseSpec {
 			etlProcessor.selectedDomain.domain == ETLDomain.Application
 
 		and: 'A new result was added in the result'
-			with(etlProcessor.result) {
+			with(etlProcessor.resultsMap()){
 				domains.size() == 1
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()

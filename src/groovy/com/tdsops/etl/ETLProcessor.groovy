@@ -1057,6 +1057,9 @@ class ETLProcessor implements RangeChecker {
 		return rows[rowIndex].getElement(columnIndex)
 	}
 
+	Map<String, ?> resultsMap(){
+		this.result.toMap()
+	}
 
 	List<String> getAvailableMethods () {
 		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',

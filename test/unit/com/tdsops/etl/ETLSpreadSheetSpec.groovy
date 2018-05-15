@@ -80,7 +80,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -113,7 +113,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 0
 
 		cleanup:
@@ -139,7 +139,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -185,7 +185,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -228,7 +228,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 								""".stripIndent())
 
 				then: 'DataSet was modified by the ETL script'
-					etlProcessor.result.domains.size() == 0
+					etlProcessor.resultsMap().domains.size() == 0
 					etlProcessor.currentRowIndex == 1
 
 				and: 'A column map is created'
@@ -323,7 +323,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -369,7 +369,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
@@ -418,7 +418,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
@@ -468,10 +468,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -526,10 +526,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 2
+			etlProcessor.resultsMap().domains.size() == 2
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -543,7 +543,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				}
 			}
 
-			with(etlProcessor.result.domains[1]) {
+			with(etlProcessor.resultsMap().domains[1]) {
 				domain == ETLDomain.Device.name()
 				data.size() == 2
 				with(data[0].fields.assetName) {
@@ -581,7 +581,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 
 		and: 'Results contains values'
 			etlProcessor.column('application id').index == 0
@@ -628,7 +628,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 
 		and: 'Results contains values'
 			etlProcessor.column('application id').index == 0
@@ -676,10 +676,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {
@@ -720,10 +720,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {

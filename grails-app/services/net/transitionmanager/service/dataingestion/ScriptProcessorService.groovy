@@ -102,7 +102,7 @@ class ScriptProcessorService {
 
 	     if (etlProcessor) {
 		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.result.toMap()
+		     result.data = etlProcessor.resultsMap()
 	     }
 
         return result

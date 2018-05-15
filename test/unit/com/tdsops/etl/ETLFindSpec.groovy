@@ -16,6 +16,7 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import com.tdssrc.grails.NumberUtil
+import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
 
 /**
@@ -152,38 +153,40 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == '152254'
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152254']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == '152254'
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152254']
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152255']
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == '152255'
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152255']
+						}
 					}
 				}
 			}
@@ -252,39 +255,42 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
+					data.size() == 14
+					data.collect {
+						it.fields.id.value.toLong()
+					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
 
 
-				with(data[0].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == 151954l
-					find.results == [151954l]
-					find.matchOn == 0
-				}
+					with(data[0].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151954l
+						find.results == [151954l]
+						find.matchOn == 0
+					}
 
-				with(data[1].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == 151971l
-					find.results == [151971l]
-					find.matchOn == 0
-				}
+					with(data[1].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151971l
+						find.results == [151971l]
+						find.matchOn == 0
+					}
 
-				with(data[2].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == 151974l
-					find.results == [151974l]
-					find.matchOn == 0
+					with(data[2].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151974l
+						find.results == [151974l]
+						find.matchOn == 0
+					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -565,51 +571,53 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
+					data.collect { it.fields.asset.value } == [
 						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					]
 
-				// Validates command: find Application of asset by id with DOMAIN.asset
-				(1..14).eachWithIndex { int value, int index ->
-					with(data[index].fields.id.find) {
-						query.size() == 1
-						with(query[0]) {
-							domain == ETLDomain.Dependency.name()
-							kv.id == value.toString()
+					// Validates command: find Application of asset by id with DOMAIN.asset
+					(1..14).eachWithIndex { int value, int index ->
+						with(data[index].fields.id.find) {
+							query.size() == 1
+							with(query[0]) {
+								domain == ETLDomain.Dependency.name()
+								kv.id == value.toString()
+							}
 						}
 					}
-				}
 
-				// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-				with(data[0].fields.asset.find) {
-					query.size() == 4
-					with(query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
-					}
+					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+					with(data[0].fields.asset.find) {
+						query.size() == 4
+						with(query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
 
-					with(query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetClass == 'VM'
-					}
+						with(query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetClass == 'VM'
+						}
 
-					with(query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
+						with(query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
 
-					with(query[3]) {
-						domain == ETLDomain.Asset.name()
-						kv.assetName == 'VMWare Vcenter'
+						with(query[3]) {
+							domain == ETLDomain.Asset.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
 					}
 				}
 			}
@@ -707,12 +715,16 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'comment'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'comment'] as Set
+					data.size() == 14
+					data.collect {
+						it.fields.id.value.toLong()
+					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+				}
 			}
 
 		cleanup:
@@ -767,21 +779,22 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0].fields.asset) {
-					originalValue == '152254'
-					value == '152254'
-				}
+					with(data[0].fields.asset) {
+						originalValue == '152254'
+						value == '152254'
+					}
 
-				with(data[1].fields.asset) {
-					originalValue == '152255'
-					value == '152255'
+					with(data[1].fields.asset) {
+						originalValue == '152255'
+						value == '152255'
+					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -894,71 +907,73 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
 
-				with(data[0]) {
-					!warn
+					with(data[0]) {
+						!warn
 
-					with(fields) {
+						with(fields) {
 
-						with(environment){
-							originalValue == 'Production'
-							value == 'Production'
-						}
-						with(appVendor){
-							originalValue == 'Microsoft'
-							value == 'Microsoft'
-						}
-						with(id){
-							originalValue == '152254'
-							value == '152254'
+							with(environment) {
+								originalValue == 'Production'
+								value == 'Production'
+							}
+							with(appVendor) {
+								originalValue == 'Microsoft'
+								value == 'Microsoft'
+							}
+							with(id) {
+								originalValue == '152254'
+								value == '152254'
 
-							// Validating queries
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152254']
+								// Validating queries
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152254']
 
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Microsoft']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Microsoft']
 
-								results == []
-								matchOn == null
+									results == []
+									matchOn == null
+								}
 							}
 						}
 					}
-				}
 
-				with(data[1]) {
-					warn
-					errors == ['found without asset id field']
-					with(fields){
+					with(data[1]) {
+						warn
+						errors == ['found without asset id field']
+						with(fields) {
 
-						with(environment){
-							originalValue == 'Production'
-							value == 'Production'
-						}
-						with(appVendor){
-							originalValue == 'Mozilla'
-							value == 'Mozilla'
-						}
-						with(id){
-							originalValue == '152255'
-							value == '152255'
-							// Validating queries
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152255']
-
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Mozilla']
-
-								results == [1l]
-								matchOn == 1
+							with(environment) {
+								originalValue == 'Production'
+								value == 'Production'
 							}
-							warn
-							errors == ['found without asset id field']
+							with(appVendor) {
+								originalValue == 'Mozilla'
+								value == 'Mozilla'
+							}
+							with(id) {
+								originalValue == '152255'
+								value == '152255'
+								// Validating queries
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152255']
+
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Mozilla']
+
+									results == [1l]
+									matchOn == 1
+								}
+								warn
+								errors == ['found without asset id field']
+							}
 						}
 					}
 				}
@@ -1004,51 +1019,53 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id', 'appVendor'] as Set
-				with(data[0]) {
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id', 'appVendor'] as Set
+					with(data[0]) {
 
-					errorCount == 2
-					with(fields) {
+						errorCount == 2
+						with(fields) {
 
-						with(id) {
-							originalValue == '152254'
-							value == '152254'
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152254']
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Microsoft']
+							with(id) {
+								originalValue == '152254'
+								value == '152254'
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152254']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Microsoft']
+								}
+								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
-						}
-						with(appVendor) {
-							originalValue == 'Microsoft'
-							value == 'Microsoft'
+							with(appVendor) {
+								originalValue == 'Microsoft'
+								value == 'Microsoft'
+							}
 						}
 					}
-				}
-				with(data[1]) {
-					errorCount == 2
-					with(fields) {
+					with(data[1]) {
+						errorCount == 2
+						with(fields) {
 
-						with(id) {
-							originalValue == '152255'
-							value == '152255'
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152255']
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Mozilla']
+							with(id) {
+								originalValue == '152255'
+								value == '152255'
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152255']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Mozilla']
+								}
+
+								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-
-							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
-						}
-						with(appVendor) {
-							originalValue == 'Mozilla'
-							value == 'Mozilla'
+							with(appVendor) {
+								originalValue == 'Mozilla'
+								value == 'Mozilla'
+							}
 						}
 					}
 				}
@@ -1218,68 +1235,70 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Rack.name()
-				fieldNames == ['id', 'location', 'room'] as Set
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Rack.name()
+					fieldNames == ['id', 'location', 'room'] as Set
 
-				data.size() == 5
-				with(data[0]) {
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == '4'
-						value == '4'
+					data.size() == 5
+					with(data[0]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '4'
+							value == '4'
+						}
 					}
-				}
-				with(data[1]) {
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == '13145'
-						value == '13145'
+					with(data[1]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == '13145'
+							value == '13145'
+						}
 					}
-				}
-				with(data[2]) {
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 3
-					with(fields.id) {
-						originalValue == '5'
-						value == '5'
+					with(data[2]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 3
+						with(fields.id) {
+							originalValue == '5'
+							value == '5'
+						}
 					}
-				}
-				with(data[3]) {
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 4
-					with(fields.id) {
-						originalValue == '6'
-						value == '6'
+					with(data[3]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 4
+						with(fields.id) {
+							originalValue == '6'
+							value == '6'
+						}
 					}
-				}
-				with(data[4]) {
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 5
-					with(fields.id) {
-						originalValue == '13358'
-						value == '13358'
+					with(data[4]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 5
+						with(fields.id) {
+							originalValue == '13358'
+							value == '13358'
+						}
 					}
-				}
 
+				}
 			}
 
 		cleanup:
@@ -1364,10 +1383,12 @@ class ETLFindSpec extends ETLBaseSpec {
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
+				}
 			}
 
 		cleanup:
@@ -1486,38 +1507,40 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == 152254
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152254]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == 152254
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == 152255
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152254]
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152255]
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == 152255
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152255]
+						}
 					}
 				}
 			}
@@ -1576,38 +1599,40 @@ class ETLFindSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == 152254l
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152254l]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == 152254l
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == 152255l
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152254l]
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152255l]
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == 152255l
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152255l]
+						}
 					}
 				}
 			}
@@ -1647,61 +1672,62 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152254'
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == '152254'
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152255'
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == '152255'
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1752,61 +1778,62 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == ETLDomain.Application.name()
-								with(kv){
-									id == 152254l
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										id == 152254l
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == [152255l]
-							matchOn == 0
-							with (query[0]){
-								domain == ETLDomain.Application.name()
-								with(kv){
-									id == 152255l
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == [152255l]
+								matchOn == 0
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										id == 152255l
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1857,54 +1884,56 @@ class ETLFindSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == 152254l
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == 152254l
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == ['The find/elseFind command(s) found multiple records']
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							matchOn == 0
-							results == [152255, 152255]
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == 152255l
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == ['The find/elseFind command(s) found multiple records']
+							warn == false
+							with(find) {
+								matchOn == 0
+								results == [152255, 152255]
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == 152255l
+									}
 								}
 							}
 						}
@@ -1916,12 +1945,12 @@ class ETLFindSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-
+	@See('TM-10678')
 	void 'test can create new results using domain command'() {
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
 				Primary App,Primary Server,Supporting App,Supporting Server
-				ERP,xraysrv001,Oracle7-Cluster,zuludb01""")
+				ERP,xraysrv001,Oracle7-Cluster,zuludb01""".stripIndent())
 
 		and:
 			List<AssetEntity> applications = [
@@ -1942,8 +1971,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
@@ -2036,19 +2065,138 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		then: 'Results should contain Application domain results associated'
 
-			with(etlProcessor.result.toMap()) {
+			with(etlProcessor.resultsMap()){
 				domains.size() == 3
 
 				with(domains[0]) {
 					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
 					data.size() == 2
+					with(data[0]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										assetName == 'ERP'
+									}
+								}
+							}
+							with(create){
+								assetName == 'ERP'
+
+							}
+						}
+
+					}
+					with(data[1]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										assetName == 'Oracle7-Cluster'
+									}
+								}
+							}
+							with(create){
+								assetName == 'Oracle7-Cluster'
+
+							}
+						}
+
+					}
 				}
 				with(domains[1]) {
 					domain == ETLDomain.Device.name()
+					fieldNames == ['id'] as Set
 					data.size() == 2
+					with(data[0]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							//errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Device.name()
+									with(kv) {
+										assetName == 'xraysrv001'
+									}
+								}
+							}
+							with(create){
+								assetName == 'xraysrv001'
+
+							}
+						}
+
+					}
+					with(data[1]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							//errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Device.name()
+									with(kv) {
+										assetName == 'zuludb01'
+									}
+								}
+							}
+							with(create){
+								assetName == 'zuludb01'
+
+							}
+						}
+
+					}
 				}
 				with(domains[2]) {
 					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq'] as Set
 					data.size() == 3
 				}
 			}
