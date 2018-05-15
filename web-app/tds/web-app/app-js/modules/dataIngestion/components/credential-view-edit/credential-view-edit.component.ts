@@ -217,14 +217,14 @@ export class CredentialViewEditComponent {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
+						this.activeDialog.close(null);
 					} else {
 						this.focusForm();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.activeDialog.close(null);
 		}
 	}
 
@@ -256,7 +256,7 @@ export class CredentialViewEditComponent {
 				if (res) {
 					this.dataIngestionService.deleteCredential(this.credentialModel.id).subscribe(
 						(result) => {
-							this.activeDialog.close(result);
+							this.activeDialog.dismiss(result);
 						},
 						(err) => console.log(err));
 				}

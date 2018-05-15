@@ -116,15 +116,38 @@ export class DataIngestionService {
 				let result = res.json();
 				let credentialModels = result && result.status === 'success' && result.data;
 
-				credentialModels.forEach((r) => {
-					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.environment = ENVIRONMENT[r.environment];
-					r.authMethod = AUTH_METHODS[r.authenticationMethod];
-					r.status = CREDENTIAL_STATUS[r.status];
+				credentialModels.forEach((model) => {
+					// r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
+					// r.environment = ENVIRONMENT[r.environment];
+					// r.authMethod = AUTH_METHODS[r.authenticationMethod];
+					// r.status = CREDENTIAL_STATUS[r.status];
+					this.processCredentialModel(model);
 				});
 				return credentialModels;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * GET Credential by id.
+	 * @returns {Observable<CredentialModel[]>}
+	 */
+	getCredential(id: number): Observable<CredentialModel> {
+		return this.http.get(`${this.credentialUrl}/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let model = result && result.status === 'success' && result.data;
+				this.processCredentialModel(model);
+				return model;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	private processCredentialModel(model): void {
+		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
+		model.environment = ENVIRONMENT[model.environment];
+		model.authMethod = AUTH_METHODS[model.authenticationMethod];
+		model.status = CREDENTIAL_STATUS[model.status];
 	}
 
 	/**
