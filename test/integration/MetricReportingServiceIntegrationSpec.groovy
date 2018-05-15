@@ -1,3 +1,4 @@
+import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
@@ -12,12 +13,16 @@ import net.transitionmanager.service.MetricReportingService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.jdbc.BadSqlGrammarException
 import spock.lang.Shared
+import test.helper.ApplicationTestHelper
 import test.helper.AssetEntityTestHelper
 
 class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	MetricReportingService metricReportingService
 	@Shared
 	AssetEntityTestHelper  assetEntityTestHelper = new AssetEntityTestHelper()
+
+	@Shared
+	ApplicationTestHelper applicationTestHelper = new ApplicationTestHelper()
 
 	@Shared
 	DataImportService dataImportService
@@ -41,10 +46,19 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	MoveBundle moveBundle
 
 	@Shared
+	MoveBundle moveBundle2
+
+	@Shared
 	AssetEntity device
 
 	@Shared
 	AssetEntity device2
+
+	@Shared
+	Application application1
+
+	@Shared
+	Application application2
 
 	@Shared
 	AssetEntity otherProjectDevice
@@ -54,8 +68,14 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	void setup() {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
+
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+
+		application1 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle)
+		application2 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle2)
+
 		otherProjectDevice = assetEntityTestHelper.createAssetEntity(
 				AssetClass.DEVICE,
 				otherProject,
@@ -72,6 +92,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		device2.assetType = 'Server'
 		device2.validation = 'Discovery'
 		device2.save(flush: true, failOnError: true)
+
+		moveBundle2.useForPlanning = 0
+		moveBundle2.save(flush: true, failOnError: true)
 
 		// Create a second project with a device with the same name and type as device above
 		otherProjectDevice.assetName = device.assetName
@@ -130,6 +153,33 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 					]
 			]
 	}
+
+	void "test gatherMetric for TM-10662 filtering out non-planning assets"() {
+			setup: 'giving a metric definition for a query, that will have results'
+				String date = (new Date() - 1).format('yyyy-MM-dd')
+				JSONObject metricDefinition = [
+						"metricCode" : "App-Count",
+						"description": "count of applications",
+						"enabled"    : 1,
+						"mode"       : "query",
+						"query"      : [
+								"domain"     : "Application",
+								"aggregation": "count(*)"
+						]
+				] as JSONObject
+			when: 'running gatherMetrics on query mode'
+				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+			then: 'We get a list of map results'
+				results == [
+						[
+								projectId : project.id,
+								metricCode: 'App-Count',
+								date      : date,
+								label     : 'count',
+								value     : 1
+						]
+				]
+		}
 
 	void "test gatherMetric for query mode no results"() {
 		setup: 'giving metric definition with a query that will not return any results'

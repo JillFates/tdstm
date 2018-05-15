@@ -593,7 +593,7 @@ class DataImportService implements ServiceMethods {
 			ImportBatch batch = ImportBatch.get(batchId)
 			if (!batch) {
 				log.error "ImportBatch($batchId) disappeared during batch processing process"
-				throw DomainUpdateException('The import batch was deleted while being processed')
+				throw new DomainUpdateException('The import batch was deleted while being processed')
 			}
 
 			// Calculate the % completed and update the batch appropriately

@@ -9,7 +9,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {CredentialColumnModel, CredentialModel} from '../../model/credential.model';
-import { DateUtils } from './../../../../shared/utils/date.utils';
 import {
 	COLUMN_MIN_WIDTH,
 	Flatten,
@@ -81,67 +80,13 @@ export class CredentialListComponent {
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(x => x.field === column.property);
-
-		if (!column.filter) {
-			column.filter = '';
-		}
-
-		if (column.type === 'text') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'date') {
-			if (!filter) {
-				const {init, end} = DateUtils.getInitEndFromDate(column.filter);
-
-				root.filters.push({
-					field: column.property,
-					operator: 'gte',
-					value: init,
-				});
-
-				root.filters.push({
-					field: column.property,
-					operator: 'lte',
-					value: end
-				});
-
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
+		const root = this.dataIngestionService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		column.filter = '';
-
-		// column = Object.assign({}, column, { filter: ''});
-		const filters = (this.state.filter && this.state.filter.filters) || [];
-
-		if (filters.length > 0) {
-			this.state.filter.filters =  filters.filter((r) => r['field'] !== column.property );
-			this.filterChange(this.state.filter);
-		}
+		this.dataIngestionService.clearFilter(column, this.state);
+		this.filterChange(this.state.filter);
 	}
 
 	/**
@@ -158,7 +103,10 @@ export class CredentialListComponent {
 	 * @param dataItem
 	 */
 	protected onEdit(dataItem: any): void {
-		this.openCredentialDialogViewEdit(dataItem, ActionType.EDIT);
+		let credential: CredentialModel = dataItem;
+		this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+			this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
+		}, err => console.log(err));
 	}
 
 	/**
@@ -184,8 +132,11 @@ export class CredentialListComponent {
 	 */
 	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openCredentialDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			let credential: CredentialModel = event['dataItem'] as CredentialModel;
+			this.selectRow(credential.id);
+			this.dataIngestionService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+				this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
+			}, err => console.log(err));
 		}
 	}
 
@@ -198,7 +149,7 @@ export class CredentialListComponent {
 					if (this.lastCreatedRecordId && this.lastCreatedRecordId !== 0) {
 						this.selectRow(this.lastCreatedRecordId);
 						let lastCredentialModel = this.gridData.data.find((dataItem) => dataItem.id === this.lastCreatedRecordId);
-						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW);
+						this.openCredentialDialogViewEdit(lastCredentialModel, ActionType.VIEW, lastCredentialModel);
 						this.lastCreatedRecordId = 0;
 					}
 				}, 500);
@@ -206,23 +157,32 @@ export class CredentialListComponent {
 			(err) => console.log(err));
 	}
 
+	private reloadItem(originalModel: CredentialModel): void {
+		this.dataIngestionService.getCredential(originalModel.id).subscribe( (response: CredentialModel) => {
+			Object.assign(originalModel, response);
+		}, err => console.log(err));
+	}
+
 	/**
 	 * Open The Dialog to Create, View or Edit the Api Action
 	 * @param {CredentialModel} credentialModel
 	 * @param {number} actionType
 	 */
-	private openCredentialDialogViewEdit(credentialModel: CredentialModel, actionType: number): void {
+	private openCredentialDialogViewEdit(credentialModel: CredentialModel, actionType: number, originalModel?: CredentialModel): void {
 		this.dialogService.open(CredentialViewEditComponent, [
 			{ provide: CredentialModel, useValue: credentialModel },
 			{ provide: Number, useValue: actionType }
-		], DIALOG_SIZE.XLG, false).then(result => {
-			this.reloadData();
-			if (actionType === ActionType.CREATE) {
-				if (result && result.id) {
+		], DIALOG_SIZE.XLG, false).then( (result: CredentialModel) => {
+			if (result && result.id) {
+				if (actionType === ActionType.CREATE) {
 					this.lastCreatedRecordId = result.id;
+					this.reloadData();
+				} else {
+					this.reloadItem(originalModel);
 				}
 			}
 		}).catch(result => {
+			this.reloadData();
 			console.log('Dismissed Dialog');
 		});
 	}
