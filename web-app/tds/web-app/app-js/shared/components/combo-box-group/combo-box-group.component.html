@@ -6,21 +6,22 @@
                 [textField]="'text'"
                 [valueField]="'id'"
                 [filterable]="true"
+                [popupSettings]="{width: auto}"
                 name="testName"
                 class="theCombo"
                 style="width: 100%;">
     <ng-template kendoComboBoxItemTemplate let-dataItem class="super-template">
-        <div class="sme-group" *ngIf="dataItem.category === 'sme'">
+        <div class="sme-group" *ngIf="dataItem.category === CATEGORY_BY_REFERENCE">
             {{dataItem.text}}
             <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
         </div>
 
-        <div class="team-group" *ngIf="dataItem.category === 'team'" >
+        <div class="team-group" *ngIf="dataItem.category === CATEGORY_BY_TEAM" >
             {{dataItem.text}}
             <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
         </div>
 
-        <div class="person-group" *ngIf="dataItem.category === 'person'" >
+        <div class="person-group" *ngIf="dataItem.category === CATEGORY_BY_NAMED_STAFF" >
             {{dataItem.text}}
             <span class="category" [ngClass]="{ 'is-first': dataItem.index === 1 }">{{ dataItem.category }}</span>
         </div>
