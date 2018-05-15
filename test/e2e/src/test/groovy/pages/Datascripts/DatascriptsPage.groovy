@@ -15,7 +15,7 @@ class DatascriptsPage extends Page {
         nameFilter(wait:true) { $("input" ,  placeholder:"Filter Name")}
 
         //First Element of the Datascripts Table
-        //firstDS(wait:true) { $("tr" ,  class:"k-state-selected").find("td")[1]}
+        firstDS(wait:true) { $("tr" ,  class:"k-state-selected").find("td")[1]}
     }
 
 
