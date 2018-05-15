@@ -35,7 +35,7 @@ export function StorageShowComponent(template, modelId: number) {
 			this.dialogService.replace(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
+				DIALOG_SIZE.XLG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {

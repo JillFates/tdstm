@@ -4,7 +4,7 @@ import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
-import {DOMAIN} from '../../../../shared/model/constants';
+import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -34,14 +34,14 @@ export function DatabaseShowComponent(template, modelId: number) {
 			this.dialogService.replace(AssetShowComponent, [
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
+				DIALOG_SIZE.XLG);
 		}
 
 		showAssetEditView() {
 			this.dialogService.replace(AssetEditComponent, [
 				{ provide: 'ID', useValue: this.mainAsset },
 				{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
-				'xlg');
+				DIALOG_SIZE.XLG);
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {
