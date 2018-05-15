@@ -178,15 +178,9 @@ class MetricReportingService {
 
 		groupBys << projectReference
 		String groupBy = getGroupBy(groupBys)
+
 		List wheres = query?.where?.clone() ?: []
-
-		if (domainClass in AssetEntity) {
-			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
-		} else if (domainClass in AssetDependency) {
-			wheres << [column: 'asset.moveBundle.useForPlanning', expression: '= 1']
-			wheres << [column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
-		}
-
+		processWheres(wheres, domainClass)
 		String where = getWhere(wheres)
 
 		return """
@@ -199,6 +193,31 @@ class MetricReportingService {
 		""".stripIndent()
 	}
 
+	/**
+	 * Adds additional where definitions, based on the domainClass used.
+	 *
+	 * @param whereDefinitions The list of where definitions.
+	 * @param domainClass the domain class being used.
+	 *
+	 * @return The list of where definitions.
+	 */
+	List<Map> processWheres(List<Map> whereDefinitions, Class domainClass) {
+		switch (domainClass) {
+			case {it in AssetEntity}:
+				whereDefinitions << [column: 'moveBundle.useForPlanning', expression: '= 1']
+				break
+			case {it in AssetDependency}:
+				whereDefinitions << [column: 'asset.moveBundle.useForPlanning', expression: '= 1']
+				whereDefinitions << [column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
+				break
+			case {it in AssetComment}:
+				whereDefinitions << [column: 'isPublished', expression: '= 1']
+				whereDefinitions << [column: 'commentType', expression: "= 'issue'"]
+				break
+		}
+
+		return whereDefinitions
+	}
 	/**
 	 * Generates the hql that will be run to generate the label. By default it will be the groupBys
 	 * delimited by a colon. Example groupBys = ['planStatus', 'assetType', 'os'] would produce:
