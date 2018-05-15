@@ -136,6 +136,7 @@ export class APIActionViewEditComponent implements OnInit {
 		id: '0',
 		name: 'Select...'
 	};
+	private savedApiAction = false;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -301,6 +302,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.dataIngestionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 			(result: any) => {
 				if (result) {
+					this.savedApiAction = true;
 					this.modalType = this.actionTypes.VIEW;
 					this.getModalTitle();
 					this.apiActionModel.id = result.id;
@@ -339,14 +341,14 @@ export class APIActionViewEditComponent implements OnInit {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
+						this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
 					} else {
 						this.focusForm();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
 		}
 	}
 
@@ -380,7 +382,7 @@ export class APIActionViewEditComponent implements OnInit {
 				if (res) {
 					this.dataIngestionService.deleteAPIAction(this.apiActionModel.id).subscribe(
 						(result) => {
-							this.activeDialog.close(result);
+							this.activeDialog.dismiss(result);
 						},
 						(err) => console.log(err));
 				}

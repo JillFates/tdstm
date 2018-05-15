@@ -69,35 +69,50 @@ export class DataIngestionService {
 			.map((res: Response) => {
 				let result = res.json();
 				let dataScriptModels = result && result.status === 'success' && result.data;
-				dataScriptModels.forEach((r) => {
-					r.agentMethod = {id: r.agentMethod};
-					r.dateCreated = ((r.dateCreated) ? new Date(r.dateCreated) : '');
-					r.lastUpdated = ((r.lastUpdated) ? new Date(r.lastUpdated) : '');
-					r.producesData = (r.producesData === 1);
-					r.polling = {
-						frequency: {
-							value: r.pollingInterval,
-							interval: INTERVAL.SECONDS
-						},
-						lapsedAfter: {
-							value: DateUtils.convertInterval({ value: r.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
-							interval: INTERVAL.MINUTES
-						},
-						stalledAfter: {
-							value: DateUtils.convertInterval({ value: r.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
-							interval: INTERVAL.MINUTES
-						}
-					};
-					r.defaultDataScript = (r.defaultDataScript) ? r.defaultDataScript : {id: 0, name: ''};
-					if (r.reactionScripts && r.reactionScripts !== null && r.reactionScripts !== 'null') {
-						APIActionModel.createReactions(r, r.reactionScripts);
-					} else {
-						APIActionModel.createBasicReactions(r);
-					}
+				dataScriptModels.forEach((model) => {
+					this.transformApiActionModel(model);
 				});
 				return dataScriptModels;
 			})
 			.catch((error: any) => error.json());
+	}
+
+	getAPIAction(id: number): Observable<APIActionModel> {
+		return this.http.get(`${this.dataDefaultUrl}/apiAction/${id}`)
+			.map((res: Response) => {
+				let result = res.json();
+				let model = result && result.status === 'success' && result.data;
+				this.transformApiActionModel(model);
+				return model;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	private transformApiActionModel(model: any): void {
+		model.agentMethod = {id: model.agentMethod};
+		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
+		model.lastUpdated = ((model.lastUpdated) ? new Date(model.lastUpdated) : '');
+		model.producesData = (model.producesData === 1);
+		model.polling = {
+			frequency: {
+				value: model.pollingInterval,
+				interval: INTERVAL.SECONDS
+			},
+			lapsedAfter: {
+				value: DateUtils.convertInterval({ value: model.pollingLapsedAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
+				interval: INTERVAL.MINUTES
+			},
+			stalledAfter: {
+				value: DateUtils.convertInterval({ value: model.pollingStalledAfter, interval: INTERVAL.SECONDS }, INTERVAL.MINUTES),
+				interval: INTERVAL.MINUTES
+			}
+		};
+		model.defaultDataScript = (model.defaultDataScript) ? model.defaultDataScript : {id: 0, name: ''};
+		if (model.reactionScripts && model.reactionScripts !== null && model.reactionScripts !== 'null') {
+			APIActionModel.createReactions(model, model.reactionScripts);
+		} else {
+			APIActionModel.createBasicReactions(model);
+		}
 	}
 
 	getAgents(): Observable<AgentModel[]> {
