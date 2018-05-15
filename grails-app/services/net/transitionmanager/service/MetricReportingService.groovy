@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
@@ -171,7 +172,7 @@ class MetricReportingService {
 	String getQuery(JSONObject query) {
 		Class domainClass = ETLDomain.lookup((String) query.domain).clazz
 		String domain = domainClass.simpleName
-		String aggregation = query.aggregation
+		String aggregation = processAggregation((String) query.aggregation)
 		List groupBys = query?.groupBy?.clone() ?: []
 		String label = getLabel(groupBys, aggregation)
 		String projectReference = getProjectReference(domainClass)
@@ -218,6 +219,25 @@ class MetricReportingService {
 
 		return whereDefinitions
 	}
+
+	/**
+	 * Applies rules to the aggregation, making them more useful. For now we just have the one rule for sum, that wraps the
+	 * domain with a COALESCE ( domain, 0), so that nulls don't screw up the sum. If the aggregation is not a sum it just
+	 * returns the aggregation, as is.
+	 *
+	 * @param aggregation The aggregation string to process.
+	 *
+	 * @return An updated aggregation string.
+	 */
+	String processAggregation(String aggregation){
+		if(aggregation.toLowerCase().contains('sum')){
+			String domain = aggregation.substring(aggregation.indexOf('(') + 1, aggregation.indexOf(')'))
+			return("SUM (COALESCE( $domain, 0 ) )")
+		}
+
+		return aggregation
+	}
+
 	/**
 	 * Generates the hql that will be run to generate the label. By default it will be the groupBys
 	 * delimited by a colon. Example groupBys = ['planStatus', 'assetType', 'os'] would produce:
