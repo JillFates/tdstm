@@ -299,7 +299,7 @@
 									   value="${assetEntityInstance.targetRackPosition}"
 									   placeholder="U position"
 									   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
-									   size=10 tabindex="350" />
+                                       targetRackPosition tabindex="350" />
 							</td>
 							<td class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="${standardFieldSpecs.sourceBladePosition.tip?: standardFieldSpecs.sourceBladePosition.label}">
 								<input type="text" id="sourceBladePositionId" name="sourceBladePosition"

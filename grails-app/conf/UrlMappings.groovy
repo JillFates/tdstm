@@ -38,6 +38,13 @@ class UrlMappings {
 		 * Asset WS
 		 ********************************************************/
 
+		"/ws/asset" {
+			controller = "wsAsset"
+			action = [
+			    POST: "saveAsset"
+			]
+		}
+
 		"/ws/asset/checkForUniqueName" {
 			controller = "wsAsset"
 			action = [
@@ -55,7 +62,8 @@ class UrlMappings {
 		"/ws/asset/$id" {
 			controller = "wsAsset"
 			action = [
-					GET:"getAsset"
+					GET:"getAsset",
+					PUT: "updateAsset"
 			]
 		}
 
@@ -82,6 +90,26 @@ class UrlMappings {
 			action = [
 					GET: "list",
 					POST: "create"
+			]
+		}
+		"/ws/asset/retrieveBundleChange" {
+			controller = 'wsAsset'
+			action = [
+			    POST: 'retrieveBundleChange'
+			]
+		}
+
+		"/ws/asset/retrieveChassisSelectOptions/$id" {
+			controller = 'wsAsset'
+			action = [
+			    GET: 'retrieveChassisSelectOptions'
+			]
+		}
+
+		"/ws/asset/retrieveRackSelectOptions/$id" {
+			controller = 'wsAsset'
+			action = [
+				GET: 'retrieveRackSelectOptions'
 			]
 		}
 

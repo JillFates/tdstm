@@ -8,9 +8,13 @@ class CommonsModule extends Module {
 
     }
 
-    def waitForLoader(){
-        waitFor{$('#main-loader')}
-        waitFor{!$('#main-loader')}
+    def waitForLoader() {
+        waitFor { $('#main-loader') }
+        waitFor { !$('#main-loader') }
     }
 
+    def waitForGlobalProgressBarModal(){
+        waitFor{$('div#globalProgressBar')}
+        waitFor{!$('div#globalProgressBar')}
+    }
 }

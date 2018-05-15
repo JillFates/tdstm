@@ -1,145 +1,173 @@
-<%@page import="com.tds.asset.Files"%>
+<%@ page import="com.tds.asset.Files" %>
+<%@ page import="net.transitionmanager.security.Permission" %>
+<%@ page import="grails.converters.JSON"%>
+<%@ page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
-<g:set var="assetClass" value="Files" />
+<g:set var="assetClass" value="Files"/>
 
-<script type="text/javascript">
-	$("#file_assetName").val($('#gs_assetName').val())
-	$("#file_fileFormat").val($('#gs_fileFormat').val())
-	$("#file_size").val($('#gs_size').val())
-	$("#file_planStatus").val($('#gs_planStatus').val())
-	$("#file_moveBundle").val($('#gs_moveBundle').val())
 
-	$(document).ready(function() {
-		// Ajax to populate dependency selects in edit pages
-		var assetId = '${fileInstance.id}'
-		populateDependency(assetId,'files','edit')
+<div class="modal-content tds-angular-component-content">
+    <div class="modal-header">
+        <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span
+                aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Storage Edit</h4>
+    </div>
 
-		changeDocTitle('${escapedName}');
-	})
-</script>
-<g:form method="post" action="update" name="createEditAssetForm">
-	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
-	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
-	<input type="hidden" id="file_size" name="sizeFilter" value="" />
-	<input type="hidden" id="file_planStatus" name="planStatusFilter" value="" />
-	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
-	<input type="hidden" name="id" value="${fileInstance?.id}" />
+    <div class="modal-body">
+        <div>
+            <form name="storageEditForm">
+                <table style="border: 0;">
+                    <tr>
+                        <td colspan="2">
+                            <div class="dialog">
+                                <table>
+                                    <tbody>
+                                    <tr>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
+                                        <td colspan="3">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${asset.assetName}" ngmodel="model.asset.assetName" />
+                                        </td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
+                                        <td colspan="3">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${asset.description}"
+                                                                     ngmodel="model.asset.description" tooltipDataPlacement="bottom" />
+                                        </td>
 
-	<input type="hidden" id ="filesId"  value ="${fileInstance.id}"/>
-	<input type="hidden" id = "tabType" name="tabType" value =""/>
-	<input name="updateView" id="updateView" type="hidden" value=""/>
+                                    </tr>
+                                    <tr>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.fileFormat}"
+                                                                       value="${asset.fileFormat}" ngmodel="model.asset.fileFormat" tabindex="12"/>
 
-	<%-- Key field and optimistic locking var --%>
-	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
-	<input type="hidden" id="version" 	name="version" value="${version}"/>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.LUN}"
+                                                                       value="${asset.LUN}" ngmodel="model.asset.LUN" tabindex="22"/>
 
-	<%-- Used to track dependencies added and deleted --%>
-	<g:render template="../assetEntity/dependentHidden" />
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}"
+                                                                       value="${asset.supportType}"  ngmodel="model.asset.supportType" tabindex="32"/>
 
-	<table style="border: 0;">
-		<tr>
-			<td colspan="2">
-				<div class="dialog">
-					<table>
-						<tbody>
-						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${fileInstance?.assetName}"/>
-							</td>
-							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${fileInstance?.assetName}"/>
-							</td>
-							<tds:inputLabel field="${standardFieldSpecs.description}" value="${fileInstance?.description}"/>
-							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${fileInstance?.description}" tooltipDataPlacement="bottom"/>
-							</td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle}"/>
+                                        <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetMoveBundle"
+                                                        [data]="model.moveBundleList"
+                                                        [(ngModel)]="model.asset.moveBundle"
+                                                        [textField]="'name'"
+                                                        [valueField]="'id'">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
+                                    </tr>
 
-						</tr>
-						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
-							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
-							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
-							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
-								</tds:tooltipSpan>
-							</td>
-						</tr>
+                                    <tr>
+                                        <td class="label ${standardFieldSpecs.size.imp ?: ''}" nowrap="nowrap">
+                                            <label for="size" data-toggle="popover" data-trigger="hover"
+                                                   data-content="${standardFieldSpecs.size.tip ?: standardFieldSpecs.size.label}">
+                                                ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+                                            </label>
+                                        </td>
+                                        <td nowrap="nowrap" class="sizeScale">
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="13"
+                                                                     value="${asset.size}" ngmodel="model.asset.size"/>&nbsp;
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.scale}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetScaleName"
+                                                        [data]="${SizeScale.getAsJsonList() as JSON}"
+                                                        [(ngModel)]="model.asset.scale.name"
+                                                        [defaultItem]="''"
+                                                        [textField]="'text'"
+                                                        [valueField]="'value'">
+                                                </kendo-dropdownlist>
+                                            %{-- <g:select from="${filesInstance.constraints.scale.inList}" name="scale"
+                                                       id="scale" tabindex="13"
+                                                       value="${filesInstance.scale}" optionValue="value"
+                                                       noSelection="${['': ' Please Select']}"/>
+                                             --}%
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
 
-						<tr>
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
-								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
-									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
-								</label>
-							</td>
-							<td nowrap="nowrap" class="sizeScale">
-								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
-								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select from="${fileInstance.constraints.scale.inList}" name="scale" id="scale" tabindex="13"
-											  value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
-								</tds:tooltipSpan>
-							</td>
+                                        <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}"
+                                                                       value="${asset.externalRefId}" tabindex="23" ngmodel="model.asset.externalRefId"/>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
+                                        <td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.environment}">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetEnvironment"
+                                                        [(ngModel)]="model.asset.environment"
+                                                        [defaultItem]="'Please Select'"
+                                                        [data]="model.environmentOptions">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
 
-							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select id="environment" name="environment" from="${environmentOptions}"
-											  value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
-								</tds:tooltipSpan>
-							</td>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
+                                        <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetPlanStatus"
+                                                        [data]="model.planStatusOptions"
+                                                        [(ngModel)]="model.asset.planStatus">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
+                                        <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.rateOfChange}">
+                                                <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4"
+                                                                         value="${asset.rateOfChange}" tabindex="14" ngmodel="model.asset.rateOfChange"/>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
 
-							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
-									<g:select from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.rateOfChange}">
-									<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${fileInstance?.rateOfChange}" tabindex="14"/>
-								</tds:tooltipSpan>
-							</td>
+                                        <td colspan="2">
+                                        <td colspan="2">
 
-							<td colspan="2">
-							<td colspan="2">
+                                            <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
+                                        <td>
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.validation}"
+                                                                    tooltipDataPlacement="bottom">
+                                                <kendo-dropdownlist
+                                                        class="select"
+                                                        name="modelAssetValidation"
+                                                        [data]="${asset.constraints.validation.inList as JSON}"
+                                                        [(ngModel)]="model.asset.validation">
+                                                </kendo-dropdownlist>
+                                            </tdsAngular:tooltipSpan>
+                                        </td>
+                                    </tr>
+                                    %{--<tbody class="customTemplate">--}%
+                                    <g:render template="/angular/common/customEdit" model="[assetEntityInstance: filesInstance]"></g:render>
+                                    %{--</tbody>--}%
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
 
-							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select from="${fileInstance.constraints.validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tbody class="customTemplate">
-						<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
-						</tbody>
-						</tbody>
-					</table>
-				</div>
-			</td>
-		</tr>
-		<tr id="filesDependentId" class="assetDependent">
-			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<div class="buttons">
-					<g:render template="../assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
-				</div>
-			</td>
-		</tr>
-	</table>
-</g:form>
-<script>
-    $(document).ready(function() {
-        $('[data-toggle="popover"]').popover();
-    });
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
-	$('#tabType').val($('#assetTypesId').val())
-</script>
+                    <!-- Dependencies -->
+                    <tr id="deps">
+                        <td valign="top" colspan="2">
+                            <tds-supports-depends [(model)]="model"></tds-supports-depends>
+                        </td>
+                    </tr>
+
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-footer form-group-center">
+        <button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span
+                class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <tds:hasPermission permission="${Permission.AssetDelete}">
+            <button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span
+                    class="glyphicon glyphicon-trash"></span> Delete</button>
+        </tds:hasPermission>
+        <button class="btn btn-default pull-right" (click)="cancelCloseDialog()" type="button"><span
+                class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+    </div>
+</div>

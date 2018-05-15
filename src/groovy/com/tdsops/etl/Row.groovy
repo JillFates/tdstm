@@ -1,7 +1,5 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetEntity
-
 /**
  * <p>Row from GETL DataSet.<p>
  * <p>Every iteration in an ETLScript will use this structure to take values from the source data set.<p>
@@ -20,26 +18,22 @@ class Row {
 	 *
 	 * </pre>
 	 */
-    Map<Integer, Element> elementsMap
-    Integer rowIndex
-    AssetEntity instance
+	Map<Integer, Element> elementsMap
+	Integer rowIndex
 	ETLProcessor processor
 
-    Row (Integer rowIndex, List<?> dataSetValues, ETLProcessor processor) {
-        this.rowIndex = rowIndex
-	    this.processor = processor
-	    this.dataSetValues = dataSetValues
-	    elementsMap = [:]
-    }
+	Row(List<?> dataSetValues, ETLProcessor processor) {
+		this.processor = processor
+		this.dataSetValues = dataSetValues
+		elementsMap = [:]
+	}
 
-	Element addNewElement (Object value, ETLFieldSpec fieldSpec, ETLProcessor processor) {
+	Element addNewElement(Object value, ETLFieldDefinition fieldDefinition, ETLProcessor processor) {
 		dataSetValues.add(value)
 		Integer columnIndex = dataSetValues.size()
 		Element newElement = new Element(originalValue: value,
 			value: value,
-			rowIndex: rowIndex,
-			columnIndex:columnIndex ,
-			fieldSpec: fieldSpec,
+			fieldDefinition: fieldDefinition,
 			processor: processor)
 		elementsMap[columnIndex] = newElement
 		newElement
@@ -50,15 +44,13 @@ class Row {
 		Element element = new Element(
 			originalValue: value,
 			value: value,
-			rowIndex: rowIndex,
-			columnIndex: columnIndex,
 			processor: processor)
 
 		elementsMap[columnIndex] = element
 		return element
 	}
 
-	Object getDataSetValue(Integer columnIndex){
+	Object getDataSetValue(Integer columnIndex) {
 		return dataSetValues[columnIndex]
 	}
 
@@ -66,7 +58,7 @@ class Row {
 		return elementsMap[columnIndex]
 	}
 
-    int size () {
-	    dataSetValues.size()
-    }
+	int size() {
+		dataSetValues.size()
+	}
 }

@@ -5,9 +5,10 @@
  * however a implemented service will be in charge of passing the emitter to this directive
  */
 
-import {Component} from '@angular/core';
+import {Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {NotifierService} from '../services/notifier.service';
 import {AlertType, AlertModel} from '../model/alert.model';
+import {KEYSTROKE} from '../model/constants';
 
 @Component({
 	selector: 'tds-ui-toast',
@@ -19,6 +20,7 @@ export class UIToastDirective {
 	private showsPopUp = false;
 	private alertModel = AlertModel;
 	private alertType = AlertType;
+	@ViewChild('closePopUpDialog') closePopUpDialog: ElementRef;
 
 	constructor(private notifierService: NotifierService) {
 		this.eventListeners();
@@ -33,6 +35,9 @@ export class UIToastDirective {
 		this.showsPopUp = true;
 		this.alertModel.alertType = alertType;
 		this.alertModel.message = message;
+		setTimeout(() => {
+			this.closePopUpDialog.nativeElement.focus();
+		}, 300);
 	}
 
 	eventListeners() {
@@ -61,6 +66,16 @@ export class UIToastDirective {
 
 	onCloseDialog() {
 		this.hidePopUp();
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the popup.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.hidePopUp();
+		}
 	}
 
 }

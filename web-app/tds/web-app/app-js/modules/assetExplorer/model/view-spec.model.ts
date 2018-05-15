@@ -6,9 +6,9 @@ export class QueryColumn {
 export const VIEW_COLUMN_MIN_WIDTH = 200;
 
 export class ViewColumn extends QueryColumn {
-	width?= VIEW_COLUMN_MIN_WIDTH;
-	locked?= false;
-	edit?= false;
+	width ? = VIEW_COLUMN_MIN_WIDTH;
+	locked ? = false;
+	edit ? = false;
 	filter = '';
 	label: string;
 	notFound?: boolean;

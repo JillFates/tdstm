@@ -32,6 +32,7 @@ import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBinding
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
+import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.control.ErrorCollector
@@ -79,7 +80,7 @@ class ApiActionService implements ServiceMethods {
 			agents << info
 		}
 
-		return agents
+		return agents.sort {it.name}
 	}
 
 	/**
@@ -116,7 +117,7 @@ class ApiActionService implements ServiceMethods {
 				}
 			}
 		}
-		return dictionary
+		return dictionary.sort {it.value.name}
 	}
 
 	/**
@@ -459,6 +460,16 @@ class ApiActionService implements ServiceMethods {
 	 */
 	void delete (Long id, Project project, boolean flush = false) {
 		ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
+
+		// TM-10541 - Check if the ApiAction is referenced by any Tasks and prevent deleting
+		int count = AssetComment.where {
+			apiAction == apiAction
+		}.count()
+
+		if (count > 0) {
+			throw new DomainUpdateException("Unable to delete Api Action since it is being referenced by Tasks")
+		}
+
 		apiAction.delete(flush: flush)
 	}
 
@@ -584,8 +595,7 @@ class ApiActionService implements ServiceMethods {
 			.with(job)
 			.build(code)
 
-		def result = new GroovyShell(this.class.classLoader, scriptBinding)
-				.evaluate(script, ApiActionScriptBinding.class.name)
+		def result = new ApiActionScriptEvaluator(scriptBinding).evaluate(script)
 
 		checkEvaluationScriptResult(code, result)
 
@@ -625,34 +635,12 @@ class ApiActionService implements ServiceMethods {
 				.with(job)
 				.build(code)
 
-		List<Map<String, ?>> errors = []
-
-		try {
-
-			new GroovyShell(this.class.classLoader, scriptBinding)
-					.parse(script, ApiActionScriptBinding.class.name)
-
-		} catch (MultipleCompilationErrorsException cfe) {
-			ErrorCollector errorCollector = cfe.getErrorCollector()
-			log.error("ETL script parse errors: " + errorCollector.getErrorCount(), cfe)
-			errors = errorCollector.getErrors()
-		}
-
-		List errorsMap = errors.collect { error ->
-			[
-					startLine  : (error.cause?.startLine)?:"",
-					endLine    : (error.cause?.endLine)?:"",
-					startColumn: (error.cause?.startColumn)?:"",
-					endColumn  : (error.cause?.endColumn)?:"",
-					fatal      : (error.cause?.fatal)?:"",
-					message    : (error.cause?.message)?:""
-			]
-		}
+		List errors = new ApiActionScriptEvaluator(scriptBinding).checkSyntax(script)
 
 		return [
 				code: code.name(),
 				validSyntax: errors.isEmpty(),
-				errors     : errorsMap
+				errors     : errors
 		]
 	}
 
@@ -666,25 +654,14 @@ class ApiActionService implements ServiceMethods {
 
 		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
 
-			Map<String, ?> scriptResults = [:]
-			try {
-
-				scriptResults = compileReactionScript(
+			return compileReactionScript(
 						scriptBindingCommand.code,
 						scriptBindingCommand.script,
 						new ActionRequest(),
 						new ApiActionResponse(),
 						new TaskFacade(),
 						new AssetFacade(new AssetEntity(), [:], true),
-						new ApiActionJob()
-				)
-
-			} catch (Exception ex) {
-				log.error("Exception evaluating script ${scriptBindingCommand.script} with code: ${scriptBindingCommand.code}", ex)
-				scriptResults.error = ex.getMessage()
-			}
-
-			return scriptResults
+						new ApiActionJob())
 		}
 	}
 

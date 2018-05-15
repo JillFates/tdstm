@@ -24,6 +24,7 @@ import { AssetExplorerModule } from '../../asset-explorer.module';
 	template: `<div #view></div>`
 })
 export class AssetShowComponent extends DynamicComponent implements AfterViewInit {
+
 	constructor(
 		inj: Injector,
 		comp: Compiler,

@@ -24,10 +24,10 @@ import {AssetExplorerStates} from '../../asset-explorer-routing.states';
 	]
 })
 export class AssetExplorerViewSelectorComponent implements AfterViewInit {
-	@Input() open?= false;
-	@Input() nameAsUrl? = true;
-	@Input() showCreate? = true;
-	@Input() isDisabled? = false;
+	@Input() open ? = false;
+	@Input() nameAsUrl ? = true;
+	@Input() showCreate ? = true;
+	@Input() isDisabled ? = false;
 	@Output() onSelectView = new EventEmitter<any>();
 	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
 	private reports: ViewGroupModel[];

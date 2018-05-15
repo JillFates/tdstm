@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { AssetShowComponent } from '../asset/asset-show.component';
+import { AssetEditComponent } from '../asset/asset-edit.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
+import {DOMAIN} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -11,7 +13,7 @@ export function DatabaseShowComponent(template, modelId: number) {
 		selector: `database-show`,
 		template: template
 	}) class DatabaseShowComponent implements OnInit {
-		mainAsset = modelId;
+		private mainAsset = modelId;
 
 		constructor(private activeDialog: UIActiveDialogService, private dialogService: UIDialogService, private assetService: DependecyService) {
 			jQuery('[data-toggle="popover"]').popover();
@@ -30,9 +32,16 @@ export function DatabaseShowComponent(template, modelId: number) {
 
 		showAssetDetailView(assetClass: string, id: number) {
 			this.dialogService.replace(AssetShowComponent, [
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass }],
+					{ provide: 'ID', useValue: id },
+					{ provide: 'ASSET', useValue: assetClass }],
 				'lg');
+		}
+
+		showAssetEditView() {
+			this.dialogService.replace(AssetEditComponent, [
+				{ provide: 'ID', useValue: this.mainAsset },
+				{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
+				'xlg');
 		}
 
 		showDependencyView(assetId: number, dependencyAsset: number) {

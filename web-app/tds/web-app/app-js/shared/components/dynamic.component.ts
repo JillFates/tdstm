@@ -9,9 +9,11 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SharedModule } from '../shared.module';
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
+import { GridModule } from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: `empty-component`,
@@ -25,11 +27,13 @@ export class DynamicComponent {
 		const tmpModule = NgModule({
 			imports: [
 				CommonModule,
+				SharedModule,
 				FormsModule,
 				// Import Kendo Modules
 				DropDownsModule,
 				IntlModule,
-				DateInputsModule
+				DateInputsModule,
+				GridModule
 			].concat(imports),
 			declarations: [
 				compClass

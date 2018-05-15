@@ -113,4 +113,15 @@ export class DateUtils {
 
 		return !isNaN(yearMontDayDate) && yearMontDayDate ?  yearMontDayDate.getTime() / 1000 : null;
 	};
+
+	/**
+	 * Given a  date returns the beginning and end interval for that particular date
+	 * @returns {init, end}
+	 */
+	public static getInitEndFromDate(date: Date): {init: Date, end: Date} {
+		const init = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+		const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+
+		return {init, end};
+	}
 }
