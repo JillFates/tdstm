@@ -182,6 +182,9 @@ class MetricReportingService {
 
 		if (domainClass in AssetEntity) {
 			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
+		} else if (domainClass in AssetDependency) {
+			wheres << [column: 'asset.moveBundle.useForPlanning', expression: '= 1']
+			wheres << [column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
 		}
 
 		String where = getWhere(wheres)
