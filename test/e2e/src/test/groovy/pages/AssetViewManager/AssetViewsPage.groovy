@@ -24,7 +24,7 @@ class AssetViewsPage extends Page{
         allViewsModule              { module ViewsModule}
         createViewModule            { module CreateViewModule}
 
-        avPageTitle                 { $("section", 	class:"content-header").find("h1") }
+        avPageTitle                 { $("h1")}
         //>>>>>>>>>>BUTTONS
         createViewBton              {$("button", text:"Create View")}
         toggleListBtn               { staffViewHeaderBar.find("a", class:"ui-jqgrid-titlebar-close HeaderButton")}

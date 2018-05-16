@@ -5,6 +5,7 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import pages.AssetViewManager.AssetViewsPage
+import pages.AssetViewManager.ViewPage
 import jodd.util.RandomString
 
 
@@ -36,7 +37,7 @@ class ViewManagerListSpec extends GebReportingSpec {
         when: "I click on All Views"
             waitFor {viewMgrAllViews.click()}
         then: "I see at least the All Assets View"
-            allViewsModule.validateViewIsListed("All Assets")
+            allViewsModule.validateRowNames("All Assets", true)
         and: "The title on the section is correct"
             allViewsModule.moduleTitleIsCorrect("All")
     }
@@ -66,35 +67,56 @@ class ViewManagerListSpec extends GebReportingSpec {
     def "4. Validates the listed views in Shared Views are correct"(){
         testKey = "TM-8501"
         given: "I am in the My Views section"
-        at AssetViewsPage
-        allViewsModule.displayed
+            at AssetViewsPage
+            allViewsModule.displayed
         when : "I go to Shared views"
-        waitFor {viewMgrSharedViews.click()}
+            waitFor {viewMgrSharedViews.click()}
         then: "Only the user's shared views are displayed"
-        allViewsModule.validateIsShared()
+            allViewsModule.validateIsShared()
         and: "The title on the section is correct"
-        allViewsModule.moduleTitleIsCorrect("Shared Views")
+            allViewsModule.moduleTitleIsCorrect("Shared Views")
     }
-    def "5. Validates the listed views in System Views are correct"(){
+    def "5. Validate views can be filtered"(){
+        testKey = "TM-8501"
+        given: "I am in shared views"
+            at AssetViewsPage
+        when : "I filter views by name"
+            filterViewByName "All Assets"
+        then: "Only views with names containing the text are listed"
+            allViewsModule.validateRowNames("All Assets", false)
+
+    }
+    def "6. Validates the listed views in System Views are correct"(){
         testKey = "TM-8501"
         given: "I am in the Shared Views section"
-        at AssetViewsPage
-        allViewsModule.displayed
+            at AssetViewsPage
+            allViewsModule.displayed
         when : "I go to System Views"
-        waitFor {viewMgrSystemViews.click()}
+            waitFor {viewMgrSystemViews.click()}
         then: "Only the Sytem views are displayed"
-        allViewsModule.systemViewsOnly()
+            allViewsModule.systemViewsOnly()
         and: "The title on the section is correct"
-        allViewsModule.moduleTitleIsCorrect("System Views")
+            allViewsModule.moduleTitleIsCorrect("System Views")
     }
-    def "6. Erase icon is reactive"(){
+    def "7. Erase icon is reactive"(){
         testKey = "TM-8501"
         given: "I am in the System Views section"
-        at AssetViewsPage
+            at AssetViewsPage
         when: "I go to My views and hit the erase button"
-        goToMyViews()
-        waitFor { allViewsModule.clickOnFirstDelete()}
+            goToMyViews()
+            waitFor { allViewsModule.clickOnFirstDelete()}
         then: "I am prompted to confirm the deletion"
-        allViewsModule.confirmationRequiredIsDisplayed()
+            allViewsModule.confirmationRequiredIsDisplayed()
+    }
+    def "8. Validate user can click on a view and then go back to the list"(){
+        testKey = "TM-8501"
+        given: "I am in the System Views section"
+            at AssetViewsPage
+        when: "I click in the first view of the list and then on View Manager breadcrumb"
+            waitFor { allViewsModule.clickFirstViewOfTheList()}
+            at ViewPage
+            waitFor {clickViewManagerBreadCrumb()}
+        then: "I am back to the list of views"
+            at AssetViewsPage
     }
 }
