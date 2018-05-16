@@ -4,13 +4,14 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, HostListener, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -30,6 +31,12 @@ export function StorageEditComponent(template: string, editModel: any): any {
 			private assetExplorerService: AssetExplorerService,
 			private dialogService: UIDialogService,
 			private notifierService: NotifierService) {
+		}
+
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
+			}
 		}
 
 		/**

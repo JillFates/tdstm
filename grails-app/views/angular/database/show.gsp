@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div class="modal-content tds-angular-component-content">
+<div class="modal-content tds-angular-component-content" tabindex="0">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">Database Detail</h4>

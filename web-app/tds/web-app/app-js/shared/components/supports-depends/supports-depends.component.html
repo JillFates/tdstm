@@ -1,6 +1,6 @@
 <kendo-grid
         *ngIf="dataGridSupportsOnHelper"
-        class="dependents-grid"
+        class="dependents-grid supports-on"
         [data]="dataGridSupportsOnHelper.gridData"
         [sort]="dataGridSupportsOnHelper.state.sort"
         [sortable]="{mode:'single'}"
@@ -9,7 +9,7 @@
 
     <!-- Toolbar Template -->
     <ng-template kendoGridToolbarTemplate [position]="'top'">
-        <label class="pad-top-7 pad-left-10">Supports On</label>
+        <label class="pad-top-7 pad-left-10">Supports</label>
         <button (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)" class="btn btn-add-new-dependency btn-default float-right mar-right-15 pad-top-6" type="button">
             <i class="fa fa-fw fa-plus-circle"></i> Add
         </button>
@@ -113,7 +113,7 @@
 
 <kendo-grid
         *ngIf="dataGridDependsOnHelper"
-        class="dependents-grid"
+        class="dependents-grid is-dependent-on"
         [data]="dataGridDependsOnHelper.gridData"
         [sort]="dataGridDependsOnHelper.state.sort"
         [sortable]="{mode:'single'}"
