@@ -85,7 +85,7 @@ class ETLProcessor implements RangeChecker {
 	DataSetFacade dataSetFacade
 	/**
 	 * An instance of this interface should be assigned
-	 * to be used in fieldSpec validations
+	 * to be used in fieldDefinition validations
 	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldSpecs(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
@@ -185,14 +185,15 @@ class ETLProcessor implements RangeChecker {
 	// ETL DSL methods
 	// ------------------------------------
 	/**
-	 * Selects a domain or throws an ETLProcessorException in case of an invalid domain
+	 * <p>Selects a domain</p>
+	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
 	 * @param domain a domain String value
 	 * @return the current instance of ETLProcessor
 	 */
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
 		selectedDomain = domain
-		result.releaseRowFoundInLookup()
+		cleanUpBindingAndReleaseLookup()
 		result.addCurrentSelectedDomain(selectedDomain)
 		debugConsole.info("Selected Domain: $domain")
 		return this
@@ -206,6 +207,7 @@ class ETLProcessor implements RangeChecker {
 	ETLProcessor read (ReservedWord reservedWord) {
 		validateStack()
 		if (reservedWord == ReservedWord.labels) {
+			columnsMap = [:]
 			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
 				Column column = new Column(label: fieldNameToLabel(field), index: index)
 				columns.add(column)
@@ -230,9 +232,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param from
 	 * @return a Map with the next steps in this command.
 	 */
-	def from (int from) {
+	Map<String, ?> from (int from) {
 		validateStack()
-		[to: { int to ->
+		return [to: { int to ->
 			[iterate: { Closure closure ->
 				from--
 				to
@@ -254,9 +256,9 @@ class ETLProcessor implements RangeChecker {
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
-	def from (int[] numbers) {
+	Map<String, ?> from (int[] numbers) {
 		validateStack()
-		[iterate: { Closure closure ->
+		return [iterate: { Closure closure ->
 			List rowNumbers = numbers as List
 			List rows = this.dataSetFacade.rows()
 			List subList = rowNumbers.collect { int number ->
@@ -295,9 +297,12 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Iterates a list of rows applying a closure
+	 * It initialize context variables in the ETL Binding context
+	 *
 	 * @param rows
 	 * @param closure
-	 * @return
+	 * @return the ETLProcesor instance
+	 * @see ETLBinding#getVariable(java.lang.String)
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
@@ -305,18 +310,19 @@ class ETLProcessor implements RangeChecker {
 		rows.each { def row ->
 			isIterating = true
 			currentColumnIndex = 0
-			result.releaseRowFoundInLookup()
-			binding.addDynamicVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
-			binding.addDynamicVariable(DOMAIN_VARNAME, new DomainFacade(result))
-			binding.addDynamicVariable(NOW_VARNAME, new NOW())
+			cleanUpBindingAndReleaseLookup()
+			bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
+			bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
+			bindVariable(NOW_VARNAME, new NOW())
 
-			closure(addCrudRowData(currentRowIndex, row))
+			closure(addCrudRowData(row))
 
 			result.removeIgnoredRows()
 
 			currentRowIndex++
 			binding.removeAllDynamicVariables()
 		}
+
 		isIterating = false
 		currentRowIndex--
 		return this
@@ -401,14 +407,16 @@ class ETLProcessor implements RangeChecker {
 	 * @param control
 	 * @return
 	 */
-	def replace (ReservedWord reservedWord) {
+	Map<String, ?> replace (ReservedWord reservedWord) {
 		debugConsole.info "Global trm status changed: $reservedWord"
 		if (reservedWord == ReservedWord.ControlCharacters) {
-			[
+			return [
 				with: { y ->
 					globalTransformers.add(Replacer(ControlCharactersRegex, y))
 				}
 			]
+		} else {
+			throw ETLProcessorException.invalidReplaceCommand()
 		}
 	}
 
@@ -457,7 +465,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param index
 	 * @return
 	 */
-	def extract (Integer index) {
+	Element extract (Integer index) {
 		validateStack()
 		index--
 		rangeCheck(index, currentRow.size())
@@ -477,7 +485,7 @@ class ETLProcessor implements RangeChecker {
 	 * @param columnName
 	 * @return
 	 */
-	def extract (String columnName) {
+	Element extract (String columnName) {
 		validateStack()
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
@@ -501,15 +509,16 @@ class ETLProcessor implements RangeChecker {
 	 * @param fieldName
 	 * @return
 	 */
-	def load(final String fieldName) {
+	Map<String, ?> load(final String fieldName) {
 		validateStack()
-		[
+		return [
 			with: { value ->
 
-				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, fieldName)
-				Element newElement = currentRow.addNewElement(ETLValueHelper.valueOf(value), fieldSpec, this)
-				addElementLoaded(selectedDomain, newElement)
-				newElement
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, fieldName))
+				element.originalValue = ETLValueHelper.valueOf(value)
+				element.value = element.originalValue
+				addElementLoaded(selectedDomain, element)
+				element
 			}
 		]
 
@@ -531,11 +540,15 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def set(final String variableName) {
+	Map<String, ?> set(final String variableName) {
+		if(!binding.isValidETLVariableName(variableName)){
+			throw ETLProcessorException.invalidETLVariableName(variableName)
+		}
 		validateStack()
-		[
+
+		return [
 			with: { value ->
-				String localVariable = ETLValueHelper.valueOf(value)
+				Object localVariable = ETLValueHelper.valueOf(value)
 				if(isIterating){
 					addLocalVariableInBinding(variableName, localVariable)
 				} else {
@@ -561,12 +574,12 @@ class ETLProcessor implements RangeChecker {
 	 * </pre>
 	 * @param fieldNames
 	 */
-	def lookup(final String fieldName){
+	Map<String, ?> lookup(final String fieldName){
 		validateStack()
 		lookUpFieldSpecs(selectedDomain, fieldName)
-		[
+		return [
 		    with: { value ->
-			    String stringValue = ETLValueHelper.valueOf(value)
+			    Object stringValue = ETLValueHelper.valueOf(value)
 			    boolean found = result.lookupInReference(fieldName, stringValue)
 			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
 		    }
@@ -602,17 +615,15 @@ class ETLProcessor implements RangeChecker {
 	 * @param field
 	 * @return
 	 */
-	def initialize(String field){
+	Map<String, ?> initialize(String field){
 		validateStack()
-		[
+		return [
 			with: { defaultValue ->
 
-				ETLFieldSpec fieldSpec = lookUpFieldSpecs(selectedDomain, field)
-
-				Element newElement = currentRow.addNewElement("", fieldSpec, this)
-				newElement.init = ETLValueHelper.valueOf(defaultValue)
-				addElementLoaded(selectedDomain, newElement)
-				newElement
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, field))
+				element.init = ETLValueHelper.valueOf(defaultValue)
+				addElementLoaded(selectedDomain, element)
+				element
 			}
 		]
 	}
@@ -629,7 +640,7 @@ class ETLProcessor implements RangeChecker {
 	 * @return
 	 * @see ETLProcessor#initialize(java.lang.String)
 	 */
-	def init(final String field) {
+	Map<String, ?> init(final String field) {
 		validateStack()
 		initialize(field)
 	}
@@ -640,11 +651,10 @@ class ETLProcessor implements RangeChecker {
 	 * @param domain
 	 * @return
 	 */
-	def find (ETLDomain domain) {
+	ETLFindElement find (ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
 		validateStack()
-		currentFindElement = new ETLFindElement(this, domain, this.currentRowIndex)
-		binding.addDynamicVariable(FINDINGS_VARNAME, new FindingsFacade(currentFindElement))
+		bindCurrentFindElement(new ETLFindElement(this, domain, this.currentRowIndex))
 		pushIntoStack(currentFindElement)
 		return currentFindElement
 	}
@@ -776,16 +786,16 @@ class ETLProcessor implements RangeChecker {
 	 * That domain class can be within the AssetEntity hierarchy or be any of the other domain classes in the system.
 	 * <br>
 	 * Validation is based on the transformation from {@link ETLDomain#clazz} field.
-	 * Then it builds an instance of ETLFieldSpec with all the necessary data used in ETLProcessorResult
+	 * Then it builds an instance of ETLFieldDefinition with all the necessary data used in ETLProcessorResult
 	 * @param an instance of ETLDomain used to validate fieldName parameter
 	 * @param fieldName field name used in the lookup process
-	 * @return an instance of {@link  ETLFieldSpec}
-	 * @see ETLFieldSpec
+	 * @return an instance of {@link  ETLFieldDefinition}
+	 * @see ETLFieldDefinition
 	 * @see ETLProcessorResult
 	 */
-	ETLFieldSpec lookUpFieldSpecs (ETLDomain domain, String field) {
+	ETLFieldDefinition lookUpFieldSpecs (ETLDomain domain, String field) {
 
-		ETLFieldSpec fieldSpec
+		ETLFieldDefinition fieldSpec
 
 		if (ETLDomain.External != domain) {
 
@@ -843,7 +853,7 @@ class ETLProcessor implements RangeChecker {
 
 	/**
 	 * Add a variable within the script as a global variable.
-	 * Tipically this variable is defined ouside a iterate command
+	 * Tipically this variable is defined outside a iterate command
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
@@ -856,8 +866,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param rowIndex
 	 * @param row
 	 */
-	private Row addCrudRowData (Integer rowIndex, Map row) {
-		currentRow = new Row(rowIndex, dataSetFacade.fields().collect { row[it.name] }, this)
+	private Row addCrudRowData (Map row) {
+		currentRow = new Row(dataSetFacade.fields().collect { row[it.name] }, this)
 		rows.add(currentRow)
 		return currentRow
 	}
@@ -866,11 +876,8 @@ class ETLProcessor implements RangeChecker {
 	 * Private method that executes extract method command internally.
 	 * @return
 	 */
-	private def doExtract () {
-		Element element = currentRow.getDataSetElement(currentColumnIndex)
-
-		addCurrentElementToBinding(element)
-
+	private Element doExtract () {
+		Element element = createCurrentElement(currentColumnIndex)
 		debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"
 		applyGlobalTransformations(element)
 		return element
@@ -883,8 +890,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-		result.loadElement(element)
-		debugConsole.info "Adding element ${element.fieldSpec.getName()}='${element.value}' to domain ${domain} results"
+		result.loadElement(element, this.currentRowIndex)
+		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
 	}
 
 	/**
@@ -893,6 +900,8 @@ class ETLProcessor implements RangeChecker {
 	 */
 	void addFindElement(ETLFindElement findElement) {
 		validateStack(findElement)
+		// TODO: review it with John.
+		findOrCreateCurrentElement(findElement.currentFind.fieldDefinition)
 		result.addFindElement(findElement)
 		popFromStack()
 	}
@@ -910,7 +919,6 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void applyGlobalTransformations (Element element) {
-
 		globalTransformers.each { transformer ->
 			transformer(element)
 		}
@@ -921,10 +929,64 @@ class ETLProcessor implements RangeChecker {
 	 * @param element a selected Element
 	 * @return the curent element selected in ETLProcessor
 	 */
-	private Element addCurrentElementToBinding (Element element) {
+	private Element bindCurrentElement(Element element) {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
 		return currentElement
+	}
+
+	/**
+	 * Add an ETLFindElement as FINDINGS_VARNAME value as variable within the binding script context.
+	 * If @findElement is not null an instance of FindingsFacade will be bound in the ETLBinding context.
+	 * If @findElement is null, the null value will be bound in order to use it in an ETL script
+	 * @param ETLFindElement a selected findElement
+	 * @return the currentFindElement selected in ETLProcessor
+	 */
+	private ETLFindElement bindCurrentFindElement(ETLFindElement findElement) {
+		currentFindElement = findElement
+		binding.addDynamicVariable(FINDINGS_VARNAME, findElement ? new FindingsFacade(currentFindElement) : findElement)
+		return currentFindElement
+	}
+
+	/**
+	 * A clean up method to release variables in the context and
+	 * release lookup references
+	 */
+	private void cleanUpBindingAndReleaseLookup() {
+		result.releaseRowFoundInLookup()
+		bindCurrentElement(null)
+		bindCurrentFindElement(null)
+	}
+
+	/**
+	 * Bind in ETL Content variables using name parameters
+	 * @param name a String name for a variable
+	 * @param value the Object instance to be bound in the ETL context
+	 */
+	private void bindVariable(String name, Object value) {
+		binding.addDynamicVariable(name, value)
+	}
+
+	/**
+	 * Find or create a current element based onf field definition
+	 * @param fieldDefinition
+	 * @return
+	 */
+	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
+		if(currentElement?.fieldDefinition?.name == fieldDefinition.name){
+			return currentElement
+		} else{
+			return bindCurrentElement(currentRow.addNewElement(null, fieldDefinition, this))
+		}
+	}
+
+	/**
+	 * Create the current element adding it in the ETL binding context
+	 * @param currentColumnIndex
+	 * @return
+	 */
+	private Element createCurrentElement(Integer currentColumnIndex) {
+		return bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex))
 	}
 
 	/**

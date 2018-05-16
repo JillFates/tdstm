@@ -12,7 +12,6 @@ import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {MAX_OPTIONS, MAX_DEFAULT} from '../../../../shared/model/constants';
 import {ProviderViewEditComponent} from '../provider-view-edit/provider-view-edit.component';
 import {PageChangeEvent} from '@progress/kendo-angular-grid';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'provider-list',
@@ -70,64 +69,13 @@ export class ProviderListComponent {
 	}
 
 	protected onFilter(column: any): void {
-		let root = this.state.filter || { logic: 'and', filters: [] };
-
-		let [filter] = Flatten(root).filter(x => x.field === column.property);
-
-		if (!column.filter) {
-			column.filter = '';
-		}
-
-		if (column.type === 'text') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'date') {
-			if (!filter) {
-				const {init, end} = DateUtils.getInitEndFromDate(column.filter);
-
-				root.filters.push({
-					field: column.property,
-					operator: 'gte',
-					value: init,
-				});
-
-				root.filters.push({
-					field: column.property,
-					operator: 'lte',
-					value: end
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
+		const root = this.dataIngestionService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
-	protected clearValue(column: any, value?: any): void {
-		column.filter = '';
-		const filters = (this.state.filter && this.state.filter.filters) || [];
-
-		if (filters.length > 0) {
-			this.state.filter.filters =  filters.filter((r) => r['field'] !== column.property );
-			this.filterChange(this.state.filter);
-		}
+	protected clearValue(column: any): void {
+		this.dataIngestionService.clearFilter(column, this.state);
+		this.filterChange(this.state.filter);
 	}
 
 	protected onCreateProvider(): void {

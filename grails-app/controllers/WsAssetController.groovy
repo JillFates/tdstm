@@ -4,10 +4,13 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.AssetCommand
+import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
@@ -17,15 +20,10 @@ import net.transitionmanager.service.AssetService
 import net.transitionmanager.service.ControllerService
 import net.transitionmanager.service.DatabaseService
 import net.transitionmanager.service.DeviceService
-import net.transitionmanager.service.SecurityService
 import net.transitionmanager.service.StorageService
 import net.transitionmanager.service.UserPreferenceService
-import org.grails.datastore.mapping.query.api.BuildableCriteria
-import grails.gsp.PageRenderer
-import org.grails.datastore.mapping.query.api.BuildableCriteria
 
 import java.text.DateFormat
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -332,10 +330,51 @@ class WsAssetController implements ControllerMethods {
 				model << assetEntityService.getCommonModelForShows(domainName, asset.project, params)
 			} else {
 				model << assetEntityService.getDefaultModelForEdits(domainName, asset.project, asset, params)
+				// Required for Supports On and Depends On
+				model.dependencyMap = assetEntityService.dependencyEditMap(asset.project, asset)
+				model.dataFlowFreq = AssetDependency.constraints.dataFlowFreq.inList;
 			}
 			log.debug "\n\n*** showModel()\n domainName=$domainName\nmodel:$model"
 			renderAsJson(model)
 		}
+	}
+
+	/**
+	 * Endpoint that needs to be executed when the user changes the selected
+	 * bundle in dropdowns.
+	 * The request must have: assetId, dependencyId and status.
+	 */
+	@HasPermission(Permission.BundleView)
+	def retrieveBundleChange() {
+		// Fetch the information for this request.
+		BundleChangeCommand command = populateCommandObject(BundleChangeCommand)
+
+		Project project = getProjectForWs()
+
+		// The id of the bundle retrieve from the asset in the dependency (if such dependency exists).
+		Long depBundleId = null
+		// The id of the  bundle for the asset received in the request.
+		Long assetBundleId = null
+		// The status of the dependency.
+		String status = null
+
+		// Can't use fetchDomain because it throws an exception when it doesn't find a result.
+		AssetDependency dependency = GormUtil.findInProject(project, AssetDependency, command.dependencyId, false)
+		// If the dependency exists, use its status and corresponding asset's bundle in the response.
+		if (dependency) {
+			AssetEntity depAsset = (command.type == 'support') ? dependency.asset : dependency.dependent
+			depBundleId = depAsset.moveBundle.id
+			status = dependency.status
+		}
+
+		// Can't use fetchDomain because it throws an exception when it doesn't find a result.
+		AssetEntity asset = GormUtil.findInProject(project, AssetEntity, command.assetId, false)
+		// If the given assetId exists, use that asset's bundle in the response.
+		if (asset) {
+			assetBundleId = asset.moveBundle.id
+		}
+
+		renderAsJson(id: assetBundleId, depBundle: depBundleId, status: status)
 	}
 
 	/**
@@ -367,4 +406,57 @@ class WsAssetController implements ControllerMethods {
 		Map params = [project: project, viewName: viewName, excludeDate: true]
 		return renderSuccessJson(FilenameUtil.buildFilename(FilenameFormat.PROJECT_VIEW_DATE, params))
 	}
+
+	/**
+	 * Save a new asset.
+	 *
+	 * @return
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def saveAsset() {
+		// Populate the command with the data coming from the request.
+		AssetCommand command = populateCommandObject(AssetCommand)
+		// Save the new asset.
+		assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson('Success!')
+	}
+
+	/**
+	 * Update an asset
+	 * @return
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def updateAsset(Long id) {
+		// Populate the command with the data coming from the request.
+		AssetCommand command = populateCommandObject(AssetCommand)
+		// Update the asset.
+		assetEntityService.saveOrUpdateAsset(command)
+		renderSuccessJson('Success!')
+	}
+
+	/**
+	 * Retrieve the Chassis options for the given room.
+	 * @param id
+	 * @return
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def retrieveChassisSelectOptions(Long id) {
+		Project project = getProjectForWs()
+		List chassisOptions = assetEntityService.getChassisSelectOptions(project, id)
+		renderSuccessJson(chassisOptions)
+	}
+
+	/**
+	 * Retrieve the Rack options for the given room.
+	 * @param id
+	 * @return
+	 */
+	@HasPermission(Permission.AssetCreate)
+	def retrieveRackSelectOptions(Long id) {
+		Project project = getProjectForWs()
+		List rackOptions = assetEntityService.getRackSelectOptions(project, id, true)
+		renderSuccessJson(rackOptions)
+	}
+
+
 }

@@ -4,6 +4,8 @@ import {Response} from '@angular/http';
 import {ViewModel, ViewGroupModel, ViewType} from '../model/view.model';
 import {HttpInterceptor} from '../../../shared/providers/http-interceptor.provider';
 import {Permission} from '../../../shared/model/permission.model';
+import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
+import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {PermissionService} from '../../../shared/services/permission.service';
 
 import 'rxjs/add/operator/map';
@@ -17,6 +19,7 @@ export class AssetExplorerService {
 	private assetUrl = '../ws/asset';
 	private FAVORITES_MAX_SIZE = 10;
 	private ALL_ASSETS = 'All Assets';
+	private assetEntitySearch = 'assetEntity';
 
 	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
@@ -199,6 +202,134 @@ export class AssetExplorerService {
 			.map((res: Response) => {
 				let result = res.json();
 				return result && result.status === 'success' && result.data && result.data.isUnique;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * @param searchParams
+	 * @returns {Observable<any>}
+	 */
+	getAssetListForComboBox(searchParams: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/assetListForSelect2?q=${searchParams.query}&value=${searchParams.value}&max=${searchParams.maxPage}&page=${searchParams.currentPage}&assetClassOption=${searchParams.metaParam}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.results,
+					total: response.total,
+					page: response.page
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 *
+	 * @param changeParams
+	 * @returns {Observable<any>}
+	 */
+	retrieveChangedBundle(changeParams: any): Observable<any> {
+		return this.http.post(`${this.assetUrl}/retrieveBundleChange`, JSON.stringify(changeParams))
+			.map((res: Response) => {
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getAssetTypesForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/assetTypesOf?${searchModel.query}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data.assetTypes,
+					total: response.data.assetTypes.length,
+					page: 1
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getManufacturersForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/manufacturer?${searchModel.query}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data.manufacturers,
+					total: response.data.manufacturers.length,
+					page: 1
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getModelsForComboBox(searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> {
+		return this.http.get(`../${this.assetEntitySearch}/modelsOf?${searchModel.query}`)
+			.map((res: Response) => {
+				let response = res.json();
+				let comboBoxSearchResultModel: ComboBoxSearchResultModel = {
+					result: response.data.models,
+					total: response.data.models.length,
+					page: 1
+				};
+				return comboBoxSearchResultModel;
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getRacksForRoom(roomId: number, sourceTarget: 'S'|'T'): Observable<any> {
+		const request = {
+			roomId: roomId,
+			rackId: null,
+			sourceTarget: sourceTarget,
+			forWhom: 'Edit'
+		};
+
+		let mockSourceResponse = [
+			{id: 0, text: 'Please Select'},
+			{id: 1, text: 'Add Rack...'},
+			{id: 14240, text: 'TBD'},
+		];
+		let mockTargetResponse = [
+			{id: 0, text: 'Please Select'},
+			{id: -1, text: 'Add Rack...'},
+			{id: 13173, text: 'B5'},
+			{id: 13161, text: 'B6'},
+		];
+		return this.http.post(`../${this.assetEntitySearch}/retrieveRackSelectForRoom`, JSON.stringify(request))
+			.map((res: Response) => {
+				console.log(res);
+				if (sourceTarget === 'S') {
+					return mockSourceResponse;
+				} else {
+					return mockTargetResponse;
+				}
+			})
+			.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Save the Asset
+	 * @param model
+	 * @returns {Observable<any>}
+	 */
+	saveAsset(model: any): Observable<any> {
+		const request: any = {
+			assetClass: model.asset.assetClass.name,
+			asset: model.asset,
+			dependencyMap: {
+				supportAssets: model.dependencyMap.supportAssets,
+				dependentAssets: model.dependencyMap.dependentAssets
+			}
+		};
+		console.log(request);
+		return this.http.put(`${this.defaultUrl}/asset/${model.assetId}`, request)
+			.map((res: Response) => {
+				let result = res.json();
+				return result && result.status === 'success' && result.data && result.data.status;
 			})
 			.catch((error: any) => error.json());
 	}

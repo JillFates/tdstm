@@ -3,6 +3,8 @@ import { UIActiveDialogService, UIDialogService } from '../../../../shared/servi
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
+import { AssetEditComponent } from '../asset/asset-edit.component';
+import { DOMAIN, DIALOG_SIZE } from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -43,6 +45,16 @@ export function ApplicationShowComponent(template, modelId: number) {
 						.then(res => console.log(res))
 						.catch(res => console.log(res));
 				}, (error) => console.log(error));
+		}
+
+		showAssetEditView(): Promise<any> {
+			const componentParameters = [
+				{ provide: 'ID', useValue: this.mainAsset },
+				{ provide: 'ASSET', useValue: DOMAIN.APPLICATION }
+			];
+
+			return this.dialogService
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
 		}
 
 	}

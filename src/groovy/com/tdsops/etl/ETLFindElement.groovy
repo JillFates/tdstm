@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import com.tdssrc.grails.GormUtil
+
 /**
  * ETL find command implementation.
  * <code>
@@ -78,6 +81,7 @@ class ETLFindElement implements ETLStackableCommand{
 	ETLFindElement into(String property) {
 		validateReference(property)
 		currentFind.property = property
+		currentFind.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, property)
 		processor.addFindElement(this)
 		return this
 	}
@@ -89,8 +93,8 @@ class ETLFindElement implements ETLStackableCommand{
 	 */
 	ETLFindElement by(String... fields) {
 		for(field in fields){
-			checkAssetFieldSpec(field)
-			currentFind.fields.add(field)
+			ETLFieldDefinition fieldDefinition = checkAssetFieldSpec(field)
+			currentFind.fields.add(fieldDefinition.name)
 		}
 		return this
 	}
@@ -128,6 +132,9 @@ class ETLFindElement implements ETLStackableCommand{
 				}
 				currentFind.errors.add(all.getMessage())
 			}
+
+			// For import process, in case of Domain classes we only need the id value. 
+			currentFind.kv = currentFind.kv.collectEntries { [(it.key): GormUtil.isDomainClass(it.value)?it?.value?.id:it?.value] }
 
 			results = [
 				objects : [],
@@ -190,11 +197,11 @@ class ETLFindElement implements ETLStackableCommand{
 	}
 
 	/**
-	 * Checks a fieldSpec based on asset field name
+	 * Checks a fieldDefinition based on asset field name
 	 * using the selected domain in the current script
 	 * @param fieldName an asset field name
 	 */
-	private ETLFieldSpec checkAssetFieldSpec(String fieldName) {
+	private ETLFieldDefinition checkAssetFieldSpec(String fieldName) {
 		return processor.lookUpFieldSpecs(currentDomain, fieldName)
 	}
 

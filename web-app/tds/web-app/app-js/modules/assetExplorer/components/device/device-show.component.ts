@@ -3,6 +3,8 @@ import { UIActiveDialogService, UIDialogService } from '../../../../shared/servi
 import { AssetShowComponent } from '../asset/asset-show.component';
 import { AssetDependencyComponent } from '../asset-dependency/asset-dependency.component';
 import { DependecyService } from '../../service/dependecy.service';
+import {DIALOG_SIZE, DOMAIN} from '../../../../shared/model/constants';
+import {AssetEditComponent} from '../asset/asset-edit.component';
 
 declare var jQuery: any;
 
@@ -43,6 +45,13 @@ export function DeviceShowComponent(template, modelId: number) {
 						.then(res => console.log(res))
 						.catch(res => console.log(res));
 				}, (error) => console.log(error));
+		}
+
+		showAssetEditView() {
+			this.dialogService.replace(AssetEditComponent, [
+					{ provide: 'ID', useValue: this.mainAsset },
+					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
+				DIALOG_SIZE.XLG);
 		}
 
 	}

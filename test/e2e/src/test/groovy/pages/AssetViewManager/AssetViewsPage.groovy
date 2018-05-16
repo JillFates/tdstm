@@ -33,6 +33,7 @@ class AssetViewsPage extends Page{
         previewGrid                 {$("kendo-grid",class:"k-widget k-grid k-grid-lockedcolumns")}
         vwGrid                      (required: false, wait:true){$("table", class:"table table-hover table-striped")}
         vwGridRows                  (required: false, wait:true) { vwGrid.find("tr","role":"row")}
+        vwGridRowsLink {$("tr td a")}
     }
     def goToCreateView(){
         createViewBtn.click()
@@ -47,8 +48,21 @@ class AssetViewsPage extends Page{
     def filterViewByName(String name){
         filter=name
     }
+
     def goToFavourites(){
         viewMgrFavoriteViews.click()
     }
 
+    def goToSystemViews(){
+        viewMgrSystemViews.click()
+    }
+
+    def openViewByName(name){
+        filterViewByName name
+        // verify exact match and no other was found with same name
+        // otherwise we can click in other view than is required
+        def links = vwGridRowsLink.findAll { it.text() == name }
+        links.size() == 1
+        waitFor{ links[0].click() }
+    }
 }

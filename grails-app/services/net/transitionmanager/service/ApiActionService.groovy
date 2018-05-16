@@ -460,6 +460,16 @@ class ApiActionService implements ServiceMethods {
 	 */
 	void delete (Long id, Project project, boolean flush = false) {
 		ApiAction apiAction = GormUtil.findInProject(project, ApiAction, id, true)
+
+		// TM-10541 - Check if the ApiAction is referenced by any Tasks and prevent deleting
+		int count = AssetComment.where {
+			apiAction == apiAction
+		}.count()
+
+		if (count > 0) {
+			throw new DomainUpdateException("Unable to delete Api Action since it is being referenced by Tasks")
+		}
+
 		apiAction.delete(flush: flush)
 	}
 

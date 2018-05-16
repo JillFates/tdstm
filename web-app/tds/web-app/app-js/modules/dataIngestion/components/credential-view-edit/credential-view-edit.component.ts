@@ -23,24 +23,24 @@ declare var jQuery: any;
         .has-error, .has-error:focus {
             border: 1px #f00 solid;
         }
-		.invalid-form {
-			color: red;
-			font-weight: bold;
-		}
-		#httpMethod {
-			width: 75px;
-		}
+        .invalid-form {
+            color: red;
+            font-weight: bold;
+        }
+        #httpMethod {
+            width: 75px;
+        }
         .radio-aligned {
             margin: 4px 4px 0;
             vertical-align: top;
         }
-		.label-detail {
+        .label-detail {
             font-weight: normal;
-			cursor: pointer;
-		}
-		.check-action {
-			margin-left: 12px !important;
-		}
+            cursor: pointer;
+        }
+        .check-action {
+            margin-left: 12px !important;
+        }
 	`]
 })
 export class CredentialViewEditComponent {
@@ -217,14 +217,14 @@ export class CredentialViewEditComponent {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
+						this.activeDialog.close(null);
 					} else {
 						this.focusForm();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.activeDialog.close(null);
 		}
 	}
 
@@ -256,7 +256,7 @@ export class CredentialViewEditComponent {
 				if (res) {
 					this.dataIngestionService.deleteCredential(this.credentialModel.id).subscribe(
 						(result) => {
-							this.activeDialog.close(result);
+							this.activeDialog.dismiss(result);
 						},
 						(err) => console.log(err));
 				}
@@ -288,12 +288,12 @@ export class CredentialViewEditComponent {
 	 */
 	private validateExpressionCheck(): Observable<any> {
 		return new Observable(observer => {
-		this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
-			(result: any) => {
-				this.validExpressionResult = result;
-				observer.next(result);
-			},
-			(err) => console.log(err));
+			this.dataIngestionService.validateExpressionCheck(this.credentialModel.validationExpression).subscribe(
+				(result: any) => {
+					this.validExpressionResult = result;
+					observer.next(result);
+				},
+				(err) => console.log(err));
 		});
 	}
 
