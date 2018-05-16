@@ -57,6 +57,9 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	AssetEntity device2
 
 	@Shared
+	AssetEntity device3
+
+	@Shared
 	Application application1
 
 	@Shared
@@ -74,12 +77,16 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
 	AssetDependency dependency2
 
+	@Shared
+	AssetDependency dependency3
+
 	void setup() {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
 
 		device = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
 		device2 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle)
+		device3 = assetEntityTestHelper.createAssetEntity(AssetClass.DEVICE, project, moveBundle2)
 
 		application1 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle)
 		application2 = applicationTestHelper.createApplication(AssetClass.APPLICATION, project, moveBundle2)
@@ -112,6 +119,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
 		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+		dependency3 = new AssetDependency(asset: application1, dependent: device3, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
 	}
 
 	void "test gatherMetric for query mode"() {
