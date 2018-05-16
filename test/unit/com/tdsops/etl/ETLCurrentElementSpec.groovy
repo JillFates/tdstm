@@ -197,17 +197,20 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == [] as Set
-				with(data[0]){
-					op == 'I'
-					errorCount == 0
-					warn == false
-					duplicate == false
-					errors == []
-					fields == [:]
+			with (etlProcessor.resultsMap()){
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == [] as Set
+					with(data[0]){
+						op == 'I'
+						errorCount == 0
+						warn == false
+						duplicate == false
+						errors == []
+						fields == [:]
+					}
 				}
 			}
 
@@ -255,24 +258,27 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				with(data[0]){
-					op == 'I'
-					errorCount == 0
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.assetName){
-						originalValue == 'xraysrv01'
-						value == 'xraysrv01'
-						errors == []
+			with (etlProcessor.resultsMap()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					with(data[0]) {
+						op == 'I'
+						errorCount == 0
 						warn == false
-						with(find){
-							query == []
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == 'xraysrv01'
+							value == 'xraysrv01'
+							errors == []
+							warn == false
+							with(find) {
+								query == []
+							}
 						}
 					}
 				}
@@ -322,25 +328,28 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				with(data[0]){
-					op == 'I'
-					errorCount == 0
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.assetName){
-						originalValue == null
-						value == null
-						init == 'Initial Name'
-						errors == []
+			with (etlProcessor.resultsMap()) {
+				ETLInfo.originalFilename == fileName
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					with(data[0]) {
+						op == 'I'
+						errorCount == 0
 						warn == false
-						with(find){
-							query == []
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.assetName) {
+							originalValue == null
+							value == null
+							init == 'Initial Name'
+							errors == []
+							warn == false
+							with(find) {
+								query == []
+							}
 						}
 					}
 				}
@@ -400,31 +409,33 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			}
 
 		and: 'Results contains the following values'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id'] as Set
-				with(data[0]){
-					op == 'I'
-					errorCount == 0
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id){
-						originalValue == null
-						value == null
-						//errors == []
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
+					with(data[0]) {
+						op == 'I'
+						errorCount == 0
 						warn == false
-						with(find){
-							query.size() == 1
-							with(query[0]){
-								domain == ETLDomain.Application.name()
-								with(kv){
-									assetName: 'PE2950'
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							//errors == []
+							warn == false
+							with(find) {
+								query.size() == 1
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										assetName: 'PE2950'
+									}
 								}
-							}
 
+							}
 						}
 					}
 				}
@@ -556,19 +567,21 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 			""".stripIndent())
 
 		then: 'Results should contain values from the local variable'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName'] as Set
-				data.size() == 1
-				with(data[0]) {
-					rowNum == 1
-					with(fields) {
-						with(assetName) {
-							value == 'xraysrv01'
-							originalValue == 'xraysrv01'
-						}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName'] as Set
+					data.size() == 1
+					with(data[0]) {
+						rowNum == 1
+						with(fields) {
+							with(assetName) {
+								value == 'xraysrv01'
+								originalValue == 'xraysrv01'
+							}
 
+						}
 					}
 				}
 			}

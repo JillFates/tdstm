@@ -116,42 +116,43 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == '152254'
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152254']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == '152254'
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152254']
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152255']
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == '152255'
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152255']
+						}
 					}
 				}
 			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -254,50 +255,51 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
-					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
 
-				// Validates command: find Application by 'id' with DOMAIN.asset
-				(1..14).eachWithIndex { int value, int index ->
-					with(data[index].fields.id.find) {
-						query.size() == 1
+					// Validates command: find Application by 'id' with DOMAIN.asset
+					(1..14).eachWithIndex { int value, int index ->
+						with(data[index].fields.id.find) {
+							query.size() == 1
+							with(query[0]) {
+								domain == ETLDomain.Dependency.name()
+								kv.id == value.toString()
+							}
+						}
+					}
+
+					// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
+					with(data[0].fields.asset.find) {
+						query.size() == 3
 						with(query[0]) {
-							domain == ETLDomain.Dependency.name()
-							kv.id == value.toString()
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
+
+						with(query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetType == 'VM'
+						}
+
+						with(query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
 						}
 					}
 				}
-
-				// Validates command: elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar
-				with(data[0].fields.asset.find) {
-					query.size() == 3
-					with(query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
-					}
-
-					with(query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
-
-					with(query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-				}
 			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -387,27 +389,28 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'comment'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'comment'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				// Validates command: find Application by 'id' with DOMAIN.asset
-				(1..13).eachWithIndex { int value, int index ->
-					with(data[index].fields.id.find) {
-						query.size() == 1
-						with(query[0]) {
-							domain == ETLDomain.Dependency.name()
-							kv.id == value.toString()
+					// Validates command: find Application by 'id' with DOMAIN.asset
+					(1..13).eachWithIndex { int value, int index ->
+						with(data[index].fields.id.find) {
+							query.size() == 1
+							with(query[0]) {
+								domain == ETLDomain.Dependency.name()
+								kv.id == value.toString()
+							}
 						}
 					}
+					// Validates command: set comment with 'Asset results found'
+					data[0..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 				}
-				// Validates command: set comment with 'Asset results found'
-				data[0..data.size() - 1].collect { it.fields.comment.value }.unique() == ['Asset results not found']
 			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -462,18 +465,20 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0].fields.asset) {
-					originalValue == '152254'
-					value == '152254'
-				}
+					with(data[0].fields.asset) {
+						originalValue == '152254'
+						value == '152254'
+					}
 
-				with(data[1].fields.asset) {
-					originalValue == '152255'
-					value == '152255'
+					with(data[1].fields.asset) {
+						originalValue == '152255'
+						value == '152255'
+					}
 				}
 			}
 
@@ -592,51 +597,53 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
 
-				with(data[0]) {
-					fields.environment.originalValue == 'Production'
-					fields.environment.value == 'Production'
+					with(data[0]) {
+						fields.environment.originalValue == 'Production'
+						fields.environment.value == 'Production'
 
-					fields.appVendor.originalValue == 'Microsoft'
-					fields.appVendor.value == 'Microsoft'
+						fields.appVendor.originalValue == 'Microsoft'
+						fields.appVendor.value == 'Microsoft'
 
-					fields.id.originalValue == '152254'
-					fields.id.value == '152254'
+						fields.id.originalValue == '152254'
+						fields.id.value == '152254'
 
-					// Validating queries
-					with(fields.id.find) {
-						query[0].domain == ETLDomain.Application.name()
-						query[0].kv == [id: '152254']
+						// Validating queries
+						with(fields.id.find) {
+							query[0].domain == ETLDomain.Application.name()
+							query[0].kv == [id: '152254']
 
-						query[1].domain == ETLDomain.Application.name()
-						query[1].kv == [appVendor: 'Microsoft']
-					}
-				}
-
-				with(data[1]) {
-					fields.environment.originalValue == 'Production'
-					fields.environment.value == 'Production'
-
-					fields.appVendor.originalValue == 'Mozilla'
-					fields.appVendor.value == 'Mozilla'
-
-					fields.id.originalValue == '152255'
-					fields.id.value == '152255'
-
-					// Validating queries
-					with(fields.id.find) {
-						query[0].domain == ETLDomain.Application.name()
-						query[0].kv == [id: '152255']
-
-						query[1].domain == ETLDomain.Application.name()
-						query[1].kv == [appVendor: 'Mozilla']
-
+							query[1].domain == ETLDomain.Application.name()
+							query[1].kv == [appVendor: 'Microsoft']
+						}
 					}
 
-					fields.id.warn
+					with(data[1]) {
+						fields.environment.originalValue == 'Production'
+						fields.environment.value == 'Production'
+
+						fields.appVendor.originalValue == 'Mozilla'
+						fields.appVendor.value == 'Mozilla'
+
+						fields.id.originalValue == '152255'
+						fields.id.value == '152255'
+
+						// Validating queries
+						with(fields.id.find) {
+							query[0].domain == ETLDomain.Application.name()
+							query[0].kv == [id: '152255']
+
+							query[1].domain == ETLDomain.Application.name()
+							query[1].kv == [appVendor: 'Mozilla']
+
+						}
+
+						fields.id.warn
+					}
 				}
 			}
 
@@ -824,45 +831,46 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
-					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
 
-				with(data[0].fields.asset) {
+					with(data[0].fields.asset) {
 
-					find.query.size() == 3
-					with(find.query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
+						find.query.size() == 3
+						with(find.query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
+
+						with(find.query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetType == 'VM'
+						}
+
+						with(find.query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						// whenNotFound create command assertions
+						create.assetClass == ETLDomain.Application.name()
+						create.assetName == 'ACMEVMPROD01'
+						create.assetType == 'VM'
+						!!create."SN Last Seen"
 					}
-
-					with(find.query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
-
-					with(find.query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					// whenNotFound create command assertions
-					create.assetClass == ETLDomain.Application.name()
-					create.assetName == 'ACMEVMPROD01'
-					create.assetType == 'VM'
-					!!create."SN Last Seen"
 				}
 			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -1180,42 +1188,43 @@ class ETLProcessorFindCommandIntegrationTests extends Specification {
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
-					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
 
-				with(data[0].fields.asset) {
+					with(data[0].fields.asset) {
 
-					find.query.size() == 3
-					with(find.query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
+						find.query.size() == 3
+						with(find.query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
+
+						with(find.query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetType == 'VM'
+						}
+
+						with(find.query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						// whenFound update command assertions
+						!!update."TN Last Seen"
 					}
-
-					with(find.query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
-
-					with(find.query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					// whenFound update command assertions
-					!!update."TN Last Seen"
 				}
 			}
-
 		cleanup:
 			if(fileName){
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -1268,32 +1277,34 @@ ${racks[2].id},${rooms[1].id},Storage,ACME Data Center,42U Rack,ACME Data Center
 			""".stripIndent())
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Rack.name()
-				fieldNames == ['id', 'location', 'room'] as Set
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Rack.name()
+					fieldNames == ['id', 'location', 'room'] as Set
 
-				data.collect { it.fields.id.value } == [
-					racks[0].id.toString(), '13145',
-					racks[1].id.toString(),
-					racks[2].id.toString(), '13358'
-				]
+					data.collect { it.fields.id.value } == [
+						racks[0].id.toString(), '13145',
+						racks[1].id.toString(),
+						racks[2].id.toString(), '13358'
+					]
 
-				data.collect { it.fields.location.value } == [
-					'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
-					'ACME Data Center', 'New Colo Provider'
-				]
+					data.collect { it.fields.location.value } == [
+						'ACME Data Center', 'ACME Data Center', 'ACME Data Center',
+						'ACME Data Center', 'New Colo Provider'
+					]
 
-				data.collect { it.fields.room.value } == [
-					'ACME Data Center / DC1', 'ACME Data Center / DC1',
-					'ACME Data Center / DC1', 'ACME Data Center / DC1',
-					'New Colo Provider / ACME Room 1'
-				]
+					data.collect { it.fields.room.value } == [
+						'ACME Data Center / DC1', 'ACME Data Center / DC1',
+						'ACME Data Center / DC1', 'ACME Data Center / DC1',
+						'New Colo Provider / ACME Room 1'
+					]
 
-				with(data[4].fields.room) {
-					find.query.size() == 0
+					with(data[4].fields.room) {
+						find.query.size() == 0
+					}
+
 				}
-
 			}
 
 		cleanup:
