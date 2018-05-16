@@ -23,7 +23,7 @@ class ImportBatchJobSchedulerResponderService implements ApplicationListener<Imp
 		log.info('Want to schedule a new job: {}', event)
 
 		securityService.assumeUserIdentity(event.source.username, true)
-		importBatchService.scheduleJob(event.source.project, event.source.batchId)
+		importBatchService.scheduleJob(event.source.projectId, event.source.batchId)
 	}
 
 }

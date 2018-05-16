@@ -32,7 +32,6 @@ class ImportBatchJob extends SecureJob implements ApplicationEventPublisher {
 		try {
 			long batchId = dataMap.getLongValue('batchId')
 			long userLoginId = dataMap.getLongValue('userLoginId')
-			log.debug('userLoginId = {}', dataMap.userLoginId)
 
 			log.debug('execute() batchId={}, projectId={}, userLoginId={}', batchId, projectId, userLoginId)
 
@@ -50,10 +49,12 @@ class ImportBatchJob extends SecureJob implements ApplicationEventPublisher {
 			log.error('execute() received exception {}\n{}', e.message, ExceptionUtil.stackTraceToString(e))
 		} finally {
 			// find if there are more queued jobs to start processing different than the current one
-			Long nextBatchId = dataImportService.getNextBatchToProcess(projectId)
-			if (nextBatchId) {
+			// Long nextBatchId = dataImportService.getNextBatchToProcess(projectId)
+			Map<String, ?> nextBatch = dataImportService.getNextBatchToProcess(projectId)
+			if (nextBatch) {
 				// if there is a next batch to process, then trigger an application event to schedule it
-				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails = new ImportBatchJobSchedulerEventDetails(Project.get(projectId), nextBatchId, ImportBatch.get(nextBatchId).queuedBy)
+				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails =
+						new ImportBatchJobSchedulerEventDetails(projectId, nextBatch.batchId, nextBatch.queuedBy)
 				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
 			}
 

@@ -576,20 +576,23 @@ class DataImportService implements ServiceMethods {
 	 * @param projectId - the ID of the project where to look for import batches
 	 */
 	@NotTransactional()
-	Long getNextBatchToProcess(Long projectId) {
+	Map<String, ?> getNextBatchToProcess(Long projectId) {
 		ImportBatch.withNewTransaction { session ->
 
 			// Get the list of the ImportBatch IDs that can be processed
-			List<Long> batchIds = ImportBatch.where {
+			List<?> batchIds = ImportBatch.where {
 				project.id == projectId
 				status == ImportBatchStatusEnum.QUEUED
 			}
-			.projections { property('id') }
+			.projections {
+				property('id')
+				property('queuedBy')
+			}
 			.sort('queuedAt')
 			.list(max: 1)
 
 			if (batchIds) {
-				return batchIds.get(0)
+				return [batchId: batchIds.get(0)[0], queuedBy: batchIds.get(0)[1]]
 			} else {
 				// there are no import batches in Queued status
 				return null

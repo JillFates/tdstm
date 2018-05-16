@@ -467,13 +467,16 @@ class ImportBatchService implements ServiceMethods {
 	 * @param project - user current project
 	 * @param batchId - the id of the batch to be queued
 	 */
-	void scheduleJob(Project project, Long batchId) {
+	void scheduleJob(Long projectId, Long batchId) {
+		// fetch project
+		Project project = Project.get(projectId)
 		// fetch batch
 		ImportBatch importBatch = fetchBatch(project, batchId)
 
 		// set batch to queued if this is the first time the user tries to schedule the import batch
 		if (!importBatch.queuedAt && !importBatch.queuedBy) {
 			dataImportService.setBatchToQueued(importBatch.id)
+			importBatch.refresh()
 		}
 
 		// Setup the Quartz job that will execute the actual posting process
@@ -486,7 +489,7 @@ class ImportBatchService implements ServiceMethods {
 		Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
 
 		trigger.jobDataMap.batchId = importBatch.id
-		trigger.jobDataMap.username = securityService.currentUsername
+		trigger.jobDataMap.username = importBatch.queuedBy
 		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		trigger.jobDataMap.projectId = project.id
 		trigger.setJobName('ImportBatchJob') 			// Please note that the JobName must match the class file name

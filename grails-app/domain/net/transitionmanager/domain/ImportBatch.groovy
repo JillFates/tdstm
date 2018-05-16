@@ -106,7 +106,7 @@ class ImportBatch {
 		processProgress nullable: true, size: 0..100
 		processLastUpdated nullable: true
 		queuedAt nullable: true
-		queuedBy nullable: true
+		queuedBy nullable: true, size: 0..50
 		processStopFlag nullable: true, range: 0..1
 		progressInfoJob nullable: true
 		provider nullable: true

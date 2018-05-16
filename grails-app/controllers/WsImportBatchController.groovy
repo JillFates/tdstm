@@ -95,8 +95,10 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails = new ImportBatchJobSchedulerEventDetails(project, actionCmd.ids[0], securityService.currentUsername)
+				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails =
+						new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername)
 				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
+				impacted = 1
 				break
 
 			case ImportBatchActionEnum.EJECT:
