@@ -12,7 +12,7 @@ import { PreferenceService } from '../../../../shared/services/preference.servic
 import { ScriptConsoleSettingsModel, ScriptTestResultModel, ScriptValidSyntaxResultModel } from '../../model/script-result.models';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
-import {DecoratorOptions} from '../../../../shared/directives/ui-modal-decorator.directive';
+import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 
 @Component({
 	selector: 'data-script-etl-builder',

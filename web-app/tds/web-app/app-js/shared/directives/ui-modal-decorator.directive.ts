@@ -1,33 +1,21 @@
-import {Directive, AfterViewInit, ElementRef, Renderer2, Input } from '@angular/core';
-
-declare var jQuery: any;
-
-interface WindowSettings {
-	left: string | number;
-	top: string | number;
-	width: string | number;
-	height: string | number;
-}
-
-export interface DecoratorOptions {
-	isFullScreen?: boolean;
-	isCentered?: boolean;
-	isResizable?: boolean;
-	isDraggable?: boolean;
-}
-
-const SCROLLBAR_BORDER = 5;
-const TOP_MARGIN = -30;
-
 /**
  * Enable full screen and resizable capabilities to modal windows
  */
+import {Directive, AfterViewInit, ElementRef, Renderer2, Input } from '@angular/core';
+import { DecoratorOptions, WindowSettings } from '../model/ui-modal-decorator.model';
 
-@Directive({ selector: '[tds-ui-modal-decorator]' })
+declare var jQuery: any;
+const SCROLLBAR_BORDER = 5;
+const TOP_MARGIN = -30;
+
+@Directive({
+	selector: '[tds-ui-modal-decorator]'
+})
 export class UIModalDecoratorDirective implements AfterViewInit {
 	private isMaximized = false;
 	private defaultOptions: DecoratorOptions = {isFullScreen: false, isCentered: true, isResizable: false, isDraggable: true};
 	private decoratorOptions: DecoratorOptions;
+	private initialWindowSettings: WindowSettings;
 
 	@Input()
 	set isWindowMaximized(isWindowMaximized: boolean) {
@@ -46,20 +34,23 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 	}
 	get options(): DecoratorOptions { return this.decoratorOptions; }
 
-	private initialWindowSettings: WindowSettings;
-
 	constructor(private el: ElementRef, private renderer: Renderer2) {}
 
 	ngAfterViewInit() {
+		// hide host while setup is executing
 		this.renderer.setStyle(this.el.nativeElement, 'visibility', 'hidden');
 		// we need to delay because the bootstrap effect displaying modals
 		setTimeout(() => {
 			this.setOptions();
+			// show host when setup is done
 			this.renderer.setStyle(this.el.nativeElement, 'visibility', 'visible');
 		}, 500);
 	}
 
-	private setOptions() {
+	/**
+	 * Based on options passed to directive apply the corresponding decorators
+	 */
+	private setOptions(): void {
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
@@ -75,40 +66,65 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 			this.centerWindow();
 		}
 
+		return;
 	}
 
-	private centerWindow() {
+	/**
+	 * Set the corresponding styles to center the host attached to this directive
+	 */
+	private centerWindow(): void {
 		const marginLeft = -(this.el.nativeElement.clientWidth / 2) ;
 
 		this.renderer.setStyle(this.el.nativeElement, 'position', 'absolute');
 		this.renderer.setStyle(this.el.nativeElement, 'left', '50%');
 		this.renderer.setStyle(this.el.nativeElement, 'top', '0');
 		this.renderer.setStyle(this.el.nativeElement, 'margin-left', this.toPixels(marginLeft));
+
+		return;
 	}
 
+	/**
+	 * Convert value to pixels
+	 */
 	private toPixels(value: string | number): string {
 		return value + 'px';
 	}
 
-	enableDraggable(enable: boolean) {
+	/**
+	 * Enable draggable capability to the host attached to this directive
+	 */
+	private enableDraggable(enable: boolean): void {
 		const element = jQuery(this.el.nativeElement);
+
 		if (enable) {
 			element.draggable({ containment: '#tdsUiDialog' });
 		} else {
 			element.draggable('destroy');
 		}
+
+		return;
 	}
 
-	enableResizable(enable: boolean) {
+	/**
+	 * Enable resizable capability to the host attached to this directive
+	 */
+	private enableResizable(enable: boolean): void {
 		const element = jQuery(this.el.nativeElement);
+
 		if (enable) {
 			element.resizable();
 		} else {
 			element.resizable('destroy');
 		}
+
+		return;
 	}
 
-	private maximizeWindow() {
+	/**
+	 * Based on width and height of parent modal, set the width and height of the host to fill up the width and height available,
+	 * previously save the initial window setting in order to be able to get back to previous width and height setting
+	 */
+	private maximizeWindow(): void {
 		const {left, top, width, height} = this.el.nativeElement.style;
 		this.initialWindowSettings = {left, top, width, height};
 
@@ -125,9 +141,14 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		if (this.options.isResizable) {
 			this.enableResizable(false);
 		}
+
+		return;
 	}
 
-	private restoreWindow() {
+	/**
+	 * Restore width/height of host to previous initial window settings
+	 */
+	private restoreWindow(): void {
 		if (!this.initialWindowSettings) { return; }
 
 		const {left, top, width, height} = this.initialWindowSettings;
@@ -141,5 +162,7 @@ export class UIModalDecoratorDirective implements AfterViewInit {
 		if (this.options.isResizable) {
 			this.enableResizable(true);
 		}
+
+		return;
 	}
 }
