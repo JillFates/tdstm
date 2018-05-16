@@ -110,7 +110,7 @@
 						</tr>
 						<tr>
 							<td></td>
-							<td></td>g
+							<td></td>
 							<td class="name"><label>Plan Methodology:</label></td>
 							<td class="valueNW">${planMethodology?.label}</td>
 						</tr>
