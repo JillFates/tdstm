@@ -580,8 +580,13 @@ class ETLProcessor implements RangeChecker {
 		return [
 		    with: { value ->
 			    Object stringValue = ETLValueHelper.valueOf(value)
-			    boolean found = result.lookupInReference(fieldName, stringValue)
-			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(found))
+
+			    int rowFound = result.lookupInReferenceIndex(fieldName, stringValue)
+			    if (rowFound >= 0) {
+				    bindVariable(DOMAIN_VARNAME, new DomainFacade(result, rowFound))
+			    }
+
+			    addLocalVariableInBinding(LOOKUP_VARNAME, new LookupFacade(rowFound >= 0))
 		    }
 		]
 	}

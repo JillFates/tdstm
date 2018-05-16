@@ -451,15 +451,33 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#rowFoundInLookup
 	 * @param fieldName - the field to examine for a match
 	 * @param value - the value that the field should have
-	 * @return true if the data row was found otherwise false
+	 * @return index where the data was found
 	 */
-	boolean lookupInReference(String fieldName, String value) {
+
+	int lookupInReferenceIndex(String fieldName, String value) {
 		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
-		rowFoundInLookup = reference.data.find { Map<String, ?> dataRow ->
+		int rowFound = reference.data.findIndexOf { Map<String, ?> dataRow ->
 			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
 		}
 
-		return (rowFoundInLookup != null)
+		if(rowFound >= 0) {
+			rowFoundInLookup = reference.data[rowFound]
+		}
+
+		return rowFound
+	}
+
+	/**
+	 * Uses the Index function to locate the lookup reference
+	 * @see ETLProcessorResult#rowFoundInLookup
+	 * @param fieldName - the field to examine for a match
+	 * @param value - the value that the field should have
+	 * @return true if the data row was found otherwise false
+	 */
+	boolean lookupInReference(String fieldName, String value) {
+		int rowFound = lookupInReferenceIndex(fieldName,value)
+		println "DAFUUUU"
+		return (rowFound >= 0)
 	}
 
 	/**
