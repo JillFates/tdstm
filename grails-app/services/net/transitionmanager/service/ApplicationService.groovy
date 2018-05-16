@@ -88,10 +88,12 @@ class ApplicationService implements ServiceMethods {
 		def testingById = testingBy instanceof Person ? testingBy.id : -1
 
 		def personList = partyRelationshipService.getProjectApplicationStaff(project)
+		def availableRoles = partyRelationshipService.getStaffingRoles()
 
 		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist,
 		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
 		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
+				availableRoles: availableRoles,
 		        personList: personList] +
 		        assetEntityService.getCommonModelForShows('Application', project, params, app)
 	}
