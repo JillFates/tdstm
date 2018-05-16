@@ -78,9 +78,7 @@ export function DatabaseEditComponent(template, editModel) {
 			});
 			modelRequest.asset.moveBundleId = modelRequest.asset.moveBundle.id;
 			delete modelRequest.asset.moveBundle;
-			// Date Formats
-			// modelRequest.asset.maintExpDate = DateUtils.translateTimeZoneFormat(modelRequest.asset.maintExpDate);
-			// modelRequest.asset.retireDate
+
 			this.assetExplorerService.saveAsset(modelRequest).subscribe((res) => {
 				this.notifierService.broadcast({
 					name: 'reloadCurrentAssetList'
