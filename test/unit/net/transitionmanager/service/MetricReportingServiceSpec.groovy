@@ -1,5 +1,9 @@
 package net.transitionmanager.service
 
+import com.tds.asset.Application
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
+import com.tds.asset.AssetEntity
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -90,6 +94,24 @@ class MetricReportingServiceSpec extends Specification {
 			service.gatherMetric([1l, 2l, 3l], (String) function.metricCode, function)
 		then: 'gatherMetric throw and InvalidParameterException'
 			thrown InvalidParamException
+	}
+
+	void 'Test processAggregation count'() {
+		setup: 'Given an aggregation string'
+			String aggregation = 'count(*)'
+		when: 'processAggregation is called with the aggregation'
+			String processedAggregation = service.processAggregation(aggregation)
+		then: 'processAggregation returns a process aggregation string'
+			processedAggregation == 'count(*)'
+	}
+
+	void 'Test processAggregation sum'() {
+		setup: 'Given an aggregation string'
+			String aggregation = 'sum(project.id)'
+		when: 'processAggregation is called with the aggregation'
+			String processedAggregation = service.processAggregation(aggregation)
+		then: 'processAggregation returns a process aggregation string'
+			processedAggregation == "SUM (COALESCE( project.id, 0 ) )"
 	}
 
 	void 'Test getLabel'() {
