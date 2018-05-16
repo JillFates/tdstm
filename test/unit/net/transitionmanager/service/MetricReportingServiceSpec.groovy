@@ -220,6 +220,37 @@ class MetricReportingServiceSpec extends Specification {
 			expected == hql
 	}
 
+	void 'test getQuery dependency'() {
+
+		setup: 'Given a query JSON structure'
+			JSONObject query = [
+					"groupBy"    : [
+							"type"
+					],
+					"domain"     : "Dependency",
+					"aggregation": "count(*)",
+					"where"      : [
+							[
+									"column"    : "type",
+									"expression": "in ('Validated')"
+							]
+					]
+			] as JSONObject
+			String expected = """
+				select asset.project.id,
+						concat(COALESCE(type, 'Unknown')) as label,
+						count(*) as value
+				from AssetDependency
+				where asset.project.id in (:projectIds) and type in ('Validated') and asset.moveBundle.useForPlanning = 1 and dependent.moveBundle.useForPlanning = 1
+				group by type, asset.project.id
+				""".stripIndent()
+
+		when: 'getQuery is called with the JSON query'
+			String hql = service.getQuery(query).stripIndent()
+		then: 'getQuery returns an HQL string'
+			expected == hql
+	}
+
 	void 'test getQuery no where'() {
 
 		setup: 'Given a query JSON structure no where'

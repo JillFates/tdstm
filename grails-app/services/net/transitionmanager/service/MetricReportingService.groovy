@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.SettingType
@@ -169,23 +170,27 @@ class MetricReportingService {
 		String aggregation = query.aggregation
 		List groupBys = query?.groupBy?.clone() ?: []
 		String label = getLabel(groupBys, aggregation)
-		groupBys << 'project.id'
+		String projectReference = getProjectReference(domainClass)
+
+		groupBys << projectReference
 		String groupBy = getGroupBy(groupBys)
-		groupBys << 'project.id'
 		List wheres = query?.where?.clone() ?: []
 
 		if (domainClass in AssetEntity) {
 			wheres << [column: 'moveBundle.useForPlanning', expression: '= 1']
+		} else if (domainClass in AssetDependency) {
+			wheres << [column: 'asset.moveBundle.useForPlanning', expression: '= 1']
+			wheres << [column: 'dependent.moveBundle.useForPlanning', expression: '= 1']
 		}
 
 		String where = getWhere(wheres)
 
 		return """
-			select project.id,
+			select $projectReference,
 					$label as label,
 					$aggregation as value
 			from $domain
-			where project.id in (:projectIds) $where
+			where $projectReference in (:projectIds) $where
 			$groupBy
 		""".stripIndent()
 	}
@@ -211,6 +216,14 @@ class MetricReportingService {
 		}
 
 		return "'${aggregation.split(/\(/)[0]}'"
+	}
+
+	String getProjectReference(Class domain) {
+		if (domain in AssetDependency) {
+			return 'asset.project.id'
+		}
+
+		return 'project.id'
 	}
 
 	/**
