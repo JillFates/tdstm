@@ -262,7 +262,7 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 				sql        : """
 						select a.project_id as projectId,
 								'APP-VPS' as metricCode,
-								DATE_FORMAT(NOW(), "%Y-%m-%d") as date,
+								DATE_FORMAT(SUBDATE(NOW(), 1), "%Y-%m-%d") as date,
 								concat(a.plan_status, ':', a.asset_type) as label,
 								count(*) as value
 						from asset_entity a
@@ -276,19 +276,20 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 		then: 'the results should have two expected map sets of values'
 			results[0] == [
-							projectId : project.id,
-							metricCode: 'APP-VPS',
-							date      : date,
-							label     : 'Unassigned:Server',
-							value     : 2
+				projectId : project.id,
+				metricCode: 'APP-VPS',
+				date      : date,
+				label     : 'Unassigned:Server',
+				value     : 2
 			]
+
 			results[1] == [
-							projectId : otherProject.id,
-							metricCode: 'APP-VPS',
-							date      : date,
-							label     : 'Unassigned:Server',
-							value     : 1
-					]
+				projectId : otherProject.id,
+				metricCode: 'APP-VPS',
+				date      : date,
+				label     : 'Unassigned:Server',
+				value     : 1
+			]
 	}
 
 	void "test gatherMetric for sql mode invalid sql"() {
