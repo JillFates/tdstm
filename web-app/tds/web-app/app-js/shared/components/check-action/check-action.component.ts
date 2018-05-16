@@ -28,6 +28,8 @@ export class CheckActionComponent implements DoCheck {
 	@Input('model') model: any;
 	@Input('name') name: string;
 	@Input('disabled') disabled = false;
+	@Input('class') class = '';
+	@Input('noneStateIcon') private noneStateIcon = '';
 	private checkActionModel = CHECK_ACTION;
 
 	private differ: any;
@@ -62,5 +64,19 @@ export class CheckActionComponent implements DoCheck {
 	 */
 	protected onCheckThumbBindAction(): void {
 		this.onCallback.emit();
+	}
+
+	/**
+	 * Returns the correct icon based on the button state.
+	 * @returns {string}
+	 */
+	protected getIcon(): string {
+		switch (this.model.state) {
+			case CHECK_ACTION.UNKNOWN: return 'fa fa-thumbs-o-up';
+			case CHECK_ACTION.VALID: return 'fa fa-check green';
+			case CHECK_ACTION.INVALID: return 'fa fa-thumbs-down red';
+			case CHECK_ACTION.NONE: return this.noneStateIcon;
+			default: return '';
+		}
 	}
 }
