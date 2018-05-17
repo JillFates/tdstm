@@ -697,7 +697,6 @@ class MoveBundleService implements ServiceMethods {
 	 */
 	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
 		// First we need the list of assets that belongs to planning bundles - See TM-10261
-
 		String assetIdsSubQuery = "select a.asset_entity_id from asset_entity a where a.move_bundle_id in ( ${moveBundleText} )";
 
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
