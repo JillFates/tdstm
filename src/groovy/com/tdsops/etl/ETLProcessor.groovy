@@ -120,7 +120,7 @@ class ETLProcessor implements RangeChecker {
 	List<Row> rows = []
 	Row currentRow
 
-	ETLDomain selectedDomain
+	SelectedDomain selectedDomain
 	ETLFindElement currentFindElement
 
 	// List of command that needs to be completed
@@ -192,9 +192,13 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor domain (ETLDomain domain) {
 		validateStack()
-		selectedDomain = domain
+		if(selectedDomain?.domain == domain){
+			selectedDomain.addNewRow = true
+		} else {
+			selectedDomain = new SelectedDomain(domain)
+		}
 		cleanUpBindingAndReleaseLookup()
-		result.addCurrentSelectedDomain(selectedDomain)
+		result.addCurrentSelectedDomain(selectedDomain.domain)
 		debugConsole.info("Selected Domain: $domain")
 		return this
 	}
@@ -514,10 +518,10 @@ class ETLProcessor implements RangeChecker {
 		return [
 			with: { value ->
 
-				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, fieldName))
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain.domain, fieldName))
 				element.originalValue = ETLValueHelper.valueOf(value)
 				element.value = element.originalValue
-				addElementLoaded(selectedDomain, element)
+				addElementLoaded(selectedDomain.domain, element)
 				element
 			}
 		]
@@ -576,7 +580,7 @@ class ETLProcessor implements RangeChecker {
 	 */
 	Map<String, ?> lookup(final String fieldName){
 		validateStack()
-		lookUpFieldSpecs(selectedDomain, fieldName)
+		lookUpFieldSpecs(selectedDomain.domain, fieldName)
 		return [
 		    with: { value ->
 			    Object stringValue = ETLValueHelper.valueOf(value)
@@ -620,9 +624,9 @@ class ETLProcessor implements RangeChecker {
 		return [
 			with: { defaultValue ->
 
-				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain, field))
+				Element element = findOrCreateCurrentElement(lookUpFieldSpecs(selectedDomain.domain, field))
 				element.init = ETLValueHelper.valueOf(defaultValue)
-				addElementLoaded(selectedDomain, element)
+				addElementLoaded(selectedDomain.domain, element)
 				element
 			}
 		]
@@ -823,14 +827,14 @@ class ETLProcessor implements RangeChecker {
 	void validateDomainPropertyAsReference(String property) {
 
 		//TODO: Refactor this logig moving some of this to fieldsValidator implementation
-		Class<?> clazz = selectedDomain.clazz
+		Class<?> clazz = selectedDomain.domain.clazz
 
 		if(!GormUtil.isDomainProperty(clazz, property)) {
-			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain, property)
+			throw ETLProcessorException.invalidDomainPropertyName(selectedDomain.domain, property)
 		}
 		if(!GormUtil.isDomainIdentifier(clazz, property) &&
 			!GormUtil.isReferenceProperty(clazz, property)){
-			throw ETLProcessorException.invalidDomainReference(selectedDomain, property)
+			throw ETLProcessorException.invalidDomainReference(selectedDomain.domain, property)
 		}
 	}
 
@@ -1033,10 +1037,6 @@ class ETLProcessor implements RangeChecker {
 		}
 	}
 
-	ETLDomain getSelectedDomain () {
-		return selectedDomain
-	}
-
 	Column column (String columnName) {
 		return columnsMap[columnName]
 	}
@@ -1057,6 +1057,9 @@ class ETLProcessor implements RangeChecker {
 		return rows[rowIndex].getElement(columnIndex)
 	}
 
+	Map<String, ?> resultsMap(){
+		this.result.toMap()
+	}
 
 	List<String> getAvailableMethods () {
 		return ['domain', 'read', 'iterate', 'console', 'skip', 'extract', 'load', 'reference',

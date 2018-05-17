@@ -1869,7 +1869,7 @@ class DataImportService implements ServiceMethods {
 		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile('import-','json')
 		result.filename = outputFilename
 		try {
-			os << (etlProcessor.result.toMap() as JSON)
+			os << (etlProcessor.resultsMap() as JSON)
 			os.close()
 		}
 		catch(e) {
