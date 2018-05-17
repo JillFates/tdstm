@@ -11,7 +11,7 @@ import net.transitionmanager.integration.ActionRequest
 class ActionActionHttpRequestElementsUnitSpec extends Specification {
 	static String url = 'https://{host}.example.com/rest/{method}/{action}/something?format={format}&limit=50'
 	static String expectedPost = 'https://xray.example.com/rest/query/update/something?format=json&limit=50'
-	static String queryStringGet = 'extra=xyzzy&desc=this+is+cool'
+	static String queryStringGet = 'extra=xyzzy&desc=this is cool'
 	static String expectedGet = expectedPost + '&' + queryStringGet
 	static Map queryParams = [
 		format: 'json',
