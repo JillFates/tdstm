@@ -214,7 +214,7 @@ abstract class AssetSaveUpdateStrategy {
 		dependency.asset = isDependent ? targetAsset : assetEntity
 		dependency.dataFlowFreq = depMap.dataFlowFreq
 		dependency.status = depMap.status
-		dependency.type = depMap.dependencyType
+		dependency.type = depMap.type
 		dependency.comment = depMap.comment
 
 		MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, depMap.moveBundleId)
@@ -238,9 +238,9 @@ abstract class AssetSaveUpdateStrategy {
 	 */
 	private void deleteDependencies(AssetEntity assetEntity) {
 		// Delete missing supporting dependencies
-		deleteDependencies(false)
+		deleteDependencies(assetEntity, false)
 		// Delete missing dependents
-		deleteDependencies(true)
+		deleteDependencies(assetEntity, true)
 	}
 
 	/**
@@ -301,10 +301,10 @@ abstract class AssetSaveUpdateStrategy {
 		String label = dependents ? "dependent" : "supporting"
 		List<Map> depList = dependents ? command.dependencyMap.dependentAssets : command.dependencyMap.supportAssets
 		for (depMap in depList) {
-			Long id = depMap.assetDepend.id
+			Long id = depMap.targetAsset.id
 			if (id) {
 				if (id in ids) {
-					throw new InvalidRequestException("Duplicate $label found for asset ${depMap.assetDepend.text}")
+					throw new InvalidRequestException("Duplicate $label found for asset ${depMap.targetAsset.name}")
 				}else {
 					ids << id
 				}
