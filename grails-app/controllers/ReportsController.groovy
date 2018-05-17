@@ -185,7 +185,7 @@ class ReportsController implements ControllerMethods {
 					}
 
 					// sort options for reportFields
-					String roomTagSort = (asset.roomSource?.roomName ?: "") + " " + (asset.rackSource?.tag ?: "") + " " + (asset?.model?.usize ?: "")
+					String roomTagSort = (asset.sourceRoom ?: "") + " " + (asset.sourceRack ?: "") + " " + (asset?.model?.usize ?: "")
 					String truckTagSort = (asset.truck ?: "") + " " + (asset.cart ?: "") + " " + (asset.shelf ?: "")
 
 					def teamMembers = []
@@ -199,7 +199,7 @@ class ReportsController implements ControllerMethods {
 					                 projectName: partyGroupInstance?.name, startAt: project.startDate,
 					                 completedAt: project.completionDate, bundleName: moveBundle?.name,
 					                 teamName: teamPartyGroup?.teamCode ? teamPartyGroup?.name + " - " + teamMembers : "",
-					                 location: "Source Team", truck: asset.truck,  room: asset.roomSource?.roomName,
+					                 location: "Source Team", truck: asset.truck,  room: asset.sourceRoom,
 					                 instructions: assetCommentString, roomTagSort: roomTagSort, truckTagSort: truckTagSort,
 					                 assetTagSort: asset.assetTag ?: "", sourcetargetLoc: "s", usize: asset?.model?.usize,
 					                 timezone: tzId, rptTime: currDate, userDateFormatter: userDateFormatter]
@@ -287,11 +287,11 @@ class ReportsController implements ControllerMethods {
 		def currDate = new Date()
 		DateFormat userDateFormatter = TimeUtil.createFormatter(TimeUtil.FORMAT_DATE_TIME)
 		assetCommentList.each { ac ->
-			def sourceTargetRoom = (ac?.assetEntity?.roomSource?.roomName ?: "--")+
-								"/"+(ac?.assetEntity?.rackSource?.tag ?: "--")+
+			def sourceTargetRoom = (ac?.assetEntity?.sourceRoom ?: "--")+
+								"/"+(ac?.assetEntity?.sourceRack ?: "--")+
 								"/"+(ac?.assetEntity?.sourceRackPosition ?: "--")+"\n"+
-								(ac?.assetEntity?.roomTarget?.roomName ?: "--")+"/"+
-								(ac?.assetEntity?.rackTarget?.tag ?: "--")+"/"+
+								(ac?.assetEntity?.targetRoom ?: "--")+"/"+
+								(ac?.assetEntity?.targetRack ?: "--")+"/"+
 								(ac?.assetEntity?.targetRackPosition ?: "--")
 			if( params.reportResolveInfo == "true" || ac.isResolved != 1 ) {
 				reportFields <<['assetName':ac?.assetEntity?.assetName,

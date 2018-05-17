@@ -272,8 +272,8 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 			}
 			def assetEntityInstance = AssetEntity.get(assetEntityList[assetRow].id)
 			assetEntity <<[id:assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance?.model?.toString(),
-				sourceLocation:assetEntityInstance.roomSource?.location, sourceRack:assetEntityInstance.rackSource?.tag,
-				targetLocation:assetEntityInstance.roomTarget?.location, targetRack:assetEntityInstance.rackTarget?.tag,
+				sourceLocation:assetEntityInstance.sourceLocation, sourceRack:assetEntityInstance.sourceRack,
+				targetLocation:assetEntityInstance.targetLocation, targetRack:assetEntityInstance.targetRack,
 				sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition,
 				uSize:assetEntityInstance?.model?.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart,
 				shelf:assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]

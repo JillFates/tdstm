@@ -1976,12 +1976,12 @@ class AssetEntityService implements ServiceMethods {
 			}
 			addCell(cablingSheet, idx + 2, 7, String.valueOf(currentCabling.cableComment ?: ''))
 			addCell(cablingSheet, idx + 2, 8, String.valueOf(currentCabling.cableColor ?: ''))
-			if (currentCabling.assetFrom?.roomSource?.roomName) {
+			if (currentCabling.assetFrom?.sourceRoom) {
 				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackSource?.location + "/" +
-						currentCabling.assetFrom.roomSource?.roomName + "/" + currentCabling.assetFrom.rackSource?.tag))
-			} else if (currentCabling.assetFrom?.roomTarget?.roomName) {
+						currentCabling.assetFrom.sourceRoom + "/" + currentCabling.assetFrom.sourceRack))
+			} else if (currentCabling.assetFrom?.targetRoom) {
 				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom.rackTarget?.location + "/" +
-						currentCabling.assetFrom.roomTarget?.roomName + "/" + currentCabling.assetFrom.rackTarget?.tag))
+						currentCabling.assetFrom.targetRoom + "/" + currentCabling.assetFrom.targetRack))
 			} else {
 				addCell(cablingSheet, idx + 2, 9, '')
 			}

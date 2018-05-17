@@ -83,8 +83,8 @@ class DeviceService implements ServiceMethods {
     }
 
 
-		logger.debug 'assignDeviceToLocationRoomRack() END {} {}/{}/{}', asset, asset.roomSource?.location,
-				asset.roomSource?.roomName, asset.rackSource?.tag
+		logger.debug 'assignDeviceToLocationRoomRack() END {} {}/{}/{}', asset, asset.sourceLocation,
+				asset.sourceRoom, asset.sourceRack
 		return null
 	}
 
