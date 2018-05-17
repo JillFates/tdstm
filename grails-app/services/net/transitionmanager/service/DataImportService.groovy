@@ -645,6 +645,7 @@ class DataImportService implements ServiceMethods {
 				processProgress = 0
 				processLastUpdated = new Date()
 				processStopFlag = 0
+
 			}
 			log.debug 'setBatchToRunning() dirtyProperties {}', batch.dirtyPropertyNames
 			batch.save(failOnError:true, flush:true)
@@ -673,6 +674,7 @@ class DataImportService implements ServiceMethods {
 			Integer percComplete = (totalRows > 0 ? Math.round(rowsProcessed / totalRows * 100) : 100)
 			batch.processProgress = percComplete
 			batch.processLastUpdated = new Date()
+
 			if (status) {
 				batch.status = status
 			}
@@ -770,7 +772,6 @@ class DataImportService implements ServiceMethods {
 
 				ImportBatchRecord.withNewTransaction { status ->
 					for (record in records) {
-						log.debug '\n\nprocessBatch() processing row {}', rowsProcessed
 						context.record = record
 						processBatchRecord(batch, record, context)
 						rowsProcessed++
@@ -1633,7 +1634,7 @@ class DataImportService implements ServiceMethods {
 
 						// If not found then try by looking up the alias of the model
 						if (!entities) {
-							Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()
+							Model model = ModelAlias.where { name == searchValue && manufacturer == entity.manufacturer }.find()?.model
 							if (model) {
 								entities = [model]
 							}

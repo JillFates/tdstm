@@ -322,16 +322,17 @@ class ImportBatchService implements ServiceMethods {
 	 * @return the count of batches that were queued
 	 */
 	Integer ejectBatchesFromQueue(Project project, List<Long> batchIds) {
-		// Transform the boolean flag to 0: false, 1: true
-		Integer idCount = batchIds.size()
 
-		// Query that archives or unarchives a list of batches.
-		String hql = 'UPDATE ImportBatch SET status = :status WHERE project = :project AND status=:currentStatus AND id in (:batches)'
+		String hql = '''UPDATE ImportBatch
+			SET status = :status, queuedBy = NULL, queuedAt = NULL
+			WHERE project = :project AND status=:currentStatus AND id in (:batches)'''
+
 		Map params = [
 			currentStatus: ImportBatchStatusEnum.QUEUED,
 			status: ImportBatchStatusEnum.PENDING,
 			project: project,
 			batches: batchIds ]
+
 		Integer updated = ImportBatch.executeUpdate(hql, params)
 
 		return updated
@@ -473,8 +474,8 @@ class ImportBatchService implements ServiceMethods {
 		// fetch batch
 		ImportBatch importBatch = fetchBatch(project, batchId)
 
-		// set batch to queued if this is the first time the user tries to schedule the import batch
-		if (!importBatch.queuedAt && !importBatch.queuedBy) {
+		// Set batch to queued if this is the first time the user tries to schedule the import batch
+		if (importBatch.status == ImportBatchStatusEnum.PENDING) {
 			dataImportService.setBatchToQueued(importBatch.id)
 			importBatch.refresh()
 		}

@@ -141,6 +141,13 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportRecordActionEnum.PROCESS: // TODO: change to Queue when implementing TM-10242 Quartz-Task
+				// Need to mark the batch as QUEUED before trying to Schedule because the client upon returning
+				// from this call will immediately call back to get the details of the batch. Because the scheduling
+				// is done async the client is getting the data quicker than the event invocation can happen and the
+				// UI doesn't show the status change.
+				importBatchService.queueBatchesForProcessing(project, [id])
+
+				// Now schedule the background job to run
 				affected = importBatchService.dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
 				break
 
