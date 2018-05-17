@@ -25,7 +25,7 @@ class Element implements RangeChecker {
 	/**
 	 * Default o initialize value
 	 */
-	String init
+	Object init
 	/**
 	 * ETLDomain selected by the current command
 	 */
@@ -106,8 +106,8 @@ class Element implements RangeChecker {
 		if (processor.hasSelectedDomain()){
 			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
 			this.init = this.value
-			this.originalValue = ''
-			this.value = ''
+			this.originalValue = null
+			this.value = null
 			processor.addElementLoaded(processor.selectedDomain.domain, this)
 			return this
 		} else {

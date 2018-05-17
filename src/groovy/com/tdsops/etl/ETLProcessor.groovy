@@ -99,6 +99,8 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessorResult result
 
+	IterateIndex iterateIndex
+
 	Integer currentRowIndex = 0
 	Integer currentColumnIndex = 0
 	/**
@@ -299,6 +301,15 @@ class ETLProcessor implements RangeChecker {
 		return this
 	}
 
+	void topOfIterate(){
+		result.startRow()
+	}
+
+	void bottomOfIterate(){
+	}
+
+
+
 	/**
 	 * Iterates a list of rows applying a closure
 	 * It initialize context variables in the ETL Binding context
@@ -310,8 +321,10 @@ class ETLProcessor implements RangeChecker {
 	 */
 	ETLProcessor doIterate (List rows, Closure closure) {
 
+		iterateIndex = new IterateIndex(rows.size())
 		currentRowIndex = 1
 		rows.each { def row ->
+			topOfIterate()
 			isIterating = true
 			currentColumnIndex = 0
 			cleanUpBindingAndReleaseLookup()
@@ -321,13 +334,16 @@ class ETLProcessor implements RangeChecker {
 
 			closure(addCrudRowData(row))
 
-			result.removeIgnoredRows()
+			//result.removeIgnoredRows()
 
 			currentRowIndex++
+			iterateIndex.next()
 			binding.removeAllDynamicVariables()
+			bottomOfIterate()
 		}
 
 		isIterating = false
+		iterateIndex = null
 		currentRowIndex--
 		return this
 	}
@@ -894,7 +910,8 @@ class ETLProcessor implements RangeChecker {
 	 * @param element
 	 */
 	void addElementLoaded (ETLDomain domain, Element element) {
-		result.loadElement(element, this.currentRowIndex)
+
+		result.loadElement(element)
 		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${domain} results"
 	}
 
@@ -957,7 +974,6 @@ class ETLProcessor implements RangeChecker {
 	 * release lookup references
 	 */
 	private void cleanUpBindingAndReleaseLookup() {
-		result.releaseRowFoundInLookup()
 		bindCurrentElement(null)
 		bindCurrentFindElement(null)
 	}
@@ -1224,4 +1240,26 @@ class ETLProcessor implements RangeChecker {
 		return checkSyntax(script, defaultCompilerConfiguration())
 	}
 
+}
+
+class IterateIndex {
+	Integer pos
+	Integer size
+
+	IterateIndex(Integer size){
+		this.pos = 1
+		this.size = size
+	}
+
+	Integer next(){
+		this.pos++
+		return this.pos
+	}
+
+	Boolean isFirst(){
+		return this.pos == 1
+	}
+	Boolean isLast() {
+		return this.pos == size
+	}
 }

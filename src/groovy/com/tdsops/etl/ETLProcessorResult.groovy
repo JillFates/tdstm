@@ -5,12 +5,6 @@ package com.tdsops.etl
  * It prepares the results used in the import process or for rendering results in the UI.
  * <br>
  * Every part of the results are covered in formatter functions.
- *
- * @see ETLProcessorResult#initialRowDataMap()
- * @see ETLProcessorResult#initialFieldDataMap(java.lang.String, java.lang.String, java.lang.String)
- * @see ETLProcessorResult#queryDataMap(com.tdsops.etl.ETLFindElement)
- * @see ETLProcessorResult#addWarnMessageInData(java.util.Map, com.tdsops.etl.ETLFindElement)
- * @see ETLProcessorResult#addResultsDataMap(java.util.Map, com.tdsops.etl.ETLFindElement)
  */
 class ETLProcessorResult {
 
@@ -27,17 +21,16 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
-	Map<String, ?> reference = [:]
+	DomainReference reference
 	/**
 	 * Collection of results with their data fields map
 	 */
-	List<Map<String, ?>> domains = []
-
+	List<Map<String, DomainReference>> domains = []
 	/**
-	 * Defines if a <b>lookup</b> command found a result
-	 * @see ETLFindElement
+	 * Result row index position in the reference.data list
+	 * @see DomainReference#data
 	 */
-	Map<String, ?> rowFoundInLookup = null
+	Integer resultIndex = -1
 
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
@@ -51,18 +44,26 @@ class ETLProcessorResult {
 	 * @param domain
 	 */
 	void addCurrentSelectedDomain(ETLDomain domain) {
-
 		reference = domains.find { it.domain == domain.name() }
-
 		if(!reference){
-			reference = [
-				domain: domain.name(),
-				fieldNames: [] as Set,
-				data: [initialRowDataMap()]
-			]
-
+			reference = new DomainReference(domain: domain.name())
 			domains.add(reference)
 		}
+		resultIndex = -1
+	}
+
+	/**
+	 * Appends a loaded element in the results.
+	 * First It adds a new element.field.name in the current domain fields list
+	 * and if it already exits, updates that element with the element values.
+	 * After that, It saves the new element in the data results.
+	 *
+	 * @param element
+	 */
+	void loadElement(Element element) {
+		RowData currentData = findOrCreateCurrentRow()
+		reference.addFieldName(element)
+		currentData.addLoadElement(element)
 	}
 
 	/**
@@ -75,47 +76,9 @@ class ETLProcessorResult {
 	 * 			used to calculate a query data, results and errors
 	 */
 	void addFindElement(ETLFindElement findElement) {
-
-		String property = findElement.currentFind.property
-
-		Map<String, ?> rowDataMap = currentRowData()
-		rowDataMap.rowNum = findElement.rowIndex
-
-		if(!rowDataMap.fields.containsKey(property)){
-			reference.fieldNames.add(property)
-			rowDataMap.fields[property] = initialFieldDataMap(null, null, null)
-		}
-
-		Map<String, ?> fieldDataMap = rowDataMap.fields[property]
-		List findCommandErrors  = findElement.currentFind.errors
-
-
-		if(findCommandErrors){
-			addErrorsToCurrentRow(fieldDataMap, findCommandErrors)
-			// After add errors at the field level
-			// we need to sum the total amount of errors at the row level
-			rowDataMap.errorCount += findCommandErrors.size()
-		}
-
-		Map<String, ?> findDataMap = fieldDataMap.find
-		findDataMap.query.add(queryDataMap(findElement))
-		addResultsDataMap(findDataMap, findElement)
-	}
-
-	/**
-	 * It adds a wanr message in the result instance
-	 * <pre>
-	 * 		find Application 'for' id by id with SOURCE.'application id'
-	 * 		elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
-	 * <pre>
-	 * @param findElement
-	 */
-	void addFindWarnMessage(ETLFindElement findElement) {
-
-		if(findElement.currentFind.objects){
-			Map<String, ?> data = reference.data.last()
-			addWarnMessageInData(data, findElement)
-		}
+		RowData currentRow = findOrCreateCurrentRow()
+		reference.addFieldName(findElement)
+		currentRow.addFindElement(findElement)
 	}
 
 	/**
@@ -131,54 +94,59 @@ class ETLProcessorResult {
 	 * @param foundElement
 	 */
 	void addFoundElement(FoundElement foundElement){
-
-		Map<String, ?> data = reference.data.last()
-		if(!data.fields[foundElement.domainPropertyName]){
-			throw ETLProcessorException.notCurrentFindElement()
-		}
-
-		Map<String, ?> field = data.fields[foundElement.domainPropertyName]
-		field[foundElement.actionName] = foundElement.propertiesMap
+		RowData currentRow = findOrCreateCurrentRow()
+		currentRow.addFoundElement(foundElement)
 	}
 
 	/**
-	 * Appends a loaded element in the results.
-	 * First It adds a new element.field.name in the current domain fields list
-	 * and if it already exits, updates that element with the element values.
-	 * After that, It saves the new element in the data results.
-	 *
-	 * @param element
+	 * It adds a wanr message in the result instance
+	 * <pre>
+	 * 		find Application 'for' id by id with SOURCE.'application id'
+	 * 		elseFind Application 'for' id by appVendor with DOMAIN.appVendor warn 'found without asset id field'
+	 * <pre>
+	 * @param findElement
 	 */
-	void loadElement(Element element, Integer rowIndex) {
-
-		Map<String, ?> currentData = currentRowData()
-		currentData.rowNum = rowIndex
-
-		if(currentData.fields[element.fieldDefinition.name]) {
-			updateFieldDataMap(currentData, element)
-
-		} else {
-			reference.fieldNames.add(element.fieldDefinition.name)
-			currentData.fields[element.fieldDefinition.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
+	void addFindWarnMessage(ETLFindElement findElement) {
+		if(findElement.currentFind.objects){
+			RowData currentRow = findOrCreateCurrentRow()
+			currentRow.addFindElementWarnMessage(findElement)
 		}
 	}
 
 	/**
-	 * Mark as ignore the current row.
-	 * Current row is determined by reference.data.last()
-	 * @see ETLProcessorResult#removeIgnoredRows()
+	 *
+	 * @param rowIndex
+	 */
+	void startRow(){
+		resultIndex = -1
+	}
+
+	void finishRow(){
+	}
+
+	/**
+	 * Remove the current row from results going back the previous row results
 	 */
 	void ignoreCurrentRow() {
-		currentRowData().ignore = true
+		if(resultIndex >= 0){
+			if(resultIndex >= reference.data.size() + 1){
+				throw ETLProcessorException.ignoreOnlyAllowOnNewRows()
+			}
+			reference.data.remove(resultIndex)
+			resultIndex = -1
+		}
 	}
 
 	/**
-	 * Removes ignored rows in the current reference.
+	 * TODO: Complete docs!!
+	 * @return
 	 */
-	def removeIgnoredRows() {
-		if(reference.data.last().ignore) {
-			reference.data = reference.data.dropRight(1)
+	RowData findOrCreateCurrentRow() {
+		if(resultIndex == -1){
+			reference.data.add(new RowData(rowNum: processor.iterateIndex.pos))
+			resultIndex = reference.data.size() - 1
 		}
+		return reference.data[resultIndex]
 	}
 
 	/**
@@ -190,7 +158,7 @@ class ETLProcessorResult {
 	 * @see ETLProcessorResult#rowFoundInLookup
 	 * @return a map with the current data node
 	 */
-	Map<String, ?> currentRowData() {
+	RowData currentRowData() {
 
 		if(rowFoundInLookup){
 			return rowFoundInLookup
@@ -318,58 +286,6 @@ class ETLProcessorResult {
 	}
 
 	/**
-	 * It adds the warn message result in the field Data Map
-	 * <pre>
-	 *  "data": {
-	 *    "warn":true,
-	 *    "errors": ["found with wrong asset class"],
-	 *
-	 *    "asset": {
-	 * 		....
-	 * 		"warn":true,
-	 * 		"errors": ["found with wrong asset class"],
-	 * 		    ....
-	 * 	    }
-	 * 	}
-	 * </pre>
-	 * @param data a row data map
-	 * @param findElement the find element with the warn message
-	 */
-	private void addWarnMessageInData(Map<String, ?> data, ETLFindElement findElement) {
-		//TODO. Add this information at the row level too.
-		data.warn = true
-		data.errors.add(findElement.warnMessage)
-
-		Map<String, ?> fieldDataMap = data.fields[findElement.currentFind.property  ]
-		fieldDataMap.warn = true
-		fieldDataMap.errors.add(findElement.warnMessage)
-	}
-
-	/**
-	 * It prepares query map results with the domain.data
-	 * following the current format:
-	 * <pre>
-	 *  [
-	 * 		"matchOn": 2,
-	 * 		"results": [
-	 * 			115123,
-	 * 			115123,
-	 * 			115123
-	 * 		]
-	 * 	]
-	 * </pre>
-	 * Results are the id of the domain classes collected by the find command
-	 * and matcOn defines the ordinal position
-	 * in the query object list where those results where found.
-	 * @param fieldDataMap a field data map
-	 * @param findElement the find element with the warn message
-	 */
-	private void addResultsDataMap(Map<String, ?> fieldDataMap, ETLFindElement findElement) {
-		fieldDataMap.results = findElement.results.objects.collect { it.id }
-		fieldDataMap.matchOn = findElement.results.matchOn
-	}
-
-	/**
 	 * Using the current field in data results it updates using element parameter
 	 * <pre>
 	 * "fields": {
@@ -458,21 +374,15 @@ class ETLProcessorResult {
 	 */
 	boolean lookupInReference(String fieldName, String value) {
 		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
-		rowFoundInLookup = reference.data.find { Map<String, ?> dataRow ->
+		Integer lookupPosition = reference.data.findIndexOf { RowData dataRow ->
 			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
 		}
-
-		return (rowFoundInLookup != null)
-	}
-
-	/**
-	 * Release the reference to the current result
-	 * in the latest lookup command executed
-	 * In every iteration, every row to be processed cleans this out.
-	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
-	 */
-	void releaseRowFoundInLookup(){
-		rowFoundInLookup = null
+		if(lookupPosition != -1){
+			resultIndex = lookupPosition
+			return true
+		} else {
+			return false
+		}
 	}
 
 	/**
@@ -486,4 +396,233 @@ class ETLProcessorResult {
 		}
 		field.errors.addAll(errors)
 	}
+}
+
+/**
+ * //TODO: What happend with @CompileStatic
+ * <pre>
+ *  "domains": {
+ *    "domain": "Device",
+ *    "fieldNames": [
+ *          "assetName",
+ *          "externalRefId"
+ *     ],
+ *
+ *    "data": [ list of RowData instances]
+ * 	}
+ * </pre>
+ */
+class DomainReference {
+	String domain
+	Set fieldNames = [] as Set
+	List<RowData> data = new ArrayList<RowData>()
+
+	/**
+	 * Add the field name for an instance of Element
+	 * to the fieldNames Set property
+	 * @param element an instance of Element ETL class
+	 */
+	void addFieldName(Element element){
+		fieldNames.add(element.fieldDefinition.name)
+	}
+	/**
+	 * Add the field name for an instance of ETLFindElement
+	 * into the fieldNames Set property
+	 * @param findElement
+	 */
+	void addFieldName(ETLFindElement findElement){
+		fieldNames.add(findElement.currentFind.property)
+	}
+}
+
+/**
+ * Init a row data map.
+ * <pre>
+ *	"data": [
+ *		{
+ * 		    "op": "I",
+ * 		    "errorCount": 0,
+ * 		    "warn": true,
+ * 		    "duplicate": true,
+ * 		    "errors": [],
+ * 		    "fields": { }
+ * 	    }
+ * </pre>
+ */
+class RowData {
+	String op = 'I'
+	Integer rowNum
+	Integer errorCount = 0
+	Boolean warn = false
+	Boolean duplicate = false
+	List<String> errors = []
+	Boolean ignore = false
+	Map<String, FieldData> fields = [:]
+
+	/**
+	 * Add element to the current row data
+	 * @param element
+	 */
+	void addLoadElement(Element element){
+		//TODO: Review with John. ETLInitilizeSpec'test can init field defined before the load command'
+		FieldData fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		fieldData.originalValue = element.originalValue?:fieldData.originalValue
+		fieldData.value = element.value?:fieldData.value
+		fieldData.init = element.init?:fieldData.init
+	}
+
+	/**
+	 *
+	 * @param findElement
+	 */
+	void addFindElement(ETLFindElement findElement){
+		FieldData fieldData = findOrCreateFieldData(findElement.currentFind.property)
+		fieldData.addFindElement(findElement)
+	}
+
+	void addFoundElement(FoundElement foundElement){
+		FieldData fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
+		fieldData.addFoundElement(foundElement)
+	}
+
+	/**
+	 * It adds the warn message result in the field Data Map
+	 * <pre>
+	 *  "data": {
+	 *    "warn":true,
+	 *    "errors": ["found with wrong asset class"],
+	 *
+	 *    "asset": {
+	 * 		....
+	 * 		"warn":true,
+	 * 		"errors": ["found with wrong asset class"],
+	 * 		    ....
+	 * 	    }
+	 * 	}
+	 * </pre>
+	 * @param data a row data map
+	 * @param findElement the find element with the warn message
+	 */
+	void addFindElementWarnMessage(ETLFindElement findElement) {
+		//TODO. Add this information at the row level too.
+		warn = true
+		errors.add(findElement.warnMessage)
+		FieldData fieldData = findOrCreateFieldData(findElement.currentFind.property)
+		fieldData.addFindElementWarnMesssage(findElement)
+	}
+
+	/**
+	 * Find or creates a Field Data content based onf fieldName parameter
+	 * @param element
+	 * @return
+	 */
+	FieldData findOrCreateFieldData(String fieldName){
+		if(!fields.containsKey(fieldName)){
+			fields[fieldName] = new FieldData()
+		}
+		return fields[fieldName]
+	}
+}
+
+/**
+ *
+ */
+class FieldData {
+
+	Object originalValue
+	Object value
+	Object init
+	List<String> errors = []
+	Integer errorCount = 0
+	Boolean warn = false
+	FindData find = new FindData()
+	Map<String, Object> create
+	Map<String, Object> update
+
+	private void addErrors(List<String> errors){
+		if(errors){
+			this.errors.addAll(errors)
+			this.errorCount += errors.size()
+		}
+	}
+
+	/**
+	 * Prepares the query data Map in the ETLProcessorResult
+	 * <pre>
+	 *	"query": [
+	 *		{
+	 *			"domain": "Application",
+	 *			"kv": {"id": null},
+	 *	    	"error" : "Named parameter [id] value may not be null"
+	 *		},
+	 *	]
+	 * </pre>
+	 * @param findElement
+	 * @return
+	 */
+	void addFindElement(ETLFindElement findElement) {
+		this.addErrors(findElement.currentFind.errors)
+		this.find.addQueryAndResults(findElement)
+	}
+
+	void addFindElementWarnMesssage(ETLFindElement findElement) {
+		warn = true
+		errors.add(findElement.warnMessage)
+	}
+
+	void addFoundElement(FoundElement foundElement) {
+		if(foundElement.getAction() == FoundElement.FoundElementType.create){
+			create = foundElement.propertiesMap
+		} else {
+			update = foundElement.propertiesMap
+		}
+	}
+}
+
+class FindData {
+	List<QueryData> query = []
+	List<Long> results = []
+	Integer matchOn
+
+
+	/**
+	 * It prepares query map results with the domain.data
+	 * following the current format:
+	 * <pre>
+	 *  [
+	 * 		"matchOn": 2,
+	 * 		"results": [
+	 * 			115123,
+	 * 			115123,
+	 * 			115123
+	 * 		]
+	 * 	]
+	 * </pre>
+	 * Results are the id of the domain classes collected by the find command
+	 * and matcOn defines the ordinal position
+	 * in the query object list where those results where found.
+	 * @param fieldDataMap a field data map
+	 * @param findElement the find element with the warn message
+	 */
+	private void addResults(ETLFindElement findElement) {
+		if(!this.results && findElement.results){
+			this.results = findElement.results.objects.collect { it.id }
+			this.matchOn = findElement.results.matchOn
+		}
+	}
+
+	private void addQuery(ETLFindElement findElement) {
+		query.add(new QueryData(domain: findElement.currentDomain.name(), kv: findElement.currentFind.kv))
+	}
+
+	void addQueryAndResults(ETLFindElement findElement){
+		addQuery(findElement)
+		addResults(findElement)
+	}
+
+}
+
+class QueryData {
+	String domain
+	Map<String, ?> kv = [:]
 }

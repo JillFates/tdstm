@@ -471,6 +471,83 @@ class ETLIterateSpec extends ETLBaseSpec {
 			}
 	}
 
+	void 'test can load fields using more than one iterator command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				First,Second
+				alphadb01,xraysrv01
+				bravodb01,yankeesrv01
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuffer()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					read labels
+					iterate {
+						domain Device
+						extract 1 load 'Name'
+					}
+
+					iterate {
+						domain Device
+						extract 1 load 'Name'
+					}
+				""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			with(etlProcessor.result){
+				domains.size() == 1
+				with(domains[0], DomainReference) {
+					domain == ETLDomain.Device.name()
+					data.size() == 4
+
+					with(data[0], RowData){
+						with(fields['assetName'], FieldData){
+							init == null
+							value == 'alphadb01'
+							originalValue == 'alphadb01'
+						}
+					}
+
+					with(data[1]){
+						with(fields['assetName']){
+							init == null
+							value == 'bravodb01'
+							originalValue == 'bravodb01'
+						}
+					}
+
+					with(data[2]){
+						with(fields['assetName']) {
+							init == null
+							value == 'alphadb01'
+							originalValue == 'alphadb01'
+						}
+					}
+
+					with(data[3]){
+						with(fields['assetName']) {
+							init == null
+							value == 'bravodb01'
+							originalValue == 'bravodb01'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if(fileName){
+				service.deleteTemporaryFile(fileName)
+			}
+	}
+
 	void 'test can load fields combining iterators'() {
 
 		given:

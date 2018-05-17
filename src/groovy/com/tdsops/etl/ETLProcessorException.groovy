@@ -180,5 +180,10 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException invalidReplaceCommand() {
         new ETLProcessorException("Use 'replace on/off' command")
     }
+
+    static ETLProcessorException ignoreOnlyAllowOnNewRows() {
+        new ETLProcessorException("Ignore only allow on new rows")
+    }
+
 }
 
