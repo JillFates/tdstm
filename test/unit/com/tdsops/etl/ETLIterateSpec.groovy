@@ -330,50 +330,51 @@ class ETLIterateSpec extends ETLBaseSpec {
 					}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.id) {
-					value == '152255'
-					originalValue == '152255'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.id) {
+						value == '152255'
+						originalValue == '152255'
+					}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 
-				with(data[1].fields.id) {
-					value == '152256'
-					originalValue == '152256'
-				}
+					with(data[1].fields.id) {
+						value == '152256'
+						originalValue == '152256'
+					}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+					with(data[1].fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
-			}
+				with(domains[1]) {
+					domain == 'Device'
+					with(data[0].fields.id) {
+						value == '1522'
+						originalValue == '1522'
+					}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == 'Device'
-				with(data[0].fields.id) {
-					value == '1522'
-					originalValue == '1522'
-				}
+					with(data[0].fields.assetName) {
+						value == 'SRW24G1'
+						originalValue == 'SRW24G1'
+					}
 
-				with(data[0].fields.assetName) {
-					value == 'SRW24G1'
-					originalValue == 'SRW24G1'
-				}
+					with(data[1].fields.id) {
+						value == '1523'
+						originalValue == '1523'
+					}
 
-				with(data[1].fields.id) {
-					value == '1523'
-					originalValue == '1523'
-				}
-
-				with(data[1].fields.assetName) {
-					value == 'ZPHA MODULE'
-					originalValue == 'ZPHA MODULE'
+					with(data[1].fields.assetName) {
+						value == 'ZPHA MODULE'
+						originalValue == 'ZPHA MODULE'
+					}
 				}
 			}
 
@@ -416,50 +417,51 @@ class ETLIterateSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.id) {
-					value == '152255'
-					originalValue == '152255'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.id) {
+						value == '152255'
+						originalValue == '152255'
+					}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 
-				with(data[1].fields.id) {
-					value == '152256'
-					originalValue == '152256'
-				}
+					with(data[1].fields.id) {
+						value == '152256'
+						originalValue == '152256'
+					}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+					with(data[1].fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
-			}
+				with(domains[1]) {
+					domain == 'Device'
+					with(data[0].fields.id) {
+						value == '1522'
+						originalValue == '1522'
+					}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == 'Device'
-				with(data[0].fields.id) {
-					value == '1522'
-					originalValue == '1522'
-				}
+					with(data[0].fields.assetName) {
+						value == 'SRW24G1'
+						originalValue == 'SRW24G1'
+					}
 
-				with(data[0].fields.assetName) {
-					value == 'SRW24G1'
-					originalValue == 'SRW24G1'
-				}
+					with(data[1].fields.id) {
+						value == '1523'
+						originalValue == '1523'
+					}
 
-				with(data[1].fields.id) {
-					value == '1523'
-					originalValue == '1523'
-				}
-
-				with(data[1].fields.assetName) {
-					value == 'ZPHA MODULE'
-					originalValue == 'ZPHA MODULE'
+					with(data[1].fields.assetName) {
+						value == 'ZPHA MODULE'
+						originalValue == 'ZPHA MODULE'
+					}
 				}
 			}
 
@@ -502,50 +504,51 @@ class ETLIterateSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 2
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.id) {
-					value == '152255'
-					originalValue == '152255'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 2
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.id) {
+						value == '152255'
+						originalValue == '152255'
+					}
 
-				with(data[0].fields.appVendor) {
-					value == 'Microsoft'
-					originalValue == 'Microsoft'
-				}
+					with(data[0].fields.appVendor) {
+						value == 'Microsoft'
+						originalValue == 'Microsoft'
+					}
 
-				with(data[1].fields.id) {
-					value == '152256'
-					originalValue == '152256'
-				}
+					with(data[1].fields.id) {
+						value == '152256'
+						originalValue == '152256'
+					}
 
-				with(data[1].fields.appVendor) {
-					value == 'Mozilla'
-					originalValue == 'Mozilla'
+					with(data[1].fields.appVendor) {
+						value == 'Mozilla'
+						originalValue == 'Mozilla'
+					}
 				}
-			}
+				with(domains[1]) {
+					domain == 'Device'
+					with(data[0].fields.id) {
+						value == '1522'
+						originalValue == '1522'
+					}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == 'Device'
-				with(data[0].fields.id) {
-					value == '1522'
-					originalValue == '1522'
-				}
+					with(data[0].fields.assetName) {
+						value == 'SRW24G1'
+						originalValue == 'SRW24G1'
+					}
 
-				with(data[0].fields.assetName) {
-					value == 'SRW24G1'
-					originalValue == 'SRW24G1'
-				}
+					with(data[1].fields.id) {
+						value == '1523'
+						originalValue == '1523'
+					}
 
-				with(data[1].fields.id) {
-					value == '1523'
-					originalValue == '1523'
-				}
-
-				with(data[1].fields.assetName) {
-					value == 'ZPHA MODULE'
-					originalValue == 'ZPHA MODULE'
+					with(data[1].fields.assetName) {
+						value == 'ZPHA MODULE'
+						originalValue == 'ZPHA MODULE'
+					}
 				}
 			}
 

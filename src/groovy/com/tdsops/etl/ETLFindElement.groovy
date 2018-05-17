@@ -81,7 +81,7 @@ class ETLFindElement implements ETLStackableCommand{
 	ETLFindElement into(String property) {
 		validateReference(property)
 		currentFind.property = property
-		currentFind.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, property)
+		currentFind.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, property)
 		processor.addFindElement(this)
 		return this
 	}

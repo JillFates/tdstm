@@ -27,14 +27,12 @@
 </head>
 
 <body>
+<tds:subHeader title="Metric Definitions" crumbs="['Admin','Metric Definitions']"/>
 
 <form method="post">
-
 	<div class="row" class="form-group">
 		<div class="col-md-6">
 			<fieldset>
-				<legend>Metric Defintions</legend>
-				<br>
 				<textarea class="form-control" name="definitions" id="definitions" rows="20" style="width: 100%;">${definitions}</textarea>
 				<br>
 

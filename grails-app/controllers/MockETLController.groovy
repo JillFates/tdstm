@@ -127,7 +127,7 @@ class MockETLController implements ControllerMethods {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.result?.domains as JSON),
+                jsonResult          : (etlProcessor?.resultsMap()?.domains as JSON),
                 dataScriptId        : params.dataScriptId,
                 providerName        : params.providerName,
                 dataScriptName      : params.dataScriptName,

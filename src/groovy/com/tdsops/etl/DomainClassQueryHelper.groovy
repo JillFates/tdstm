@@ -1,18 +1,11 @@
 package com.tdsops.etl
 
-import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
-import com.tds.asset.Files
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.Rack
-import net.transitionmanager.domain.Room
 
 import java.util.Map.Entry
 

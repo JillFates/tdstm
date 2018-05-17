@@ -132,49 +132,50 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model', 'custom1'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model', 'custom1'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-					with(fields.custom1){
-						value == 'xray01'
-						originalValue == 'xray01'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -211,45 +212,46 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[1]) {
-					with(fields.assetName) {
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model) {
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -288,49 +290,50 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model', 'custom1'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model', 'custom1'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-					with(fields.custom1){
-						value == 'xray01'
-						originalValue == 'xray01'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -367,45 +370,46 @@ class ETLLookupSpec extends ETLBaseSpec {
 						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 
@@ -497,23 +501,25 @@ class ETLLookupSpec extends ETLBaseSpec {
 					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 3
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
-				data.size() == 5
-			}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 3
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
+					data.size() == 5
+				}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['assetName', 'id'] as Set
-				data.size() == 2
-			}
+				with(domains[1]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'id'] as Set
+					data.size() == 2
+				}
 
-			with(etlProcessor.result.domains[2]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
-				data.size() == 5
+				with(domains[2]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
+					data.size() == 5
+				}
 			}
 
 		cleanup:

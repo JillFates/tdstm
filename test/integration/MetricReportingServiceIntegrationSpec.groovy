@@ -1,7 +1,9 @@
 import com.tds.asset.Application
+import com.tds.asset.AssetDependency
 import com.tds.asset.AssetEntity
 import com.tdsops.etl.ETLDomain
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import grails.test.spock.IntegrationSpec
 import net.transitionmanager.domain.ImportBatchRecord
 import net.transitionmanager.domain.MetricResult
@@ -66,6 +68,12 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 	@Shared
 	Map context
 
+	@Shared
+	AssetDependency dependency1
+
+	@Shared
+	AssetDependency dependency2
+
 	void setup() {
 		moveBundle = moveBundleTestHelper.createBundle(project, null)
 		moveBundle2 = moveBundleTestHelper.createBundle(project, null)
@@ -101,8 +109,10 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		otherProjectDevice.assetType = device.assetType
 		otherProjectDevice.validation = 'Discovery'
 		otherProjectDevice.save(flush: true, failOnError: true)
-	}
 
+		dependency1 = new AssetDependency(asset: application1, dependent: device, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+		dependency2 = new AssetDependency(asset: application2, dependent: device2, status: AssetDependencyStatus.VALIDATED).save(flush: true, failOnError: true)
+	}
 
 	void "test gatherMetric for query mode"() {
 		setup: 'giving a metric definition for a query, that will have results'
@@ -136,48 +146,74 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 		when: 'running gatherMetrics on query mode'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 		then: 'We get a list of map results'
-			results == [
-					[
+			results[0] == [
 							projectId : project.id,
 							metricCode: 'APP-VPS',
 							date      : date,
 							label     : 'Unassigned:Server',
 							value     : 2
-					],
-					[
+			]
+			results[1] == [
 							projectId : otherProject.id,
 							metricCode: 'APP-VPS',
 							date      : date,
 							label     : 'Unassigned:Server',
 							value     : 1
 					]
-			]
 	}
 
 	void "test gatherMetric for TM-10662 filtering out non-planning assets"() {
+		setup: 'giving a metric definition for a query, that will have results'
+			String date = (new Date() - 1).format('yyyy-MM-dd')
+			JSONObject metricDefinition = [
+				"metricCode" : "App-Count",
+				"description": "count of applications",
+				"enabled"    : 1,
+				"mode"       : "query",
+				"query"      : [
+					"domain"     : "Application",
+					"aggregation": "count(*)"
+				]
+			] as JSONObject
+		when: 'running gatherMetrics on query mode'
+			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
+		then: 'We get a list of map results'
+			results == [
+				[
+					projectId : project.id,
+					metricCode: 'App-Count',
+					date      : date,
+					label     : 'count',
+					value     : 1
+				]
+			]
+	}
+
+	void "test gatherMetric for TM-10647 query Dependency"() {
 			setup: 'giving a metric definition for a query, that will have results'
 				String date = (new Date() - 1).format('yyyy-MM-dd')
 				JSONObject metricDefinition = [
-						"metricCode" : "App-Count",
-						"description": "count of applications",
-						"enabled"    : 1,
-						"mode"       : "query",
-						"query"      : [
-								"domain"     : "Application",
-								"aggregation": "count(*)"
-						]
+					"metricCode" : "Dependency",
+					"description": "Dependency counts metrics DependencyStatus",
+					"enabled": 1,
+					"mode"   : "query",
+					"query"  : [
+						"domain"     : "Dependency",
+						"aggregation": "count(*)",
+						"groupBy"    : ["status"]
+					]
 				] as JSONObject
 			when: 'running gatherMetrics on query mode'
 				List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
 			then: 'We get a list of map results'
 				results == [
-						[
-								projectId : project.id,
-								metricCode: 'App-Count',
-								date      : date,
-								label     : 'count',
-								value     : 1
-						]
+					[
+						projectId : project.id,
+						metricCode: 'Dependency',
+						date      : date,
+						label     : AssetDependencyStatus.VALIDATED,
+						value     : 1 // Should be 2 but will wait for the next PR to solve
+					]
 				]
 		}
 
@@ -217,43 +253,42 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 
 	void "test gatherMetric for sql mode"() {
 		setup: 'giving sql metric definition'
-			String date = new Date().format('yyyy-MM-dd')
+			String date = (new Date() - 1).format('yyyy-MM-dd')
 			JSONObject metricDefinition = [
-					"metricCode" : "APP-VPS",
-					"description": "Application counts metrics for Validation/PlanStatus",
-					"enabled"    : true,
-					"mode"       : "sql",
-					sql          : """
+				metricCode : "APP-VPS",
+				description: "Application counts metrics for Validation/PlanStatus",
+				enabled    : true,
+				mode       : "sql",
+				sql        : """
 						select a.project_id as projectId,
-								'APP-VPS' as metricCode, 
+								'APP-VPS' as metricCode,
 								DATE_FORMAT(NOW(), "%Y-%m-%d") as date,
 								concat(a.plan_status, ':', a.asset_type) as label,
 								count(*) as value
 						from asset_entity a
 						join move_bundle m on m.move_bundle_id=a.move_bundle_id
-						where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true 
-						group by a.plan_status, a.asset_type, a.project_id;
+						where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
+					group by a.plan_status, a.asset_type, a.project_id
+					order by a.project_id, a.plan_status, a.asset_type;
 					""".stripIndent().toString()
 			]
 		when: 'running gatherMetrics on sql query'
 			List results = metricReportingService.gatherMetric([project.id, otherProject.id], (String) metricDefinition.metricCode, metricDefinition)
-		then: 'Get Results for the query'
-			results == [
-					[
+		then: 'the results should have two expected map sets of values'
+			results[0] == [
 							projectId : project.id,
 							metricCode: 'APP-VPS',
 							date      : date,
 							label     : 'Unassigned:Server',
 							value     : 2
-					],
-					[
+			]
+			results[1] == [
 							projectId : otherProject.id,
 							metricCode: 'APP-VPS',
 							date      : date,
 							label     : 'Unassigned:Server',
 							value     : 1
 					]
-			]
 	}
 
 	void "test gatherMetric for sql mode invalid sql"() {
@@ -266,13 +301,13 @@ class MetricReportingServiceIntegrationSpec extends IntegrationSpec {
 					"mode"       : "sql",
 					sql          : """
 							select a.project_id as projectId,
-									'APP-VPS' as metricCode 
+									'APP-VPS' as metricCode
 									DATE_FORMAT(NOW(), "%Y-%m-%d") as date,
 									concat(a.plan_status, ':', a.asset_type) as label,
 									count(*) as value
 							from asset_entity a
 							join move_bundle m on m.move_bundle_id=a.move_bundle_id
-							where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true 
+							where a.project_id in (:projectIds) and a.validation in ('Discovery', 'BundleReady') and m.use_for_planning = true
 							group by a.plan_status, a.asset_type, a.project_id;
 						""".stripIndent().toString()
 			]

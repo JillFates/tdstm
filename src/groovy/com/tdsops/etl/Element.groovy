@@ -35,7 +35,7 @@ class Element implements RangeChecker {
 	 */
 	ETLProcessor processor
 	/**
-	 *
+	 * ETL Field defined by the label and field name
 	 */
 	ETLFieldDefinition fieldDefinition
 
@@ -84,8 +84,8 @@ class Element implements RangeChecker {
 	Element load(String fieldName) {
 		processor.validateStack()
 		if(processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
-			processor.addElementLoaded(processor.selectedDomain, this)
+			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
 			return this
 		} else{
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -104,11 +104,11 @@ class Element implements RangeChecker {
 	Element initialize(String fieldName) {
 		processor.validateStack()
 		if (processor.hasSelectedDomain()){
-			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain, fieldName)
+			this.fieldDefinition = processor.lookUpFieldSpecs(processor.selectedDomain.domain, fieldName)
 			this.init = this.value
 			this.originalValue = ''
 			this.value = ''
-			processor.addElementLoaded(processor.selectedDomain, this)
+			processor.addElementLoaded(processor.selectedDomain.domain, this)
 			return this
 		} else {
 			throw ETLProcessorException.domainMustBeSpecified()
@@ -326,7 +326,7 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element right(Integer amount) {
-		value = value.reverse().take(amount).reverse()
+		value = value?.reverse().take(amount).reverse()
 		return this
 	}
 
@@ -342,7 +342,7 @@ class Element implements RangeChecker {
 	 * @return the element instance that received this command
 	 */
 	Element replace(String regex, String replacement) {
-		value = value.replaceAll(regex, replacement)
+		value = value?.replaceAll(regex, replacement)
 		return this
 	}
 

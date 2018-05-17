@@ -116,26 +116,27 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -161,26 +162,27 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -206,26 +208,27 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -251,26 +254,27 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -295,26 +299,27 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == ''
-						originalValue == ''
-						init == 'Microsoft'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == ''
+							originalValue == ''
+							init == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == ''
-						originalValue == ''
-						init == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == ''
+							originalValue == ''
+							init == 'Mozilla'
+						}
 					}
 				}
 			}
@@ -339,15 +344,16 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == [null, null]
-				data.collect { it.fields.appVendor.originalValue } == [null, null]
-				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+				}
 			}
 	}
 
@@ -370,15 +376,16 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == [null, null]
-				data.collect { it.fields.appVendor.originalValue } == [null, null]
-				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+				}
 			}
 	}
 
@@ -401,15 +408,16 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == [null, null]
-				data.collect { it.fields.appVendor.originalValue } == [null, null]
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 
@@ -433,15 +441,16 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['Microsoft', 'Mozilla']
-				data.collect { it.fields.appVendor.originalValue } == ['Microsoft', 'Mozilla']
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == ['Microsoft', 'Mozilla']
+					data.collect { it.fields.appVendor.originalValue } == ['Microsoft', 'Mozilla']
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 
@@ -465,15 +474,16 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == [null, null]
-				data.collect { it.fields.appVendor.originalValue } == [null, null]
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 
