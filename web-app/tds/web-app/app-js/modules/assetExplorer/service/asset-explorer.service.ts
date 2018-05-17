@@ -351,6 +351,9 @@ export class AssetExplorerService {
 				};
 				delete support.assetDepend;
 				delete support.dependencyType;
+				if (support.id === 0) {
+					delete support.id;
+				}
 			});
 		}
 		return dependencies;
