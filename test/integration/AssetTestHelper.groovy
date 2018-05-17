@@ -90,16 +90,16 @@ class AssetTestHelper {
 				moveBundle: project.projectDefaultBundle,
 				"moveBundle.id": params.moveBundle ? params.moveBundle.id.toString() : project.projectDefaultBundle.id.toString(),
 				roomSourceId: "-1",
-				sourceLocation: "",
-				sourceRoom: "",
+				locationSource: "TBD",
+				roomSource: "",
 				roomTargetId: "-1",
-				targetLocation: "",
-				targetRoom: "",
+				locationTarget: "TBD",
+				roomTarget: "",
 				rackSourceId: "-1",
-				sourceRack: "",
+				rackSource: "",
 				newRackSourceId: "-1",
 				rackTargetId: "-1",
-				targetRack: "",
+				rackTarget: "",
 				newRackTargetId: "-1",
 				sourceChassis: "0",
 				targetChassis: "0",
@@ -107,8 +107,7 @@ class AssetTestHelper {
 				targetRackPosition: "",
 				sourceBladePosition: "",
 				targetBladePosition: "",
-				sourceLocation: "TBD",
-				targetLocation: "TBD",
+
 		 ]
 		 defaultValues.each{ key, val->
 			 if(!params.containsKey(key)) {

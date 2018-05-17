@@ -637,7 +637,7 @@ class MoveBundleService implements ServiceMethods {
 			def started = new Date()
 			progressService.update(progressKey, 10I, ProgressService.STARTED, "Search assets and dependencies")
 
-			def results = searchForAssetDependencies(moveBundleText, moveBundleIds, connectionTypes, statusTypes)
+			def results = searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes)
 
 			logger.info 'Dependency groups generation - Search assets and dependencies time {}', TimeUtil.elapsed(started)
 			started = new Date()
@@ -690,23 +690,23 @@ class MoveBundleService implements ServiceMethods {
 
 	/**
 	 * Performs a search for all the assets and dependencies that match the parameters.
+	 * @param moveBundleText : bundle ids to analyze
 	 * @param connectionTypes : filter for asset types on connection
 	 * @param statusTypes : filter for status types
-	 * @param moveBundleText : bundle ids to analyze
 	 * @return List of records
 	 */
-	private def searchForAssetDependencies(moveBundleText, List<Long> moveBundleIds, connectionTypes, statusTypes) {
+	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
 		// First we need the list of assets that belongs to planning bundles - See TM-10261
-		List<Long> assetIds = AssetEntity.where { moveBundle.id in moveBundleIds}.list()*.id
-		String assetIdsText = GormUtil.asCommaDelimitedString(assetIds)
+
+		String assetIdsSubQuery = "select a.asset_entity_id from asset_entity a where a.move_bundle_id in ( ${moveBundleText} )";
 
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 		String  queryForAssets = "SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, " +
 				" a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType " +
 				" FROM asset_entity a, asset_dependency ad " +
-				" WHERE a.move_bundle_id in ( ${moveBundleText} ) " +
-				" AND ((a.asset_entity_id = ad.asset_id AND ad.dependent_id IN ( ${assetIdsText} )) " +
-				" OR ad.dependent_id = a.asset_entity_id)"
+				" WHERE a.asset_entity_id in ( " + assetIdsSubQuery + "  ) " +
+				" AND (a.asset_entity_id = ad.asset_id AND ad.dependent_id IN ( " + assetIdsSubQuery + " )) " +
+				" OR ad.dependent_id = a.asset_entity_id"
 
 		queryForAssets += connectionTypes ? " AND ad.type in (${connectionTypes}) " : ""
 		queryForAssets += statusTypes ? " AND ad.status in (${statusTypes}) " : ""
