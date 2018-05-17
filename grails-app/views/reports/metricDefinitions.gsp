@@ -111,7 +111,15 @@
 	//
 	function testMetricDefinitions() {
 		var metricCodes = $("#metricCodes").val();
-		var definitions = JSON.parse($("#definitions").val());
+		var definitions;
+
+		try {
+			definitions = JSON.parse($("#definitions").val())
+		} catch (error) {
+			alert("Invalid JSON for metric definitions.");
+			return
+		}
+
 		delete Array.prototype.toJSON;
 		var data = {"definitions": definitions, "metricCodes": metricCodes};
 		$('#data').empty();
