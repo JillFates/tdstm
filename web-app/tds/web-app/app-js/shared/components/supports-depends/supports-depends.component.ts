@@ -137,7 +137,7 @@ export class SupportsDependsComponent implements OnInit {
 	}
 
 	/**
-	 * Detects whe
+	 * Detects when the value of the dependency has change, then attach it to the model
 	 * @param {DependencySupportModel} dataItem
 	 */
 	public onDependencyChange(dependency: any, dataItem: DependencySupportModel): void {
@@ -146,6 +146,8 @@ export class SupportsDependsComponent implements OnInit {
 			dependentId: dataItem.id,
 			type: dataItem.dependencyType
 		};
+		dataItem.assetDepend.id = dependency.id;
+		dataItem.assetDepend.text = dependency.text;
 		this.assetExplorerService.retrieveChangedBundle(changeParams).subscribe((res: any) => {
 			if (res.id && res.id !== dataItem.assetDepend.moveBundle.id) {
 				let mb = this.moveBundleList.find((mbi) => mbi.id === res.id);
