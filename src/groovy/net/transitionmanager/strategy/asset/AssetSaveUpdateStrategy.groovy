@@ -180,6 +180,10 @@ abstract class AssetSaveUpdateStrategy {
 		validateRelatedAssets()
 		// Delete those dependencies not present in the command
 		deleteDependencies(assetEntity)
+		// Create and/or update supporting assets
+		createOrUpdateDependencies(assetEntity, true)
+		// Create and/or update dependents
+		createOrUpdateDependencies(assetEntity, false)
 	}
 
 	/**
@@ -188,7 +192,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param isDependent
 	 */
 	private void createOrUpdateDependencies(AssetEntity assetEntity, boolean isDependent) {
-		Map depMaps = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
+		List depMaps = isDependent ? command.dependencyMap.supportAssets : command.dependencyMap.dependentAssets
 		for (depMap in depMaps) {
 			createOrUpdateDependency(assetEntity, depMap, isDependent)
 		}
@@ -206,9 +210,10 @@ abstract class AssetSaveUpdateStrategy {
 			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id)
 		} else {
 			dependency = new AssetDependency()
+			dependency.createdBy = currentPerson
 		}
 
-		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.assetDepend.id)
+		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.targetAsset.id)
 
 		dependency.dependent = isDependent? assetEntity : targetAsset
 		dependency.asset = isDependent ? targetAsset : assetEntity
