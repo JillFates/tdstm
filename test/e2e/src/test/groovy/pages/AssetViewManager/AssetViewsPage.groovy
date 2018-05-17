@@ -40,7 +40,7 @@ class AssetViewsPage extends Page{
         createViewBtn.click()
     }
     def goToMyViews(){
-        viewMgrMyViews.click()
+        waitFor{viewMgrMyViews.click()}
     }
     def goToAllViews(){
         viewMgrAllViews.click()
