@@ -12,22 +12,14 @@ package com.tdsops.etl
 class DomainFacade {
 
 	private ETLProcessorResult result
-	private int domainRow = -1
 
-	DomainFacade(ETLProcessorResult result, int domainRow = -1) {
+	DomainFacade(ETLProcessorResult result) {
 		this.result = result
-		this.domainRow = domainRow
 	}
 
 	Object getProperty(String name) {
 
-		Map<String,?> currentDataFields
-
-		if ( domainRow >=0 ) {
-			currentDataFields = result.reference.data[domainRow].fields
-		} else {
-			currentDataFields = result.reference.data.last().fields
-		}
+		Map<String,?> currentDataFields = result.currentRowData().fields
 
 		if(!currentDataFields.containsKey(name)) {
 			throw ETLProcessorException.unknownDomainProperty(name)
