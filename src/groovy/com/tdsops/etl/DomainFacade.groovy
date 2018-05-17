@@ -6,8 +6,6 @@ package com.tdsops.etl
  *     find Application of id by id with DOMAIN.id
  * </pre>
  * Where id property is the value in the current row data for the column 'id'
- * The facade can contain the data row index reference of the fetching data
- * this is used in LOOKUP operations
  */
 class DomainFacade {
 
