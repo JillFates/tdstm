@@ -8,6 +8,7 @@ class AssetViewsPage extends Page{
     static at = {
         waitFor {viewMgrPageWindow.displayed}
         avPageTitle.text().trim().startsWith("View")
+        waitFor {allViewsModule.viewModuleContainer.displayed}
     }
 
     static content = {

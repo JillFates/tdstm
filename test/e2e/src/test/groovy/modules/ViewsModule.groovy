@@ -7,6 +7,7 @@ class ViewsModule extends Module {
     static content = {
         moduleTitle       {$(".box-title.box-title-grid-list")}
         viewsContainer    { $( "div", class:"content body")}
+        viewModuleContainer {viewsContainer.find(".asset-explorer-index-container")}
 
         viewList          { $( "div", class:"table-responsive").find("tbody")}
         viewListTableBody {$("tbody")}
@@ -74,33 +75,6 @@ class ViewsModule extends Module {
      */
     def systemViewsOnly(){
         createdBy.text()==""
-    }
-    /**
-     * This validates that a view is listed
-     * @param viewName
-     * @return
-     */
-    def validateViewIsListed(String viewName){
-        viewsListed.find {
-            if (it.text()==viewName) return true
-            return false
-        }
-    }
-    /**
-     * Here, we validata that ALL of th rows contain the text, therefore
-     * the filtering was successfull
-     * @param text
-     * @return
-     */
-    def validateFilteredList(String text){
-        boolean validList=true
-        for (view in viewsListed){
-           println(view.text())
-           if(!view.text().contains(text)){
-               validList=false
-           }
-        }
-        validList
     }
     /**
      * This method validates how the mame of a view is listed in a grid.

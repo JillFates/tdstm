@@ -56,7 +56,6 @@ class ViewManagerListSpec extends GebReportingSpec {
         testKey = "TM-8501"
         given: "I am in the Favorites section"
             at AssetViewsPage
-            allViewsModule.displayed
         when : "I go to My Views"
             waitFor {viewMgrMyViews.click()}
         then: "Only the user's views are displayed"
@@ -68,7 +67,6 @@ class ViewManagerListSpec extends GebReportingSpec {
         testKey = "TM-8501"
         given: "I am in the My Views section"
             at AssetViewsPage
-            allViewsModule.displayed
         when : "I go to Shared views"
             waitFor {viewMgrSharedViews.click()}
         then: "Only the user's shared views are displayed"
@@ -90,7 +88,6 @@ class ViewManagerListSpec extends GebReportingSpec {
         testKey = "TM-8501"
         given: "I am in the Shared Views section"
             at AssetViewsPage
-            allViewsModule.displayed
         when : "I go to System Views"
             waitFor {viewMgrSystemViews.click()}
         then: "Only the Sytem views are displayed"
