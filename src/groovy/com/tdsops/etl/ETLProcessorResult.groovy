@@ -176,7 +176,7 @@ class ETLProcessorResult {
 	 * Removes ignored rows in the current reference.
 	 */
 	def removeIgnoredRows() {
-		if(reference.data.last().ignore) {
+		if(reference.data && reference.data.last().ignore) {
 			reference.data = reference.data.dropRight(1)
 		}
 	}
