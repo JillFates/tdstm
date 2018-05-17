@@ -255,8 +255,10 @@ abstract class AssetSaveUpdateStrategy {
 	private void deleteDependencies(AssetEntity assetEntity, boolean isDependent) {
 		// Determine those dependencies no longer valid.
 		List<Long> dependents = collectDependencies(isDependent)
-		// Delete the dependencies calculated in the previous step.
-		deleteDependencies(dependents, assetEntity, isDependent)
+		if (dependents) {
+			// Delete the dependencies calculated in the previous step.
+			deleteDependencies(dependents, assetEntity, isDependent)
+		}
 	}
 
 	/**
@@ -324,14 +326,9 @@ abstract class AssetSaveUpdateStrategy {
 	private void deleteDependencies(List<Long> ids, AssetEntity assetEntity, boolean isDependent) {
 		/* Delete dependencies. As an extra precaution, the query doesn't simply delete dependencies
 		* given their id, but also takes the asset being edited into account.*/
-		AssetDependency.where {
-			id in ids
-			if (isDependent) {
-				dependent == assetEntity
-			} else {
-				asset == assetEntity
-			}
-		}.deleteAll()
+		String side = isDependent ? 'dependent' : 'asset'
+		String hql = "DELETE FROM AssetDependency ad WHERE id NOT IN (:ids) AND $side = :asset"
+		AssetDependency.executeUpdate(hql, [ids: ids, asset: assetEntity])
 	}
 
 
