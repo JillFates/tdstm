@@ -23,7 +23,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
-import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.junit.Ignore
 import spock.lang.Shared
@@ -504,12 +503,12 @@ class ETLIterateSpec extends ETLBaseSpec {
 		then: 'Results should contain domain results associated'
 			with(etlProcessor.result){
 				domains.size() == 1
-				with(domains[0], DomainReference) {
+				with(domains[0], DomainResult) {
 					domain == ETLDomain.Device.name()
 					data.size() == 4
 
-					with(data[0], RowData){
-						with(fields['assetName'], FieldData){
+					with(data[0], RowResult){
+						with(fields['assetName'], FieldResult){
 							init == null
 							value == 'alphadb01'
 							originalValue == 'alphadb01'

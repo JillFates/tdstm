@@ -23,14 +23,14 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
-	DomainReference reference
+	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
 	 */
-	List<Map<String, DomainReference>> domains = []
+	List<Map<String, DomainResult>> domains = []
 	/**
 	 * Result row index position in the reference.data list
-	 * @see DomainReference#data
+	 * @see DomainResult#data
 	 */
 	Integer resultIndex = -1
 
@@ -48,7 +48,7 @@ class ETLProcessorResult {
 	void addCurrentSelectedDomain(ETLDomain domain) {
 		reference = domains.find { it.domain == domain.name() }
 		if(!reference){
-			reference = new DomainReference(domain: domain.name())
+			reference = new DomainResult(domain: domain.name())
 			domains.add(reference)
 		}
 		resultIndex = -1
@@ -63,7 +63,7 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	void loadElement(Element element) {
-		RowData currentData = findOrCreateCurrentRow()
+		RowResult currentData = findOrCreateCurrentRow()
 		reference.addFieldName(element)
 		currentData.addLoadElement(element)
 	}
@@ -78,7 +78,7 @@ class ETLProcessorResult {
 	 * 			used to calculate a query data, results and errors
 	 */
 	void addFindElement(ETLFindElement findElement) {
-		RowData currentRow = findOrCreateCurrentRow()
+		RowResult currentRow = findOrCreateCurrentRow()
 		reference.addFieldName(findElement)
 		currentRow.addFindElement(findElement)
 	}
@@ -96,7 +96,7 @@ class ETLProcessorResult {
 	 * @param foundElement
 	 */
 	void addFoundElement(FoundElement foundElement){
-		RowData currentRow = findOrCreateCurrentRow()
+		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.addFoundElement(foundElement)
 	}
 
@@ -110,7 +110,7 @@ class ETLProcessorResult {
 	 */
 	void addFindWarnMessage(ETLFindElement findElement) {
 		if(findElement.currentFind.objects){
-			RowData currentRow = findOrCreateCurrentRow()
+			RowResult currentRow = findOrCreateCurrentRow()
 			currentRow.addFindElementWarnMessage(findElement)
 		}
 	}
@@ -140,9 +140,9 @@ class ETLProcessorResult {
 	 * TODO: Complete docs!!
 	 * @return
 	 */
-	private RowData findOrCreateCurrentRow() {
+	private RowResult findOrCreateCurrentRow() {
 		if(resultIndex == -1){
-			reference.data.add(new RowData(rowNum: processor.iterateIndex.pos))
+			reference.data.add(new RowResult(rowNum: processor.iterateIndex.pos))
 			resultIndex = reference.data.size() - 1
 		}
 		return reference.data[resultIndex]
@@ -203,10 +203,10 @@ class ETLProcessorResult {
 	 */
 	boolean lookupInReference(String fieldName, String value) {
 		// TODO : JPM 3/2018 : lookupInReference will have issues if there are multiple matches so we should look to expand the search to multiple fields/values
-		Integer lookupPosition = reference.data.findIndexOf { RowData dataRow ->
+		Integer lookupPosition = reference.data.findIndexOf { RowResult dataRow ->
 			dataRow.fields.containsKey(fieldName) && dataRow.fields[fieldName]?.value == value
 		}
-		if(lookupPosition != -1){
+		if(lookupPosition >= 0){
 			resultIndex = lookupPosition
 			return true
 		} else {
@@ -217,7 +217,6 @@ class ETLProcessorResult {
 }
 
 /**
- * //TODO: What happend with
  * <pre>
  *  "domains": {
  *    "domain": "Device",
@@ -226,15 +225,15 @@ class ETLProcessorResult {
  *          "externalRefId"
  *     ],
  *
- *    "data": [ list of RowData instances]
+ *    "data": [ list of RowResult instances]
  * 	}
  * </pre>
  */
 @CompileStatic
-class DomainReference {
+class DomainResult {
 	String domain
 	Set fieldNames = [] as Set
-	List<RowData> data = new ArrayList<RowData>()
+	List<RowResult> data = new ArrayList<RowResult>()
 
 	/**
 	 * Add the field name for an instance of Element
@@ -269,7 +268,7 @@ class DomainReference {
  * </pre>
  */
 @CompileStatic
-class RowData {
+class RowResult {
 	String op = 'I'
 	Integer rowNum
 	Integer errorCount = 0
@@ -277,7 +276,7 @@ class RowData {
 	Boolean duplicate = false
 	List<String> errors = []
 	Boolean ignore = false
-	Map<String, FieldData> fields = [:]
+	Map<String, FieldResult> fields = [:]
 
 	/**
 	 * Add element to the current row data
@@ -285,14 +284,14 @@ class RowData {
 	 */
 	void addLoadElement(Element element){
 		//TODO: Review with John. ETLInitilizeSpec'test can init field defined before the load command'
-		FieldData fieldData = findOrCreateFieldData(element.fieldDefinition.name)
+		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition.name)
 		fieldData.originalValue = element.originalValue?:fieldData.originalValue
 		fieldData.value = element.value?:fieldData.value
 		fieldData.init = element.init?:fieldData.init
 	}
 
 	/**
-	 * It adds the find result in the FieldData
+	 * It adds the find result in the FieldResult
 	 * <pre>
 	 *  "data": {
 	 *    "warn":true,
@@ -309,18 +308,18 @@ class RowData {
 	 * @param findElement the find element with the warn message
 	 */
 	void addFindElement(ETLFindElement findElement){
-		FieldData fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElement(findElement)
 		this.errorCount = fieldData.errors.size()
 	}
 
 	void addFoundElement(FoundElement foundElement){
-		FieldData fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
+		FieldResult fieldData = findOrCreateFieldData(foundElement.domainPropertyName)
 		fieldData.addFoundElement(foundElement)
 	}
 
 	/**
-	 * It adds the warn message result in the FieldData
+	 * It adds the warn message result in the FieldResult
 	 * <pre>
 	 *  "data": {
 	 *    "warn":true,
@@ -339,7 +338,7 @@ class RowData {
 	void addFindElementWarnMessage(ETLFindElement findElement) {
 		warn = true
 		errors.add(findElement.warnMessage)
-		FieldData fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
+		FieldResult fieldData = findOrCreateFieldData((String)findElement.currentFind.property)
 		fieldData.addFindElementWarnMessage(findElement)
 	}
 
@@ -348,9 +347,9 @@ class RowData {
 	 * @param element
 	 * @return
 	 */
-	FieldData findOrCreateFieldData(String fieldName){
+	FieldResult findOrCreateFieldData(String fieldName){
 		if(!fields.containsKey(fieldName)){
-			fields[fieldName] = new FieldData()
+			fields[fieldName] = new FieldResult()
 		}
 		return fields[fieldName]
 	}
@@ -380,17 +379,21 @@ class RowData {
  * </pre>
  */
 @CompileStatic
-class FieldData {
+class FieldResult {
 
 	Object originalValue
 	Object value
 	Object init
 	List<String> errors = []
 	Boolean warn = false
-	FindData find = new FindData()
+	FindResult find = new FindResult()
 	Map<String, Object> create
 	Map<String, Object> update
 
+	/**
+	 * Add errors list in JSON results
+	 * @param errors
+	 */
 	private void addErrors(List<String> errors){
 		if(errors){
 			this.errors.addAll(errors)
@@ -404,7 +407,7 @@ class FieldData {
 	 *		{
 	 *			"domain": "Application",
 	 *			"kv": {"id": null},
-	 *	    	"error" : "Named parameter [id] value may not be null"
+	 *	    	"errors" : ["Named parameter [id] value may not be null"]
 	 *		},
 	 *	]
 	 * </pre>
@@ -416,11 +419,19 @@ class FieldData {
 		this.find.addQueryAndResults(findElement)
 	}
 
+	/**
+	 * Add find wran message in JSON results
+	 * @param findElement
+	 */
 	void addFindElementWarnMessage(ETLFindElement findElement) {
 		warn = true
 		errors.add(findElement.warnMessage)
 	}
 
+	/**
+	 * Add FoundElement map fields in JSON results
+	 * @param foundElement
+	 */
 	void addFoundElement(FoundElement foundElement) {
 		if(foundElement.getAction() == FoundElement.FoundElementType.create){
 			create = foundElement.propertiesMap
@@ -431,11 +442,10 @@ class FieldData {
 }
 
 @CompileStatic
-class FindData {
-	List<QueryData> query = []
+class FindResult {
+	List<QueryResult> query = []
 	List<Long> results = []
 	Integer matchOn
-
 
 	/**
 	 * It prepares query map results with the domain.data
@@ -462,11 +472,18 @@ class FindData {
 			this.matchOn = findElement.results.matchOn as Integer
 		}
 	}
-
+	/**
+	 * Add Query content in JSON result
+	 * @param findElement
+	 */
 	private void addQuery(ETLFindElement findElement) {
-		query.add(new QueryData(domain: findElement.currentDomain.name(), kv: (Map<String, Object>)findElement.currentFind.kv))
+		query.add(new QueryResult(domain: findElement.currentDomain.name(), kv: (Map<String, Object>)findElement.currentFind.kv))
 	}
 
+	/**
+	 * Add query and Results in JSON result
+	 * @param findElement
+	 */
 	void addQueryAndResults(ETLFindElement findElement){
 		addQuery(findElement)
 		addResults(findElement)
@@ -488,7 +505,7 @@ class FindData {
  * @return
  */
 @CompileStatic
-class QueryData {
+class QueryResult {
 	String domain
 	Map<String, Object> kv = [:]
 }

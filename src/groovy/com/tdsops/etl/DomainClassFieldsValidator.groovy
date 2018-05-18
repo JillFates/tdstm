@@ -6,6 +6,11 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 class DomainClassFieldsValidator implements ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
+	Map<String, ETLFieldDefinition> fieldsDefinitionCache = [:]
+
+	private String cacheKey(ETLDomain domain, String field){
+		return new StringBuffer(domain.name()).append('.').append(field).toString()
+	}
 
 	/**
 	 * Add fields specification for an ETLDomain instance
@@ -25,6 +30,11 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	//TODO: rename validate fieldName exists
 	Boolean hasSpecs(ETLDomain domain, String field) {
 
+		String cacheKey = cacheKey(domain, field)
+		if(fieldsDefinitionCache.containsKey(cacheKey)){
+			return fieldsDefinitionCache.get(cacheKey)
+		}
+
 		if(domain.isAsset()){
 			return (assetClassFieldsSpecMap[domain].find { it.field == field || it.label == field } != null)
 		} else{
@@ -40,17 +50,27 @@ class DomainClassFieldsValidator implements ETLFieldsValidator {
 	 */
 	ETLFieldDefinition lookup(ETLDomain domain, String field) {
 
+		String cacheKey = cacheKey(domain, field)
+		if(fieldsDefinitionCache.containsKey(cacheKey)){
+			return fieldsDefinitionCache.get(cacheKey)
+		}
+
+		ETLFieldDefinition fieldDefinition
+
 		if(domain.isAsset()){
 			if(hasSpecs(domain, field)){
 				Map<String, ?> fieldSpec = assetClassFieldsSpecMap[domain].find {
 					it.field == field || it.label == field
 				}
-				return new ETLFieldDefinition(fieldSpec)
+				fieldDefinition = new ETLFieldDefinition(fieldSpec)
 			}
 		} else{
 			Class<?> domainClass = domain.clazz
 			GrailsDomainClassProperty domainProperty = GormUtil.getDomainProperty(domainClass, field)
-			return new ETLFieldDefinition(domainProperty)
+			fieldDefinition = new ETLFieldDefinition(domainProperty)
 		}
+
+		fieldsDefinitionCache.put(cacheKey, fieldDefinition)
+		return fieldDefinition
 	}
 }
