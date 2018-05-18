@@ -3,6 +3,7 @@ package net.transitionmanager.agent
 import com.tdsops.common.grails.ApplicationContextHolder
 import groovy.util.logging.Slf4j
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.HttpProducerService
 import groovy.transform.CompileStatic
 
@@ -28,7 +29,7 @@ class HttpAgent extends AbstractAgent {
 				docUrl: '',
 				method: 'invokeHttpRequest',
 				producesData: 0,
-				params: queueParams()
+				params: []
             ])
         ] )
 
@@ -40,7 +41,7 @@ class HttpAgent extends AbstractAgent {
      * @param actionRequest
      * @return
      */
-    void invokeHttpRequest(ActionRequest actionRequest) {
-        httpProducerService.executeCall(actionRequest)
+    ApiActionResponse invokeHttpRequest(ActionRequest actionRequest) {
+        return httpProducerService.executeCall(actionRequest)
     }
 }

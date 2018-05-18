@@ -149,17 +149,17 @@ class ETLProcessorResult {
 	 *
 	 * @param element
 	 */
-	void loadElement(Element element) {
+	void loadElement(Element element, Integer rowIndex) {
 
 		Map<String, ?> currentData = currentRowData()
-		currentData.rowNum = element.rowIndex
+		currentData.rowNum = rowIndex
 
-		if(currentData.fields[element.fieldSpec.name]) {
+		if(currentData.fields[element.fieldDefinition.name]) {
 			updateFieldDataMap(currentData, element)
 
 		} else {
-			reference.fieldNames.add(element.fieldSpec.name)
-			currentData.fields[element.fieldSpec.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
+			reference.fieldNames.add(element.fieldDefinition.name)
+			currentData.fields[element.fieldDefinition.name] = initialFieldDataMap(element.originalValue, element.value, element.init)
 		}
 	}
 
@@ -176,7 +176,7 @@ class ETLProcessorResult {
 	 * Removes ignored rows in the current reference.
 	 */
 	def removeIgnoredRows() {
-		if(reference.data.last().ignore) {
+		if(reference.data && reference.data.last().ignore) {
 			reference.data = reference.data.dropRight(1)
 		}
 	}
@@ -198,6 +198,9 @@ class ETLProcessorResult {
 
 		if(reference.data.isEmpty()){
 			reference.data.add(initialRowDataMap())
+		} else if(processor.selectedDomain.addNewRow) {
+			reference.data.add(initialRowDataMap())
+			processor.selectedDomain.addNewRow = false
 		} else if (reference.data.last().rowNum &&
 			reference.data.last().rowNum  < processor.currentRowIndex){
 			reference.data.add(initialRowDataMap())
@@ -403,7 +406,7 @@ class ETLProcessorResult {
 	 * @param element
 	 */
 	private void updateFieldDataMap(Map<String, ?> currentData, Element element) {
-		Map<String, ?> field = currentData.fields[element.fieldSpec.name]
+		Map<String, ?> field = currentData.fields[element.fieldDefinition.name]
 
 		if(element.init){
 			field.init = element.init

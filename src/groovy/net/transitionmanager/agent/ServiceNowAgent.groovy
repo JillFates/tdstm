@@ -2,7 +2,8 @@ package net.transitionmanager.agent
 
 import net.transitionmanager.integration.ActionRequest
 import com.tdsops.common.grails.ApplicationContextHolder
-import net.transitionmanager.service.ServiceNowService
+import net.transitionmanager.integration.ApiActionResponse
+import net.transitionmanager.service.HttpProducerService
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
@@ -15,7 +16,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class ServiceNowAgent extends AbstractAgent {
 	private static final String DOCUMENTATION_URL = 'https://developer.servicenow.com/app.do#!/rest_api_doc?v=jakarta&id=r_TableAPI-GET'
-	public ServiceNowService serviceNowService
+	HttpProducerService httpProducerService
 
 	private static final LinkedHashMap HOSTNAME_PARAM = [
 			paramName: 'HOSTNAME',
@@ -218,7 +219,7 @@ class ServiceNowAgent extends AbstractAgent {
 							readonly: 0,
 							encoded: 0
 						],
-						tableParam('cmdb_ci_server', 1)
+						tableParam('cmdb_ci_database', 1)
 					] + COMMON_PARAMS
 				] ),
 			MSDList:
@@ -296,14 +297,14 @@ class ServiceNowAgent extends AbstractAgent {
 							readonly: 0,
 							encoded: 0
 						],
-						tableParam('User defined table name', 0)
+						tableParam('', 0)
 					] + COMMON_PARAMS
 				] )
 		]
 
 		setDictionary( dictionary )
 
-		serviceNowService = (ServiceNowService) ApplicationContextHolder.getBean('serviceNowService')
+		httpProducerService = (HttpProducerService) ApplicationContextHolder.getBean('httpProducerService')
 
 		/*
 
@@ -356,6 +357,7 @@ class ServiceNowAgent extends AbstractAgent {
 	private LinkedHashMap tableParam(String fieldName, int readOnly) {
 		LinkedHashMap<String, ?> table = new LinkedHashMap<>(TABLE_PARAM)
 		table.put('fieldName', fieldName)
+		table.put('value', fieldName)
 		table.put('readOnly', readOnly)
 		return table;
 	}
@@ -365,12 +367,8 @@ class ServiceNowAgent extends AbstractAgent {
 	 * @param actionRequest
 	 * @return
 	 */
-	Map fetchAssetList(ActionRequest actionRequest) {
-
-		Map result = serviceNowService.fetchAssetList(actionRequest)
-		log.debug 'fetchAssetList() Result of fetch assets. {}', result
-
-		return result
+	ApiActionResponse fetchAssetList(ActionRequest actionRequest) {
+		return httpProducerService.executeCall(actionRequest)
 	}
 
 }

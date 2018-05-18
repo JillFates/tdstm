@@ -16,6 +16,8 @@ import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import com.tdssrc.grails.NumberUtil
+import spock.lang.See
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Test about ETLProcessor commands:
@@ -26,11 +28,13 @@ import com.tdssrc.grails.NumberUtil
  * </ul>
  */
 @TestFor(FileSystemService)
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
+@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
 class ETLFindSpec extends ETLBaseSpec {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
+	String deviceBladeChassisDataSetContent
+	String deviceDataSetContent
 	Project GMDEMO
 	Project TMDEMO
 	DebugConsole debugConsole
@@ -74,18 +78,28 @@ class ETLFindSpec extends ETLBaseSpec {
 			152254,Microsoft,(xlsx updated),ACME Data Center
 			152255,Mozilla,NGM,ACME Data Center""".stripIndent()
 
+		deviceDataSetContent = """
+			device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+			152254,SRW24G1,LINKSYS,322223,100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+			152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+			152256,Slideaway,ATEN,322224,4344344,VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R""".stripIndent()
+
+		deviceBladeChassisDataSetContent = """
+			name,mfg,model,type,chassis,slot
+			hpchassis01,HP,BladeSystem Z7000,Blade Chassis,,
+			xrayblade01,HP,ProLiant BL460c G1,Blade,hpchassis01,1
+			xrayblade02,HP,ProLiant BL460c G1,Blade,hpchassis01,2
+			xrayblade03,HP,ProLiant BL460c G1,Blade,hpchassis01,3
+			xrayblade04,HP,ProLiant BL460c G1,Blade,hpchassis01,4
+		""".stripIndent()
+
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
 
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -126,8 +140,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -137,42 +150,43 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with SOURCE.'application id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == '152254'
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152254']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == '152254'
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == '152255'
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152254']
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: '152255']
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == '152255'
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: '152255']
+						}
 					}
 				}
 			}
@@ -202,6 +216,106 @@ class ETLFindSpec extends ETLBaseSpec {
 					[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 					[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
 					[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getMoveBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				assetEntities.findAll { it.id == namedParams.id }
+			}
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					debugConsole,
+					validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' transform with toLong() load 'id'
+							find Application by 'id' with DOMAIN.id into 'id' 
+						}
+						""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
+					data.size() == 14
+					data.collect {
+						it.fields.id.value.toLong()
+					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+
+
+					with(data[0].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151954l
+						find.results == [151954l]
+						find.matchOn == 0
+					}
+
+					with(data[1].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151971l
+						find.results == [151971l]
+						find.matchOn == 0
+					}
+
+					with(data[2].fields.id) {
+						find.query.size() == 1
+						find.query[0].domain == ETLDomain.Application.name()
+						find.query[0].kv.id == 151974l
+						find.results == [151974l]
+						find.matchOn == 0
+					}
+				}
+			}
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void "test exception when [into] keyword is not found"() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+
+		and:
+			List<AssetEntity> assetEntities = [
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
 
 			].collect {
 				AssetEntity mock = Mock()
@@ -216,15 +330,15 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			List<AssetDependency> assetDependencies = [
-					[id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
-					[id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
-						it.getId() == 152402l
-					}, type: 'Hosts'],
+					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
 			].collect {
 				AssetDependency mock = Mock()
 				mock.getId() >> it.id
@@ -245,57 +359,117 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
-					GMDEMO,
-					dataSet,
-					debugConsole,
-					validator)
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
 
 		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+					  .evaluate("""
 						console on
 						read labels
 						domain Application
 						iterate {
 							extract 'AssetId' load 'id'
-							find Application by 'id' with DOMAIN.id into 'id' 
+							find Application by 'id' with DOMAIN.id // <-- Missing into keyword
 						}
 						""".stripIndent(),
-					ETLProcessor.class.name)
+					  ETLProcessor.class.name)
 
-		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "find/elseFind statement is missing required [into] keyword"
 
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
 
-				with(data[0].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151954'
-					find.results == [151954]
-					find.matchOn == 0
-				}
+	void "test exception when [with, into] keywords are not found"() {
 
-				with(data[1].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151971'
-					find.results == [151971]
-					find.matchOn == 0
-				}
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
-				with(data[2].fields.id) {
-					find.query.size() == 1
-					find.query[0].domain == ETLDomain.Application.name()
-					find.query[0].kv.id == '151974'
-					find.results == [151974]
-					find.matchOn == 0
-				}
+		and:
+			List<AssetEntity> assetEntities = [
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV01', id: 151990l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+					  [assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', moveBundle: 'M2-Hybrid', project: TMDEMO],
+					  [assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', moveBundle: 'M2-Hybrid', project: GMDEMO],
+
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getBundle() >> it.bundle
+				mock.getProject() >> it.project
+				mock
 			}
+
+		and:
+			List<AssetDependency> assetDependencies = [
+					  [id    : 1l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 2l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+					  [id    : 3l, asset: assetEntities.find { it.getId() == 151954l }, dependent: assetEntities.find {
+						  it.getId() == 152402l
+					  }, type: 'Hosts'],
+			].collect {
+				AssetDependency mock = Mock()
+				mock.getId() >> it.id
+				mock.getType() >> it.type
+				mock.getAsset() >> it.asset
+				mock.getDependent() >> it.dependent
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+				assetEntities.findAll { it.id == args.id }
+			}
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+					  GMDEMO,
+					  dataSet,
+					  debugConsole,
+					  validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+					  .evaluate("""
+						console on
+						read labels
+						domain Application
+						iterate {
+							extract 'AssetId' load 'id'
+							find Application by 'id' // <-- Missing [with and into] keyword
+						}
+						""".stripIndent(),
+					  ETLProcessor.class.name)
+
+		then: 'It throws an Exception because find command is incorrect'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "find/elseFind statement is missing required [with, into] keywords"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -374,8 +548,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -390,60 +563,61 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
+					data.collect { it.fields.asset.value } == [
 						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
 						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					]
 
-				// Validates command: find Application of asset by id with DOMAIN.asset
-				(1..14).eachWithIndex { int value, int index ->
-					with(data[index].fields.id.find) {
-						query.size() == 1
-						with(query[0]) {
-							domain == ETLDomain.Dependency.name()
-							kv.id == value.toString()
+					// Validates command: find Application of asset by id with DOMAIN.asset
+					(1..14).eachWithIndex { int value, int index ->
+						with(data[index].fields.id.find) {
+							query.size() == 1
+							with(query[0]) {
+								domain == ETLDomain.Dependency.name()
+								kv.id == value.toString()
+							}
 						}
 					}
-				}
 
-				// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
-				with(data[0].fields.asset.find) {
-					query.size() == 4
-					with(query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
-					}
+					// Validates command: elseFind Application of asset by assetName, assetType with SOURCE.AssetName, primaryType
+					with(data[0].fields.asset.find) {
+						query.size() == 4
+						with(query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
 
-					with(query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
+						with(query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetClass == 'VM'
+						}
 
-					with(query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
+						with(query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
 
-					with(query[3]) {
-						domain == ETLDomain.Asset.name()
-						kv.assetName == 'VMWare Vcenter'
+						with(query[3]) {
+							domain == ETLDomain.Asset.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
 					}
 				}
 			}
@@ -520,8 +694,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -539,16 +712,19 @@ class ETLFindSpec extends ETLBaseSpec {
 							 	load 'comment' with 'Asset results not found'
 							}
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'comment'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value.toLong() } == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'comment'] as Set
+					data.size() == 14
+					data.collect {
+						it.fields.id.value.toLong()
+					} == [151954, 151971, 151974, 151975, 151978, 151990, 151999, 152098, 152100, 152106, 152117, 152118, 152118, 152118]
+				}
 			}
 
 		cleanup:
@@ -591,8 +767,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -601,25 +776,25 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'asset'
 							find Application by 'id' with DOMAIN.asset into 'asset'   
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0].fields.asset) {
-					originalValue == '152254'
-					value == '152254'
-				}
+					with(data[0].fields.asset) {
+						originalValue == '152254'
+						value == '152254'
+					}
 
-				with(data[1].fields.asset) {
-					originalValue == '152255'
-					value == '152255'
+					with(data[1].fields.asset) {
+						originalValue == '152255'
+						value == '152255'
+					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -657,8 +832,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -667,8 +841,7 @@ class ETLFindSpec extends ETLBaseSpec {
 							extract 'application id' load 'id'
 							find Application by 'id' with 'id' into 'id'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -703,11 +876,11 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				if (args.containsKey('id')) {
-					applications.findAll { it.getId() == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				if (namedParams.containsKey('id')) {
+					applications.findAll { it.getId() == namedParams.id && it.project.id == namedParams.project.id }
 				} else {
-					applications.findAll { it.getAppVendor() == args.appVendor && it.project.id == args.project.id }
+					applications.findAll { it.getAppVendor() == namedParams.appVendor && it.project.id == namedParams.project.id }
 				}
 			}
 
@@ -719,8 +892,7 @@ class ETLFindSpec extends ETLBaseSpec {
 					validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-					.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -732,75 +904,76 @@ class ETLFindSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id' 
 							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id' warn 'found without asset id field'
 						}
-						""".stripIndent(),
-					ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
 
-				with(data[0]) {
-					!warn
+					with(data[0]) {
+						!warn
 
-					with(fields) {
+						with(fields) {
 
-						with(environment){
-							originalValue == 'Production'
-							value == 'Production'
-						}
-						with(appVendor){
-							originalValue == 'Microsoft'
-							value == 'Microsoft'
-						}
-						with(id){
-							originalValue == '152254'
-							value == '152254'
+							with(environment) {
+								originalValue == 'Production'
+								value == 'Production'
+							}
+							with(appVendor) {
+								originalValue == 'Microsoft'
+								value == 'Microsoft'
+							}
+							with(id) {
+								originalValue == '152254'
+								value == '152254'
 
-							// Validating queries
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152254']
+								// Validating queries
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152254']
 
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Microsoft']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Microsoft']
 
-								results == []
-								matchOn == null
+									results == []
+									matchOn == null
+								}
 							}
 						}
 					}
-				}
 
-				with(data[1]) {
-					warn
-					errors == ['found without asset id field']
-					with(fields){
+					with(data[1]) {
+						warn
+						errors == ['found without asset id field']
+						with(fields) {
 
-						with(environment){
-							originalValue == 'Production'
-							value == 'Production'
-						}
-						with(appVendor){
-							originalValue == 'Mozilla'
-							value == 'Mozilla'
-						}
-						with(id){
-							originalValue == '152255'
-							value == '152255'
-							// Validating queries
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152255']
-
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Mozilla']
-
-								results == [1l]
-								matchOn == 1
+							with(environment) {
+								originalValue == 'Production'
+								value == 'Production'
 							}
-							warn
-							errors == ['found without asset id field']
+							with(appVendor) {
+								originalValue == 'Mozilla'
+								value == 'Mozilla'
+							}
+							with(id) {
+								originalValue == '152255'
+								value == '152255'
+								// Validating queries
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152255']
+
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Mozilla']
+
+									results == [1l]
+									matchOn == 1
+								}
+								warn
+								errors == ['found without asset id field']
+							}
 						}
 					}
 				}
@@ -820,7 +993,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
 				throw new RuntimeException('Invalid query for this Spec')
 			}
 
@@ -832,8 +1005,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -844,55 +1016,56 @@ class ETLFindSpec extends ETLBaseSpec {
 							find Application by 'id' with SOURCE.'application id' into 'id' 
 							elseFind Application by 'appVendor' with DOMAIN.appVendor into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['id', 'appVendor'] as Set
-				with(data[0]) {
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id', 'appVendor'] as Set
+					with(data[0]) {
 
-					errorCount == 2
-					with(fields) {
+						errorCount == 2
+						with(fields) {
 
-						with(id) {
-							originalValue == '152254'
-							value == '152254'
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152254']
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Microsoft']
+							with(id) {
+								originalValue == '152254'
+								value == '152254'
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152254']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Microsoft']
+								}
+								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
-						}
-						with(appVendor) {
-							originalValue == 'Microsoft'
-							value == 'Microsoft'
+							with(appVendor) {
+								originalValue == 'Microsoft'
+								value == 'Microsoft'
+							}
 						}
 					}
-				}
-				with(data[1]) {
-					errorCount == 2
-					with(fields) {
+					with(data[1]) {
+						errorCount == 2
+						with(fields) {
 
-						with(id) {
-							originalValue == '152255'
-							value == '152255'
-							with(find) {
-								query[0].domain == ETLDomain.Application.name()
-								query[0].kv == [id: '152255']
-								query[1].domain == ETLDomain.Application.name()
-								query[1].kv == [appVendor: 'Mozilla']
+							with(id) {
+								originalValue == '152255'
+								value == '152255'
+								with(find) {
+									query[0].domain == ETLDomain.Application.name()
+									query[0].kv == [id: '152255']
+									query[1].domain == ETLDomain.Application.name()
+									query[1].kv == [appVendor: 'Mozilla']
+								}
+
+								errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
 							}
-
-							errors == ['Invalid query for this Spec', 'Invalid query for this Spec']
-						}
-						with(appVendor) {
-							originalValue == 'Mozilla'
-							value == 'Mozilla'
+							with(appVendor) {
+								originalValue == 'Mozilla'
+								value == 'Mozilla'
+							}
 						}
 					}
 				}
@@ -957,16 +1130,17 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		and:
-			GroovySpy(AssetEntity, global: true)
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				if (namedParams.containsKey('id')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == namedParams.id }
+				} else if (namedParams.containsKey('assetName')){
+					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == namedParams.assetName }
+				}
+			}
+
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
-			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				if (args.containsKey('id')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.id == args.id }
-				} else if (args.containsKey('assetName')){
-					return assetEntities.findAll { it.getProject() == GMDEMO && it.getAssetName() == args.assetName }
-				}
 			}
 
 		and:
@@ -977,17 +1151,16 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console on
 					read labels
 					domain Dependency
 					iterate {
 					
-						extract 'AssetDependencyId' load 'id'
+						extract 'AssetDependencyId' transform with toLong() load 'id'
 						extract 'AssetId' load 'asset'
 						
-						find Asset by 'assetName' with SOURCE.AssetName into 'asset'
+						find Application by 'assetName' with SOURCE.AssetName into 'asset'
 						// Grab the reference to the FINDINGS to be used later. 
 						def primaryFindings = FINDINGS
 
@@ -997,8 +1170,7 @@ class ETLFindSpec extends ETLBaseSpec {
 						    set commentVar with 'Asset results not found'
 						}
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'It throws an Exception because project was not defined'
 
@@ -1025,12 +1197,157 @@ class ETLFindSpec extends ETLBaseSpec {
 			])
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
-				${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
-				13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
-				${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
-				${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
-				13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""device id,model name,manufacturer name,rackId,RoomId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
+				152254,SRW24G1,LINKSYS,${racks[0].getId()},100,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,0,500,235,3300,3300,0,Rack,R
+				152255,ZPHA MODULE,TippingPoint,13145,102,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,0,280,252,3300,3300,0,Rack,L
+				152256,Slideaway,ATEN,${racks[1].getId()},${rooms[0].getId()},VMAX-1,ACME Data Center,VMAX 20K Rack,ACME Data Center / DC1,1,160,0,1430,1430,0,Rack,R
+				152257,ZPHA MODULE,TippingPoint,${racks[2].getId()},${rooms[1].getId()},Storage,ACME Data Center,42U Rack,ACME Data Center / DC1,1,1,15,0,0,0,Object,L
+				152258,Slideaway,ATEN,13358,,UPS 1,New Colo Provider,42U Rack,New Colo Provider / ACME Room 1,1,41,42,0,0,0,block3x5,L""".stripIndent())
+
+		and:
+			GroovyMock(Room, global: true)
+			Room.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			Room.executeQuery(_, _) >> { String query, Map args ->
+				rooms.findAll { it.id == args.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+					console on
+					read labels
+					iterate {
+						domain Rack
+						extract 'rackId' load 'id'
+						extract 'Location' load 'location'
+						extract 'Room' load 'room'
+				 
+						find Room by 'id' with SOURCE.RoomId into 'room'
+					}
+					""".stripIndent())
+
+		then: 'Results should contain Rack domain results associated'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Rack.name()
+					fieldNames == ['id', 'location', 'room'] as Set
+
+					data.size() == 5
+					with(data[0]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == '4'
+							value == '4'
+						}
+					}
+					with(data[1]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == '13145'
+							value == '13145'
+						}
+					}
+					with(data[2]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 3
+						with(fields.id) {
+							originalValue == '5'
+							value == '5'
+						}
+					}
+					with(data[3]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 4
+						with(fields.id) {
+							originalValue == '6'
+							value == '6'
+						}
+					}
+					with(data[4]) {
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 5
+						with(fields.id) {
+							originalValue == '13358'
+							value == '13358'
+						}
+					}
+
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can load Devices with locationSource, Rooms and Racks'() {
+
+		given:
+			List<Room> rooms = buildRooms([
+				[1, GMDEMO, 'DC1', 'ACME Data Center', 26, 40, '112 Main St', 'Cumberland', 'IA', '50843'],
+				[2, GMDEMO, 'ACME Room 1', 'New Colo Provider', 40, 42, '411 Elm St', 'Dallas', 'TX', '75202']
+			])
+
+		and:
+			List<Rack> racks = buildRacks([
+				[4, GMDEMO, rooms[0], null, null, 'ACME Data Center', 'R', 0, 500, 235, 3300, 3300, 0, 'Rack'],
+				[5, GMDEMO, rooms[1], null, null, 'ACME Data Center', 'L', 1, 160, 0, 1430, 1430, 0, 'Rack'],
+				[6, GMDEMO, null, null, null, 'New Colo Provider', 'L', 0, 41, 42, 0, 0, 0, 'block3x5']
+			])
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(deviceDataSetContent)
+
+			List<AssetEntity> assetEntities = [
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151954l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD18', id: 151971l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD21', id: 151974l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD22', id: 151975l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ATXVMPROD25', id: 151978l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMPROD01', id: 151990l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'ACMEVMDEV10', id: 151999l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'Mailserver01', id: 152098l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'PL-DL580-01', id: 152100l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'SH-E-380-1', id: 152106l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 1', id: 152117l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, assetName: 'System z10 Cab 2', id: 152118l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152256l, assetName: "Application Microsoft", environment: 'Production', bundle: 'M2-Hybrid', project: TMDEMO],
+				[assetClass: AssetClass.APPLICATION, assetName: 'VMWare Vcenter', id: 152402l, environment: 'Production', bundle: 'M2-Hybrid', project: GMDEMO],
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getEnvironment() >> it.environment
+				mock.getProject() >> it.project
+				mock.isaApplication() >> (it.assetClass.name().toLowerCase() == 'application')
+				mock
+			}
 
 		and:
 			GroovyMock(Room, global: true)
@@ -1054,21 +1371,24 @@ class ETLFindSpec extends ETLBaseSpec {
 					console on
 					read labels
 					iterate {
-						domain Rack
-						extract 'rackId' load 'id' 
-						extract 'Location' load 'location'
-						extract 'Room' load 'room'
-				 
-						find Room by 'id' with SOURCE.RoomId into 'room'
+						domain Device
+						extract 'device id' load 'id' 
+						extract 'model name' load 'assetName'
+						extract 'Location' load 'locationSource'
+						extract 'Room' load 'roomSource'
+						
+						find Room by 'id' with SOURCE.RoomId into 'roomSource'
 					}
 					""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results should contain Rack domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Rack.name()
-				fieldNames == ['id', 'location', 'room'] as Set
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id', 'assetName', 'locationSource', 'roomSource'] as Set
+				}
 			}
 
 		cleanup:
@@ -1115,8 +1435,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console on
 					read labels
 					iterate {
@@ -1127,8 +1446,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				 
 						find Room 'for' 'room' by 'id' with SOURCE.RoomId
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 
 		then: 'It throws an Exception because find command is incorrect'
@@ -1176,8 +1494,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -1187,42 +1504,43 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with DOMAIN.id into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == 152254
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152254]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == 152254
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == 152255
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152254]
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152255]
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == 152255
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152255]
+						}
 					}
 				}
 			}
@@ -1268,8 +1586,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						iterate {
@@ -1279,42 +1596,43 @@ class ETLFindSpec extends ETLBaseSpec {
 							
 							find Application by 'id' with DOMAIN.id into 'id'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
-
-				with(data[0].fields.id) {
-					originalValue == '152254'
-					value == 152254l
-
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152254l]
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
 					}
-				}
 
-				with(data[1].fields.environment) {
-					originalValue == 'Production'
-					value == 'Production'
-				}
+					with(data[0].fields.id) {
+						originalValue == '152254'
+						value == 152254l
 
-				with(data[1].fields.id) {
-					originalValue == '152255'
-					value == 152255l
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152254l]
+						}
+					}
 
-					find.query.size() == 1
-					with(find.query[0]) {
-						domain == 'Application'
-						kv == [id: 152255l]
+					with(data[1].fields.environment) {
+						originalValue == 'Production'
+						value == 'Production'
+					}
+
+					with(data[1].fields.id) {
+						originalValue == '152255'
+						value == 152255l
+
+						find.query.size() == 1
+						with(find.query[0]) {
+							domain == 'Application'
+							kv == [id: 152255l]
+						}
 					}
 				}
 			}
@@ -1345,72 +1663,71 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
 						find Application by 'id' with SOURCE.'application id' into 'id'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152254'
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == '152254'
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152255'
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == '152255'
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1439,8 +1756,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
@@ -1451,72 +1768,72 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
-						find Application by 'id' with SOURCE.'application id' into 'id' 
+						extract 'application id' transform with toLong() set appIdVar
+						find Application by 'id' with appIdVar into 'id' 
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152254'
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										id == 152254l
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == [152255]
-							matchOn == 0
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152255'
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == [152255l]
+								matchOn == 0
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										id == 152255l
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
@@ -1545,8 +1862,8 @@ class ETLFindSpec extends ETLBaseSpec {
 			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
 				return true
 			}
-			AssetEntity.executeQuery(_, _) >> { String query, Map args ->
-				applications.findAll { it.id == args.id && it.project.id == args.project.id }
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
 			}
 
 		and:
@@ -1557,65 +1874,66 @@ class ETLFindSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Dependency
 					iterate {
-						find Application by 'id' with SOURCE.'application id' into 'id' 
+						extract 'application id' transform with toLong() set appIdVar
+						find Application by 'id' with appIdVar into 'id' 
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
 
-				with(data[0]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 1
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == []
+					with(data[0]) {
+						op == 'I'
 						warn == false
-						with (find){
-							results == []
-							matchOn == null
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152254'
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == 152254l
+									}
 								}
 							}
 						}
 					}
-				}
 
-				with(data[1]){
-					op == 'I'
-					warn == false
-					duplicate == false
-					errors == []
-					rowNum == 2
-					with(fields.id) {
-						originalValue == null
-						value == null
-						init == null
-						errors == ['The find/elseFind command(s) found multiple records']
+					with(data[1]) {
+						op == 'I'
 						warn == false
-						with (find){
-							matchOn == 0
-							results == [152255, 152255]
-							with (query[0]){
-								domain == 'Application'
-								with(kv){
-									id == '152255'
+						duplicate == false
+						errors == []
+						rowNum == 2
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == ['The find/elseFind command(s) found multiple records']
+							warn == false
+							with(find) {
+								matchOn == 0
+								results == [152255, 152255]
+								with(query[0]) {
+									domain == 'Application'
+									with(kv) {
+										id == 152255l
+									}
 								}
 							}
 						}
@@ -1626,4 +1944,266 @@ class ETLFindSpec extends ETLBaseSpec {
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
+
+	@See('TM-10678')
+	void 'test can create new results using domain command'() {
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				Primary App,Primary Server,Supporting App,Supporting Server
+				ERP,xraysrv001,Oracle7-Cluster,zuludb01""".stripIndent())
+
+		and:
+			List<AssetEntity> applications = [
+				[assetClass: AssetClass.APPLICATION, id: 152253l, assetName: "ACME Data Center", project: GMDEMO],
+				[assetClass: AssetClass.APPLICATION, id: 152255l, assetName: "Another Data Center", project: GMDEMO],
+				[assetClass: AssetClass.DEVICE, id: 152255l, assetName: "Application Microsoft", project: TMDEMO]
+			].collect {
+				AssetEntity mock = Mock()
+				mock.getId() >> it.id
+				mock.getAssetClass() >> it.assetClass
+				mock.getAssetName() >> it.assetName
+				mock.getProject() >> it.project
+				mock
+			}
+
+		and:
+			GroovyMock(AssetEntity, global: true)
+			AssetEntity.isAssignableFrom(_) >> { Class<?> clazz->
+				return true
+			}
+			AssetEntity.executeQuery(_, _, _) >> { String query, Map namedParams, Map metaParams ->
+				applications.findAll { it.id == namedParams.id && it.project.id == namedParams.project.id }
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+			read labels
+			iterate {
+				extract 'Primary App' set primaryAppVar
+				extract 'Primary Server' set primaryServerVar
+				extract 'Supporting App' set supportAppVar
+				extract 'Supporting Server' set supportServerVar
+
+				// Primary App
+				domain Application
+				lookup 'assetName' with primaryAppVar
+				if (LOOKUP.notFound()) {
+					find Application by 'assetName' with primaryAppVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' primaryAppVar
+					}
+				}
+
+				// Supporting App
+				domain Application
+				lookup 'assetName' with supportAppVar
+				if (LOOKUP.notFound()) {
+					find Application by 'assetName' with supportAppVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' supportAppVar
+					}
+				}
+
+				// Primary Server
+				domain Device
+				lookup 'assetName' with primaryServerVar
+				if (LOOKUP.notFound()) {
+					find Device by 'assetName' with primaryServerVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' primaryServerVar
+					}
+				}
+
+				// Supporting Server
+				domain Device
+				lookup 'assetName' with supportServerVar
+				if (LOOKUP.notFound()) {
+					find Device by 'assetName' with supportServerVar into 'id'
+					whenNotFound 'id' create {
+						'assetName' supportServerVar
+					}
+				}
+
+				// Create App - App Dependency
+				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, supportAppVar
+				load 'asset' with primaryAppVar
+				load 'dependent' with supportAppVar
+				load 'type' with 'Communicates With'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+
+				// Create Primary App - Primary Server
+				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with primaryAppVar, primaryServerVar
+				load 'asset' with primaryAppVar
+				load 'dependent' with primaryServerVar
+				load 'type' with 'Runs On'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+
+				// Create Supporting App - Supporting Server
+				domain Dependency
+				// Note that this doesn't work correctly yet.... I'll update this shortly
+				// find Dependency by 'asset', 'dependency' with supportAppVar, supportServerVar
+				load 'asset' with supportAppVar
+				load 'dependent' with supportServerVar
+				load 'type' with 'Runs On'
+				load 'status' with 'Validated'
+				load 'dataFlowFreq' with 'constant'
+			}
+		""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+
+			with(etlProcessor.resultsMap()){
+				domains.size() == 3
+
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['id'] as Set
+					data.size() == 2
+					with(data[0]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										assetName == 'ERP'
+									}
+								}
+							}
+							with(create){
+								assetName == 'ERP'
+
+							}
+						}
+
+					}
+					with(data[1]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Application.name()
+									with(kv) {
+										assetName == 'Oracle7-Cluster'
+									}
+								}
+							}
+							with(create){
+								assetName == 'Oracle7-Cluster'
+
+							}
+						}
+
+					}
+				}
+				with(domains[1]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['id'] as Set
+					data.size() == 2
+					with(data[0]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							//errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Device.name()
+									with(kv) {
+										assetName == 'xraysrv001'
+									}
+								}
+							}
+							with(create){
+								assetName == 'xraysrv001'
+
+							}
+						}
+
+					}
+					with(data[1]){
+						op == 'I'
+						warn == false
+						duplicate == false
+						errors == []
+						rowNum == 1
+						with(fields.id) {
+							originalValue == null
+							value == null
+							init == null
+							//errors == []
+							warn == false
+							with(find) {
+								results == []
+								matchOn == null
+								with(query[0]) {
+									domain == ETLDomain.Device.name()
+									with(kv) {
+										assetName == 'zuludb01'
+									}
+								}
+							}
+							with(create){
+								assetName == 'zuludb01'
+
+							}
+						}
+
+					}
+				}
+				with(domains[2]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq'] as Set
+					data.size() == 3
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+
+	}
 }
+

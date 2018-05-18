@@ -98,7 +98,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
     @HasPermission(Permission.DataScriptView)
     def list() {
         Long providerId = NumberUtil.toLong(request.JSON.providerId)
-        List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)
+        List<DataScript> dataScripts = dataScriptService.getDataScripts(providerId)?.sort {it.name}
         renderSuccessJson(dataScripts*.toMap())
     }
 

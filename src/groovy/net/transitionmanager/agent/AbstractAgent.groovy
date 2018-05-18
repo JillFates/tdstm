@@ -2,16 +2,15 @@ package net.transitionmanager.agent
 
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.service.InvalidParamException
 import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.InvalidConfigurationException
 import com.tds.asset.AssetComment
 import com.tdssrc.grails.UrlUtil
 
 import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import java.net.UnknownHostException
 
 /**
  * AbstractAgent Class
@@ -75,7 +74,7 @@ class AbstractAgent {
 	 * @param actionRequest - the container class that contains all we need to know about the call
 	 */
 	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
-	Map invoke(String methodName, ActionRequest actionRequest) {
+	ApiActionResponse invoke(String methodName, ActionRequest actionRequest) {
 		if (dict.containsKey(methodName)) {
 			DictionaryItem dictItem = (DictionaryItem) dict[methodName]
 			if (dictItem.method) {
@@ -120,6 +119,8 @@ class AbstractAgent {
 					if (task.assetEntity) {
 						// This line prevents the @CompileStatic
 						value = task.assetEntity[param.fieldName]
+					} else {
+						value = null
 					}
 					break
 				case ContextType.USER_DEF:
@@ -129,10 +130,10 @@ class AbstractAgent {
 					// Shouldn't actually ever get here but just in case - put a bullet in this execution
 					throw new InvalidRequestException("Parameter context ${param.context} is not supported")
 			}
-			if (param.encoded == 1) {
+			if (value && param.encoded == 1) {
 				value = UrlUtil.decode(value)
 			}
-			methodParams.put(param.paramName,value)
+			methodParams.put(param.paramName, value)
 		}
 		return methodParams
 	}

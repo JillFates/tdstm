@@ -31,6 +31,7 @@ export const en_DICTIONARY: Object = {
 			'CREATED_ON': 'Created On',
 			'UPDATED_ON': 'Updated On',
 			'SHARED': 'Shared',
+			'SYSTEM': 'System',
 		},
 		'SYSTEM_VIEW': 'System View'
 	},
@@ -117,6 +118,7 @@ export const en_DICTIONARY: Object = {
 			'STOP_PROCESSING': 'Stop processing',
 			'VIEW_ARCHIVED': 'View Archived',
 			'UNARCHIVE': 'Unarchive',
+			'STOP_BATCH_CONFIRMATION': 'Are you sure you want to stop running the batch process?',
 			'ARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to archive this item?',
 			'ARCHIVE_ITEMS_CONFIRMATION': 'Are you sure you want to archive these items?',
 			'UNARCHIVE_ITEM_CONFIRMATION': 'Are you sure you want to unarchive this item?',

@@ -19,6 +19,7 @@ import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
+import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -86,7 +87,7 @@ class TaskService implements ServiceMethods {
 	Scheduler quartzScheduler
 	def securityService
 	def sequenceService
-    CustomDomainService customDomainService
+	CustomDomainService customDomainService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -5423,5 +5424,56 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	def findAllByAssetEntity(def assetEntity) {
         AssetComment.findAllByAssetEntityAndCommentType(assetEntity, AssetCommentType.TASK)
+	}
+
+	/**
+	 * Fills the methodParams with the Label of the fieldName and the contextDesc that gives a user readable name
+	 * to be consistent with the API Action Parameters dialog
+	 * @param project where we are getting the fieldSpecs
+	 * @param List of maps with the MethodParam info
+	 * @return the new methodParams List with the new fields added
+	 */
+	List<Map> fillLabels(Project project, List<Map> methodParams) {
+		Map ASSET_CLASS_FOR_PARAMETERS = [
+				  'COMMON': 'Asset',
+				  'APPLICATION': 'Application',
+				  'DATABASE': 'Database',
+				  'DEVICE': 'Device',
+				  'STORAGE': 'Storage'
+		]
+
+
+
+		Map fieldSpecs = customDomainService.fieldSpecsWithCommon(project)
+		List<Map> newMethodParams = methodParams.collect {
+			Map mparam = new HashMap(it)
+			mparam.fieldNameLabel = ''
+
+			if (mparam.context == 'TASK') { // Checking against the TaskPropertyEnum
+				//Swap from AssetCommon
+				mparam.contextLabel = 'Task'
+				Map taskLabels = AssetCommentPropertyEnum.toMap()
+				mparam.fieldNameLabel = taskLabels[mparam.fieldName]
+
+			} else if ( ASSET_CLASS_FOR_PARAMETERS.containsKey(mparam.context) ) { //Check against the FieldSpecs
+				mparam.contextLabel = ASSET_CLASS_FOR_PARAMETERS[mparam.context]
+				mparam.fieldNameLabel = mparam.fieldName
+
+				def searchList =  ((fieldSpecs[mparam.context]?.fields)?:[]) + ((fieldSpecs['COMMON']?.fields)?:[])
+				def found = searchList.find { spec ->
+					spec.field == mparam.fieldName
+				}
+
+				if(found) {
+					mparam.fieldNameLabel = found.label
+				}
+			} else { // USER_DEF
+				mparam.contextLabel = 'User Defined'
+			}
+
+			return mparam
+		}
+
+		return newMethodParams
 	}
 }

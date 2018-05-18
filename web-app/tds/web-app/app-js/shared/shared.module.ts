@@ -20,6 +20,7 @@ import { UILoaderDirective } from '../shared/directives/ui-loader.directive';
 import { UIToastDirective } from '../shared/directives/ui-toast.directive';
 import { UIDialogDirective } from '../shared/directives/ui-dialog.directive';
 import { UIPromptDirective, UIPromptService } from '../shared/directives/ui-prompt.directive';
+import { UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
 import { UISVGIconDirectiveDirective } from './directives/ui-svg-icon.directive';
 import { UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
 // Shared Pipes
@@ -80,7 +81,8 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxComponent,
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
-		DependentCommentComponent
+		DependentCommentComponent,
+		UIModalDecoratorDirective
 	],
 	providers: [
 		AuthService,
@@ -117,7 +119,8 @@ import { DictionaryService } from './services/dictionary.service';
 		TDSComboBoxComponent,
 		TDSComboBoxGroupComponent,
 		SupportsDependsComponent,
-		DependentCommentComponent
+		DependentCommentComponent,
+		UIModalDecoratorDirective
 	],
 	entryComponents: [
 		DynamicComponent,

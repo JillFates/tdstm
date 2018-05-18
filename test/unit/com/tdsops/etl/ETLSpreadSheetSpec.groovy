@@ -57,12 +57,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -80,15 +75,46 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						sheet 'Applications'
+					""".stripIndent())
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 0
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can define more than one sheet for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSetWithMultipleSheets(
+				[
+					'Applications': ApplicationDataSet,
+					'Devices': DeviceDataSet
+				]
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
 						sheet 'Applications'
-						
+						sheet 'Devices'
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 0
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -107,15 +133,14 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -154,15 +179,14 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications Tab'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -198,15 +222,14 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						validator)
 
 				when: 'The ETL script is evaluated'
-					new GroovyShell(this.class.classLoader, etlProcessor.binding)
-						.evaluate("""
+					etlProcessor		.evaluate("""
 								sheet 0
 								read labels
-								""".stripIndent(),
-						ETLProcessor.class.name)
+								""".stripIndent())
 
 				then: 'DataSet was modified by the ETL script'
-					etlProcessor.result.domains.size() == 0
+					etlProcessor.resultsMap().domains.size() == 0
+					etlProcessor.currentRowIndex == 1
 
 				and: 'A column map is created'
 					etlProcessor.column('application id').index == 0
@@ -244,12 +267,10 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 10
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -271,16 +292,39 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Active Applications'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
 			e.message == "Sheet 'Active Applications' is not found in workbook"
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can throw an exception if sheet name case is incorrect for a spreadSheet DataSet'(){
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications', ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						sheet 'applications'
+						read labels
+						""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "Sheet 'applications' is not found in workbook"
 
 		cleanup:
 			if(fileName) service.deleteTemporaryFile(fileName)
@@ -299,14 +343,13 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -345,15 +388,14 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet '2'
 						read labels
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 1
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -393,17 +435,16 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						skip 1
 						read labels
-						
-						""".stripIndent(),
-				ETLProcessor.class.name)
+
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
+			etlProcessor.currentRowIndex == 2
 
 		and: 'A column map is created'
 			etlProcessor.column('application id').index == 0
@@ -442,22 +483,20 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
 						iterate {
 							domain Application
 							extract 'vendor name' load 'Vendor'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'DataSet was modified by the ETL script'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 2
 				with(data[0].fields.appVendor) {
@@ -468,6 +507,78 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				with(data[1].fields.appVendor) {
 					originalValue == 'Mozilla'
 					value == 'Mozilla'
+				}
+			}
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read iterate rows for more than one sheet in a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSetWithMultipleSheets(
+				[
+					'Applications': ApplicationDataSet,
+					'Devices': DeviceDataSet
+				]
+			)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			new GroovyShell(this.class.classLoader, etlProcessor.binding)
+				.evaluate("""
+					sheet 'Applications'
+					read labels
+					domain Application
+					iterate {
+						extract 'vendor name' load 'Vendor'
+					}
+
+					sheet 'Devices'
+					read labels
+					domain Device
+					iterate {
+						extract 'name' load 'Name'
+					}
+					""".stripIndent(),
+				ETLProcessor.class.name)
+
+		then: 'DataSet was modified by the ETL script'
+			etlProcessor.resultsMap().domains.size() == 2
+
+		and: 'Results contains values'
+			with(etlProcessor.resultsMap().domains[0]) {
+				domain == ETLDomain.Application.name()
+				data.size() == 2
+				with(data[0].fields.appVendor) {
+					originalValue == 'Microsoft'
+					value == 'Microsoft'
+				}
+
+				with(data[1].fields.appVendor) {
+					originalValue == 'Mozilla'
+					value == 'Mozilla'
+				}
+			}
+
+			with(etlProcessor.resultsMap().domains[1]) {
+				domain == ETLDomain.Device.name()
+				data.size() == 2
+				with(data[0].fields.assetName) {
+					originalValue == 'xraysrv01'
+					value == 'xraysrv01'
+				}
+
+				with(data[1].fields.assetName) {
+					originalValue == 'zuludb01'
+					value == 'zuludb01'
 				}
 			}
 
@@ -489,15 +600,59 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						skip 1
+						read labels
+						""".stripIndent())
+
+		then: 'Results contains'
+			etlProcessor.resultsMap().domains.size() == 0
+
+		and: 'Results contains values'
+			etlProcessor.column('application id').index == 0
+			etlProcessor.column(0).label == 'application id'
+
+		and:
+			etlProcessor.column('vendor name').index == 1
+			etlProcessor.column(1).label == 'vendor name'
+
+		and:
+			etlProcessor.column('technology').index == 2
+			etlProcessor.column(2).label == 'technology'
+
+		and:
+			etlProcessor.column('location').index == 3
+			etlProcessor.column(3).label == 'location'
+
+		cleanup:
+			if(fileName) service.deleteTemporaryFile(fileName)
+	}
+
+	void 'test can read labels skipping more than one row before for a spreadSheet DataSet'(){
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildSpreadSheetDataSet('Applications',
+				"invalid headers, are not part, of the valid\n" +
+					"Another, Lines with, invalid, headers, are not part, of the valid\n" +
+					ApplicationDataSet)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
 			new GroovyShell(this.class.classLoader, etlProcessor.binding)
 				.evaluate("""
-						skip 1
+						skip 2
 						read labels
 						""".stripIndent(),
 				ETLProcessor.class.name)
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 0
+			etlProcessor.resultsMap().domains.size() == 0
 
 		and: 'Results contains values'
 			etlProcessor.column('application id').index == 0
@@ -533,8 +688,7 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						skip 1
 						read labels
@@ -543,14 +697,13 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 						iterate {
 							extract 'vendor name' load 'Vendor'
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {
@@ -576,27 +729,25 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						sheet 'Applications'
 						read labels
-						
+
 						iterate {
 							domain Application
-							
+
 							extract 'vendor name' load 'Vendor'
 							if(CE == 'Microsoft'){
 								ignore row
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results contains'
-			etlProcessor.result.domains.size() == 1
+			etlProcessor.resultsMap().domains.size() == 1
 
 		and: 'Results contains values'
-			with(etlProcessor.result.domains[0]) {
+			with(etlProcessor.resultsMap().domains[0]) {
 				domain == ETLDomain.Application.name()
 				data.size() == 1
 				with(data[0].fields.appVendor) {
@@ -609,9 +760,16 @@ class ETLSpreadSheetSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	static final String ApplicationDataSet = """application id,vendor name,technology,location
-152254,Microsoft,(xlsx updated),ACME Data Center
-152255,Mozilla,NGM,ACME Data Center
-""".stripIndent().trim()
+	static final String ApplicationDataSet = """
+		application id,vendor name,technology,location
+		152254,Microsoft,(xlsx updated),ACME Data Center
+		152255,Mozilla,NGM,ACME Data Center
+		""".stripIndent().trim()
+
+	static final String DeviceDataSet = """
+		name,mfg,model,type
+		xraysrv01,Dell,PE2950,Server
+		zuludb01,HP,BL380,Blade
+		""".stripIndent().trim()
 
 }

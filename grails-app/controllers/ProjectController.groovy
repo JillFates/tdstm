@@ -7,11 +7,11 @@ import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonSlurper
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.MoveBundle
@@ -31,15 +31,10 @@ import net.transitionmanager.service.PersonService
 import net.transitionmanager.service.ProjectService
 import net.transitionmanager.service.UserPreferenceService
 import net.transitionmanager.service.UserService
-
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.commons.lang.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
-import grails.transaction.Transactional
-import grails.plugin.springsecurity.annotation.Secured
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectController implements ControllerMethods {
@@ -78,7 +73,7 @@ class ProjectController implements ControllerMethods {
 		                    sortOn: ProjectSortProperty.valueOfParam(sortIndex),
 		                    sortOrder: SortOrder.valueOfParam(sortOrder), params: params]
 
-		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive) ?: ProjectStatus.COMPLETED
+		ProjectStatus projectStatus = ProjectStatus.lookup(params.isActive) ?: ProjectStatus.COMPLETED
 
 		def projectList = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), projectStatus, searchParams)
 
@@ -233,6 +228,7 @@ class ProjectController implements ControllerMethods {
 			}
 			params.timezone = retrievetimeZone(params.timezone)
 
+			params.collectMetrics = params.collectMetrics == "1" ? 1: 0
 			params.runbookOn = 1
 			project.properties = params
 
@@ -368,12 +364,16 @@ class ProjectController implements ControllerMethods {
 			}
 			params.runbookOn =  1	// Default to ON
 			params.timezone = retrievetimeZone(params.timezone)
+			params.collectMetrics = params.collectMetrics == "1" ? 1: 0
 
 			Project project = new Project(params)
 
 			def partnersIds = params.projectPartners
 
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
+
+			project.guid = StringUtil.generateGuid()
+
 			if (logoFile instanceof String || project.hasErrors() || !project.save(flush:true)) {
 				if (logoFile instanceof String) {
 					flash.message = logoFile

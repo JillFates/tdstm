@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, HostListener, Inject, OnInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
@@ -12,6 +12,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AssetShowComponent} from '../asset/asset-show.component';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import * as R from 'ramda';
+import {DIALOG_SIZE, KEYSTROKE} from '../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -47,6 +48,12 @@ export function DatabaseEditComponent(template, editModel) {
 				this.model.asset.scale = {
 					name: ''
 				};
+			}
+		}
+
+		@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+			if (event && event.code === KEYSTROKE.ESCAPE) {
+				this.cancelCloseDialog();
 			}
 		}
 
@@ -92,7 +99,7 @@ export function DatabaseEditComponent(template, editModel) {
 			this.dialogService.replace(AssetShowComponent, [
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }],
-				'lg');
+				DIALOG_SIZE.XLG);
 		}
 
 		/**
@@ -104,5 +111,6 @@ export function DatabaseEditComponent(template, editModel) {
 		}
 
 	}
+
 	return DatabaseShowComponent;
 }

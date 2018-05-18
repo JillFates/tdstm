@@ -23,13 +23,13 @@ class MockETLController implements ControllerMethods {
 
     String exampleDataSet = """\
             device id,model name,manufacturer name,environment
-            152254,SRW24G4,LINKSYS,Prod
-            152255,ZPHA MODULE,TippingPoint,Dev
-            152256,Slideaway,ATEN,Prod
-            152258,CCM4850,Avocent,Prod
-            152259,DSR2035,Avocent,Dev
-            152266,2U Cable Management,Generic,Prod
-            152275,ProLiant BL465c G7,HP,Dev\
+            122097,SRW24G4,LINKSYS,Prod
+            122105,ZPHA MODULE,TippingPoint,Dev
+            122151,Slideaway,ATEN,Prod
+            122072,CCM4850,Avocent,Prod
+            122076,DSR2035,Avocent,Dev
+            122117,2U Cable Management,Generic,Prod
+            205820,ProLiant BL465c G7,HP,Dev\
     """.stripIndent().trim()
 
 
@@ -40,17 +40,17 @@ class MockETLController implements ControllerMethods {
         iterate {
             domain Application
         
-            extract 1 load 'id'
+            extract 1 transform with toLong() load 'id' set applicationIdVar
             extract 'model name' transform with lowercase() load 'Name'
             extract 3 transform with uppercase() load 'description'
         
             set environmentVar with 'Production'
-            find Application by 'id' with SOURCE.'device id' into 'id'
+            find Application by 'id' with applicationIdVar into 'id'
         
             domain Device
-            extract 1 load 'id'
+            extract 1 transform with toLong() load 'id' set deviceIdVar
             extract 'model name' transform with uppercase() load 'Name'
-            find Device by 'id' with SOURCE.'device id' into 'id'
+            find Device by 'id' with deviceIdVar into 'id'
         }\
     """.stripIndent().trim()
 
@@ -127,7 +127,7 @@ class MockETLController implements ControllerMethods {
                 assetFields         : (etlProcessor?.assetFields as JSON).toString(),
                 missingPropertyError: missingPropertyError,
                 logContent          : etlProcessor?.debugConsole?.content(),
-                jsonResult          : (etlProcessor?.result?.domains as JSON),
+                jsonResult          : (etlProcessor?.resultsMap()?.domains as JSON),
                 dataScriptId        : params.dataScriptId,
                 providerName        : params.providerName,
                 dataScriptName      : params.dataScriptName,

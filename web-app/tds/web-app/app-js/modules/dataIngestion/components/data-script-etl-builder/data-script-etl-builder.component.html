@@ -1,10 +1,19 @@
 <div class="modal fade in data-script-etl-builder-component" id="etlBuilder" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content resizable" #resizableForm  [style.width.px]="width" [style.height.px]="height">
+		<div tds-ui-modal-decorator="" [isWindowMaximized]="isWindowMaximized" [options]="modalOptions" class="modal-content resizable" #resizableForm  [style.width.px]="width" [style.height.px]="height">
 			<div class="modal-header">
-				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
+                <button id="btnCloseDialog" (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close" title="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+
+                <button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
+                    <span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
+                </button>
+
+               <button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
+                    <span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
+                </button>
+
 				<h4 class="modal-title">{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_BUILDER_TITLE' | translate}} - {{ dataScriptModel.provider.name }} / {{ dataScriptModel.name }}</h4>
 			</div>
 			<div class="modal-body">

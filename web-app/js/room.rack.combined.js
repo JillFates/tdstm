@@ -46,6 +46,7 @@ function listDialog(assign,sort,order,source,rack,roomName,location,position){
 				$("#createDialog").dialog("close");
 				$("#listDialog").dialog('option', 'modal', 'true');
 				$("#listDialog").dialog("open");
+				$('.ui-dialog-titlebar-close').html('').append('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
 			}
 		}
 	});

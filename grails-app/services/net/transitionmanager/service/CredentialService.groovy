@@ -10,6 +10,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.CredentialCommand
@@ -22,11 +23,11 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
+import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 
 import javax.net.ssl.SSLContext
@@ -109,7 +110,7 @@ class CredentialService implements ServiceMethods {
 
         if (count > 0) {
             // TODO : JPM 2/2018 : change to use standard service method to throw message that is i18n
-            throw DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
+            throw new DomainUpdateException('Unable to delete Credential since it is reference by ApiActions')
         }
 
         credential.delete()
@@ -129,6 +130,7 @@ class CredentialService implements ServiceMethods {
      * @param credential
      * @return
      */
+    @NotTransactional
     Map<String, ?> authenticate(Credential credential) {
         if (!credential) {
             throw new EmptyResultException('Credential not found.')

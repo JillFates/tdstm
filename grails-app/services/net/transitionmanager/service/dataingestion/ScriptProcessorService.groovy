@@ -6,10 +6,7 @@ import com.tdsops.etl.DomainClassFieldsValidator
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.tm.enums.domain.AssetClass
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
 import getl.data.Dataset
-import getl.utils.FileUtils
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.domain.Project
@@ -42,7 +39,7 @@ class ScriptProcessorService {
 
         ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
 
-        new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+	    etlProcessor.evaluate(scriptContent?.trim())
 
         return etlProcessor
     }
@@ -95,7 +92,7 @@ class ScriptProcessorService {
                     new DebugConsole(buffer: new StringBuffer()),
                     createFieldsSpecValidator(project))
 
-            new GroovyShell(this.class.classLoader, etlProcessor.binding).evaluate(scriptContent?.trim(), ETLProcessor.class.name)
+	        etlProcessor.evaluate(scriptContent?.trim())
 
             result.isValid = true
         } catch (all) {
@@ -105,7 +102,7 @@ class ScriptProcessorService {
 
 	     if (etlProcessor) {
 		     result.consoleLog = etlProcessor?.debugConsole?.content()
-		     result.data = etlProcessor.result.toMap()
+		     result.data = etlProcessor.resultsMap()
 	     }
 
         return result

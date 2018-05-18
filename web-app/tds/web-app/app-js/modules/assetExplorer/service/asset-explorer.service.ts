@@ -21,8 +21,7 @@ export class AssetExplorerService {
 	private ALL_ASSETS = 'All Assets';
 	private assetEntitySearch = 'assetEntity';
 
-	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {
-	}
+	constructor(private http: HttpInterceptor, private permissionService: PermissionService) {}
 
 	getReports(): Observable<ViewGroupModel[]> {
 		return this.http.get(`${this.assetExplorerUrl}/views`)
@@ -300,14 +299,17 @@ export class AssetExplorerService {
 			{id: 13173, text: 'B5'},
 			{id: 13161, text: 'B6'},
 		];
-		return this.http.post(`../${this.assetEntitySearch}/retrieveRackSelectForRoom`, JSON.stringify(request))
+		return this.http.get(`${this.assetUrl}/retrieveRackSelectOptions/${roomId}`)
 			.map((res: Response) => {
-				console.log(res);
-				if (sourceTarget === 'S') {
-					return mockSourceResponse;
-				} else {
-					return mockTargetResponse;
-				}
+				return res.json();
+			})
+			.catch((error: any) => error.json());
+	}
+
+	getChassisForRoom(roomId: number): Observable<any> {
+		return this.http.get(`${this.assetUrl}/retrieveChassisSelectOptions/${roomId}`)
+			.map((res: Response) => {
+				return res.json();
 			})
 			.catch((error: any) => error.json());
 	}

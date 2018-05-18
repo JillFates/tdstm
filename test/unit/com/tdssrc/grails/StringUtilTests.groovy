@@ -391,4 +391,41 @@ class StringUtilTests extends Specification {
 			null		| false
 	}
 
+	def 'test the truncateIfBigger method under some valid scenarios'() {
+		expect:
+			expected == StringUtil.truncateIfBigger(text, limit)
+		where:
+			text		|   limit       | expected
+			''          |   10          |   ''
+			'abc'       |   0           |   ''
+			'abc'       |   3           |   'abc'
+			'abcd'      |   3           |   'abc'
+			'abc'       |   10          |   'abc'
+	}
+
+	def 'test the truncateIfBigger under invalid scenarios' () {
+		when: 'Trying to truncate a null String'
+			StringUtil.truncateIfBigger(null, 10)
+		then: 'an InvalidParamException is thrown'
+			thrown InvalidParamException
+		when: 'Trying to trucante using a negative limit'
+			StringUtil.truncateIfBigger('abc', -1)
+		then: 'an InvalidParamException is thrown'
+			thrown InvalidParamException
+	}
+
+
+	def 'test generateGuid' () {
+		when: 'Generating a GUID'
+			String guid = StringUtil.generateGuid()
+		then: 'No exception'
+			noExceptionThrown()
+		and: 'The length of the GUID is 36'
+			guid.length() == 36
+		when: 'Generating a second guid'
+			String guid2 = StringUtil.generateGuid()
+		then: "The guids don't match."
+			guid != guid2
+	}
+
 }

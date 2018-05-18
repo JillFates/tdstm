@@ -114,15 +114,12 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	protected isDirty(): boolean {
 		let result = this.dataSignature !== JSON.stringify(this.model);
-		if (this.stateService && this.stateService.$current && this.stateService.$current.data) {
-			this.stateService.$current.data.hasPendingChanges = result;
-		}
 		return result;
 	}
 
 	protected onExport(): void {
 		let assetExportModel: AssetExportModel = {
-			assetQueryParams: this.getQueryParams(),
+			assetQueryParams: this.getQueryParamsForExport(),
 			domains: this.domains,
 			queryId: this.model.id,
 			viewName: this.model.name
@@ -162,16 +159,18 @@ export class AssetExplorerViewShowComponent implements OnInit {
 
 	/**
 	 * Prepare the Params for the Query with the current UI configuration
+	 * Params should 'limit' to total number of total from the gridData since we want to export ALL DATA, not
+	 * the configured pagination results.
 	 * @returns {AssetQueryParams}
 	 */
-	private getQueryParams(): AssetQueryParams {
-		let assetQueryParams = {
-			offset: this.grid.state.skip,
-			limit: this.grid.state.take,
+	private getQueryParamsForExport(): AssetQueryParams {
+		let assetQueryParams: AssetQueryParams = {
+			offset: this.grid.gridData ? 0 : this.grid.state.skip,
+			limit: this.grid.gridData ? this.grid.gridData.total : this.grid.state.take,
+			forExport: true,
 			sortDomain: this.model.schema.sort.domain,
 			sortProperty: this.model.schema.sort.property,
 			sortOrder: this.model.schema.sort.order,
-
 			filters: {
 				domains: this.model.schema.domains,
 				columns: this.model.schema.columns

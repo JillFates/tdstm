@@ -56,12 +56,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -79,8 +74,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -96,8 +90,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -120,8 +113,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -137,53 +129,53 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model', 'custom1'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model', 'custom1'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-					with(fields.custom1){
-						value == 'xray01'
-						originalValue == 'xray01'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -203,8 +195,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -218,49 +209,49 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[1]) {
-					with(fields.assetName) {
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model) {
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -280,8 +271,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -297,53 +287,53 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model', 'custom1'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model', 'custom1'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+						with(fields.custom1) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-					with(fields.custom1){
-						value == 'xray01'
-						originalValue == 'xray01'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
@@ -363,8 +353,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Device
@@ -378,49 +367,49 @@ class ETLLookupSpec extends ETLBaseSpec {
 								log 'Repeated asset'
 							}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'model'] as Set
-				data.size() == 3
-				with(data[0]){
-					with(fields.assetName){
-						value == 'xray01'
-						originalValue == 'xray01'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model'] as Set
+					data.size() == 3
+					with(data[0]) {
+						with(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[1]){
-					with(fields.assetName){
-						value == 'deltasrv03'
-						originalValue == 'deltasrv03'
+					with(data[1]) {
+						with(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
-					}
-				}
 
-				with(data[2]){
-					with(fields.assetName){
-						value == 'alpha'
-						originalValue == 'alpha'
-					}
-					with(fields.model){
-						value == 'VM'
-						originalValue == 'VM'
+					with(data[2]) {
+						with(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						with(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
 					}
 				}
 			}
-
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 
@@ -428,7 +417,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			if(fileName) service.deleteTemporaryFile(fileName)
 	}
 
-	void 'test when lookup does not find results that the current result is new.'() {
+	void 'test when lookup does not find results that the current result is new'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(RVToolsCSVContent)
@@ -447,8 +436,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					def assetTypeVM = 'VM'
 					def vmWare = 'VMWare'
 
@@ -510,27 +498,28 @@ class ETLLookupSpec extends ETLBaseSpec {
 							load 'dataFlowFreq' with 'constant'
 							initialize 'comment' with 'From RVTools'
 					}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 3
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Device.name()
-				fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
-				data.size() == 5
-			}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 3
+				with(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'externalRefId', 'serialNumber', 'os'] as Set
+					data.size() == 5
+				}
 
-			with(etlProcessor.result.domains[1]) {
-				domain == ETLDomain.Application.name()
-				fieldNames == ['assetName', 'id'] as Set
-				data.size() == 2
-			}
+				with(domains[1]) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['assetName', 'id'] as Set
+					data.size() == 2
+				}
 
-			with(etlProcessor.result.domains[2]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
-				data.size() == 5
+				with(domains[2]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['asset', 'dependent', 'type', 'status', 'dataFlowFreq', 'comment'] as Set
+					data.size() == 5
+				}
 			}
 
 		cleanup:

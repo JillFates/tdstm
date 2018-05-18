@@ -7,12 +7,14 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.DataImportService
 import net.transitionmanager.service.FileSystemService
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
+
 /**
  * Handles WS calls of the ApplicationService.
  *
@@ -71,12 +73,12 @@ class WsAssetImportController implements ControllerMethods {
 		ApiAction action = fetchDomain(ApiAction, params)
 
 		// Invoke action and eval the result
-		Map actionInvocationResult = apiActionService.invoke(action)
+		ApiActionResponse actionInvocationResult = apiActionService.invoke(action)
 
-		if (actionInvocationResult.status == 'error') {
-			renderErrorJson(actionInvocationResult.cause)
-		} else {
+		if (actionInvocationResult.successful) {
 			renderSuccessJson( [ filename: actionInvocationResult.filename ] )
+		} else {
+			renderErrorJson(actionInvocationResult.error)
 		}
 	}
 
@@ -164,8 +166,8 @@ class WsAssetImportController implements ControllerMethods {
 	def manualFormOptions() {
 		Project project = getProjectForWs()
 
-		Map map = [ : ]
-		List<Map> tmpList = []
+		Map results = [ : ]
+		List<Map> actions = []
 
 		def where = ApiAction.where { project == project && producesData == 1}.readOnly(true)
 				/*
@@ -179,26 +181,26 @@ class WsAssetImportController implements ControllerMethods {
 				*/
 
 		where.list().each() {
-			tmpList << [
+			actions << [
 					id: it.id,
 					name: "${it.provider.name} - ${it.name}",
 					provider:it.provider.name,
 					defaultDataScriptId: (it.defaultDataScript?.id ?: 0)
 			]
 		}
-		tmpList = tmpList.sort { it.name }
-		map.actions = tmpList
+		actions = actions.sort { it.name }
+		results.actions = actions
 
 
-		tmpList = []
+		List<Map> dataScripts = []
 		where = DataScript.where { project == project }.readOnly(true)
-		where.list(order:'name').each() {
-			tmpList << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
+		where.list().each() {
+			dataScripts << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
 		}
+		dataScripts = dataScripts.sort { it.name }
+		results.dataScripts = dataScripts
 
-		map.dataScripts = tmpList
-
-		renderAsJson map
+		renderAsJson results
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdssrc.grails.TimeUtil
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -34,6 +35,7 @@ import net.transitionmanager.domain.DataTransferComment
 import net.transitionmanager.domain.DataTransferValue
 import net.transitionmanager.domain.Dataview
 import net.transitionmanager.domain.KeyValue
+import net.transitionmanager.domain.License
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.ModelSync
 import net.transitionmanager.domain.MoveBundle
@@ -77,6 +79,7 @@ class ProjectService implements ServiceMethods {
 	StateEngineService stateEngineService
 	UserPreferenceService userPreferenceService
 	CustomDomainService customDomainService
+	LicenseAdminService licenseAdminService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -743,7 +746,7 @@ class ProjectService implements ServiceMethods {
 		MoveBundle moveBundle
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
 		if (!project.defaultBundle) {
-			
+
 			// TM-8319 - the name was being set to null
 			String bundleName = defaultBundleName ?: 'TBD'
 
@@ -1783,5 +1786,33 @@ class ProjectService implements ServiceMethods {
 		}
 
 		return planMethodologies
+	}
+
+	/**
+	 * Gets a list of project, and licence data to be used by the metrics aggregation server.
+	 *
+	 * @return A list of maps containing project and licence information.
+	 */
+	List<Map> projects(ProjectStatus projectStatus=ProjectStatus.ANY) {
+//		List<Project> projects = getUserProjectsOrderBy(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+		List<Project> projects = getUserProjectsOrderBy(securityService.hasPermission(Permission.ProjectShowAll), projectStatus)
+
+		projects.collect { Project project ->
+			Map licenseData = licenseAdminService.getLicenseStateMap(project)
+
+			return [
+					id                   : project.id,
+					guid                 : project.guid,
+					projectName          : project.name,
+					projectCode          : project.projectCode,
+					clientName           : project.client.name,
+					description          : project.description ?: '',
+					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_TIME_6),
+					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_TIME_6),
+					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
+					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_TIME_6),
+					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_TIME_6)
+			]
+		}
 	}
 }

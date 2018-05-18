@@ -1,5 +1,6 @@
 package com.tdsops.common.sql
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.search.FieldSearchData
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringEscapeUtils
@@ -458,20 +459,20 @@ class SqlUtil {
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
 	private static void buildSingleValueParameter(FieldSearchData fieldSearchData, String operator) {
-
+		String searchColumn = fieldSearchData.column
 		Object paramValue
 
 		if (isNumericField(fieldSearchData)) {
 			if (fieldSearchData.filter.isNumber()) {
-				paramValue = parseNumberParameter(fieldSearchData.filter)
+				paramValue = parseNumberParameter(fieldSearchData)
 			}
-		} else {
+		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
 
 		// Calculate the expression only if there's a valid value to be added to the query.
 		if (paramValue) {
-			String expression = getSingleValueExpression(fieldSearchData.column, fieldSearchData.columnAlias, operator)
+			String expression = getSingleValueExpression(searchColumn, fieldSearchData.columnAlias, operator)
 			fieldSearchData.sqlSearchExpression = expression
 			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
 		}
@@ -526,12 +527,20 @@ class SqlUtil {
 	 * @param parameter
 	 * @return numeric representation or null if the parameter is not a number.
 	 */
-	private static Number parseNumberParameter(String parameter) {
-		if (parameter.isNumber()) {
-			return parameter.isLong() ? parameter.toLong() : parameter.toDouble()
-		} else {
-			return null
+	private static Number parseNumberParameter(FieldSearchData fsd) {
+		Class type = fsd.getType()
+		String filter = fsd.getFilter()
+		def parsedNumber = null
+		if (filter.isNumber()) {
+			if (type == Integer) {
+				parsedNumber = NumberUtil.toInteger(filter)
+			} else if (type == Long) {
+				parsedNumber = NumberUtil.toLong(filter)
+			} else {
+				parsedNumber = filter.toFloat()
+			}
 		}
+		return parsedNumber
 
 	}
 

@@ -1,3 +1,5 @@
+import { SortInfo } from '../utils/sort.utils';
+
 export const COLUMN_MIN_WIDTH = 360;
 
 export const BooleanFilterData: Array<string> = ['True', 'False'];
@@ -30,6 +32,7 @@ export class GridColumnModel {
 	headerClass?: Array<string>;
 	cellStyle?: any;
 	cellClass?: string | Array<string>;
+	sort?: SortInfo;
 
 	constructor() {
 		this.type = 'text';

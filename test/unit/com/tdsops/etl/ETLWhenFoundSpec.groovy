@@ -79,12 +79,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 		TMDEMO = Mock(Project)
 		TMDEMO.getId() >> 125612l
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Storage, buildFieldSpecsFor(AssetClass.STORAGE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Asset, buildFieldSpecsFor(CustomDomainService.COMMON))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 
 		debugConsole = new DebugConsole(buffer: new StringBuffer())
 	}
@@ -136,8 +131,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -149,7 +143,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -160,51 +154,52 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"SN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
-					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
 
-				with(data[0].fields.asset) {
+					with(data[0].fields.asset) {
 
-					find.query.size() == 4
-					with(find.query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
+						find.query.size() == 4
+						with(find.query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
+
+						with(find.query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetClass == 'VM'
+						}
+
+						with(find.query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						with(find.query[3]) {
+							domain == ETLDomain.Asset.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						// whenNotFound create command assertions
+						create.assetClass == ETLDomain.Application.name()
+						create.assetName == 'ACMEVMPROD01'
+						create.assetType == 'VM'
+						!!create."SN Last Seen"
 					}
-
-					with(find.query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
-
-					with(find.query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					with(find.query[3]) {
-						domain == ETLDomain.Asset.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					// whenNotFound create command assertions
-					create.assetClass == ETLDomain.Application.name()
-					create.assetName == 'ACMEVMPROD01'
-					create.assetType == 'VM'
-					!!create."SN Last Seen"
 				}
 			}
 
@@ -261,8 +256,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -274,7 +268,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						
     						whenNotFound 'asset' update {
@@ -284,8 +278,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"SN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -344,8 +337,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -357,7 +349,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset' 
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, 'primaryType' into 'asset'
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, 'primaryType' into 'asset'
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -365,8 +357,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"TN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -425,8 +416,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						console on
 						read labels
 						domain Dependency
@@ -438,7 +428,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 							extract 'AssetType' set primaryTypeVar
     
 							find Application by 'id' with DOMAIN.asset into 'asset'  
-   							elseFind Application by 'assetName', 'assetType' with SOURCE.AssetName, primaryTypeVar into 'asset' 
+   							elseFind Application by 'assetName', 'assetClass' with SOURCE.AssetName, primaryTypeVar into 'asset' 
        						elseFind Application by 'assetName' with SOURCE.DependentName into 'asset'
     						elseFind Asset by 'assetName' with SOURCE.DependentName into 'asset' warn 'found with wrong asset class'
     						
@@ -446,48 +436,49 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
     							"TN Last Seen" NOW
     						}
 						}
-						""".stripIndent(),
-				ETLProcessor.class.name)
+						""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Dependency.name()
-				fieldNames == ['id', 'asset'] as Set
-				data.size() == 14
-				data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Dependency.name()
+					fieldNames == ['id', 'asset'] as Set
+					data.size() == 14
+					data.collect { it.fields.id.value } == (1..14).collect { it.toString() }
 
-				data.collect { it.fields.asset.value } == [
-					'151954', '151971', '151974', '151975', '151978', '151990', '151999',
-					'152098', '152100', '152106', '152117', '152118', '152118', '152118'
-				]
+					data.collect { it.fields.asset.value } == [
+						'151954', '151971', '151974', '151975', '151978', '151990', '151999',
+						'152098', '152100', '152106', '152117', '152118', '152118', '152118'
+					]
 
-				with(data[0].fields.asset) {
+					with(data[0].fields.asset) {
 
-					find.query.size() == 4
-					with(find.query[0]) {
-						domain == ETLDomain.Application.name()
-						kv.id == '151954'
+						find.query.size() == 4
+						with(find.query[0]) {
+							domain == ETLDomain.Application.name()
+							kv.id == '151954'
+						}
+
+						with(find.query[1]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'ACMEVMPROD01'
+							kv.assetClass == 'VM'
+						}
+
+						with(find.query[2]) {
+							domain == ETLDomain.Application.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						with(find.query[3]) {
+							domain == ETLDomain.Asset.name()
+							kv.assetName == 'VMWare Vcenter'
+						}
+
+						// whenFound update command assertions
+						!!update."TN Last Seen"
 					}
-
-					with(find.query[1]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'ACMEVMPROD01'
-						kv.assetType == 'VM'
-					}
-
-					with(find.query[2]) {
-						domain == ETLDomain.Application.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					with(find.query[3]) {
-						domain == ETLDomain.Asset.name()
-						kv.assetName == 'VMWare Vcenter'
-					}
-
-					// whenFound update command assertions
-					!!update."TN Last Seen"
 				}
 			}
 

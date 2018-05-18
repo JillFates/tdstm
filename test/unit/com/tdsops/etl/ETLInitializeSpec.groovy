@@ -23,6 +23,7 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
 import net.transitionmanager.domain.Room
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import spock.lang.Shared
 
@@ -89,11 +90,7 @@ class ETLInitializeSpec extends ETLBaseSpec {
 		applicationFieldsValidator = new DomainClassFieldsValidator()
 		applicationFieldsValidator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
 
-		validator = new DomainClassFieldsValidator()
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Device, buildFieldSpecsFor(AssetClass.DEVICE))
-		validator.addAssetClassFieldsSpecFor(ETLDomain.Dependency, buildFieldSpecsFor(ETLDomain.Dependency))
+		validator = createDomainClassFieldsValidator()
 	}
 
 	/**
@@ -102,10 +99,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize field defined before the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -113,38 +106,37 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						initialize 'appVendor' with 'Apple'
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -153,10 +145,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize field defined after the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -164,38 +152,37 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						initialize 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -204,10 +191,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can init field defined before the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -215,38 +198,37 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -255,10 +237,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can init field defined after the load command'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -266,38 +244,37 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-						init == 'Apple'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+							init == 'Apple'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-						init == 'Apple'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+							init == 'Apple'
+						}
 					}
 				}
 			}
@@ -306,10 +283,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize an element with defined value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -317,37 +290,36 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' initialize 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				with(data[0]) {
-					rowNum == 1
-					with(fields.appVendor) {
-						value == ''
-						originalValue == ''
-						init == 'Microsoft'
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					with(data[0]) {
+						rowNum == 1
+						with(fields.appVendor) {
+							value == ''
+							originalValue == ''
+							init == 'Microsoft'
+						}
 					}
-				}
 
-				with(data[1]) {
-					rowNum == 2
-					with(fields.appVendor) {
-						value == ''
-						originalValue == ''
-						init == 'Mozilla'
+					with(data[1]) {
+						rowNum == 2
+						with(fields.appVendor) {
+							value == ''
+							originalValue == ''
+							init == 'Mozilla'
+						}
 					}
 				}
 			}
@@ -356,10 +328,6 @@ class ETLInitializeSpec extends ETLBaseSpec {
 	void 'test can initialize values using a literal String'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -367,36 +335,31 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
-				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+				}
 			}
 	}
 
 	void 'test can initialize values using an implicit String'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -404,36 +367,31 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with 'Apple'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
-				data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Apple', 'Apple']
+				}
 			}
 	}
 
 	void 'test can initialize values using an SOURCE value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -441,36 +399,31 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						init 'appVendor' with SOURCE.'vendor name'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 
 	void 'test can initialize values using an DOMAIN value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -478,37 +431,32 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name' load 'appVendor'
 						init 'appVendor' with DOMAIN.appVendor
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['Microsoft', 'Mozilla']
-				data.collect { it.fields.appVendor.originalValue } == ['Microsoft', 'Mozilla']
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == ['Microsoft', 'Mozilla']
+					data.collect { it.fields.appVendor.originalValue } == ['Microsoft', 'Mozilla']
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 
 	void 'test can initialize values using CE value'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -516,27 +464,26 @@ class ETLInitializeSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					iterate {
 						domain Application
 						extract 'vendor name'
 						init 'appVendor' with CE
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.ETLInfo.originalFilename == applicationDataSet.fileName()
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				data.size() == 2
-				data.collect { it.rowNum } == [1, 2]
-				data.collect { it.fields.appVendor.value } == ['', '']
-				data.collect { it.fields.appVendor.originalValue } == ['', '']
-				data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					data.size() == 2
+					data.collect { it.rowNum } == [1, 2]
+					data.collect { it.fields.appVendor.value } == [null, null]
+					data.collect { it.fields.appVendor.originalValue } == [null, null]
+					data.collect { it.fields.appVendor.init } == ['Microsoft', 'Mozilla']
+				}
 			}
 	}
 

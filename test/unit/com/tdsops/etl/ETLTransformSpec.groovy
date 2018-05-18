@@ -17,6 +17,7 @@ import grails.test.mixin.TestFor
 import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Project
 import net.transitionmanager.service.CoreService
+import net.transitionmanager.service.CustomDomainService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import spock.lang.Shared
@@ -48,6 +49,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	DataSetFacade sixRowsDataSet
 	DebugConsole debugConsole
 	ETLFieldsValidator applicationFieldsValidator
+	ETLFieldsValidator validator
 
 	static doWithSpring = {
 		coreService(CoreService) {
@@ -149,6 +151,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
 			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
 		}
+
+		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test can transform a field value with uppercase transformation'() {
@@ -158,15 +162,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 'model name' transform with uppercase() 
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == 'SRW24G1'
@@ -181,15 +183,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate 
 							extract 'MODEL NAME' transform with unknown()
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'An MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -202,8 +202,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
@@ -211,8 +210,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 								uppercase() 
 							}
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == 'SRW24G1'
@@ -227,15 +225,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 'model name' transform with lowercase()
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == 'srw24g1'
@@ -250,8 +246,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
@@ -259,8 +254,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 								lowercase()
 							}    
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == 'srw24g1'
@@ -275,15 +269,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						domain Device
 						read labels
 						iterate {
 							extract 'model name' transform with left(4)
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every column for every row is transformed to left 4 transformation'
 			etlProcessor.getElement(0, 1).value == "SRW2"
@@ -298,8 +290,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
@@ -307,8 +298,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 							left(4)
 						}
 					}   
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed to left 4 transformation'
 			etlProcessor.getElement(0, 1).value == "SRW2"
@@ -323,15 +313,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with middle(3, 2) lowercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed with middle 2 transformation'
 			etlProcessor.getElement(0, 1).value == "w2"
@@ -346,15 +334,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with middle(0, 2) lowercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -368,15 +354,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with middle(3, 2) lowercase()  
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed with middle 2 transformation'
 			etlProcessor.getElement(0, 1).value == "w2"
@@ -391,15 +375,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with uppercase() replaceFirst('A')
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row striping first "A" character'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
@@ -414,15 +396,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with uppercase() replaceLast('A')
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row striping last "A" character'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
@@ -437,15 +417,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with uppercase() replaceAll('A')
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row striping all "A" characters'
 			etlProcessor.getElement(0, 1).value == "SRW24G1"
@@ -460,15 +438,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with uppercase() replaceAll('A') lowercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row striping all "A" characters'
 			etlProcessor.getElement(0, 1).value == "srw24g1"
@@ -483,15 +459,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with right(4)
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed with right 4 transformation'
 			etlProcessor.getElement(0, 1).value == "24G1"
@@ -506,15 +480,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with left(4) lowercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == "srw2"
@@ -528,27 +500,28 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' transform with trim() replace('Inc', 'Incorporated') load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.appVendor) {
-					originalValue.contains('Microsoft\b\nInc')
-					value == 'Microsoft\b\nIncorporated'
-				}
+			with(etlProcessor.resultsMap()){
+				domains.size() == 1
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.appVendor) {
+						originalValue.contains('Microsoft\b\nInc')
+						value == 'Microsoft\b\nIncorporated'
+					}
 
-				with(data[1].fields.appVendor) {
-					originalValue.contains('Mozilla\t\t\0Inc')
-					value == 'Mozilla\t\t\0Incorporated'
+					with(data[1].fields.appVendor) {
+						originalValue.contains('Mozilla\t\t\0Inc')
+						value == 'Mozilla\t\t\0Incorporated'
+					}
 				}
 			}
 	}
@@ -559,27 +532,27 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' transform with trim() replace(/a|b|c/, '') load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
-			with(etlProcessor.result.domains[0]) {
-				domain == ETLDomain.Application.name()
-				with(data[0].fields.appVendor) {
-					originalValue.contains('Microsoft\b\nInc')
-					value == "Mirosoft\b\nIn"
-				}
+			with(etlProcessor.resultsMap()) {
+				with(domains[0]) {
+					domain == ETLDomain.Application.name()
+					with(data[0].fields.appVendor) {
+						originalValue.contains('Microsoft\b\nInc')
+						value == "Mirosoft\b\nIn"
+					}
 
-				with(data[1].fields.appVendor) {
-					originalValue.contains('Mozilla\t\t\0Inc')
-					value == "Mozill\t\t\0In"
+					with(data[1].fields.appVendor) {
+						originalValue.contains('Mozilla\t\t\0Inc')
+						value == "Mozill\t\t\0In"
+					}
 				}
 			}
 	}
@@ -591,15 +564,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'model name' transform with uppercase() lowercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed to uppercase'
 			etlProcessor.getElement(0, 1).value == "srw24g1"
@@ -610,10 +581,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can append strings and element in a transformation chain using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -621,29 +588,29 @@ class ETLTransformSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
 						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					value == 'ACME Data Center - microsoft'
-					originalValue == 'ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						value == 'ACME Data Center - microsoft'
+						originalValue == 'ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					value == 'ACME Data Center - mozilla'
-					originalValue == 'ACME Data Center'
+					with(data[1].fields.description) {
+						value == 'ACME Data Center - mozilla'
+						originalValue == 'ACME Data Center'
+					}
 				}
 			}
 	}
@@ -657,12 +624,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, console, GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					console 'open'
 					domain Device
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			ETLProcessorException e = thrown ETLProcessorException
@@ -678,16 +643,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), environmentDataSet, console, GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					def final dictionary = [prod: 'Production', dev: 'Development']
 					read labels
 					iterate {
 						extract 'environment' transform with lowercase() substitute(dictionary)
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'The column is trsanlated for every row'
 			etlProcessor.getElement(0, 3).value == "Production"
@@ -698,18 +661,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can plus strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			DebugConsole console = new DebugConsole(buffer: new StringBuffer())
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), applicationDataSet, console, validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 								
@@ -717,21 +675,22 @@ class ETLTransformSpec extends ETLBaseSpec {
 						extract 'vendor name' transform with lowercase() set myLocalVar
 						extract 'location' transform with append(myLocalVar + ' - ' + CE) load 'description'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Centermicrosoft - ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Centermicrosoft - ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Centermozilla - ACME Data Center'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Centermozilla - ACME Data Center'
+					}
 				}
 			}
 	}
@@ -739,10 +698,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can append strings, current element and a defined variable in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -750,39 +705,36 @@ class ETLTransformSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 					extract 'vendor name' transform with lowercase() set myLocalVar
 					extract 'location' transform with append('-', myLocalVar, '-' , CE ) load 'description'
-				}""".stripIndent(),
-				ETLProcessor.class.name)
+				}""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center-microsoft-ACME Data Center'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center-microsoft-ACME Data Center'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center-mozilla-ACME Data Center'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center-mozilla-ACME Data Center'
+					}
 				}
 			}
+
 	}
 
 	void 'test can append strings and elements in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -790,29 +742,29 @@ class ETLTransformSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
 						extract 'location' transform with append(' - ', myLocalVar, ' - ') load 'description'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - microsoft - '
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - microsoft - '
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - mozilla - '
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - mozilla - '
+					}
 				}
 			}
 	}
@@ -820,10 +772,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use a set element in a transformation using local variables'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -831,29 +779,29 @@ class ETLTransformSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
 						extract 'vendor name' transform with lowercase() set myLocalVar
 						extract 'location' transform with append(' - ', myLocalVar) load 'description'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - microsoft'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - microsoft'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'ACME Data Center - mozilla'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'ACME Data Center - mozilla'
+					}
 				}
 			}
 	}
@@ -861,10 +809,6 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use a set element in a transformation closure'() {
 
 		given:
-			ETLFieldsValidator validator = new DomainClassFieldsValidator()
-			validator.addAssetClassFieldsSpecFor(ETLDomain.Application, buildFieldSpecsFor(AssetClass.APPLICATION))
-
-		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
 				applicationDataSet,
@@ -872,8 +816,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				validator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					read labels
 					domain Application
 					iterate {
@@ -882,21 +825,22 @@ class ETLTransformSpec extends ETLBaseSpec {
 						} load 'description'
 								  
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Results should contain domain results associated'
-			etlProcessor.result.domains.size() == 1
-			with(etlProcessor.result.domains[0]) {
-				domain == 'Application'
-				with(data[0].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'acme data center**'
-				}
+			with(etlProcessor.resultsMap()) {
+				domains.size() == 1
+				with(domains[0]) {
+					domain == 'Application'
+					with(data[0].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'acme data center**'
+					}
 
-				with(data[1].fields.description) {
-					originalValue == 'ACME Data Center'
-					value == 'acme data center**'
+					with(data[1].fields.description) {
+						originalValue == 'ACME Data Center'
+						value == 'acme data center**'
+					}
 				}
 			}
 	}
@@ -907,22 +851,20 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' transform with sanitize() load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft~+Inc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla++~Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -932,22 +874,20 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' transform with trim() load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getRow(0).getElement(1).value == "Microsoft\b\nInc"
-			etlProcessor.getRow(0).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(0).getElement(1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getRow(1).getElement(1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getRow(1).getElement(1).fieldSpec.name == "appVendor"
+			etlProcessor.getRow(1).getElement(1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -957,8 +897,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					trim on
 					replace 'Inc', 'Incorporated'
 					domain Application
@@ -966,15 +905,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 					iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nIncorporated"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Incorporated"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can transform globally a field value using replace command using a range in the iteration'() {
@@ -983,8 +921,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					trim on
 					replace ControlCharacters with '~'
 					domain Application
@@ -992,12 +929,11 @@ class ETLTransformSpec extends ETLBaseSpec {
 					from 1 to 2 iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 	}
 
 	void 'test can turn on globally trim command to remove leading and trailing whitespaces'() {
@@ -1006,23 +942,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 						trim on
 						domain Application
 						read labels
 						iterate {
 							extract 'vendor name' load 'appVendor'
 						}
-					""".stripIndent(),
-				ETLProcessor.class.name)
+					""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -1032,23 +966,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					trim on
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft\b\nInc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla\t\t\0Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 
 	}
 
@@ -1058,23 +990,21 @@ class ETLTransformSpec extends ETLBaseSpec {
 			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), nonSanitizedDataSet, debugConsole, applicationFieldsValidator)
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(this.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					sanitize on
 					domain Application
 					read labels
 					iterate {
 						extract 'vendor name' load 'appVendor'
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every field property is assigned to the correct element'
 			etlProcessor.getElement(0, 1).value == "Microsoft~+Inc"
-			etlProcessor.getElement(0, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(0, 1).fieldDefinition.name == "appVendor"
 
 			etlProcessor.getElement(1, 1).value == "Mozilla++~Inc"
-			etlProcessor.getElement(1, 1).fieldSpec.name == "appVendor"
+			etlProcessor.getElement(1, 1).fieldDefinition.name == "appVendor"
 	}
 
 
@@ -1085,15 +1015,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'device id' transform with toLong()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'Every column for every row is transformed with middle 2 transformation'
 			etlProcessor.getElement(0, 0).value == 152254l
@@ -1108,15 +1036,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
-			new GroovyShell(etlProcessor.class.classLoader, etlProcessor.binding)
-				.evaluate("""
+			etlProcessor.evaluate("""
 					domain Device
 					read labels
 					iterate {
 						extract 'device id' transform with toInteger() uppercase()
 					}
-				""".stripIndent(),
-				ETLProcessor.class.name)
+				""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException

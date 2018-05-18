@@ -1,4 +1,6 @@
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.event.ImportBatchJobSchedulerEvent
+import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.IdsCommand
@@ -39,8 +41,9 @@ class WsImportBatchController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.DataTransferBatchView)
 	def fetchImportBatch(Long id) {
-		ImportBatch importBatch = fetchDomain(ImportBatch, [id:id]) as ImportBatch
-		renderSuccessJson(importBatch.toMap())
+		Project project = getProjectForWs()
+		Map batchMap = importBatchService.findBatch(project, id)
+		renderSuccessJson(batchMap)
 	}
 
 	/**
@@ -92,11 +95,10 @@ class WsImportBatchController implements ControllerMethods {
 				break
 
 			case ImportBatchActionEnum.QUEUE:
-				// impacted = importBatchService.queueBatchesForProcessing(project, actionCmd.ids)
-				//
-				// For the time being we are calling the process batch directly but this eventually will be done by
-				// triggering a Quartz job.
-				impacted = dataImportService.processBatch(project, actionCmd.ids[0])
+				ImportBatchJobSchedulerEventDetails importBatchJobSchedulerEventDetails =
+						new ImportBatchJobSchedulerEventDetails(project.id, actionCmd.ids[0], securityService.currentUsername)
+				publishEvent(new ImportBatchJobSchedulerEvent(importBatchJobSchedulerEventDetails))
+				impacted = 1
 				break
 
 			case ImportBatchActionEnum.EJECT:
@@ -138,7 +140,14 @@ class WsImportBatchController implements ControllerMethods {
 				affected = importBatchService.toggleIgnoreOnRecords(importBatch, actionCmd.ids, false)
 				break
 
-			case ImportRecordActionEnum.PROCESS:
+			case ImportRecordActionEnum.PROCESS: // TODO: change to Queue when implementing TM-10242 Quartz-Task
+				// Need to mark the batch as QUEUED before trying to Schedule because the client upon returning
+				// from this call will immediately call back to get the details of the batch. Because the scheduling
+				// is done async the client is getting the data quicker than the event invocation can happen and the
+				// UI doesn't show the status change.
+				importBatchService.queueBatchesForProcessing(project, [id])
+
+				// Now schedule the background job to run
 				affected = importBatchService.dataImportService.processBatch(importBatch.project, importBatch.id, actionCmd.ids)
 				break
 
@@ -147,7 +156,7 @@ class WsImportBatchController implements ControllerMethods {
 				return
 		}
 
-		dataImportService.updateBatchStatus(importBatch)
+		dataImportService.updateBatchStatus(importBatch.id)
 		renderSuccessJson( (actionCmd.action.toString()) : affected )
 	}
 

@@ -111,11 +111,11 @@
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
 
-                <g:if test="${!(etlProcessor?.result)}">
+                <g:if test="${!(etlProcessor?.resultsMap())}">
                     <h2>Note Results yet</h2>
                 </g:if>
 
-                <g:each in="${etlProcessor?.result?.domains}" var="resultsRow">
+                <g:each in="${etlProcessor?.resultsMap()?.domains}" var="resultsRow">
                     <h3>Results for Domain ${resultsRow.domain}</h3>
 
                     <div class="table-responsive">
@@ -158,8 +158,8 @@
                             </tr>
                             <g:each in="${etlProcessor?.rows}" var="row">
                                 <tr>
-                                    <g:each in="${row.elements}" var="element">
-                                        <td>${element.value}</td>
+                                    <g:each in="${row.dataSetValues}" var="element">
+                                        <td>${element}</td>
                                     </g:each>
                                 </tr>
                             </g:each>

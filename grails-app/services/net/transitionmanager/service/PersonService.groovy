@@ -689,18 +689,21 @@ class PersonService implements ServiceMethods {
 
 		int cleared = 0
 		boolean deleted = false
-		String messages = []
+		def messages = []
 
 		UserLogin userLogin = person.userLogin
 
 		// Determine if person can be deleted based on if there are key referenced or if there is a user account for the person
 		boolean isDeletable = true
 		if (! deleteIfAssocWithAssets && hasKeyReferences(person)) {
-			messages << "$person was unable to be delete due to being associated with assets"
+			messages << "$person was unable to be deleted due to being associated with assets"
 			isDeletable = false
 		}
 		if (userLogin && !deleteIfUserLogin) {
-			messages << "$person was unable to be delete due to having user login account"
+			messages << "$person was unable to be deleted due to having an associated UserLogin account"
+			isDeletable = false
+		} else if (userLogin == securityService.userLogin) {
+			messages << "You cannot delete your own user login account while logged in with it"
 			isDeletable = false
 		}
 		if (person.isSystemUser()) {
@@ -790,7 +793,7 @@ class PersonService implements ServiceMethods {
 					Person person = validatePersonAccess(id, byWhom)
 					if (person) {
 						// Deletes the person and other related entities.
-						Map deleteResultMap = deletePerson(byWhom, person, true, deleteIfAssocWithAssets)
+						Map deleteResultMap = deletePerson(byWhom, person, false, deleteIfAssocWithAssets)
 						// Updates variables that comput different results.
 						cleared += deleteResultMap.cleared
 						if (deleteResultMap.deleted) {
@@ -799,7 +802,7 @@ class PersonService implements ServiceMethods {
 							skipped++
 						}
 						log.info("bulkDelete() ${deleteResultMap["messages"]}")
-						messages << deleteResultMap["messages"]
+						messages.addAll(deleteResultMap["messages"])
 
 					} else {
 						messages << 'Invalid ID(s) were submitted in the request'
