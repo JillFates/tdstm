@@ -26,6 +26,7 @@ export function DatabaseEditComponent(template, editModel) {
 	}) class DatabaseShowComponent implements OnInit {
 
 		private dateFormat: string;
+		private isDependenciesValidForm = true;
 
 		constructor(
 			@Inject('model') private model: any,
@@ -93,6 +94,15 @@ export function DatabaseEditComponent(template, editModel) {
 					{ provide: 'ASSET', useValue: assetClass }],
 				'lg');
 		}
+
+		/**
+		 * Validate if the current content of the Dependencies is correct
+		 * @param {boolean} invalidForm
+		 */
+		public onDependenciesValidationChange(validForm: boolean): void {
+			this.isDependenciesValidForm = validForm;
+		}
+
 	}
 	return DatabaseShowComponent;
 }

@@ -436,13 +436,13 @@
             <!-- Dependencies -->
             <tr id="deps">
                 <td valign="top" colspan="2">
-                    <tds-supports-depends [(model)]="model"></tds-supports-depends>
+                    <tds-supports-depends [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
                 </td>
             </tr>
         </table>
     </div>
     <div class="modal-footer form-group-center">
-        <button class="btn btn-primary pull-left" type="button" (click)="onUpdate()"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
+        <button class="btn btn-primary pull-left" type="button" (click)="onUpdate()" [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Update</button>
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <button class="btn btn-danger pull-left mar-left-50" (click)="onDelete()" type="button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
         </tds:hasPermission>
