@@ -125,6 +125,8 @@ class WsImportBatchController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.DataTransferBatchProcess)
 	def patchActionOnBatchRecords(Long id) {
+		Project project = getProjectForWs()
+
 		PatchActionCommand actionCmd = populateCommandObject(PatchActionCommand) as PatchActionCommand
 		validateCommandObject(actionCmd)
 
