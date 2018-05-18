@@ -271,12 +271,23 @@ class AssetEntityAttributeLoaderService implements ServiceMethods {
 				displayTeam = assetEntityList[assetRow][sourceTeamType.get(role)]?.teamCode
 			}
 			def assetEntityInstance = AssetEntity.get(assetEntityList[assetRow].id)
-			assetEntity <<[id            :assetEntityInstance.id, assetName:assetEntityInstance.assetName, model:assetEntityInstance?.model?.toString(),
-			               sourceLocation:assetEntityInstance.sourceLocationName, sourceRack:assetEntityInstance.sourceRackName,
-			               targetLocation:assetEntityInstance.targetLocationName, targetRack:assetEntityInstance.targetRackName,
-			               sourcePosition:assetEntityInstance?.sourceRackPosition, targetPosition:assetEntityInstance?.targetRackPosition,
-			               uSize         :assetEntityInstance?.model?.usize, team:displayTeam, cart:assetEntityList[assetRow]?.cart,
-			               shelf         :assetEntityList[assetRow]?.shelf, projectTeam:projectTeam, assetTag:assetEntityInstance?.assetTag]
+			assetEntity << [
+				id: assetEntityInstance.id,
+				assetName: assetEntityInstance.assetName,
+				model: assetEntityInstance?.model?.toString(),
+			    sourceLocation: assetEntityInstance.sourceLocationName,
+				sourceRack: assetEntityInstance.sourceRackName,
+				targetLocation: assetEntityInstance.targetLocationName,
+				targetRack: assetEntityInstance.targetRackName,
+				sourcePosition: assetEntityInstance?.sourceRackPosition,
+				targetPosition: assetEntityInstance?.targetRackPosition,
+				uSize: assetEntityInstance?.model?.usize,
+				team: displayTeam,
+				cart: assetEntityList[assetRow]?.cart,
+				shelf: assetEntityList[assetRow]?.shelf,
+				projectTeam: projectTeam,
+				assetTag: assetEntityInstance?.assetTag
+			]
 		}
 		return assetEntity
 	}
