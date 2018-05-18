@@ -4,7 +4,8 @@
     <i aria-hidden="true" class="fa"
        [ngClass]="{'fa-thumbs-o-up': model.state == checkActionModel.UNKNOWN,
        'fa-check green': model.state == checkActionModel.VALID,
-       'fa-thumbs-down red': model.state == checkActionModel.INVALID }">
+       'fa-thumbs-down red': model.state == checkActionModel.INVALID,
+       'fa-fw fa-spinner fast-right-spinner': model.state == checkActionModel.IN_PROGRESS}">
     </i>
     <span *ngIf="name" style="margin-right: 3px;"> {{name}} </span>
 </button>

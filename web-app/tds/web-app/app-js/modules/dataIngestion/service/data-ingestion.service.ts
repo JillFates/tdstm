@@ -18,6 +18,7 @@ import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
+import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 
 const DATA_SCRIPT_SIZE_PREFERENCE = 'DataScriptSize';
 const UNITS_SIZE_SEPARATOR = 'x';
@@ -26,6 +27,7 @@ const UNITS_SIZE_SEPARATOR = 'x';
 export class DataIngestionService {
 
 	private dataDefaultUrl = '../ws';
+	private jobProgressUrl = '../ws/progress/';
 	private dataApiActionUrl = '../ws/apiAction';
 	private dataIngestionUrl = '../ws/dataingestion';
 	private dataScriptUrl = '../ws/dataScript';
@@ -592,10 +594,16 @@ export class DataIngestionService {
 			.catch((error: any) => error.json());
 	}
 
+	/**
+	 * POST - this will create a progress job for the test script process.
+	 * @param {string} script
+	 * @param {string} filename
+	 * @returns {Observable<any>}
+	 */
 	testScript(script: string, filename: string): Observable<any> {
 		let postRequest = {
 			script: script,
-			fileName: filename
+			filename: filename
 		};
 		return this.http.post(`${this.dataScriptUrl}/testScript`, JSON.stringify(postRequest))
 			.map((res: Response) => {
@@ -761,4 +769,15 @@ export class DataIngestionService {
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
 	}
 
+	/**
+	 * GET - Gets any job current progresss based on progressKey used as a unique job identifier.
+	 * @param {string} progressKey
+	 * @returns {Observable<ApiResponseModel>}
+	 */
+	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
+		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
+			.map((res: Response) => {
+				return res.json();
+			}).catch((error: any) => error.json());
+	}
 }
