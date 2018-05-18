@@ -247,7 +247,10 @@ class DataImportService implements ServiceMethods {
 				statusCode: DataTransferBatch.PENDING,
 				transferMode: "I",
 				eavEntityType: eavEntityType,
-				dataTransferSet: dts
+				dataTransferSet: dts,
+
+				// Make an assumption that the export time was now...
+				exportDatetime: new Date()
 			)
 
 		// Check if the transfer batch is valid, report the error if not.
@@ -340,6 +343,7 @@ class DataImportService implements ServiceMethods {
 	private void importRow(session, Object batch, JSONObject rowData, Map importContext ) {
 		boolean importOfRowOkay = false
 		Long domainId = getAndValidateDomainId(rowData, importContext)
+		log.debug "importRow() id={}", domainId
 		if (importContext.isLegacy) {
 			if (domainId == null || domainId > 0) {
 				importOfRowOkay = insertRowDataIntoDataTransferValues(session, batch, rowData, domainId, importContext)

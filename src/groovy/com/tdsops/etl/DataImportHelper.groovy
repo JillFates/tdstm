@@ -245,7 +245,7 @@ class DataImportHelper {
 			}
 
 			// First check if there are any results from find/elseFind
-			int resultsFound = idField?.find?.results?.size()
+			Integer resultsFound = idField?.find?.results?.size()
 			if (resultsFound > 0) {
 				if (resultsFound == 1) {
 					id = idField.find.results[0]
