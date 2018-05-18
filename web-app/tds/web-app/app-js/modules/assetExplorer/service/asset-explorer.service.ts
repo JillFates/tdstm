@@ -357,7 +357,10 @@ export class AssetExplorerService {
 					delete support.id;
 				}
 			});
+		} else {
+			dependencies = [];
 		}
+
 		return dependencies;
 	}
 }

@@ -39,7 +39,7 @@
                 </button>
                 <button (click)="onAddEditComment(dataItem)"
                         class="btn btn-action btn-default btn-comment"
-                        title="Delete">
+                        title="Comments">
                     <i class="fa fa-fw fa-comment-o"></i>
                     <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
                     <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
@@ -152,7 +152,7 @@
                 </button>
                 <button (click)="onAddEditComment(dataItem)"
                         class="btn btn-action btn-default btn-comment"
-                        title="Delete">
+                        title="Comments">
                     <i class="fa fa-fw fa-comment-o"></i>
                     <span class="glyphicon" [ngClass]="{'glyphicon-plus': dataItem.comment?.length <= 0}"></span>
                     <span class="glyphicon" [ngClass]="{'glyphicon-pencil': dataItem.comment?.length > 0}"></span>
@@ -222,5 +222,5 @@
         </ng-template>
 
     </kendo-grid-column>
-    <kendo-grid-messages noRecords="There are no Dependency Assets to display."> </kendo-grid-messages>
+    <kendo-grid-messages noRecords="There are no Dependent Assets to display."> </kendo-grid-messages>
 </kendo-grid>
